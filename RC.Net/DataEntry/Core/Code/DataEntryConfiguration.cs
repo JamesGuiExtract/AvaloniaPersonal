@@ -1,11 +1,15 @@
 ﻿using Extract.Database;
 using Extract.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using System.Xml;
 using System.Xml.XPath;
 using UCLID_AFUTILSLib;
@@ -31,7 +35,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Protects access to non-thread-safe code.
         /// </summary>
-        static object _lock = new object();
+        object _lock = new object();
 
         /// <summary>
         /// The configuration settings specified via config file.
@@ -61,9 +65,26 @@ namespace Extract.DataEntry
         /// </summary>
         FileProcessingDB _fileProcessingDB;
 
+        /// <summary>
+        /// The <see cref="BackgroundFieldModel"/>s to use for performing background data loads.
+        /// </summary>
+        IEnumerable<BackgroundFieldModel> _backgroundFieldModels;
+
+        /// <summary>
+        /// <c>true</c> if this configuration is for background data loading; otherwise <c>false</c>.
+        /// </summary>
+        bool _isBackgroundConfig;
+
         #endregion Fields
 
         #region Constructors
+
+        /// <summary>
+        /// To be used privately only by <see cref="CreateNoUIConfiguration"/>.
+        /// </summary>
+        private DataEntryConfiguration()
+        {
+        }
 
         /// <summary>
         /// Initializes a new <see cref="DataEntryConfiguration"/> instance.
@@ -72,9 +93,11 @@ namespace Extract.DataEntry
         /// <param name="tagUtility">The <see cref="ITagUtility"/> interface provided to expand path
         /// tags/functions.</param>
         /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
+        /// <param name="isBackgroundConfig"><c>true</c> if this instance is for loading data in the
+        /// background; <c>false</c> if it is for loading data into a foreground form.</param>
         public DataEntryConfiguration(
             ConfigSettings<Extract.DataEntry.Properties.Settings> config,
-            ITagUtility tagUtility, FileProcessingDB fileProcessingDB)
+            ITagUtility tagUtility, FileProcessingDB fileProcessingDB, bool isBackgroundConfig)
         {
             try
             {
@@ -82,12 +105,12 @@ namespace Extract.DataEntry
                 _tagUtility = tagUtility;
                 _fileProcessingDB = fileProcessingDB;
 
-                // Retrieve the name of the DEP assembly
-                string dataEntryPanelFileName = DataEntryMethods.ResolvePath(
-                    config.Settings.DataEntryPanelFileName);
-
-                // Create a DataEntryControlHost instance from the specified assembly
-                _dataEntryControlHost = CreateDataEntryControlHost(dataEntryPanelFileName);
+                _isBackgroundConfig = isBackgroundConfig;
+                if (!isBackgroundConfig)
+                {
+                    // Foreground configuration; create DEP immediately.
+                    CreateDataEntryControlHost();
+                }
             }
             catch (Exception ex)
             {
@@ -96,6 +119,15 @@ namespace Extract.DataEntry
         }
 
         #endregion Constructors
+
+        #region Events
+
+        /// <summary>
+        /// Raised when the <see cref="DataEntryControlHost"/> is created.
+        /// </summary>
+        internal event EventHandler<EventArgs> PanelCreated;
+
+        #endregion Events
 
         #region Properties
 
@@ -117,8 +149,53 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _dataEntryControlHost;
+                try
+                {
+                    if (_dataEntryControlHost == null &&
+                                (!_isBackgroundConfig || !_config.Settings.SupportsNoUILoad))
+                    {
+                        CreateDataEntryControlHost();
+                    }
+
+                    return _dataEntryControlHost;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI45573");
+                }
             }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="FileProcessingDB"/> to be used by this configuration.
+        /// </summary>
+        public FileProcessingDB FileProcessingDB
+        {
+            get
+            {
+                return _fileProcessingDB;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="BackgroundFieldModel"/>s to use for performing background data loads.
+        /// </summary>
+        public IEnumerable<BackgroundFieldModel> BackgroundFieldModels
+        {
+            get
+            {
+                return _backgroundFieldModels ?? new BackgroundFieldModel[0];
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets an object with custom settings needed to perform a background load of the
+        /// current configuration.
+        /// </summary>
+        public object CustomBackgroundLoadSettings
+        {
+            get;
+            set;
         }
 
         #endregion Properties
@@ -148,7 +225,15 @@ namespace Extract.DataEntry
         {
             try
             {
-                DataEntryControlHost.SetDatabaseConnections(GetDatabaseConnections());
+                // This call ensures _dbConnections is set (even if there currently no DEP to apply
+                // them to).
+                var dbConnections = GetDatabaseConnections();
+
+                // Background configurations will defer DEP creation until needed.
+                if (!_isBackgroundConfig || !_config.Settings.SupportsNoUILoad)
+                {
+                    DataEntryControlHost.SetDatabaseConnections(dbConnections);
+                }
             }
             catch (Exception ex)
             {
@@ -164,19 +249,170 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (DataEntryControlHost != null)
+                // Background configurations will share database connections.
+                if (!_isBackgroundConfig)
                 {
-                    DataEntryControlHost.SetDatabaseConnections(null);
-                }
+                    if (DataEntryControlHost != null)
+                    {
+                        DataEntryControlHost.SetDatabaseConnections(null);
+                    }
 
-                if (_dbConnections != null)
-                {
-                    CollectionMethods.ClearAndDispose(_dbConnections);
+                    lock (_lock)
+                    {
+                        if (_dbConnections != null)
+                        {
+                            CollectionMethods.ClearAndDispose(_dbConnections);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41591");
+            }
+        }
+
+        /// <summary>
+        /// Creates a copy of this configuration with no controls to use for background data loading.
+        /// </summary>
+        public DataEntryConfiguration CreateNoUIConfiguration()
+        {
+            try
+            {
+                var configuration = new DataEntryConfiguration();
+                configuration._isBackgroundConfig = true;
+                configuration.CustomBackgroundLoadSettings = CustomBackgroundLoadSettings;
+                configuration._config = _config;
+                configuration._tagUtility = _tagUtility;
+                configuration._fileProcessingDB = _fileProcessingDB;
+                configuration._backgroundFieldModels = _backgroundFieldModels;
+
+                return configuration;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45510");
+            }
+        }
+
+        /// <summary>
+        /// Attempts to open database connection(s) for use by the DEP for validation and
+        /// auto-updates if connection information is specified in the config settings.
+        /// </summary>
+        /// <returns>A dictionary of <see cref="DbConnection"/>(s) where the key is the connection
+        /// name (blank for default). If no database connection is currently configured, any open
+        /// connection will be closed and <see langword="null"/> will returned.
+        /// </returns>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public Dictionary<string, DbConnection> GetDatabaseConnections()
+        {
+            try
+            {
+                lock (_lock)
+                {
+                    if (!_dbConnections.Any())
+                    {
+                        // Retrieve the databaseConnections XML section from the active configuration if
+                        // it exists
+                        IXPathNavigable databaseConnections = Config.GetSectionXml("databaseConnections");
+
+                        bool loadedDefaultConnection = false;
+
+                        // Parse and create/update each specified connection.
+                        XPathNavigator databaseConnectionsNode = null;
+                        if (databaseConnections != null)
+                        {
+                            databaseConnectionsNode = databaseConnections.CreateNavigator();
+
+                            if (databaseConnectionsNode.MoveToFirstChild())
+                            {
+                                do
+                                {
+                                    bool isDefaultConnection = false;
+                                    var connectionInfo =
+                                        LoadDatabaseConnection(databaseConnectionsNode, out isDefaultConnection);
+                                    connectionInfo.ShareLocalDBCopy = _isBackgroundConfig;
+
+                                    ExtractException.Assert("ELI37781",
+                                        "Multiple default connections are defined.",
+                                        !isDefaultConnection || !loadedDefaultConnection);
+
+                                    loadedDefaultConnection |= isDefaultConnection;
+
+                                    // https://extract.atlassian.net/browse/ISSUE-13385
+                                    // If this is the default connection, use the FKB version (if
+                                    // specified) to be able to expand the <ComponentDataDir> using
+                                    // _tagUtility from this point forward (including for any subsequent
+                                    // connection definitions).
+                                    if (isDefaultConnection && _tagUtility != null)
+                                    {
+                                        AddComponentDataDirTag(connectionInfo);
+                                    }
+                                }
+                                while (databaseConnectionsNode.MoveToNext());
+                            }
+                        }
+
+                        // If there was no default database connection specified via the
+                        // databaseConnections section, attempt to load it via the legacy DB properties.
+                        if (!loadedDefaultConnection)
+                        {
+                            SetDatabaseConnection("",
+                                Config.Settings.DatabaseType,
+                                Config.Settings.LocalDataSource,
+                                Config.Settings.DatabaseConnectionString);
+                        }
+                    }
+
+                    // This class keeps track of DatabaseConfigurationInfo objects for ease of
+                    // management, but the DataEntryControlHost only cares about the DbConnections
+                    // themselves; return the managed connection for each.
+                    return _dbConnections.ToDictionary(
+                        (conn) => conn.Key, (conn) => conn.Value.ManagedDbConnection);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI26159");
+            }
+        }
+
+        /// <summary>
+        /// Builds a hierarchy of <see cref="BackgroundFieldModel"/> that represent the fields in
+        /// the DEP for the specified <see paramref="config"/>.
+        /// </summary>
+        /// <param name="config">The <see cref="ConfigSettings{Properties.Settings}"/> for which field models
+        /// are to be created.</param>
+        internal void BuildFieldModels(ConfigSettings<Properties.Settings> config)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(Config.Settings.NoUILoadConfig))
+                {
+                    _backgroundFieldModels = BuildFieldModels(_dataEntryControlHost);
+                }
+                else
+                {
+                    string noUiLoadConfigFile = DataEntryMethods.ResolvePath(config.Settings.NoUILoadConfig);
+                    if (File.Exists(noUiLoadConfigFile))
+                    {
+                        string noUiLoadConfig = File.ReadAllText(noUiLoadConfigFile);
+                        _backgroundFieldModels = JsonConvert.DeserializeObject<IEnumerable<BackgroundFieldModel>>(noUiLoadConfig);
+                    }
+                    else
+                    {
+                        var fieldModels = BuildFieldModels(_dataEntryControlHost);
+                        string noUiLoadConfig =
+                            JsonConvert.SerializeObject(fieldModels, Newtonsoft.Json.Formatting.Indented);
+                        File.WriteAllText(noUiLoadConfigFile, noUiLoadConfig);
+
+                        _backgroundFieldModels = fieldModels;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45569");
             }
         }
 
@@ -211,9 +447,13 @@ namespace Extract.DataEntry
                     _dataEntryControlHost = null;
                 }
 
-                if (_dbConnections != null)
+                lock (_lock)
                 {
-                    CollectionMethods.ClearAndDispose(_dbConnections);
+                    if (_dbConnections != null)
+                    {
+                        CollectionMethods.ClearAndDispose(_dbConnections);
+                    }
+
                     _dbConnections = null;
                 }
             }
@@ -292,14 +532,17 @@ namespace Extract.DataEntry
                     SetDatabaseConnection(connectionName,
                         databaseType, localDataSource, databaseConnectionString);
 
-                // If this is the default connection, add the connection under a blank name as well
-                // (blank in _dbConnections indicates the default connection.) 
-                if (isDefaultConnection && !string.IsNullOrEmpty(connectionName))
+                lock (_lock)
                 {
-                    _dbConnections[""] = _dbConnections[connectionName];
-                }
+                    // If this is the default connection, add the connection under a blank name as well
+                    // (blank in _dbConnections indicates the default connection.) 
+                    if (isDefaultConnection && !string.IsNullOrEmpty(connectionName))
+                    {
+                        _dbConnections[""] = _dbConnections[connectionName];
+                    }
 
-                return _dbConnections[connectionName];
+                    return _dbConnections[connectionName];
+                }
             }
 
             return null;
@@ -329,108 +572,34 @@ namespace Extract.DataEntry
                     DataEntryMethods.ResolvePath(localDataSource).ToLower(CultureInfo.CurrentCulture));
             }
 
-            DatabaseConnectionInfo dbConnInfo = null;
-            if (_dbConnections.TryGetValue(name, out dbConnInfo))
+            lock (_lock)
             {
-                // If there is an existing connection by this name that differs from the newly
-                // specified one (or there is no newly specified connection) close the existing
-                // connection.
-                if (string.IsNullOrWhiteSpace(connectionString) ||
-                    Type.GetType(databaseType) != dbConnInfo.TargetConnectionType ||
-                    connectionString != dbConnInfo.ConnectionString)
+                DatabaseConnectionInfo dbConnInfo = null;
+                if (_dbConnections.TryGetValue(name, out dbConnInfo))
                 {
-                    _dbConnections.Remove(name);
-                    if (dbConnInfo != null)
+                    // If there is an existing connection by this name that differs from the newly
+                    // specified one (or there is no newly specified connection) close the existing
+                    // connection.
+                    if (string.IsNullOrWhiteSpace(connectionString) ||
+                        Type.GetType(databaseType) != dbConnInfo.TargetConnectionType ||
+                        connectionString != dbConnInfo.ConnectionString)
                     {
-                        dbConnInfo.Dispose();
-                        dbConnInfo = null;
-                    }
-                }
-            }
-
-            // Create the DatabaseConnectionInfo instance if needed.
-            if (dbConnInfo == null && !string.IsNullOrWhiteSpace(connectionString))
-            {
-                dbConnInfo = new DatabaseConnectionInfo(databaseType, connectionString);
-                dbConnInfo.UseLocalSqlCeCopy = true;
-                _dbConnections[name] = dbConnInfo;
-            }
-        }
-
-        /// <summary>
-        /// Attempts to open database connection(s) for use by the DEP for validation and
-        /// auto-updates if connection information is specified in the config settings.
-        /// </summary>
-        /// <returns>A dictionary of <see cref="DbConnection"/>(s) where the key is the connection
-        /// name (blank for default). If no database connection is currently configured, any open
-        /// connection will be closed and <see langword="null"/> will returned.
-        /// </returns>
-        Dictionary<string, DbConnection> GetDatabaseConnections()
-        {
-            try
-            {
-                if (!_dbConnections.Any())
-                {
-                    // Retrieve the databaseConnections XML section from the active configuration if
-                    // it exists
-                    IXPathNavigable databaseConnections = Config.GetSectionXml("databaseConnections");
-
-                    bool loadedDefaultConnection = false;
-
-                    // Parse and create/update each specified connection.
-                    XPathNavigator databaseConnectionsNode = null;
-                    if (databaseConnections != null)
-                    {
-                        databaseConnectionsNode = databaseConnections.CreateNavigator();
-
-                        if (databaseConnectionsNode.MoveToFirstChild())
+                        _dbConnections.Remove(name);
+                        if (dbConnInfo != null)
                         {
-                            do
-                            {
-                                bool isDefaultConnection = false;
-                                var connectionInfo =
-                                    LoadDatabaseConnection(databaseConnectionsNode, out isDefaultConnection);
-
-                                ExtractException.Assert("ELI37781",
-                                    "Multiple default connections are defined.",
-                                    !isDefaultConnection || !loadedDefaultConnection);
-
-                                loadedDefaultConnection |= isDefaultConnection;
-
-                                // https://extract.atlassian.net/browse/ISSUE-13385
-                                // If this is the default connection, use the FKB version (if
-                                // specified) to be able to expand the <ComponentDataDir> using
-                                // _tagUtility from this point forward (including for any subsequent
-                                // connection definitions).
-                                if (isDefaultConnection && _tagUtility != null)
-                                {
-                                    AddComponentDataDirTag(connectionInfo);
-                                }
-                            }
-                            while (databaseConnectionsNode.MoveToNext());
+                            dbConnInfo.Dispose();
+                            dbConnInfo = null;
                         }
                     }
-
-                    // If there was no default database connection specified via the
-                    // databaseConnections section, attempt to load it via the legacy DB properties.
-                    if (!loadedDefaultConnection)
-                    {
-                        SetDatabaseConnection("",
-                            Config.Settings.DatabaseType,
-                            Config.Settings.LocalDataSource,
-                            Config.Settings.DatabaseConnectionString);
-                    }
                 }
 
-                // This class keeps track of DatabaseConfigurationInfo objects for ease of
-                // management, but the DataEntryControlHost only cares about the DbConnections
-                // themselves; return the managed connection for each.
-                return _dbConnections.ToDictionary(
-                    (conn) => conn.Key, (conn) => conn.Value.ManagedDbConnection);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI26159");
+                // Create the DatabaseConnectionInfo instance if needed.
+                if (dbConnInfo == null && !string.IsNullOrWhiteSpace(connectionString))
+                {
+                    dbConnInfo = new DatabaseConnectionInfo(databaseType, connectionString);
+                    dbConnInfo.UseLocalSqlCeCopy = true;
+                    _dbConnections[name] = dbConnInfo;
+                }
             }
         }
 
@@ -503,32 +672,106 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Instantiates the one and only <see cref="DataEntryControlHost"/> implemented by the
-        /// specified assembly.
+        /// configuration's specified DataEntryPanelFileName.
         /// </summary>
-        /// <param name="assemblyFileName">The filename of the assembly to use.</param>
-        /// <returns>A <see cref="DataEntryControlHost"/> instantiated from the specified assembly.
-        /// </returns>
-        DataEntryControlHost CreateDataEntryControlHost(string assemblyFileName)
+        void CreateDataEntryControlHost()
         {
             try
             {
+                // Retrieve the name of the DEP assembly
+                string dataEntryPanelFileName = DataEntryMethods.ResolvePath(
+                    _config.Settings.DataEntryPanelFileName);
+
                 // A variable to store the return value
                 DataEntryControlHost dataEntryControlHost =
-                    UtilityMethods.CreateTypeFromAssembly<DataEntryControlHost>(assemblyFileName);
+                    UtilityMethods.CreateTypeFromAssembly<DataEntryControlHost>(dataEntryPanelFileName);
 
                 ExtractException.Assert("ELI23676",
                     "Failed to find data entry control host implementation!", dataEntryControlHost != null);
 
                 dataEntryControlHost.Config = Config;
 
-                return dataEntryControlHost;
+                _dataEntryControlHost = dataEntryControlHost;
+
+                PanelCreated?.Invoke(this, new EventArgs());
             }
             catch (Exception ex)
             {
                 ExtractException ee = new ExtractException("ELI23677",
                     "Unable to initialize data entry control host!", ex);
-                ee.AddDebugData("Assembly Name", assemblyFileName, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Builds a hierarchy of <see cref="BackgroundFieldModel"/> that represent the fields in
+        /// the specified <see cref="controlHost"/>.
+        /// </summary>
+        /// <param name="controlHost">The <see cref="DataEntryControlHost"/> for which field models
+        /// are to be created.</param>
+        static List<BackgroundFieldModel> BuildFieldModels(DataEntryControlHost controlHost)
+        {
+            var modelDictionary = new Dictionary<object, BackgroundFieldModel>();
+            var fieldModels =
+                BuildFieldModels(controlHost, modelDictionary)
+                .ToArray();
+
+            var modelList = new List<BackgroundFieldModel>();
+            foreach (var fieldModel in fieldModels)
+            {
+                if (fieldModel.ParentAttributeControl == null)
+                {
+                    modelList.Add(fieldModel);
+                }
+                else
+                {
+                    var parentModel = modelDictionary[fieldModel.ParentAttributeControl];
+
+                    // Confirm that the parent has a name since otherwise it won't be in the fieldModels collection
+                    ExtractException.Assert("ELI45636", "Logic exception", !string.IsNullOrEmpty(parentModel.Name));
+
+                    parentModel.Children.Add(fieldModel);
+                }
+            }
+
+            return modelList;
+        }
+
+        /// <summary>
+        /// Builds a hierarchy of <see cref="BackgroundFieldModel"/> that represent the fields in
+        /// the specified <see cref="control"/> and decedent controls.
+        /// </summary>
+        /// <param name="control">The <see cref="DataEntryControlHost"/> for which field models
+        /// are to be created.</param>
+        /// <param name="modelDictionary">A dictionary that maps every parent control to its
+        /// decendent field models. Used by <see cref="BuildFieldModels{DataEntryControlHost}"/> to
+        /// organize the returned enumerations into the appropriate hierarchy for the attributes.
+        /// </param>
+        static IEnumerable<BackgroundFieldModel> BuildFieldModels(Control control,
+            Dictionary<object, BackgroundFieldModel> modelDictionary)
+        {
+            var thisDataEntryControl = control as IDataEntryControl;
+            if (thisDataEntryControl != null)
+            {
+                var fieldModel = thisDataEntryControl.GetBackgroundFieldModel();
+                if (fieldModel != null)
+                {
+                    modelDictionary[control] = fieldModel;
+                    // Don't create unnamed models
+                    // https://extract.atlassian.net/browse/ISSUE-15300
+                    if (!string.IsNullOrEmpty(fieldModel.Name))
+                    {
+                        yield return fieldModel;
+                    }
+                }
+            }
+
+            foreach (var childControl in control.Controls.OfType<Control>())
+            {
+                foreach (var fieldModel in BuildFieldModels(childControl, modelDictionary))
+                {
+                    yield return fieldModel;
+                }
             }
         }
 

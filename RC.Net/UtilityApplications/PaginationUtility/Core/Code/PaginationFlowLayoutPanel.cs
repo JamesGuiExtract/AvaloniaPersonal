@@ -23,9 +23,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _allowScrollToControl;
 
         /// <summary>
-        /// A control that should be scrolled to after the next _layoutEngine has executed a pending layout.
+        /// A control that should be scrolled to after the next _layoutEngine has executed a pending
+        /// layout paired with a boolean that indicates whether the scroll should be executed such
+        /// that is leaves the control flush with the top of the view (if possible).
         /// </summary>
-        Control _scrollToControl;
+        (Control control, bool flushWithTop) _scrollToControl;
 
         /// <summary>
         /// The <see cref="PaginationLayoutEngine"/> that manages the layout of the
@@ -53,22 +55,32 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Allows the specified <see paramref="control"/> to be manually scrolled into into view.
         /// </summary>
         /// <param name="control">The <see cref="Control"/> to be scrolled into view.</param>
-        public void ScrollControlIntoViewManual(Control control)
+        /// <param name="flushWithTop"><c>true</c> if the scroll should be executed such that is
+        /// leaves the control flush with the top of the view (if possible).</param>
+        public void ScrollControlIntoViewManual(Control control, bool flushWithTop)
         {
             try
             {
                 if (_layoutEngine.LayoutPending)
                 {
                     // If the scroll is commanded before a layout, the end result may not have the
-                    // control in view after all. Wait until the layout has completed before
+                    // control in view after all. Wait the layout has completed before
                     // executing the scroll.
-                    _scrollToControl = control;
+                    _scrollToControl = (control, flushWithTop);
                 }
                 else
                 {
                     _allowScrollToControl = true;
 
-                    base.ScrollControlIntoView(control);
+                    if (flushWithTop)
+                    {
+                        _layoutEngine.SnapToControl = control;
+                        PerformLayout();
+                    }
+                    else
+                    {
+                        base.ScrollControlIntoView(control);
+                    }
                 }   
             }
             catch (Exception ex)
@@ -126,6 +138,29 @@ namespace Extract.UtilityApplications.PaginationUtility
             return base.ScrollToControl(activeControl);
         }
 
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="T:System.Windows.Forms.Control" /> and its child controls and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (disposing)
+            {
+                try
+                {
+                    // Dispose of managed resources
+                    if (_layoutEngine != null)
+                    {
+                        _layoutEngine.Dispose();
+                        _layoutEngine = null;
+                    }
+                }
+                catch { }
+            }
+        }
+
         #endregion Overrides
 
         #region Event Handlers
@@ -140,11 +175,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (_scrollToControl != null)
+                if (_scrollToControl.control != null)
                 {
-                    var control = _scrollToControl;
-                    _scrollToControl = null;
-                    ScrollControlIntoViewManual(control);
+                    var control = _scrollToControl.control;
+                    bool flushWithTop = _scrollToControl.flushWithTop;
+                    _scrollToControl = (null, false);
+                    if (control.Visible)
+                    {
+                        ScrollControlIntoViewManual(control, flushWithTop);
+                    }
                 }
             }
             catch (Exception ex)

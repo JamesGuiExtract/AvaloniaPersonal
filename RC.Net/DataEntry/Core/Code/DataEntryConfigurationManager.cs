@@ -1,4 +1,5 @@
-﻿using Extract.FileActionManager.Forms;
+﻿using Extract.AttributeFinder;
+using Extract.FileActionManager.Forms;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
 using System;
@@ -6,10 +7,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Globalization;
+using System.Linq;
 using System.Windows.Forms;
 using System.Xml.XPath;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.DataEntry
 {
@@ -33,6 +36,11 @@ namespace Extract.DataEntry
         /// expand path tags/functions.
         /// </summary>
         ITagUtility _tagUtility;
+
+        /// <summary>
+        /// An <see cref="IPathTags"/> interface for <see cref="_tagUtility"/>.
+        /// </summary>
+        IPathTags _pathTags;
 
         /// <summary>
         /// A map of defined document types to the configuration to be used.
@@ -91,6 +99,11 @@ namespace Extract.DataEntry
         /// </summary>
         IAttribute _documentTypeAttribute;
 
+        /// <summary>
+        /// The master configuration file name
+        /// </summary>
+        string _masterConfigFileName;
+
         #endregion Fields
 
         #region Constructors
@@ -128,6 +141,11 @@ namespace Extract.DataEntry
         #endregion Constructors
 
         #region Events
+
+        /// <summary>
+        /// Raised when each of this instances <see cref="DataEntryConfiguration"/>s has finished initializing.
+        /// </summary>
+        public event EventHandler<ConfigurationInitializedEventArgs> ConfigurationInitialized;
 
         /// <summary>
         /// Raised when the active configuration is about to change (initial load or when doc type
@@ -181,6 +199,19 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets all the <see cref="DataEntryConfiguration"/>s.
+        /// </summary>
+        public IEnumerable<DataEntryConfiguration> Configurations
+        {
+            get
+            {
+                return (_documentTypeConfigurations == null)
+                    ? new[] { DefaultDataEntryConfiguration }
+                    : _documentTypeConfigurations.Values.OfType<DataEntryConfiguration>();
+            }
+        }
+
+        /// <summary>
         /// Gets/sets the attributes used to determine the current data configuration.
         /// </summary>
         public IUnknownVector Attributes
@@ -194,6 +225,12 @@ namespace Extract.DataEntry
                 _attributes = value;
             }
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is a background manager for
+        /// loading document status information.
+        /// </summary>
+        public bool IsBackgroundManager { get; set; }
 
         #endregion Properties
 
@@ -226,6 +263,8 @@ namespace Extract.DataEntry
         {
             try
             {
+                _masterConfigFileName = masterConfigFileName;
+
                 // Retrieve the documentTypeConfigurations XML section if it exists
                 IXPathNavigable documentTypeConfiguration =
                     _applicationConfig.GetSectionXml("documentTypeConfigurations");
@@ -240,7 +279,7 @@ namespace Extract.DataEntry
                 // use the master config file as the one and only configuration.
                 if (configurationNode == null || !configurationNode.MoveToFirstChild())
                 {
-                    _defaultDataEntryConfig = LoadDataEntryConfiguration(masterConfigFileName, null);
+                    _defaultDataEntryConfig = LoadDataEntryConfiguration(masterConfigFileName);
                     ChangeActiveDocumentType(null, true);
                     return;
                 }
@@ -301,8 +340,7 @@ namespace Extract.DataEntry
 
                     configFileName = DataEntryMethods.ResolvePath(configFileName);
 
-                    DataEntryConfiguration config =
-                        LoadDataEntryConfiguration(configFileName, masterConfigFileName);
+                    DataEntryConfiguration config = LoadDataEntryConfiguration(configFileName);
                     if (defaultConfiguration)
                     {
                         _defaultDataEntryConfig = config;
@@ -337,7 +375,7 @@ namespace Extract.DataEntry
                             throw ee;
                         }
 
-                        _documentTypeComboBox.Items.Add(documentType);
+                        _documentTypeComboBox?.Items.Add(documentType);
                         _documentTypeConfigurations[documentType] = config;
                     }
                     while (documentTypeNode.MoveToNext());
@@ -345,11 +383,78 @@ namespace Extract.DataEntry
                 while (configurationNode.MoveToNext());
 
                 // Register to be notified when the user selects a new document type.
-                _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeSelectedIndexChanged;
+                if (_documentTypeConfigurations != null)
+                {
+                    _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeSelectedIndexChanged;
+                }
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41595");
+            }
+        }
+
+        /// <summary>
+        /// Creates a copy of this instance for use in background data loading.
+        /// </summary>
+        public DataEntryConfigurationManager<T> CreateBackgroundManager()
+        {
+            try
+            {
+                var manager = new DataEntryConfigurationManager<T>(
+                    new NullDataEntryApp(), _tagUtility, _applicationConfig, null, null);
+
+                manager.IsBackgroundManager = true;
+                manager.ChangeActiveDocumentType(null, true);
+
+                if (_documentTypeConfigurations != null)
+                {
+                    manager._documentTypeConfigurations = new Dictionary<string, DataEntryConfiguration>();
+
+                    foreach (var configuration in _documentTypeConfigurations)
+                    {
+                        var backgroundConfig = CreateBackgroundConfiguration(configuration.Value);
+
+                        manager._documentTypeConfigurations[configuration.Key] = backgroundConfig;
+
+                        // Initialize active and default configurations
+                        if (_activeDataEntryConfig == configuration.Value)
+                        {
+                            manager._activeDataEntryConfig = backgroundConfig;
+                        }
+                        if (_defaultDataEntryConfig == configuration.Value)
+                        {
+                            manager._defaultDataEntryConfig = backgroundConfig;
+                        }
+
+                        backgroundConfig.PanelCreated += BackgroundConfig_PanelCreated;
+                    }
+                }
+                else
+                {
+                    manager._defaultDataEntryConfig = CreateBackgroundConfiguration(_defaultDataEntryConfig);
+                    manager._activeDataEntryConfig = manager._defaultDataEntryConfig;
+
+                    manager._defaultDataEntryConfig.PanelCreated += BackgroundConfig_PanelCreated;
+                }
+
+                // _pathTags needed for AttributeStatusInfo.ExecuteNoUILoad so that workflow-specific
+                // tags are available
+                // https://extract.atlassian.net/browse/ISSUE-15297
+                if (_dataEntryApp.FileProcessingDB != null)
+                {
+                    var famPathTags = new FileActionManagerPathTags();
+                    famPathTags.DatabaseServer = _dataEntryApp.FileProcessingDB.DatabaseServer;
+                    famPathTags.DatabaseName = _dataEntryApp.FileProcessingDB.DatabaseName;
+                    famPathTags.Workflow = _dataEntryApp.FileProcessingDB.ActiveWorkflow;
+                    manager._pathTags = famPathTags;
+                }
+
+                return manager;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45509");
             }
         }
 
@@ -460,18 +565,17 @@ namespace Extract.DataEntry
         /// <param name="masterConfigFileName">If not <see langword="null"/>, the configuration that
         /// may provide defaults for DataEntry and objectSettings config file values.</param>
         /// <returns>The loaded <see cref="DataEntryConfiguration"/>.</returns>
-        DataEntryConfiguration LoadDataEntryConfiguration(string configFileName,
-            string masterConfigFileName)
+        DataEntryConfiguration LoadDataEntryConfiguration(string configFileName)
         {
             try
             {
                 // Load the configuration settings from file.
                 ConfigSettings<Extract.DataEntry.Properties.Settings> config =
                     new ConfigSettings<Extract.DataEntry.Properties.Settings>(
-                        configFileName, masterConfigFileName, false, false, _tagUtility);
+                        configFileName, _masterConfigFileName, false, false, _tagUtility);
 
                 DataEntryConfiguration configuration =
-                    new DataEntryConfiguration(config, _tagUtility, _dataEntryApp.FileProcessingDB);
+                    new DataEntryConfiguration(config, _tagUtility, _dataEntryApp.FileProcessingDB, false);
 
                 // Tie the newly created DEP to this application and its ImageViewer.
                 configuration.DataEntryControlHost.DataEntryApplication = _dataEntryApp;
@@ -479,15 +583,42 @@ namespace Extract.DataEntry
                 configuration.DataEntryControlHost.ImageViewer = _imageViewer;
 
                 QueryNode.QueryCacheLimit = config.Settings.QueryCacheLimit;
+                InitializePanel(configuration);
 
+                if (config.Settings.SupportsNoUILoad)
+                {
+                    configuration.BuildFieldModels(config);
+                }
+
+                OnConfigurationInitialized(configuration);
+
+                return configuration;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI30539",
+                    "Failed to load data entry configuration", ex);
+                ee.AddDebugData("Config file", configFileName, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Initializes the panel.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        void InitializePanel(DataEntryConfiguration configuration)
+        {
+            try
+            {
                 // If HighlightConfidenceBoundary settings has been specified in the config file and
                 // the controlHost has exactly two confidence tiers, use the provided value as the
                 // minimum OCR confidence value in order to highlight text as confidently OCR'd
-                if (!string.IsNullOrEmpty(config.Settings.HighlightConfidenceBoundary)
+                if (!string.IsNullOrEmpty(configuration.Config.Settings.HighlightConfidenceBoundary)
                     && configuration.DataEntryControlHost.HighlightColors.Length == 2)
                 {
                     int confidenceBoundary = Convert.ToInt32(
-                        config.Settings.HighlightConfidenceBoundary,
+                        configuration.Config.Settings.HighlightConfidenceBoundary,
                         CultureInfo.CurrentCulture);
 
                     ExtractException.Assert("ELI25684", "HighlightConfidenceBoundary settings must " +
@@ -499,25 +630,20 @@ namespace Extract.DataEntry
                     configuration.DataEntryControlHost.HighlightColors = highlightColors;
                 }
 
-                configuration.DataEntryControlHost.DisabledControls = config.Settings.DisabledControls;
+                configuration.DataEntryControlHost.DisabledControls = configuration.Config.Settings.DisabledControls;
                 configuration.DataEntryControlHost.DisabledValidationControls =
-                    config.Settings.DisabledValidationControls;
+                    configuration.Config.Settings.DisabledValidationControls;
 
                 // Apply settings from the config file that pertain to the DEP.
-                if (!string.IsNullOrEmpty(masterConfigFileName))
+                if (!string.IsNullOrEmpty(_masterConfigFileName))
                 {
                     _applicationConfig.ApplyObjectSettings(configuration.DataEntryControlHost);
                 }
-                config.ApplyObjectSettings(configuration.DataEntryControlHost);
-
-                return configuration;
+                configuration.Config.ApplyObjectSettings(configuration.DataEntryControlHost);
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI30539",
-                    "Failed to load data entry configuration", ex);
-                ee.AddDebugData("Config file", configFileName, false);
-                throw ee;
+                throw ex.AsExtract("ELI45637");
             }
         }
 
@@ -595,14 +721,17 @@ namespace Extract.DataEntry
                     GetDocumentTypeAttribute();
                     string documentType = _documentTypeAttribute?.Value.String;
 
-                    // If there is a default configuration, add the original document type to the
-                    // document type combo and allow the document to be saved with the undefined
-                    // document type.
-                    if (_defaultDataEntryConfig != null &&
-                        _documentTypeComboBox.FindStringExact(documentType) == -1)
+                    if (_documentTypeComboBox != null)
                     {
-                        _temporaryDocumentType = documentType;
-                        _documentTypeComboBox.Items.Insert(0, documentType);
+                        // If there is a default configuration, add the original document type to the
+                        // document type combo and allow the document to be saved with the undefined
+                        // document type.
+                        if (_defaultDataEntryConfig != null &&
+                            _documentTypeComboBox.FindStringExact(documentType) == -1)
+                        {
+                            _temporaryDocumentType = documentType;
+                            _documentTypeComboBox.Items.Insert(0, documentType);
+                        }
                     }
 
                     changedDocumentType = ChangeActiveDocumentType(documentType, true);
@@ -617,6 +746,78 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35079");
+            }
+        }
+
+        /// <summary>
+        /// Creates a <see cref="DataEntryConfiguration"/> to be used for background document status
+        /// loading based on the specified source <see paramref="configuration"/>.
+        /// </summary>
+        /// <param name="configuration">The <see cref="DataEntryConfiguration"/> on which this
+        /// background configuration is based.</param>
+        /// <returns></returns>
+        DataEntryConfiguration CreateBackgroundConfiguration(DataEntryConfiguration configuration)
+        {
+            // Create a background configuration as long as the configuration supports a NoUI load.
+            DataEntryConfiguration backgroundConfig = null;
+            if (configuration.Config.Settings.SupportsNoUILoad)
+            {
+                backgroundConfig = configuration.CreateNoUIConfiguration();
+            }
+            else
+            {
+                backgroundConfig = new DataEntryConfiguration(
+                    configuration.Config, _tagUtility, configuration.FileProcessingDB, true);
+            }
+
+            return backgroundConfig;
+        }
+
+        /// <summary>
+        /// Attempts to load and transform the <see paramref="attributes"/> without a UI.
+        /// </summary>
+        /// <param name="attributes">The attributes to load/transform</param>
+        /// <param name="sourceDocName">Name of the source document.</param>
+        /// <returns><c>true</c> if the data was loaded in the background; <c>false</c> if no UI
+        /// loading is not supported in this configuration.</returns>
+        public bool ExecuteNoUILoad(IUnknownVector attributes, string sourceDocName)
+        {
+            try
+            {
+                LoadCorrectConfigForData(attributes);
+                if (!ActiveDataEntryConfiguration.Config.Settings.SupportsNoUILoad)
+                {
+                    return false;
+                }
+
+                AttributeStatusInfo.ExecuteNoUILoad(attributes, sourceDocName,
+                    ActiveDataEntryConfiguration.GetDatabaseConnections(),
+                    ActiveDataEntryConfiguration.BackgroundFieldModels, _pathTags);
+
+                // While validation queries are executed by AttributeStatusInfo.ExecuteNoUILoad, the
+                // attributes are not explicitly validated. Validate all attributes here to ensure
+                // ValidationPatterns are considered.
+                // https://extract.atlassian.net/browse/ISSUE-15327
+                foreach (var attribute in attributes
+                    .ToIEnumerable<IAttribute>()
+                    .SelectMany(attribute => attribute.EnumerateDepthFirst()))
+                {
+                    if (AttributeStatusInfo.Validate(attribute, false) == DataValidity.Invalid)
+                    {
+                        // Don't prune attributes if there is invalid data; otherwise the invalid
+                        // attribute might be pruned such that the caller doesn't know of the error.
+                        // https://extract.atlassian.net/browse/ISSUE-15328
+                        return true;
+                    }
+                }
+
+                DataEntryMethods.PruneNonPersistingAttributes(attributes);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45511");
             }
         }
 
@@ -679,17 +880,20 @@ namespace Extract.DataEntry
                             SetDocumentTypeAttribute(documentType);
                         }
 
-                        if (blockedConfigurationChange ||
-                            _documentTypeComboBox.FindStringExact(documentType) == -1)
+                        if (_documentTypeComboBox != null)
                         {
-                            // The new documentType is not valid.
-                            _documentTypeComboBox.SelectedIndex = -1;
-                        }
-                        else
-                        {
-                            // Assign the new document type.
-                            _activeDocumentType = documentType;
-                            _documentTypeComboBox.Text = documentType;
+                            if (blockedConfigurationChange ||
+                                _documentTypeComboBox.FindStringExact(documentType) == -1)
+                            {
+                                // The new documentType is not valid.
+                                _documentTypeComboBox.SelectedIndex = -1;
+                            }
+                            else
+                            {
+                                // Assign the new document type.
+                                _activeDocumentType = documentType;
+                                _documentTypeComboBox.Text = documentType;
+                            }
                         }
                     }
                 }
@@ -827,6 +1031,35 @@ namespace Extract.DataEntry
                 // not be able to be correctly saved.
                 OnConfigurationChangeError(ee);
             }
+        }
+
+        /// <summary>
+        /// Handles the PanelCreated event for configurations in the background.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void BackgroundConfig_PanelCreated(object sender, EventArgs e)
+        {
+            try
+            {
+                var configuration = (DataEntryConfiguration)sender;
+
+                InitializePanel(configuration);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45638");
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ConfigurationInitialized"/> event.
+        /// </summary>
+        /// <param name="dataEntryConfig">The <see cref="DataEntryConfiguration"/> that has been initialized.
+        /// </param>
+        void OnConfigurationInitialized(DataEntryConfiguration dataEntryConfig)
+        {
+            ConfigurationInitialized?.Invoke(this, new ConfigurationInitializedEventArgs(dataEntryConfig));
         }
 
         /// <summary>

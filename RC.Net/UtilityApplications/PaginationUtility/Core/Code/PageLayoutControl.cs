@@ -46,6 +46,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// </summary>
             LockControlUpdates _controlUpdateLock;
 
+            /// <summary>
+            /// Indicates whether a full layout should be performed when this instance is disposed.
+            /// </summary>
+            bool _forceFullLayout;
+
             #endregion Fields
 
             #region Constructors
@@ -55,11 +60,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// </summary>
             /// <param name="pageLayoutControl">The <see cref="PageLayoutControl"/> for which the
             /// update is taking place.</param>
-            public PageLayoutControlUpdateLock(PageLayoutControl pageLayoutControl)
+            /// <param name="forceFullRefresh"><c>true</c> to force a full layout when layout is
+            /// resumed.</param>
+            public PageLayoutControlUpdateLock(PageLayoutControl pageLayoutControl, bool forceFullLayout = false)
             {
                 if (!pageLayoutControl._inUpdateOperation)
                 {
                     _pageLayoutControl = pageLayoutControl;
+                    _forceFullLayout = forceFullLayout;
                     pageLayoutControl._inUpdateOperation = true;
 
                     _waitCursor = new TemporaryWaitCursor();
@@ -69,6 +77,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     _controlUpdateLock =
                         new LockControlUpdates(_pageLayoutControl._flowLayoutPanel, true, true);
+
+                    
                 }
             }
 
@@ -128,6 +138,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_pageLayoutControl != null)
                         {
                             _pageLayoutControl._inUpdateOperation = false;
+                            if (_forceFullLayout)
+                            {
+                                ((PaginationLayoutEngine)_pageLayoutControl._flowLayoutPanel.LayoutEngine).ForceNextLayout = true;
+                            }
                             _pageLayoutControl._flowLayoutPanel.ResumeLayout(true);
                             _pageLayoutControl.ResumeLayout(true);
                             _pageLayoutControl.UpdateCommandStates();
@@ -215,6 +229,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// context menu commands.
         /// </summary>
         PaginationControl _commandTargetControl;
+
+        /// <summary>
+        /// The <see cref="PageThumbnailControl"/> whose page is current displayed in the
+        /// <see cref="ImageViewer"/>.
+        /// </summary>
+        PageThumbnailControl _displayedPage;
 
         /// <summary>
         /// Indicates whether an operation is in progress that might otherwise cause a document to
@@ -391,7 +411,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Indicates whether this panel should appear as having input focus.
         /// </summary>
-        public bool _indicateFocus = true;
+        bool _indicateFocus = true;
+
+        /// <summary>
+        /// Indicates when a DEP is scheduled to be "snapped" to the top of the layout control.
+        /// </summary>
+        bool _pendingSnapDataPanelToTop;
 
         #endregion Fields
 
@@ -456,12 +481,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// this instance.
         /// </summary>
         public event EventHandler<PageDeletedEventArgs> PageDeleted;
-
-        /// <summary>
-        /// Raised when not all pages from a document could be loaded without exceeding
-        /// _MAX_LOADED_PAGES.
-        /// </summary>
-        public event EventHandler<PagesPendingLoadEventArgs> PagesPendingLoad;
 
         /// <summary>
         /// Raised when references have been removed from pages and, therefore, some files may no
@@ -574,6 +593,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     var documents = _flowLayoutPanel.Controls
                         .OfType<PageThumbnailControl>()
+                        .Where(pageControl => pageControl.Document != null)
                         .Select(pageControl => pageControl.Document)
                         .Distinct();
 
@@ -744,7 +764,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             var primaryPage = PrimarySelection as PageThumbnailControl;
                             if (primaryPage != null)
                             {
-                                primaryPage.DisplayPage(ImageViewer, true);
+                                DisplayPage(primaryPage, true);
                             }
                         }
                     }
@@ -765,6 +785,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// be able to be initiated by this control.
         /// </value>
         public bool ExternalOutputOnly
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether document pages for newly loaded documents should
+        /// be collapsed by default.
+        /// </summary>
+        public bool DefaultToCollapsed
         {
             get;
             set;
@@ -1009,21 +1039,21 @@ namespace Extract.UtilityApplications.PaginationUtility
                 outputDocument = outputDocument ??
                     GetOutputDocumentFromUtility(sourceDocument.FileName);
 
-                var pagesSet = (pages == null && deletedPages == null)
+                var pagesList = (pages == null && deletedPages == null)
                     ? null
-                    : new HashSet<int>((pages ?? new int[0]).Union(deletedPages ?? new int[0]));
-                var pagesToLoad = (pagesSet == null)
+                    : new List<int>((pages ?? new int[0]).Union(deletedPages ?? new int[0]));
+                var pagesToLoad = (pagesList == null)
                     ? sourceDocument.Pages.ToArray()
                     : sourceDocument.Pages
-                        .Where(page => pagesSet
+                        .Where(page => pagesList
                             .Contains(page.OriginalPageNumber))
+                        .OrderBy(page => pagesList.IndexOf(page.OriginalPageNumber))
                         .ToArray();
 
-                bool allPagesCanBeLoaded = true;
                 if (position == -1)
                 {
                     // Handle case that loading pagesToLoad would exceed _MAX_LOADED_PAGES.
-                    allPagesCanBeLoaded = CanAllPagesBeLoaded(ref pagesToLoad);
+                    AssertAllPagesBeLoaded(pagesToLoad.Length);
                 }
 
                 // Retrieve spatialPageInfos, which will trigger auto-page rotation, only if
@@ -1056,11 +1086,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
-                // As long as all pages could be loaded and we haven't appended to the end of an
-                // existing document, indicate that if the document is output in its present
-                // form, it can simply be copied to the output path rather than require it to be
-                // re-assembled.
-                if (allPagesCanBeLoaded && !usingExistingDocument)
+                if (DefaultToCollapsed)
+                {
+                    outputDocument.Collapsed = true;
+                }
+
+                // As long as we haven't appended to the end of an existing document, indicate that
+                // if the document is output in its present form, it can simply be copied to the
+                // output path rather than require it to be re-assembled.
+                if (!usingExistingDocument)
                 {
                     outputDocument.SetOriginalForm();
                 }
@@ -1120,11 +1154,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
 
                     Control lastPageControl = _flowLayoutPanel.Controls
-                        .OfType<PageThumbnailControl>()
-                        .LastOrDefault();
+                        .OfType<PaginationControl>()
+                        .LastOrDefault()
+                        as PageThumbnailControl;
 
-                    // If insertSeparator == true and the last control is currently a page control,
-                    // we need to add a separator.
+                    // If the last control is currently a page control, we need to add a separator.
                     if (lastPageControl != null)
                     {
                         InsertPaginationControl(
@@ -1146,6 +1180,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         }
 
                         InsertPaginationControl(pageControl, index: -1);
+                    }
+
+                    if (DefaultToCollapsed)
+                    {
+                        outputDocument.Collapsed = true;
                     }
 
                     outputDocument.DocumentOutput += HandleOutputDocument_DocumentOutput;
@@ -1196,10 +1235,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                 DeleteControls(outputDocument.PageControls.ToArray());
                 outputDocument.DocumentOutput -= HandleOutputDocument_DocumentOutput;
 
-                // Remove association with separator when removing from layout
-                // to prevent bad selection state
+                // Delete and remove association with separator when removing from layout to ensure
+                // proper associations of separators to documents and to avoid bad selection states
                 // https://extract.atlassian.net/browse/ISSUE-13916
-                outputDocument.PaginationSeparator = null;
+                // https://extract.atlassian.net/browse/ISSUE-15293
+                if (outputDocument.PaginationSeparator != null)
+                {
+                    DeleteControls(new[] { outputDocument.PaginationSeparator });
+                    outputDocument.PaginationSeparator = null;
+                }
 
                 return docPosition;
             }
@@ -1337,7 +1381,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (removedPageControl.PageIsDisplayed && dispose)
                     {
-                        removedPageControl.DisplayPage(ImageViewer, false);
+                        DisplayPage(removedPageControl, false);
                     }
 
                     if (removedPageControl == _toolTipControl)
@@ -1655,7 +1699,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (position >= 0 && position < _flowLayoutPanel.Controls.Count)
+                if (position >= 0 && position < _flowLayoutPanel.Controls.OfType<PaginationControl>().Count())
                 {
                     var pageControl = _flowLayoutPanel.Controls
                         .OfType<Control>()
@@ -1785,6 +1829,26 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI44721");
+            }
+        }
+
+        /// <summary>
+        /// Snaps the active data panel so that it is flush with the top of the view by adjusting
+        /// scroll position.
+        /// </summary>
+        public void SnapDataPanelToTop()
+        {
+            try
+            {
+                if (DocumentInDataEdit.PaginationSeparator != null)
+                {
+                    _flowLayoutPanel.ScrollControlIntoViewManual(DocumentInDataEdit.PaginationSeparator,
+                        flushWithTop: true);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45750");
             }
         }
 
@@ -2301,14 +2365,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (_dropLocationIndex >= 0)
                 {
-                    using (new PageLayoutControlUpdateLock(this))
+                    var sourceLayoutControl =
+                        e.Data.GetData(_DRAG_DROP_DATA_FORMAT) as PageLayoutControl;
+                    if (sourceLayoutControl != null)
                     {
-                        var sourceLayoutControl =
-                            e.Data.GetData(_DRAG_DROP_DATA_FORMAT) as PageLayoutControl;
-                        if (sourceLayoutControl != null)
-                        {
-                            MoveSelectedControls(sourceLayoutControl, _dropLocationIndex);
-                        }
+                        MoveSelectedControls(sourceLayoutControl, _dropLocationIndex);
                     }
                 }
             }
@@ -2404,6 +2465,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                 foreach (PaginationControl control in e.RedundantControls)
                 {
                     RemovePaginationControl(control, true);
+                }
+
+                // https://extract.atlassian.net/browse/ISSUE-15414
+                // When a DEP has been opened, "snap" it to the top of the panel to help ensure the
+                // is clear about which data is currently being edited.
+                if (_pendingSnapDataPanelToTop)
+                {
+                    _pendingSnapDataPanelToTop = false;
+
+                    SnapDataPanelToTop();
+
+                    PerformLayout();
                 }
             }
             catch (Exception ex)
@@ -2595,14 +2668,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 OnLoadNextDocumentRequest();
-
-                // I cannot, for the life of me, figure out how to scroll to the bottom of
-                // _flowLayoutPanel here; nothing seems to work.
-                //                this.SafeBeginInvoke("ELI35660", () =>
-                //                {
-                //                    _flowLayoutPanel.ScrollControlIntoViewManual(_loadNextDocumentButtonControl);
-                //                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Maximum;    
-                //                });
             }
             catch (Exception ex)
             {
@@ -2669,6 +2734,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     DocumentDataPanel.PrimaryPageIsForActiveDocument =
                         (DocumentInDataEdit != null) &&
                         (DocumentInDataEdit == (_primarySelection as PageThumbnailControl)?.Document);
+
+                    // https://extract.atlassian.net/browse/ISSUE-15414
+                    // When a DEP has been opened, "snap" it to the top of the panel to help ensure the
+                    // is clear about which data is currently being edited.
+                    _pendingSnapDataPanelToTop = true;
                 }
             }
             catch (Exception ex)
@@ -2734,7 +2804,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var separator = (PaginationSeparator)sender;
                 if (separator.Collapsed)
                 {
-                    _flowLayoutPanel.ScrollControlIntoViewManual(separator);
+                    _flowLayoutPanel.ScrollControlIntoViewManual(separator, flushWithTop: false);
                 }
             }
             catch (Exception ex)
@@ -2820,9 +2890,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             bool isPageControl = control is PageThumbnailControl;
+            bool areAnyPaginationControls = _flowLayoutPanel.Controls.OfType<PaginationControl>().Any();
+
+            if (!areAnyPaginationControls && _flowLayoutPanel.Controls.Count > 0)
+            {
+                _flowLayoutPanel.Controls.Clear();
+            }
 
             // Precede the first page with a separator to serve as a header for the document.
-            if (isPageControl && _flowLayoutPanel.Controls.Count == 0)
+            if (isPageControl && !areAnyPaginationControls)
             {
                 AddPaginationControl(new PaginationSeparator(CommitOnlySelection));
             }
@@ -2879,7 +2955,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         void MoveSelectedControls(PageLayoutControl sourceLayoutControl, int targetIndex)
         {
-            using (new PageLayoutControlUpdateLock(this))
+            using (new PageLayoutControlUpdateLock(this, forceFullLayout: true))
             {
                 var primarySelection = PrimarySelection;
                 var selectedControls = sourceLayoutControl.SelectedControls
@@ -2937,7 +3013,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 newDocument.AddPage(thumbnailControl);
 
                 index++;
-                if (index == _flowLayoutPanel.Controls.Count)
+                if (index == _flowLayoutPanel.Controls.OfType<PaginationControl>().Count())
                 {
                     break;
                 }
@@ -3120,10 +3196,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         var lastSelectedPage = lastSelectedControl as PageThumbnailControl;
                         var activeSeparator = activeControl as PaginationSeparator;
-                        if (lastSelectedPage != null && activeSeparator != null)
+                        if (activeSeparator != null)
                         {
                             if (activeSeparator.Document == null
-                                || activeSeparator.Document == lastSelectedPage.Document)
+                                || activeSeparator.Document == lastSelectedPage?.Document)
                             {
                                 activeControl = lastSelectedPage;
                             }
@@ -3139,9 +3215,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Allow _lastSelectedControl to become activeControl unless the shift modifier key
                     // is down.
                     bool resetLastSelected = ((modifierKeys & Keys.Shift) == 0);
-                    // Only ever scroll to the control if a new control as been selected.
-                    scrollToControl &= (lastSelectedControl != activeControl);
-                    SelectControl(activeControl, select, resetLastSelected, scrollToControl);
+                    if (activeControl == null)
+                    {
+                        ClearSelection();
+                    }
+                    else
+                    {
+                        // Only ever scroll to the control if a new control as been selected.
+                        scrollToControl &= (lastSelectedControl != activeControl);
+                        SelectControl(activeControl, select, resetLastSelected, scrollToControl);
+                    }
                 }
             }
             catch (Exception ex)
@@ -3185,9 +3268,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 PrimarySelection = control;
 
                 // Make sure the selected control is scrolled into view.
-                if (scrollToControl && Rectangle.Intersect(ClientRectangle, control.Bounds) != control.Bounds)
+                if (scrollToControl &&
+                    control.Visible &&
+                    Rectangle.Intersect(ClientRectangle, control.Bounds) != control.Bounds)
                 {
-                    _flowLayoutPanel.ScrollControlIntoViewManual(control);
+                    _flowLayoutPanel.ScrollControlIntoViewManual(control, flushWithTop: false);
                 }
             }
             else
@@ -3264,7 +3349,31 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var pageControl = control as PageThumbnailControl;
                 if (pageControl != null && (highlight || !_preventTransientDocumentClose))
                 {
-                    pageControl.DisplayPage(ImageViewer, highlight);
+                    DisplayPage(pageControl, highlight);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Displays or closes the image associated with the specified <see paramref="pageControl"/>
+        /// in the<see cref="ImageViewer"/>.
+        /// </summary>
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> whose page should be displayed.</param>
+        /// <param name="display"><see langword="true"/> to display the image;
+        /// <see langword="false"/> to close it.</param>
+        void DisplayPage(PageThumbnailControl pageControl, bool display)
+        {
+            bool changedPage = (display != pageControl.PageIsDisplayed || pageControl != _displayedPage);
+            pageControl.DisplayPage(ImageViewer, display);
+
+            if (changedPage)
+            {
+                pageControl.Document?.PaginationSeparator?.Invalidate();
+
+                if (pageControl != _displayedPage)
+                {
+                    _displayedPage?.Document?.PaginationSeparator?.Invalidate();
+                    _displayedPage = pageControl;
                 }
             }
         }
@@ -3470,7 +3579,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _updateCommandStatesInvoked = false;
 
             int contextMenuControlIndex = (_commandTargetControl == null)
-                ? _flowLayoutPanel.Controls.Count
+                ? _flowLayoutPanel.Controls.OfType<PaginationControl>().Count()
                 : _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
 
             // Commands that operate on the active selection require there to be a selection and for
@@ -3729,7 +3838,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 if (newSelectionPosition != -1 &&
-                    newSelectionPosition < _flowLayoutPanel.Controls.Count)
+                    newSelectionPosition < _flowLayoutPanel.Controls.OfType<PaginationControl>().Count())
                 {
                     PaginationControl controlToSelect =
                         _flowLayoutPanel.Controls[newSelectionPosition] as PaginationControl;
@@ -3751,39 +3860,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// without exceeding <see cref="PaginationUtilityForm._MAX_LOADED_PAGES"/> and if not takes
         /// appropriate action (including adjusting the pages in <see paramref="pagesToLoad"/>).
         /// </summary>
-        /// <param name="pagesToLoad">The <see cref="Page"/>s to load, if possible.</param>
-        /// <returns><see langword="true"/> if all pages can be loaded; otherwise,
-        /// <see langword="false"/>.</returns>
-        bool CanAllPagesBeLoaded(ref Page[] pagesToLoad)
+        /// <param name="pageCountToLoad">The number of <see cref="Page"/>s to about to be loaded.
+        /// </param>
+        void AssertAllPagesBeLoaded(int pageCountToLoad)
         {
-            int numToLoad = PaginationUtilityForm._MAX_LOADED_PAGES - PageCount;
-            int pagesInReserveCount = 0;
-            if (numToLoad < pagesToLoad.Length)
+            int remainingPages = PaginationUtilityForm._MAX_LOADED_PAGES - PageCount;
+            if (remainingPages < pageCountToLoad)
             {
-                MessageBox.Show("No more than " +
+                throw new ExtractException("ELI45516",
+                    "No more than " +
                     PaginationUtilityForm._MAX_LOADED_PAGES.ToString(CultureInfo.CurrentCulture) +
-                    " pages may be loaded at once.\r\n\r\n" +
-                    "Some pages have not been loaded. These pages will be loaded as\r\n" +
-                    "existing pages are output or deleted.", "Page limit reached",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
-
-                pagesInReserveCount = pagesToLoad.Length - numToLoad;
-                Page[] pagesInReserve = new Page[pagesInReserveCount];
-                Array.Copy(pagesToLoad, numToLoad, pagesInReserve, 0, pagesInReserveCount);
-                Array.Resize(ref pagesToLoad, numToLoad);
-
-                foreach (Page page in pagesInReserve)
-                {
-                    // So that a source document isn't considered "processed" before all pages have
-                    // been loaded into the UI, reference all pages pending load.
-                    page.AddReference(this);
-                }
-
-                OnPagesPendingLoad(pagesInReserve);
+                    " pages may be loaded at once.\r\n\r\n");
             }
-
-            return (pagesInReserveCount == 0);
         }
 
         /// <summary>
@@ -4652,19 +4740,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (eventHandler != null)
             {
                 eventHandler(this, new PageDeletedEventArgs(page, outputDocument));
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="PagesPendingLoad"/> event.
-        /// </summary>
-        /// <param name="pagesPendingLoad">The <see cref="Page"/>s are pending to be loaded.</param>
-        void OnPagesPendingLoad(Page[] pagesPendingLoad)
-        {
-            var eventHandler = PagesPendingLoad;
-            if (eventHandler != null)
-            {
-                eventHandler(this, new PagesPendingLoadEventArgs(pagesPendingLoad));
             }
         }
 

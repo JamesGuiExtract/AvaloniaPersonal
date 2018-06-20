@@ -77,25 +77,14 @@ namespace Extract.FileActionManager.FileProcessors
         IFileRequestHandler _fileRequestHandler;
 
         /// <summary>
-        /// The ID of the file being processed.
-        /// </summary>
-        int _fileID;
-
-        /// <summary>
-        /// The name of the file being processed.
-        /// </summary>
-        string _fileName;
-
-        /// <summary>
         /// The ID of the action being processed.
         /// </summary>
         int _actionID;
 
         /// <summary>
-        /// The ID of the currently active FileTaskSession row. <see langword="null"/> if there is
-        /// no such row.
+        /// Maps source file IDs to corresponding file task session IDs
         /// </summary>
-        int? _fileTaskSessionID;
+        Dictionary<int, int> _fileTaskSessionMap = new Dictionary<int, int>();
 
         /// <summary>
         /// The <see cref="ITagUtility"/> interface of the <see cref="FAMTagManager"/> provided to
@@ -277,7 +266,11 @@ namespace Extract.FileActionManager.FileProcessors
                     = settings.OutputExpectedPaginationAttributesFiles;
                 _paginationPanel.ExpectedPaginationAttributesPath = settings.ExpectedPaginationAttributesOutputPath;
                 _paginationPanel.FileProcessingDB = FileProcessingDB;
+                _paginationPanel.DefaultToCollapsed = _settings.DefaultToCollapsed;
                 _paginationPanel.AutoRotateImages = _settings.AutoRotateImages;
+                _paginationPanel.SelectAllCheckBoxVisible = _settings.SelectAllCheckBoxVisible;
+                _paginationPanel.LoadNextDocumentVisible = _settings.LoadNextDocumentVisible;
+                _paginationPanel.SaveButtonVisible = true;
 
                 if (!string.IsNullOrWhiteSpace(paginationDocumentDataPanelAssembly))
                 {
@@ -348,6 +341,20 @@ namespace Extract.FileActionManager.FileProcessors
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the form supports displaying multiple documents
+        /// simultaneously (one for each processing thread).
+        /// </summary>
+        /// <value><c>true</c> if the form supports multiple documents, <c>false</c> if only one
+        /// document at a time can be loaded.</value>
+        public bool SupportsMultipleDocuments
+        {
+            get
+            {
+                return !_settings.SingleSourceDocumentMode;
+            }
         }
 
         /// <summary>
@@ -664,6 +671,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 _paginationPanel.LoadNextDocument += HandlePaginationPanel_LoadNextDocument;
+                _paginationPanel.FileTaskSessionIdRequest += HandlePaginationPanel_FileTaskSessionRequest;
 
                 // May be null if the an IPaginationDocumentDataPanel is not specified to be used in
                 // this workflow.
@@ -884,6 +892,11 @@ namespace Extract.FileActionManager.FileProcessors
 
                     // Without this call, after committing the top document separator bar is not updating correctly after commit.
                     _paginationPanel.Invalidate();
+
+                    if (!Focused)
+                    {
+                        FormsMethods.FlashWindow(this, true, true);
+                    }
                 }
             }
             catch (Exception ex)
@@ -936,6 +949,7 @@ namespace Extract.FileActionManager.FileProcessors
                 if (fileID > 0)
                 {
                     string fileName = FileProcessingDB.GetFileNameFromFileID(fileID);
+                    _fileTaskSessionMap[fileID] = StartFileTaskSession(fileID);
                     LoadDocumentForPagination(fileID, fileName, true);
                 }
                 else
@@ -946,6 +960,26 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI40088");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PaginationPanel.FileTaskSessionRequest"/> event of the <see cref="_paginationPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="FileTaskSessionRequestEventArgs"/> instance containing the event data.</param>
+        void HandlePaginationPanel_FileTaskSessionRequest(object sender, FileTaskSessionRequestEventArgs e)
+        {
+            try
+            {
+                if (_fileTaskSessionMap.TryGetValue(e.FileID, out int fileTaskSessionID))
+                {
+                    e.FileTaskSessionID = fileTaskSessionID;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45597");
             }
         }
 
@@ -1064,17 +1098,21 @@ namespace Extract.FileActionManager.FileProcessors
                     })
                     .ToIUnknownVector();
 
+                int firstSourceDocID = e.SourcePageInfo
+                    .Select(pageInfo => FileProcessingDB.GetFileID(pageInfo.DocumentName))
+                    .First();
+
                 ExtractException.Assert("ELI40090", "FileTaskSession was not started.",
-                    _fileTaskSessionID.HasValue);
+                    _fileTaskSessionMap.TryGetValue(firstSourceDocID, out int sessionID));
 
                 FileProcessingDB.AddPaginationHistory(
-                    e.OutputFileName, sourcePageInfo, deletedSourcePageInfo, _fileTaskSessionID.Value);
+                    e.OutputFileName, sourcePageInfo, deletedSourcePageInfo, sessionID);
 
                 // Produce a uss file for the paginated document using the uss data from the
                 // source documents
                 int pageCounter = 1;
                 var pageMap = new Dictionary<Tuple<string, int>, List<int>>();
-                foreach (var pageInfo in e.SourcePageInfo)
+                foreach (var pageInfo in e.SourcePageInfo.Where(info => !info.Deleted))
                 {
                     var sourcePage = new Tuple<string, int>(pageInfo.DocumentName, pageInfo.Page);
                     var destPages = new List<int>();
@@ -1353,13 +1391,10 @@ namespace Extract.FileActionManager.FileProcessors
 
             try
             {
-                _fileName = Path.GetFullPath(fileName);
-                _fileID = fileID;
                 _actionID = actionID;
                 _fileProcessingDB = fileProcessingDB;
 
-                _fileTaskSessionID = _paginationPanel.FileTaskSessionID = null;
-                StartFileTaskSession();
+                _fileTaskSessionMap[fileID] = StartFileTaskSession(fileID);
 
                 if (_inputEventTracker == null)
                 {
@@ -1367,11 +1402,6 @@ namespace Extract.FileActionManager.FileProcessors
                     _inputEventTracker.RegisterControl(this);
                 }
                 _inputEventTracker.Active = true;
-
-                if (!Focused)
-                {
-                    FormsMethods.FlashWindow(this, true, true);
-                }
 
                 if (_settings.SingleSourceDocumentMode)
                 {
@@ -1387,6 +1417,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 LoadDocumentForPagination(fileID, fileName, false);
+
                 _documentSelectionPending = true;
             }
             catch (Exception ex)
@@ -1409,27 +1440,6 @@ namespace Extract.FileActionManager.FileProcessors
         public void Prefetch(string fileName, int fileID, int actionID, FAMTagManager tagManager,
             FileProcessingDB fileProcessingDB)
         {
-            try
-            {
-                if (!_settings.SingleSourceDocumentMode)
-                {
-                    // This method must be run in the UI thread since it is loading attributes for
-                    // use in the UI thread.
-                    if (InvokeRequired)
-                    {
-                        this.Invoke((MethodInvoker)(() =>
-                            Prefetch(fileName, fileID, actionID, tagManager, fileProcessingDB)));
-                        return;
-                    }
-
-                    LoadDocumentForPagination(fileID, fileName, false);
-                    _documentSelectionPending = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI40098", ex);
-            }
         }
 
         /// <summary>
@@ -1509,10 +1519,7 @@ namespace Extract.FileActionManager.FileProcessors
                 ExtractException.Assert("ELI40139", "Invalid operation.",
                     FileProcessingDB != null);
 
-                if (_fileID == fileId || (fileId == -1 || _fileID != -1))
-                {
-                    OnFileComplete(EFileProcessingResult.kProcessingDelayed);
-                }
+                OnFileComplete(fileId, EFileProcessingResult.kProcessingDelayed);
             }
             catch (Exception ex)
             {
@@ -1583,13 +1590,12 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Create a new FileTaskSession table row and starts a timer for the session.
         /// </summary>
-        void StartFileTaskSession()
+        /// <param name="fileID">The ID of the file for which a session is to be started.</param>
+        int StartFileTaskSession(int fileID)
         {
             try
             {
-                _fileTaskSessionID =
-                    _paginationPanel.FileTaskSessionID = FileProcessingDB.StartFileTaskSession(
-                        _PAGINATION_TASK_GUID, _fileID, _actionID);
+                return FileProcessingDB.StartFileTaskSession(_PAGINATION_TASK_GUID, fileID, _actionID);
             }
             catch (Exception ex)
             {
@@ -1601,12 +1607,15 @@ namespace Extract.FileActionManager.FileProcessors
         /// Ends the current FileTaskSession by recording the DateTimeStamp and duration to the
         /// FileTaskSession row.
         /// </summary>
-        void EndFileTaskSession()
+        /// <param name="fileID">The ID of the file for which a session is to be ended.</param>
+        void EndFileTaskSession(int fileID)
         {
             try
             {
-                _fileProcessingDB.UpdateFileTaskSession(
-                    _fileTaskSessionID.Value, 0, 0, 0);
+                ExtractException.Assert("ELI45593", "No active session",
+                    _fileTaskSessionMap.TryGetValue(fileID, out int sessionID));
+
+                _fileProcessingDB.UpdateFileTaskSession(sessionID, 0, 0, 0);
             }
             catch (Exception ex)
             {
@@ -1662,12 +1671,8 @@ namespace Extract.FileActionManager.FileProcessors
                     "FileID", sourceFileID);
                 ReleaseFile(sourceFileID);
 
-                if (sourceFileName == _fileName)
-                {
-                    DelayFile();
-                    EndFileTaskSession();
-                    _fileName = null;
-                }
+                DelayFile(sourceFileID);
+                EndFileTaskSession(sourceFileID);
 
                 if (!string.IsNullOrWhiteSpace(targetAction))
                 {
@@ -1770,15 +1775,14 @@ namespace Extract.FileActionManager.FileProcessors
                                     .Select(attribute => attribute.Value.String)
                                     .SingleOrDefault() ?? "", pageCount, true);
 
-                            var documentAttributes = documentAttribute.SubAttributes
+                            var documentDataAttribute = documentAttribute.SubAttributes
                                 .ToIEnumerable<IAttribute>()
                                 .Where(attribute => attribute.Name.Equals(
                                     "DocumentData", StringComparison.OrdinalIgnoreCase))
-                                .Select(data => data.SubAttributes)
-                                .SingleOrDefault() ?? new IUnknownVector();
+                                .SingleOrDefault();
 
                             PaginationDocumentData documentData =
-                                GetAsPaginationDocumentData(documentAttributes, fileName);
+                                GetAsPaginationDocumentData(documentDataAttribute, fileName);
 
                             if (!suggestedPagination.HasValue)
                             {
@@ -1793,7 +1797,7 @@ namespace Extract.FileActionManager.FileProcessors
                                 }
                             }
 
-                            _paginationPanel.LoadFile(fileName, -1, pages, deletedPages,
+                            _paginationPanel.LoadFile(fileName, fileId, -1, pages, deletedPages,
                                 suggestedPagination.Value, documentData, selectDocument);
                             selectDocument = false;
                         }
@@ -1804,13 +1808,13 @@ namespace Extract.FileActionManager.FileProcessors
                     // There was a VOA file, just not with suggested pagination. Pass on the VOA data.
                     PaginationDocumentData rootDocumentData = GetAsPaginationDocumentData(attributes, fileName);
                     _paginationPanel.LoadFile(
-                        fileName, -1, null, null, false, rootDocumentData, selectDocument);
+                        fileName, fileId, -1, null, null, false, rootDocumentData, selectDocument);
                     return;
                 }
 
                 // If there was no rules-suggested pagination, go ahead and load the physical document
                 // into the _paginationPanel
-                _paginationPanel.LoadFile(fileName, -1, selectDocument);
+                _paginationPanel.LoadFile(fileName, fileId, -1, selectDocument);
             }
             finally
             {
@@ -1828,7 +1832,10 @@ namespace Extract.FileActionManager.FileProcessors
                     ex.ExtractLog("ELI44678");
                 }
 
-                _paginationPanel.SuspendUIUpdates = false;
+                if (!_paginationPanel.IsCommittingChanges)
+                {
+                    _paginationPanel.SuspendUIUpdates = false;
+                }
             }
         }
 
@@ -1837,7 +1844,26 @@ namespace Extract.FileActionManager.FileProcessors
         /// <see paramref="attributes"/> if the <see cref="_paginationDocumentDataPanel"/> is
         /// available.
         /// </summary>
-        /// <param name="attributes">The attributes.</param>
+        /// <param name="documentDataAttribute">The attributes.</param>
+        /// <param name="sourceDocName">The source document name to be associated the data is
+        /// associated with or <see langword="null"/> if the data is not associated with a
+        /// particular source document.</param>
+        /// <returns>The <see cref="PaginationDocumentData"/> instance or <see langword="null"/> if
+        /// the <see cref="_paginationDocumentDataPanel"/> is not available.</returns>
+        PaginationDocumentData GetAsPaginationDocumentData(IAttribute documentDataAttribute, string sourceDocName)
+        {
+            return (_paginationDocumentDataPanel == null)
+                ? new PaginationDocumentData(documentDataAttribute, sourceDocName)
+                : _paginationDocumentDataPanel.GetDocumentData(
+                    documentDataAttribute, sourceDocName, FileProcessingDB, _imageViewer);
+        }
+
+        /// <summary>
+        /// Gets a <see cref="PaginationDocumentData"/> instance representing the specified
+        /// <see paramref="attributes"/> if the <see cref="_paginationDocumentDataPanel"/> is
+        /// available.
+        /// </summary>
+        /// <param name="documentDataAttribute">The attributes.</param>
         /// <param name="sourceDocName">The source document name to be associated the data is
         /// associated with or <see langword="null"/> if the data is not associated with a
         /// particular source document.</param>
@@ -1863,7 +1889,8 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 string outputDocPath = _settings.OutputPath;
-                string sourceDocName = e.SourcePageInfo.First().DocumentName;
+                var sourcePageInfo = e.SourcePageInfo.Where(info => !info.Deleted).ToList();
+                string sourceDocName = sourcePageInfo.First().DocumentName;
                 var pathTags = new FileActionManagerPathTags((FAMTagManager)_tagUtility, sourceDocName);
                 if (outputDocPath.Contains(PaginationSettings.SubDocIndexTag))
                 {
@@ -1883,7 +1910,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
                 if (outputDocPath.Contains(PaginationSettings.FirstPageTag))
                 {
-                    int firstPageNum = e.SourcePageInfo
+                    int firstPageNum = sourcePageInfo
                         .Where(page => page.DocumentName == sourceDocName)
                         .Min(page => page.Page);
 
@@ -1892,7 +1919,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
                 if (outputDocPath.Contains(PaginationSettings.LastPageTag))
                 {
-                    int lastPageNum = e.SourcePageInfo
+                    int lastPageNum = sourcePageInfo
                         .Where(page => page.DocumentName == sourceDocName)
                         .Max(page => page.Page);
 
@@ -1918,8 +1945,9 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
+                var sourcePageInfo = e.SourcePageInfo.Where(info => !info.Deleted).ToList();
                 var sourceDocNames = string.Join(", ",
-                        e.SourcePageInfo
+                        sourcePageInfo
                             .Select(page => "'" + page.DocumentName.Replace("'", "''") + "'")
                             .Distinct());
 
@@ -1942,16 +1970,6 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Cancels the current document and stops processing in the FAM.
-        /// </summary>
-        void CancelFile()
-        {
-            _imageViewer.CloseImage();
-
-            OnFileComplete(EFileProcessingResult.kProcessingCancelled);
-        }
-
-        /// <summary>
         /// If there are any manual pagination changes, warns the user about the changes that will
         /// be lost if the pagination UI is closed.
         /// </summary>
@@ -1960,22 +1978,21 @@ namespace Extract.FileActionManager.FileProcessors
         /// changes or the user is okay losing them.</returns>
         bool PreventClose()
         {
-            bool paginationModified = false;
-            bool dataModified = false;
-
-            _paginationPanel.CheckForChanges(out paginationModified, out dataModified);
-
-            if (paginationModified || dataModified)
+            if (FileIds.Any())
             {
-                if (DialogResult.No == MessageBox.Show(this,
-                "You have uncommitted changes to " +
-                    ((paginationModified && dataModified)
-                        ? "pagination and data"
-                        : paginationModified ? "pagination" : "data") +
-                " that will be lost.\r\n\r\n" +
-                "Discard changes?",
-                "Uncommitted changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question,
-                MessageBoxDefaultButton.Button2, 0))
+                // Because PaginationPanel.CheckForChanges is not very robust a determining when there
+                // are actually changes to save, always prompt for save on close without also trying to
+                // state whether changes have been correctly saved.
+                var response = MessageBox.Show(this, "Would you like to save your work?",
+                "Save progress?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button1, 0);
+
+                if (response == DialogResult.Yes)
+                {
+                    _paginationPanel.Save();
+                    return false;
+                }
+                else if (response == DialogResult.Cancel)
                 {
                     return true;
                 }
@@ -2068,11 +2085,12 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// Raises the <see cref="FileComplete"/> event.
         /// </summary>
+        /// <param name="fileId">The ID of the file that has completed.</param>
         /// <param name="processingResult">The <see cref="EFileProcessingResult"/> the file should
         /// be completed with.</param>
-        void OnFileComplete(EFileProcessingResult processingResult)
+        void OnFileComplete(int fileId, EFileProcessingResult processingResult)
         {
-            FileComplete.Invoke(this, new FileCompleteEventArgs(processingResult));
+            FileComplete.Invoke(this, new FileCompleteEventArgs(fileId, processingResult));
         }
 
         /// <summary>

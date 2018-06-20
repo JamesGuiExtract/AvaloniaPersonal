@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -43,37 +44,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Gets the <see cref="OutputDocument"/> the <see cref="Page"/> was deleted from.
         /// </summary>
         public OutputDocument OutputDocument
-        {
-            get;
-            private set;
-        }
-    }
-
-    /// <summary>
-    /// The event arguments for the <see cref="PageLayoutControl.PagesPendingLoad"/> event.
-    /// </summary>
-    internal class PagesPendingLoadEventArgs : EventArgs
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PagesPendingLoadEventArgs"/> class.
-        /// </summary>
-        /// <param name="pages">The <see cref="Page"/>s are pending to be loaded.</param>
-        public PagesPendingLoadEventArgs(Page[] pages)
-        {
-            try
-            {
-                Pages = new ReadOnlyCollection<Page>(pages);
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI35669", ex);
-            }
-        }
-
-        /// <summary>
-        /// Gets the <see cref="Page"/>s are pending to be loaded.
-        /// </summary>
-        public ReadOnlyCollection<Page> Pages
         {
             get;
             private set;
@@ -512,9 +482,45 @@ namespace Extract.UtilityApplications.PaginationUtility
     }
 
     /// <summary>
+    /// The event arguments for the <see cref="PaginationPanel.CommittingChanges"/>
+    /// event.
+    /// </summary>
+    public class FileTaskSessionRequestEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileTaskSessionRequestEventArgs"/> class.
+        /// </summary>
+        /// <param name="fileID">The ID of the file for which the corresponding file task session ID
+        /// is needed.</param>
+        public FileTaskSessionRequestEventArgs(int fileID)
+        {
+            FileID = fileID;
+        }
+
+        /// <summary>
+        /// Gets the ID of the file for which the corresponding file task session ID
+        /// is needed.
+        /// </summary>
+        public int FileID
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets or sets the corresponding file task session ID for the <see cref="FileID"/>.
+        /// </summary>
+        public int? FileTaskSessionID
+        {
+            get;
+            set;
+        }
+    }
+
+    /// <summary>
     /// The event arguments for the <see cref="PageLayoutControl.PageDeleted"/> event.
     /// </summary>
-    public class PageLoadRequestEventArgs : EventArgs
+    public class PageLoadRequestEventArgs : HandledEventArgs
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PageLoadRequestEventArgs"/> class.

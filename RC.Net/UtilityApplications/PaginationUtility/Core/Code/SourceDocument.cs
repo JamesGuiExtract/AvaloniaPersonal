@@ -38,7 +38,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Initializes a new instance of the <see cref="SourceDocument"/> class.
         /// </summary>
         /// <param name="fileName">Name of the file to load.</param>
-        public SourceDocument(string fileName)
+        /// <param name="fileID"></param>
+        public SourceDocument(string fileName, int fileID)
         {
             try
             {
@@ -46,6 +47,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     "Filename", fileName);
 
                 FileName = fileName;
+                FileID = fileID;
 
                 _thumbnailWorker = new ThumbnailWorker(FileName, PageThumbnailControl.ThumbnailSize, true);
 
@@ -88,6 +90,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Gets the filename of the document.
         /// </summary>
         public string FileName
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the file ID.
+        /// </summary>
+        public int FileID
         {
             get;
             private set;

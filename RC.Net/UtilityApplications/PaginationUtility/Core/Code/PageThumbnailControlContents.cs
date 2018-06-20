@@ -106,6 +106,15 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #endregion Constructors
 
+        #region Events
+
+        /// <summary>
+        /// Occurs when the image associated with this control is closed or changed in the <see cref="ImageViewer"/>.
+        /// </summary>
+        public event EventHandler<EventArgs> ImageClosed;
+
+        #endregion Events
+
         #region Methods
 
         /// <summary>
@@ -218,6 +227,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _activeImageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
                 _activeImageViewer.PageChanged -= HandleImageViewer_PageChanged;
                 _activeImageViewer = null;
+
+                ImageClosed?.Invoke(this, new EventArgs());
             }
         }
 
@@ -333,7 +344,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_pageControl != null && _pageControl.Highlighted)
                 {
                     var highlightColor = _pageControl.PageLayoutControl.IndicateFocus
-                        ? SystemColors.Highlight
+                        ? ExtractColors.LightBlue
                         : SystemColors.ControlDark;
                     var highlightBrush = ExtractBrushes.GetSolidBrush(highlightColor);
                     e.Graphics.FillRectangle(highlightBrush, e.ClipRectangle);
@@ -599,6 +610,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return;
             }
 
+            var thumbnail = _page.ThumbnailImage;
+
             // Since the thumbnail may be changed by a background thread and we don't want the work
             // of the background worker to be held up waiting on messages currently being
             // handled in the UI thread, invoke the image change to occur on the UI thread.
@@ -608,7 +621,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (!IsDisposed && _page != null && !_page.IsDisposed)
                 {
                     // RasterPictureBox does dispose of the old image.
-                    _rasterPictureBox.Image = _page.ThumbnailImage;
+                    _rasterPictureBox.Image = thumbnail;
                     _rasterPictureBox.Invalidate();
                 }
             });

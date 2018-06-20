@@ -555,7 +555,7 @@ namespace Extract.DataEntry
         static bool ConfirmDataIsNotInvalid(IAttribute attribute, AttributeStatusInfo statusInfo,
             bool value)
         {
-            return (statusInfo._owningControl == null || !statusInfo._isViewable ||
+            return (!statusInfo._isViewable ||
                 (statusInfo._dataValidity != DataValidity.Invalid) == value);
         }
 

@@ -1,6 +1,7 @@
-﻿using Extract.UtilityApplications.PaginationUtility;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -18,6 +19,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// The attribute hierarchy (voa data) on which this instance is based.
         /// </summary>
         IUnknownVector _attributes;
+
+        /// <summary>
+        /// An attribute that sits on top of _attributes and is used to store state info for the
+        /// document data as a whole.
+        /// </summary>
+        IAttribute _documentDataAttribute;
 
         /// <summary>
         /// Indicates whether this instance was modified as of the last time the
@@ -38,8 +45,39 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// for which data is being loaded.</param></param>
         public PaginationDocumentData(IUnknownVector attributes, string sourceDocName)
         {
-            _attributes = attributes;
-            SourceDocName = sourceDocName;
+            try
+            {
+                _attributes = attributes;
+                SourceDocName = sourceDocName;
+                _documentDataAttribute = new UCLID_AFCORELib.Attribute();
+                _documentDataAttribute.Name = "DocumentData";
+                _documentDataAttribute.SubAttributes = _attributes;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46047");
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PaginationDocumentData"/> class.
+        /// </summary>
+        /// <param name="documentDataAttribute">The <see cref="IAttribute"/> hierarchy (voa data) on which this
+        /// instance is based including this top-level attribute which contains document data status info.</param>
+        /// <param name="sourceDocName"><param name="sourceDocName">The name of the source document
+        /// for which data is being loaded.</param></param>
+        public PaginationDocumentData(IAttribute documentDataAttribute, string sourceDocName)
+        {
+            try
+            {
+                _documentDataAttribute = documentDataAttribute ?? new UCLID_AFCORELib.Attribute() { Name = "DocumentData" };
+                _attributes = _documentDataAttribute.SubAttributes;
+                SourceDocName = sourceDocName;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46048");
+            }
         }
 
         #endregion Constructors
@@ -100,11 +138,54 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (_attributes != value)
                     {
                         _attributes = value;
+                        _documentDataAttribute.SubAttributes = _attributes;
                     }
                 }
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI41342");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets an attribute that sits on top of <see cref="Attributes"/> and is used to
+        /// store state info for the document data as a whole.
+        /// </summary>
+        /// <value>
+        /// The document data attribute.
+        /// </value>
+        public IAttribute DocumentDataAttribute
+        {
+            get
+            {
+                try
+                {
+                    if (_documentDataAttribute == null)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        ExtractException.Assert("ELI46046",
+                            "Data inconsistency",
+                            _attributes == _documentDataAttribute.SubAttributes);
+
+                        return _documentDataAttribute;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI45986");
+                }
+            }
+
+            set
+            {
+                if (_documentDataAttribute != value)
+                {
+                    _documentDataAttribute = value;
+                    _attributes = value.SubAttributes;
                 }
             }
         }
@@ -150,6 +231,18 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 // Unless overridden, the data is never considered to have an error.
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the tooltip text that should be associated with the document validation error
+        /// or <c>null</c> to use the default error text.
+        /// </summary>
+        public virtual string DataErrorMessage
+        {
+            get
+            {
+                return null;
             }
         }
 
@@ -245,6 +338,46 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 throw ex.AsExtract("ELI39772");
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the order numbers and collection dates associated with this data
+        /// </summary>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public ReadOnlyCollection<(string OrderNumber, DateTime? OrderDate)> Orders
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets whether to prompt about order numbers for which a document has already been filed.
+        /// </summary>
+        public bool PromptForDuplicateOrders
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the encounter numbers and dates associated with this data
+        /// </summary>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public ReadOnlyCollection<(string EncounterNumber, DateTime? EncounterDate)> Encounters
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets whether to prompt about encounter numbers for which a document has already been filed.
+        /// </summary>
+        public bool PromptForDuplicateEncounters
+        {
+            get;
+            set;
         }
 
         #endregion Public Members

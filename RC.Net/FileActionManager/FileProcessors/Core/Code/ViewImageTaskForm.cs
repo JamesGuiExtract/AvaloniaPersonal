@@ -223,6 +223,20 @@ namespace Extract.FileActionManager.FileProcessors
             set;
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the form supports displaying multiple documents
+        /// simultaneously (one for each processing thread).
+        /// </summary>
+        /// <value><c>true</c> if the form supports multiple documents, <c>false</c> if only one
+        /// document at a time can be loaded.</value>
+        public bool SupportsMultipleDocuments
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -721,7 +735,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// This event is not implemented by <see cref="ViewImageTaskForm"/>.
         /// </summary>
-        public void DelayFile(int fileID)
+        public void DelayFile(int fileId)
         {
             throw new ExtractException("ELI37504", "Method not implemented.");
         }
@@ -748,7 +762,7 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 _imageViewer.CloseImage();
 
-                OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSuccessful));
+                OnFileComplete(new FileCompleteEventArgs(_currentFileId, EFileProcessingResult.kProcessingSuccessful));
             }
             catch (Exception ex)
             {
@@ -765,7 +779,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             _imageViewer.CloseImage();
 
-            OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSkipped));
+            OnFileComplete(new FileCompleteEventArgs(_currentFileId, EFileProcessingResult.kProcessingSkipped));
         }
 
         /// <summary>
@@ -775,7 +789,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             _imageViewer.CloseImage();
 
-            OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingCancelled));
+            OnFileComplete(new FileCompleteEventArgs(_currentFileId, EFileProcessingResult.kProcessingCancelled));
         }
 
         /// <summary>

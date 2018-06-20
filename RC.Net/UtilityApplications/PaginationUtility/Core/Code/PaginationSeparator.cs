@@ -1,6 +1,6 @@
-﻿using Extract.Utilities.Forms;
+﻿using Extract.DataEntry;
+using Extract.Utilities.Forms;
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -53,6 +53,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _documentSelectedToCommit;
 
         /// <summary>
+        /// Indicates whether the associated <see cref="OutputDocument"/>'s has been viewed (in the
+        /// data entry panel).
+        /// </summary>
+        bool? _documentDataHasBeenViewed;
+
+        /// <summary>
         /// Indicates when a click event has been handled internal to this class and should not be
         /// raised.
         /// </summary>
@@ -67,6 +73,27 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Indicates whether the selection check box should be visible.
         /// </summary>
         bool _showSelectionCheckBox;
+
+        /// <summary>
+        /// Indicates whether document status information has been applied to this separator.
+        /// </summary>
+        bool _hasAppliedStatus;
+
+        /// <summary>
+        /// Indicates whether a update of the separator controls is required to reflect a change
+        /// in document status.
+        /// </summary>
+        bool _invalidatePending;
+
+        /// <summary>
+        /// Indicates whether an update of the separator controls is pending.
+        /// </summary>
+        bool _controlUpdatePending;
+
+        /// <summary>
+        /// The current color of the separator bar.
+        /// </summary>
+        Color _currentColor;
 
         #endregion Fields
 
@@ -201,6 +228,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _documentSelectedToCommit = value;
                         _selectedCheckBox.Checked = value;
 
+                        if (_outputDocument?.DocumentData != null)
+                        {
+                            AttributeStatusInfo.AcceptValue(_outputDocument.DocumentData.DocumentDataAttribute, value);
+                        }
+
                         OnDocumentSelectedToCommitChanged();
                     }
                 }
@@ -212,7 +244,45 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// 
+        /// Gets or sets whether the associated <see cref="OutputDocument"/>'s data has been viewed
+        /// (in the data panel).
+        /// </summary>
+        /// <value><see langword="true"/> if the document data has been viewed; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool DocumentDataHasBeenViewed
+        {
+            get
+            {
+                return _documentDataHasBeenViewed.HasValue && _documentDataHasBeenViewed.Value;
+            }
+
+            set
+            {
+                try
+                {
+                    if (!_documentDataHasBeenViewed.HasValue || value != _documentDataHasBeenViewed.Value)
+                    {
+                        _documentDataHasBeenViewed = value;
+                        _summaryLabel.Font = new Font(_summaryLabel.Font, value ? FontStyle.Regular : FontStyle.Bold);
+                        _pagesLabel.Font = new Font(_pagesLabel.Font, value ? FontStyle.Regular : FontStyle.Bold);
+
+                        if (_outputDocument?.DocumentData != null)
+                        {
+                            var statusInfo = AttributeStatusInfo.GetStatusInfo(_outputDocument.DocumentData.DocumentDataAttribute);
+                            statusInfo.HasBeenViewed = value;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI45961");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IPaginationDocumentDataPanel"/> used to display the document data for editing.
         /// </summary>
         public IPaginationDocumentDataPanel DocumentDataPanel
         {
@@ -228,10 +298,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <value><c>true</c> if an update of the control is required; otherwise, <c>false</c>.
         /// </value>
-        public bool UpdateRequired
+        public bool InvalidatePending
         {
-            get;
-            set;
+            get
+            {
+                return Parent != null && (_invalidatePending || _controlUpdatePending);
+            }
+
+            set
+            {
+                _invalidatePending = value;
+            }
         }
 
         #endregion Properties
@@ -267,6 +344,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_outputDocument != null)
                         {
                             _outputDocument.Invalidated -= HandleDocument_Invalidated;
+                            _outputDocument.DocumentStateChanged -= HandleOutputDocument_DocumentStateChanged;
                         }
 
                         _outputDocument = document;
@@ -275,13 +353,24 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             _collapsed = _outputDocument.PageControls.Any(c => !c.Visible);
                             _outputDocument.Invalidated += HandleDocument_Invalidated;
+                            _outputDocument.DocumentStateChanged += HandleOutputDocument_DocumentStateChanged;
+
+                            if (_outputDocument?.DocumentData != null)
+                            {
+                                DocumentSelectedToCommit =
+                                    AttributeStatusInfo.IsAccepted(_outputDocument.DocumentData.DocumentDataAttribute);
+                                var statusInfo = AttributeStatusInfo.GetStatusInfo(Document.DocumentData.DocumentDataAttribute);
+                                DocumentDataHasBeenViewed = statusInfo.HasBeenViewed;
+                            }
                         }
                         else
                         {
+                            DocumentSelectedToCommit = false;
+                            DocumentDataHasBeenViewed = false;
                             _collapsed = false;
                         }
 
-                        UpdateRequired = true;
+                        InvalidatePending = true;
                     }
 
                     return document;
@@ -327,8 +416,10 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                             Document.Collapsed = value;
 
-                            // Invalidate so that paint occurs and new collapsed state is indicated.
-                            Invalidate();
+                            // Display the new collapsed state.
+                            _collapseDocumentButton.Image = Document.Collapsed
+                                ? Properties.Resources.Expand
+                                : Properties.Resources.Collapse;
 
                             OnDocumentCollapsedChanged();
                         }
@@ -364,15 +455,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                         locked = true;
                         _documentDataPanelControl = (Control)args.DocumentDataPanel;
                         _documentDataPanelControl.Width = _tableLayoutPanel.Width;
-                        _tableLayoutPanel.Controls.Add(_documentDataPanelControl, 0, 1);
+                        _documentDataPanelControl.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+                        _tableLayoutPanel.Controls.Add(_documentDataPanelControl, 0, 3);
                         _tableLayoutPanel.SetColumnSpan(_documentDataPanelControl, _tableLayoutPanel.ColumnCount);
-                        _documentDataPanelControl.Dock = DockStyle.Fill;
 
                         args.DocumentDataPanel.LoadData(args.OutputDocument.DocumentData, forDisplay: true);
 
                         _editDocumentDataButton.Checked = true;
 
                         args.DocumentDataPanel.DataPanelChanged += DocumentDataPanel_DataPanelChanged;
+
+                        DocumentDataHasBeenViewed = true;
 
                         // Ensure this control gets sized based upon the added _documentDataPanelControl.
                         PerformLayout();
@@ -540,19 +633,30 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     var parentPanel = (ScrollableControl)Parent;
 
-                    int rightPadding = parentPanel.VerticalScroll.Visible
+                    // Set margin when scroll bar is not visible such that when it does become visible,
+                    // it doesn't force a shift of separator icons/controls to the left.
+                    int scrollMargin = parentPanel.VerticalScroll.Visible
                         ? 0
                         : SystemInformation.VerticalScrollBarWidth;
 
-                    if (Padding.Right != rightPadding)
+                    var marginColumnStyle = _tableLayoutPanel.ColumnStyles.OfType<ColumnStyle>().Last();
+                    if (marginColumnStyle.Width != scrollMargin)
                     {
-                        Padding = new Padding(0, 0, rightPadding, 0);
+                        _tableLayoutPanel.SuspendLayout();
+                        marginColumnStyle.Width = scrollMargin;
+
+                        _tableLayoutPanel.ResumeLayout();
                     }
                 }
 
                 if (_tableLayoutPanel != null)
                 {
                     Height = _tableLayoutPanel.Height;
+                }
+
+                if (_controlUpdatePending)
+                {
+                    UpdateControls();
                 }
 
                 base.OnLayout(e);
@@ -572,8 +676,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                InvalidatePending = true;
+
+                SetColor();
+
                 // If the controls cannot be updated at this time, no need to invalidate (optimization).
-                if (UpdateControls())
+                // If UpdateControls returns true it will have executed a full layout such that a call
+                // to Invalidate would now be superfluous.
+                if (!UpdateControls())
                 {
                     base.OnInvalidated(e);
                 }
@@ -581,6 +691,37 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI40183");
+            }
+        }
+
+        /// <summary>
+        /// Updates the color of the separator bar based on the whether the current document has a
+        /// page displayed in the image viewer.
+        /// </summary>
+        void SetColor()
+        {
+            // Determine what the separator color should be base on whether the current document
+            // has a page displayed in the image viewer.
+            var newColor = (Document?.PageControls.Any(pageControl =>
+                                pageControl.PageIsDisplayed && pageControl.Highlighted) == true)
+                ? ExtractColors.LightOrange
+                : ExtractColors.White;
+            
+            // Update the BackColor of the separator itself, as well as any controls except the edit button.
+            if (newColor != _currentColor)
+            {
+                _tableLayoutPanel.BackColor = newColor;
+                foreach (var control in _tableLayoutPanel.Controls.OfType<Control>()
+                    .Except(new Control[] {
+                        _topDividingLinePanel,
+                        _bottomDividingLinePanel,
+                        _documentDataPanelControl,
+                        _editDocumentDataButton }))
+                {
+                    control.BackColor = newColor;
+                }
+
+                _currentColor = newColor;
             }
         }
 
@@ -664,6 +805,28 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_editDocumentDataButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleEditDocumentDataButton_Click(object sender, EventArgs e)
+        {
+            _clickEventHandledInternally = true;
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_selectedCheckBox"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
+        /// </param>
+        void HandleSelectedCheckBox_Click(object sender, EventArgs e)
+        {
+            _clickEventHandledInternally = true;
+        }
+
+        /// <summary>
         /// Handles the <see cref="CheckBox.CheckedChanged"/> event of the
         /// <see cref="_selectedCheckBox"/>.
         /// </summary>
@@ -674,8 +837,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _clickEventHandledInternally = true;
-
                 if (DocumentSelectedToCommit != _selectedCheckBox.Checked)
                 {
                     DocumentSelectedToCommit = _selectedCheckBox.Checked;
@@ -708,8 +869,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             try
             {
-                _clickEventHandledInternally = true;
-
                 if (_editDocumentDataButton.Checked)
                 {
                     OpenDataPanel();
@@ -737,11 +896,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                UpdateRequired = true;
+                InvalidatePending = true;
 
-                // Whenever the associated document is updated, invalidate to ensure displayed icons
-                // reflect the current document state.
-                Invalidate();
+                // https://extract.atlassian.net/browse/ISSUE-15261
+                // In some operations, the separator may be removed from the panel before the
+                // document is invalid. We shouldn't invalidate controls no longer in the UI
+                if (Parent != null)
+                {
+                    // Whenever the associated document is updated, invalidate to ensure displayed icons
+                    // reflect the current document state.
+                    Invalidate();
+                }
             }
             catch (Exception ex)
             {
@@ -765,6 +930,43 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45337");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="OutputDocument.DocumentStateChanged"/> event of the
+        /// <see cref="_outputDocument"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <exception cref="NotImplementedException"></exception>
+        void HandleOutputDocument_DocumentStateChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // The below fix (ISSUE-15320) caused and issue where a separator no longer in
+                // the PaginationPanel was trying to be refreshed.
+                // https://extract.atlassian.net/browse/ISSUE-15331
+                if (Parent != null)
+                {
+                    _controlUpdatePending = true;
+
+                    // Direct calls to invalidate separators on document state changes have been removed
+                    // from PaginationPanel. Instead, the separators will be responsible for ensuring
+                    // UpdateControls is called at the end of the current event handler that triggered
+                    // the change. Invoke to prevent multiple calls to UpdateControls as part of the
+                    // same event. (UpdateControls will short-circut if an Invalidate from elsewhere has
+                    // triggered UpdateControls in the interim)
+                    // https://extract.atlassian.net/browse/ISSUE-15320
+                    this.SafeBeginInvoke("ELI45648", () => UpdateControls(), false);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Errors here are unlikely to be a critical issue; remove risk of displayed
+                // exceptions leaving the pagination panel in a bad state by just logging here.
+                // https://extract.atlassian.net/browse/ISSUE-15331
+                ex.AsExtract("ELI45612").Log();
             }
         }
 
@@ -792,30 +994,50 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool UpdateControls()
         {
-            bool doLayout = false;
-            if (Document != null)
+            if (Parent == null || !Parent.ClientRectangle.IntersectsWith(Bounds))
             {
-                if (Document.PaginationSeparator != this)
-                {
-                    Document.PaginationSeparator = this;
+                return false;
+            }
 
-                    // Force a follow-up layout to occur after assigning this separator to a new document.
-                    doLayout = true;
-                    UpdateRequired = true;
+            if (Document != null && Document.PaginationSeparator != this)
+            {
+                // Force a follow-up layout to occur after assigning this separator to a new document.
+                _controlUpdatePending = true;
+                Document.PaginationSeparator = this;
+                InvalidatePending = true;
+
+                if (Document.DocumentData != null)
+                {
+                    DocumentSelectedToCommit =
+                        AttributeStatusInfo.IsAccepted(_outputDocument.DocumentData.DocumentDataAttribute);
+                    var statusInfo = AttributeStatusInfo.GetStatusInfo(Document.DocumentData.DocumentDataAttribute);
+                    DocumentDataHasBeenViewed = statusInfo.HasBeenViewed;
+                }
+                else
+                {
+                    DocumentSelectedToCommit = false;
+                    DocumentDataHasBeenViewed = false;
                 }
             }
 
-            if (doLayout || Document?.DocumentData?.Initialized == true)
+            if (_controlUpdatePending &&
+                (Parent as PageLayoutControl)?.UIUpdatesSuspended != true &&
+                Document?.DocumentData?.Initialized == true)
             {
-                _collapseDocumentButton.Visible = true;
+                _controlUpdatePending = false;
+
+                _hasAppliedStatus = true;
                 _selectedCheckBox.Visible = _showSelectionCheckBox;
                 _selectedCheckBox.Checked = _showSelectionCheckBox && Document.Selected;
+                _collapseDocumentButton.Visible = true;
                 _collapseDocumentButton.Image = Document.Collapsed
                     ? Properties.Resources.Expand
                     : Properties.Resources.Collapse;
                 _editDocumentDataButton.Visible =
                     Document.DocumentData != null && Document.DocumentData.AllowDataEdit;
+                _summaryLabel.Visible = true;
                 _summaryLabel.Text = Document.Summary;
+                _pagesLabel.Visible = true;
                 int pageCount = Document.PageControls.Count(c => !c.Deleted);
                 _pagesLabel.Text = string.Format(CultureInfo.CurrentCulture,
                     "{0} page{1}", pageCount, (pageCount == 1) ? "" : "s");
@@ -827,29 +1049,34 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 _newDocumentGlyph.Visible = !Document.InSourceDocForm;
                 _editedPaginationGlyph.Visible = !Document.InOriginalForm;
-                _reprocessDocumentPictureBox.Visible = Document.SendForReprocessing;
+                _reprocessDocumentPictureBox.Visible = Document.SendForReprocessing && pageCount > 0;
                 _editedDataPictureBox.Visible = Document.DataModified;
                 _dataErrorPictureBox.Visible = Document.DataError;
+                _toolTip.SetToolTip(_dataErrorPictureBox,
+                    Document?.DocumentData?.DataErrorMessage ?? "The data for this document has error(s)");
 
-                if (doLayout)
-                {
-                    PerformLayout();
-                }
+                SetColor();
+
+                PerformLayout();
 
                 return true;
             }
             else
             {
-                _collapseDocumentButton.Visible = false;
-                _selectedCheckBox.Visible = false;
-                _editDocumentDataButton.Visible = false;
-                _summaryLabel.Text = "";
-                _pagesLabel.Text = "";
-                _newDocumentGlyph.Visible = false;
-                _editedPaginationGlyph.Visible = false;
-                _reprocessDocumentPictureBox.Visible = false;
-                _editedDataPictureBox.Visible = false;
-                _dataErrorPictureBox.Visible = false;
+                if (_hasAppliedStatus && Document?.DocumentData.Initialized != true)
+                {
+                    _hasAppliedStatus = false;
+                    _collapseDocumentButton.Visible = false;
+                    _selectedCheckBox.Visible = false;
+                    _editDocumentDataButton.Visible = false;
+                    _summaryLabel.Text = "";
+                    _pagesLabel.Text = "";
+                    _newDocumentGlyph.Visible = false;
+                    _editedPaginationGlyph.Visible = false;
+                    _reprocessDocumentPictureBox.Visible = false;
+                    _editedDataPictureBox.Visible = false;
+                    _dataErrorPictureBox.Visible = false;
+                }
 
                 return false;
             }

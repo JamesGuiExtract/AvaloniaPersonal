@@ -147,6 +147,14 @@ namespace Extract.DataEntry
         static IUnknownVector _attributes;
 
         /// <summary>
+        /// The current base <see cref="ExecutionContext"/> for use in enforcing the
+        /// ExecutionExemptions attribute for <see cref="DataEntryQuery"/>s.
+        /// https://extract.atlassian.net/browse/ISSUE-15342
+        /// </summary>
+        [ThreadStatic]
+        static ExecutionContext _queryExecutionContext;
+
+        /// <summary>
         /// A database(s) available for use in validation or auto-update queries; The key is the
         /// connection name (blank for default connection).
         /// </summary>
@@ -267,6 +275,13 @@ namespace Extract.DataEntry
         /// </summary>
         [ThreadStatic]
         static bool _threadEnding;
+
+        /// <summary>
+        /// Indicates whether cached data should be be shared with with other threads in this process
+        /// (for the purpose of background loading efficiency).
+        /// </summary>
+        [ThreadStatic]
+        static bool _processWideDataCache;
 
         /// <summary>
         /// Registered event handlers for the <see cref="DataReset"/> event.
@@ -442,6 +457,11 @@ namespace Extract.DataEntry
         string _lastAppliedStringValue;
 
         /// <summary>
+        /// Indicates whether this attribute has been mapped to a control.
+        /// </summary>
+        bool _isMapped;
+
+        /// <summary>
         /// Indicates whether the attribute has been initialized and has not been deleted.
         /// </summary>
         bool _initialized;
@@ -481,6 +501,17 @@ namespace Extract.DataEntry
         #region Properties
 
         /// <summary>
+        /// Gets a value indicating whether field has been mapped to a control
+        /// </summary>
+        public bool IsMapped
+        {
+            get
+            {
+                return _isMapped;
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether the attribute has been initialized and has not been
         /// deleted.
         /// </summary>
@@ -513,6 +544,10 @@ namespace Extract.DataEntry
             set
             {
                 _owningControl = value;
+                if (value != null)
+                {
+                    _isMapped = true;
+                }
             }
         }
 
@@ -570,6 +605,26 @@ namespace Extract.DataEntry
                 _persistAttribute = value;
             }
         }
+
+        /// <summary>
+        /// Gets or sets whether the attribute should be persisted in output.
+        /// NOTE: Unlike the HasBeenViewedOrIsNotViewable method, this property does not take into
+        /// account whether the attribute is viewable; the raw field value is returned here.
+        /// </summary>
+        public bool HasBeenViewed
+        {
+
+            get
+            {
+                return _hasBeenViewed;
+            }
+
+            set
+            {
+                _hasBeenViewed = value;
+            }
+        }
+
 
         /// <summary>
         /// Gets or sets a <see langword="string"/> that allows <see cref="IAttribute"/>s to be
@@ -736,6 +791,24 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets the current base <see cref="ExecutionContext"/> for use in enforcing the
+        /// ExecutionExemptions attribute for <see cref="DataEntryQuery"/>s.
+        /// https://extract.atlassian.net/browse/ISSUE-15342
+        /// </summary>
+        public static ExecutionContext QueryExecutionContext
+        {
+            get
+            {
+                return _queryExecutionContext;
+            }
+
+            set
+            {
+                _queryExecutionContext = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether auto-update queries should be disabled.
         /// The queries will not be loaded for any attributes.
         /// </summary>
@@ -854,6 +927,26 @@ namespace Extract.DataEntry
             {
                 ExtractException.Assert("ELI44740", "Cannot clear ThreadEnding status.", value);
                 _threadEnding = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether cached data should be be shared with with other
+        /// threads in this process (for the purpose of background loading efficiency).
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [block automatic update queries]; otherwise, <c>false</c>.
+        /// </value>
+        public static bool ProcessWideDataCache
+        {
+            get
+            {
+                return _processWideDataCache;
+            }
+
+            set
+            {
+                _processWideDataCache = value;
             }
         }
 
@@ -1000,6 +1093,11 @@ namespace Extract.DataEntry
                 // Make sure _all_ the attributes are released
                 ReleaseAttributes(_statusInfoMap.Keys.ToIUnknownVector<IAttribute>());
 
+                // Starting now query executions should be considered to be in the context of a
+                // document load. This context will only change once the DataEntryControlHost has
+                // finished initializing the DEP, at which point the context will be changed to
+                // OnUpdate.
+                _queryExecutionContext = ExecutionContext.OnLoad;
                 _statusInfoMap.Clear();
                 _subAttributesToParentMap.Clear();
                 _attributesBeingModified.Clear();
@@ -1085,6 +1183,42 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Loads the specified attributes in to the <see paramref="fieldModels"/> to enable the
+        /// data to be transformed as they would be they UI without loading into the UI.
+        /// <para><b>Note</b></para>
+        /// While this results in all queries (both auto-update and validation) executing, it does
+        /// not explicitly validate all fields so, for example, ValidationPatterns will not have
+        /// been considered.
+        /// Also, while this call re-orders attributes, it does not prune any unmapped or
+        /// un-persistable attributes.
+        /// </summary>
+        /// <param name="attributes">The attributes to load.</param>
+        /// <param name="sourceDocName">Name of the source document.</param>
+        /// <param name="dbConnections">The database(s) to use for the queries. (Can be
+        /// <see langword="null"/> if not required).</param>
+        /// <param name="fieldModels">The <see cref="BackgroundFieldModel"/>s that represent
+        /// the controls in the DEP.</param>
+        /// <param name="tagUtility">The <see cref="IPathTags"/> instance that should be used to
+        /// expand any path tag expressions in data queries.</param>
+        [ComVisible(false)]
+        public static void ExecuteNoUILoad(IUnknownVector attributes, string sourceDocName,
+            Dictionary<string, DbConnection> dbConnections, IEnumerable<BackgroundFieldModel> fieldModels,
+            IPathTags pathTags)
+        {
+            try
+            {
+                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags);
+                EnableValidationTriggers(false);
+                Initialize(attributes, fieldModels);
+                EnableValidationTriggers(true);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI37785");
+            }
+        }
+
+        /// <summary>
         /// Initializes for query (includes resetting the current threads AttributeStatusInfo data).
         /// </summary>
         /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s
@@ -1145,18 +1279,58 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attributes">The <see cref="IUnknownVector"/> of
         /// <see cref="IAttribute"/>s to initialize.</param>
+        /// <param name="fieldModels">If initializing in the background, the
+        /// <see cref="BackgroundFieldModel"/>s that represent the controls in the DEP.
+        /// Should be <c>null</c> if loading into a DEP.</param>
         [ComVisible(false)]
-        public static void Initialize(IUnknownVector attributes)
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
+        public static void Initialize(IUnknownVector attributes,
+            IEnumerable<BackgroundFieldModel> fieldModels = null)
         {
             try
             {
+                // If using attribute models instead of a DEP, create a new attribute for any
+                // AutoCreate model that does not already have one.
+                if (fieldModels != null)
+                {
+                    foreach (var fieldModel in fieldModels.Where(model => model.AutoCreate))
+                    {
+                        if (!attributes
+                                .ToIEnumerable<IAttribute>()
+                                .Any(attribute => attribute.Name == fieldModel.Name))
+                        {
+                            var newAttribute = new UCLID_AFCORELib.Attribute();
+                            newAttribute.Name = fieldModel.Name;
+                            attributes.PushBack(newAttribute);
+                        }
+                    }
+                }
+
                 int attributeCount = attributes.Size();
                 for (int i = 0; i < attributeCount; i++)
                 {
                     IAttribute attribute = (IAttribute)attributes.At(i);
-                    AttributeStatusInfo.Initialize(attribute, attributes, null);
+                    var fieldModel = fieldModels?.SingleOrDefault(child => child.Name == attribute.Name);
 
-                    Initialize(attribute.SubAttributes);
+                    AttributeStatusInfo.Initialize(attribute, attributes, null, fieldModel?.DisplayOrder,
+                        false, TabStopMode.Never, new DataEntryValidator(), fieldModel?.AutoUpdateQuery,
+                        fieldModel?.ValidationQuery);
+
+                    Initialize(attribute.SubAttributes, fieldModel?.Children);
+
+                    if (fieldModel != null)
+                    {
+                        // Initialize the status info and validator as the corresponding DEP control
+                        // would have done.
+                        var statusInfo = GetStatusInfo(attribute);
+                        statusInfo._isMapped = true;
+                        statusInfo._isViewable = fieldModel.IsViewable;
+                        statusInfo.PersistAttribute = fieldModel.PersistAttribute;
+                        var validator = (DataEntryValidator)statusInfo.Validator;
+                        validator.ValidationErrorMessage = fieldModel.ValidationErrorMessage;
+                        validator.ValidationPattern = fieldModel.ValidationPattern;
+                        validator.CorrectCase = fieldModel.ValidationCorrectsCase;
+                    }
                 }
             }
             catch (Exception ex)
@@ -1204,8 +1378,9 @@ namespace Extract.DataEntry
         /// generated <see cref="IAttribute"/> should be added.</param>
         /// <param name="owningControl">The <see cref="IDataEntryControl"/> in charge of displaying 
         /// the generated <see cref="IAttribute"/>.</param>
-        /// <param name="displayOrder">A <see langword="string"/> that allows the 
-        /// <see cref="IAttribute"/> to be sorted by compared to other <see cref="IAttribute"/>'s 
+        /// <param name="displayOrder">An enumerable of <c>int</c> that allows the 
+        /// <see cref="IAttribute"/> to be sorted by comparing to the display order of other
+        /// <see cref="IAttribute"/>s.
         /// <see cref="DisplayOrder"/>values. Specify <see langword="null"/> to allow the 
         /// <see cref="IAttribute"/> to keep any display order it already has.</param>
         /// <param name="considerPropagated"><see langword="true"/> to consider the 
@@ -1225,7 +1400,7 @@ namespace Extract.DataEntry
         /// <see cref="IAttribute"/>'s and/or a database query.</param>
         [SuppressMessage("Microsoft.Interoperability", "CA1407:AvoidStaticMembersInComVisibleTypes")]
         public static IAttribute Initialize(string attributeName, IUnknownVector sourceAttributes,
-            IDataEntryControl owningControl, int? displayOrder, bool considerPropagated,
+            IDataEntryControl owningControl, IEnumerable<int> displayOrder, bool considerPropagated,
             TabStopMode? tabStopMode, IDataEntryValidator validatorTemplate, string autoUpdateQuery,
             string validationQuery)
         {
@@ -1296,7 +1471,7 @@ namespace Extract.DataEntry
         [ComVisible(false)]
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
         public static void Initialize(IAttribute attribute, IUnknownVector sourceAttributes,
-            IDataEntryControl owningControl, int? displayOrder, bool considerPropagated,
+            IDataEntryControl owningControl, IEnumerable<int> displayOrder, bool considerPropagated,
             TabStopMode? tabStopMode, IDataEntryValidator validatorTemplate, string autoUpdateQuery,
             string validationQuery, bool newAttribute = false)
         {
@@ -1330,6 +1505,12 @@ namespace Extract.DataEntry
                 }
 
                 statusInfo._owningControl = owningControl;
+                statusInfo._isMapped = (owningControl !=null);
+
+                if (owningControl != null && displayOrder == null)
+                {
+                    displayOrder = DataEntryMethods.GetTabIndices((Control)owningControl);
+                }
 
                 // Check to see if the display order should be set.
                 bool reorder = false;
@@ -1337,19 +1518,14 @@ namespace Extract.DataEntry
                 {
                     // [DataEntry:1004]
                     // Since this value will be compared using the string class, pad zeros so that tab
-                    // indices of up to 999 can be compared.
-                    string paddedDisplayOrder =
-                        string.Format(CultureInfo.InvariantCulture, "{0:D3}", displayOrder.Value);
-
-                    // Set/update the displayOrder value if necessary.
-                    string fullDisplayOrder = DataEntryMethods.GetTabIndex((Control)owningControl) +
-                        "." + paddedDisplayOrder;
+                    string textDisplayOrder = string.Join(".",
+                        displayOrder.Select(index => string.Format(CultureInfo.InvariantCulture, "{0:D3}", index)));
 
                     // If the displayOrder value has changed, sourceAttributes need to be reordered.
-                    if (statusInfo._displayOrder != fullDisplayOrder)
+                    if (statusInfo._displayOrder != textDisplayOrder)
                     {
                         reorder = true;
-                        statusInfo._displayOrder = fullDisplayOrder;
+                        statusInfo._displayOrder = textDisplayOrder;
                     }
                 }
 
@@ -1523,8 +1699,12 @@ namespace Extract.DataEntry
         [ComVisible(false)]
         public static void RefreshAutoUpdateValues()
         {
+            var executionContext = QueryExecutionContext;
+
             try
             {
+                QueryExecutionContext = ExecutionContext.OnRefresh;
+
                 foreach (AutoUpdateTrigger autoUpdateTrigger in _autoUpdateTriggers.Values)
                 {
                     autoUpdateTrigger.UpdateValue();
@@ -1534,6 +1714,10 @@ namespace Extract.DataEntry
             {
                 throw ex.AsExtract("ELI41573");
             }
+            finally
+            {
+                QueryExecutionContext = executionContext;
+            }
         }
 
         /// <summary>
@@ -1542,8 +1726,12 @@ namespace Extract.DataEntry
         [ComVisible(false)]
         public static void RefreshValidation()
         {
+            var executionContext = QueryExecutionContext;
+
             try
             {
+                QueryExecutionContext = ExecutionContext.OnRefresh;
+
                 foreach (AutoUpdateTrigger validationTrigger in _validationTriggers.Values)
                 {
                     validationTrigger.UpdateValue();
@@ -1552,6 +1740,10 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41574");
+            }
+            finally
+            {
+                QueryExecutionContext = executionContext;
             }
         }
 
@@ -1569,6 +1761,22 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI38247");
+            }
+        }
+
+        /// <summary>
+        /// Clears process-wide cache data
+        /// </summary>
+        [ComVisible(false)]
+        public static void ClearProcessWideCache()
+        {
+            try
+            {
+                ClearedProcessWideCache?.Invoke(null, new EventArgs());
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45502");
             }
         }
 
@@ -2016,7 +2224,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if the <see cref="IAttribute"/> has been viewed, or
         /// <see langword="false"/> if it has not.</returns>
         [ComVisible(false)]
-        public static bool HasBeenViewed(IAttribute attribute, bool recursive)
+        public static bool HasBeenViewedOrIsNotViewable(IAttribute attribute, bool recursive)
         {
             try
             {
@@ -2603,40 +2811,6 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI24984", ex);
-            }
-        }
-
-        /// <summary>
-        /// Updates the <see cref="AttributeStatusInfo.DisplayOrder"/> value associated with the 
-        /// specified <see cref="IAttribute"/> using the provided displayOrder value.
-        /// </summary>
-        /// <param name="attribute">The <see cref="IAttribute"/> whose 
-        /// <see cref="AttributeStatusInfo.DisplayOrder"/> value is to be updated.</param>
-        /// <param name="displayOrder">An <see langword="integer"/> representing the display order
-        /// of the <see cref="IAttribute"/> within its immediate containing control.</param>
-        [ComVisible(false)]
-        public static void UpdateDisplayOrder(IAttribute attribute, int displayOrder)
-        {
-            try
-            {
-                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
-                ExtractException.Assert("ELI24688",
-                    "Cannot update display order without owning control!",
-                    statusInfo._owningControl != null);
-
-                // [DataEntry:1004]
-                // Since this value will be compared using the string class, pad zeros so that tab
-                // indices of up to 999 can be compared.
-                string paddedDisplayOrder =
-                        string.Format(CultureInfo.InvariantCulture, "{0:D3}", displayOrder);
-
-                statusInfo._displayOrder =
-                    DataEntryMethods.GetTabIndex((Control)statusInfo._owningControl) + "." +
-                    paddedDisplayOrder;
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI24687", ex);
             }
         }
 
@@ -3433,18 +3607,31 @@ namespace Extract.DataEntry
         /// <param name="attributes">The <see cref="IUnknownVector"/> containing the
         /// <see cref="IAttribute"/>s that need to be freed.
         /// </param>
+        /// <param name="miscUtils">Pass any existing instance of to avoid another having to be
+        /// created or <c>null</c> if no such instance currently exists.</param>
         [ComVisible(false)]
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
-        public static void ReleaseAttributes(IUnknownVector attributes)
+        public static void ReleaseAttributes(IUnknownVector attributes, MiscUtils miscUtils = null)
         {
             try
             {
-                foreach (IAttribute attribute in
-                    DataEntryMethods.ToAttributeEnumerable(attributes, true))
+                if (attributes.Size() > 0)
                 {
-                    ReleaseAttributes(attribute.SubAttributes);
+                    if (miscUtils == null)
+                    {
+                        miscUtils = new MiscUtils();
+                    }
 
-                    attribute.DataObject = null;
+                    foreach (IAttribute attribute in
+                        DataEntryMethods.ToAttributeEnumerable(attributes, true))
+                    {
+                        ReleaseAttributes(attribute.SubAttributes, miscUtils);
+
+                        // This will release the reference to the DataObject (thereby preventing memory
+                        // leak issues), while saving the persistable elements of the status info object
+                        // so that they are persisted with the attribute itself.
+                        attribute.StowDataObject(miscUtils);
+                    }
                 }
             }
             catch (Exception ex)
@@ -3627,6 +3814,11 @@ namespace Extract.DataEntry
                 _queryCacheClearHandler.RemoveEventHander(value);
             }
         }
+
+        /// <summary>
+        /// Raised to notify listeners that a request to clear all process-wide cache data.
+        /// </summary>
+        public static event EventHandler<EventArgs> ClearedProcessWideCache;
 
         /// <summary>
         /// Raised to notify listeners that an Attribute's value was modified.
@@ -4189,6 +4381,7 @@ namespace Extract.DataEntry
                 _hasBeenViewed = source._hasBeenViewed;
                 _dataValidity = source._dataValidity;
                 _owningControl = source._owningControl;
+                _isMapped = source._isMapped;
                 _hintType = source._hintType;
                 _hintRasterZones = source._hintRasterZones;
                 _isAccepted = source._isAccepted;

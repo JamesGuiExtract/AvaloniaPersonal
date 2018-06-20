@@ -287,6 +287,13 @@ namespace Extract.DataEntry
         /// <param name="selectionState">The <see cref="SelectionState"/> to apply.</param>
         void ApplySelection(SelectionState selectionState);
 
+        /// <summary>
+        /// Creates a <see cref="BackgroundFieldModel"/> for representing this control during
+        /// a background data load.
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        BackgroundFieldModel GetBackgroundFieldModel();
+
         #endregion Methods
 
         #region EventHandlers

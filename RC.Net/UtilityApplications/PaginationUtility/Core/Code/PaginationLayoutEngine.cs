@@ -11,7 +11,7 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// <summary>
     /// A <see cref="LayoutEngine"/> that manages the layout of <see cref="PaginationControl"/>s.
     /// </summary>
-    internal class PaginationLayoutEngine : LayoutEngine
+    internal class PaginationLayoutEngine : LayoutEngine, IDisposable
     {
         #region Events
 
@@ -29,6 +29,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// able to perform one layout rather than many as individual control properties change).
         /// </summary>
         bool _layoutInvoked;
+
+        /// <summary>
+        /// In order to allow SnapToControl to be able to snap all the way to the top, extra space
+        /// may need to be added to the bottom so that there is enough scrolling available to get the
+        /// control to the top.
+        /// </summary>
+        Panel _bottomMarginControl = null;
+
+        /// <summary>
+        /// Recursion protection for UpdateBottomMargin.
+        /// </summary>
+        bool _updatingMargin;
 
         #endregion Fields
 
@@ -53,6 +65,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// there is no known reason the layout event can't be skipped for optimization purposes.
         /// </value>
         public bool ForceNextLayout
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the control which should be snapped to the top of the pane (<c>null</c> if
+        /// no control should be snapped to the top.
+        /// </summary>
+        public Control SnapToControl
         {
             get;
             set;
@@ -85,35 +107,47 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 Control parent = container as Control;
-                if (parent.Handle == null)
+                if (parent != null)
                 {
-                    return false;
-                }
-
-                parent.SafeBeginInvoke("ELI40230", () =>
-                {
-                    DoLayout(parent, layoutEventArgs);
-
-                    // Manually update separators that have pending status changes.
-                    foreach (var separator in parent.Controls.OfType<PaginationSeparator>()
-                        .Where(separator => separator.UpdateRequired))
+                    if (parent.Handle == null)
                     {
-                        separator.Invalidate();
-                        separator.UpdateRequired = false;
+                        return false;
                     }
 
-                    parent.ResumeLayout();
-                    _layoutInvoked = false;
-                }, 
-                true, 
-                (e) => 
+                    parent.SafeBeginInvoke("ELI40230", () =>
                     {
-                        parent.ResumeLayout();
-                        _layoutInvoked = false;
-                    });
+                        // Locking control update here prevents flicker in document headers as the
+                        // layout occurs.
+                        using (new LockControlUpdates(parent, initiallyLock: true, invalidateOnUnlock: true))
+                        {
+                            DoLayout(parent, layoutEventArgs, out List<PaginationControl> redundantControls);
 
-                parent.SuspendLayout();
-                _layoutInvoked = true;
+                            // Reset _layoutInvoked before OnLayoutCompleted, otherwise pending
+                            // _scrollToControl actions will be missed.
+                            _layoutInvoked = false;
+                            OnLayoutCompleted(redundantControls.ToArray());
+
+                            // Manually update separators that have pending status changes.
+                            foreach (var separator in parent.Controls.OfType<PaginationSeparator>()
+                                .Where(separator => separator.InvalidatePending))
+                            {
+                                separator.Invalidate();
+                                separator.InvalidatePending = false;
+                            }
+
+                            parent.ResumeLayout();
+                        }
+                    },
+                    true,
+                    (e) =>
+                        {
+                            parent.ResumeLayout();
+                            _layoutInvoked = false;
+                        });
+
+                    parent.SuspendLayout();
+                    _layoutInvoked = true;
+                }
             }
             catch (Exception ex)
             {
@@ -125,13 +159,52 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #endregion Overrides
 
+        #region IDisposable Members
+
+        /// <summary>
+        /// Releases all resources used by the <see cref="PaginationLayoutEngine"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <overloads>Releases resources used by the <see cref="PaginationLayoutEngine"/>.</overloads>
+        /// <summary>
+        /// Releases all unmanaged resources used by the <see cref="PaginationLayoutEngine"/>.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+        void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                try
+                {
+                    // Dispose of managed resources
+                    if (_bottomMarginControl != null)
+                    {
+                        _bottomMarginControl.Dispose();
+                        _bottomMarginControl = null;
+                    }
+                }
+                catch { }
+            }
+
+            // Dispose of unmanaged resources
+        }
+
+        #endregion IDisposable Members
+
         #region Private Members
 
         /// <summary>
         /// Does the layout.
         /// </summary>
         /// <param name="parent">The parent.</param>
-        void DoLayout(Control parent, LayoutEventArgs layoutEventArgs)
+        /// <param name="layoutEventArgs">redundant controls that may be removed as a result of the layout.</param>
+        void DoLayout(Control parent, LayoutEventArgs layoutEventArgs, out List<PaginationControl> redundantControls)
         {
             // Use DisplayRectangle so that parent.Padding is honored.
             Rectangle parentDisplayRectangle = parent.DisplayRectangle;
@@ -140,13 +213,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             parentDisplayRectangle.Width = parent.ClientRectangle.Width;
             Point nextControlLocation = parentDisplayRectangle.Location;
 
-            List<PaginationControl> redundantControls = new List<PaginationControl>();
+            redundantControls = new List<PaginationControl>();
             PaginationSeparator lastSeparator = null;
 
             // If the affected control is not currently visible or is offscreen below the current
             // visible ClientRectangle, abort the layout to avoid unnecessary repeated layouts as
             // a large number of documents/pages are loading.
             if (!ForceNextLayout &&
+                SnapToControl == null &&
                 layoutEventArgs?.AffectedControl != null &&
                 layoutEventArgs?.AffectedControl != parent &&
                 !layoutEventArgs.AffectedProperty.Equals("Visible") &&
@@ -183,7 +257,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     // Separator is being removed, previousSeparator is will be associated with a
                     // new document. Ensure this new association is reflected.
-                    previousSeparator.UpdateRequired = true;
+                    previousSeparator.InvalidatePending = true;
 
                     continue;
                 }
@@ -210,7 +284,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             {
                                 if (lastSeparator != null)
                                 {
-                                    nextControlLocation.Y += lastSeparator.Height + 1;
+                                    nextControlLocation.Y += lastSeparator.Height - 1;
                                 }
                             }
                             else
@@ -263,7 +337,99 @@ namespace Extract.UtilityApplications.PaginationUtility
                 redundantControls.Add(lastControl);
             }
 
-            OnLayoutCompleted(redundantControls.ToArray());
+            UpdateBottomMargin((FlowLayoutPanel)parent, layoutEventArgs);
+        }
+
+        /// <summary>
+        /// Updates the size and position of _bottomMarginControl based on SnapToControl and
+        /// current control positions.
+        /// </summary>
+        /// <param name="flowLayoutPanel">The <see cref="FlowLayoutPanel"/> for which the layout is occurring.</param>
+        /// <param name="layoutEventArgs">The <see cref="LayoutEventArgs"/> instance containing the event data.</param>
+        void UpdateBottomMargin(FlowLayoutPanel flowLayoutPanel, LayoutEventArgs layoutEventArgs)
+        {
+            if (_updatingMargin)
+            {
+                return;
+            }
+
+            try
+            {
+                _updatingMargin = true;
+
+                if (_bottomMarginControl?.Parent == flowLayoutPanel)
+                {
+                    if (flowLayoutPanel.Controls.IndexOf(_bottomMarginControl) != flowLayoutPanel.Controls.Count - 1)
+                    {
+                        flowLayoutPanel.Controls.SetChildIndex(_bottomMarginControl, flowLayoutPanel.Controls.Count - 1);
+                    }
+                }
+                else
+                {
+                    if (_bottomMarginControl == null)
+                    {
+                        _bottomMarginControl = new Panel();
+                        _bottomMarginControl.Margin = new Padding();
+                    }
+
+                    flowLayoutPanel.Controls.Add(_bottomMarginControl);
+                }
+
+                var lastVisibleControlBottom = flowLayoutPanel.Controls
+                    .OfType<PaginationControl>()
+                    .LastOrDefault(control => control.Visible)?.Bottom ?? flowLayoutPanel.Top;
+
+                if (SnapToControl == null)
+                {
+                    if (_bottomMarginControl != null)
+                    {
+                        _bottomMarginControl.Location = new Point(0, lastVisibleControlBottom);
+                        _bottomMarginControl.Width = flowLayoutPanel.Width - SystemInformation.VerticalScrollBarWidth;
+                    }
+                }
+                else
+                {
+                    bool newlyVisible = !flowLayoutPanel.VerticalScroll.Visible;
+
+                    var currentHeight = flowLayoutPanel.VerticalScroll.Visible 
+                        ? flowLayoutPanel.VerticalScroll.Maximum
+                        : flowLayoutPanel.Height;
+                    var scrollPosition = flowLayoutPanel.VerticalScroll.Visible
+                        ? flowLayoutPanel.VerticalScroll.Value
+                        : 0;
+                    var currentMargin = _bottomMarginControl?.Height ?? 0;
+
+                    var bottomMargin = Math.Max(0,
+                        SnapToControl.Top -
+                            (currentHeight
+                                - flowLayoutPanel.Height
+                                - scrollPosition
+                                - currentMargin));
+
+                    if (bottomMargin != _bottomMarginControl.Height)
+                    {
+                        _bottomMarginControl.Width = flowLayoutPanel.Width - SystemInformation.VerticalScrollBarWidth;
+                        _bottomMarginControl.Height = bottomMargin;
+                        _bottomMarginControl.Location = new Point(0, lastVisibleControlBottom);
+                    }
+
+                    if (bottomMargin > 0 && newlyVisible)
+                    {
+                        DoLayout(flowLayoutPanel, layoutEventArgs, out List<PaginationControl> _);
+                    }
+                    else
+                    {
+                        flowLayoutPanel.VerticalScroll.Value =
+                            flowLayoutPanel.VerticalScroll.Value + SnapToControl.Top;
+
+                        SnapToControl = null;
+                    }
+                }
+            }
+            finally
+            {
+                _updatingMargin = false;
+            }
         }
 
         /// <summary>

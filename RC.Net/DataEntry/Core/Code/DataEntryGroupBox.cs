@@ -197,7 +197,7 @@ namespace Extract.DataEntry
                     // attribute if no such attribute can be found.
                     _attribute = DataEntryMethods.InitializeAttribute(_attributeName,
                         MultipleMatchSelectionMode.None, !string.IsNullOrEmpty(_attributeName),
-                        sourceAttributes, null, this, 0, false, TabStopMode.Never, null, null, null);
+                        sourceAttributes, null, this, null, false, TabStopMode.Never, null, null, null);
                 }
 
                 OnPropagateAttributes();
@@ -521,6 +521,30 @@ namespace Extract.DataEntry
         public void ApplySelection(SelectionState selectionState)
         {
             // Nothing to do.
+        }
+
+        /// <summary>
+        /// Creates a <see cref="BackgroundFieldModel"/> for representing this control during
+        /// a background data load.
+        /// </summary>
+        public BackgroundFieldModel GetBackgroundFieldModel()
+        {
+            try
+            {
+                var fieldModel = new BackgroundFieldModel()
+                {
+                    Name = AttributeName,
+                    ParentAttributeControl = ParentDataEntryControl,
+                    DisplayOrder = DataEntryMethods.GetTabIndices(this),
+                    PersistAttribute = true
+                };
+
+                return fieldModel;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45512");
+            }
         }
 
         #endregion Unused IDataEntryControl Members

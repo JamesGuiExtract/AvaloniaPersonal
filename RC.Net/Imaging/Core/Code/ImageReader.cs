@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Runtime.Caching;
 using System.Threading;
 
 namespace Extract.Imaging
@@ -419,24 +420,44 @@ namespace Extract.Imaging
         /// <paramref name="pageNumber"/>.</returns>
         ImagePageProperties GetPageProperties(int pageNumber)
         {
-            try
+            // Chache info so that correcting spatial data on large images works well
+            // https://extract.atlassian.net/projects/ISSUE/issues/ISSUE-15299
+            var key = "ImagePageProperties" + _fileName + ":" + pageNumber;
+            var cache = MemoryCache.Default;
+            var result = cache.Get(key) as ImagePageProperties;
+            if (result == null)
             {
-                // TODO: Cache image info?
                 lock (_lock)
                 {
-                    _stream.Position = _startOfImage;
-                    using (CodecsImageInfo info = _codecs.GetInformation(_stream, false, pageNumber))
+                    result = cache.Get(key) as ImagePageProperties;
+                    if (result == null)
                     {
-                        return new ImagePageProperties(info);
+                        try
+                        {
+
+                            _stream.Position = _startOfImage;
+                            using (CodecsImageInfo info = _codecs.GetInformation(_stream, false, pageNumber))
+                            {
+                                result = new ImagePageProperties(info);
+                            }
+                        }
+                        finally
+                        {
+                            // Make sure to reset the stream position to the beginning so that
+                            // calls to _codecs.Load that pass in an offset work correctly
+                            _stream.Position = 0;
+                        }
+
+                        CacheItemPolicy policy = new CacheItemPolicy
+                        {
+                            SlidingExpiration = TimeSpan.FromMinutes(30)
+                        };
+                        cache.Set(key, result, policy);
                     }
                 }
             }
-            finally
-            {
-                // Make sure to reset the stream position to the beginning so that
-                // calls to _codecs.Load that pass in an offset work correctly
-                _stream.Position = 0;
-            }
+
+            return result;
         }
 
         /// <summary>

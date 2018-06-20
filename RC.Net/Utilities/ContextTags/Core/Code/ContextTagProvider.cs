@@ -75,6 +75,12 @@ namespace Extract.Utilities.ContextTags
         (string contextPath, ContextTagDatabaseManager manager) _readOnlyManager;
 
         /// <summary>
+        /// Indicates whether access to a local read-only context database has been permanently
+        /// closed.
+        /// </summary>
+        bool _localDatabaseClosed;
+
+        /// <summary>
         /// Controls access to _tagValues from multiple threads.
         /// </summary>
         object _lock = new object();
@@ -104,6 +110,25 @@ namespace Extract.Utilities.ContextTags
         }
 
         #endregion Constructors
+
+        #region Finalizer
+
+        /// <summary>
+        /// Finalizes an instance of the <see cref="ContextTagProvider"/> class.
+        /// </summary>
+        ~ContextTagProvider()
+        {
+            try
+            {
+                _readOnlyManager.manager?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI44958");
+            }
+        }
+
+        #endregion Finalizer
 
         #region IContextTagProvider
 
@@ -379,7 +404,7 @@ namespace Extract.Utilities.ContextTags
             try
             {
                 var manager = GetReadOnlyManager(contextPath);
-                return manager.IsUpdateRequired;
+                return manager?.IsUpdateRequired ?? false;
             }
             catch (Exception ex)
             {
@@ -413,14 +438,18 @@ namespace Extract.Utilities.ContextTags
         }
 
         /// <summary>
-        /// Closes any open databases or resources
+        /// Closes any open read-only context tag database. This is permanent; this instance will no
+        /// longer have access to a read-only copy of the context tag database.
         /// </summary>
-        public void Close()
+        public void CloseDatabase()
         {
             try
             {
-                _readOnlyManager.manager?.Dispose();
-                _readOnlyManager = ("", null);
+                lock (_lock)
+                {
+                    _localDatabaseClosed = true;
+                    CloseDB();
+                }
             }
             catch (Exception ex)
             {
@@ -444,9 +473,14 @@ namespace Extract.Utilities.ContextTags
             {
                 lock (_lock)
                 {
+                    if (_localDatabaseClosed)
+                    {
+                        return null;
+                    }
+
                     if (_readOnlyManager.contextPath != contextPath)
                     {
-                        Close();
+                        CloseDB();
                     }
 
                     if (_readOnlyManager.manager == null)
@@ -591,7 +625,11 @@ namespace Extract.Utilities.ContextTags
  
                 _workflowTagValues[""].Add(_EDIT_CUSTOM_TAGS_LABEL, "");
 
-                return manager.ContextTagDatabase.Context.Any() || manager.ContextTagDatabase.CustomTag.Any();
+                bool dataLoaded = manager.ContextTagDatabase.Context.Any() || manager.ContextTagDatabase.CustomTag.Any();
+
+                manager.ResetDatabase();
+
+                return dataLoaded;
             }
         }
 
@@ -659,6 +697,15 @@ namespace Extract.Utilities.ContextTags
                     WaitForHandle(finishedEvent, parentWindow != IntPtr.Zero);
                 }
             }
+        }
+
+        /// <summary>
+        /// Closes any open read-only context tag database.
+        /// </summary>
+        void CloseDB()
+        {
+            _readOnlyManager.manager?.Dispose();
+            _readOnlyManager = ("", null);
         }
 
         /// <summary>

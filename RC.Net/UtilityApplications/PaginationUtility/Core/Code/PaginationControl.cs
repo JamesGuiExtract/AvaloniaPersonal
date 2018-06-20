@@ -116,10 +116,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     ExtractException.Assert("ELI35487", "Unexpected control state.",
                         index >= 0);
 
-                    var previousControl = (index == 0) ? null
-                        : Parent.Controls[index - 1];
+                    PaginationControl previousControl = null;
+                    for (index = index - 1; previousControl == null && index >= 0; index--)
+                    {
+                        previousControl = Parent.Controls[index] as PaginationControl;
+                    }
 
-                    return previousControl as PaginationControl;
+                    return previousControl;
                 }
                 catch (Exception ex)
                 {
@@ -149,10 +152,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     ExtractException.Assert("ELI35489", "Unexpected control state.",
                         index >= 0);
 
-                    var nextControl = (index + 1 >= Parent.Controls.Count) ? null :
-                        Parent.Controls[index + 1];
+                    PaginationControl nextControl = null;
+                    for (index = index + 1; nextControl == null && index < Parent.Controls.Count; index++)
+                    {
+                        nextControl = Parent.Controls[index] as PaginationControl;
+                    }
 
-                    return nextControl as PaginationControl;
+                    return nextControl;
                 }
                 catch (Exception ex)
                 {

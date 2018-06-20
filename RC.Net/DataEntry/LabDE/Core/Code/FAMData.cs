@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.OleDb;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UCLID_FILEPROCESSINGLib;
@@ -469,7 +470,7 @@ namespace Extract.DataEntry.LabDE
                 string id = documentDataRecord.IdField.Value;
 
                 DocumentDataRecordInfo recordInfo = GetRecordInfo(id);
-                if (recordInfo != null && recordInfo.CorrespondingFileIds.Any()) 
+                if (recordInfo != null && recordInfo.CorrespondingFileIds.Any())
                 {
                     yield return recordInfo.Description;
                 }
@@ -499,6 +500,92 @@ namespace Extract.DataEntry.LabDE
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI38183");
+            }
+        }
+
+        /// <summary>
+        /// Links a file with the specified order.
+        /// </summary>
+        /// <param name="fileId">The file identifier.</param>
+        /// <param name="orderNumber">The order number.</param>
+        /// <param name="dateTime">The collection date/time for the order or <c>null</c> if not known.</param>
+        public virtual void LinkFileWithOrder(int fileId, string orderNumber, DateTime? dateTime)
+        {
+            try
+            {
+                string query = string.Format(CultureInfo.CurrentCulture,
+                    "DECLARE @linkExists INT \r\n" +
+                    "   SELECT @linkExists = COUNT([OrderNumber]) \r\n" +
+                    "       FROM [LabDEOrderFile] WHERE [OrderNumber] = {0} AND [FileID] = {1} \r\n" +
+                    "IF @linkExists = 1 \r\n" +
+                    "BEGIN \r\n" +
+                    ((dateTime != null)
+                        ? "    UPDATE [LabDEOrderFile] SET [CollectionDate] = '{2}' \r\n"
+                        : "    UPDATE [LabDEOrderFile] SET [CollectionDate] = NULL \r\n") +
+                    "        WHERE [OrderNumber] = {0} AND [FileID] = {1} \r\n" +
+                    "END \r\n" +
+                    "ELSE \r\n" +
+                    "BEGIN \r\n" +
+                    "    IF {0} IN (SELECT [OrderNumber] FROM [LabDEOrder]) \r\n" +
+                    "    BEGIN \r\n" +
+                    ((dateTime != null)
+                        ? "        INSERT INTO [LabDEOrderFile] ([OrderNumber], [FileID], [CollectionDate]) \r\n" +
+                            "            VALUES ({0}, {1}, '{2}') \r\n"
+                        : "        INSERT INTO [LabDEOrderFile] ([OrderNumber], [FileID]) \r\n" +
+                            "            VALUES ({0}, {1}) \r\n") +
+                    "   END \r\n" +
+                    "END",
+                    "'" + orderNumber + "'", fileId, dateTime);
+
+                // The query has no results-- immediately dispose of the DataTable returned.
+                DBMethods.ExecuteDBQuery(OleDbConnection, query).Dispose();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45617");
+            }
+        }
+
+        /// <summary>
+        /// Links a file with the specified encounter.
+        /// </summary>
+        /// <param name="fileId">The file identifier.</param>
+        /// <param name="orderNumber">The encounter identifier.</param>
+        /// <param name="dateTime">The encounter date/time or <c>null</c> if not known.</param>
+        public virtual void LinkFileWithEncounter(int fileId, string encounterID, DateTime? dateTime)
+        {
+            try
+            {
+                string query = string.Format(CultureInfo.CurrentCulture,
+                    "DECLARE @linkExists INT \r\n" +
+                    "   SELECT @linkExists = COUNT([EncounterID]) \r\n" +
+                    "       FROM [LabDEEncounterFile] WHERE [EncounterID] = {0} AND [FileID] = {1} \r\n" +
+                    "IF @linkExists = 1 \r\n" +
+                    "BEGIN \r\n" +
+                    ((dateTime != null)
+                        ? "    UPDATE [LabDEEncounterFile] SET [DateTime] = '{2}' \r\n"
+                        : "    UPDATE [LabDEEncounterFile] SET [DateTime] = NULL \r\n") +
+                    "        WHERE [EncounterID] = {0} AND [FileID] = {1} \r\n" +
+                    "END \r\n" +
+                    "ELSE \r\n" +
+                    "BEGIN \r\n" +
+                    "    IF {0} IN (SELECT [CSN] FROM [LabDEEncounter]) \r\n" +
+                    "    BEGIN \r\n" +
+                    ((dateTime != null)
+                        ? "        INSERT INTO [LabDEEncounterFile] ([EncounterID], [FileID], [DateTime]) \r\n" +
+                            "            VALUES ({0}, {1}, '{2}') \r\n"
+                        : "        INSERT INTO [LabDEEncounterFile] ([EncounterID], [FileID]) \r\n" +
+                            "            VALUES ({0}, {1}) \r\n") +
+                    "   END \r\n" +
+                    "END",
+                    "'" + encounterID + "'", fileId, dateTime);
+
+                // The query has no results-- immediately dispose of the DataTable returned.
+                DBMethods.ExecuteDBQuery(OleDbConnection, query).Dispose();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45618");
             }
         }
 

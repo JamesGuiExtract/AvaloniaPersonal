@@ -952,7 +952,7 @@ namespace Extract.DataEntry
         {
             get;
             set;
-        } = Color.LightGreen;
+        } = ExtractColors.LightLightBlue;
 
         /// <summary>
         /// Gets or sets one or more colors to use to highlight data in the image viewer or indicate
@@ -1011,7 +1011,6 @@ namespace Extract.DataEntry
 
                     // Apply the supplied colors and initialize the default color.
                     _highlightColors = value;
-                    ActiveSelectionColor = _highlightColors[_highlightColors.Length - 1].Color;
 
                     // Initialize _confidenceBoundaries
                     _confidenceBoundaries = new VariantVectorClass();
@@ -1464,7 +1463,7 @@ namespace Extract.DataEntry
                                 }
                             }
 
-                            _imageViewer.DefaultHighlightColor = ActiveSelectionColor;
+                            _imageViewer.DefaultHighlightColor = _highlightColors[_highlightColors.Length - 1].Color;
                             _imageViewer.AllowBandedSelection = false;
                             _changingData = false;
                         }
@@ -1662,7 +1661,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (_dbConnections != dbConnections)
+                if (_dbConnections?.SequenceEqual(dbConnections ?? new Dictionary<string, DbConnection>()) != true)
                 {
                     _dbConnections = dbConnections;
 
@@ -1926,12 +1925,14 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="validateData"><c>true</c> if the data should be validated; otherwise, 
         /// <c>false</c>.</param>
+        /// <param name="pruneUnmappedAttributes"><c>true</c> if unmapped attributes should be
+        /// pruned from the returned hierarchy; <c>false</c> to keep them in the hierarchy.</param>
         /// <returns>An <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s representing the
         /// current data.
         /// </returns>
         // Since this method has side-effects, it should not be a property.
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public virtual IUnknownVector GetData(bool validateData)
+        public virtual IUnknownVector GetData(bool validateData, bool pruneUnmappedAttributes = true)
         {
             try
             {
@@ -1954,7 +1955,7 @@ namespace Extract.DataEntry
                     _mostRecentlySaveAttributes = (IUnknownVector)copyThis.CloneIdentifiableObject();
                     _mostRecentlySaveAttributes.ReportMemoryUsage();
 
-                    PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
+                    DataEntryMethods.PruneNonPersistingAttributes(_mostRecentlySaveAttributes, pruneUnmappedAttributes);
 
                     return _mostRecentlySaveAttributes;
                 }
@@ -2012,7 +2013,7 @@ namespace Extract.DataEntry
                             _mostRecentlySaveAttributes = (IUnknownVector)copyThis.CloneIdentifiableObject();
                             _mostRecentlySaveAttributes.ReportMemoryUsage();
 
-                            PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
+                            DataEntryMethods.PruneNonPersistingAttributes(_mostRecentlySaveAttributes);
 
                             OnDataSaving(_mostRecentlySaveAttributes, forCommit: validateData);
 
@@ -3534,7 +3535,7 @@ namespace Extract.DataEntry
                 // Blank attributes will not be counted as unviewed in terms of the value of
                 // IsDataUnviewed, but if a query applies a value while still in the unviewed state,
                 // then it should count as unviewed.
-                if (!AttributeStatusInfo.HasBeenViewed(e.Attribute, false) &&
+                if (!AttributeStatusInfo.HasBeenViewedOrIsNotViewable(e.Attribute, false) &&
                     !string.IsNullOrWhiteSpace(e.Attribute.Value.String))
                 {
                     if (_unviewedAttributes.Add(e.Attribute) && _unviewedAttributes.Count == 1)
@@ -4650,43 +4651,6 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI36172");
-            }
-        }
-
-        /// <summary>
-        /// Removes all <see cref="IAttribute"/>s not marked as persistable from the provided
-        /// attribute hierarchy.
-        /// </summary>
-        /// <param name="attributes">The hierarchy of <see cref="IAttribute"/>s from which
-        /// non-persistable attributes should be removed.</param>
-        internal static void PruneNonPersistingAttributes(IUnknownVector attributes)
-        {
-            try
-            {
-                int count = attributes.Size();
-                for (int i = 0; i < count; i++)
-                {
-                    IAttribute attribute = (IAttribute)attributes.At(i);
-                    if (AttributeStatusInfo.IsAttributePersistable(attribute))
-                    {
-                        PruneNonPersistingAttributes(attribute.SubAttributes);
-                    }
-                    else
-                    {
-                        attributes.Remove(i);
-                        count--;
-                        i--;
-
-                        // [DataEntry:693]
-                        // Since these attributes will no longer be accessed by the DataEntry,
-                        // the DataObject needs to be set to null to prevent handle leaks.
-                        attribute.DataObject = null;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI40243");
             }
         }
 
@@ -5968,9 +5932,6 @@ namespace Extract.DataEntry
                 return;
             }
 
-            // [DataEntry:269] Swipes should trigger document to be marked as dirty.
-            OnDataChanged();
-
             try
             {
                 // Delay calls to DrawHighlights until processing of the swipe is
@@ -6010,6 +5971,14 @@ namespace Extract.DataEntry
                 ControlUpdateReferenceCount--;
             }
 
+            // [DataEntry:269] Swipes should trigger document to be marked as dirty.
+            // Ensure the change
+            // https://extract.atlassian.net/browse/ISSUE-15472
+            // Make sure this is called after the swipe has been processed, otherwise affected
+            // entities that use data queries in response to changed data may not have the
+            // swipe result available.
+            OnDataChanged();
+
             try
             {
                 // Notify AttributeStatusInfo that the current edit is over so that
@@ -6046,7 +6015,7 @@ namespace Extract.DataEntry
                 Dictionary<IDataEntryControl, List<IAttribute>> attributesMarkedAsViewed =
                     new Dictionary<IDataEntryControl, List<IAttribute>>();
 
-                if (!AttributeStatusInfo.HasBeenViewed(attribute, false) &&
+                if (!AttributeStatusInfo.HasBeenViewedOrIsNotViewable(attribute, false) &&
                     string.IsNullOrEmpty(attribute.Value.String))
                 {
                     AttributeStatusInfo.MarkAsViewed(attribute, true);
@@ -6917,7 +6886,7 @@ namespace Extract.DataEntry
             // have done so. I'm torn between the risk of re-introducing ISSUE-14328 and other
             // as-yet undiscovered consequences of this early return. As a compromise, I'm adding a
             // check to confirm the attribute has an SDN before allowing the early return.
-            if (!string.IsNullOrEmpty(attribute.Value.SourceDocName) && 
+            if (!string.IsNullOrEmpty(attribute.Value.SourceDocName) &&
                 !FileSystemMethods.ArePathsEqual(attribute.Value.SourceDocName, ImageViewer.ImageFile))
             {
                 return attributeHighlights;
@@ -7918,9 +7887,10 @@ namespace Extract.DataEntry
         /// or <see langword="false"/> to release the lock and allow updates again.</param>
         void LockControlUpdates(bool lockUpdates)
         {
-            if (lockUpdates == _controlUpdatesLocked)
+            if (Parent == null || lockUpdates == _controlUpdatesLocked)
             {
-                // If the requested state is the same as the current state, there is nothing to do.
+                // If the DEP is not yet added to a form or the requested state is the same as the
+                // current state, there is nothing to do.
                 return;
             }
             else
@@ -8032,6 +8002,9 @@ namespace Extract.DataEntry
                 ExecuteOnIdle("ELI39651", () =>
                 {
                     _isDocumentLoaded = true;
+                    // By default, all query executions from this point forward should be considered
+                    // to be the result of a manual data update.
+                    AttributeStatusInfo.QueryExecutionContext = ExecutionContext.OnUpdate;
                     OnDocumentLoaded();
                 });
 

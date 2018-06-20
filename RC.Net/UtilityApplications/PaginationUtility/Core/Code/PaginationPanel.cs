@@ -1,5 +1,6 @@
 ﻿using ADODB;
 using Extract.AttributeFinder;
+using Extract.DataEntry.LabDE;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
@@ -15,6 +16,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -35,6 +37,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Text to use for otherwise empty Document attribute values in pagination hierarchy
         /// </summary>
         private static readonly string _DOCUMENT_PLACEHOLDER_TEXT = "N/A";
+
+        /// <summary>
+        /// A string representation of the GUID for <see cref="AttributeStorageManagerClass"/> 
+        /// </summary>
+        static readonly string _ATTRIBUTE_STORAGE_MANAGER_GUID =
+            typeof(AttributeStorageManagerClass).GUID.ToString("B");
 
         #endregion Constants
 
@@ -241,6 +249,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public event EventHandler<EventArgs> RevertedChanges;
 
+        /// <summary>
+        /// Occurs when [file task session identifier request].
+        /// </summary>
+        public event EventHandler<FileTaskSessionRequestEventArgs> FileTaskSessionIdRequest;
+
         #endregion Events
 
         #region Configuration Properties
@@ -297,6 +310,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether document pages for newly loaded documents should
+        /// be collapsed by default.
+        /// </summary>
+        public bool DefaultToCollapsed
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether pages should automatically be oriented to match
         /// the orientation of the text (per OCR).
         /// </summary>
@@ -305,6 +328,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         ///   text; otherwise, <c>false</c>.
         /// </value>
         public bool AutoRotateImages
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the select all check box should be visible.
+        /// </summary>
+        public bool SelectAllCheckBoxVisible
+        {
+            get;
+            set;
+        } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the save button visible (to save changes without committing).
+        /// </summary>
+        public bool SaveButtonVisible
         {
             get;
             set;
@@ -345,6 +386,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Configuration Properties
 
         #region Runtime Properties
+
+        /// <summary>
+        /// Gets whenther the panel is currently commiting changes.
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable(false)]
+        public bool IsCommittingChanges
+        {
+            get
+            {
+                return _committingChanges;
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether there are any uncommitted changes to document pagination.
@@ -605,17 +659,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets/sets the ID of the currently active FileTaskSession row.
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [Browsable(false)]
-        public int? FileTaskSessionID
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets a value indicating whether this instance's data panel is open.
         /// </summary>
         /// <value><see langword="true"/> if this instance's data panel is open; otherwise,
@@ -657,15 +700,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// should expect to be able to calculate.</param>
         /// <param name="selectDocument"><see langword="true"/> to select the document; otherwise,
         /// <see langword="false"/>.</param>
-        public void LoadFile(string fileName, int position, bool selectDocument)
+        public void LoadFile(string fileName, int fileID, int position, bool selectDocument)
         {
-            LoadFile(fileName, position, null, null, false, null, selectDocument);
+            LoadFile(fileName, fileID, position, null, null, false, null, selectDocument);
         }
 
         /// <summary>
         /// Loads the specified documents pages into the pane.
         /// </summary>
         /// <param name="fileName">Name of the file to load.</param>
+        /// <param name="fileID">The file ID.</param>
         /// <param name="position">The position at which a document should be loaded. 0 = Load at
         /// the front (top), -1 = load at the end (bottom). Any other value should be a value
         /// passed via <see cref="CreatingOutputDocumentEventArgs"/> and not a value the caller
@@ -680,7 +724,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         /// <param name="selectDocument"><see langword="true"/> to select the document; otherwise,
         /// <see langword="false"/>.</param>
-        public void LoadFile(string fileName, int position, IEnumerable<int> pages,
+        public void LoadFile(string fileName, int fileID, int position, IEnumerable<int> pages,
             IEnumerable<int> deletedPages, bool paginationSuggested,
             PaginationDocumentData documentData, bool selectDocument)
         {
@@ -689,13 +733,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (InvokeRequired)
                 {
                     this.Invoke((MethodInvoker)(() => LoadFile(
-                        fileName, position, pages, deletedPages, paginationSuggested, documentData, selectDocument)));
+                        fileName, fileID, position, pages, deletedPages, paginationSuggested, documentData, selectDocument)));
                     return;
                 }
 
                 _pendingChangesOverride = null;
 
                 SuspendUIUpdatesForOperation();
+
+                // Selecting the new document causes unexepected UI behavior and, in some cases
+                // exceptions if new documents are being loaded collapsed or a DEP is currently
+                // open for another document.
+                // https://extract.atlassian.net/browse/ISSUE-15337
+                selectDocument &= !DefaultToCollapsed && !IsDataPanelOpen;
 
                 // The OutputDocument doesn't get created directly by this method. Use
                 // _documentData to be able to pass this info to when it is needed in
@@ -706,7 +756,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         paginationSuggested, documentData);
                 }
 
-                var sourceDocument = OpenDocument(fileName);
+                var sourceDocument = OpenDocument(fileName, fileID);
 
                 if (sourceDocument != null)
                 {
@@ -730,6 +780,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 ApplyOrderOfLoadedSourceDocuments();
+
+                // https://extract.atlassian.net/browse/ISSUE-15351
+                // In the process of loading a document, controls are added and removed. In some
+                // cases, such as with the removal and re-addition of the load next document button,
+                // this seems leave focus in the DEP when it should really be with the newly loaded
+                // document. Re-evaluate current focus any time a new file has been loaded.
+                ProcessFocusChange(forceUpdate: false);
             }
             catch (Exception ex)
             {
@@ -927,6 +984,97 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Saves the current state of pagination and index data for all source documents.
+        /// NOTE: An exception will be thrown if the pages from multiple source documents
+        /// are currently combined into a single proposed output document.
+        /// </summary>
+        /// <returns><c>true</c> if the data was saved; otherwise, <c>false</c>.</returns>
+        public bool Save()
+        {
+            TemporaryWaitCursor waitCursor = new TemporaryWaitCursor();
+
+            try
+            {
+                bool result = SaveDocumentData(selectedDocumentsOnly: false, validateData: false);
+
+                var sourceToOutputMap = _pendingDocuments.ToDictionary(
+                    pendingDocument => pendingDocument
+                        .PageControls
+                        .Select(pageControl => pageControl.Page.SourceDocument)
+                        .Distinct(),
+                    pendingDocument => pendingDocument);
+
+                if (sourceToOutputMap.Keys.Any(key => key.Count() > 1))
+                {
+                    UtilityMethods.ShowMessageBox("It is not possible to save progress when multiple " +
+                        "source documents have been combined into a single output document.",
+                        "Unable to save", true);
+                    return false;
+                }
+
+                var documentsToSave = new Dictionary<SourceDocument, List<OutputDocument>>();
+                foreach (var entry in sourceToOutputMap.Where(entry => entry.Key.Any()))
+                {
+                    var outputDocs = documentsToSave.GetOrAdd(entry.Key.Single(), () => new List<OutputDocument>());
+                    outputDocs.Add(entry.Value);
+                }
+
+                var orderedDocuments = _primaryPageLayoutControl.Documents.ToList();
+
+                foreach (var sourceEntry in documentsToSave)
+                {
+                    var sourceDocName = sourceEntry.Key.FileName;
+                    var documentAttributes = new IUnknownVector();
+
+                    foreach (var outputDoc in sourceEntry.Value.OrderBy(doc => orderedDocuments.IndexOf(doc)))
+                    {
+                        var documentAttribute = documentAttributes.AddSubAttribute("Document");
+
+                        var pages = outputDoc.PageControls
+                            .Where(pageControl => !pageControl.Deleted)
+                            .Select(pageControl => pageControl.Page.OriginalPageNumber);
+                        if (pages.Any())
+                        {
+                            documentAttribute.AddSubAttribute("Pages",
+                                UtilityMethods.GetPageNumbersAsString(pages),
+                                sourceDocName);
+                        }
+
+                        var deletedPages = outputDoc.PageControls
+                            .Where(pageControl => pageControl.Deleted)
+                            .Select(pageControl => pageControl.Page.OriginalPageNumber);
+                        if (deletedPages.Any())
+                        {
+                            documentAttribute.AddSubAttribute("DeletedPages",
+                                UtilityMethods.GetPageNumbersAsString(deletedPages),
+                                sourceDocName);
+                        }
+
+                        documentAttribute.SubAttributes.PushBack(outputDoc.DocumentData.DocumentDataAttribute);
+                    }
+
+                    if (documentAttributes.Size() > 0)
+                    {
+                        IUnknownVector saveFileData = new IUnknownVector();
+                        saveFileData.Append(documentAttributes);
+                        saveFileData.SaveTo(sourceEntry.Key.FileName + ".voa", false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                        saveFileData.ReportMemoryUsage();
+                    }
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45736");
+            }
+            finally
+            {
+                waitCursor.Dispose();
+            }
+        }
+
+        /// <summary>
         /// Commits changes (either for all document or just selected documents depending on the
         /// value of <see cref="CommitOnlySelection"/>.
         /// </summary>
@@ -934,15 +1082,21 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see langword="false"/>.</returns>
         public bool CommitChanges()
         {
+            TemporaryWaitCursor waitCursor = new TemporaryWaitCursor();
+
             try
             {
-                SuspendUIUpdatesForOperation();
                 _committingChanges = true;
 
                 if (!CanSelectedDocumentsBeCommitted())
                 {
                     return false;
                 }
+
+                // Don't suspend UI updates until CanSelectedDocumentsBeCommitted has been checked--
+                // there is not flickering to prevent at this point and moving windows in front of
+                // a suspended UI can cause artifacts.
+                SuspendUIUpdates = true;
 
                 // Prevent the UI from trying to load/close pages in the image viewer as the
                 // operation is taking place.
@@ -1033,6 +1187,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _pendingDocuments.Remove(outputDocument);
                 }
 
+                LinkFilesWithRecordIDs(documentsToCommit);
+
                 var disregardedPagination = documentsInSourceForm
                     .Where(doc => doc.PaginationSuggested)
                     .Select(doc => doc.PageControls
@@ -1093,6 +1249,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 try
                 {
                     _committingChanges = false;
+                    SuspendUIUpdates = false;
                     if (_outputDocumentPositions != null)
                     {
                         _outputDocumentPositions.Clear();
@@ -1106,6 +1263,46 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     ex.ExtractLog("ELI40210");
                 }
+
+                waitCursor.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Links <see cref="documentsToCommit"/> to whatever order/encounter numbers are reported.
+        /// </summary>
+        /// <param name="documentsToCommit">The documents to commit.</param>
+        void LinkFilesWithRecordIDs(HashSet<OutputDocument> documentsToCommit)
+        {
+            using (var famData = new FAMData(FileProcessingDB))
+            {
+                foreach (var document in documentsToCommit
+                    .Where(doc => doc.DocumentData.Orders?.Any() == true))
+                {
+                    if (document.FileID == -1)
+                    {
+                        new ExtractException("ELI45615", "Failed to link record ID to document.").Display();
+                    }
+
+                    foreach (var order in document.DocumentData.Orders)
+                    {
+                        famData.LinkFileWithOrder(document.FileID, order.OrderNumber, order.OrderDate);
+                    }
+                }
+
+                foreach (var document in documentsToCommit
+                   .Where(doc => doc.DocumentData.Encounters?.Any() == true))
+                {
+                    if (document.FileID == -1)
+                    {
+                        new ExtractException("ELI45616", "Failed to link record ID to document.").Display();
+                    }
+
+                    foreach (var encounter in document.DocumentData.Encounters)
+                    {
+                        famData.LinkFileWithEncounter(document.FileID, encounter.EncounterNumber, encounter.EncounterDate);
+                    }
+                }
             }
         }
 
@@ -1115,9 +1312,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="documentsToCommit">The pending documents to be committed</param>
         void WritePaginationHistoryForDocumentsWithOnlyDeletedPages(IEnumerable<OutputDocument> documentsToCommit)
         {
-            ExtractException.Assert("ELI39699", "FileTaskSession was not started.",
-                FileTaskSessionID.HasValue);
-
+            int? firstSourceFileID = null;
             var info = new IUnknownVectorClass();
             foreach (var document in documentsToCommit
                 .Where(doc => doc.PageControls.All(c => c.Deleted)))
@@ -1131,12 +1326,22 @@ namespace Extract.UtilityApplications.PaginationUtility
                         StringKey = originalDocumentName,
                         StringValue = originalPageNumber.ToString(CultureInfo.InvariantCulture)
                     });
+                    if (!firstSourceFileID.HasValue)
+                    {
+                        firstSourceFileID = FileProcessingDB.GetFileID(originalDocumentName);
+                    }
                 }
             }
 
             if (info.Size() > 0)
             {
-                FileProcessingDB.AddPaginationHistory(null, null, info, FileTaskSessionID.Value);
+                var sessionIdRequestArgs = new FileTaskSessionRequestEventArgs(firstSourceFileID.Value);
+                FileTaskSessionIdRequest?.Invoke(this, sessionIdRequestArgs);
+
+                ExtractException.Assert("ELI45596", "Session not available", 
+                    sessionIdRequestArgs.FileTaskSessionID.HasValue);
+
+                FileProcessingDB.AddPaginationHistory(null, null, info, sessionIdRequestArgs.FileTaskSessionID.Value);
             }
         }
 
@@ -1150,23 +1355,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </returns>
         bool CanSelectedDocumentsBeCommitted()
         {
-            // If document data could not be saved, abort the commit operation.
-            if (!SaveDocumentData(selectedDocumentsOnly: CommitOnlySelection, validateData: true))
-            { 
-                return false;
-            }
-
             var affectedSourceDocuments = new HashSet<string>(
                 _pendingDocuments
                     .Where(doc => doc.Selected)
                     .SelectMany(doc => doc.PageControls
                         .Select(c => c.Page.OriginalDocumentName)));
 
-            var unIncludedPagesControls = 
+            var unIncludedPagesControls =
                 _pendingDocuments
                     .Where(doc => !doc.Selected)
                     .SelectMany(doc => doc.PageControls
-                        .Where(c => 
+                        .Where(c =>
                             affectedSourceDocuments.Contains(c.Page.OriginalDocumentName)));
 
             if (unIncludedPagesControls.Any())
@@ -1196,6 +1395,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
+                return false;
+            }
+
+            // If document data could not be saved, abort the commit operation.
+            if (!SaveDocumentData(selectedDocumentsOnly: CommitOnlySelection, validateData: true))
+            { 
                 return false;
             }
 
@@ -1252,7 +1457,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 outputDocument.DocumentData.Revert();
                                 if (_documentDataPanel != null)
                                 {
-                                    _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData);
+                                    _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData,
+                                        saveData: false, validateData: false);
                                 }
                             }
                             _pendingDocuments.Add(outputDocument);
@@ -1300,7 +1506,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                             outputDocument.DocumentData.Revert();
                             if (_documentDataPanel != null)
                             {
-                                _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData);
+                                _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData,
+                                    saveData: false, validateData: false);
                             }
                         }
                     }
@@ -1361,9 +1568,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                                     .Any(c => c.Page.SourceDocument == sourceDocument))
                                 .ToArray();
 
-                            ExtractException.Assert("ELI41281", "FileTaskSession was not started.",
-                                FileTaskSessionID.HasValue);
-
                             foreach (var outputDocument in documentsToDelete)
                             {
                                 string sourceFileName = null;
@@ -1421,7 +1625,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 // Add pagination history records to DB if got this far without error
                                 if (acceptingPagination)
                                 {
-                                    FileProcessingDB.AddPaginationHistory(sourceFileName, sourcePageInfo, deletedSourcePageInfo, FileTaskSessionID.Value);
+                                    int sourceFileId = FileProcessingDB.GetFileID(sourceFileName);
+                                    var sessionIdRequestArgs = new FileTaskSessionRequestEventArgs(sourceFileId);
+                                    FileTaskSessionIdRequest?.Invoke(this, sessionIdRequestArgs);
+
+                                    ExtractException.Assert("ELI45596", "Session not available",
+                                        sessionIdRequestArgs.FileTaskSessionID.HasValue);
+
+                                    FileProcessingDB.AddPaginationHistory(sourceFileName, sourcePageInfo, deletedSourcePageInfo,
+                                        sessionIdRequestArgs.FileTaskSessionID.Value);
                                 }
                             }
 
@@ -1499,6 +1711,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (targetDocument != null &&
                     targetDocument != _primaryPageLayoutControl.DocumentInDataEdit)
                 {
+                    targetDocument.Collapsed = false;
+
                     // https://extract.atlassian.net/browse/ISSUE-14886
                     // Ensure separator has been assigned to the target document
                     if (targetDocument.PaginationSeparator == null)
@@ -2155,6 +2369,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _selectAllToCommitCheckBox.CheckedChanged += HandleSelectAllToCommitCheckBox_CheckedChanged;
                 }
 
+                _saveToolStripButton.Visible = SaveButtonVisible;
+
                 ResetPrimaryPageLayoutControl();
             }
             catch (Exception ex)
@@ -2293,6 +2509,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 OnCreatingOutputDocument(eventArgs);
                 string outputFileName = eventArgs.OutputFileName;
+                outputDocument.FileID = eventArgs.FileID;
 
                 ExtractException.Assert("ELI39588",
                     "No filename has been specified for pagination output.",
@@ -2341,6 +2558,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_saveToolStripButton"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandleSaveToolStripButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Save();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI45740");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="Control.Click"/> event of the
         /// <see cref="_revertToOriginalToolStripButton"/>.
         /// </summary>
@@ -2351,7 +2585,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                RevertPendingChanges(revertToSource: false);
+                var response = MessageBox.Show(this,
+                    "Restore all pages and extracted data to the state at which they existed when " +
+                    "first displayed. This may represent the original state or the state saved by a prior user.",
+                    "Restore as originally loaded?", MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2, 0);
+
+                if (response == DialogResult.Yes)
+                {
+                    RevertPendingChanges(revertToSource: false);
+                }
             }
             catch (Exception ex)
             {
@@ -2370,7 +2613,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                RevertPendingChanges(revertToSource: true);
+                var response = MessageBox.Show(this,
+                    "Discarding all changes will display all source documents as they were before " +
+                    "being processed by the software and will discard all data extracted from " +
+                    "those documents.", "Discard all changes?", MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2, 0);
+
+                if (response == DialogResult.Yes)
+                {
+                    RevertPendingChanges(revertToSource: true);
+                }
             }
             catch (Exception ex)
             {
@@ -2504,21 +2756,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return;
                 }
 
-                if (document.PaginationSeparator != null)
-                {
-                    // This event may be raised from another thread (such as via
-                    // DataEntryPaginationDocumentData.UpdateDocumentStatus)
-                    if (document.PaginationSeparator.InvokeRequired)
-                    {
-                        document.PaginationSeparator.Invoke((MethodInvoker)(() => 
-                            document.PaginationSeparator.Invalidate()));
-                    }
-                    else
-                    {
-                        document.PaginationSeparator.Invalidate();
-                    }
-                }
-
                 UpdateCommandStates();
             }
             catch (Exception ex)
@@ -2602,6 +2839,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // page change.
                         _primaryPageLayoutControl.SelectPage(pageToSelect, scrollToPage: false);
                     }
+
+                    e.Handled = true;
                 }
             }
             catch (Exception ex)
@@ -2656,6 +2895,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                _primaryPageLayoutControl.SnapDataPanelToTop();
+
                 ProcessFocusChange(forceUpdate: true);
             }
             catch (Exception ex)
@@ -2825,7 +3066,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (_selectAllToCommitCheckBox != null)
             {
-                _selectAllToCommitCheckBox.Visible = CommitOnlySelection;
+                _selectAllToCommitCheckBox.Visible = CommitOnlySelection && SelectAllCheckBoxVisible;
             }
 
             if (_primaryPageLayoutControl != null)
@@ -2852,6 +3093,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.AutoRotateImages = AutoRotateImages;
             _primaryPageLayoutControl.CommitOnlySelection = CommitOnlySelection;
             _primaryPageLayoutControl.LoadNextDocumentVisible = LoadNextDocumentVisible;
+            _primaryPageLayoutControl.DefaultToCollapsed = DefaultToCollapsed;
             _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
             _primaryPageLayoutControl.LoadNextDocumentRequest += HandlePrimaryPageLayoutControl_LoadNextDocumentRequest;
             _primaryPageLayoutControl.DocumentDataPanelRequest += HandlePrimaryPageLayoutControl_DocumentDataPanelRequest;
@@ -2864,9 +3106,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// instance.
         /// </summary>
         /// <param name="inputFileName">Name of the input file.</param>
+        /// <param name="fileID">The File ID</param>
         /// <returns>A <see cref="SourceDocument"/> representing <see paramref="inputFileName"/> or
         /// <see langword="null"/> if the file is missing or could not be opened.</returns>
-        SourceDocument OpenDocument(string inputFileName)
+        SourceDocument OpenDocument(string inputFileName, int fileID)
         {
             SourceDocument sourceDocument = null;
 
@@ -2880,7 +3123,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (sourceDocument == null)
                 {
-                    sourceDocument = new SourceDocument(inputFileName);
+                    sourceDocument = new SourceDocument(inputFileName, fileID);
                     if (!sourceDocument.Pages.Any())
                     {
                         sourceDocument.Dispose();
@@ -2961,8 +3204,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return true;
             }
 
-            var openData = IsDataPanelOpen ? _primaryPageLayoutControl.DocumentInDataEdit : null;
-            if (openData != null)
+            if (IsDataPanelOpen)
             {
                 if (!CloseDataPanel(validateData))
                 {
@@ -2972,26 +3214,200 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
             }
 
-            foreach (var document in _pendingDocuments.Where(document =>
-                document != openData &&
+            var documentsToSave = _pendingDocuments.Where(document =>
                 document.PageControls.Any(c => !c.Deleted) &&
-                (!selectedDocumentsOnly || document.Selected)))
+                (!selectedDocumentsOnly || document.Selected))
+                .ToArray();
+
+            if (documentsToSave.Length > 0)
             {
-                // To account for the case that the panel may manipulate raw data; make
-                // sure the data has been loaded into a panel before saving.
-                _documentDataPanel.LoadData(document.DocumentData, forDisplay: false);
-                Application.DoEvents();
-                bool dataIsValid = _documentDataPanel.SaveData(document.DocumentData, validateData);
-
-                if (validateData && !dataIsValid)
+                foreach (var document in documentsToSave)
                 {
-                    this.SafeBeginInvoke("ELI41669", () =>
-                    {
-                        _primaryPageLayoutControl.SelectDocument(document);
-                        document.PaginationSeparator.OpenDataPanel();
-                    });
+                    _documentDataPanel.UpdateDocumentDataStatus(document.DocumentData, true, validateData);
+                }
 
-                    return false;
+                _documentDataPanel.WaitForDocumentStatusUpdates();
+            }
+
+            if (validateData)
+            {
+                try
+                {
+                    SuspendUIUpdates = false;
+
+                    var erroredDocument = documentsToSave.FirstOrDefault(document => document.DocumentData.DataError);
+
+                    if (erroredDocument != null)
+                    {
+                        this.SafeBeginInvoke("ELI41669", () =>
+                        {
+                            _primaryPageLayoutControl.SelectDocument(erroredDocument);
+                            erroredDocument.PaginationSeparator.OpenDataPanel();
+                            erroredDocument.Collapsed = false;
+                            ProcessFocusChange(forceUpdate: true);
+                        });
+
+                        return false;
+                    }
+
+                    if (!ConfirmRecordNumberReuse(
+                            documentsToSave.Where(document => document.DocumentData.PromptForDuplicateOrders),
+                            document => document.DocumentData.Orders?.Select(order => order.OrderNumber),
+                            "LabDEOrderFile", "OrderNumber", "order number"))
+                    {
+                        return false;
+                    }
+
+                    if (!ConfirmRecordNumberReuse(
+                            documentsToSave.Where(document => document.DocumentData.PromptForDuplicateEncounters),
+                            document => document.DocumentData.Encounters?.Select(encounter => encounter.EncounterNumber),
+                            "LabDEEncounterFile", "EncounterID", "encounter number"))
+                    {
+                        return false;
+                    }
+                }
+                finally
+                {
+                    SuspendUIUpdates = true;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Checks for duplicate order/encounter numbers in <see cref="documents"/> and also checks
+        /// to see if any of the order/encounter numbers have been previously linked. If so, a prompt
+        /// will be displayed and if the user choses not to save, the documents with used/duplicate
+        /// numbers will be indicated.
+        /// </summary>
+        /// <returns><c>true</c> if there are no used/duplicate numbers or if the user chose to
+        /// to commit anyway; <c>false</c> if the user chose to abort the commit.</returns>
+        bool ConfirmRecordNumberReuse(IEnumerable<OutputDocument> documents,
+                    Func<OutputDocument, IEnumerable<string>> numberSelector,
+                    string tableName, string fieldName, string numberLabel)
+        {
+            var docsWithRecordNumbers = documents
+                .Where(document => numberSelector(document)
+                    ?.Any(numbers => !string.IsNullOrWhiteSpace(numbers)) == true);
+
+            if (docsWithRecordNumbers.Any())
+            {
+                var allOrderNumbers = docsWithRecordNumbers
+                    .SelectMany(document => numberSelector(document));
+
+                var docsWithDuplicateRecordNumbers = docsWithRecordNumbers
+                    .Select(document =>
+                        (Document: document,
+                         DuplicateNumbers: numberSelector(document)
+                                .Where(x => allOrderNumbers.Count(y => (x == y)) >= 2)
+                        ))
+                    .Where(item => item.DuplicateNumbers.Any());
+
+                if (docsWithDuplicateRecordNumbers.Any())
+                {
+                    var message = string.Join("\r\n",
+                    docsWithDuplicateRecordNumbers.Select(item =>
+                        Invariant($"{item.Document.Summary} ({string.Join(", ", item.DuplicateNumbers)})")));
+
+                    message =
+                        Invariant($"The following {numberLabel}(s) have been used multiple times:\r\n\r\n") +
+                        message +
+                        "\r\n\r\nSubmit documents anyway?";
+
+                    using (CustomizableMessageBox messageBox = new CustomizableMessageBox())
+                    {
+                        messageBox.Caption = "Warning";
+                        messageBox.StandardIcon = MessageBoxIcon.Exclamation;
+                        messageBox.Text = message;
+                        messageBox.AddStandardButtons(MessageBoxButtons.YesNo);
+                        if (messageBox.Show(this) == "Yes")
+                        {
+                            foreach (var documentData in documents
+                                .Select(document => document.DocumentData as DataEntryPaginationDocumentData))
+                            {
+                                documentData.SetDataError(false);
+                            }
+                            // Clear any error icons added for duplicate record numbers.
+                            Refresh();
+                        }
+                        else
+                        {
+                            foreach (var documentData in docsWithDuplicateRecordNumbers
+                                .Select(item => item.Document.DocumentData as DataEntryPaginationDocumentData))
+                            {
+                                documentData.SetDataError(true);
+                                documentData.SetDataErrorMessage(
+                                    Invariant($"This document has a duplicate {numberLabel}."));
+                            }
+
+                            return false;
+                        }
+                    }
+                }
+
+                var quotedNumbers = allOrderNumbers.Select(n => "'" + n.Replace("'", "''") + "'");
+
+                string query = Invariant($"Select DISTINCT [{fieldName}] FROM [{tableName}] ") +
+                    Invariant($"WHERE [{fieldName}] IN ({string.Join(",", quotedNumbers)})");
+
+                HashSet<string> usedNumbers;
+                using (var usedNumberTable = GetResultsForQuery(query))
+                {
+                    usedNumbers = new HashSet<string>(
+                        usedNumberTable.Rows
+                            .OfType<DataRow>()
+                            .Select(r => (string)r[0]));
+                }
+
+                var docsWithUsedRecordNumbers = docsWithRecordNumbers
+                    .Select(document =>
+                        (Document: document,
+                         UsedNumbers: numberSelector(document)
+                            .Where(x => usedNumbers.Contains(x)))
+                        )
+                    .Where(item => item.UsedNumbers?.Any() == true);
+
+                if (docsWithUsedRecordNumbers.Any())
+                {
+                    var message = string.Join("\r\n",
+                    docsWithUsedRecordNumbers.Select(item =>
+                        Invariant($"{item.Document.Summary} ({string.Join(", ", item.UsedNumbers)})")));
+
+                    message =
+                        Invariant($"Documents have already been filed against the following {numberLabel}(s):\r\n\r\n") +
+                        message +
+                        "\r\n\r\nSubmit document(s) anyway?";
+
+                    using (CustomizableMessageBox messageBox = new CustomizableMessageBox())
+                    {
+                        messageBox.Caption = "Warning";
+                        messageBox.StandardIcon = MessageBoxIcon.Exclamation;
+                        messageBox.Text = message;
+                        messageBox.AddStandardButtons(MessageBoxButtons.YesNo);
+                        if (messageBox.Show(this) == "Yes")
+                        {
+                            foreach (var documentData in documents
+                                .Select(document => document.DocumentData as DataEntryPaginationDocumentData))
+                            {
+                                documentData.SetDataError(false);
+                                // Clear any error icons added for duplicate record numbers.
+                                Refresh();
+                            }
+                        }
+                        else
+                        {
+                            foreach (var documentData in docsWithUsedRecordNumbers
+                                .Select(item => item.Document.DocumentData as DataEntryPaginationDocumentData))
+                            {
+                                documentData.SetDataError(true);
+                                documentData.SetDataErrorMessage(
+                                    Invariant($"This document is using an {numberLabel} that previous document(s) have been filed against."));
+                            }
+
+                            return false;
+                        }
+                    }
                 }
             }
 
@@ -3018,7 +3434,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         .FirstOrDefault();
                     if (separator != null)
                     {
-                        return separator.CloseDataPanel(saveData: true, validateData: validateData);
+                        bool closed = separator.CloseDataPanel(saveData: true, validateData: validateData);
+                        ProcessFocusChange(forceUpdate: true);
+                        return closed;
                     }
                 }
             }
@@ -3037,35 +3455,39 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _updatingCommandStates = true;
-
-                var nonEmptyDocs = _pendingDocuments.Where(doc =>
-                    doc.PageControls.Any()).ToList();
-                var docsWithNonDeletedPages = nonEmptyDocs.Where(doc =>
-                    doc.PageControls.Any(c => !c.Deleted));
-                bool isDocDataEdited = docsWithNonDeletedPages.Any(doc =>
-                    doc.DocumentData != null && doc.DocumentData.Modified);
-                bool documentCopyExists = nonEmptyDocs.Count > _originalDocuments.Count();
-
-                // Removed check of doc.PaginationSuggested here so that auto-rotated images can also
-                // register as if it is a pagination suggestion in terms of reverting.
-                RevertToSuggestedEnabled =
-                    nonEmptyDocs.Any(doc => isDocDataEdited || documentCopyExists || !doc.InOriginalForm);
-                _revertToOriginalToolStripButton.Enabled = RevertToSuggestedEnabled;
-
-                RevertToSourceEnabled = isDocDataEdited || documentCopyExists
-                    || nonEmptyDocs.Any(doc => !doc.InSourceDocForm);
-                _revertToSourceToolStripButton.Enabled = RevertToSourceEnabled;
-
-                _applyToolStripButton.Enabled = CommitEnabled;
-                _collapseAllToolStripButton.Image =
-                    AllDocumentsCollapsed
-                        ? Properties.Resources.Expand
-                        : Properties.Resources.Collapse;
-                if (CommitOnlySelection)
+                if (!SuspendUIUpdates)
                 {
-                    _selectAllToCommitCheckBox.Enabled = _pendingDocuments.Any();
-                    _selectAllToCommitCheckBox.Checked = AllDocumentsSelected;
+                    _updatingCommandStates = true;
+
+                    var nonEmptyDocs = _pendingDocuments.Where(doc =>
+                        doc.PageControls.Any()).ToList();
+                    var docsWithNonDeletedPages = nonEmptyDocs.Where(doc =>
+                        doc.PageControls.Any(c => !c.Deleted));
+                    bool isDocDataEdited = docsWithNonDeletedPages.Any(doc =>
+                        doc.DocumentData != null && doc.DocumentData.Modified);
+                    bool documentCopyExists = nonEmptyDocs.Count > _originalDocuments.Count();
+
+                    // Removed check of doc.PaginationSuggested here so that auto-rotated images can also
+                    // register as if it is a pagination suggestion in terms of reverting.
+                    RevertToSuggestedEnabled =
+                        nonEmptyDocs.Any(doc => isDocDataEdited || documentCopyExists || !doc.InOriginalForm);
+                    _revertToOriginalToolStripButton.Enabled = RevertToSuggestedEnabled;
+
+                    RevertToSourceEnabled = isDocDataEdited || documentCopyExists
+                        || nonEmptyDocs.Any(doc => !doc.InSourceDocForm);
+                    _revertToSourceToolStripButton.Enabled = RevertToSourceEnabled;
+
+                    _saveToolStripButton.Enabled = _pendingDocuments.Any();
+                    _applyToolStripButton.Enabled = CommitEnabled;
+                    _collapseAllToolStripButton.Image =
+                        AllDocumentsCollapsed
+                            ? Properties.Resources.Expand
+                            : Properties.Resources.Collapse;
+                    if (CommitOnlySelection)
+                    {
+                        _selectAllToCommitCheckBox.Enabled = _pendingDocuments.Any();
+                        _selectAllToCommitCheckBox.Checked = AllDocumentsSelected;
+                    }
                 }
             }
             finally
@@ -3098,11 +3520,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                             _primaryPageLayoutControl.UIUpdatesSuspended = true;
                             EnablePageDisplay = false;
                         }
-                        else
+                        // Document loads that being in the midst committing documents was turning off
+                        // SuspendUIUpdates and allowing flickering to occur.
+                        else if (!_committingChanges)
                         {
                             _uiUpdatesSuspended = false;
                             EnablePageDisplay = true;
                             _primaryPageLayoutControl.UIUpdatesSuspended = false;
+                            UpdateCommandStates();
                             ResumeLayout(true);
                         }
                     }

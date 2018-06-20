@@ -118,7 +118,10 @@ namespace Extract.FileActionManager.FileProcessors
                     = _expectedPaginationAttributesPathTagButton.Enabled
                     = _expectedPaginationAttributesCheckBox.Checked;
                 _singleDocModeCheckBox.Checked = Settings.SingleSourceDocumentMode;
+                _defaultToCollapsedCheckBox.Checked = Settings.DefaultToCollapsed;
                 _autoRotateCheckBox.Checked = Settings.AutoRotateImages;
+                _selectAllVisibleCheckBox.Checked = Settings.SelectAllCheckBoxVisible;
+                _loadNextDocumentVisibleCheckBox.Checked = Settings.LoadNextDocumentVisible;
             }
             catch (Exception ex)
             {
@@ -176,7 +179,10 @@ namespace Extract.FileActionManager.FileProcessors
                 Settings.OutputExpectedPaginationAttributesFiles = _expectedPaginationAttributesCheckBox.Checked;
                 Settings.ExpectedPaginationAttributesOutputPath = _expectedPaginationAttributesTextBox.Text;
                 Settings.SingleSourceDocumentMode = _singleDocModeCheckBox.Checked;
+                Settings.DefaultToCollapsed = _defaultToCollapsedCheckBox.Checked;
                 Settings.AutoRotateImages = _autoRotateCheckBox.Checked;
+                Settings.SelectAllCheckBoxVisible = _selectAllVisibleCheckBox.Checked;
+                Settings.LoadNextDocumentVisible = _loadNextDocumentVisibleCheckBox.Checked;
 
                 DialogResult = DialogResult.OK;
             }

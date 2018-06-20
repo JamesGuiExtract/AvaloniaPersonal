@@ -7,6 +7,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 
 namespace Extract.UtilityApplications.PaginationUtility
@@ -70,15 +71,79 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Properties
 
         /// <summary>
-        /// Gets or sets the data entry query text used to generate a summary for the document.
+        /// Gets or the data entry query text used to generate a summary for the document.
         /// </summary>
-        /// <value>
-        /// The data entry query text used to generate a summary for the document.
-        /// </value>
-        public string SummaryQuery
+        public virtual string SummaryQuery
         {
             get;
-            set;
+            protected set;
+        }
+
+        /// <summary>
+        /// Function that when set is to be used so that the panel can specify whether a document is
+        /// to be sent for rules reprocessing.
+        /// </summary>
+        public virtual bool? SendForReprocessingFunc(DataEntryPaginationDocumentData documentData)
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the data entry query text that should be used to identify any order numbers in the
+        /// file to be recorded in the LabDEOrderFile table.
+        /// </summary>
+        public virtual string OrderNumberQuery
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
+        /// Gets the data entry query text that should be used to identify the date for each order.
+        /// Any attribute queries should be relative to an order number attribute.
+        /// </summary>
+        public virtual string OrderDateQuery
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
+        /// Gets whether to prompt about order numbers for which a document has already been filed.
+        /// </summary>
+        public virtual bool PromptForDuplicateOrders
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
+        /// Gets the data entry query text that should be used to identify any encounter numbers in the
+        /// file to be recorded in the LabDEOrderFile table.
+        /// </summary>
+        public virtual string EncounterNumberQuery
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
+        /// Gets the data entry query text that should be used to identify the date for each encounter.
+        /// Any attribute queries should be relative to an encoutner number attribute.
+        /// </summary>
+        public virtual string EncounterDateQuery
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
+        /// Gets whether to prompt about encounter numbers for which a document has already been filed.
+        /// </summary>
+        public virtual bool PromptForDuplicateEncounters
+        {
+            get;
+            protected set;
         }
 
         #endregion Properties
@@ -151,6 +216,29 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets a <see cref="DataEntryPaginationDocumentData" /> instance based on the provided
+        /// <see paramref="attributes" />.
+        /// </summary>
+        /// <param name="documentDataAttribute">The <see cref="IAttribute"/> hierarchy (voa data) on which this
+        /// instance is based including this top-level attribute which contains document data status info.</param>
+        /// <param name="sourceDocName">The name of the source document for which data is being
+        /// loaded.</param>
+        /// <returns>
+        /// The <see cref="DataEntryPaginationDocumentData"/> instance.
+        /// </returns>
+        public virtual DataEntryPaginationDocumentData GetDocumentData(IAttribute documentDataAttribute, string sourceDocName)
+        {
+            try
+            {
+                return new DataEntryPaginationDocumentData(documentDataAttribute, sourceDocName);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45985");
+            }
+        }
+
+        /// <summary>
         /// Loads the specified <see paramref="data" />.
         /// </summary>
         /// <param name="data">The data to load.</param>
@@ -174,6 +262,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_imageViewer.Visible)
                 {
                     _documentData.SetSummary(SummaryDataEntryQuery?.Evaluate().ToString());
+                    _documentData.SetSendForReprocessing(SendForReprocessingFunc(_documentData));
                     _documentData.SetModified(UndoOperationAvailable);
                     if (!Config.Settings.PerformanceTesting)
                     {
@@ -596,8 +685,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnDataChanged();
 
-                _documentData?.SetSummary(
-                    SummaryDataEntryQuery?.Evaluate().ToString());
+                if (_documentData != null)
+                {
+                    _documentData.SetSummary(
+                        SummaryDataEntryQuery?.Evaluate().ToString());
+                    _documentData.SetSendForReprocessing(SendForReprocessingFunc(_documentData));
+                }
             }
             catch (Exception ex)
             {
@@ -908,9 +1001,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     ClearHighlights();
 
-                    OnPageLoadRequest(pageControl.Page.OriginalDocumentName, pageControl.Page.OriginalPageNumber);
-
-                    CreateAllAttributeHighlights(Attributes, null);
+                    if (OnPageLoadRequest(pageControl.Page.OriginalDocumentName, pageControl.Page.OriginalPageNumber))
+                    {
+                        CreateAllAttributeHighlights(Attributes, null);
+                    }
                 }
             }
         }
@@ -944,9 +1038,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         /// <param name="pageNum">The page number that needs to be loaded in <see cref="_sourceDocName"/>.
         /// </param>
-        void OnPageLoadRequest(string sourceDocName, int pageNum)
+        bool OnPageLoadRequest(string sourceDocName, int pageNum)
         {
-            PageLoadRequest?.Invoke(this, new PageLoadRequestEventArgs(sourceDocName, pageNum));
+            var args = new PageLoadRequestEventArgs(sourceDocName, pageNum);
+            PageLoadRequest?.Invoke(this, args);
+            return args.Handled;
         }
 
         /// <summary>

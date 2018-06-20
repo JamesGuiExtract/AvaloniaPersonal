@@ -25,7 +25,7 @@ namespace Extract.DataEntry.LabDE
         /// A <see cref="Regex"/> used to parse attribute paths from the
         /// <see cref="RecordMatchCriteria"/>.
         /// </summary>
-        Regex _attributeRegex = new Regex(@"{(?<path>[\S\s]+)}", RegexOptions.Compiled);
+        Regex _attributeRegex = new Regex(@"{(?<path>[\S\s]+?)}", RegexOptions.Compiled);
 
         /// <summary>
         /// A cached <see cref="DataTable"/> of potential matching FAM DB records for the current

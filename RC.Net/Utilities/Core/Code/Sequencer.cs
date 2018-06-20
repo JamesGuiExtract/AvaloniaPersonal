@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
@@ -191,7 +190,7 @@ namespace Extract.Utilities
                                 }
                             }
 
-                            if (remainingTimeout >= 0 && !recheckEvent.WaitOne(remainingTimeout))
+                            if (!recheckEvent.WaitOne(remainingTimeout))
                             {
                                 throw new ExtractException("ELI39520",
                                     "Timeout waiting for next object in sequence.");
@@ -277,6 +276,25 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39523");
+            }
+        }
+
+        /// <summary>
+        /// Returns the next value queued or the default value for <see typeref="T"/> if no value
+        /// is queued.
+        /// </summary>
+        public T Peek()
+        {
+            try
+            {
+                lock (_lock)
+                {
+                    return (_queue.Count > 0) ? _queue[0] : default(T);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45645");
             }
         }
 

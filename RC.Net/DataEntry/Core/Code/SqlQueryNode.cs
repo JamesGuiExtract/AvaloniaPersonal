@@ -21,56 +21,39 @@ namespace Extract.DataEntry
         #region Statics
 
         /// <summary>
-        /// Cached SQL query results for frequently used or expensive queries.
+        /// Cached SQL query results for frequently used or expensive queries (per DB connection string).
         /// </summary>
-        // https://extract.atlassian.net/browse/ISSUE-12827
-        // The data query framework (primarily AttributeStatusInfo) is set up to run independently
-        // on separate threads by having static fields be designated ThreadStatic. In this case,
-        // if _connectionInfo is not set to be ThreadStatic and the DataQueryRuleObject is being
-        // used in a multi-threaded FPS file, the connection (originally assigned via 
-        // DataEntryQuery.Create()) in one thread may be inappropriately used in another thread.
         [ThreadStatic]
-        static Dictionary<string, DbConnectionWrapper> _connectionInfo;
-
-        #endregion Statics
-
-        #region DbConnectionWrapper
+        static Dictionary<string, DataCache<string, CachedQueryData<string[]>>> _threadCacheManager = 
+            new Dictionary<string, DataCache<string, CachedQueryData<string[]>>>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// Encapsulates a <see cref="DbConnection"/> and its associated cached results.
+        /// While ordinarily AttributeStatusInfo environments will be separate for every thread and, thus, we
+        /// want data caches to be thread specific, in some contexts such as loading many documents for in the
+        /// paginination UI via UpdateDocumentStatusThread, we do want to share the cache across all threads in
+        /// the process. _processCacheManager will be used for this shared cache data.
         /// </summary>
-        class DbConnectionWrapper
-        {
-            /// <summary>
-            /// The <see cref="DbConnection"/>.
-            /// </summary>
-            public DbConnection DbConnection;
+        static Dictionary<string, DataCache<string, CachedQueryData<string[]>>> _processCacheManager = 
+            new Dictionary<string, DataCache<string, CachedQueryData<string[]>>>(StringComparer.OrdinalIgnoreCase);
 
-            /// <summary>
-            /// The cached results associated with <see cref="DbConnection"/>
-            /// </summary>
-            public DataCache<string, CachedQueryData<string[]>> CachedResults =
-                new DataCache<string, CachedQueryData<string[]>>(
-                    QueryNode.QueryCacheLimit, CachedQueryData<string[]>.GetScore);
+        /// <summary>
+        /// Synchronizes access to shared cache (_processCacheManager)
+        /// </summary>
+        static object _lock = new object();
 
-            /// <summary>
-            /// Initializes a new instance of the <see cref="DbConnectionWrapper"/> class.
-            /// </summary>
-            /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
-            public DbConnectionWrapper(DbConnection dbConnection)
-            {
-                DbConnection = dbConnection;
-            }
-        }
-
-        #endregion DbConnectionWrapper
+        #endregion Statics
 
         #region Fields
 
         /// <summary>
-        /// The <see cref="DbConnectionWrapper"/> currently being used for this query node.
+        /// The <see cref="DataCache"/> currently being used for this query node.
         /// </summary>
-        DbConnectionWrapper _currentConnection = null;
+        DataCache<string, CachedQueryData<string[]>> _currentCache = null;
+
+        /// <summary>
+        /// The current connection
+        /// </summary>
+        DbConnection _currentConnection;
 
         /// <summary>
         /// A string that indicates the following element in a query is a parameter.
@@ -92,19 +75,39 @@ namespace Extract.DataEntry
         [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
         static SqlQueryNode()
         {
-            Application.ThreadExit += (o, e) =>
+            try
             {
+                AttributeStatusInfo.ClearedProcessWideCache += (o, e) =>
+                    {
+                        lock (_lock)
+                        {
+                            try
+                            {
+                                _processCacheManager = null;
+                                DatabaseConnectionInfo.ResetSharedDatabaseCopies();
+                            }
+                            catch (Exception ex)
+                            {
+                                ex.ExtractLog("ELI45622");
+                            }
+                        }
+                    };
+
+                Application.ThreadExit += (o, e) =>
+                {
                 // https://extract.atlassian.net/browse/ISSUE-12987
                 // dotMemory indicates leaks related to the _connectionInfo dictionary when
                 // processing is stopped and restarted (causing a new UI thread to be created). Even
                 // though the cached data for each DbConnectionWrapper is cleared when the UI thread
                 // exits, the dictionary still has space reserved for cached data. If the thread is
                 // exiting, remove references to all DbConnectionWrapper instances.
-                if (_connectionInfo != null)
-                {
-                    _connectionInfo.Clear();
-                }
-            };
+                _threadCacheManager?.Clear();
+                };
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45621");
+            }
         }
 
         /// <summary>
@@ -158,32 +161,26 @@ namespace Extract.DataEntry
                 ExtractException.Assert("ELI37783", "Database must be specified for SQL query nodes.",
                     DatabaseConnections != null && DatabaseConnections.ContainsKey(connectionName));
 
-                // _connectionInfo is ThreadStatic; ensure it is created per-thread.
-                if (_connectionInfo == null)
+                lock (_lock)
                 {
-                    _connectionInfo = new Dictionary<string, DbConnectionWrapper>();
-                }
+                    var dataCache = AttributeStatusInfo.ProcessWideDataCache
+                        ? _processCacheManager ?? (_processCacheManager = new Dictionary<string, DataCache<string, CachedQueryData<string[]>>>())
+                        : _threadCacheManager ?? (_threadCacheManager = new Dictionary<string, DataCache<string, CachedQueryData<string[]>>>());
 
-                // Look for an existing DbConnectionWrapper under this name.
-                if (_connectionInfo.TryGetValue(connectionName, out _currentConnection))
-                {
-                    // If the connection itself has changed since the last time DbConnectionWrapper
-                    // was used (such as if an SQL CE OrderMappingDB has been updated), the static
-                    // cache needs to be cleared.
-                    if (_currentConnection.DbConnection != DatabaseConnections[connectionName])
+                    _currentConnection = DatabaseConnections[connectionName];
+                    string connectionString = _currentConnection.ConnectionString;
+
+                    // Look for an existing cache for this connectionString.
+                    if (!dataCache.TryGetValue(connectionString, out _currentCache))
                     {
-                        _currentConnection.CachedResults.Clear();
-                        _currentConnection.DbConnection = DatabaseConnections[connectionName];
+                        // A new DataCache needs to be created for this name.
+                        _currentCache = new DataCache<string, CachedQueryData<string[]>>(
+                            QueryNode.QueryCacheLimit, CachedQueryData<string[]>.GetScore);
+                        dataCache[connectionString] = _currentCache;
                     }
                 }
-                else
-                {
-                    // A DbConnectionWrapper needs to be created for this name.
-                    _currentConnection = new DbConnectionWrapper(DatabaseConnections[connectionName]);
-                    _connectionInfo[connectionName] = _currentConnection;
-                }
 
-                string dbType = _currentConnection.DbConnection.GetType().ToString();
+                string dbType = _currentConnection.GetType().ToString();
                 if (dbType.IndexOf("Oracle", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     _parameterMarker = ":";  // Oracle
@@ -219,7 +216,7 @@ namespace Extract.DataEntry
             {
                 ExtractException.Assert("ELI26733",
                     "Unable to evaluate query without database connection!",
-                    _currentConnection != null && _currentConnection.DbConnection != null);
+                    _currentCache != null && _currentConnection != null);
 
                 StringBuilder sqlQuery = new StringBuilder();
 
@@ -251,16 +248,16 @@ namespace Extract.DataEntry
                     }
                 }
 
-                if (FlushCache)
+                if (FlushCache && !AttributeStatusInfo.ProcessWideDataCache)
                 {
-                    _currentConnection.CachedResults.Clear();
+                    _currentCache.Clear();
                 }
 
                 // If there are cached results for this query, retrieve them.
                 string[] queryResults;
                 CachedQueryData<string[]> cachedResults;
                 cacheKey += sqlQuery.ToString();
-                if (_currentConnection.CachedResults.TryGetData(cacheKey, out cachedResults))
+                if (_currentCache.TryGetData(cacheKey, out cachedResults))
                 {
                     queryResults = cachedResults.Data;
                 }
@@ -271,14 +268,17 @@ namespace Extract.DataEntry
 
                     // Execute the query.
                     queryResults = DBMethods.GetQueryResultsAsStringArray(
-                        _currentConnection.DbConnection, sqlQuery.ToString(), parameters, ", ", SplitCsv);
+                        _currentConnection, sqlQuery.ToString(), parameters, ", ", SplitCsv);
 
                     if (AllowCaching && !FlushCache)
                     {
-                        // Attempt to cache the results.
-                        double executionTime = (DateTime.Now - startTime).TotalMilliseconds;
-                        cachedResults = new CachedQueryData<string[]>(queryResults, executionTime);
-                        _currentConnection.CachedResults.CacheData(cacheKey, cachedResults);
+                        lock (_lock)
+                        {
+                            // Attempt to cache the results.
+                            double executionTime = (DateTime.Now - startTime).TotalMilliseconds;
+                            cachedResults = new CachedQueryData<string[]>(queryResults, executionTime);
+                            _currentCache.CacheData(cacheKey, cachedResults);
+                        }
                     }
                 }
                 else
@@ -305,9 +305,9 @@ namespace Extract.DataEntry
             base.HandleQueryCacheCleared(sender, e);
 
             // Clear the db wrapper's cache too
-            if (_currentConnection != null)
+            if (_currentCache != null && !AttributeStatusInfo.ProcessWideDataCache)
             {
-                _currentConnection.CachedResults.Clear();
+                _currentCache.Clear();
             }
         }
 

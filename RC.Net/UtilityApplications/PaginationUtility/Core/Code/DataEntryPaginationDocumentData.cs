@@ -1,6 +1,7 @@
 ﻿using Extract.AttributeFinder;
 using System;
 using System.Collections.Generic;
+using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 
 namespace Extract.UtilityApplications.PaginationUtility
@@ -16,7 +17,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// A copy of the original data loaded (to implement revert functionality)
         /// </summary>
-        IUnknownVector _originalData;
+        IAttribute _originalData;
 
         /// <summary>
         /// Indicates whether the data has been modified.
@@ -38,6 +39,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Indicates whether the data currently contains a validation error.
         /// </summary>
         bool _dataError;
+
+        /// <summary>
+        /// If specified, the tooltip text that should be associated with the document validation error.
+        /// </summary>
+        string _dataErrorMessage;
 
         /// <summary>
         /// An object representing the undo/redo operations that should be restored to the
@@ -74,12 +80,35 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 WorkingAttributes = attributes;
-                _originalData = (IUnknownVector)((ICopyableObject)attributes).Clone();
+                _originalData = (IAttribute)((ICopyableObject)DocumentDataAttribute).Clone();
                 _originalData.ReportMemoryUsage();
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41357");
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="DataEntryPaginationDocumentData"/>.
+        /// </summary>
+        /// <param name="documentDataAttribute">The <see cref="IAttribute"/> hierarchy (voa data) on which this
+        /// instance is based including this top-level attribute which contains document data status info.</param>
+        /// <param name="sourceDocName">The source document related to <see cref="_documentData"/>
+        /// if there is a singular source document; otherwise <see langword="null"/>.</param>
+        public DataEntryPaginationDocumentData(IAttribute documentDataAttribute, string sourceDocName)
+            : base(documentDataAttribute, sourceDocName)
+        {
+            try
+            {
+                WorkingAttributes = Attributes;
+
+                _originalData = (IAttribute)((ICopyableObject)DocumentDataAttribute).Clone();
+                _originalData.ReportMemoryUsage();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45952");
             }
         }
 
@@ -131,7 +160,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="sendForReprocessing">The value to apply.</param>
         public void SetSendForReprocessing(bool? sendForReprocessing)
         {
-            _sendForReprocessing = sendForReprocessing;
+            try
+            {
+                if (_sendForReprocessing != sendForReprocessing)
+                {
+                    _sendForReprocessing = sendForReprocessing;
+
+                    OnDocumentDataStateChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45611");
+            }
         }
 
         #endregion Methods
@@ -197,6 +238,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets the tooltip text that should be associated with the document validation error
+        /// or <c>null</c> to use the default error text.
+        /// </summary>
+        public override string DataErrorMessage
+        {
+            get
+            {
+                return _dataErrorMessage;
+            }
+        }
+
+        /// <summary>
         /// Unused base class implementation.
         /// </summary>
         protected override Dictionary<string, PaginationDataField> Fields
@@ -215,8 +268,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 UndoState = null;
-                base.Attributes = (IUnknownVector)_originalData.Clone();
-                base.Attributes.ReportMemoryUsage();
+                DocumentDataAttribute = (IAttribute)((ICopyableObject)_originalData).Clone();
+                DocumentDataAttribute.ReportMemoryUsage();
                 WorkingAttributes = base.Attributes;
                 _permanentlyModified = false;
                 SetModified(false);
@@ -331,6 +384,26 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (dataError != _dataError)
             {
                 _dataError = dataError;
+                if (!dataError)
+                {
+                    _dataErrorMessage = null;
+                }
+
+                OnDocumentDataStateChanged();
+            }
+        }
+
+        /// <summary>
+        /// Sets the tooltip text that should be associated with the document validation error.
+        /// </summary>
+        /// <param name="dataErrorMessage">The data error message.</param>
+        internal void SetDataErrorMessage(string dataErrorMessage)
+        {
+            if (dataErrorMessage != _dataErrorMessage)
+            {
+                _dataErrorMessage = string.IsNullOrWhiteSpace(dataErrorMessage)
+                    ? null
+                    : dataErrorMessage;
 
                 OnDocumentDataStateChanged();
             }

@@ -609,36 +609,6 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 							eResult == kProcessingSkipped ||
 							eResult == kProcessingDelayed)
 						{
-							// Processing didn't complete.
-							// Log the fact that processing was cancelled or skipped
-							string strMsg = "Application Trace: Processing ";
-							switch (eResult)
-							{
-								case kProcessingCancelled:	strMsg += "cancelled";	break;
-								case kProcessingSkipped:	strMsg += "skipped";	break;
-								case kProcessingDelayed:	strMsg += "delayed";	break;
-							}
-							strMsg += " while performing ";
-							if (strCurrentTaskName.empty())
-							{
-								// Use the task # as part of the error string.
-								strMsg += "task #";
-								strMsg += asString(nCurrentTask + 1); // use 1-based index for the user
-							}
-							else
-							{
-								// Use the task name as part of the error string.
-								strMsg += strCurrentTaskName;
-							}
-							strMsg += ".";
-
-							// Add the history record and debug information, then log the exception
-							UCLIDException ue("ELI17862",strMsg);
-							ue.addDebugInfo("File", strSourceDocName);
-							ue.addDebugInfo("Task", strCurrentTaskName);
-							ue.addDebugInfo("User Name", getCurrentUserName());
-							ue.log();
-
 							return (EFileProcessingResult)eResult;
 						}
 					}

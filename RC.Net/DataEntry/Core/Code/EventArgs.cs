@@ -862,6 +862,34 @@ namespace Extract.DataEntry
     /// Event arguments for the <see cref="DataEntryConfigurationManager.ConfigurationChanged"/> event.
     /// </summary>
     /// <seealso cref="EventArgs" />
+    public class ConfigurationInitializedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConfigurationChangedEventArgs"/> class.
+        /// </summary>
+        /// <param name="dataEntryConfig">The initialized data entry configuration.</param>
+        public ConfigurationInitializedEventArgs(DataEntryConfiguration dataEntryConfig)
+        {
+            DataEntryConfiguration = dataEntryConfig;
+        }
+
+        /// <summary>
+        /// Gets the initialized data entry configuration.
+        /// </summary>
+        /// <value>
+        /// The initialized data entry configuration.
+        /// </value>
+        public DataEntryConfiguration DataEntryConfiguration
+        {
+            get;
+            private set;
+        }
+    }
+
+    /// <summary>
+    /// Event arguments for the <see cref="DataEntryConfigurationManager.ConfigurationChanged"/> event.
+    /// </summary>
+    /// <seealso cref="EventArgs" />
     public class ConfigurationChangedEventArgs : EventArgs
     {
         /// <summary>

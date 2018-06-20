@@ -157,7 +157,13 @@ namespace Extract.DataEntry
                         _queries.Add(dataEntryQuery);
                     }
 
-                    dataEntryQuery.QueryValueModified += HandleQueryValueModified;
+                    // Don't bother registering for query value modifications if this query is
+                    // exempted from executing for all updates.
+                    if (!dataEntryQuery.ExecutionExemptions
+                            .Any(exemption => exemption == ExecutionContext.OnUpdate))
+                    {
+                        dataEntryQuery.QueryValueModified += HandleQueryValueModified;
+                    }
                 }
 
                 // Attempt to update the value once the query has been loaded.
@@ -190,7 +196,7 @@ namespace Extract.DataEntry
                 // update the attribute using the default query.
                 if (_defaultQuery != null)
                 {
-                    UpdateValue(_defaultQuery);
+                    UpdateValue(_defaultQuery, viaDataUpdate: false);
                 }
 
                 // Keep track of which properties have already been updated so that we can prevent
@@ -208,7 +214,7 @@ namespace Extract.DataEntry
                         continue;
                     }
 
-                    if (UpdateValue(query))
+                    if (UpdateValue(query, viaDataUpdate: false))
                     {
                         valueUpdated = true;
 
@@ -419,7 +425,7 @@ namespace Extract.DataEntry
                         // query, not the entire trigger.
                         else
                         {
-                            UpdateValue(dataEntryQuery);
+                            UpdateValue(dataEntryQuery, viaDataUpdate: true);
                         }
                     }
                 }
@@ -459,9 +465,12 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="dataEntryQuery">The <see cref="DataEntryQuery"/> that should be used to
         /// update the target attribute.</param>
+        /// <param name="viaDataUpdate"><c>true</c> if the value is being updated in response to a
+        /// referenced data value that has updated; <c>false</c> for an otherwise commanded execution
+        /// of an attribute's queries.</param>
         /// <returns><see langword="true"/> if the target attribute was updated;
         /// <see langword="false"/> otherwise.</returns>
-        bool UpdateValue(DataEntryQuery dataEntryQuery)
+        bool UpdateValue(DataEntryQuery dataEntryQuery, bool viaDataUpdate)
         {
             QueryResult queryResult = null;
 
@@ -479,6 +488,12 @@ namespace Extract.DataEntry
                     (_validationTrigger && !AttributeStatusInfo.ValidationTriggersEnabled) ||
                     (!_validationTrigger && dataEntryQuery.TargetProperty == null &&
                         AttributeStatusInfo.BlockAutoUpdateQueries))
+                {
+                    return false;
+                }
+
+                // https://extract.atlassian.net/browse/ISSUE-15342
+                if (IsExecutionExempted(dataEntryQuery, viaDataUpdate))
                 {
                     return false;
                 }
@@ -568,7 +583,7 @@ namespace Extract.DataEntry
                     // cost.
                     AttributeStatusInfo.Validate(_targetAttribute, false);
 
-                    statusInfo.OwningControl.RefreshAttributes(false, _targetAttribute);
+                    statusInfo.OwningControl?.RefreshAttributes(false, _targetAttribute);
 
                     return true;
                 }
@@ -578,7 +593,11 @@ namespace Extract.DataEntry
                     // A default trigger will never need to fire again-- disable and disarm the
                     // query.
                     dataEntryQuery.Disabled = true;
-                    dataEntryQuery.QueryValueModified -= HandleQueryValueModified;
+                    if (!dataEntryQuery.ExecutionExemptions
+                        .Any(exemption => exemption == ExecutionContext.OnUpdate))
+                    {
+                        dataEntryQuery.QueryValueModified -= HandleQueryValueModified;
+                    }
 
                     // If the target attribute is empty and would need a default value (or it was
                     // when the default trigger was created), apply the default query value.
@@ -630,6 +649,42 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Determines whether execution of the specified <see cref="dataEntryQuery"/> should be
+        /// exempted under the current circumstances.
+        /// </summary>
+        /// <param name="dataEntryQuery">The <see cref="DataEntryQuery"/> to consider for exemption.
+        /// </param>
+        /// <param name="viaDataUpdate"><c>true</c> if the current check is being run in response to a
+        /// referenced data value that has updated; <c>false</c> for an otherwise commanded execution
+        /// of an attribute's queries.</param>
+        /// <returns><c>true</c> if execution of the query is exempted; <c>false</c> if the query
+        /// should be executed.</returns>
+        bool IsExecutionExempted(DataEntryQuery dataEntryQuery, bool viaDataUpdate)
+        {
+            var executionContext = AttributeStatusInfo.QueryExecutionContext;
+            if (AttributeStatusInfo.QueryExecutionContext == ExecutionContext.OnUpdate)
+            {
+                executionContext = viaDataUpdate
+                    ? ExecutionContext.OnUpdate
+                    : ExecutionContext.OnCreate;
+            }
+
+            executionContext |= string.IsNullOrWhiteSpace(_targetAttribute?.Value.String)
+                ? ExecutionContext.WhenEmpty
+                : ExecutionContext.WhenPopulated;
+
+            foreach (var exemption in dataEntryQuery.ExecutionExemptions)
+            {
+                if ((exemption & executionContext) == exemption)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Attempts to apply the specified <see cref="QueryResult"/> to the target
         /// <see cref="IAttribute"/>.
         /// </summary>
@@ -668,7 +723,7 @@ namespace Extract.DataEntry
 
                 // After applying the value, direct the control that contains it to
                 // refresh the value.
-                AttributeStatusInfo.GetOwningControl(_targetAttribute).
+                AttributeStatusInfo.GetOwningControl(_targetAttribute)?.
                     RefreshAttributes(queryResult.IsSpatial, _targetAttribute);
 
                 // https://extract.atlassian.net/browse/ISSUE-13506
@@ -791,7 +846,7 @@ namespace Extract.DataEntry
                     }
                     else
                     {
-                        autoUpdateQuery.UpdateValue(dataEntryQuery);
+                        autoUpdateQuery.UpdateValue(dataEntryQuery, viaDataUpdate: true);
                     }
                 }
             }

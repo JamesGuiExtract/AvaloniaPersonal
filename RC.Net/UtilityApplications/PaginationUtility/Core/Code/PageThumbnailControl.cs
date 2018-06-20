@@ -577,6 +577,20 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #endregion Overrides
 
+        #region Event Handlers
+
+        /// <summary>
+        /// Handles the ImageClosed event of the HandleContentsPanel control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandleContentsPanel_ImageClosed(object sender, EventArgs e)
+        {
+            _pageIsDisplayed = false;
+        }
+
+        #endregion Event Handlers
+
         /// <summary>
         /// Gets the page stylists.
         /// </summary>
@@ -623,12 +637,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                     contentsPanel.Invalidate(true);
 
                     RegisterForEvents(contentsPanel);
+                    contentsPanel.ImageClosed += HandleContentsPanel_ImageClosed;
+
                     _contentsPanel = contentsPanel;
                 }
                 else if (!visible && _contentsPanel != null)
                 {
                     var contentsPanel = _contentsPanel;
                     UnRegisterForEvents(contentsPanel);
+                    contentsPanel.ImageClosed -= HandleContentsPanel_ImageClosed;
                     Controls.Remove(contentsPanel);
                     contentsPanel.Dispose();
                     _contentsPanel = null;

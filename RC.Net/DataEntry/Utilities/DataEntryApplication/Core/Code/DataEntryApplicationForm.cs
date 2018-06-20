@@ -652,17 +652,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             get
             {
-                // [DataEntry:614]
-                // Don't use the Window's theme for Windows Vista or later since the Aero theme
-                // hides the color applied to the active control when the active control is a
-                // drop-list combo box.
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT &&
-                    Environment.OSVersion.Version.Major >= 6)
-                {
-                    return false;
-                }
-
-                // The Windows XP theme doesn't cause any problems
+                // https://extract.atlassian.net/browse/ISSUE-15445
+                // Removed code that disabled visual styles in order to allow active control
+                // selection for combo boxes be indicated (ISSUE-473). This fix is suspected of
+                // causing a crash. Also, this setting is inconsistent with the pagination task
+                // that does use visual styles.
                 return true;
             }
         }
@@ -692,6 +686,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the form supports displaying multiple documents
+        /// simultaneously (one for each processing thread).
+        /// </summary>
+        /// <value><c>true</c> if the form supports multiple documents, <c>false</c> if only one
+        /// document at a time can be loaded.</value>
+        public bool SupportsMultipleDocuments
+        {
+            get
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -873,26 +881,25 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 _cachedVOAData.Remove(fileName);
 
+                ExtractException.Assert("ELI29830", "Unexpected file processing database!",
+                    _fileProcessingDb == fileProcessingDB);
+                ExtractException.Assert("ELI29831", "Unexpected database action ID!",
+                    _fileProcessingDb == null || _actionId == actionID);
+
+                // These variables should be initialized here before the potential call to
+                // AbortProcessing, otherwise AbortProcessing will report a bad file ID is being
+                // aborted.
+                // https://extract.atlassian.net/browse/ISSUE-15316
+                _fileId = fileID;
+                _fileName = fileName;
+                _fileTaskSessionID = null;
+
                 // In order to keep the order documents are displayed in sync with the
                 // _paginationPanel, swap out the loading file for another if necessary.
                 if (_paginationPanel != null && ReorderAccordingToPagination(fileName))
                 {
                     AbortProcessing(EFileProcessingResult.kProcessingDelayed, false);
                     return;
-                }
-
-                ExtractException.Assert("ELI29830", "Unexpected file processing database!",
-                    _fileProcessingDb == fileProcessingDB);
-                ExtractException.Assert("ELI29831", "Unexpected database action ID!",
-                    _fileProcessingDb == null || _actionId == actionID);
-
-                _fileId = fileID;
-                _fileName = fileName;
-                _fileTaskSessionID = null;
-
-                if (_paginationPanel != null)
-                {
-                    _paginationPanel.FileTaskSessionID = null;
                 }
 
                 _tagFileToolStripButton.Database = fileProcessingDB;
@@ -920,7 +927,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (_paginationPanel != null)
                 {
-                    LoadDocumentForPagination(fileName);
+                    LoadDocumentForPagination(fileName, fileID);
 
                     if (_paginationPanel.IsPaginationSuggested(fileName))
                     {
@@ -1327,6 +1334,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _paginationPanel.OutputExpectedPaginationAttributesFile =
                         _settings.PaginationSettings.OutputExpectedPaginationAttributesFiles;
                     _paginationPanel.FileProcessingDB = FileProcessingDB;
+                    _paginationPanel.SaveButtonVisible = false;
 
                     ValidatePaginationActions();
 
@@ -1335,6 +1343,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // Register for OutputDocumentCreated event in order to set status for the
                     // PaginationOutputAction _after_ the document has been created
                     _paginationPanel.OutputDocumentCreated += HandlePaginationPanel_OutputDocumentCreated;
+                    _paginationPanel.FileTaskSessionIdRequest += (o, args) => args.FileTaskSessionID = _fileTaskSessionID;
 
                     if (_configManager.RegisteredDocumentTypes.Any())
                     {
@@ -1830,7 +1839,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // host will have an empty attribute vector initially)
                         if (oldDataEntryControlHost.IsDocumentLoaded)
                         {
-                            _configManager.Attributes = oldDataEntryControlHost.GetData(validateData: false);
+                            _configManager.Attributes = oldDataEntryControlHost.GetData(
+                                validateData: false, pruneUnmappedAttributes: false);
                         }
 
                         // Set Active = false for the old DEP so that it no longer tracks image
@@ -2186,7 +2196,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // https://extract.atlassian.net/browse/ISSUE-13051
                         // Consider removing code that would cancel processing in response to the
                         // ImageFileClosing event.
-                        OnFileComplete(EFileProcessingResult.kProcessingCancelled);
+                        OnFileComplete(_fileId, EFileProcessingResult.kProcessingCancelled);
                     }
                 }
             }
@@ -3132,7 +3142,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // source documents
                 int pageCounter = 1;
                 var pageMap = new Dictionary<Tuple<string, int>, List<int>>();
-                foreach (var pageInfo in e.SourcePageInfo)
+                var nonDeletedSourcePageInfo = e.SourcePageInfo.Where(info => !info.Deleted).ToList();
+                foreach (var pageInfo in nonDeletedSourcePageInfo)
                 {
                     var sourcePage = new Tuple<string, int>(pageInfo.DocumentName, pageInfo.Page);
                     var destPages = new List<int>();
@@ -3162,9 +3173,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         var attributesCopy = (IUnknownVector)copyThis.Clone();
                         attributesCopy.ReportMemoryUsage();
 
-                        if (e.SourcePageInfo.Any(pageInfo => pageInfo.DocumentName == _fileName))
+                        if (nonDeletedSourcePageInfo.Any(pageInfo => pageInfo.DocumentName == _fileName))
                         {
-                            DataEntryControlHost.PruneNonPersistingAttributes(attributesCopy);
+                            DataEntryMethods.PruneNonPersistingAttributes(attributesCopy);
                         }
 
                         AttributeMethods.TranslateAttributesToNewDocument(
@@ -3576,7 +3587,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="fileId">The ID of the file to delay (or -1 when there is only a single
         /// file to which this call could apply).</param>
-        public void DelayFile(int fileId = -1)
+        public void DelayFile(int fileID = -1)
         {
             if (InvokeRequired)
             {
@@ -3584,7 +3595,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     try
                     {
-                        DelayFile(fileId);
+                        DelayFile(fileID);
                     }
                     catch (Exception ex)
                     {
@@ -3601,7 +3612,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     !_standAloneMode && _fileProcessingDb != null);
 
                 ExtractException.Assert("ELI44741", "Cannot delay file that is not open.",
-                    fileId == -1 || fileId == _fileId);
+                    fileID == -1 || fileID == _fileId);
 
                 // If is no image loaded, there is no file to delay. (While paginating the normal
                 // document load may have been short-circuited; assume there is a document to
@@ -3800,14 +3811,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// Raises the <see cref="FileComplete"/> event.
         /// </summary>
+        /// <param name="fileId">The ID of the file that completed.</param>
         /// <param name="fileProcessingResult">Specifies under what circumstances
         /// verification of the file completed.</param>
-        void OnFileComplete(EFileProcessingResult fileProcessingResult)
+        void OnFileComplete(int fileId, EFileProcessingResult fileProcessingResult)
         {
             var eventHandler = FileComplete;
             if (eventHandler != null)
             {
-                eventHandler(this, new FileCompleteEventArgs(fileProcessingResult));
+                eventHandler(this, new FileCompleteEventArgs(fileId, fileProcessingResult));
             }
         }
 
@@ -3918,12 +3930,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         RecordCounts(onLoad: false,
                             attributes: DataEntryControlHost.MostRecentlySavedAttributes);
                         EndFileTaskSession();
-
-                        _fileId = -1;
-                        _fileName = null;
                     }
 
-                    OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
+                    OnFileComplete(_fileId, EFileProcessingResult.kProcessingSuccessful);
+
+                    _fileId = -1;
+                    _fileName = null;
                 }
             }
             catch (Exception ex)
@@ -4109,10 +4121,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 RecordCounts(onLoad: false, attributes: null);
                 EndFileTaskSession();
 
+                OnFileComplete(_fileId, processingResult);
+
                 _fileId = -1;
                 _fileName = null;
-
-                OnFileComplete(processingResult);
             }
         }
 
@@ -4504,11 +4516,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 _fileTaskSessionID = FileProcessingDB.StartFileTaskSession(_VERIFICATION_TASK_GUID, _fileId, _actionId);
 
-                if (_paginationPanel != null)
-                {
-                    _paginationPanel.FileTaskSessionID = _fileTaskSessionID;
-                }
-
                 // If the timer is currently running, its current time will be the overhead time
                 // (time since the previous document was saved. Restart the timer to track the
                 // screen time of this document.
@@ -4557,10 +4564,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     double elapsedSeconds = _fileProcessingStopwatch.ElapsedMilliseconds / 1000.0;
                     _fileProcessingStopwatch.Restart();
 
-                    double activityTime = _inputEventTracker?.StopActivityTimer() ?? 0.0;
-
-                    _fileProcessingDb.UpdateFileTaskSession(
-                        _fileTaskSessionID.Value, elapsedSeconds, _overheadElapsedTime.Value, activityTime);
+                    // ReorderAccordingToPagination may triggered an abort of processing of a document
+                    // before a FileTaskSession was started.
+                    if (_fileTaskSessionID != null)
+                    {
+                        _fileProcessingDb.UpdateFileTaskSession(
+                            _fileTaskSessionID.Value, elapsedSeconds, _overheadElapsedTime.Value);
+                    }
                 }
             }
             catch (Exception ex)
@@ -4831,7 +4841,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// UI thread.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
-        void LoadDocumentForPagination(string fileName)
+        /// <param name="fileID">File ID</param>
+        void LoadDocumentForPagination(string fileName, int fileID)
         {
             if (_paginationPanel == null || _paginationPanel.SourceDocuments.Contains(fileName))
             {
@@ -4927,20 +4938,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         }
 
                         _paginationPanel.LoadFile(
-                            fileName, -1, pages, deletedPages, suggestedPagination.Value, documentData, false);
+                            fileName, fileID, -1, pages, deletedPages, suggestedPagination.Value, documentData, false);
                     }
 
                     return;
                 }
 
                 // There was a VOA file, just not with suggested pagination. Pass on the VOA data.
-                _paginationPanel.LoadFile(fileName, -1, null, null, false, documentData, false);
+                _paginationPanel.LoadFile(fileName, fileID, - 1, null, null, false, documentData, false);
                 return;
             }
 
             // If there was no rules-suggested pagination, go ahead and load the physical document
             // into the _paginationPanel
-            _paginationPanel.LoadFile(fileName, -1, false);
+            _paginationPanel.LoadFile(fileName, fileID, -1, false);
         }
 
         /// <summary>
@@ -4998,7 +5009,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 string outputDocPath = _settings.PaginationSettings.PaginationOutputPath;
-                string sourceDocName = e.SourcePageInfo.First().DocumentName;
+                var sourcePageInfo = e.SourcePageInfo.Where(info => !info.Deleted).ToList();
+                string sourceDocName = sourcePageInfo.First().DocumentName;
                 var pathTags = new FileActionManagerPathTags((FAMTagManager)_tagUtility, sourceDocName);
                 if (outputDocPath.Contains(PaginationSettings.SubDocIndexTag))
                 {
@@ -5018,7 +5030,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
                 if (outputDocPath.Contains(PaginationSettings.FirstPageTag))
                 {
-                    int firstPageNum = e.SourcePageInfo
+                    int firstPageNum = sourcePageInfo
                         .Where(page => page.DocumentName == sourceDocName)
                         .Min(page => page.Page);
 
@@ -5027,7 +5039,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
                 if (outputDocPath.Contains(PaginationSettings.LastPageTag))
                 {
-                    int lastPageNum = e.SourcePageInfo
+                    int lastPageNum = sourcePageInfo
                         .Where(page => page.DocumentName == sourceDocName)
                         .Max(page => page.Page);
 
@@ -5054,8 +5066,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
+                var sourcePageInfo = e.SourcePageInfo.Where(info => !info.Deleted).ToList();
                 var sourceDocNames = string.Join(", ",
-                        e.SourcePageInfo
+                        sourcePageInfo
                             .Select(page => "'" + page.DocumentName.Replace("'", "''") + "'")
                             .Distinct());
 

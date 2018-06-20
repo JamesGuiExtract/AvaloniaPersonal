@@ -1,6 +1,7 @@
 ﻿using Extract.Imaging.Forms;
 using System;
 using System.Windows.Forms;
+using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 
@@ -146,9 +147,39 @@ namespace Extract.UtilityApplications.PaginationUtility
             FileProcessingDB fileProcessingDB, ImageViewer imageViewer);
 
         /// <summary>
+        /// Gets a <see cref="PaginationDocumentData" /> instance based on the provided
+        /// <see paramref="attributes" />.
+        /// </summary>
+        /// <param name="documentDataAttribute">The VOA data for which a <see cref="PaginationDocumentData" />
+        /// instance is needed including this top-level attribute which contains document data status info.
+        /// </param>
+        /// <param name="sourceDocName">The name of the source document for which data is being
+        /// loaded.</param>
+        /// <param name="fileProcessingDB"></param>
+        /// <param name="imageViewer"></param>
+        /// <returns>
+        /// The <see cref="PaginationDocumentData" /> instance.
+        /// </returns>
+        PaginationDocumentData GetDocumentData(IAttribute documentDataAttribute, string sourceDocName,
+            FileProcessingDB fileProcessingDB, ImageViewer imageViewer);
+
+        /// <summary>
         /// Updates the document data status.
         /// </summary>
-        void UpdateDocumentDataStatus(PaginationDocumentData data);
+        /// <param name="data">The <see cref="PaginationDocumentData"/> whose status will be checked.
+        /// </param>
+        /// <param name="saveData"><c>true</c> if the result of the data load (including auto-update
+        /// queries that manipulate the data) should be saved or <c>false</c> to update the status
+        /// bar.</param>
+        /// <param name="validateData"><see langword="true"/> if the <see paramref="data"/> should
+        /// be validated for errors when saving; otherwise, <see langwor="false"/>.</param>
+        void UpdateDocumentDataStatus(PaginationDocumentData data, bool saveData, bool validateData);
+
+        /// <summary>
+        /// Waits for all documents status updates (started via <see cref="UpdateDocumentDataStatus"/>)
+        /// to complete.
+        /// </summary>
+        void WaitForDocumentStatusUpdates();
 
         /// <summary>
         /// Provides a message to be displayed.

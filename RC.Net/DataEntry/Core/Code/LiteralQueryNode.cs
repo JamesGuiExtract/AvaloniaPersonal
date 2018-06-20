@@ -34,8 +34,13 @@ namespace Extract.DataEntry
                 // [DataEntry:858]
                 // Do not unnecessarily expand path tags-- this method is called a lot and the
                 // expand call is a relatively expensive COM call.
-                bool containsPossiblePathTag = (QueryText.Contains("$") ||
-                    QueryText.IndexOf("<SourceDocName>", StringComparison.Ordinal) >= 0);
+                bool containsPossiblePathTag = QueryText.Contains("$");
+                if (!containsPossiblePathTag)
+                {
+                    int tagOpen = QueryText.IndexOf('<');
+                    containsPossiblePathTag = tagOpen >= 0 && QueryText.IndexOf('>') > tagOpen;
+                }
+
                 string expandedQuery = containsPossiblePathTag ?
                     AttributeStatusInfo.PathTags.Expand(QueryText) : QueryText;
 

@@ -13,6 +13,28 @@ using TD.SandDock;
 namespace Extract.Utilities.Forms
 {
     /// <summary>
+    /// The Extract color scheme.
+    /// </summary>
+    public static class ExtractColors
+    {
+        public static readonly Color Blue = Color.FromArgb(0, 175, 249);
+
+        public static readonly Color LightBlue = ControlPaint.LightLight(ExtractColors.Blue);
+
+        public static readonly Color LightLightBlue = ControlPaint.LightLight(ExtractColors.LightBlue);
+
+        public static readonly Color Orange = Color.FromArgb(249, 133, 0);
+
+        public static readonly Color LightOrange = ControlPaint.LightLight(ExtractColors.Orange);
+
+        public static readonly Color LightLightOrange = ControlPaint.LightLight(ExtractColors.LightOrange);
+
+        public static readonly Color Gray = Color.FromArgb(216, 216, 216);
+
+        public static readonly Color White = Color.White;
+    }
+
+    /// <summary>
     /// Represents a grouping of methods for performing operations on 
     /// <see cref="System.Windows.Forms"/> related objects.
     /// </summary>

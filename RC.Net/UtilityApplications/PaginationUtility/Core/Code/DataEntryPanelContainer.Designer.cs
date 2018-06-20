@@ -70,6 +70,7 @@
             this._documentTypeComboBox.Size = new System.Drawing.Size(239, 21);
             this._documentTypeComboBox.Sorted = true;
             this._documentTypeComboBox.TabIndex = 1;
+            this._documentTypeComboBox.MouseWheel += HandleDocumentTypeComboBox_MouseWheel;
             // 
             // _documentTypeLabel
             // 

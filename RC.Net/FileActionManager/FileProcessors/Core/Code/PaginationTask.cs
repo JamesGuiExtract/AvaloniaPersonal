@@ -1,23 +1,11 @@
-using Extract.Database;
 using Extract.DataEntry;
 using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
-using Extract.Utilities;
-using Extract.UtilityApplications.PaginationUtility;
 using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
-using System.Xml;
-using System.Xml.XPath;
-using UCLID_AFCORELib;
-using UCLID_AFUTILSLib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -114,6 +102,34 @@ namespace Extract.FileActionManager.FileProcessors
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether document pages for newly loaded documents should
+        /// be collapsed by default.
+        /// </summary>
+        bool DefaultToCollapsed
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the select all check box should be visible.
+        /// </summary>
+        bool SelectAllCheckBoxVisible
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the load next document button should be visible.
+        /// </summary>
+        bool LoadNextDocumentVisible
+        {
+            get;
+            set;
+        }
     }
 
     /// <summary>
@@ -139,8 +155,10 @@ namespace Extract.FileActionManager.FileProcessors
         /// 2. Added OutputExpectedPaginationAttributesFiles and ExpectedPaginationAttributesOutputPath
         /// 3. Added SingleSourceDocumentMode
         /// 4. Added AutoRotateImages
+        /// 5. Added DefaultToCollapsed
+        /// 6. Added SelectAllCheckBoxVisible, LoadNextDocumentButtonVisible
         /// </summary>
-        const int _CURRENT_VERSION = 4;
+        const int _CURRENT_VERSION = 6;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -234,6 +252,21 @@ namespace Extract.FileActionManager.FileProcessors
         /// text (per OCR).
         /// </summary>
         bool _autoRotateImages = true;
+
+        /// <summary>
+        /// Indicates whether document pages for newly loaded documents should be collapsed by default.
+        /// </summary>
+        bool _defaultToCollapsed = false;
+
+        /// <summary>
+        /// Indicates whether the select all check box should be visible.
+        /// </summary>
+        bool _selectAllCheckBoxVisible = true;
+
+        /// <summary>
+        /// Indicates whether the load next document button should be visible.
+        /// </summary>
+        bool _loadNextDocumentButtonVisible = true;
 
         #endregion Fields
 
@@ -476,6 +509,67 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether document pages for newly loaded documents should
+        /// be collapsed by default.
+        /// </summary>
+        public bool DefaultToCollapsed
+        {
+            get
+            {
+                return _defaultToCollapsed;
+            }
+
+            set
+            {
+                if (value != _defaultToCollapsed)
+                {
+                    _defaultToCollapsed = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the select all check box should be visible.
+        /// </summary>
+        public bool SelectAllCheckBoxVisible
+        {
+            get
+            {
+                return _selectAllCheckBoxVisible;
+            }
+
+            set
+            {
+                if (value != _selectAllCheckBoxVisible)
+                {
+                    _selectAllCheckBoxVisible = value;
+                    _dirty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the load next document button should be visible.
+        /// </summary>
+        public bool LoadNextDocumentVisible
+        {
+            get
+            {
+                return _loadNextDocumentButtonVisible;
+            }
+
+            set
+            {
+                if (value != _loadNextDocumentButtonVisible)
+                {
+                    _loadNextDocumentButtonVisible = value;
+                    _dirty = true;
+                }
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -518,6 +612,9 @@ namespace Extract.FileActionManager.FileProcessors
             ExpectedPaginationAttributesOutputPath = task.ExpectedPaginationAttributesOutputPath;
             SingleSourceDocumentMode = task.SingleSourceDocumentMode;
             AutoRotateImages = task.AutoRotateImages;
+            DefaultToCollapsed = task.DefaultToCollapsed;
+            SelectAllCheckBoxVisible = task.SelectAllCheckBoxVisible;
+            LoadNextDocumentVisible = task.LoadNextDocumentVisible;
 
             _dirty = true;
         }
@@ -878,6 +975,17 @@ namespace Extract.FileActionManager.FileProcessors
                     {
                         AutoRotateImages = reader.ReadBoolean();
                     }
+
+                    if (reader.Version >= 5)
+                    {
+                        DefaultToCollapsed = reader.ReadBoolean();
+                    }
+
+                    if (reader.Version >= 6)
+                    {
+                        SelectAllCheckBoxVisible = reader.ReadBoolean();
+                        LoadNextDocumentVisible = reader.ReadBoolean();
+                    }
                 }
 
                 // Freshly loaded object is not dirty
@@ -914,6 +1022,9 @@ namespace Extract.FileActionManager.FileProcessors
                     writer.Write(ExpectedPaginationAttributesOutputPath);
                     writer.Write(SingleSourceDocumentMode);
                     writer.Write(AutoRotateImages);
+                    writer.Write(DefaultToCollapsed);
+                    writer.Write(SelectAllCheckBoxVisible);
+                    writer.Write(LoadNextDocumentVisible);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);

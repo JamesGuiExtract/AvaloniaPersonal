@@ -257,7 +257,7 @@ DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemo
 
 DoBuilds: DisplayTimeStamp SetupBuildEnv BuildAttributeFinderCore
 
-DoEverythingNoGet: DoBuilds CreateInstalls CopyComponentVersionFile DoDemos UpdateLicenseFiles
+DoEverythingNoGet: DoBuilds CreateInstalls CopyComponentVersionFile DoDemos 
     @ECHO.
     @DATE /T
     @TIME /T

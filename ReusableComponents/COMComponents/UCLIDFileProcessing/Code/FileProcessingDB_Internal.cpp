@@ -2695,11 +2695,12 @@ void CFileProcessingDB::validateDBSchemaVersion(bool bCheckForUnaffiliatedFiles/
 			m_bProductSpecificDBSchemasAreValid = true;
 		}
 
-		if (bCheckForUnaffiliatedFiles && unaffiliatedWorkflowFilesExist())
-		{
-			m_strCurrentConnectionStatus = gstrUNAFFILIATED_FILES;
-			throw UCLIDException("ELI43450", "Workflows exist, but there are unaffiliated files.");
-		}
+		// Removing assertions for now to solve false positive assertions at Hurley.
+		//if (bCheckForUnaffiliatedFiles && unaffiliatedWorkflowFilesExist())
+		//{
+		//	m_strCurrentConnectionStatus = gstrUNAFFILIATED_FILES;
+		//	throw UCLIDException("ELI43450", "Workflows exist, but there are unaffiliated files.");
+		//}
 	}
 }
 //--------------------------------------------------------------------------------------------------
