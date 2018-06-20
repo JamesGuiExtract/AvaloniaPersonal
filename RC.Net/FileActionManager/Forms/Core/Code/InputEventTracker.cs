@@ -324,10 +324,17 @@ namespace Extract.FileActionManager.Forms
         /// </summary>
         public void NotifyOfInputEvent()
         {
-            if (Active)
+            try
             {
-                _inputCount++;
-                UpdateActivityTime();
+                if (Active)
+                {
+                    _inputCount++;
+                    UpdateActivityTime();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45600");
             }
         }
 

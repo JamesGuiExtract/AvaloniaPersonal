@@ -510,6 +510,7 @@ int UpdateToSchemaVersion12(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45026");
 }
+
 //-------------------------------------------------------------------------------------------------
 int UpdateToSchemaVersion13(_ConnectionPtr ipConnection,
 	long* pnNumSteps,

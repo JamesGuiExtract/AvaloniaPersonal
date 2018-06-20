@@ -3587,7 +3587,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="fileId">The ID of the file to delay (or -1 when there is only a single
         /// file to which this call could apply).</param>
-        public void DelayFile(int fileID = -1)
+        public void DelayFile(int fileId = -1)
         {
             if (InvokeRequired)
             {
@@ -3595,7 +3595,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     try
                     {
-                        DelayFile(fileID);
+                        DelayFile(fileId);
                     }
                     catch (Exception ex)
                     {
@@ -3612,7 +3612,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     !_standAloneMode && _fileProcessingDb != null);
 
                 ExtractException.Assert("ELI44741", "Cannot delay file that is not open.",
-                    fileID == -1 || fileID == _fileId);
+                    fileId == -1 || fileId == _fileId);
 
                 // If is no image loaded, there is no file to delay. (While paginating the normal
                 // document load may have been short-circuited; assume there is a document to
@@ -4564,12 +4564,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     double elapsedSeconds = _fileProcessingStopwatch.ElapsedMilliseconds / 1000.0;
                     _fileProcessingStopwatch.Restart();
 
+                    double activityTime = _inputEventTracker?.StopActivityTimer() ?? 0.0;
+
                     // ReorderAccordingToPagination may triggered an abort of processing of a document
                     // before a FileTaskSession was started.
                     if (_fileTaskSessionID != null)
                     {
                         _fileProcessingDb.UpdateFileTaskSession(
-                            _fileTaskSessionID.Value, elapsedSeconds, _overheadElapsedTime.Value);
+                            _fileTaskSessionID.Value, elapsedSeconds, _overheadElapsedTime.Value, activityTime);
                     }
                 }
             }
