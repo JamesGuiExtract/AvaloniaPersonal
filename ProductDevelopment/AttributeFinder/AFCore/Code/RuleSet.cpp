@@ -1832,7 +1832,17 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
 		ByteStreamManipulator dataWriter(ByteStreamManipulator::kWrite, data);
-		m_nVersionNumber = gnCurrentVersion; // save always with the latest version
+
+		// Conditionally save with version 16 to avoid needlessly breaking compatibility for an unused feature
+		if (gnCurrentVersion == 17
+			&& (m_ipOCRParameters == __nullptr || m_ipOCRParameters->Size == 0))
+		{
+			m_nVersionNumber = 16;
+		}
+		else
+		{
+			m_nVersionNumber = gnCurrentVersion; // save with the latest version
+		}
 		dataWriter << m_nVersionNumber;
 
 		// Write counter flags to stream ( added in version 4 of the file )
@@ -1921,9 +1931,13 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		// Save the GUID for the IIdentifiableObject interface.
 		saveGUID(pStream);
 
-		IPersistStreamPtr ipPIObj = getOCRParameters();
-		ASSERT_RESOURCE_ALLOCATION("ELI45946", ipPIObj != __nullptr);
-		writeObjectToStream(ipPIObj, pStream, "ELI45947", fClearDirty);
+		// Only write OCR parameters if the version hasn't been decremented to 16
+		if (m_nVersionNumber >= 17)
+		{
+			IPersistStreamPtr ipPIObj = getOCRParameters();
+			ASSERT_RESOURCE_ALLOCATION("ELI45946", ipPIObj != __nullptr);
+			writeObjectToStream(ipPIObj, pStream, "ELI45947", fClearDirty);
+		}
 
 		// clear the flag as specified
 		if (fClearDirty)
