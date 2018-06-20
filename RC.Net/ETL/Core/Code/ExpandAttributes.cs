@@ -3,11 +3,13 @@ using Extract.Code.Attributes;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Windows.Forms;
@@ -25,6 +27,96 @@ namespace Extract.ETL
     [ExtractCategory("DatabaseService", "Expand attributes")]
     public class ExpandAttributes : DatabaseService, IConfigSettings
     {
+        #region DashboardAttributeField class definition
+
+        /// <summary>
+        /// Class that contains the definition of the fields for the dashboard attribute
+        /// </summary>
+        public class DashboardAttributeField : INotifyPropertyChanged
+        {
+            #region DashboardAttributeField Fields
+
+            string _dashboardAttributeName;
+            Int64 _attributeSetNameID;
+            string _pathForAttributeInAttributeSet;
+
+            #endregion
+
+            #region DashboardAttributeField Properties
+
+            /// <summary>
+            /// Name for the Dashboard attribute field
+            /// </summary>
+            public string DashboardAttributeName
+            {
+                get { return _dashboardAttributeName; }
+                set
+                {
+                    if (value != _dashboardAttributeName)
+                    {
+                        _dashboardAttributeName = value;
+                        NotifyPropertyChanged();
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Attribute set name id for the Set the dashboard attribute is to be extracted from
+            /// </summary>
+            public Int64 AttributeSetNameID
+            {
+                get { return _attributeSetNameID; }
+                set
+                {
+                    if(value != _attributeSetNameID)
+                    {
+                        _attributeSetNameID = value;
+                        NotifyPropertyChanged();
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Path to extract the attribute from the attribute set
+            /// </summary>
+            public string PathForAttributeInAttributeSet
+            {
+                get { return _pathForAttributeInAttributeSet; }
+                set
+                {
+                    if (value != _pathForAttributeInAttributeSet)
+                    {
+                        _pathForAttributeInAttributeSet = value;
+                        NotifyPropertyChanged();
+                    }
+                }
+            }
+
+            #endregion
+
+            #region DashboardAttributeField Events
+
+            public event PropertyChangedEventHandler PropertyChanged;
+
+            #endregion
+
+            #region DashboardAttributeField Event handlers
+
+            /// <summary>
+            /// Called by each of the property Set accessors when property changes
+            /// </summary>
+            /// <param name="propertyName">Name of the property changed</param>
+            protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+
+            #endregion
+
+        }
+
+        #endregion
+
         #region Constants
 
         /// <summary>
@@ -109,6 +201,85 @@ namespace Extract.ETL
             
             ";
 
+        /// <summary>
+        /// Query that adds new values to the DashboardAttributeFields table
+        /// Requires 3 parameters
+        ///     @AttributeSetName - Name of the attribute set to get the data from
+        ///     @AttributePath - Path of the attribute - created by using attribute names separated by \
+        ///     @DashboardNameForAttribute - Name that is used to identify the value in the dashboard
+        /// </summary>
+        readonly string AddDashboardAttributes = @"
+                ;WITH AttributeWithPath (
+                	AttributeSetForFileID
+                	,AttributeID
+                	,ParentAttributeID
+                	,[Name]
+                	,[Value]
+                	,[Guid]
+                	,[Level]
+                	)
+                AS (
+                	-- anchor
+                	SELECT Attribute.AttributeSetForFileID
+                		,Attribute.id
+                		,ParentAttributeID
+                		,CAST(AttributeName.Name AS NVARCHAR(MAX))
+                		,Attribute.Value
+                		,Attribute.GUID
+                		,0 [Level]
+                	FROM Attribute
+                	INNER JOIN AttributeName ON Attribute.AttributeNameID = AttributeName.ID
+                	INNER JOIN AttributeSetForFile ON AttributeSetForFile.ID = Attribute.AttributeSetForFileID
+                	WHERE ParentAttributeID IS NULL
+                		AND AttributeSetForFile.AttributeSetNameID = @AttributeSetNameID
+                	
+                	UNION ALL
+                	
+                	SELECT Attribute.AttributeSetForFileID
+                		,Attribute.id
+                		,Attribute.ParentAttributeID
+                		,AttributeWithPath.[Name] + '\' + AttributeName.[Name]
+                		,Attribute.Value
+                		,Attribute.GUID
+                		,[Level] + 1
+                	FROM Attribute
+                	INNER JOIN AttributeName ON Attribute.AttributeNameID = AttributeName.ID
+                	INNER JOIN AttributeWithPath ON Attribute.ParentAttributeID = AttributeWithPath.AttributeID
+                	)
+                	,ExpandedAttributeSets
+                AS (
+                	SELECT DISTINCT AttributeSetForFileID
+                	FROM Attribute
+                	)
+                	,DataToInsert
+                AS (
+                	SELECT DISTINCT ExpandedAttributeSets.AttributeSetForFileID
+                		,@DashboardNameForAttribute [Name]
+                		,COALESCE(AttributeWithPath.[Value], 'UNKNOWN') [Value]
+                		,ROW_NUMBER() OVER (
+                			PARTITION BY ExpandedAttributeSets.AttributeSetForFileID ORDER BY ExpandedAttributeSets.AttributeSetForFileID DESC
+                			) RowsOfAttribute
+                	FROM ExpandedAttributeSets
+                	INNER JOIN AttributeSetForFile 
+                        ON AttributeSetForFile.ID = ExpandedAttributeSets.AttributeSetForFileID 
+                            AND AttributeSetForFile.AttributeSetNameID = @AttributeSetNameID
+                	LEFT JOIN AttributeWithPath ON AttributeSetForFile.ID = AttributeWithPath.AttributeSetForFileID
+                		AND AttributeWithPath.[Name] = @AttributePath
+                	LEFT JOIN DashboardAttributeFields ON AttributeSetForFile.ID = DashboardAttributeFields.AttributeSetForFileID
+                		AND DashboardAttributeFields.Name = @DashboardNameForAttribute
+                	WHERE DashboardAttributeFields.Name IS NULL
+                	)
+                INSERT INTO DashboardAttributeFields (
+                	AttributeSetForFileID
+                	,[Name]
+                	,[Value]
+                	)
+                SELECT AttributeSetForFileID
+                	,[Name]
+                	,[Value]
+                FROM DataToInsert
+                WHERE RowsOfAttribute = 1
+            ";
 
         #endregion
 
@@ -117,7 +288,7 @@ namespace Extract.ETL
         /// <summary>
         /// Current version
         /// </summary>
-        const int CURRENT_VERSION = 1;
+        const int CURRENT_VERSION = 2;
 
         /// <summary>
         /// Indicates whether the Process method is currently executing.
@@ -142,6 +313,12 @@ namespace Extract.ETL
         /// </summary>
         [DataMember]
         public bool StoreEmptyAttributes { get; set; } = false;
+
+        /// <summary>
+        /// List of Dashboard attributes to be saved to DashboardAttributeFields
+        /// </summary>
+        [DataMember]
+        public BindingList<DashboardAttributeField> DashboardAttributes = new BindingList<DashboardAttributeField>();
 
         #endregion
 
@@ -250,6 +427,33 @@ namespace Extract.ETL
                             catch (Exception ex)
                             {
                                 ex.AsExtract("ELI45424").Log();
+                            }
+                        }
+                    }
+                }
+                
+                // Update the DashboardAttributeFields table
+                foreach (var da in DashboardAttributes)
+                {
+                    using (var connection = NewSqlDBConnection())
+                    {
+                        connection.Open();
+                        var cmd = connection.CreateCommand();
+                        cmd.CommandText = AddDashboardAttributes;
+                        cmd.CommandTimeout = 0;
+                        cmd.Parameters.AddWithValue("@AttributeSetNameID", da.AttributeSetNameID);
+                        cmd.Parameters.AddWithValue("@AttributePath", da.PathForAttributeInAttributeSet);
+                        cmd.Parameters.AddWithValue("@DashboardNameForAttribute", da.DashboardAttributeName);
+
+                        using (var transaction = connection.BeginTransaction())
+                        {
+                            cmd.Transaction = transaction;
+                            var task = cmd.ExecuteNonQueryAsync(cancelToken);
+                            
+                            // if there were changes commit the transaction
+                            if (task.Result > 0)
+                            {
+                                transaction.Commit();
                             }
                         }
                     }

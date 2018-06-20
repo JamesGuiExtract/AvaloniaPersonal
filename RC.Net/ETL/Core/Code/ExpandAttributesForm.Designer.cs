@@ -36,8 +36,14 @@
             this._storeEmptyAttributesCheckBox = new System.Windows.Forms.CheckBox();
             this._storeSpatialInfoCheckBox = new System.Windows.Forms.CheckBox();
             this._schedulerControl = new Extract.Utilities.Forms.SchedulerControl();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.groupBox1.SuspendLayout();
+            this.tabControl = new System.Windows.Forms.TabControl();
+            this.tabPageSchedule = new System.Windows.Forms.TabPage();
+            this.tabPageDashboardFields = new System.Windows.Forms.TabPage();
+            this.dataGridView = new System.Windows.Forms.DataGridView();
+            this.tabControl.SuspendLayout();
+            this.tabPageSchedule.SuspendLayout();
+            this.tabPageDashboardFields.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // cancelButton
@@ -45,7 +51,7 @@
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.CausesValidation = false;
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(400, 276);
+            this.cancelButton.Location = new System.Drawing.Point(710, 403);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 6;
@@ -56,7 +62,7 @@
             // 
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.okButton.Location = new System.Drawing.Point(319, 276);
+            this.okButton.Location = new System.Drawing.Point(629, 403);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 5;
@@ -80,11 +86,11 @@
             this._descriptionTextBox.Size = new System.Drawing.Size(395, 20);
             this._descriptionTextBox.TabIndex = 0;
             // 
-            // _stroreEmptyAttributesCheckBox
+            // _storeEmptyAttributesCheckBox
             // 
             this._storeEmptyAttributesCheckBox.AutoSize = true;
             this._storeEmptyAttributesCheckBox.Location = new System.Drawing.Point(13, 62);
-            this._storeEmptyAttributesCheckBox.Name = "_stroreEmptyAttributesCheckBox";
+            this._storeEmptyAttributesCheckBox.Name = "_storeEmptyAttributesCheckBox";
             this._storeEmptyAttributesCheckBox.Size = new System.Drawing.Size(128, 17);
             this._storeEmptyAttributesCheckBox.TabIndex = 2;
             this._storeEmptyAttributesCheckBox.Text = "Store empty attributes";
@@ -103,7 +109,7 @@
             // _schedulerControl
             // 
             this._schedulerControl.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this._schedulerControl.Location = new System.Drawing.Point(6, 19);
+            this._schedulerControl.Location = new System.Drawing.Point(6, 6);
             this._schedulerControl.MinimumSize = new System.Drawing.Size(351, 153);
             this._schedulerControl.Name = "_schedulerControl";
             this._schedulerControl.Size = new System.Drawing.Size(385, 157);
@@ -116,23 +122,59 @@
             scheduledEvent1.Start = new System.DateTime(2018, 3, 16, 9, 38, 23, 0);
             this._schedulerControl.Value = scheduledEvent1;
             // 
-            // groupBox1
+            // tabControl
             // 
-            this.groupBox1.Controls.Add(this._schedulerControl);
-            this.groupBox1.Location = new System.Drawing.Point(16, 85);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(459, 185);
-            this.groupBox1.TabIndex = 3;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Schedule";
+            this.tabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabControl.Controls.Add(this.tabPageSchedule);
+            this.tabControl.Controls.Add(this.tabPageDashboardFields);
+            this.tabControl.Location = new System.Drawing.Point(16, 85);
+            this.tabControl.Name = "tabControl";
+            this.tabControl.SelectedIndex = 0;
+            this.tabControl.Size = new System.Drawing.Size(769, 304);
+            this.tabControl.TabIndex = 7;
+            // 
+            // tabPageSchedule
+            // 
+            this.tabPageSchedule.Controls.Add(this._schedulerControl);
+            this.tabPageSchedule.Location = new System.Drawing.Point(4, 22);
+            this.tabPageSchedule.Name = "tabPageSchedule";
+            this.tabPageSchedule.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageSchedule.Size = new System.Drawing.Size(761, 278);
+            this.tabPageSchedule.TabIndex = 0;
+            this.tabPageSchedule.Text = "Schedule";
+            this.tabPageSchedule.UseVisualStyleBackColor = true;
+            // 
+            // tabPageDashboardFields
+            // 
+            this.tabPageDashboardFields.Controls.Add(this.dataGridView);
+            this.tabPageDashboardFields.Location = new System.Drawing.Point(4, 22);
+            this.tabPageDashboardFields.Name = "tabPageDashboardFields";
+            this.tabPageDashboardFields.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageDashboardFields.Size = new System.Drawing.Size(761, 278);
+            this.tabPageDashboardFields.TabIndex = 1;
+            this.tabPageDashboardFields.Text = "Dashboard fields";
+            this.tabPageDashboardFields.UseVisualStyleBackColor = true;
+            // 
+            // dataGridView
+            // 
+            this.dataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView.Location = new System.Drawing.Point(3, 3);
+            this.dataGridView.Name = "dataGridView";
+            this.dataGridView.Size = new System.Drawing.Size(755, 272);
+            this.dataGridView.TabIndex = 0;
+            this.dataGridView.DefaultValuesNeeded += new System.Windows.Forms.DataGridViewRowEventHandler(this.HandleDataGridView_DefaultValuesNeeded);
             // 
             // ExpandAttributesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(487, 308);
-            this.Controls.Add(this.groupBox1);
+            this.ClientSize = new System.Drawing.Size(797, 435);
+            this.Controls.Add(this.tabControl);
             this.Controls.Add(this._storeSpatialInfoCheckBox);
             this.Controls.Add(this._storeEmptyAttributesCheckBox);
             this.Controls.Add(this._descriptionTextBox);
@@ -141,7 +183,6 @@
             this.Controls.Add(this.okButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(503, 347);
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(503, 347);
             this.Name = "ExpandAttributesForm";
@@ -149,7 +190,10 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Expand attributes";
-            this.groupBox1.ResumeLayout(false);
+            this.tabControl.ResumeLayout(false);
+            this.tabPageSchedule.ResumeLayout(false);
+            this.tabPageDashboardFields.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -164,6 +208,9 @@
         private System.Windows.Forms.CheckBox _storeEmptyAttributesCheckBox;
         private System.Windows.Forms.CheckBox _storeSpatialInfoCheckBox;
         private Utilities.Forms.SchedulerControl _schedulerControl;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.TabControl tabControl;
+        private System.Windows.Forms.TabPage tabPageSchedule;
+        private System.Windows.Forms.TabPage tabPageDashboardFields;
+        private System.Windows.Forms.DataGridView dataGridView;
     }
 }
