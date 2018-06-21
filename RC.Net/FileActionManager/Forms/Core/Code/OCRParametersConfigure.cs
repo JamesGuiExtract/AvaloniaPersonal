@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
@@ -851,26 +852,6 @@ namespace Extract.FileActionManager.Forms
             }
         }
 
-        #endregion
-
-        #region Private Classes
-
-        private class Language
-        {
-            public LANGUAGES Value { get; set; } = LANGUAGES.LANG_NO;
-
-            public string DisplayName { get; set; }
-        }
-
-        private class KeyValueClass<TKey, TValue>
-        {
-            public TKey Key { get; set; }
-
-            public TValue Value { get; set; }
-        }
-
-        #endregion Private Classes
-
         private void SetDefaultRecognitionOptions()
         {
             _defaultDecompositionMethodComboBox.SelectEnumValue(EPageDecompositionMethod.kAutoDecomposition);
@@ -916,5 +897,28 @@ namespace Extract.FileActionManager.Forms
             _ignoreParagraphFlagCheckBox.Checked = false;
             _treatZonesAsParagraphsCheckBox.Checked = false;
         }
+
+        #endregion
+
+        #region Private Classes
+
+        [Obfuscation(Feature = "renaming", Exclude = true)]
+        private class Language
+        {
+            public LANGUAGES Value { get; set; } = LANGUAGES.LANG_NO;
+
+            public string DisplayName { get; set; }
+        }
+
+        [Obfuscation(Feature = "renaming", Exclude = true)]
+        private class KeyValueClass<TKey, TValue>
+        {
+            public TKey Key { get; set; }
+
+            public TValue Value { get; set; }
+        }
+
+        #endregion Private Classes
+
     }
 }
