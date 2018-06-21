@@ -927,13 +927,10 @@ IOCRParametersPtr CAFDocument::getOCRParameters()
 
 	// If none specified directly, e.g., by a ruleset, then just return the parameters
 	// associated with the input value (SpatialString will create the collection if needed)
-	if (m_ipAttribute != __nullptr)
-	{
-		IHasOCRParametersPtr ipInputParams(m_ipAttribute->Value);
-		IOCRParametersPtr ipOCRParameters = ipInputParams->OCRParameters;
-		ASSERT_RESOURCE_ALLOCATION("ELI45910", ipOCRParameters != __nullptr);
+	IHasOCRParametersPtr ipInputParams(getAttribute()->Value);
+	IOCRParametersPtr ipOCRParameters = ipInputParams->OCRParameters;
+	ASSERT_RESOURCE_ALLOCATION("ELI45910", ipOCRParameters != __nullptr);
 
-		return ipOCRParameters;
-	}
+	return ipOCRParameters;
 }
 //-------------------------------------------------------------------------------------------------
