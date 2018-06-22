@@ -540,10 +540,15 @@ namespace Extract.FileActionManager.Utilities
 
                             // Spawn a DatabaseServiceManager instance for the database if one has
                             // not been spawned already.
-                            if (!_databaseServiceManagers.ContainsKey(famProcess.ConnectionString))
+                            if (_databaseServiceManagers.TryAdd(famProcess.ConnectionString, null))
                             {
-                                _databaseServiceManagers.TryAdd(
-                                    famProcess.ConnectionString, new DatabaseServiceManager(famProcess.ConnectionString));
+                                // Don't actually create the instance until we know this thread got
+                                // the slot in _databaseServiceManagers since the manager
+                                // constructor will start the manager. (Given time, that design might
+                                // be best reconsidered).
+                                ExtractException.Assert("ELI46062", "Failed to create service manager",
+                                    _databaseServiceManagers.TryUpdate(famProcess.ConnectionString,
+                                        new DatabaseServiceManager(famProcess.ConnectionString), null));
                             }
 
                             ExtractException ee = new ExtractException("ELI29808",

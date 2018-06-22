@@ -148,6 +148,14 @@ namespace Extract.FileActionManager.Utilities
             }
 
             // Dispose of unmanaged resources
+            if (_fileProcessingDb != null)
+            {
+                try
+                {
+                    _fileProcessingDb.CloseAllDBConnections();
+                }
+                catch { }
+            }
         }
 
         #endregion IDisposable Members
@@ -166,7 +174,22 @@ namespace Extract.FileActionManager.Utilities
                         dbService.Enabled &&
                         !dbService.Schedule.GetIsInExcludedTime())
                     {
-                        dbService.Process(_canceller.Token);
+                        var fileProcessingDB = new FileProcessingDB();
+                        try
+                        {
+                            fileProcessingDB.DatabaseServer = _fileProcessingDb.DatabaseServer;
+                            fileProcessingDB.DatabaseName = _fileProcessingDb.DatabaseName;
+
+                            fileProcessingDB.RecordFAMSessionStart("ETL: " + dbService.Description, "", false, false);
+
+                            dbService.Process(_canceller.Token);
+
+                            fileProcessingDB.RecordFAMSessionStop();
+                        }
+                        finally
+                        {
+                            fileProcessingDB.CloseAllDBConnections();
+                        }
                     }
                 }
             }
@@ -182,14 +205,72 @@ namespace Extract.FileActionManager.Utilities
 
         #endregion Event Handlers
 
-        #region Private Members
+        #region Public Members
 
         /// <summary>
-        /// Attempts to start the services. If another ESFAMService instance is already running
-        /// against the database, it will continue to check every 5 minutes to see if this
-        /// instance should start running the services.
+        /// Stops this instance.
         /// </summary>
-         void TryStart()
+        public void Stop()
+        {
+            try
+            {
+                lock (_lock)
+                {
+                    _canceller.Cancel();
+
+                    if (!_running)
+                    {
+                        return;
+                    }
+
+                    _running = false;
+
+                    _fileProcessingDb.UnregisterActiveFAM();
+                    _fileProcessingDb.RecordFAMSessionStop();
+                    _fileProcessingDb.CloseAllDBConnections();
+
+                    foreach (var dbService in _databaseServices)
+                    {
+                        dbService.Value.Enabled = false;
+                    }
+                }
+
+                Task.Run(() =>
+                {
+                    foreach (var dbService in _databaseServices)
+                    {
+                        try
+                        {
+                            while (dbService.Value.Processing)
+                            {
+                                Thread.Sleep(1000);
+                            }
+
+                            dbService.Value.Dispose();
+                        }
+                        catch (Exception ex)
+                        {
+                            new ExtractException("ELI45395",
+                                "Failed waiting for DB service to complete.", ex).Log();
+                        }
+                    }
+
+                    _databaseServices.Clear();
+
+                    _stoppedEvent.Set();
+                });
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45416");
+            }
+        }
+
+        #endregion Public Members
+
+        #region Private Members
+
+        void TryStart()
         {
             try
             {
@@ -229,7 +310,7 @@ namespace Extract.FileActionManager.Utilities
             {
                 lock (_lock)
                 {
-                    _fileProcessingDb.RecordFAMSessionStart("ETL", "", false, false);
+                    _fileProcessingDb.RecordFAMSessionStart("ETL Manager", "", false, false);
                     _fileProcessingDb.RegisterActiveFAM();
 
                     _running = true;
@@ -241,12 +322,14 @@ namespace Extract.FileActionManager.Utilities
                         {
                             var dbService = DatabaseService.FromJson((string)dbServiceRow["Settings"]);
 
-                            dbService.DatabaseServiceID = (int)dbServiceRow["ID"];
-                            dbService.DatabaseServer = _oleDbConnection.DataSource;
-                            dbService.DatabaseName = _oleDbConnection.Database;
+                            if (_databaseServices.TryAdd(dbService.Schedule, dbService))
+                            {
+                                dbService.DatabaseServiceID = (int)dbServiceRow["ID"];
+                                dbService.DatabaseServer = _oleDbConnection.DataSource;
+                                dbService.DatabaseName = _oleDbConnection.Database;
 
-                            dbService.Schedule.EventStarted += HandleScheduleEvent_EventStarted;
-                            _databaseServices.TryAdd(dbService.Schedule, dbService);
+                                dbService.Schedule.EventStarted += HandleScheduleEvent_EventStarted;
+                            }
                         }
                     }
                 }
@@ -263,64 +346,6 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 new ExtractException("ELI45415", "ETL failed to start", ex).Log();
-            }
-        }
-
-        /// <summary>
-        /// Stops this instance.
-        /// </summary>
-        public void Stop()
-        {
-            try
-            {
-                lock (_lock)
-                {
-                    _canceller.Cancel();
-
-                    if (!_running)
-                    {
-                        return;
-                    }
-
-                    _running = false;
-
-                    _fileProcessingDb.UnregisterActiveFAM();
-                    _fileProcessingDb.RecordFAMSessionStop();
-
-                    foreach (var dbService in _databaseServices)
-                    {
-                        dbService.Value.Enabled = false;
-                    }
-                }
-
-                Task.Run(() =>
-                {
-                    foreach (var dbService in _databaseServices)
-                    {
-                        try
-                        {
-                            while (dbService.Value.Processing)
-                            {
-                                Thread.Sleep(1000);
-                            }
-
-                            dbService.Value.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            new ExtractException("ELI45395",
-                                "Failed waiting for DB service to complete.", ex).Log();
-                        }
-                    }
-
-                     _databaseServices.Clear();
-
-                    _stoppedEvent.Set();
-                });
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45416");
             }
         }
 
