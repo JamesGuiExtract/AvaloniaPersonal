@@ -1989,6 +1989,9 @@ void CRuleSetEditor::OnFileProperties()
 			ipCopyThis->CopyFrom(ipCopy);
 			getRuleExecutionEnv()->FKBVersion = m_ipRuleSet->FKBVersion;
 
+			// Refresh UI in order to update references, e.g., to the AttributeNameToInfoMap
+			refreshUIFromRuleSet();
+
 			// update the status bar as the user may have changed settings
 			setStatusBarText();
 		}
