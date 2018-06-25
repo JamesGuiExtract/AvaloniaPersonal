@@ -12,7 +12,9 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
+using System.Transactions;
 using System.Windows.Forms;
+using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 
 namespace Extract.ETL
@@ -24,7 +26,7 @@ namespace Extract.ETL
     [KnownType(typeof(ScheduledEvent))]
     [ExtractCategory("DatabaseService", "Data capture accuracy")]
     [SuppressMessage("Microsoft.Naming", "CA1709: CorrectCasingInTypeName")]
-    public class DataCaptureAccuracy : DatabaseService, IConfigSettings
+    public class DataCaptureAccuracy : DatabaseService, IConfigSettings, IHasConfigurableDatabaseServiceStatus
     {
         #region Constants
 
@@ -34,110 +36,89 @@ namespace Extract.ETL
         const int CURRENT_VERSION = 1;
 
         /// <summary>
-        /// Query used to remove data from ReportingDataCaptureAccuracy table that will be replaced
-        /// This query requires values for the following parameters
-        ///     @FoundSetName - Name of the Attribute set for found values
-        ///     @ExpectedSetName - Name of the Attribute set for Expected values
-        ///     @DatabaseServiceID - Id of the record in the DatabaseService table for this service instance
+        /// The number of FileTaskSession rows to process in a single transaction.
         /// </summary>
-        static readonly string REMOVE_OLD_ACCURACY_DATA =
-            @"
-                WITH MostRecent AS (
-                SELECT AttributeSetName.Description
-	                ,MAX(AttributeSetForFile.FileTaskSessionID) AS MostRecentFileTaskSession
-	                ,AttributeSetForFile.AttributeSetNameID
-	                ,FileTaskSession.FileID
-	
-                FROM AttributeSetForFile
-                INNER JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
-                INNER JOIN FileTaskSession ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID
-                GROUP BY AttributeSetName.Description
-	                ,AttributeSetForFile.AttributeSetNameID
-	                ,FileTaskSession.FileID
-                HAVING AttributeSetName.Description in (@FoundSetName,@ExpectedSetName)
-                )
-
-                DELETE FROM ReportingDataCaptureAccuracy
-                WHERE ID IN(
-                SELECT ReportingDataCaptureAccuracy.ID AS AccuracyDataID
-                FROM MostRecent found 
-	                INNER JOIN MostRecent expected 
-		                ON found.Description = @FoundSetName AND Expected.Description = @ExpectedSetName 
-			                AND found.FileID = expected.FileID
-	                INNER JOIN AttributeSetForFile FoundAttributeSet 
-		                ON FoundAttributeSet.FileTaskSessionID = found.MostRecentFileTaskSession 
-			                AND FoundAttributeSet.AttributeSetNameID = found.AttributeSetNameID
-	                INNER JOIN AttributeSetForFile ExpectedAttributeSet 
-		                ON ExpectedAttributeSet.FileTaskSessionID = expected.MostRecentFileTaskSession 
-			                AND ExpectedAttributeSet.AttributeSetNameID = expected.AttributeSetNameID
-	                INNER JOIN ReportingDataCaptureAccuracy 
-		                ON ReportingDataCaptureAccuracy.FileID = found.FileID 
-                            AND ReportingDataCaptureAccuracy.DatabaseServiceID = @DatabaseServiceID 
-                            AND (
-                                ReportingDataCaptureAccuracy.FoundAttributeSetForFileID != FoundAttributeSet.ID
-			                    OR ReportingDataCaptureAccuracy.ExpectedAttributeSetForFileID != ExpectedAttributeSet.ID
-			                )
-                )
-            ";
+        const int PROCESS_BATCH_SIZE = 1000;
 
         /// <summary>
         /// Query used to get the data used to create the records in ReportingDataCaptureAccuracy table
-        /// This query requires values for the following parameters
+        /// This query will collect a list of all files affected by FileTaskSession rows in the range
+        /// @StartFileTaskSessionSetID to @EndFileTaskSessionSetID, delete all related rows from 
+        /// ReportingDataCaptureAccuracy, then provide the necessary data for all comparisons to be
+        /// executed on those affected files given the data that currently exists in the DB (may include
+        /// pulling data from a FileTaskSession row not in the provided range of FileTaskSession rows.
+        /// Parameters:
         ///     @FoundSetName - Name of the Attribute set for found values
         ///     @ExpectedSetName - Name of the Attribute set for Expected values
-        ///     @DatabaseServiceID - Id of the record in the DatabaseService table for this service instance
+        ///     @StartFileTaskSessionSetID - The first FileTaskSession row used to define the affected files.
+        ///     @EndFileTaskSessionSetID - The last FileTaskSession row used to define the affected files.
         /// </summary>
         static readonly string UPDATE_ACCURACY_DATA_SQL =
             @"
-                WITH MostRecent AS (
-                SELECT AttributeSetName.Description
-	                ,MAX(AttributeSetForFile.FileTaskSessionID) AS MostRecentFileTaskSession
-	                ,AttributeSetForFile.AttributeSetNameID
-	                ,FileTaskSession.FileID
-	
-                FROM AttributeSetForFile
-                INNER JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
-                INNER JOIN FileTaskSession ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID
-                GROUP BY AttributeSetName.Description
-	                ,AttributeSetForFile.AttributeSetNameID
-	                ,FileTaskSession.FileID
-                HAVING AttributeSetName.Description in (@FoundSetName,@ExpectedSetName)
-                )
+                DECLARE @affectedFiles TABLE (FileID INT)
+				INSERT INTO @affectedFiles
+				SELECT DISTINCT FileID
+					FROM AttributeSetForFile
+					INNER JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
+					INNER JOIN FileTaskSession ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID
+					WHERE AttributeSetName.Description IN (@FoundSetName, @ExpectedSetName)
+                    AND FileTaskSession.DateTimeStamp IS NOT NULL
+					AND FileTaskSession.ID >= @StartFileTaskSessionSetID AND FileTaskSession.ID <= @EndFileTaskSessionSetID
+                
+				;WITH ExpectedFTS AS (
+				SELECT DISTINCT affectedFiles.FileID, MAX(AttributeSetForFile.FileTaskSessionID) AS ID
+					FROM @affectedFiles affectedFiles
+					INNER JOIN FileTaskSession ON affectedFiles.FileID = FileTaskSession.FileID
+                        AND FileTaskSession.ID <= @EndFileTaskSessionSetID
+					INNER JOIN AttributeSetForFile ON FileTaskSession.ID = AttributeSetForFile.FileTaskSessionID
+					INNER JOIN AttributeSetName ON AttributeSetNameID = AttributeSetName.ID
+					WHERE AttributeSetName.Description = @ExpectedSetName
+					GROUP BY affectedFiles.FileID
+				),
+				FoundAndExpectedFTS AS (
+				SELECT DISTINCT
+					RANK() OVER (PARTITION BY ExpectedFTS.FileID ORDER BY FileTaskSession.ID DESC, Pagination.ID DESC) AS Rank
+					,ExpectedFTS.ID AS ExpectedFTSID
+					,FileTaskSession.ID AS FoundFTSID
+					,Pagination.ID AS PaginationID
+				FROM ExpectedFTS
+				LEFT JOIN Pagination ON (ExpectedFTS.FileID = Pagination.DestFileID 
+					AND Pagination.SourceFileID <> Pagination.DestFileID 
+					AND Pagination.DestPage IS NOT NULL)
+				LEFT JOIN FileTaskSession ON
+					(FileTaskSession.FileID = ExpectedFTS.FileID OR FileTaskSession.FileID = Pagination.OriginalFileID)
+				INNER JOIN AttributeSetForFile ON FileTaskSession.ID = AttributeSetForFile.FileTaskSessionID
+				INNER JOIN AttributeSetName ON AttributeSetNameID = AttributeSetName.ID
+				LEFT JOIN FAMFile ON FileTaskSession.FileID = FAMFile.ID
+				WHERE AttributeSetName.Description = @FoundSetName
+				)
 
-                SELECT FoundAttributeSet.ID AS FoundAttributeSetFileID
-	                  ,FoundAttributeSet.VOA FoundVOA
-	                  ,ExpectedAttributeSet.ID AS ExpectedAttributeSetFileID
-	                  ,ExpectedAttributeSet.VOA AS ExpectedVOA
-	                  ,found.FileID
-                      ,foundFTS.DateTimeStamp FoundDateTimeStamp
-                      ,foundFTS.ActionID FoundActionID
-                      ,foundFS.FAMUserID FoundFAMUserID
-                      ,expectedFTS.DateTimeStamp ExpectedDateTimeStamp
-                      ,expectedFTS.ActionID ExpectedActionID
-                      ,expectedFS.FAMUserID ExpectedFAMUserID
-                FROM MostRecent found 
-	                INNER JOIN MostRecent expected 
-		                ON found.Description = @FoundSetName AND Expected.Description = @ExpectedSetName 
-			                AND found.FileID = expected.FileID
-                    INNER JOIN FileTaskSession foundFTS 
-                            ON found.MostRecentFileTaskSession = foundFTS.ID
-                    INNER JOIN FAMSession foundFS 
-                        ON foundFTS.FAMSessionID = foundFS.ID
-                    INNER JOIN FileTaskSession expectedFTS 
-                            ON expected.MostRecentFileTaskSession = expectedFTS.ID
-                    INNER JOIN FAMSession expectedFS 
-                        ON expectedFTS.FAMSessionID = expectedFS.ID
-	                INNER JOIN AttributeSetForFile FoundAttributeSet 
-		                ON FoundAttributeSet.FileTaskSessionID = found.MostRecentFileTaskSession 
-			                AND FoundAttributeSet.AttributeSetNameID = found.AttributeSetNameID
-	                INNER JOIN AttributeSetForFile ExpectedAttributeSet 
-		                ON ExpectedAttributeSet.FileTaskSessionID = expected.MostRecentFileTaskSession 
-			                AND ExpectedAttributeSet.AttributeSetNameID = expected.AttributeSetNameID
-	                LEFT JOIN ReportingDataCaptureAccuracy 
-		                ON ReportingDataCaptureAccuracy.FoundAttributeSetForFileID = FoundAttributeSet.ID
-			                AND ReportingDataCaptureAccuracy.ExpectedAttributeSetForFileID = ExpectedAttributeSet.ID
-			                AND ReportingDataCaptureAccuracy.DatabaseServiceID = @DatabaseServiceID
-                WHERE ReportingDataCaptureAccuracy.ID IS NULL
+				SELECT FoundAttributeSet.ID AS FoundAttributeSetFileID
+						,FoundAttributeSet.VOA FoundVOA
+						,ExpectedAttributeSet.ID AS ExpectedAttributeSetFileID
+						,ExpectedAttributeSet.VOA AS ExpectedVOA
+						,expectedFTS.FileID as ExpectedFileID
+						,foundFTS.FileID AS OriginalFileID
+						,COALESCE(Pagination.OriginalPage, -1) AS FirstPageFromOriginal
+						,COALESCE(FAMFile.Pages, 1) AS FoundPageCount
+						,foundFTS.DateTimeStamp FoundDateTimeStamp
+						,foundFTS.ActionID FoundActionID
+						,foundFS.FAMUserID FoundFAMUserID
+						,expectedFTS.DateTimeStamp ExpectedDateTimeStamp
+						,expectedFTS.ActionID ExpectedActionID
+						,expectedFS.FAMUserID ExpectedFAMUserID
+				FROM FoundAndExpectedFTS
+					INNER JOIN FileTaskSession foundFTS ON FoundFTSID = foundFTS.ID
+					INNER JOIN FAMSession foundFS 
+						ON foundFTS.FAMSessionID = foundFS.ID
+					INNER JOIN FileTaskSession expectedFTS ON ExpectedFTSID = expectedFTS.ID
+					INNER JOIN FAMSession expectedFS 
+						ON expectedFTS.FAMSessionID = expectedFS.ID
+					INNER JOIN AttributeSetForFile FoundAttributeSet ON FoundAttributeSet.FileTaskSessionID = FoundFTSID
+					INNER JOIN AttributeSetForFile ExpectedAttributeSet ON ExpectedAttributeSet.FileTaskSessionID = ExpectedFTSID
+					LEFT JOIN Pagination ON Pagination.ID = FoundAndExpectedFTS.PaginationID
+					INNER JOIN FAMFile ON foundFTS.FileID = FAMFile.ID
+					WHERE RANK = 1
             ";
 
         #endregion
@@ -148,6 +129,16 @@ namespace Extract.ETL
         /// Indicates whether the Process method is currently executing.
         /// </summary>
         bool _processing;
+
+        /// <summary>
+        /// The ID of the last file task session row processed by this service.
+        /// </summary>
+        int lastFileTaskSessionIDProcessed = -1;
+
+        /// <summary>
+        /// The current status info for this service.
+        /// </summary>
+        DataCaptureAccuracyStatus _status;
 
         #endregion Fields
 
@@ -161,8 +152,6 @@ namespace Extract.ETL
         }
 
         #endregion Constructors
-
-        #region DatabaseService implementation
 
         #region DatabaseService Properties
 
@@ -194,141 +183,17 @@ namespace Extract.ETL
             {
                 _processing = true;
 
-                using (var connection = NewSqlDBConnection())
+                RefreshStatus();
+
+                int maxReportableFileTaskSession = MaxReportableFileTaskSessionId();
+
+                while (LastFileTaskSessionIDProcessed < maxReportableFileTaskSession
+                    && !cancelToken.IsCancellationRequested)
                 {
-                    // Open the connection
-                    connection.Open();
+                    var endFileTaskSessionID =
+                        Math.Min(LastFileTaskSessionIDProcessed + PROCESS_BATCH_SIZE, maxReportableFileTaskSession);
 
-                    deleteOldRecords(connection);
-
-                    // Records to calculate stats
-                    SqlCommand cmd = connection.CreateCommand();
-
-                    // Set the timeout so that it waits indefinitely
-                    cmd.CommandTimeout = 0;
-                    cmd.CommandText = UPDATE_ACCURACY_DATA_SQL;
-
-                    addParametersToCommand(cmd);
-
-                    // Get VOA data for each file
-                    using (SqlDataReader ExpectedAndFoundReader = cmd.ExecuteReader())
-                    {
-                        // Get the ordinal for the FoundVOA and ExpectedVOA columns
-                        int foundVOAColumn = ExpectedAndFoundReader.GetOrdinal("FoundVOA");
-                        int expectedVOAColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedVOA");
-                        int foundAttributeForFileSetColumn = ExpectedAndFoundReader.GetOrdinal("FoundAttributeSetFileID");
-                        int expectedAttributeForFileSetColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedAttributeSetFileID");
-                        int fileIDColumn = ExpectedAndFoundReader.GetOrdinal("FileID");
-                        int foundDateTimeStampColumn = ExpectedAndFoundReader.GetOrdinal("FoundDateTimeStamp");
-                        int foundActionIDColumn = ExpectedAndFoundReader.GetOrdinal("FoundActionID");
-                        int foundFAMUserIDColumn = ExpectedAndFoundReader.GetOrdinal("FoundFAMUserID");
-                        int expectedDateTimeStampColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedDateTimeStamp");
-                        int expectedActionIDColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedActionID");
-                        int expectedFAMUserIDColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedFAMUserID");
-
-                        // Process the found records
-                        while (ExpectedAndFoundReader.Read() && !cancelToken.IsCancellationRequested)
-                        {
-                            // Get the streams for the expected and found voa data (the thread will read the voa from the stream
-                            Stream expectedStream = ExpectedAndFoundReader.GetStream(expectedVOAColumn);
-                            Stream foundStream = ExpectedAndFoundReader.GetStream(foundVOAColumn);
-                            Int64 foundID = ExpectedAndFoundReader.GetInt64(foundAttributeForFileSetColumn);
-                            Int64 expectedID = ExpectedAndFoundReader.GetInt64(expectedAttributeForFileSetColumn);
-                            Int32 fileID = ExpectedAndFoundReader.GetInt32(fileIDColumn);
-                            DateTime foundDateTime = ExpectedAndFoundReader.GetDateTime(foundDateTimeStampColumn);
-                            Int32 foundActionID = ExpectedAndFoundReader.GetInt32(foundActionIDColumn);
-                            Int32 foundFAMUserID = ExpectedAndFoundReader.GetInt32(foundFAMUserIDColumn);
-                            DateTime expectedDateTime = ExpectedAndFoundReader.GetDateTime(expectedDateTimeStampColumn);
-                            Int32 expectedActionID = ExpectedAndFoundReader.GetInt32(expectedActionIDColumn);
-                            Int32 expectedFAMUserID = ExpectedAndFoundReader.GetInt32(expectedFAMUserIDColumn);
-
-                            try
-                            {
-                                // Put the expected and found streams in usings so they will be disposed
-                                using (expectedStream)
-                                {
-                                    using (foundStream)
-                                    {
-                                        // Get the VOAs from the streams
-                                        IUnknownVector ExpectedAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(expectedStream);
-                                        IUnknownVector FoundAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(foundStream);
-
-                                        // Compare the VOAs
-                                        var output = AttributeTreeComparer.CompareAttributes(ExpectedAttributes,
-                                            FoundAttributes, XPathOfAttributesToIgnore, XPathOfContainerOnlyAttributes)
-                                            .ToList();
-
-                                        // Add the comparison results to the Results
-                                        var statsToSave = output.AggregateStatistics();
-
-                                        var lookup = statsToSave.ToLookup(a => new { a.Path, a.Label });
-
-                                        var attributePaths = statsToSave
-                                            .Select(a => a.Path)
-                                            .Distinct()
-                                            .OrderBy(p => p)
-                                            .ToList();
-
-                                        List<string> valuesToAdd = new List<string>();
-                                        foreach (var p in attributePaths)
-                                        {
-                                            int correct = lookup[new { Path = p, Label = AccuracyDetailLabel.Correct }].Sum(a => a.Value);
-                                            int incorrect = lookup[new { Path = p, Label = AccuracyDetailLabel.Incorrect }].Sum(a => a.Value);
-                                            int expected = lookup[new { Path = p, Label = AccuracyDetailLabel.Expected }].Sum(a => a.Value);
-                                            if (correct != 0 || incorrect != 0 || expected != 0)
-                                            {
-                                                valuesToAdd.Add(string.Format(CultureInfo.InvariantCulture,
-                                                    @"({0}, {1}, {2}, {3}, '{4}', {5}, {6}, {7}, '{8:s}', {9}, {10}, '{11:s}', {12}, {13})"
-                                                    , DatabaseServiceID
-                                                    , foundID
-                                                    , expectedID
-                                                    , fileID
-                                                    , p
-                                                    , correct
-                                                    , expected
-                                                    , incorrect
-                                                    , foundDateTime
-                                                    , foundActionID
-                                                    , foundFAMUserID
-                                                    , expectedDateTime
-                                                    , expectedActionID
-                                                    , expectedFAMUserID
-                                                    ));
-                                            }
-                                        }
-
-                                        // Add the data to the ReportingDataCaptureAccuracy table
-                                        var saveCmd = connection.CreateCommand();
-
-                                        saveCmd.CommandText = string.Format(CultureInfo.InvariantCulture,
-                                            @"INSERT INTO [dbo].[ReportingDataCaptureAccuracy]
-                                                           ([DatabaseServiceID]
-                                                           ,[FoundAttributeSetForFileID]
-                                                           ,[ExpectedAttributeSetForFileID]
-                                                           ,[FileID]
-                                                           ,[Attribute]
-                                                           ,[Correct]
-                                                           ,[Expected]
-                                                           ,[Incorrect]
-                                                           ,[FoundDateTimeStamp]
-                                                           ,[FoundActionID]
-                                                           ,[FoundFAMUserID]
-                                                           ,[ExpectedDateTimeStamp]
-                                                           ,[ExpectedActionID]
-                                                           ,[ExpectedFAMUserID]
-                                                           )
-                                                     VALUES
-                                                           {0};", string.Join(",\r\n", valuesToAdd));
-                                        saveCmd.ExecuteNonQuery();
-                                    }
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                ex.AsExtract("ELI41544").Log();
-                            }
-                        }
-                    }
+                    ProcessBatch(cancelToken, endFileTaskSessionID);
                 }
             }
             catch (Exception ex)
@@ -341,9 +206,261 @@ namespace Extract.ETL
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Processes a batch of FileTaskSession table rows (starting with
+        /// <see cref="LastFileTaskSessionIDProcessed"/> + 1 and ending with
+        /// <see paramref="endFileTaskSessionID"/>.
+        /// </summary>
+        /// <param name="cancelToken">Cancel token to indicate that processing should stop</param>
+        /// <param name="endFileTaskSessionID">The ID of the last file task session row to process.</param>
+        void ProcessBatch(CancellationToken cancelToken, int endFileTaskSessionID)
+        {
+            using (TransactionScope scope = new TransactionScope())
+            using (var connection = NewSqlDBConnection())
+            {
+                // Open the connection
+                connection.Open();
 
-        #endregion
+                SqlCommand cmd = connection.CreateCommand();
+                // Set the timeout so that it waits indefinitely
+                cmd.CommandTimeout = 0;
+                // This command will first delete all stats for the files affected between
+                // LastFileTaskSessionIDProcessed and endFileTaskSessionID, then produce
+                // the data necessary to generate (or re-generate) stats for these files.
+                cmd.CommandText = UPDATE_ACCURACY_DATA_SQL;
+
+                addParametersToCommand(cmd, endFileTaskSessionID);
+
+                using (SqlDataReader ExpectedAndFoundReader = cmd.ExecuteReader())
+                {
+                    // Get VOA and other relevant data for each file needed to calculate capture statistics.
+                    while (ReadDataAccuracyQueryData(ExpectedAndFoundReader, cancelToken, out var queryResultRow))
+                    {
+                        // Put the expected and found streams in usings so they will be disposed
+                        using (queryResultRow.ExpectedStream)
+                        using (queryResultRow.FoundStream)
+                        {
+                            // Get the VOAs from the streams
+                            IUnknownVector expectedAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(queryResultRow.ExpectedStream);
+                            IUnknownVector foundAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(queryResultRow.FoundStream);
+
+                            // If the original file ID differs from the expected file ID, search the
+                            // original file's attribute hierarchy to find the comparison attributes
+                            // in a proposed document pagination hierarchy.
+                            // We know to be searching the pagination source document data because
+                            // if manual pagination had triggered rule execution on the expected file
+                            // (or even rules had been run after-the-fact on the expected file), the
+                            // more recent storage of the found attribute set would trigger that to
+                            // be used as the comparison.
+                            if (queryResultRow.ExpectedFileID != queryResultRow.OriginalFileID)
+                            {
+                                foundAttributes = GetFoundAttributesFromPaginationSource(foundAttributes, queryResultRow);
+                            }
+
+                            // Compare the VOAs
+                            var output = AttributeTreeComparer.CompareAttributes(expectedAttributes,
+                            foundAttributes, XPathOfAttributesToIgnore, XPathOfContainerOnlyAttributes)
+                            .ToList();
+
+                            // Add the comparison results to the Results
+                            var statsToStore = output.AggregateStatistics();
+
+                            StoreAccuracyData(connection, statsToStore, queryResultRow);
+                        }
+                    }
+                }
+
+                // We can not store any results for this batch if cancellation was requested since
+                // there is no good way of saying exactly which FileTaskSession rows could be
+                // considered processed.
+                if (!cancelToken.IsCancellationRequested)
+                {
+                    LastFileTaskSessionIDProcessed = endFileTaskSessionID;
+                    scope.Complete();
+                }
+            }
+
+            // Getting errors when called from the above transaction scope (either before or after
+            // Complete). Avoiding that issue for now by moving SaveStatus out of that scope.
+            if (!cancelToken.IsCancellationRequested)
+            {
+                SaveStatus();
+            }
+        }
+
+        /// <summary>
+        /// Reads the next row from the data accuracy query's results.
+        /// </summary>
+        /// <param name="dataAccuracyQueryReader">THe <see cref="SqlDataReader"/> for the query's results.</param>
+        /// <param name="cancelToken">Cancel token to indicate that processing should stop</param>
+        /// <param name="queryResultRow">The <see cref="UpdateQueryResultRow"/> instance to store the data.</param>
+        /// <returns><c>true</c> if the next row was read successfully; <c>false</c> if the process was cancelled
+        /// or there were no more rows in the result.</returns>
+        static bool ReadDataAccuracyQueryData(SqlDataReader dataAccuracyQueryReader, CancellationToken cancelToken,
+            out UpdateQueryResultRow queryResultRow)
+        {
+            // Get the ordinal for the FoundVOA and ExpectedVOA columns
+            int foundVOAColumn = dataAccuracyQueryReader.GetOrdinal("FoundVOA");
+            int expectedVOAColumn = dataAccuracyQueryReader.GetOrdinal("ExpectedVOA");
+            int foundAttributeForFileSetColumn = dataAccuracyQueryReader.GetOrdinal("FoundAttributeSetFileID");
+            int expectedAttributeForFileSetColumn = dataAccuracyQueryReader.GetOrdinal("ExpectedAttributeSetFileID");
+            int expectedfileIDColumn = dataAccuracyQueryReader.GetOrdinal("ExpectedFileID");
+            int originalFileIDColumn = dataAccuracyQueryReader.GetOrdinal("OriginalFileID");
+            int firstPageFromOriginalColumn = dataAccuracyQueryReader.GetOrdinal("FirstPageFromOriginal");
+            int foundPageCountColumn = dataAccuracyQueryReader.GetOrdinal("FoundPageCount");
+            int foundDateTimeStampColumn = dataAccuracyQueryReader.GetOrdinal("FoundDateTimeStamp");
+            int foundActionIDColumn = dataAccuracyQueryReader.GetOrdinal("FoundActionID");
+            int foundFAMUserIDColumn = dataAccuracyQueryReader.GetOrdinal("FoundFAMUserID");
+            int expectedDateTimeStampColumn = dataAccuracyQueryReader.GetOrdinal("ExpectedDateTimeStamp");
+            int expectedActionIDColumn = dataAccuracyQueryReader.GetOrdinal("ExpectedActionID");
+            int expectedFAMUserIDColumn = dataAccuracyQueryReader.GetOrdinal("ExpectedFAMUserID");
+
+            // Process the found records
+            if (dataAccuracyQueryReader.Read() && !cancelToken.IsCancellationRequested)
+            {
+                queryResultRow = new UpdateQueryResultRow() {
+                    // Get the streams for the expected and found voa data (the thread will read the voa from the stream
+                    ExpectedStream = dataAccuracyQueryReader.GetStream(expectedVOAColumn),
+                    FoundStream = dataAccuracyQueryReader.GetStream(foundVOAColumn),
+                    FoundID = dataAccuracyQueryReader.GetInt64(foundAttributeForFileSetColumn),
+                    ExpectedID = dataAccuracyQueryReader.GetInt64(expectedAttributeForFileSetColumn),
+                    ExpectedFileID = dataAccuracyQueryReader.GetInt32(expectedfileIDColumn),
+                    OriginalFileID = dataAccuracyQueryReader.GetInt32(originalFileIDColumn),
+                    FirstPageFromOriginal = dataAccuracyQueryReader.GetInt32(firstPageFromOriginalColumn),
+                    FoundPageCount = dataAccuracyQueryReader.GetInt32(foundPageCountColumn),
+                    FoundDateTime = dataAccuracyQueryReader.GetDateTime(foundDateTimeStampColumn),
+                    FoundActionID = dataAccuracyQueryReader.GetInt32(foundActionIDColumn),
+                    FoundFAMUserID = dataAccuracyQueryReader.GetInt32(foundFAMUserIDColumn),
+                    ExpectedDateTime = dataAccuracyQueryReader.GetDateTime(expectedDateTimeStampColumn),
+                    ExpectedActionID = dataAccuracyQueryReader.GetInt32(expectedActionIDColumn),
+                    ExpectedFAMUserID = dataAccuracyQueryReader.GetInt32(expectedFAMUserIDColumn) };
+
+                return true;
+            }
+            else
+            {
+                queryResultRow = new UpdateQueryResultRow();
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the "Found" attribute set from a pagination source file's attribute hierarchy
+        /// to find the comparison attributes that correspond to this output document.
+        /// </summary>
+        /// <param name="foundAttributes">The "found" attribute hierarchy which is expected to have
+        /// data for multiple documents under parallel root-leve "Document" attributes.</param>
+        /// <param name="queryResultRow">The <see cref="UpdateQueryResultRow"/> providing the data
+        /// for this file's comparison.</param>
+        /// <returns></returns>
+        static IUnknownVector GetFoundAttributesFromPaginationSource(
+            IUnknownVector foundAttributes, UpdateQueryResultRow queryResultRow)
+        {
+            var foundContext = new XPathContext(foundAttributes);
+            var documentIterator = foundContext.GetIterator("/*/Document");
+            while (documentIterator.MoveNext())
+            {
+                var pagesAttribute = (foundContext.Evaluate(documentIterator, "Pages") as List<object>)
+                    .OfType<IAttribute>()
+                    ?.SingleOrDefault();
+                var pagesString = pagesAttribute?.Value.String;
+
+                // If we find a Document node containing the first page, use this as a comparison.
+                // We can know the document wasn't manually paginated, lest the output document would
+                // have a more found data set.
+                if (UtilityMethods.GetPageNumbersFromString(pagesString, queryResultRow.FoundPageCount, true)
+                        .Contains(queryResultRow.FirstPageFromOriginal))
+                {
+                    var foundAttributesFromSource = (foundContext.Evaluate(documentIterator, "DocumentData") as List<object>)
+                        .OfType<IAttribute>()
+                        ?.SingleOrDefault()
+                        ?.SubAttributes;
+                    if (foundAttributesFromSource != null)
+                    {
+                        return foundAttributesFromSource;
+                    }
+                }
+            }
+
+            return foundAttributes;
+        }
+
+        /// <summary>
+        /// Stores the accuracy data in <see paramref="statsToStore"/> to the
+        /// ReportingDataCaptureAccuracy table.
+        /// </summary>
+        /// <param name="connection">The database connection to use.</param>
+        /// <param name="statsToStore">The <see cref="AccuracyDetail"/> instances to store.</param>
+        /// <param name="queryResultRow">The <see cref="UpdateQueryResultRow"/> used to generate the stats.
+        /// </param>
+        void StoreAccuracyData(SqlConnection connection, IEnumerable<AccuracyDetail> statsToStore,
+            UpdateQueryResultRow queryResultRow)
+        {
+            var lookup = statsToStore.ToLookup(a => new { a.Path, a.Label });
+
+            var attributePaths = statsToStore
+                .Select(a => a.Path)
+                .Distinct()
+                .OrderBy(p => p)
+                .ToList();
+
+            List<string> valuesToAdd = new List<string>();
+            foreach (var path in attributePaths)
+            {
+                int correct = lookup[new { Path = path, Label = AccuracyDetailLabel.Correct }].Sum(a => a.Value);
+                int incorrect = lookup[new { Path = path, Label = AccuracyDetailLabel.Incorrect }].Sum(a => a.Value);
+                int expected = lookup[new { Path = path, Label = AccuracyDetailLabel.Expected }].Sum(a => a.Value);
+                if (correct != 0 || incorrect != 0 || expected != 0)
+                {
+                    valuesToAdd.Add(string.Format(CultureInfo.InvariantCulture,
+                        @"({0}, {1}, {2}, {3}, '{4}', {5}, {6}, {7}, '{8:s}', {9}, {10}, '{11:s}', {12}, {13})"
+                        , DatabaseServiceID
+                        , queryResultRow.FoundID
+                        , queryResultRow.ExpectedID
+                        , queryResultRow.ExpectedFileID
+                        , path
+                        , correct
+                        , expected
+                        , incorrect
+                        , queryResultRow.FoundDateTime
+                        , queryResultRow.FoundActionID
+                        , queryResultRow.FoundFAMUserID
+                        , queryResultRow.ExpectedDateTime
+                        , queryResultRow.ExpectedActionID
+                        , queryResultRow.ExpectedFAMUserID
+                        ));
+                }
+            }
+
+            // Add the data to the ReportingDataCaptureAccuracy table
+            var saveCmd = connection.CreateCommand();
+
+            saveCmd.CommandText = string.Format(CultureInfo.InvariantCulture,
+                @"DELETE FROM ReportingDataCaptureAccuracy WHERE FileID = {0};
+
+                  INSERT INTO [dbo].[ReportingDataCaptureAccuracy]
+                    ([DatabaseServiceID]
+                    ,[FoundAttributeSetForFileID]
+                    ,[ExpectedAttributeSetForFileID]
+                    ,[FileID]
+                    ,[Attribute]
+                    ,[Correct]
+                    ,[Expected]
+                    ,[Incorrect]
+                    ,[FoundDateTimeStamp]
+                    ,[FoundActionID]
+                    ,[FoundFAMUserID]
+                    ,[ExpectedDateTimeStamp]
+                    ,[ExpectedActionID]
+                    ,[ExpectedFAMUserID]
+                    )
+                VALUES
+                    {1};", queryResultRow.ExpectedFileID, string.Join(",\r\n", valuesToAdd));
+            saveCmd.ExecuteNonQuery();
+        }
+
+        #endregion DatabaseService Methods
 
         #region IConfigSettings implementation
 
@@ -388,7 +505,7 @@ namespace Extract.ETL
             return false;
         }
 
-        #endregion
+        #endregion IConfigSettings implementation
 
         #region DataCaptureAccuracy Properties
 
@@ -416,10 +533,82 @@ namespace Extract.ETL
         [DataMember]
         public string FoundAttributeSetName { get; set; } = "DataFoundByRules";
 
+        /// <summary>
+        /// The average F1Score from the last time the testing command was successfully executed
+        /// </summary>
+        public int LastFileTaskSessionIDProcessed
+        {
+            get
+            {
+                if (_status != null)
+                {
+                    return _status.LastFileTaskSessionIDProcessed;
+                }
+                else
+                {
+                    return lastFileTaskSessionIDProcessed;
+                }
+            }
+            set
+            {
+                if (_status != null)
+                {
+                    _status.LastFileTaskSessionIDProcessed = value;
+                }
+                else
+                {
+                    lastFileTaskSessionIDProcessed = value;
+                }
+            }
+        }
+
         [DataMember]
         public override int Version { get; protected set; } = CURRENT_VERSION;
 
-        #endregion
+        #endregion DataCaptureAccuracy Properties
+
+        #region IHasConfigurableDatabaseServiceStatus
+
+        /// <summary>
+        /// The <see cref="DatabaseServiceStatus"/> for this instance
+        /// </summary>
+        public DatabaseServiceStatus Status
+        {
+            get => _status ?? new DataCaptureAccuracyStatus
+            {
+                LastFileTaskSessionIDProcessed = -1
+            };
+
+            set => _status = value as DataCaptureAccuracyStatus;
+        }
+
+        /// <summary>
+        /// Refreshes the <see cref="DatabaseServiceStatus"/> by loading from the database, creating a new instance,
+        /// or setting it to null (if <see cref="DatabaseServiceID"/>, <see cref="DatabaseServer"/> and
+        /// <see cref="DatabaseName"/> are not configured)
+        /// </summary>
+        public void RefreshStatus()
+        {
+            try
+            {
+                if (DatabaseServiceID > 0
+                    && !string.IsNullOrEmpty(DatabaseServer)
+                    && !string.IsNullOrEmpty(DatabaseName))
+                {
+                    _status = GetLastOrCreateStatus(() => new DataCaptureAccuracyStatus());
+                }
+                else
+                {
+                    _status = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46065");
+            }
+        }
+
+        #endregion IHasConfigurableDatabaseServiceStatus
 
         #region Private Methods
 
@@ -447,50 +636,86 @@ namespace Extract.ETL
         ///     @DatabaseServiceID - Set to ID
         /// </summary>
         /// <param name="cmd">The SqlCommand that needs the parameters added</param>
-        void addParametersToCommand(SqlCommand cmd)
+        void addParametersToCommand(SqlCommand cmd, int endFileTaskSessionId)
         {
             cmd.Parameters.Add("@FoundSetName", SqlDbType.NVarChar);
             cmd.Parameters.Add("@ExpectedSetName", SqlDbType.NVarChar);
-            cmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int);
+            cmd.Parameters.Add("@StartFileTaskSessionSetID", SqlDbType.Int);
+            cmd.Parameters.Add("@EndFileTaskSessionSetID", SqlDbType.Int);
             cmd.Parameters["@FoundSetName"].Value = FoundAttributeSetName;
             cmd.Parameters["@ExpectedSetName"].Value = ExpectedAttributeSetName;
-            cmd.Parameters["@DatabaseServiceID"].Value = DatabaseServiceID;
+            cmd.Parameters["@StartFileTaskSessionSetID"].Value = LastFileTaskSessionIDProcessed + 1;
+            cmd.Parameters["@EndFileTaskSessionSetID"].Value = endFileTaskSessionId;
         }
 
         /// <summary>
-        /// Runs the query to remove the records that will be replaced
+        /// Saves the current <see cref="DatabaseServiceStatus"/> to the DB
         /// </summary>
-        /// <param name="connection">Database connection to perform the deletion</param>
-        void deleteOldRecords(SqlConnection connection)
+        void SaveStatus()
         {
-            // Remove records to be replaced
-            SqlCommand deleteCommand = connection.CreateCommand();
-            deleteCommand.CommandText = REMOVE_OLD_ACCURACY_DATA;
-            addParametersToCommand(deleteCommand);
+            SaveStatus(_status);
+        }
 
-            deleteCommand.Transaction = connection.BeginTransaction();
-            try
-            {
+        #endregion Private Methods
 
-                deleteCommand.ExecuteNonQuery();
-                deleteCommand.Transaction.Commit();
-            }
-            catch (Exception ex)
+        #region Private Classes
+
+        /// <summary>
+        /// Class for the MLModelTrainerStatus stored in the DatabaseService record
+        /// </summary>
+        [DataContract]
+        class DataCaptureAccuracyStatus : DatabaseServiceStatus
+        {
+            const int _CURRENT_VERSION = 1;
+
+            [DataMember]
+            public override int Version { get; protected set; } = _CURRENT_VERSION;
+
+            /// <summary>
+            /// The ID of the last MLData record processed
+            /// </summary>
+            [DataMember]
+            public int LastFileTaskSessionIDProcessed { get; set; }
+
+            /// <summary>
+            /// Called after this instance is deserialized.
+            /// </summary>
+            [OnDeserialized]
+            void OnDeserialized(StreamingContext context)
             {
-                try
+                if (Version > CURRENT_VERSION)
                 {
-                    deleteCommand.Transaction.Rollback();
+                    ExtractException ee = new ExtractException("ELI46064", "Settings were saved with a newer version.");
+                    ee.AddDebugData("SavedVersion", Version, false);
+                    ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
+                    throw ee;
                 }
-                catch (Exception rollbackException)
-                {
-                    rollbackException.AsExtract("ELI45381").Log();
-                }
-                ExtractException ee = new ExtractException("ELI45380", "Unable to update ReportingDataCaptureAccuracy", ex);
-                ee.AddDebugData("SaveQuery", deleteCommand.CommandText, false);
-                throw ee;
+
+                Version = CURRENT_VERSION;
             }
         }
-        #endregion
 
+        /// <summary>
+        /// Stores the data from a row of output from UPDATE_ACCURACY_DATA_SQL
+        /// </summary>
+        struct UpdateQueryResultRow
+        {
+            public Stream ExpectedStream;
+            public Stream FoundStream;
+            public Int64 FoundID;
+            public Int64 ExpectedID;
+            public Int32 ExpectedFileID;
+            public Int32 OriginalFileID;
+            public Int32 FirstPageFromOriginal;
+            public Int32 FoundPageCount;
+            public DateTime FoundDateTime;
+            public Int32 FoundActionID;
+            public Int32 FoundFAMUserID;
+            public DateTime ExpectedDateTime;
+            public Int32 ExpectedActionID;
+            public Int32 ExpectedFAMUserID;
+        }
+
+        #endregion Private Classes
     }
 }

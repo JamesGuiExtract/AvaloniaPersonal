@@ -339,6 +339,38 @@ namespace Extract.ETL
             }
         }
 
+        /// <summary>
+        /// Returns the maximum FileTaskSession row ID that should be used for ETL service processing.
+        /// This is either 1 less than the minimum row belonging to an ActiveFAM that does not have
+        /// a DateTimeStamp assigned, or the maximum FileTaskSession ID if no active session exists.
+        /// </summary>
+        /// <returns></returns>
+        protected int MaxReportableFileTaskSessionId()
+        {
+            try
+            {
+                using (var connection = NewSqlDBConnection())
+                {
+                    connection.Open();
+
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                            SELECT COALESCE(MIN(CASE WHEN ActiveFAM.ID IS NOT NULL AND DateTimeStamp IS NULL THEN FileTaskSession.ID END) - 1,
+                                    MAX(FileTaskSession.ID))
+	                            FROM FileTaskSession
+	                            LEFT JOIN FAMSession ON FAMSessionID = FAMSession.ID
+	                            LEFT JOIN ActiveFAM ON FAMSession.ID = ActiveFAM.FAMSessionID";
+                        return (int)cmd.ExecuteScalar();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46066");
+            }
+        }
+
         #region IDisposable Members
 
         /// <summary>
