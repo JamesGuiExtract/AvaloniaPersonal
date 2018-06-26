@@ -2991,7 +2991,7 @@ bool CTestSpatialString::compareSpatialStrings(ISpatialStringPtr ipSS1, ISpatial
 		}
 		ISpatialPageInfoPtr ipSP1 = ipPageInfo1->GetValue(nKey);
 		ISpatialPageInfoPtr ipSP2 = ipPageInfo2->GetValue(nKey);
-		if (ipSP1->Equal(ipSP2) == VARIANT_FALSE)
+		if (ipSP1->Equal(ipSP2, VARIANT_FALSE) == VARIANT_FALSE)
 		{
 			return false;
 		}

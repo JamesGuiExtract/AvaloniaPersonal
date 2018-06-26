@@ -409,7 +409,7 @@ void CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMap
                     ASSERT_RESOURCE_ALLOCATION("ELI25809", ipCurrentInfo != __nullptr);
 
                     // Check that the spatial page infos are compatible
-                    if (ipCurrentInfo->Equal(ipSourceInfo) == VARIANT_FALSE)
+                    if (ipCurrentInfo->Equal(ipSourceInfo, VARIANT_TRUE) == VARIANT_FALSE)
                     {
                         long lSourceWidth, lCurrentWidth, lSourceHeight, lCurrentHeight;
                         UCLID_RASTERANDOCRMGMTLib::EOrientation eSourceOrient, eCurrentOrient;

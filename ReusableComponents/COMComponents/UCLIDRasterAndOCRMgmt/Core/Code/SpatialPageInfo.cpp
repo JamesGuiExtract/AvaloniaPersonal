@@ -176,7 +176,8 @@ STDMETHODIMP CSpatialPageInfo::GetPageInfo(long* plWidth, long* plHeight,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25764");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSpatialPageInfo::Equal(ISpatialPageInfo *pPageInfo, VARIANT_BOOL *pEqual)
+STDMETHODIMP CSpatialPageInfo::Equal(ISpatialPageInfo *pPageInfo, VARIANT_BOOL vbIgnoreSmallDeskewDifference,
+	VARIANT_BOOL *pEqual)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -194,9 +195,13 @@ STDMETHODIMP CSpatialPageInfo::Equal(ISpatialPageInfo *pPageInfo, VARIANT_BOOL *
 
 		// Set the return value (equal if all pieces are equal)
 		*pEqual = asVariantBool(m_nWidth == lWidth
-								&& m_nHeight == lHeight
-								&& m_eOrientation == eOrient
-								&& m_fDeskew == dDeskew);
+							&& m_nHeight == lHeight
+							&& m_eOrientation == eOrient
+							&& (m_fDeskew == dDeskew
+								// Deskew is often discarded when it is very small so, if specified to,
+								// ignore differences in that case
+								// https://extract.atlassian.net/browse/ISSUE-15513
+								|| asCppBool(vbIgnoreSmallDeskewDifference) && abs(m_fDeskew) + abs(dDeskew) < 0.3));
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25767");

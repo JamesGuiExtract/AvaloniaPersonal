@@ -358,6 +358,7 @@ library UCLID_RASTERANDOCRMGMTLib
 		// PURPOSE: To check if this spatial page info is equal to a specified spatial page info.
 		//			Equal means all values are the same (width, height, orientation and deskew)
 		[id(8), helpstring("method Equal")] HRESULT Equal([in] ISpatialPageInfo* pPageInfo,
+			VARIANT_BOOL vbIgnoreSmallDeskewDifference,
 			[out, retval] VARIANT_BOOL* pEqual);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Gets the angle in radians that describes the rotation and deskew together.

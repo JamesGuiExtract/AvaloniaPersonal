@@ -44,7 +44,7 @@ public:
 	STDMETHOD(GetWidthAndHeight)(long* plWidth, long* plHeight);
 	STDMETHOD(GetPageInfo)(long* plWidth, long* plHeight,
 		EOrientation* peOrientation, double* pdDeskew);
-	STDMETHOD(Equal)(ISpatialPageInfo* pPageInfo, VARIANT_BOOL* pEqual);
+	STDMETHOD(Equal)(ISpatialPageInfo* pPageInfo, VARIANT_BOOL vbIgnoreSmallDeskewDifference, VARIANT_BOOL* pEqual);
 	STDMETHOD(GetTheta)(double* pdTheta);
 
 // ICopyableObject
