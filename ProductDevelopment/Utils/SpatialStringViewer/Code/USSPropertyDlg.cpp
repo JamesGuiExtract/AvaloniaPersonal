@@ -93,6 +93,18 @@ BOOL USSPropertyDlg::OnInitDialog()
 
 		setUpListControl();
 		populateListControl();
+
+		// Don't allow looking at OCR parameters if there are none set
+		// because the information shown won't be accurate
+		// https://extract.atlassian.net/browse/ISSUE-15513
+		if (m_ipHasOCRParameters->OCRParameters->Size > 0)
+		{
+			GetDlgItem(IDC_BTN_VIEW_OCR_PARAMETERS)->EnableWindow();
+		}
+		else
+		{
+			GetDlgItem(IDC_BTN_VIEW_OCR_PARAMETERS)->EnableWindow(0);
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI16834")
 
