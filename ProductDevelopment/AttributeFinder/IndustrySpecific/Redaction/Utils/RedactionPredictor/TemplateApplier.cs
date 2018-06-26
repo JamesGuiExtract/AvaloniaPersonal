@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Threading;
 using UCLID_AFCORELib;
 using UCLID_AFOUTPUTHANDLERSLib;
@@ -35,17 +36,18 @@ namespace RedactionPredictor
                 if (string.Equals(Path.GetExtension(templateLibrary), ".etf", StringComparison.OrdinalIgnoreCase))
                 {
                     _miscUtils.Value.AutoEncryptFile(templateLibrary, _AUTO_ENCRYPT_KEY);
+
                     var str = _miscUtils.Value.GetBase64StringFromFile(templateLibrary);
                     var bytes = Convert.FromBase64String(str);
                     using (var zipFile = new TemporaryFile(true))
                     {
                         File.WriteAllBytes(zipFile.FileName, bytes);
-                        ThrowIfFails(() => RecAPI.kRecLoadFormTemplateLibrary(0, zipFile.FileName, true, out templates), "ELI44692", "Unable to initialize Nuance engine");
+                        ThrowIfFails(() => RecAPI.kRecLoadFormTemplateLibrary(0, zipFile.FileName, true, out templates), "ELI46098", "Unable to load template library");
                     }
                 }
                 else
                 {
-                    ThrowIfFails(() => RecAPI.kRecLoadFormTemplateLibrary(0, templateLibrary, true, out templates), "ELI46060", "Unable to initialize Nuance engine");
+                    ThrowIfFails(() => RecAPI.kRecLoadFormTemplateLibrary(0, templateLibrary, true, out templates), "ELI46060", "Unable to load template library");
                 }
 
                 // Use templates
@@ -125,16 +127,28 @@ namespace RedactionPredictor
 
                 pageHandle = LoadImagePage(imagePath, fileHandle, pageNum);
 
-                RecAPI.kRecFindFormTemplate(0, pageHandle, templates, out formTmplCollection, out bestMatchingID, out var confidence, out var numMatching);
+                int confidence = 0, numMatching = 0;
+                var rc = RecAPI.kRecFindFormTemplate(0, pageHandle, templates, out formTmplCollection, out bestMatchingID, out confidence, out numMatching);
+                if (rc != RECERR.REC_OK)
+                {
+                    return;
+                }
+
                 if (numMatching > 0)
                 {
-                    RecAPI.kRecGetMatchingInfo(bestMatchingID, out matchName);
+                    ThrowIfFails(() => RecAPI.kRecGetMatchingInfo(bestMatchingID, out matchName), "ELI46079", "Failed to get matching info");
                 }
 
                 if (matchName != null)
                 {
-                    RecAPI.kRecApplyFormTemplateEx(0, pageHandle, bestMatchingID);
-                    RecAPI.kRecGetZoneCount(pageHandle, out int numZones);
+                    rc = RecAPI.kRecApplyFormTemplateEx(0, pageHandle, bestMatchingID);
+                    if (rc != RECERR.REC_OK)
+                    {
+                        return;
+                    }
+
+                    int numZones = 0;
+                    ThrowIfFails(() => RecAPI.kRecGetZoneCount(pageHandle, out numZones), "ELI46081", "Failed to get zone count");
                     for (int i=0; i < numZones; i++)
                     {
                         // Create an attribute for each zone that was added to the template (originates from the VOA the template was created from)
@@ -143,9 +157,11 @@ namespace RedactionPredictor
                         {
                             // Create the top-level attribute
                             RecAPI.kRecGetZoneAttribute(pageHandle, i, "Type", out string attributeType);
-                            RecAPI.kRecGetZoneName(pageHandle, i, out string attributeName);
-                            RecAPI.kRecGetZoneInfo(pageHandle, IMAGEINDEX.II_CURRENT, out var userZone, i);
-                            var spatialString = ZoneToSpatialString(userZone, " ", imagePath, pageNum, pageInfoMap);
+                            string attributeName = null;
+                            ThrowIfFails(() => RecAPI.kRecGetZoneName(pageHandle, i, out attributeName), "ELI46084", "Failed to get zone name");
+                            RECT[] rects = null;
+                            ThrowIfFails(() => RecAPI.kRecGetZoneLayout(pageHandle, IMAGEINDEX.II_CURRENT, out rects, i), "ELI46086", "Failed to get zone layout");
+                            var spatialString = ZoneToSpatialString(rects, " ", imagePath, pageNum, pageInfoMap);
 
                             var attribute = new AttributeClass
                             {
@@ -186,9 +202,10 @@ namespace RedactionPredictor
                             RecAPI.kRecGetZoneAttribute(pageHandle, i, "FormField", out string formField);
                             if (formField != null && int.TryParse(formField, out int zoneIndex))
                             {
-                                RecAPI.kRecGetZoneInfo(pageHandle, IMAGEINDEX.II_CURRENT, out var formFieldZone, zoneIndex);
-                                RecAPI.kRecGetZoneName(pageHandle, zoneIndex, out string fieldName);
-                                spatialString = ZoneToSpatialString(formFieldZone, fieldName, imagePath, pageNum, pageInfoMap);
+                                ThrowIfFails(() => RecAPI.kRecGetZoneLayout(pageHandle, IMAGEINDEX.II_CURRENT, out rects, zoneIndex), "ELI46089", "Failed to get zone layout");
+                                string fieldName = null;
+                                ThrowIfFails(() => RecAPI.kRecGetZoneName(pageHandle, zoneIndex, out fieldName), "ELI46090", "Failed to get zone name");
+                                spatialString = ZoneToSpatialString(rects, fieldName, imagePath, pageNum, pageInfoMap);
                                 var formFieldAttribute = new AttributeClass
                                 {
                                     Name = "FormField",
@@ -201,19 +218,22 @@ namespace RedactionPredictor
 
                     if (outputAllFormFields)
                     {
-                        RecAPI.kRecRecognize(0, pageHandle);
-                        RecAPI.kRecGetOCRZoneCount(pageHandle, out var ocrZoneCount);
+                        ThrowIfFails(() => RecAPI.kRecRecognize(0, pageHandle), "ELI46091", "Failed to recognize text");
+                        int ocrZoneCount = 0;
+                        ThrowIfFails(() => RecAPI.kRecGetOCRZoneCount(pageHandle, out ocrZoneCount), "ELI46092", "Failed to get OCR zone count");
                         for (int i = 0; i < ocrZoneCount; i++)
                         {
-                            RecAPI.kRecGetOCRZoneName(pageHandle, i, out var ocrZoneName);
-                            RecAPI.kRecGetOCRZoneText(0, pageHandle, i, out var text);
-                            RecAPI.kRecGetOCRZoneInfo(pageHandle, IMAGEINDEX.II_CURRENT, out var ocrZone, i);
+                            string ocrZoneName = null;
+                            ThrowIfFails(() => RecAPI.kRecGetOCRZoneName(pageHandle, i, out ocrZoneName), "ELI46093", "Failed to get OCR zone name");
+                            RecAPI.kRecGetOCRZoneText(0, pageHandle, i, out string text);
+                            RECT[] rects = null;
+                            ThrowIfFails(() => RecAPI.kRecGetOCRZoneLayout(pageHandle, IMAGEINDEX.II_CURRENT, out rects, i), "ELI46096", "Failed to get OCR zone layout");
 
                             if (string.IsNullOrEmpty(text))
                             {
                                 text = " ";
                             }
-                            var spatialString = ZoneToSpatialString(ocrZone, text, imagePath, pageNum, pageInfoMap);
+                            var spatialString = ZoneToSpatialString(rects, text, imagePath, pageNum, pageInfoMap);
                             var formFieldAttribute = new AttributeClass
                             {
                                 Name = "_FormField",
@@ -347,13 +367,18 @@ namespace RedactionPredictor
             return pageInfoMap;
         }
 
-        static SpatialString ZoneToSpatialString(ZONE userZone, string value, string imagePath, int pageNum, LongToObjectMap pageInfoMap)
+        static SpatialString ZoneToSpatialString(RECT[] rects, string value, string imagePath, int pageNum, LongToObjectMap pageInfoMap)
         {
-            var sourceRect = userZone.rectBBox;
-            var rect = new LongRectangleClass();
-            rect.SetBounds(sourceRect.left, sourceRect.top, sourceRect.right, sourceRect.bottom);
-            var zone = new RasterZoneClass();
-            zone.CreateFromLongRectangle(rect, pageNum);
+            var zones = rects.Select(sourceRect =>
+            {
+                var rect = new LongRectangleClass();
+                rect.SetBounds(sourceRect.left, sourceRect.top, sourceRect.right, sourceRect.bottom);
+                var zone = new RasterZoneClass();
+                zone.CreateFromLongRectangle(rect, pageNum);
+                return zone;
+            })
+            .ToIUnknownVector();
+
             var spatialString = new SpatialStringClass();
 
             // Template creator/finder needs to handle empty form field names
@@ -362,7 +387,16 @@ namespace RedactionPredictor
             {
                 value = " ";
             }
-            spatialString.CreatePseudoSpatialString(zone, value, imagePath, pageInfoMap);
+
+            if (zones.Size() == 1)
+            {
+                spatialString.CreatePseudoSpatialString((RasterZone)zones.At(0), value, imagePath, pageInfoMap);
+            }
+            else
+            {
+                spatialString.CreateHybridString(zones, value, imagePath, pageInfoMap);
+            }
+
             return spatialString;
         }
 
