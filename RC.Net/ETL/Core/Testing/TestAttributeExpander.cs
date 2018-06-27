@@ -298,7 +298,7 @@ namespace Extract.ETL.Test
 
                 expandAttributes.DatabaseServiceID = (int)cmd.ExecuteScalar();
 
-                expandAttributes.Process(_cancel);
+                Assert.Throws<ExtractException>(()=> expandAttributes.Process(_cancel));
                 cmd.CommandText = "SELECT COUNT(ID) FROM Attribute ";
                 Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 0);
 

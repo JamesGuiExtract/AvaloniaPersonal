@@ -162,7 +162,7 @@ namespace Extract.ETL.Test
                     //redactionAccuracy.XPathOfSensitiveAttributes = "";
 
                     // with the _cancel token there should be no results
-                    redactionAccuracy.Process(_cancel);
+                    Assert.Throws<ExtractException>(() => redactionAccuracy.Process(_cancel));
 
                     cmd.CommandText = "Select Count(ID) from ReportingRedactionAccuracy";
 

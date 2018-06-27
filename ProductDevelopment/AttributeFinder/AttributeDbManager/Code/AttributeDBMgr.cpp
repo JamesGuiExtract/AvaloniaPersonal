@@ -59,6 +59,7 @@ namespace
 		names.push_back(gstrREPORTING_REDACTION_ACCURACY_TABLE);
 		names.push_back(gstrREPORTING_DATA_CAPTURE_ACCURACY_TABLE);
 		names.push_back(gstrDASHBOARD_ATTRIBUTE_FIELDS_TABLE);
+		names.push_back(gstrREPORTING_HIM_STATS_TABLE);
 
 		return names;
 	}

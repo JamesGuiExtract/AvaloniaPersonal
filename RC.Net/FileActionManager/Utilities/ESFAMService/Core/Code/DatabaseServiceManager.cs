@@ -20,9 +20,16 @@ namespace Extract.FileActionManager.Utilities
     {
         #region Fields
 
-        // Map the of the ScheduledEvent for each service to the corresponding service to execute.
+        // Map of the ScheduledEvent for each service to the corresponding service to execute.
         ConcurrentDictionary<ScheduledEvent, DatabaseService> _databaseServices =
             new ConcurrentDictionary<ScheduledEvent, DatabaseService>();
+		
+		// Map for indicating if the scheduledEvent is in the EventStarted event so that 
+		// if it is already waiting another will not be queued
+        ConcurrentDictionary<ScheduledEvent, bool> _inEventStarted = new ConcurrentDictionary<ScheduledEvent, bool>();
+
+        // Lock for accessing _inEventStarted
+        object _inEventStartedLock = new object();
 
         /// <summary>
         /// Indicates whether the manager is currently running.
@@ -167,28 +174,51 @@ namespace Extract.FileActionManager.Utilities
             try
             {
                 DatabaseService dbService = _databaseServices[(ScheduledEvent)sender];
+
+                lock (_inEventStartedLock)
+                {
+                    // check if the ScheduledEvent is already in this method
+                    if (_inEventStarted[(ScheduledEvent)sender])
+                    {
+                        return;
+                    }
+
+                    // Set the flag to true to indicate that the 
+                    _inEventStarted[(ScheduledEvent)sender] = true;
+                }
+
                 lock (_processingLock)
                 {
-                    if (_running &&
-                        !_stoppedEvent.WaitOne(0) &&
-                        dbService.Enabled &&
-                        !dbService.Schedule.GetIsInExcludedTime())
+                    try
                     {
-                        var fileProcessingDB = new FileProcessingDB();
-                        try
+                        if (_running &&
+                            !_stoppedEvent.WaitOne(0) &&
+                            dbService.Enabled &&
+                            !dbService.Schedule.GetIsInExcludedTime())
                         {
-                            fileProcessingDB.DatabaseServer = _fileProcessingDb.DatabaseServer;
-                            fileProcessingDB.DatabaseName = _fileProcessingDb.DatabaseName;
+                            var fileProcessingDB = new FileProcessingDB();
+                            try
+                            {
+                                fileProcessingDB.DatabaseServer = _fileProcessingDb.DatabaseServer;
+                                fileProcessingDB.DatabaseName = _fileProcessingDb.DatabaseName;
 
-                            fileProcessingDB.RecordFAMSessionStart("ETL: " + dbService.Description, "", false, false);
+                                fileProcessingDB.RecordFAMSessionStart("ETL: " + dbService.Description, "", false, false);
 
-                            dbService.Process(_canceller.Token);
+                                dbService.Process(_canceller.Token);
 
-                            fileProcessingDB.RecordFAMSessionStop();
+                                fileProcessingDB.RecordFAMSessionStop();
+                            }
+                            finally
+                            {
+                                fileProcessingDB.CloseAllDBConnections();
+                            }
                         }
-                        finally
+                    }
+                    finally
+                    {
+                        lock (_inEventStartedLock)
                         {
-                            fileProcessingDB.CloseAllDBConnections();
+                            _inEventStarted[(ScheduledEvent)sender] = false;
                         }
                     }
                 }
@@ -327,7 +357,7 @@ namespace Extract.FileActionManager.Utilities
                                 dbService.DatabaseServiceID = (int)dbServiceRow["ID"];
                                 dbService.DatabaseServer = _oleDbConnection.DataSource;
                                 dbService.DatabaseName = _oleDbConnection.Database;
-
+                                _inEventStarted[dbService.Schedule] = false;
                                 dbService.Schedule.EventStarted += HandleScheduleEvent_EventStarted;
                             }
                         }

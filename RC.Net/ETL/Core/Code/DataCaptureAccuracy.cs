@@ -187,9 +187,9 @@ namespace Extract.ETL
 
                 int maxReportableFileTaskSession = MaxReportableFileTaskSessionId();
 
-                while (LastFileTaskSessionIDProcessed < maxReportableFileTaskSession
-                    && !cancelToken.IsCancellationRequested)
+                while (LastFileTaskSessionIDProcessed < maxReportableFileTaskSession)
                 {
+                    cancelToken.ThrowIfCancellationRequested();
                     var endFileTaskSessionID =
                         Math.Min(LastFileTaskSessionIDProcessed + PROCESS_BATCH_SIZE, maxReportableFileTaskSession);
 
@@ -215,7 +215,7 @@ namespace Extract.ETL
         /// <param name="endFileTaskSessionID">The ID of the last file task session row to process.</param>
         void ProcessBatch(CancellationToken cancelToken, int endFileTaskSessionID)
         {
-            using (TransactionScope scope = new TransactionScope())
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             using (var connection = NewSqlDBConnection())
             {
                 // Open the connection
@@ -265,27 +265,19 @@ namespace Extract.ETL
                             // Add the comparison results to the Results
                             var statsToStore = output.AggregateStatistics();
 
-                            StoreAccuracyData(connection, statsToStore, queryResultRow);
+                            StoreAccuracyData(connection, statsToStore, queryResultRow, cancelToken);
                         }
                     }
                 }
 
-                // We can not store any results for this batch if cancellation was requested since
-                // there is no good way of saying exactly which FileTaskSession rows could be
-                // considered processed.
-                if (!cancelToken.IsCancellationRequested)
-                {
-                    LastFileTaskSessionIDProcessed = endFileTaskSessionID;
-                    scope.Complete();
-                }
+                // If Canceled, there will have been an exception everything but saving the status is done 
+                LastFileTaskSessionIDProcessed = endFileTaskSessionID;
+                scope.Complete();
             }
 
             // Getting errors when called from the above transaction scope (either before or after
             // Complete). Avoiding that issue for now by moving SaveStatus out of that scope.
-            if (!cancelToken.IsCancellationRequested)
-            {
-                SaveStatus();
-            }
+            SaveStatus();
         }
 
         /// <summary>
@@ -316,8 +308,9 @@ namespace Extract.ETL
             int expectedFAMUserIDColumn = dataAccuracyQueryReader.GetOrdinal("ExpectedFAMUserID");
 
             // Process the found records
-            if (dataAccuracyQueryReader.Read() && !cancelToken.IsCancellationRequested)
+            if (dataAccuracyQueryReader.Read())
             {
+                cancelToken.ThrowIfCancellationRequested();
                 queryResultRow = new UpdateQueryResultRow() {
                     // Get the streams for the expected and found voa data (the thread will read the voa from the stream
                     ExpectedStream = dataAccuracyQueryReader.GetStream(expectedVOAColumn),
@@ -395,7 +388,7 @@ namespace Extract.ETL
         /// <param name="queryResultRow">The <see cref="UpdateQueryResultRow"/> used to generate the stats.
         /// </param>
         void StoreAccuracyData(SqlConnection connection, IEnumerable<AccuracyDetail> statsToStore,
-            UpdateQueryResultRow queryResultRow)
+            UpdateQueryResultRow queryResultRow, CancellationToken cancelToken)
         {
             var lookup = statsToStore.ToLookup(a => new { a.Path, a.Label });
 
@@ -457,7 +450,11 @@ namespace Extract.ETL
                     )
                 VALUES
                     {1};", queryResultRow.ExpectedFileID, string.Join(",\r\n", valuesToAdd));
-            saveCmd.ExecuteNonQuery();
+
+            saveCmd.CommandTimeout = 0;
+            var task = saveCmd.ExecuteNonQueryAsync();
+            task.Wait(cancelToken);
+            
         }
 
         #endregion DatabaseService Methods

@@ -372,15 +372,18 @@ namespace Extract.ETL
                     // Set the timeout so that it waits indefinitely
                     cmd.CommandTimeout = 0;
 
+                    var readerTask = cmd.ExecuteReaderAsync(cancelToken);
+                                        
                     // Get VOA data for each file
-                    using (SqlDataReader VOAsToStore = cmd.ExecuteReader())
+                    using (SqlDataReader VOAsToStore = readerTask.Result)
                     {
                         // Get the ordinals needed
                         int AttributeSetForFileIDColumn = VOAsToStore.GetOrdinal("AttributeSetForFileID");
                         int VOAColumn = VOAsToStore.GetOrdinal("VOA");
 
-                        while (VOAsToStore.Read() && !cancelToken.IsCancellationRequested)
+                        while (VOAsToStore.Read())
                         {
+                            cancelToken.ThrowIfCancellationRequested();
                             Int64 AttributeSetForFileID = VOAsToStore.GetInt64(AttributeSetForFileIDColumn);
 
                             try
@@ -448,13 +451,9 @@ namespace Extract.ETL
                         using (var transaction = connection.BeginTransaction())
                         {
                             cmd.Transaction = transaction;
-                            var task = cmd.ExecuteNonQueryAsync(cancelToken);
-                            
-                            // if there were changes commit the transaction
-                            if (task.Result > 0)
-                            {
-                                transaction.Commit();
-                            }
+                            var task = cmd.ExecuteNonQueryAsync();
+                            task.Wait(cancelToken);
+                            transaction.Commit();
                         }
                     }
                 }

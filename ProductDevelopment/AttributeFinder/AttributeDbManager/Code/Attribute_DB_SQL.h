@@ -333,6 +333,8 @@ static const std::string gstrCREATE_REPORTING_REDACTION_ACCURACY_FOUND_FAMUSERID
 "ON[dbo].[ReportingRedactionAccuracy]([FoundFAMUserID]) "
 "INCLUDE([DatabaseServiceID], [FoundAttributeSetForFileID], [FileID], [Attribute], [Correct], [Expected], [FoundDateTimeStamp]) ";
 
+static const std::string gstrREPORTING_HIM_STATS_TABLE = "ReportingHIMStats";
+
 static const std::string gstrCREATE_REPORTING_HIM_STATS =
 "CREATE TABLE[dbo].[ReportingHIMStats]( "
 "	[PaginationID][int] NOT NULL CONSTRAINT [PK_ReportingHIMStats] PRIMARY KEY CLUSTERED, "

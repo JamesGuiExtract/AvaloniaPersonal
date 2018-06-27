@@ -187,7 +187,7 @@ namespace Extract.ETL.Test
                 rates.DatabaseServiceID = StoreDatabaseServiceRecord(rates);
 
                 // This should not process any results
-                rates.Process(_cancel);
+                Assert.Throws<ExtractException>(() => rates.Process(_cancel));
                 CheckResults(rates, new VerificationRatesList());
 
                 rates.Process(_noCancel);

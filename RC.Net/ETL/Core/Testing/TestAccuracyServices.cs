@@ -196,7 +196,7 @@ namespace Extract.ETL.Test
                     dataCaptureAccuracy.DatabaseServiceID = (int)cmd.ExecuteScalar();
 
                     // no records should be produced by this
-                    dataCaptureAccuracy.Process(_cancel);
+                    Assert.Throws<ExtractException>(() => dataCaptureAccuracy.Process(_cancel));
                     cmd.CommandText = "SELECT COUNT(ID) FROM ReportingDataCaptureAccuracy";
 
                     Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 0);

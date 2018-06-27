@@ -137,18 +137,13 @@ namespace Extract.ETL
                     connection.Open();
 
                     using (var cmd = connection.CreateCommand())
-                    using (var scope = new TransactionScope())
+                    using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                     {
                         cmd.CommandText = _UpdateQuery;
-                        cmd.CommandTimeout = 600;
-                        var task = cmd.ExecuteNonQueryAsync(cancelToken);
-                        var result = task.Result;
-
-                        // if records were affected then complete the transaction 
-                        if (result > 0)
-                        {
-                            scope.Complete();
-                        }
+                        cmd.CommandTimeout = 0;
+                        var task = cmd.ExecuteNonQueryAsync();
+                        task.Wait(cancelToken);
+                        scope.Complete();
                     }
                 }
             }

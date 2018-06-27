@@ -207,10 +207,15 @@ namespace Extract.ETL
                         (status.SetOfActiveFileTaskIds.Count == 0) ? "0": string.Join(",", status.SetOfActiveFileTaskIds));
                     sourceCmd.Parameters.Add("@LastFileTaskSessionID", SqlDbType.Int).Value = status.LastFileTaskSessionIDProcessed;
 
-                    using (var sourceReader = sourceCmd.ExecuteReader())
+                    sourceCmd.CommandTimeout = 0;
+                    var readerTask = sourceCmd.ExecuteReaderAsync(cancelToken);
+
+                    using (var sourceReader = readerTask.Result)
                     {
-                        while (sourceReader.Read() && !cancelToken.IsCancellationRequested)
+                        while (sourceReader.Read())
                         {
+                            cancelToken.ThrowIfCancellationRequested();
+
                             Int32 fileTaskSessionID = sourceReader.GetInt32(sourceReader.GetOrdinal("ID"));
                             bool activeFAM = sourceReader.GetInt32(sourceReader.GetOrdinal("ActiveFAM")) != 0;
                             Int32 actionID = sourceReader.GetInt32(sourceReader.GetOrdinal("ActionID"));
@@ -234,7 +239,7 @@ namespace Extract.ETL
 
                             try
                             {
-                                using (var trans = new TransactionScope())
+                                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                                 using (var saveConnection = NewSqlDBConnection())
                                 {
                                     saveConnection.Open();
@@ -250,7 +255,9 @@ namespace Extract.ETL
                                         saveCmd.Parameters.Add("@ActivityTime", SqlDbType.Float).Value = activityTime;
                                         saveCmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
 
-                                        saveCmd.ExecuteNonQuery();
+                                        var task = saveCmd.ExecuteNonQueryAsync();
+                                        task.Wait(cancelToken);
+
                                         status.SaveStatus(saveConnection, DatabaseServiceID);
 
                                         trans.Complete();
