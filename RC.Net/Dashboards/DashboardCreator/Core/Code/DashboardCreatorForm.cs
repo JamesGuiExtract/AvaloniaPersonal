@@ -33,6 +33,8 @@ namespace DashboardCreator
         /// </summary>
         Dictionary<string, int> _drillDownLevelForItem = new Dictionary<string, int>();
 
+        bool _drillDownLevelIncreased = false;
+
 
         #endregion
 
@@ -55,6 +57,7 @@ namespace DashboardCreator
             try
             {
                 _drillDownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
+                _drillDownLevelIncreased = true;
             }
             catch (Exception ex)
             {
@@ -163,11 +166,13 @@ namespace DashboardCreator
                     int drillLevel;
                     _drillDownLevelForItem.TryGetValue(e.DashboardItemName, out drillLevel);
 
-                    if (!gridItem.InteractivityOptions.IsDrillDownEnabled || gridItem.GetDimensions().Count - 1 == drillLevel)
+                    if (!gridItem.InteractivityOptions.IsDrillDownEnabled || 
+                        !_drillDownLevelIncreased && (gridItem.GetDimensions().Count - 1 == drillLevel))
                     {
                         DashboardHelper.DisplayDashboardDetailForm(gridItem, e, _customGridValues[e.DashboardItemName]);
                     }
                 }
+                _drillDownLevelIncreased = false;
             }
             catch (Exception ex)
             {

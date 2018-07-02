@@ -4,6 +4,7 @@ using DevExpress.DataAccess.ConnectionParameters;
 using Extract.Dashboard.Forms;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
@@ -60,8 +61,18 @@ namespace Extract.Dashboard.Utilities
                         // the form will only be displayed if there is a FileName specified and the datasource is SQL database
                         if (columnValues.Count > 0 && columnValues.ContainsKey("FileName") && sqlParameters != null)
                         {
-                            DashboardFileDetailForm detailForm = new DashboardFileDetailForm(columnValues, sqlParameters.ServerName, sqlParameters.DatabaseName, configuration);
-                            detailForm.ShowDialog();
+                            if (File.Exists(((string)columnValues["FileName"])))
+                            {
+                                DashboardFileDetailForm detailForm = new DashboardFileDetailForm(
+                                    columnValues, sqlParameters.ServerName, sqlParameters.DatabaseName, configuration);
+                                detailForm.ShowDialog();
+                            }
+                            else
+                            {
+                                ExtractException ee = new ExtractException("ELI46114", "File does not exist.");
+                                ee.AddDebugData("FileName", (string)columnValues["FileName"], false);
+                                throw ee;
+                            }
                         }
                     }
                 }
