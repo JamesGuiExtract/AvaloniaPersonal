@@ -658,7 +658,7 @@ namespace Extract.ETL
         #region Private Classes
 
         /// <summary>
-        /// Class for the MLModelTrainerStatus stored in the DatabaseService record
+        /// Class for the DataCaptureAccuracyStatus stored in the DatabaseService record
         /// </summary>
         [DataContract]
         class DataCaptureAccuracyStatus : DatabaseServiceStatus

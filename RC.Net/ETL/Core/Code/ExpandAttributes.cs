@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading;
+using System.Transactions;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -25,7 +26,7 @@ namespace Extract.ETL
     [DataContract]
     [KnownType(typeof(ScheduledEvent))]
     [ExtractCategory("DatabaseService", "Expand attributes")]
-    public class ExpandAttributes : DatabaseService, IConfigSettings
+    public class ExpandAttributes : DatabaseService, IConfigSettings, IHasConfigurableDatabaseServiceStatus
     {
         #region DashboardAttributeField class definition
 
@@ -68,7 +69,7 @@ namespace Extract.ETL
                 get { return _attributeSetNameID; }
                 set
                 {
-                    if(value != _attributeSetNameID)
+                    if (value != _attributeSetNameID)
                     {
                         _attributeSetNameID = value;
                         NotifyPropertyChanged();
@@ -113,11 +114,71 @@ namespace Extract.ETL
 
             #endregion
 
+            #region Overrides
+
+            public override string ToString()
+            {
+                return string.Format(CultureInfo.InvariantCulture,
+                    "{0},{1},{2}", DashboardAttributeName, AttributeSetNameID, PathForAttributeInAttributeSet);
+            }
+
+            public override bool Equals(object obj)
+            {
+                DashboardAttributeField d = obj as DashboardAttributeField;
+                if (d is null)
+                {
+                    return false;
+                }
+
+                return d.ToString() == ToString();
+            }
+
+            public override int GetHashCode()
+            {
+                return ToString().GetHashCode();
+            }  
+
+            #endregion
+
+            #region DashboardAttributefield Methods
+
+            /// <summary>
+            /// converts a string to a DashboardAttributeField
+            /// </summary>
+            /// <param name="s">String formatted as DashboardAttributeName,AttributeSetNameID,PathForAttributeInAttributeSet
+            /// this is the same format returned by ToString()</param>
+            /// <returns>New instance of DashboardAttributeField</returns>
+            public static DashboardAttributeField FromString(string s)
+            {
+                var tokens = s.Split(new char[] { ' ', ',' });
+                if (tokens.Count() < 3)
+                {
+                    ExtractException ee = new ExtractException("ELI46113", "Unable to convert string to DashboardAttributeField");
+                    ee.AddDebugData("string", s, false);
+                    throw ee;
+                }
+                return new DashboardAttributeField()
+                {
+                    DashboardAttributeName = tokens[0],
+                    AttributeSetNameID = Int64.Parse(tokens[1]),
+                    PathForAttributeInAttributeSet = tokens[2]
+                };
+            }
+
+            #endregion
+
         }
 
         #endregion
 
         #region Constants
+
+        /// <summary>
+        /// Size of the batch to process in each transaction
+        /// 
+        /// Note: First used 100 but TransactionScope timed out - set to 1 and seems to work fine
+        /// </summary>
+        const int _BATCH_SIZE = 1;
 
         /// <summary>
         /// String used to create the add attributes sql
@@ -204,81 +265,24 @@ namespace Extract.ETL
         /// <summary>
         /// Query that adds new values to the DashboardAttributeFields table
         /// Requires 3 parameters
-        ///     @AttributeSetName - Name of the attribute set to get the data from
-        ///     @AttributePath - Path of the attribute - created by using attribute names separated by \
         ///     @DashboardNameForAttribute - Name that is used to identify the value in the dashboard
+        ///     @AttributeSetForFileID - the AttributeSetForFileID being processed
+        ///     @DashboardAttributeValue - Value for the DashbaordAttribute
         /// </summary>
-        readonly string AddDashboardAttributes = @"
-                ;WITH AttributeWithPath (
-                	AttributeSetForFileID
-                	,AttributeID
-                	,ParentAttributeID
-                	,[Name]
-                	,[Value]
-                	,[Guid]
-                	,[Level]
-                	)
-                AS (
-                	-- anchor
-                	SELECT Attribute.AttributeSetForFileID
-                		,Attribute.id
-                		,ParentAttributeID
-                		,CAST(AttributeName.Name AS NVARCHAR(MAX))
-                		,Attribute.Value
-                		,Attribute.GUID
-                		,0 [Level]
-                	FROM Attribute
-                	INNER JOIN AttributeName ON Attribute.AttributeNameID = AttributeName.ID
-                	INNER JOIN AttributeSetForFile ON AttributeSetForFile.ID = Attribute.AttributeSetForFileID
-                	WHERE ParentAttributeID IS NULL
-                		AND AttributeSetForFile.AttributeSetNameID = @AttributeSetNameID
-                	
-                	UNION ALL
-                	
-                	SELECT Attribute.AttributeSetForFileID
-                		,Attribute.id
-                		,Attribute.ParentAttributeID
-                		,AttributeWithPath.[Name] + '\' + AttributeName.[Name]
-                		,Attribute.Value
-                		,Attribute.GUID
-                		,[Level] + 1
-                	FROM Attribute
-                	INNER JOIN AttributeName ON Attribute.AttributeNameID = AttributeName.ID
-                	INNER JOIN AttributeWithPath ON Attribute.ParentAttributeID = AttributeWithPath.AttributeID
-                	)
-                	,ExpandedAttributeSets
-                AS (
-                	SELECT DISTINCT AttributeSetForFileID
-                	FROM Attribute
-                	)
-                	,DataToInsert
-                AS (
-                	SELECT DISTINCT ExpandedAttributeSets.AttributeSetForFileID
-                		,@DashboardNameForAttribute [Name]
-                		,COALESCE(AttributeWithPath.[Value], 'UNKNOWN') [Value]
-                		,ROW_NUMBER() OVER (
-                			PARTITION BY ExpandedAttributeSets.AttributeSetForFileID ORDER BY ExpandedAttributeSets.AttributeSetForFileID DESC
-                			) RowsOfAttribute
-                	FROM ExpandedAttributeSets
-                	INNER JOIN AttributeSetForFile 
-                        ON AttributeSetForFile.ID = ExpandedAttributeSets.AttributeSetForFileID 
-                            AND AttributeSetForFile.AttributeSetNameID = @AttributeSetNameID
-                	LEFT JOIN AttributeWithPath ON AttributeSetForFile.ID = AttributeWithPath.AttributeSetForFileID
-                		AND AttributeWithPath.[Name] = @AttributePath
-                	LEFT JOIN DashboardAttributeFields ON AttributeSetForFile.ID = DashboardAttributeFields.AttributeSetForFileID
-                		AND DashboardAttributeFields.Name = @DashboardNameForAttribute
-                	WHERE DashboardAttributeFields.Name IS NULL
-                	)
+        readonly string _AddDashboardAttribute = @"
+                DELETE FROM DashboardAttributeFields
+                WHERE AttributeSetForFileID = @AttributeSetForFileID AND [Name] = @DashboardNameForAttribute
+
                 INSERT INTO DashboardAttributeFields (
                 	AttributeSetForFileID
                 	,[Name]
                 	,[Value]
-                	)
-                SELECT AttributeSetForFileID
-                	,[Name]
-                	,[Value]
-                FROM DataToInsert
-                WHERE RowsOfAttribute = 1
+                )
+                VALUES (
+                    @AttributeSetForFileID
+                	,@DashboardNameForAttribute
+                	,@DashboardAttributeValue
+                )
             ";
 
         #endregion
@@ -294,6 +298,16 @@ namespace Extract.ETL
         /// Indicates whether the Process method is currently executing.
         /// </summary>
         bool _processing;
+
+        /// <summary>
+        /// Status
+        /// </summary>
+        ExpandAttributesStatus _status;
+
+        /// <summary>
+        /// Cancel token - will be set in Process to CancellationToken passed in
+        /// </summary>
+        CancellationToken _cancelToken = CancellationToken.None;
 
         #endregion Fields
 
@@ -356,108 +370,76 @@ namespace Extract.ETL
             {
                 _processing = true;
 
+                _cancelToken = cancelToken;
+
+                RefreshStatus();
+
+                int maxFileTaskSession = MaxReportableFileTaskSessionId();
+                int currentLastProcessed = _status.StartingFileTaskSessionId();
+
+                // check if there is anything to do
+                if (currentLastProcessed >= maxFileTaskSession)
+                {
+                    return;
+                }
+
                 using (var connection = NewSqlDBConnection())
                 {
                     connection.Open();
 
-                    // Records that contain attributes that need to be stored
-                    SqlCommand cmd = connection.CreateCommand();
-                    cmd.CommandText = @"
-                            SELECT AttributeSetForFile.ID AttributeSetForFileID
-                                ,AttributeSetForFile.VOA
-                            FROM AttributeSetForFile
-                            LEFT OUTER JOIN Attribute ON AttributeSetForFile.ID = Attribute.AttributeSetForFileID
-                            WHERE (Attribute.AttributeSetForFileID IS NULL)";
-
-                    // Set the timeout so that it waits indefinitely
-                    cmd.CommandTimeout = 0;
-
-                    var readerTask = cmd.ExecuteReaderAsync(cancelToken);
-                                        
-                    // Get VOA data for each file
-                    using (SqlDataReader VOAsToStore = readerTask.Result)
+                    while (currentLastProcessed < maxFileTaskSession)
                     {
-                        // Get the ordinals needed
-                        int AttributeSetForFileIDColumn = VOAsToStore.GetOrdinal("AttributeSetForFileID");
-                        int VOAColumn = VOAsToStore.GetOrdinal("VOA");
+                        int lastInBatch = Math.Min(currentLastProcessed + _BATCH_SIZE, maxFileTaskSession);
 
-                        while (VOAsToStore.Read())
-                        {
-                            cancelToken.ThrowIfCancellationRequested();
-                            Int64 AttributeSetForFileID = VOAsToStore.GetInt64(AttributeSetForFileIDColumn);
+                        // Records that contain attributes that need to be stored
+                        SqlCommand cmd = connection.CreateCommand();
+                        cmd.CommandText = @"
+                            SELECT ID AttributeSetForFileID
+                                    ,FileTaskSessionID
+                                    ,AttributeSetNameID
+                                    ,VOA
+                                FROM [dbo].[AttributeSetForFile] 
+                                WHERE FileTaskSessionID > @FirstFileTaskSessionInBatch AND
+		                            FileTaskSessionID <= @LastfileTaskSessionInBatch
+                                ORDER BY FileTaskSessionID";
 
-                            try
-                            {
-                                using (Stream VOAStream = VOAsToStore.GetStream(VOAColumn))
-                                {
-                                    // Get the VOAs from the stream
-                                    IUnknownVector AttributesToStore = AttributeMethods.GetVectorOfAttributesFromSqlBinary(VOAStream);
+                        cmd.Parameters.AddWithValue("@FirstFileTaskSessionInBatch", currentLastProcessed);
+                        cmd.Parameters.AddWithValue("@LastfileTaskSessionInBatch", lastInBatch);
 
-                                    // Use separate connection so that the entire VOA can be added in a transaction
-                                    using (var saveConnection = NewSqlDBConnection())
-                                    {
-                                        saveConnection.Open();
-
-                                        var transaction = saveConnection.BeginTransaction();
-
-                                        var saveCmd = saveConnection.CreateCommand();
-                                        saveCmd.Transaction = transaction;
-
-                                        try
-                                        {
-                                            addAttributes(saveConnection, transaction, AttributesToStore, AttributeSetForFileID);
-                                            transaction.Commit();
-
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            try
-                                            {
-                                                transaction.Rollback();
-                                            }
-                                            catch (Exception rollbackException)
-                                            {
-                                                List<ExtractException> exceptionList = new List<ExtractException>();
-                                                exceptionList.Add(ex.AsExtract("ELI45427"));
-                                                exceptionList.Add(rollbackException.AsExtract("ELI45428"));
-                                                throw exceptionList.AsAggregateException();
-                                            }
-                                            throw ex.AsExtract("ELI45429");
-                                        }
-                                    }
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                ex.AsExtract("ELI45424").Log();
-                            }
-                        }
-                    }
-                }
-                
-                // Update the DashboardAttributeFields table
-                foreach (var da in DashboardAttributes)
-                {
-                    using (var connection = NewSqlDBConnection())
-                    {
-                        connection.Open();
-                        var cmd = connection.CreateCommand();
-                        cmd.CommandText = AddDashboardAttributes;
+                        // Set the timeout so that it waits indefinitely
                         cmd.CommandTimeout = 0;
-                        cmd.Parameters.AddWithValue("@AttributeSetNameID", da.AttributeSetNameID);
-                        cmd.Parameters.AddWithValue("@AttributePath", da.PathForAttributeInAttributeSet);
-                        cmd.Parameters.AddWithValue("@DashboardNameForAttribute", da.DashboardAttributeName);
 
-                        using (var transaction = connection.BeginTransaction())
+                        var readerTask = cmd.ExecuteReaderAsync(cancelToken);
+
+                        // Process each batch
+                        using (SqlDataReader VOAsToStore = readerTask.Result)
+                        using (var scope = new TransactionScope(TransactionScopeOption.Required,
+                            new TransactionOptions()
+                            {
+                                IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
+                                Timeout = TransactionManager.MaximumTimeout
+                            },
+                            TransactionScopeAsyncFlowOption.Enabled))
                         {
-                            cmd.Transaction = transaction;
-                            var task = cmd.ExecuteNonQueryAsync();
-                            task.Wait(cancelToken);
-                            transaction.Commit();
-                        }
-                    }
-                }
 
+
+                            ProcessBatch(VOAsToStore, cancelToken);
+
+                            SaveStatus();
+                            scope.Complete();
+
+                        }
+                        currentLastProcessed = lastInBatch;
+                    }
+
+                    // Since there may be FileTaskSessions that have nothing to do with attributes update all the 
+                    // status items to have maxFileTaskSession since all processing is complete at this point
+                    _status.LastFileTaskSessionIDProcessed = maxFileTaskSession;
+                    _status.LastIDProcessedForDashboardAttribute.Keys
+                        .ToList()
+                        .ForEach(k => _status.LastIDProcessedForDashboardAttribute[k] = maxFileTaskSession);
+                    SaveStatus();
+                }
             }
             catch (Exception ex)
             {
@@ -466,6 +448,114 @@ namespace Extract.ETL
             finally
             {
                 _processing = false;
+            }
+        }
+
+        /// <summary>
+        /// Process a batch of VOA's from the database
+        /// </summary>
+        /// <param name="VOAsToStore"><see cref="SqlDataReader"/> that contains the records to process</param>
+        /// <param name="cancelToken"><see cref="CancellationToken"/> that could cancel the operation</param>
+        void ProcessBatch(SqlDataReader VOAsToStore, CancellationToken cancelToken)
+        {
+            // Get the ordinals needed
+            int AttributeSetForFileIDColumn = VOAsToStore.GetOrdinal("AttributeSetForFileID");
+            int FileTaskSessionIDColumn = VOAsToStore.GetOrdinal("FileTaskSessionID");
+            int AttributeSetNameIDColumn = VOAsToStore.GetOrdinal("AttributeSetNameID");
+            int VOAColumn = VOAsToStore.GetOrdinal("VOA");
+
+            while (VOAsToStore.Read())
+            {
+                cancelToken.ThrowIfCancellationRequested();
+                Int64 AttributeSetForFileID = VOAsToStore.GetInt64(AttributeSetForFileIDColumn);
+                Int32 FileTaskSessionID = VOAsToStore.GetInt32(FileTaskSessionIDColumn);
+                Int64 AttributeSetNameID = VOAsToStore.GetInt64(AttributeSetNameIDColumn);
+
+                using (Stream VOAStream = VOAsToStore.GetStream(VOAColumn))
+                {
+                    // Get the VOAs from the stream
+                    IUnknownVector AttributesToStore = AttributeMethods.GetVectorOfAttributesFromSqlBinary(VOAStream);
+                    if (_status.LastFileTaskSessionIDProcessed < FileTaskSessionID)
+                    {
+                        using (var deleteConnection = NewSqlDBConnection())
+                        {
+                            deleteConnection.Open();
+                            using (var deleteCmd = deleteConnection.CreateCommand())
+                            {
+                                deleteCmd.CommandTimeout = 0;
+                                deleteCmd.CommandText = @"
+                                                    DELETE FROM Attribute
+                                                    WHERE AttributeSetForFileID = @AttributeSetForFileID
+                                                ";
+                                deleteCmd.Parameters.AddWithValue("@AttributeSetForFileID", AttributeSetForFileID);
+                                var deleteTask = deleteCmd.ExecuteNonQueryAsync();
+                                deleteTask.Wait(cancelToken);
+                            }
+                        }
+
+                        // Use separate connection so that the entire VOA can be added in a transaction
+                        using (var saveConnection = NewSqlDBConnection())
+                        {
+                            saveConnection.Open();
+
+                            try
+                            {
+                                addAttributes(saveConnection, AttributesToStore, AttributeSetForFileID);
+                            }
+                            catch (Exception ex)
+                            {
+                                throw ex.AsExtract("ELI45429");
+                            }
+                        }
+                        _status.LastFileTaskSessionIDProcessed = FileTaskSessionID;
+                    }
+
+                    // Check for DashboardAttribute records that need to be processed
+                    var needToProcess = _status.LastIDProcessedForDashboardAttribute
+                        .Select(d => d.Value < FileTaskSessionID);
+                    if (needToProcess.Count() > 0)
+                    {
+                        XPathContext pathContext = new XPathContext(AttributesToStore);
+
+                        // Update the DashboardAttributeFields table
+                        foreach (var da in DashboardAttributes)
+                        {
+                            ProccessDashboardAttributeFields(da, AttributeSetForFileID, pathContext);
+                            _status.LastIDProcessedForDashboardAttribute[da.ToString()] = FileTaskSessionID;
+                        }
+                    }
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Save the DashboardAttribute field
+        /// </summary>
+        /// <param name="dashboardAttributeField"><see cref="DashboardAttributeField"/> that has the configuration for 
+        /// the attribute being saved</param>
+        /// <param name="attributeSetForfileID">The ID for the AttributeSetForFile record for this attribute</param>
+        /// <param name="pathContext"><see cref="XPathContext"/> for the VOA that is being processed</param>
+        void ProccessDashboardAttributeFields(DashboardAttributeField dashboardAttributeField, Int64 attributeSetForfileID, XPathContext pathContext)
+        {
+            string path = "/root/" + dashboardAttributeField.PathForAttributeInAttributeSet.Replace(@"\", "/");
+            var attributesWithPath = pathContext.FindAllOfType<IAttribute>(path);
+            var firstAttribute = attributesWithPath.FirstOrDefault();
+
+            string valueToSave = firstAttribute?.Value?.String ?? "UNKNOWN";
+
+            using (var connection = NewSqlDBConnection())
+            {
+                connection.Open();
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = _AddDashboardAttribute;
+                cmd.CommandTimeout = 0;
+                cmd.Parameters.AddWithValue("@DashboardNameForAttribute", dashboardAttributeField.DashboardAttributeName);
+                cmd.Parameters.AddWithValue("@AttributeSetForFileID", attributeSetForfileID);
+                cmd.Parameters.AddWithValue("@DashboardAttributeValue", valueToSave);
+
+                var task = cmd.ExecuteNonQueryAsync();
+                task.Wait(_cancelToken);
             }
         }
 
@@ -481,7 +571,7 @@ namespace Extract.ETL
         /// <returns>Returns <see langword="true"/> if configuration is valid, otherwise false</returns>
         public bool IsConfigured()
         {
-            return !string.IsNullOrWhiteSpace(Description);   
+            return !string.IsNullOrWhiteSpace(Description);
         }
 
         /// <summary>
@@ -508,8 +598,106 @@ namespace Extract.ETL
         }
 
         #endregion
+        
+        #region IHasConfigurableDatabaseServiceStatus
+
+        /// <summary>
+        /// The <see cref="DatabaseServiceStatus"/> for this instance
+        /// </summary>
+        public DatabaseServiceStatus Status
+        {
+            get => _status ?? new ExpandAttributesStatus
+            {
+                LastFileTaskSessionIDProcessed = -1
+            };
+
+            set => _status = value as ExpandAttributesStatus;
+        }
+
+        /// <summary>
+        /// Refreshes the <see cref="DatabaseServiceStatus"/> by loading from the database, creating a new instance,
+        /// or setting it to null (if <see cref="DatabaseServiceID"/>, <see cref="DatabaseServer"/> and
+        /// <see cref="DatabaseName"/> are not configured)
+        /// </summary>
+        public void RefreshStatus()
+        {
+            try
+            {
+                if (DatabaseServiceID > 0
+                    && !string.IsNullOrEmpty(DatabaseServer)
+                    && !string.IsNullOrEmpty(DatabaseName))
+                {
+                    _status = GetLastOrCreateStatus(() => new ExpandAttributesStatus());
+
+                    UpdateDashboardAttributesStatusItems();
+                }
+                else
+                {
+                    _status = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46107");
+            }
+        }
+
+        #endregion IHasConfigurableDatabaseServiceStatus
 
         #region Private Methods
+
+        /// <summary>
+        /// Checks for DashboardAttributes that have been added or removed and updates the status records and removes
+        /// the DashboardAttributes in the database for any that are no longer being added
+        /// </summary>
+        void UpdateDashboardAttributesStatusItems()
+        {
+            var itemsToAdd = DashboardAttributes
+                .Where(s => !_status.LastIDProcessedForDashboardAttribute.ContainsKey(s.ToString()));
+
+            var itemsToDelete = _status.LastIDProcessedForDashboardAttribute.Keys
+                .Where(k => !DashboardAttributes.Contains(DashboardAttributeField.FromString(k)));
+
+            if (itemsToAdd.Count() > 0 || itemsToDelete.Count() > 0)
+            {
+                // Add New items
+                foreach (var a in itemsToAdd)
+                {
+                    _status.LastIDProcessedForDashboardAttribute.TryAdd(a.ToString(), -1);
+                }
+
+                foreach (var d in itemsToDelete)
+                {
+                    using (var scope = new TransactionScope(TransactionScopeOption.Required,
+                        new TransactionOptions()
+                        {
+                            IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
+                            Timeout = TransactionManager.MaximumTimeout
+                        },
+                        TransactionScopeAsyncFlowOption.Enabled))
+                    {
+                        _status.LastIDProcessedForDashboardAttribute.Remove(d);
+                        using (var connection = NewSqlDBConnection())
+                        {
+                            connection.Open();
+                            using (var cmd = connection.CreateCommand())
+                            {
+                                DashboardAttributeField dashboardAttributeField = DashboardAttributeField.FromString(d);
+                                cmd.CommandTimeout = 0;
+                                cmd.CommandText = String.Format(CultureInfo.InvariantCulture,
+                                    @"DELETE FROM DashboardAttributeFields
+                                                WHERE [Name] = '{0}' AND [AttributeSetForFileID = {1}",
+                                    dashboardAttributeField.DashboardAttributeName, dashboardAttributeField.AttributeSetNameID);
+                                var task = cmd.ExecuteNonQueryAsync();
+                                task.Wait(_cancelToken);
+                            }
+                        }
+                        SaveStatus();
+                        scope.Complete();
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Called after this instance is deserialized.
@@ -532,11 +720,10 @@ namespace Extract.ETL
         /// Adds the IUnknownVector of attributes to the database attribute related tables
         /// </summary>
         /// <param name="connection">The open connection for the add</param>
-        /// <param name="transaction">The transaction to use for adding attribute data</param>
         /// <param name="attributes">The attributes to add</param>
         /// <param name="attributeSetForFileID">The ID of the AttributeSetForFileID record that contains the VOA being added</param>
         /// <param name="parentAttributeID">The ID of the parent Attribute record. if 0 it is a top level attribute</param>
-        void addAttributes(SqlConnection connection, SqlTransaction transaction, IUnknownVector attributes,
+        void addAttributes(SqlConnection connection, IUnknownVector attributes,
             Int64 attributeSetForFileID,
             Int64 parentAttributeID = 0)
         {
@@ -548,7 +735,6 @@ namespace Extract.ETL
                 }
 
                 var insertCmd = connection.CreateCommand();
-                insertCmd.Transaction = transaction;
 
                 insertCmd.CommandText = string.Format(CultureInfo.InvariantCulture,
                     AddAttributeQuery,
@@ -574,10 +760,11 @@ namespace Extract.ETL
                     }
                     insertCmd.Parameters.Add("@GUID", SqlDbType.UniqueIdentifier).Value = idObject.InstanceGUID;
 
-                    Int64? attributeID = insertCmd.ExecuteScalar() as Int64?;
+                    var insertTask = insertCmd.ExecuteScalarAsync(_cancelToken);
+                    Int64? attributeID = insertTask.Result as Int64?;
                     if (!(attributeID is null) && !(attribute.SubAttributes is null))
                     {
-                        addAttributes(connection, transaction, attribute.SubAttributes, attributeSetForFileID, (Int64)attributeID);
+                        addAttributes(connection, attribute.SubAttributes, attributeSetForFileID, (Int64)attributeID);
                     }
                 }
                 catch (Exception ex)
@@ -687,6 +874,69 @@ namespace Extract.ETL
             }
             return true;
         }
+
+        /// <summary>
+        /// Saves the current <see cref="DatabaseServiceStatus"/> to the DB
+        /// </summary>
+        void SaveStatus()
+        {
+            SaveStatus(_status);
+        }
+        #endregion
+
+        #region Private Classes
+
+        /// <summary>
+        /// Class for the ExpandAttributesStatus stored in the DatabaseService record
+        /// </summary>
+        [DataContract]
+        class ExpandAttributesStatus : DatabaseServiceStatus
+        {
+            const int _CURRENT_VERSION = 1;
+
+            [DataMember]
+            public override int Version { get; protected set; } = _CURRENT_VERSION;
+
+            /// <summary>
+            /// The ID of the last FileTaskSession record processed
+            /// </summary>
+            [DataMember]
+            public Int32 LastFileTaskSessionIDProcessed { get; set; }
+
+            /// <summary>
+            /// Dictionary contains the last ID processed for each of the defined attributes
+            /// </summary>
+            [DataMember]
+            public Dictionary<string, Int32> LastIDProcessedForDashboardAttribute =
+                new Dictionary<string, Int32>();
+
+            /// <summary>
+            /// Called after this instance is deserialized.
+            /// </summary>
+            [OnDeserialized]
+            void OnDeserialized(StreamingContext context)
+            {
+                if (Version > CURRENT_VERSION)
+                {
+                    ExtractException ee = new ExtractException("ELI46106", "Settings were saved with a newer version.");
+                    ee.AddDebugData("SavedVersion", Version, false);
+                    ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
+                    throw ee;
+                }
+
+                Version = CURRENT_VERSION;
+            }
+
+            /// <summary>
+            /// Method to return the minimum FileTaskSession that needs to be processed.
+            /// </summary>
+            /// <returns>The Minimum FileTaskSession that needs to be processed</returns>
+            public Int32 StartingFileTaskSessionId()
+            {
+                return Math.Min(LastFileTaskSessionIDProcessed, LastIDProcessedForDashboardAttribute.Values.Min()) + 1;
+            }
+        }
+
         #endregion
 
     }

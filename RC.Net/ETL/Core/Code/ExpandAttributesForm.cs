@@ -116,7 +116,11 @@ namespace Extract.ETL
                     cmd.CommandText = "Select ID, Description FROM AttributeSetName";
                     DataTable attributeSets = new DataTable();
                     attributeSets.Load(cmd.ExecuteReader());
-                    //var attributeSets = cmd.ExecuteReader().Cast<IDataRecord>();
+                    if (attributeSets.Rows.Count < 1)
+                    {
+                        ExtractException ex = new ExtractException("ELI46108", "No AttributeSets are defined.");
+                        throw ex;
+                    }
 
                     var attributeSetColumn = new DataGridViewComboBoxColumn()
                     {
