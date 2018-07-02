@@ -512,7 +512,7 @@ namespace Extract.ETL
 
                     // Check for DashboardAttribute records that need to be processed
                     var needToProcess = _status.LastIDProcessedForDashboardAttribute
-                        .Select(d => d.Value < FileTaskSessionID);
+                        .Select(d => d.Value < FileTaskSessionID && DashboardAttributeField.FromString(d.Key).AttributeSetNameID == AttributeSetNameID);
                     if (needToProcess.Count() > 0)
                     {
                         XPathContext pathContext = new XPathContext(AttributesToStore);
