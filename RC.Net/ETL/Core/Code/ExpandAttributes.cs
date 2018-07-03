@@ -410,16 +410,15 @@ namespace Extract.ETL
                     }
 
                     currentLastProcessed = lastInBatch;
+                    // Since there may be FileTaskSessions that have nothing to do with attributes update all the 
+                    // status items to have maxFileTaskSession since all processing is complete at this point
+                    _status.LastFileTaskSessionIDProcessed = Math.Max(lastInBatch, _status.LastFileTaskSessionIDProcessed);
+                    _status.LastIDProcessedForDashboardAttribute.Keys
+                        .ToList()
+                        .ForEach(k => _status.LastIDProcessedForDashboardAttribute[k] =
+                                     Math.Max(lastInBatch, _status.LastIDProcessedForDashboardAttribute[k]));
                     SaveStatus();
                 }
-
-                // Since there may be FileTaskSessions that have nothing to do with attributes update all the 
-                // status items to have maxFileTaskSession since all processing is complete at this point
-                _status.LastFileTaskSessionIDProcessed = maxFileTaskSession;
-                _status.LastIDProcessedForDashboardAttribute.Keys
-                    .ToList()
-                    .ForEach(k => _status.LastIDProcessedForDashboardAttribute[k] = maxFileTaskSession);
-                SaveStatus();
             }
             catch (Exception ex)
             {
@@ -445,30 +444,15 @@ namespace Extract.ETL
             using (SqlCommand cmd = connection.CreateCommand())
             {
                 cmd.CommandText = @"
-                    DECLARE @attributeSetData TABLE (AttributeSetForFileID BIGINT,
-                                                    FileTaskSessionID INT,
-                                                    AttributeSetNameID BIGINT,
-                                                    VOA VARBINARY(MAX))
-                    INSERT INTO @attributeSetData
-	                    SELECT AttributeSetForFile.ID, FileTaskSessionID, AttributeSetNameID, VOA
-		                    FROM [dbo].[AttributeSetForFile] 
-                            WHERE FileTaskSessionID > @FirstFileTaskSessionInBatch AND
-		                    FileTaskSessionID <= @LastfileTaskSessionInBatch
-
-                    -- First delete the attributes for any existing sets in this range
-                    -- Turn off constraints before doing so, otherwise performance is slow... I believe
-                    -- because it is being hung up ensuring child attributes are deleted before parents.
-                    ALTER TABLE Attribute NOCHECK CONSTRAINT ALL
-                    DELETE FROM Attribute
-                    WHERE AttributeSetForFileID IN (SELECT AttributeSetForFileID FROM @attributeSetData)
-                    ALTER TABLE Attribute CHECK CONSTRAINT ALL
-
-                    SELECT AttributeSetForFileID
-                        ,FileTaskSessionID
-                        ,AttributeSetNameID
-                        ,VOA
-                        FROM @attributeSetData
-                        ORDER BY FileTaskSessionID";
+                    SELECT [ASFF].[ID] [AttributeSetForFileID],
+	                        CASE WHEN EXISTS (SELECT TOP 1 [ID] FROM [Attribute] WHERE [AttributeSetForFileID] = [ASFF].[ID]) THEN 1 ELSE 0 END
+		                        [HasExpandedAttributes],
+	                        [FileTaskSessionID], 
+	                        [AttributeSetNameID], 
+	                        [VOA]
+	                    FROM [dbo].[AttributeSetForFile] [ASFF]
+                        WHERE [FileTaskSessionID] > @FirstFileTaskSessionInBatch
+		                    AND [FileTaskSessionID] <= @LastfileTaskSessionInBatch";
 
                 cmd.Parameters.AddWithValue("@FirstFileTaskSessionInBatch", currentLastProcessed);
                 cmd.Parameters.AddWithValue("@LastfileTaskSessionInBatch", lastInBatch);
@@ -491,53 +475,60 @@ namespace Extract.ETL
         void ProcessBatch(SqlConnection connection, SqlDataReader VOAsToStore, CancellationToken cancelToken)
         {
             // Get the ordinals needed
-            int AttributeSetForFileIDColumn = VOAsToStore.GetOrdinal("AttributeSetForFileID");
-            int FileTaskSessionIDColumn = VOAsToStore.GetOrdinal("FileTaskSessionID");
-            int AttributeSetNameIDColumn = VOAsToStore.GetOrdinal("AttributeSetNameID");
-            int VOAColumn = VOAsToStore.GetOrdinal("VOA");
+            int attributeSetForFileIDColumn = VOAsToStore.GetOrdinal("AttributeSetForFileID");
+            int hasExpandedAttributesColulmn = VOAsToStore.GetOrdinal("HasExpandedAttributes");
+            int fileTaskSessionIDColumn = VOAsToStore.GetOrdinal("FileTaskSessionID");
+            int attributeSetNameIDColumn = VOAsToStore.GetOrdinal("AttributeSetNameID");
+            int voaColumn = VOAsToStore.GetOrdinal("VOA");
 
             while (VOAsToStore.Read())
             {
                 cancelToken.ThrowIfCancellationRequested();
-                Int64 AttributeSetForFileID = VOAsToStore.GetInt64(AttributeSetForFileIDColumn);
-                Int32 FileTaskSessionID = VOAsToStore.GetInt32(FileTaskSessionIDColumn);
-                Int64 AttributeSetNameID = VOAsToStore.GetInt64(AttributeSetNameIDColumn);
+                Int64 attributeSetForFileID = VOAsToStore.GetInt64(attributeSetForFileIDColumn);
+                bool hasExpandedAttributes = (VOAsToStore.GetInt32(hasExpandedAttributesColulmn) == 1);
+                Int32 fileTaskSessionID = VOAsToStore.GetInt32(fileTaskSessionIDColumn);
+                Int64 attributeSetNameID = VOAsToStore.GetInt64(attributeSetNameIDColumn);
 
-                using (Stream VOAStream = VOAsToStore.GetStream(VOAColumn))
+                // Check for DashboardAttribute records that need to be processed
+                var dashboardAttributesNeeded = _status.LastIDProcessedForDashboardAttribute
+                    .Select(status => (LastFTSID: status.Value, DashboardAttribute: DashboardAttributeField.FromString(status.Key)))
+                    .Where(status2 => status2.LastFTSID < fileTaskSessionID && status2.DashboardAttribute.AttributeSetNameID == attributeSetNameID)
+                    .Select(status2 => status2.DashboardAttribute);
+
+                if (!hasExpandedAttributes || dashboardAttributesNeeded.Any())
                 {
-                    // Get the VOAs from the stream
-                    IUnknownVector AttributesToStore = AttributeMethods.GetVectorOfAttributesFromSqlBinary(VOAStream);
-                    if (_status.LastFileTaskSessionIDProcessed < FileTaskSessionID)
+                    using (Stream voaStream = VOAsToStore.GetStream(voaColumn))
                     {
-                        try
+                        // Get the VOAs from the stream
+                        IUnknownVector AttributesToStore = AttributeMethods.GetVectorOfAttributesFromSqlBinary(voaStream);
+
+                        if (!hasExpandedAttributes && _status.LastFileTaskSessionIDProcessed < fileTaskSessionID)
                         {
-                            addAttributes(connection, AttributesToStore, AttributeSetForFileID);
+                            try
+                            {
+                                addAttributes(connection, AttributesToStore, attributeSetForFileID);
+                            }
+                            catch (Exception ex)
+                            {
+                                throw ex.AsExtract("ELI45429");
+                            }
+
+                            _status.LastFileTaskSessionIDProcessed = fileTaskSessionID;
                         }
-                        catch (Exception ex)
+
+                        if (dashboardAttributesNeeded.Any())
                         {
-                            throw ex.AsExtract("ELI45429");
-                        }
+                            XPathContext pathContext = new XPathContext(AttributesToStore);
 
-                        _status.LastFileTaskSessionIDProcessed = FileTaskSessionID;
-                    }
-
-                    // Check for DashboardAttribute records that need to be processed
-                    var needToProcess = _status.LastIDProcessedForDashboardAttribute
-                        .Select(d => d.Value < FileTaskSessionID && DashboardAttributeField.FromString(d.Key).AttributeSetNameID == AttributeSetNameID);
-                    if (needToProcess.Count() > 0)
-                    {
-                        XPathContext pathContext = new XPathContext(AttributesToStore);
-
-                        // Update the DashboardAttributeFields table
-                        foreach (var da in DashboardAttributes)
-                        {
-                            ProccessDashboardAttributeFields(connection, da, AttributeSetForFileID, pathContext);
-                            _status.LastIDProcessedForDashboardAttribute[da.ToString()] = FileTaskSessionID;
+                            // Update the DashboardAttributeFields table
+                            foreach (var da in dashboardAttributesNeeded)
+                            {
+                                ProccessDashboardAttributeFields(connection, da, attributeSetForFileID, pathContext);
+                            }
                         }
                     }
                 }
             }
-
         }
 
         /// <summary>
