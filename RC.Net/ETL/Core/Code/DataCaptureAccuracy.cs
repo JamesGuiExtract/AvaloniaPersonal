@@ -69,7 +69,7 @@ namespace Extract.ETL
 				SELECT DISTINCT affectedFiles.FileID, MAX(AttributeSetForFile.FileTaskSessionID) AS ID
 					FROM @affectedFiles affectedFiles
 					INNER JOIN FileTaskSession ON affectedFiles.FileID = FileTaskSession.FileID
-                        AND FileTaskSession.ID <= @EndFileTaskSessionSetID
+                        AND FileTaskSession.ID <= @EndFileTaskSessionSetID AND FileTaskSession.ActionID IS NOT NULL
 					INNER JOIN AttributeSetForFile ON FileTaskSession.ID = AttributeSetForFile.FileTaskSessionID
 					INNER JOIN AttributeSetName ON AttributeSetNameID = AttributeSetName.ID
 					WHERE AttributeSetName.Description = @ExpectedSetName
@@ -87,6 +87,7 @@ namespace Extract.ETL
 					AND Pagination.DestPage IS NOT NULL)
 				LEFT JOIN FileTaskSession ON
 					(FileTaskSession.FileID = ExpectedFTS.FileID OR FileTaskSession.FileID = Pagination.OriginalFileID)
+                     AND FileTaskSession.ActionID IS NOT NULL
 				INNER JOIN AttributeSetForFile ON FileTaskSession.ID = AttributeSetForFile.FileTaskSessionID
 				INNER JOIN AttributeSetName ON AttributeSetNameID = AttributeSetName.ID
 				LEFT JOIN FAMFile ON FileTaskSession.FileID = FAMFile.ID
