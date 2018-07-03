@@ -62,7 +62,7 @@
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 2;
-            this.okButton.Text = "Ok";
+            this.okButton.Text = "OK";
             this.okButton.UseVisualStyleBackColor = true;
             // 
             // cancelButton

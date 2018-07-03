@@ -237,7 +237,10 @@ namespace Extract.ETL.Management
                     // Hide the ID column
                     _databaseServicesDataGridView.Columns["ID"].Visible = false;
                     _databaseServicesDataGridView.Columns["Service"].Visible = false;
+                    _databaseServicesDataGridView.Columns["ServiceType"].HeaderText = "Service Type";
+                    _databaseServicesDataGridView.Columns["ServiceType"].MinimumWidth = 150;
                     _databaseServicesDataGridView.Columns["Enabled"].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+                    _databaseServicesDataGridView.Columns["Enabled"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
                     _databaseServicesDataGridView.Columns["Description"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 
                 }
