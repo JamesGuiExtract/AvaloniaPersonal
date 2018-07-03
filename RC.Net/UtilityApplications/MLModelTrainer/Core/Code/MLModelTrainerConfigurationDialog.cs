@@ -145,6 +145,8 @@ namespace Extract.UtilityApplications.MLModelTrainer
                         MLModelTrainer.DataFilePathTag,
                         MLModelTrainer.TempModelPathTag
                     };
+
+                SetEnabledStates();
             }
             catch (Exception ex)
             {
@@ -319,24 +321,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
                 Dirty = true;
 
-                if (_lmModelTypeRadioButton.Checked)
-                {
-                    _modelPathLabel.Text = "LM file path";
-                    _trainingCommandTextBox.Enabled =
-                        _trainingCommandPathTagsButton.Enabled =
-                        _testingCommandTextBox.Enabled =
-                        _testingCommandPathTagsButton.Enabled = false;
-                    _changeAnswerButton.Enabled = true;
-                }
-                else
-                {
-                    _modelPathLabel.Text = "Destination path";
-                    _trainingCommandTextBox.Enabled =
-                        _trainingCommandPathTagsButton.Enabled =
-                        _testingCommandTextBox.Enabled =
-                        _testingCommandPathTagsButton.Enabled = true;
-                    _changeAnswerButton.Enabled = false;
-                }
+                SetEnabledStates();
             }
             catch (Exception ex)
             {
@@ -473,6 +458,28 @@ namespace Extract.UtilityApplications.MLModelTrainer
             _settings.EmailAddressesToNotifyOnFailure = _emailAddressesTextBox.Text;
             _settings.EmailSubject = _emailSubjectTextBox.Text;
             _settings.Schedule = _schedulerControl.Value;
+        }
+
+        private void SetEnabledStates()
+        {
+            if (_lmModelTypeRadioButton.Checked)
+            {
+                _modelPathLabel.Text = "LM file path";
+                _trainingCommandTextBox.Enabled =
+                    _trainingCommandPathTagsButton.Enabled =
+                    _testingCommandTextBox.Enabled =
+                    _testingCommandPathTagsButton.Enabled = false;
+                _changeAnswerButton.Enabled = true;
+            }
+            else
+            {
+                _modelPathLabel.Text = "Destination path";
+                _trainingCommandTextBox.Enabled =
+                    _trainingCommandPathTagsButton.Enabled =
+                    _testingCommandTextBox.Enabled =
+                    _testingCommandPathTagsButton.Enabled = true;
+                _changeAnswerButton.Enabled = false;
+            }
         }
 
         #endregion Private Methods
