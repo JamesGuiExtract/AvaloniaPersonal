@@ -437,6 +437,14 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 else if(!cancellationToken.IsCancellationRequested)
                 {
                     _editor.CurrentLearningMachine = learningMachine;
+
+                    // The editor preserves the previous training log
+                    // so overwrite it with the text box value
+                    // (previously this wasn't necessary because the CurrentLearningMachine update took place
+                    // before the accuracy status updates were written but now that happens above in
+                    // SharedTrainingMethods.RunCleanup())
+                    // https://extract.atlassian.net/projects/ISSUE/issues/ISSUE-15523
+                    learningMachine.TrainingLog = textBox1.Text;
                 }
 
                 // Re-enable buttons

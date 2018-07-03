@@ -66,8 +66,13 @@ namespace Extract.AttributeFinder
                 cm =>
                 {
                     // The ConfusionMatrix class puts class 0 at index 1 so reverse the labels
-                    labels.Reverse();
-                    _labels = labels.ToArray();
+                    // but don't modify the encoder's list
+                    // https://extract.atlassian.net/browse/ISSUE-15524
+                    _labels = new string[2]
+                    {
+                        labels[1],
+                        labels[0]
+                    };
                     _positiveIndexes = new[] { 0 };
 
                     sourceData = cm.Matrix;
