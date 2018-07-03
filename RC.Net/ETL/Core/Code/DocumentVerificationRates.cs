@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Globalization;
 using System.Runtime.Serialization;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Transactions;
 using System.Windows.Forms;
 
@@ -17,8 +17,8 @@ namespace Extract.ETL
     /// </summary>
     [DataContract]
     [KnownType(typeof(ScheduledEvent))]
-    [ExtractCategory("DatabaseService", "Document verification rates" )]
-    public class DocumentVerificationRates : DatabaseService, IConfigSettings
+    [ExtractCategory("DatabaseService", "Document verification rates")]
+    public class DocumentVerificationRates : DatabaseService, IConfigSettings, IHasConfigurableDatabaseServiceStatus
     {
         #region Internal classes
 
@@ -47,6 +47,7 @@ namespace Extract.ETL
 
             /// <summary>
             /// Set of FileTaskSession Ids that where associated with an active FAM in the last run
+            /// NOTE: This is no longer used and if it has values the ReportingVerificationRates Table will be cleared
             /// </summary>
             [DataMember]
             public HashSet<Int32> SetOfActiveFileTaskIds { get; protected set; } = new HashSet<int>();
@@ -70,7 +71,7 @@ namespace Extract.ETL
                 }
 
                 Version = CURRENT_VERSION;
-            } 
+            }
 
             #endregion
         }
@@ -79,42 +80,45 @@ namespace Extract.ETL
 
         #region Constants
 
+        /// <summary>
+        /// Current version
+        /// </summary>
         const int CURRENT_VERSION = 1;
+
+        /// <summary>
+        /// The number of FileTaskSession rows to process in a single transaction.
+        /// </summary>
+        const int PROCESS_BATCH_SIZE = 1000;
 
         /// <summary>
         /// Query to select the records to be used for updating ReportingVerificationRates table
         /// Requires the following parameters
-        ///     @LastFileTaskSessionID INT 
+        ///     @LastProcessedFileTaskSessionID INT 
+        ///     @EndOfBatch INT
         ///     
         /// This string is to be used in a string.Format statement with {0} either (0) if no previous ID's 
         ///     or (<comma separated list of previously active id's>)
         /// </summary>
         static readonly string _QUERY_FOR_SOURCE_RECORDS = @"
-           SELECT [FileTaskSession].[ID]
-			  ,CASE 
-                    WHEN ([ActiveFAM].FAMSessionID) IS NULL THEN 0
-                    WHEN ([Duration] IS NULL AND [OverheadTime] IS NULL) THEN 1
-			        ELSE 0 
-			   END  ActiveFAM
-              ,[FileTaskSession].[ActionID]
-              ,[TaskClassID]
-              ,[FileID]
-              , COALESCE([Duration], 0.0) [Duration]
-              , COALESCE([OverheadTime], 0.0) [OverheadTime]
-              , COALESCE([ActivityTime], 0.0) [ActivityTime] 
-          FROM [dbo].[FileTaskSession] 
-            INNER JOIN [dbo].[TaskClass] ON [TaskClass].[ID] = [FileTaskSession].[TaskClassID]
-            LEFT JOIN [dbo].[ActiveFAM] ON [FileTaskSession].[FAMSessionID] = [ActiveFAM].[FAMSessionID]
-          WHERE ([TaskClass].GUID IN 
-                    ('FD7867BD-815B-47B5-BAF4-243B8C44AABB', 
-                     '59496DF7-3951-49B7-B063-8C28F4CD843F', 
-                     'AD7F3F3F-20EC-4830-B014-EC118F6D4567' )) 
-                AND (([FileTaskSession].[ID] > @LastFileTaskSessionID 
-				AND [FileTaskSession].[Duration] IS NOT NULL 
-				AND [FileTaskSession].OverheadTime IS NOT NULL)
-				OR [ActiveFAM].FAMSessionID IS NOT NULL
-				OR ([FileTaskSession].[ID] IN ({0})))
-          ORDER BY ID ASC";
+            SELECT [FileTaskSession].[ID]
+                     ,[FileID]
+            		 ,[FileTaskSession].[ActionID]
+                     ,[TaskClassID]
+                     , COALESCE([Duration], 0.0) [Duration]
+                     , COALESCE([OverheadTime], 0.0) [OverheadTime]
+                     , COALESCE([ActivityTime], 0.0) [ActivityTime] 
+                 FROM [dbo].[FileTaskSession] 
+                   INNER JOIN [dbo].[TaskClass] ON [TaskClass].[ID] = [FileTaskSession].[TaskClassID]
+                   
+                 WHERE ([TaskClass].GUID IN 
+                           ('FD7867BD-815B-47B5-BAF4-243B8C44AABB', 
+                            '59496DF7-3951-49B7-B063-8C28F4CD843F', 
+                            'AD7F3F3F-20EC-4830-B014-EC118F6D4567' )) 
+                       AND (([FileTaskSession].[ID] > @LastProcessedFileTaskSessionID 
+            			AND [FileTaskSession].[ID] < = @EndOfBatch
+            AND [FileTaskSession].[Duration] IS NOT NULL 
+            AND [FileTaskSession].OverheadTime IS NOT NULL))
+            ORDER BY ID ASC";
 
         /// <summary>
         /// Query to add or update the ReportingVerificationRates table
@@ -162,6 +166,16 @@ namespace Extract.ETL
         /// </summary>
         bool _processing;
 
+        /// <summary>
+        /// The current status info for this service.
+        /// </summary>
+        DocumentVerificationStatus _status;
+
+        /// <summary>
+        /// <see cref="CancellationToken"/> that was passed into the <see cref="Process(CancellationToken)"/> method
+        /// </summary>
+        CancellationToken _cancelToken = CancellationToken.None;
+
         #endregion
 
         #region DatabaseService implementation
@@ -188,87 +202,64 @@ namespace Extract.ETL
         #endregion DatabaseService Properties
 
         #region DatabaseService Methods
-
         public override void Process(CancellationToken cancelToken)
         {
             try
             {
                 _processing = true;
 
-                var status = GetLastOrCreateStatus(() => new DocumentVerificationStatus());
+                _cancelToken = cancelToken;
 
-                using (var connection = NewSqlDBConnection())
+                RefreshStatus();
+
+                // Reset the Stats on the following conditions
+                if (_status.LastFileTaskSessionIDProcessed <= 0 || _status.SetOfActiveFileTaskIds.Count > 0)
                 {
-                    connection.Open();
+                    ResetStatistics();
+                }
+                int maxFileTaskSession = MaxReportableFileTaskSessionId();
 
-                    var sourceCmd = connection.CreateCommand();
-                    sourceCmd.CommandText = string.Format(CultureInfo.InvariantCulture,
-                        _QUERY_FOR_SOURCE_RECORDS, 
-                        (status.SetOfActiveFileTaskIds.Count == 0) ? "0": string.Join(",", status.SetOfActiveFileTaskIds));
-                    sourceCmd.Parameters.Add("@LastFileTaskSessionID", SqlDbType.Int).Value = status.LastFileTaskSessionIDProcessed;
 
-                    sourceCmd.CommandTimeout = 0;
-                    var readerTask = sourceCmd.ExecuteReaderAsync(cancelToken);
-
-                    using (var sourceReader = readerTask.Result)
+                while (_status.LastFileTaskSessionIDProcessed < maxFileTaskSession)
+                {
+                    using (var scope = GetNewTransactionScope())
                     {
-                        while (sourceReader.Read())
+                        using (var connection = NewSqlDBConnection())
                         {
-                            cancelToken.ThrowIfCancellationRequested();
+                            connection.Open();
 
-                            Int32 fileTaskSessionID = sourceReader.GetInt32(sourceReader.GetOrdinal("ID"));
-                            bool activeFAM = sourceReader.GetInt32(sourceReader.GetOrdinal("ActiveFAM")) != 0;
-                            Int32 actionID = sourceReader.GetInt32(sourceReader.GetOrdinal("ActionID"));
-                            Int32 taskClassID = sourceReader.GetInt32(sourceReader.GetOrdinal("TaskClassID"));
-                            Int32 fileID = sourceReader.GetInt32(sourceReader.GetOrdinal("FileID"));
-                            Double duration = sourceReader.GetDouble(sourceReader.GetOrdinal("Duration"));
-                            Double overhead = sourceReader.GetDouble(sourceReader.GetOrdinal("OverheadTime"));
-                            Double activityTime = sourceReader.GetDouble(sourceReader.GetOrdinal("ActivityTime"));
-
-                            status.LastFileTaskSessionIDProcessed = fileTaskSessionID;
-
-                            // Update the list of active file task ids for status
-                            if (activeFAM && !status.SetOfActiveFileTaskIds.Contains(fileTaskSessionID))
+                            using (var sourceCmd = connection.CreateCommand())
                             {
-                                status.SetOfActiveFileTaskIds.Add(fileTaskSessionID);
-                            }
-                            if (!activeFAM && status.SetOfActiveFileTaskIds.Contains(fileTaskSessionID))
-                            {
-                                status.SetOfActiveFileTaskIds.Remove(fileTaskSessionID);
-                            }
+                                int endOfBatch = Math.Min(_status.LastFileTaskSessionIDProcessed + PROCESS_BATCH_SIZE, maxFileTaskSession);
 
-                            try
-                            {
-                                using (var trans = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                                using (var saveConnection = NewSqlDBConnection())
+                                sourceCmd.CommandTimeout = 0;
+                                sourceCmd.CommandText = _QUERY_FOR_SOURCE_RECORDS;
+
+                                sourceCmd.Parameters.AddWithValue("@LastProcessedFileTaskSessionID", _status.LastFileTaskSessionIDProcessed);
+                                sourceCmd.Parameters.AddWithValue("@EndOfBatch", endOfBatch);
+
+                                sourceCmd.CommandTimeout = 0;
+                                using (var readerTask = sourceCmd.ExecuteReaderAsync(cancelToken))
                                 {
-                                    saveConnection.Open();
-                                    using (var saveCmd = saveConnection.CreateCommand())
-                                    {
-                                        saveCmd.CommandText = _QUERY_TO_ADD_UPDATE_REPORTING_VERIFICATION;
-                                        saveCmd.Parameters.Add("@FileID", SqlDbType.Int).Value = fileID;
-                                        saveCmd.Parameters.Add("@ActionID", SqlDbType.Int).Value = actionID;
-                                        saveCmd.Parameters.Add("@TaskClassID", SqlDbType.Int).Value = taskClassID;
-                                        saveCmd.Parameters.Add("@LastFileTaskSessionID", SqlDbType.Int).Value = fileTaskSessionID;
-                                        saveCmd.Parameters.Add("@Duration", SqlDbType.Float).Value = duration;
-                                        saveCmd.Parameters.Add("@Overhead", SqlDbType.Float).Value = overhead;
-                                        saveCmd.Parameters.Add("@ActivityTime", SqlDbType.Float).Value = activityTime;
-                                        saveCmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
-
-                                        var task = saveCmd.ExecuteNonQueryAsync();
-                                        task.Wait(cancelToken);
-
-                                        status.SaveStatus(saveConnection, DatabaseServiceID);
-
-                                        trans.Complete();
-                                    }
+                                    ProcessBatch(connection, readerTask);
                                 }
-                            }
-                            catch (Exception ex)
-                            {
-                                throw ex.AsExtract("ELI45472");
+                                _status.LastFileTaskSessionIDProcessed = endOfBatch;
+
                             }
                         }
+                        scope.Complete();
+                    }
+
+                    // There is a chance that this status will get out of sync with the ReportingVerificationRates
+                    try
+                    {
+                        SaveStatus();
+                    }
+                    catch (Exception saveException )
+                    {
+                        ExtractException saveStatusException = new ExtractException("ELI46124", "There was a problem saving status", saveException);
+                        saveStatusException.AddDebugData("DatabaseService", Description, false);
+                        throw saveStatusException;
                     }
                 }
             }
@@ -281,12 +272,84 @@ namespace Extract.ETL
                 _processing = false;
             }
         }
-
         #endregion
 
         #endregion
 
         #region Private Methods
+
+        /// <summary>
+        /// Clears the ReportingVerificationRates table
+        /// </summary>
+        void ResetStatistics()
+        {
+            _status.LastFileTaskSessionIDProcessed = -1;
+            _status.SetOfActiveFileTaskIds.Clear();
+
+            SaveStatus();
+
+            using (var scope = GetNewTransactionScope())
+            using (var connection = NewSqlDBConnection())
+            {
+                connection.Open();
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandTimeout = 0;
+                    cmd.CommandText = "DELETE FROM [ReportingVerificationRates]";
+                    var deleteTask = cmd.ExecuteNonQueryAsync();
+                    deleteTask.Wait(_cancelToken);
+
+                    scope.Complete();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Processes the current batch
+        /// </summary>
+        /// <param name="readerTask">Reader task that contains the records to be processed</param>
+        /// <param name="connection">Connection to use to process the batch</param>
+        void ProcessBatch(SqlConnection connection,  Task<SqlDataReader> readerTask)
+        {
+            using (var sourceReader = readerTask.Result)
+            {
+                while (sourceReader.Read())
+                {
+                    _cancelToken.ThrowIfCancellationRequested();
+
+                    Int32 fileTaskSessionID = sourceReader.GetInt32(sourceReader.GetOrdinal("ID"));
+                    Int32 actionID = sourceReader.GetInt32(sourceReader.GetOrdinal("ActionID"));
+                    Int32 taskClassID = sourceReader.GetInt32(sourceReader.GetOrdinal("TaskClassID"));
+                    Int32 fileID = sourceReader.GetInt32(sourceReader.GetOrdinal("FileID"));
+                    Double duration = sourceReader.GetDouble(sourceReader.GetOrdinal("Duration"));
+                    Double overhead = sourceReader.GetDouble(sourceReader.GetOrdinal("OverheadTime"));
+                    Double activityTime = sourceReader.GetDouble(sourceReader.GetOrdinal("ActivityTime"));
+
+                    try
+                    {
+                        using (var saveCmd = connection.CreateCommand())
+                        {
+                            saveCmd.CommandText = _QUERY_TO_ADD_UPDATE_REPORTING_VERIFICATION;
+                            saveCmd.Parameters.Add("@FileID", SqlDbType.Int).Value = fileID;
+                            saveCmd.Parameters.Add("@ActionID", SqlDbType.Int).Value = actionID;
+                            saveCmd.Parameters.Add("@TaskClassID", SqlDbType.Int).Value = taskClassID;
+                            saveCmd.Parameters.Add("@LastFileTaskSessionID", SqlDbType.Int).Value = fileTaskSessionID;
+                            saveCmd.Parameters.Add("@Duration", SqlDbType.Float).Value = duration;
+                            saveCmd.Parameters.Add("@Overhead", SqlDbType.Float).Value = overhead;
+                            saveCmd.Parameters.Add("@ActivityTime", SqlDbType.Float).Value = activityTime;
+                            saveCmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
+
+                            var task = saveCmd.ExecuteNonQueryAsync();
+                            task.Wait(_cancelToken);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex.AsExtract("ELI45472");
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Called after this instance is deserialized.
@@ -312,18 +375,86 @@ namespace Extract.ETL
                 DocumentVerificationRatesForm configForm = new DocumentVerificationRatesForm(this);
                 return configForm.ShowDialog() == DialogResult.OK;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45685");
             }
             return false;
         }
 
+
         public bool IsConfigured()
         {
-            return !string.IsNullOrWhiteSpace(Description);   
+            return !string.IsNullOrWhiteSpace(Description);
+        }
+
+        /// <summary>
+        /// Saves the current <see cref="DatabaseServiceStatus"/> to the DB
+        /// </summary>
+        void SaveStatus()
+        {
+            SaveStatus(_status);
+        }
+
+        /// <summary>
+        /// Gets a <see cref="TransactionScope"/> that has been configured 
+        /// </summary>
+        /// <returns>Configured <see cref="TransactionScope"/></returns>
+        TransactionScope GetNewTransactionScope()
+        {
+            return new TransactionScope(
+                TransactionScopeOption.Required,
+                new TransactionOptions()
+                {
+                    IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
+                    Timeout = TransactionManager.MaximumTimeout,
+                },
+                TransactionScopeAsyncFlowOption.Enabled);
         }
 
         #endregion
+
+        #region IHasConfigurableDatabaseServiceStatus
+
+        /// <summary>
+        /// The <see cref="DatabaseServiceStatus"/> for this instance
+        /// </summary>
+        public DatabaseServiceStatus Status
+        {
+            get => _status ?? new DocumentVerificationStatus
+            {
+                LastFileTaskSessionIDProcessed = -1
+            };
+
+            set => _status = value as DocumentVerificationStatus;
+        }
+
+        /// <summary>
+        /// Refreshes the <see cref="DatabaseServiceStatus"/> by loading from the database, creating a new instance,
+        /// or setting it to null (if <see cref="DatabaseServiceID"/>, <see cref="DatabaseServer"/> and
+        /// <see cref="DatabaseName"/> are not configured)
+        /// </summary>
+        public void RefreshStatus()
+        {
+            try
+            {
+                if (DatabaseServiceID > 0
+                    && !string.IsNullOrEmpty(DatabaseServer)
+                    && !string.IsNullOrEmpty(DatabaseName))
+                {
+                    _status = GetLastOrCreateStatus(() => new DocumentVerificationStatus());
+                }
+                else
+                {
+                    _status = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46119");
+            }
+        }
+
+        #endregion IHasConfigurableDatabaseServiceStatus
     }
 }
