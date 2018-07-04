@@ -1,4 +1,5 @@
-﻿using Extract.ETL;
+﻿using AttributeDbMgrComponentsLib;
+using Extract.ETL;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
@@ -783,6 +784,8 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                         string json = File.ReadAllText(openDialog.FileName);
                         var newSettings = TrainingCoordinator.FromJson(json);
 
+                        newSettings.RootDir = Path.GetDirectoryName(openDialog.FileName);
+
                         _settings.PropertyChanged -= HandleSettings_PropertyChanged;
 
                         // Apply loaded values through the UI
@@ -799,8 +802,9 @@ namespace Extract.UtilityApplications.TrainingCoordinator
 
                         _settings.PropertyChanged += HandleSettings_PropertyChanged;
 
-                        // Check for missing model names and prompt to add them
+                        // Check for missing model names and attribute sets and prompt to add them
                         ValidateModelNames();
+                        ValidateAttributeSets();
 
                         UpdateButtonStatesForCollectors();
                         UpdateButtonStatesForTrainers();
@@ -834,6 +838,38 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                 if (result == DialogResult.Yes)
                 {
                     _settings.AddModels(referencedModels);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks-for/prompts-to-add missing referenced model names
+        /// </summary>
+        private void ValidateAttributeSets()
+        {
+            var attributeDBMgr = new AttributeDBMgr
+            {
+                FAMDB = _database
+            };
+            var existingAttributeSets = new HashSet<string>(attributeDBMgr.GetAllAttributeSetNames().GetKeys().ToIEnumerable<string>());
+            var referencedAttributeSets = new HashSet<string>(_settings.DataCollectors
+                .OfType<TrainingDataCollector.TrainingDataCollector>()
+                .Select(s => s.AttributeSetName)
+                .Where(n => !string.IsNullOrWhiteSpace(n)));
+
+            referencedAttributeSets.ExceptWith(existingAttributeSets);
+            if (referencedAttributeSets.Any())
+            {
+                var result = MessageBox.Show(UtilityMethods.FormatCurrent(
+                    $"The following Attribute Sets do not exist. Add?",
+                    $"\r\n{string.Join(Environment.NewLine, referencedAttributeSets)}"),
+                    "Add missing attribute sets", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
+                {
+                    foreach (var missingName in referencedAttributeSets)
+                    {
+                        attributeDBMgr.CreateNewAttributeSetName(missingName);
+                    }
                 }
             }
         }
