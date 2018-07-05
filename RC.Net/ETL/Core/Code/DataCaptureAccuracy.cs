@@ -662,7 +662,7 @@ namespace Extract.ETL
         /// Class for the DataCaptureAccuracyStatus stored in the DatabaseService record
         /// </summary>
         [DataContract]
-        class DataCaptureAccuracyStatus : DatabaseServiceStatus
+        public class DataCaptureAccuracyStatus : DatabaseServiceStatus
         {
             const int _CURRENT_VERSION = 1;
 
