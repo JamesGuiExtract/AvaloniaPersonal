@@ -60,11 +60,11 @@ namespace RedactionPredictor
                     ThrowIfFails(() => RecAPI.kRecGetImgFilePageCount(fileHandle, out pageCount), "ELI44723", "Unable to obtain page count",
                         new KeyValuePair<string, string>("Image path", imagePath));
 
-                    // Build page info map
-                    var pageInfoMap = BuildPageInfoMap(fileHandle, imagePath, pageCount);
-
                     if (pageRange == null)
                     {
+                        // Build page info map
+                        var pageInfoMap = BuildPageInfoMap(fileHandle, imagePath, pageCount);
+
                         for (int pageNum = 1; pageNum <= pageCount; pageNum++)
                         {
                             ApplyTemplateToPage(templates, fileHandle, imagePath, pageNum, pageInfoMap, voa, outputAllFormFields);
@@ -74,6 +74,10 @@ namespace RedactionPredictor
                     {
                         UtilityMethods.ValidatePageNumbers(pageRange);
                         var pages = UtilityMethods.GetPageNumbersFromString(pageRange, pageCount, true);
+
+                        // Build page info map
+                        var pageInfoMap = BuildPageInfoMap(fileHandle, imagePath, pages);
+
                         foreach (int pageNum in pages)
                         {
                             ApplyTemplateToPage(templates, fileHandle, imagePath, pageNum, pageInfoMap, voa, outputAllFormFields);
@@ -308,61 +312,76 @@ namespace RedactionPredictor
             return pageHandle;
         }
 
+        static SpatialPageInfo BuildPageInfo(IntPtr fileHandle, string imagePath, int pageNum)
+        {
+            var rotate = IMG_ROTATE.ROT_NO;
+            var pageHandle = IntPtr.Zero;
+            double deskew = 0;
+            try
+            {
+                pageHandle = LoadImagePage(imagePath, fileHandle, pageNum);
+
+                RecAPI.kRecDetectImgSkew(0, pageHandle, out int slope, out rotate);
+                deskew = Math.Atan2(slope, 1000) * 180 / Math.PI;
+
+                RecAPI.kRecGetImgInfo(0, pageHandle, IMAGEINDEX.II_CURRENT, out var info);
+
+                var pageInfo = new SpatialPageInfoClass();
+                EOrientation orient = EOrientation.kRotNone;
+                switch (rotate)
+                {
+                    case IMG_ROTATE.ROT_NO:
+                        orient = EOrientation.kRotNone;
+                        break;
+
+                    case IMG_ROTATE.ROT_RIGHT:
+                        orient = EOrientation.kRotRight;
+                        break;
+
+                    case IMG_ROTATE.ROT_DOWN:
+                        orient = EOrientation.kRotDown;
+                        break;
+
+                    case IMG_ROTATE.ROT_LEFT:
+                        orient = EOrientation.kRotLeft;
+                        break;
+                }
+                pageInfo.Initialize(info.Size.cx, info.Size.cy, orient, deskew);
+                return pageInfo;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44694");
+            }
+            finally
+            {
+                try
+                {
+                    if (pageHandle != IntPtr.Zero)
+                    {
+                        RecAPI.kRecFreeImg(pageHandle);
+                    }
+                }
+                catch { }
+            }
+        }
+
         static LongToObjectMap BuildPageInfoMap(IntPtr fileHandle, string imagePath, int pageCount)
         {
             var pageInfoMap = new LongToObjectMap();
             for (int pageNum = 1; pageNum <= pageCount; pageNum++)
             {
-                var rotate = IMG_ROTATE.ROT_NO;
-                var pageHandle = IntPtr.Zero;
-                double deskew = 0;
-                try
-                {
-                    pageHandle = LoadImagePage(imagePath, fileHandle, pageNum);
+                pageInfoMap.Set(pageNum, BuildPageInfo(fileHandle, imagePath, pageNum));
+            }
+            return pageInfoMap;
+        }
 
-                    RecAPI.kRecDetectImgSkew(0, pageHandle, out int slope, out rotate);
-                    deskew = Math.Atan2(slope, 1000) * 180 / Math.PI;
-
-                    RecAPI.kRecGetImgInfo(0, pageHandle, IMAGEINDEX.II_CURRENT, out var info);
-
-                    var pageInfo = new SpatialPageInfoClass();
-                    EOrientation orient = EOrientation.kRotNone;
-                    switch (rotate)
-                    {
-                        case IMG_ROTATE.ROT_NO:
-                            orient = EOrientation.kRotNone;
-                            break;
-
-                        case IMG_ROTATE.ROT_RIGHT:
-                            orient = EOrientation.kRotRight;
-                            break;
-
-                        case IMG_ROTATE.ROT_DOWN:
-                            orient = EOrientation.kRotDown;
-                            break;
-
-                        case IMG_ROTATE.ROT_LEFT:
-                            orient = EOrientation.kRotLeft;
-                            break;
-                    }
-                    pageInfo.Initialize(info.Size.cx, info.Size.cy, orient, deskew);
-                    pageInfoMap.Set(pageNum, pageInfo);
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI44694");
-                }
-                finally
-                {
-                    try
-                    {
-                        if (pageHandle != IntPtr.Zero)
-                        {
-                            RecAPI.kRecFreeImg(pageHandle);
-                        }
-                    }
-                    catch { }
-                }
+        static LongToObjectMap BuildPageInfoMap(IntPtr fileHandle, string imagePath, IEnumerable<int> pages)
+        {
+            var pageInfoMap = new LongToObjectMap();
+            foreach (int pageNum in pages)
+            {
+                pageInfoMap.Set(pageNum, BuildPageInfo(fileHandle, imagePath, pageNum));
             }
             return pageInfoMap;
         }
