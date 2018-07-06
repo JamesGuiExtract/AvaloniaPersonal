@@ -935,7 +935,9 @@ namespace Extract.ETL
             /// <returns>The Minimum FileTaskSession that needs to be processed</returns>
             public Int32 StartingFileTaskSessionId()
             {
-                return Math.Min(LastFileTaskSessionIDProcessed, LastIDProcessedForDashboardAttribute.Values.Min()) + 1;
+                return (LastIDProcessedForDashboardAttribute.Count() > 0) ?
+                    Math.Min(LastFileTaskSessionIDProcessed, LastIDProcessedForDashboardAttribute.Values.Min()) + 1 :
+                    LastFileTaskSessionIDProcessed;
             }
         }
 
