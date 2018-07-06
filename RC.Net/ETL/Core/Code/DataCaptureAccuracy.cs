@@ -38,7 +38,7 @@ namespace Extract.ETL
         /// <summary>
         /// The number of FileTaskSession rows to process in a single transaction.
         /// </summary>
-        const int PROCESS_BATCH_SIZE = 1000;
+        const int PROCESS_BATCH_SIZE = 100;
 
         /// <summary>
         /// Query used to get the data used to create the records in ReportingDataCaptureAccuracy table
@@ -220,7 +220,14 @@ namespace Extract.ETL
         /// <param name="endFileTaskSessionID">The ID of the last file task session row to process.</param>
         void ProcessBatch(CancellationToken cancelToken, int endFileTaskSessionID)
         {
-            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            using (TransactionScope scope = new TransactionScope(
+                TransactionScopeOption.Required,
+                new TransactionOptions()
+                {
+                    IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
+                    Timeout = TransactionManager.MaximumTimeout,
+                },
+                TransactionScopeAsyncFlowOption.Enabled))
             using (var connection = NewSqlDBConnection())
             {
                 // Open the connection

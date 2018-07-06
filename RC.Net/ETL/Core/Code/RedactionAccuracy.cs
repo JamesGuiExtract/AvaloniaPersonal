@@ -89,7 +89,7 @@ namespace Extract.ETL
         /// <summary>
         /// Number of files to process at a time
         /// </summary>
-        const int _PROCESS_BATCH_SIZE = 1000;
+        const int _PROCESS_BATCH_SIZE = 100;
 
         /// <summary>
         /// Query used to get the data used to create the records in ReportingRedactionAccuracy table
@@ -246,13 +246,19 @@ namespace Extract.ETL
                 // Get the maximum File task session id available
                 Int32 maxFileTaskSession = MaxReportableFileTaskSessionId();
 
-                // Process the entries in chunks of 1000 file task session
+                // Process the entries in chunks of 100 file task session
                 while (status.LastFileTaskSessionIDProcessed < maxFileTaskSession)
                 {
                     cancelToken.ThrowIfCancellationRequested();
 
                     // Records to calculate stats
-                    using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                    using (var scope = new TransactionScope(TransactionScopeOption.Required,
+                        new TransactionOptions()
+                        {
+                            IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
+                            Timeout = TransactionManager.MaximumTimeout
+                        },
+                        TransactionScopeAsyncFlowOption.Enabled))
                     using (var connection = NewSqlDBConnection())
                     using (SqlCommand cmd = connection.CreateCommand())
                     {

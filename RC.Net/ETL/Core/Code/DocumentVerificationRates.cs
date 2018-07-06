@@ -88,7 +88,7 @@ namespace Extract.ETL
         /// <summary>
         /// The number of FileTaskSession rows to process in a single transaction.
         /// </summary>
-        const int PROCESS_BATCH_SIZE = 1000;
+        const int PROCESS_BATCH_SIZE = 100;
 
         /// <summary>
         /// Query to select the records to be used for updating ReportingVerificationRates table

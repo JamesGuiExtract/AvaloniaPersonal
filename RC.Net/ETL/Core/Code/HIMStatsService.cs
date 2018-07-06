@@ -137,7 +137,14 @@ namespace Extract.ETL
                     connection.Open();
 
                     using (var cmd = connection.CreateCommand())
-                    using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                    using (var scope = new TransactionScope(
+                        TransactionScopeOption.Required,
+                        new TransactionOptions()
+                        {
+                            IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
+                            Timeout = TransactionManager.MaximumTimeout,
+                        },
+                        TransactionScopeAsyncFlowOption.Enabled))
                     {
                         cmd.CommandText = _UpdateQuery;
                         cmd.CommandTimeout = 0;
