@@ -111,9 +111,13 @@ namespace Extract.ETL
                 )
                 
                 INSERT INTO @FilesTable
-                SELECT FileID FROM TouchedFiles 
-                
-                ;WITH
+                    SELECT FileID FROM TouchedFiles 
+
+                DELETE FROM ReportingRedactionAccuracy 
+                    WHERE DatabaseServiceID = @DatabaseServiceID
+                        AND FileID IN (SELECT FileID FROM @FilesTable)
+
+                ; WITH
                  MostRecent AS (
                     SELECT AttributeSetName.Description
                      ,MAX(AttributeSetForFile.FileTaskSessionID) AS MostRecentFileTaskSession
@@ -237,45 +241,43 @@ namespace Extract.ETL
                             task.Wait(cancelToken);
                         }
                     }
+                }
 
-                    // Get the maximum File task session id available
-                    Int32 maxFileTaskSession = MaxReportableFileTaskSessionId();
+                // Get the maximum File task session id available
+                Int32 maxFileTaskSession = MaxReportableFileTaskSessionId();
 
-                    // Process the entries in chunks of 1000 file task session
-                    while (status.LastFileTaskSessionIDProcessed < maxFileTaskSession)
+                // Process the entries in chunks of 1000 file task session
+                while (status.LastFileTaskSessionIDProcessed < maxFileTaskSession)
+                {
+                    cancelToken.ThrowIfCancellationRequested();
+
+                    // Records to calculate stats
+                    using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                    using (var connection = NewSqlDBConnection())
+                    using (SqlCommand cmd = connection.CreateCommand())
                     {
-                        cancelToken.ThrowIfCancellationRequested();
+                        connection.Open();
 
-                        // Records to calculate stats
-                        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                        using (SqlCommand cmd = connection.CreateCommand())
-                        {
-                            int lastInBatchToProcess = Math.Min(status.LastFileTaskSessionIDProcessed + _PROCESS_BATCH_SIZE, maxFileTaskSession);
+                        int lastInBatchToProcess = Math.Min(status.LastFileTaskSessionIDProcessed + _PROCESS_BATCH_SIZE, maxFileTaskSession);
 
-                            // Set the timeout so that it waits indefinitely
-                            cmd.CommandTimeout = 0;
-                            cmd.CommandText = UPDATE_ACCURACY_DATA_SQL;
+                        // Set the timeout so that it waits indefinitely
+                        cmd.CommandTimeout = 0;
+                        cmd.CommandText = UPDATE_ACCURACY_DATA_SQL;
 
-                            cmd.Parameters.AddWithValue("@FoundSetName", FoundAttributeSetName);
-                            cmd.Parameters.AddWithValue("@ExpectedSetName", ExpectedAttributeSetName);
-                            cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
-                            cmd.Parameters.AddWithValue("@LastProcessedID", status.LastFileTaskSessionIDProcessed);
-                            cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
+                        cmd.Parameters.AddWithValue("@FoundSetName", FoundAttributeSetName);
+                        cmd.Parameters.AddWithValue("@ExpectedSetName", ExpectedAttributeSetName);
+                        cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                        cmd.Parameters.AddWithValue("@LastProcessedID", status.LastFileTaskSessionIDProcessed);
+                        cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
 
-                            // Get VOA data for each file
-                            SaveAccuracy(cmd, cancelToken);
+                        // Get VOA data for each file
+                        SaveAccuracy(connection, cmd, cancelToken);
 
-                            status.LastFileTaskSessionIDProcessed = lastInBatchToProcess;
+                        status.LastFileTaskSessionIDProcessed = lastInBatchToProcess;
 
-                            using (var saveConnection = NewSqlDBConnection())
-                            {
-                                saveConnection.Open();
+                        status.SaveStatus(connection, DatabaseServiceID);
 
-                                status.SaveStatus(saveConnection, DatabaseServiceID);
-                            }
-
-                            scope.Complete();
-                        }
+                        scope.Complete();
                     }
                 }
             }
@@ -361,7 +363,7 @@ namespace Extract.ETL
         /// </summary>
         /// <param name="cmd">Command to get the data needed to calculate the stats for the current block of data being processed</param>
         /// <param name="cancelToken"></param>
-        void SaveAccuracy(SqlCommand cmd, CancellationToken cancelToken)
+        void SaveAccuracy(SqlConnection connection, SqlCommand cmd, CancellationToken cancelToken)
         {
             using (SqlDataReader ExpectedAndFoundReader = cmd.ExecuteReader())
             {
@@ -465,42 +467,35 @@ namespace Extract.ETL
                                         }
                                     }
 
-                                    using (var saveConnection = NewSqlDBConnection())
-                                    {
-                                        saveConnection.Open();
-                                        // Add the data to the ReportingRedactionAccuracy table
-                                        var saveCmd = saveConnection.CreateCommand();
+                                    // Add the data to the ReportingRedactionAccuracy table
+                                    var saveCmd = connection.CreateCommand();
 
-                                        saveCmd.CommandText = string.Format(CultureInfo.InvariantCulture,
-                                            @"
-                                                DELETE FROM ReportingRedactionAccuracy
-                                                WHERE DatabaseServiceID = {0} AND FileID = {1} AND Page = {2}
-
-                                                INSERT INTO [dbo].[ReportingRedactionAccuracy]
-                                                       ([DatabaseServiceID]
-                                                       ,[FoundAttributeSetForFileID]
-                                                       ,[ExpectedAttributeSetForFileID]
-                                                       ,[FileID]
-                                                       ,[Page]
-                                                       ,[Attribute]
-                                                       ,[Expected]
-                                                       ,[Found]
-                                                       ,[Correct]
-                                                       ,[FalsePositives]
-                                                       ,[OverRedacted]
-                                                       ,[UnderRedacted]
-                                                       ,[Missed]
-                                                       ,[FoundDateTimeStamp]
-                                                       ,[FoundFAMUserID]
-                                                       ,[FoundActionID]
-													   ,[ExpectedDateTimeStamp]
-                                                       ,[ExpectedFAMUserID]
-                                                       ,[ExpectedActionID])
-                                                     VALUES
-                                                           {3};", DatabaseServiceID, fileID, page, string.Join(",\r\n", valuesToAdd));
-                                        var task = saveCmd.ExecuteNonQueryAsync();
-                                        task.Wait(cancelToken);
-                                    }
+                                    saveCmd.CommandText = string.Format(CultureInfo.InvariantCulture,
+                                        @"
+                                            INSERT INTO [dbo].[ReportingRedactionAccuracy]
+                                                    ([DatabaseServiceID]
+                                                    ,[FoundAttributeSetForFileID]
+                                                    ,[ExpectedAttributeSetForFileID]
+                                                    ,[FileID]
+                                                    ,[Page]
+                                                    ,[Attribute]
+                                                    ,[Expected]
+                                                    ,[Found]
+                                                    ,[Correct]
+                                                    ,[FalsePositives]
+                                                    ,[OverRedacted]
+                                                    ,[UnderRedacted]
+                                                    ,[Missed]
+                                                    ,[FoundDateTimeStamp]
+                                                    ,[FoundFAMUserID]
+                                                    ,[FoundActionID]
+													,[ExpectedDateTimeStamp]
+                                                    ,[ExpectedFAMUserID]
+                                                    ,[ExpectedActionID])
+                                                    VALUES
+                                                        {3};", DatabaseServiceID, fileID, page, string.Join(",\r\n", valuesToAdd));
+                                    var task = saveCmd.ExecuteNonQueryAsync();
+                                    task.Wait(cancelToken);
                                 }
                             }
                         }

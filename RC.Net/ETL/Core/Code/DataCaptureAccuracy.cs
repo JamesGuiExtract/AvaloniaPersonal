@@ -65,6 +65,10 @@ namespace Extract.ETL
                     AND FileTaskSession.DateTimeStamp IS NOT NULL
 					AND FileTaskSession.ID >= @StartFileTaskSessionSetID AND FileTaskSession.ID <= @EndFileTaskSessionSetID
                 
+                DELETE FROM ReportingDataCaptureAccuracy 
+                    WHERE DatabaseServiceID = @DatabaseServiceID
+                        AND FileID IN (SELECT FileID FROM @affectedFiles)
+
 				;WITH ExpectedFTS AS (
 				SELECT DISTINCT affectedFiles.FileID, MAX(AttributeSetForFile.FileTaskSessionID) AS ID
 					FROM @affectedFiles affectedFiles
@@ -431,9 +435,7 @@ namespace Extract.ETL
             var saveCmd = connection.CreateCommand();
 
             saveCmd.CommandText = string.Format(CultureInfo.InvariantCulture,
-                @"DELETE FROM ReportingDataCaptureAccuracy WHERE FileID = {0};
-
-                  INSERT INTO [dbo].[ReportingDataCaptureAccuracy]
+                @"INSERT INTO [dbo].[ReportingDataCaptureAccuracy]
                     ([DatabaseServiceID]
                     ,[FoundAttributeSetForFileID]
                     ,[ExpectedAttributeSetForFileID]
@@ -636,10 +638,12 @@ namespace Extract.ETL
         /// <param name="cmd">The SqlCommand that needs the parameters added</param>
         void addParametersToCommand(SqlCommand cmd, int endFileTaskSessionId)
         {
+            cmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int);
             cmd.Parameters.Add("@FoundSetName", SqlDbType.NVarChar);
             cmd.Parameters.Add("@ExpectedSetName", SqlDbType.NVarChar);
             cmd.Parameters.Add("@StartFileTaskSessionSetID", SqlDbType.Int);
             cmd.Parameters.Add("@EndFileTaskSessionSetID", SqlDbType.Int);
+            cmd.Parameters["@DatabaseServiceID"].Value = DatabaseServiceID;
             cmd.Parameters["@FoundSetName"].Value = FoundAttributeSetName;
             cmd.Parameters["@ExpectedSetName"].Value = ExpectedAttributeSetName;
             cmd.Parameters["@StartFileTaskSessionSetID"].Value = LastFileTaskSessionIDProcessed + 1;
