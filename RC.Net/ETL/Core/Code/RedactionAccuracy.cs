@@ -413,6 +413,8 @@ namespace Extract.ETL
                                 // process output for each page
                                 foreach (var pageKeyPair in output)
                                 {
+                                    int page = pageKeyPair.Key;
+
                                     // Add the comparison results to the Results
                                     var statsToSave = pageKeyPair.Value.AggregateStatistics();
 
@@ -434,7 +436,6 @@ namespace Extract.ETL
                                         int overRedacted = lookup[new { Path = p, Label = AccuracyDetailLabel.OverRedacted }].Sum(a => a.Value);
                                         int underRedacted = lookup[new { Path = p, Label = AccuracyDetailLabel.UnderRedacted }].Sum(a => a.Value);
                                         int missed = lookup[new { Path = p, Label = AccuracyDetailLabel.Missed }].Sum(a => a.Value);
-                                        int page = pageKeyPair.Key;
 
                                         if (expected != 0 || found != 0 || correct != 0 || falsePositives != 0
                                             || overRedacted != 0 || underRedacted != 0 || missed != 0)
@@ -473,7 +474,7 @@ namespace Extract.ETL
                                         saveCmd.CommandText = string.Format(CultureInfo.InvariantCulture,
                                             @"
                                                 DELETE FROM ReportingRedactionAccuracy
-                                                WHERE DatabaseServiceID = {0} AND FileID = {1} 
+                                                WHERE DatabaseServiceID = {0} AND FileID = {1} AND Page = {2}
 
                                                 INSERT INTO [dbo].[ReportingRedactionAccuracy]
                                                        ([DatabaseServiceID]
@@ -496,7 +497,7 @@ namespace Extract.ETL
                                                        ,[ExpectedFAMUserID]
                                                        ,[ExpectedActionID])
                                                      VALUES
-                                                           {2};", DatabaseServiceID, fileID, string.Join(",\r\n", valuesToAdd));
+                                                           {3};", DatabaseServiceID, fileID, page, string.Join(",\r\n", valuesToAdd));
                                         var task = saveCmd.ExecuteNonQueryAsync();
                                         task.Wait(cancelToken);
                                     }
