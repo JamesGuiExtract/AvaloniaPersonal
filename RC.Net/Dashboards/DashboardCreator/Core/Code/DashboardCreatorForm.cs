@@ -1,5 +1,6 @@
 ﻿using DevExpress.DashboardCommon;
 using DevExpress.DashboardWin;
+using DevExpress.DataAccess.ConnectionParameters;
 using DevExpress.XtraBars;
 using DevExpress.XtraBars.Ribbon;
 using Extract;
@@ -141,7 +142,7 @@ namespace DashboardCreator
 
             try
             {
-                ShowConfigureExtractSettingsMenuItem(e.Menu, 
+                ShowConfigureExtractSettingsMenuItem(e.Menu,
                     dashboardDesigner.Dashboard.Items[e.DashboardItemName] is GridDashboardItem);
             }
             catch (Exception ex)
@@ -166,10 +167,15 @@ namespace DashboardCreator
                     int drillLevel;
                     _drillDownLevelForItem.TryGetValue(e.DashboardItemName, out drillLevel);
 
-                    if (!gridItem.InteractivityOptions.IsDrillDownEnabled || 
+                    // Get the data source
+                    DashboardSqlDataSource sqlDataSource = (DashboardSqlDataSource)gridItem.DataSource;
+                    SqlServerConnectionParametersBase sqlParameters = sqlDataSource.ConnectionParameters as SqlServerConnectionParametersBase;
+
+                    if (!gridItem.InteractivityOptions.IsDrillDownEnabled ||
                         !_drillDownLevelIncreased && (gridItem.GetDimensions().Count - 1 == drillLevel))
                     {
-                        DashboardHelper.DisplayDashboardDetailForm(gridItem, e, _customGridValues[e.DashboardItemName]);
+                        DashboardHelper.DisplayDashboardDetailForm(gridItem, e, _customGridValues[e.DashboardItemName],
+                            sqlParameters.ServerName, sqlParameters.DatabaseName);
                     }
                 }
                 _drillDownLevelIncreased = false;

@@ -1,4 +1,5 @@
 ﻿using Extract.AttributeFinder;
+using Extract.Imaging.Forms;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -6,6 +7,7 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -46,6 +48,21 @@ namespace Extract.Dashboard.Forms
         /// the database
         /// </summary>
         Dictionary<Int64, XPathContext> _attributesByIdAndXPathContext = new Dictionary<long, XPathContext>();
+
+        /// <summary>
+        /// Flag to indicate when the grid is being loaded
+        /// </summary>
+        bool _loading = false;
+
+        /// <summary>
+        /// Timer used to populate the grid after the data has been loaded from the database
+        /// </summary>
+        Timer _loadingTimer;
+
+        /// <summary>
+        /// Task that is loading a DataTable with the data to display in the grid
+        /// </summary>
+        Task<DataTable> _loadingTask;
 
         #endregion
 
@@ -111,6 +128,9 @@ namespace Extract.Dashboard.Forms
                 _imageViewer.ContextMenu = null;
 
                 base.OnLoad(e);
+
+                // Add a handler for the PageChanged event to update the centering on the page
+                _imageViewer.PageChanged += HandleImageViewerPageChanged;
 
                 LoadGridData();
             }
@@ -215,24 +235,59 @@ namespace Extract.Dashboard.Forms
         {
             try
             {
-                using (var connection = NewSqlDBConnection())
+                // Check if data is already in the process of being loaded
+                if (!_loading)
                 {
-                    connection.Open();
+                    _loading = true;
 
-                    var command = connection.CreateCommand();
-                    command.CommandTimeout = 60;
-                    command.CommandText = _gridDetailConfiguration.RowQuery;
+                    DisplayProgress(true);
 
-                    // add the column values as parameters for the query
-                    foreach (var kp in _columnValues)
+                    // Setup task to get the data from the database
+                    _loadingTask = Task.Run<DataTable>(() =>
                     {
-                        command.Parameters.AddWithValue("@" + kp.Key, kp.Value);
-                    }
+                        using (var connection = NewSqlDBConnection())
+                        {
+                            connection.Open();
 
-                    DataTable dataTable = new DataTable();
-                    dataTable.Load(command.ExecuteReader());
+                            var command = connection.CreateCommand();
+                            command.CommandTimeout = 0;
+                            command.CommandText = _gridDetailConfiguration.RowQuery;
 
-                    dataGridView.DataSource = dataTable;
+                            // add the column values as parameters for the query
+                            foreach (var kp in _columnValues)
+                            {
+                                command.Parameters.AddWithValue("@" + kp.Key, kp.Value);
+                            }
+                            var gridDataTable = new DataTable();
+                            gridDataTable.Load(command.ExecuteReader());
+                            return gridDataTable;
+                        }
+                    });
+
+                    // Set up timer to populate the grid when the task is done
+                    _loadingTimer = new Timer();
+                    _loadingTimer.Tick += (o, e) =>
+                    {
+                        try
+                        {
+                            LoadGridData();
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractLog("ELI46125");
+                        }
+
+                    };
+                    _loadingTimer.Interval = 1000;
+                    _loadingTimer.Start();
+                }
+                else if (_loadingTask.Status != TaskStatus.Running)
+                {
+                    _loadingTimer.Stop();
+
+                    DisplayProgress(false);
+
+                    dataGridView.DataSource = _loadingTask.Result;
 
                     // hide the columns needed for highlights
                     var columnsToHide = dataGridView.Columns.Cast<DataGridViewColumn>()
@@ -241,6 +296,10 @@ namespace Extract.Dashboard.Forms
                     {
                         d.Visible = false;
                     }
+
+                    _loadingTimer = null;
+                    _loading = false;
+                    _loadingTask = null;
                 }
             }
             catch (Exception ex)
@@ -264,6 +323,28 @@ namespace Extract.Dashboard.Forms
             sqlConnectionBuild.MultipleActiveResultSets = true;
             return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
+
+        /// <summary>
+        /// Show or Hide the loading progress for the grid
+        /// </summary>
+        /// <param name="showProgress"></param>
+        void DisplayProgress(bool showProgress)
+        {
+            _loadingLabel.Visible = showProgress;
+            _loadProgressBar.Visible = showProgress;
+
+            if (showProgress)
+            {
+                _loadProgressBar.BringToFront();
+                _loadProgressBar.BringToFront();
+            }
+            else
+            {
+                _loadingLabel.SendToBack();
+                _loadProgressBar.SendToBack();
+            }
+        }
+
 
         #endregion
 
@@ -297,7 +378,8 @@ namespace Extract.Dashboard.Forms
                 }
                 if (_imageViewer.LayerObjects.Count() > 0)
                 {
-                    _imageViewer.CenterOnLayerObjects(_imageViewer.LayerObjects.ToArray());
+                    var pageNumber = _imageViewer.LayerObjects.FirstOrDefault(l => l.PageNumber > 0)?.PageNumber;
+                    _imageViewer.PageNumber = pageNumber ?? _imageViewer.PageNumber;
                 }
                 _imageViewer.Invalidate();
             }
@@ -321,6 +403,26 @@ namespace Extract.Dashboard.Forms
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45722");
+            }
+        }
+
+        void HandleImageViewerPageChanged(object sender, PageChangedEventArgs e)
+        {
+            try
+            {
+                if (_imageViewer.LayerObjects.Count() > 0)
+                {
+                    var objectsToCenter = _imageViewer.LayerObjects.Where(l => l.PageNumber == e.PageNumber).ToArray();
+                    if (objectsToCenter.Count() > 0)
+                    {
+                        _imageViewer.CenterOnLayerObjects(objectsToCenter);
+                    }
+                }
+                _imageViewer.Invalidate();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46127");
             }
         }
 

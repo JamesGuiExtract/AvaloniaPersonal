@@ -324,7 +324,7 @@ namespace DashboardViewer
             try
             {
 
-                if (sender is DevExpress.DashboardWin.DashboardViewer dashboardViewer 
+                if (sender is DevExpress.DashboardWin.DashboardViewer dashboardViewer
                     && _customGridValues.ContainsKey(e.DashboardItemName))
                 {
                     Dashboard dashboard = dashboardViewer.Dashboard;
@@ -338,10 +338,12 @@ namespace DashboardViewer
                     int drillLevel;
                     _drillDownLevelForItem.TryGetValue(e.DashboardItemName, out drillLevel);
 
-                    if (!gridItem.InteractivityOptions.IsDrillDownEnabled || 
-                        !_drillDownLevelIncreased && (gridItem.GetDimensions().Count -1 == drillLevel))
+                    if (!gridItem.InteractivityOptions.IsDrillDownEnabled ||
+                        !_drillDownLevelIncreased && (gridItem.GetDimensions().Count - 1 == drillLevel))
                     {
-                        DashboardHelper.DisplayDashboardDetailForm(gridItem, e, _customGridValues[e.DashboardItemName]);
+                        DashboardHelper.DisplayDashboardDetailForm(gridItem, e, _customGridValues[e.DashboardItemName],
+                            (IsDatabaseOverridden()) ? _serverName : _serverConfiguredInDashboard,
+                            (IsDatabaseOverridden()) ? _databaseName : _databaseConfiguredInDashboard);
                     }
                     _drillDownLevelIncreased = false;
                 }
@@ -371,9 +373,18 @@ namespace DashboardViewer
                 {
                     return;
                 }
-
                 sqlParameters.ServerName = _serverName;
                 sqlParameters.DatabaseName = _databaseName;
+
+                // Set timeout to 0 (infinite) for all DataSources
+                foreach (var ds in dashboardViewerMain.Dashboard.DataSources)
+                {
+                    var sqlDataSource = ds as DashboardSqlDataSource;
+                    if (sqlDataSource != null)
+                    {
+                        sqlDataSource.ConnectionOptions.DbCommandTimeout = 0;
+                    }
+                }
             }
             catch (Exception ex)
             {

@@ -1245,6 +1245,11 @@ namespace Extract.Imaging.Forms
         {
             try
             {
+                // Check for at least one layerObject
+                if (layerObjects.Count() < 1)
+                {
+                    return;
+                }
                 // Is the image viewer in fit to page mode?
                 bool isFitToPage = _fitMode == FitMode.FitToPage;
 

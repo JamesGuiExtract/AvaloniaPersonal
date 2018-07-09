@@ -111,6 +111,8 @@
             this._rotateCounterclockwiseToolStripButton = new Extract.Imaging.Forms.RotateCounterclockwiseToolStripButton();
             this._rotateClockwiseToolStripButton = new Extract.Imaging.Forms.RotateClockwiseToolStripButton();
             this._imageViewerStatusStrip = new Extract.Imaging.Forms.ImageViewerStatusStrip();
+            this._loadProgressBar = new System.Windows.Forms.ProgressBar();
+            this._loadingLabel = new System.Windows.Forms.TextBox();
             this._toolStripContainer.ContentPanel.SuspendLayout();
             this._toolStripContainer.TopToolStripPanel.SuspendLayout();
             this._toolStripContainer.SuspendLayout();
@@ -245,6 +247,8 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this._loadingLabel);
+            this.splitContainer1.Panel1.Controls.Add(this._loadProgressBar);
             this.splitContainer1.Panel1.Controls.Add(this.dataGridView);
             // 
             // splitContainer1.Panel2
@@ -645,7 +649,7 @@
             this.toolStripSeparator11,
             this._invertColorsToolStripButton,
             this.toolStripSeparator13});
-            this._basicTools.Location = new System.Drawing.Point(51, 24);
+            this._basicTools.Location = new System.Drawing.Point(710, 24);
             this._basicTools.Name = "_basicTools";
             this._basicTools.Size = new System.Drawing.Size(168, 39);
             this._basicTools.TabIndex = 5;
@@ -711,7 +715,7 @@
             this._pageNavigationToolStripTextBox,
             this._nextPageToolStripButton,
             this._lastPageToolStripButton});
-            this._navigationTools.Location = new System.Drawing.Point(228, 24);
+            this._navigationTools.Location = new System.Drawing.Point(477, 24);
             this._navigationTools.Name = "_navigationTools";
             this._navigationTools.Size = new System.Drawing.Size(233, 39);
             this._navigationTools.TabIndex = 7;
@@ -787,7 +791,7 @@
             this.toolStripSeparator10,
             this._rotateCounterclockwiseToolStripButton,
             this._rotateClockwiseToolStripButton});
-            this._viewCommands.Location = new System.Drawing.Point(462, 24);
+            this._viewCommands.Location = new System.Drawing.Point(51, 24);
             this._viewCommands.Name = "_viewCommands";
             this._viewCommands.Size = new System.Drawing.Size(426, 39);
             this._viewCommands.TabIndex = 8;
@@ -937,6 +941,28 @@
             this._imageViewerStatusStrip.TabIndex = 2;
             this._imageViewerStatusStrip.Text = "_imageViewerStatusStrip";
             // 
+            // _loadProgressBar
+            // 
+            this._loadProgressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._loadProgressBar.Location = new System.Drawing.Point(0, 20);
+            this._loadProgressBar.Name = "_loadProgressBar";
+            this._loadProgressBar.Size = new System.Drawing.Size(324, 23);
+            this._loadProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this._loadProgressBar.TabIndex = 1;
+            // 
+            // _loadingLabel
+            // 
+            this._loadingLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._loadingLabel.Location = new System.Drawing.Point(0, 0);
+            this._loadingLabel.Name = "_loadingLabel";
+            this._loadingLabel.ReadOnly = true;
+            this._loadingLabel.Size = new System.Drawing.Size(324, 20);
+            this._loadingLabel.TabIndex = 2;
+            this._loadingLabel.Text = "Loading...";
+            this._loadingLabel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
             // DashboardFileDetailForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -956,6 +982,7 @@
             this._toolStripContainer.PerformLayout();
             this._contextMenu.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
@@ -1055,5 +1082,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator15;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.DataGridView dataGridView;
+        private System.Windows.Forms.ProgressBar _loadProgressBar;
+        private System.Windows.Forms.TextBox _loadingLabel;
     }
 }

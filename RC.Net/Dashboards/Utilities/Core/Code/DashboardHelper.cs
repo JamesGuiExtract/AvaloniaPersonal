@@ -39,8 +39,10 @@ namespace Extract.Dashboard.Utilities
         /// <param name="gridItem">Grid item that needs to display the detail</param>
         /// <param name="e">Event args</param>
         /// <param name="configuration">The configuration to pass to the DashboardDetailForm</param>
+        /// <param name="serverName">Database server to use for the DashboardDetail</param>
+        /// <param name="databaseName">Name of Database to use for the DashboardDetail</param>
         public static void DisplayDashboardDetailForm(GridDashboardItem gridItem, DashboardItemMouseActionEventArgs e,
-            GridDetailConfiguration configuration)
+            GridDetailConfiguration configuration, string serverName, string databaseName)
         {
             try
             {
@@ -59,12 +61,13 @@ namespace Extract.Dashboard.Utilities
                         SqlServerConnectionParametersBase sqlParameters = sqlDataSource.ConnectionParameters as SqlServerConnectionParametersBase;
 
                         // the form will only be displayed if there is a FileName specified and the datasource is SQL database
-                        if (columnValues.Count > 0 && columnValues.ContainsKey("FileName") && sqlParameters != null)
+                        if (columnValues.Count > 0 && columnValues.ContainsKey("FileName") && !string.IsNullOrWhiteSpace(serverName)
+                            && !string.IsNullOrWhiteSpace(databaseName))
                         {
                             if (File.Exists(((string)columnValues["FileName"])))
                             {
                                 DashboardFileDetailForm detailForm = new DashboardFileDetailForm(
-                                    columnValues, sqlParameters.ServerName, sqlParameters.DatabaseName, configuration);
+                                    columnValues, serverName, databaseName, configuration);
                                 detailForm.ShowDialog();
                             }
                             else
