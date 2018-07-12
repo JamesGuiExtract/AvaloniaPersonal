@@ -458,7 +458,7 @@ namespace Extract.DataEntry.LabDE
                 if (esCodesToNames.Any())
                 {
                     query = "SELECT [ESComponentCode], [Name] FROM [ESComponentAKA]"
-                            + " WHERE [ESComponent].[Code] IN ('"
+                            + " WHERE [ESComponentCode] IN ('"
                             + string.Join("','", esCodesToNames.Keys.Select(code => code.Replace("'", "''")))
                             + "')";
                     dt = DBMethods.ExecuteDBQuery(componentDataDB, query);
