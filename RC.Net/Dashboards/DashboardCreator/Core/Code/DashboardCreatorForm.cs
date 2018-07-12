@@ -52,6 +52,25 @@ namespace DashboardCreator
         #endregion
 
         #region Event Handlers
+        private void HandleConfigureDataConnection(object sender, DashboardConfigureDataConnectionEventArgs e)
+        {
+            try
+            {
+                // Set timeout to 0 (infinite) for all DataSources
+                foreach (var ds in dashboardDesigner.Dashboard.DataSources)
+                {
+                    var sqlDataSource = ds as DashboardSqlDataSource;
+                    if (sqlDataSource != null)
+                    {
+                        sqlDataSource.ConnectionOptions.DbCommandTimeout = 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46128");
+            }
+        }
 
         void HandleDashboardDesignerDrillDownPerformed(object sender, DrillActionEventArgs e)
         {

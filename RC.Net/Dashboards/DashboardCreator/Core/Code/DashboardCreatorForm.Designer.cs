@@ -1343,6 +1343,7 @@
             this.dashboardDesigner.Size = new System.Drawing.Size(1037, 427);
             this.dashboardDesigner.TabIndex = 1;
             this.dashboardDesigner.DashboardChanged += new System.EventHandler(this.HandleDashboardDesignerDashboardChanged);
+            this.dashboardDesigner.ConfigureDataConnection += new DevExpress.DashboardCommon.DashboardConfigureDataConnectionEventHandler(this.HandleConfigureDataConnection);
             this.dashboardDesigner.DrillDownPerformed += new DevExpress.DashboardCommon.DrillActionEventHandler(this.HandleDashboardDesignerDrillDownPerformed);
             this.dashboardDesigner.DrillUpPerformed += new DevExpress.DashboardCommon.DrillActionEventHandler(this.HandleDashboardDesignerDrillUpPerformed);
             this.dashboardDesigner.DashboardItemDoubleClick += new DevExpress.DashboardWin.DashboardItemMouseActionEventHandler(this.HandleDashboardDesignerDashboardItemDoubleClick);
