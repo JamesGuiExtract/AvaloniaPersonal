@@ -416,26 +416,24 @@ namespace Extract.ETL
                 int correct = lookup[new { Path = path, Label = AccuracyDetailLabel.Correct }].Sum(a => a.Value);
                 int incorrect = lookup[new { Path = path, Label = AccuracyDetailLabel.Incorrect }].Sum(a => a.Value);
                 int expected = lookup[new { Path = path, Label = AccuracyDetailLabel.Expected }].Sum(a => a.Value);
-                if (correct != 0 || incorrect != 0 || expected != 0)
-                {
-                    valuesToAdd.Add(string.Format(CultureInfo.InvariantCulture,
-                        @"({0}, {1}, {2}, {3}, '{4}', {5}, {6}, {7}, '{8:s}', {9}, {10}, '{11:s}', {12}, {13})"
-                        , DatabaseServiceID
-                        , queryResultRow.FoundID
-                        , queryResultRow.ExpectedID
-                        , queryResultRow.ExpectedFileID
-                        , path
-                        , correct
-                        , expected
-                        , incorrect
-                        , queryResultRow.FoundDateTime
-                        , queryResultRow.FoundActionID
-                        , queryResultRow.FoundFAMUserID
-                        , queryResultRow.ExpectedDateTime
-                        , queryResultRow.ExpectedActionID
-                        , queryResultRow.ExpectedFAMUserID
-                        ));
-                }
+
+                valuesToAdd.Add(string.Format(CultureInfo.InvariantCulture,
+                    @"({0}, {1}, {2}, {3}, '{4}', {5}, {6}, {7}, '{8:s}', {9}, {10}, '{11:s}', {12}, {13})"
+                    , DatabaseServiceID
+                    , queryResultRow.FoundID
+                    , queryResultRow.ExpectedID
+                    , queryResultRow.ExpectedFileID
+                    , path
+                    , correct
+                    , expected
+                    , incorrect
+                    , queryResultRow.FoundDateTime
+                    , queryResultRow.FoundActionID
+                    , queryResultRow.FoundFAMUserID
+                    , queryResultRow.ExpectedDateTime
+                    , queryResultRow.ExpectedActionID
+                    , queryResultRow.ExpectedFAMUserID
+                    ));
             }
 
             // Add the data to the ReportingDataCaptureAccuracy table
