@@ -445,32 +445,28 @@ namespace Extract.ETL
                                         int underRedacted = lookup[new { Path = p, Label = AccuracyDetailLabel.UnderRedacted }].Sum(a => a.Value);
                                         int missed = lookup[new { Path = p, Label = AccuracyDetailLabel.Missed }].Sum(a => a.Value);
 
-                                        if (expected != 0 || found != 0 || correct != 0 || falsePositives != 0
-                                            || overRedacted != 0 || underRedacted != 0 || missed != 0)
-                                        {
-                                            valuesToAdd.Add(string.Format(CultureInfo.InvariantCulture,
-                                                @"({0}, {1}, {2}, {3}, {4}, '{5}', {6}, {7}, {8}, {9}, {10}, {11}, {12}, '{13:s}', {14}, {15}, '{16:s}', {17}, {18} )"
-                                                , DatabaseServiceID
-                                                , foundID
-                                                , expectedID
-                                                , fileID
-                                                , page
-                                                , p
-                                                , expected
-                                                , found
-                                                , correct
-                                                , falsePositives
-                                                , overRedacted
-                                                , underRedacted
-                                                , missed
-                                                , foundDateTime
-                                                , foundFAMUserID
-                                                , foundActionID
-                                                , expectedDateTime
-                                                , expectedFAMUserID
-                                                , expectedActionID
-                                                ));
-                                        }
+                                        valuesToAdd.Add(string.Format(CultureInfo.InvariantCulture,
+                                            @"({0}, {1}, {2}, {3}, {4}, '{5}', {6}, {7}, {8}, {9}, {10}, {11}, {12}, '{13:s}', {14}, {15}, '{16:s}', {17}, {18} )"
+                                            , DatabaseServiceID
+                                            , foundID
+                                            , expectedID
+                                            , fileID
+                                            , page
+                                            , p
+                                            , expected
+                                            , found
+                                            , correct
+                                            , falsePositives
+                                            , overRedacted
+                                            , underRedacted
+                                            , missed
+                                            , foundDateTime
+                                            , foundFAMUserID
+                                            , foundActionID
+                                            , expectedDateTime
+                                            , expectedFAMUserID
+                                            , expectedActionID
+                                            ));
                                     }
 
                                     // Add the data to the ReportingRedactionAccuracy table
