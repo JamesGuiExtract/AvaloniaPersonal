@@ -56,6 +56,7 @@
             this.dashboardDataGridView.Size = new System.Drawing.Size(434, 426);
             this.dashboardDataGridView.TabIndex = 0;
             this.dashboardDataGridView.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.HandleDashboardGridViewCellBeginEdit);
+            this.dashboardDataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dashboardDataGridView_CellDoubleClick);
             this.dashboardDataGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDashboardGridViewCellEndEdit);
             // 
             // _importDashboardButton

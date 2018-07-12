@@ -76,7 +76,7 @@ namespace Extract.Dashboard.Forms
                 string dashboardViewer = FileSystemMethods.PathCombine(
                     FileSystemMethods.CommonComponentsPath, "DashboardViewer.exe");
 
-                SystemMethods.RunExtractExecutable(dashboardViewer, parameters);
+                SystemMethods.RunExecutable(dashboardViewer, parameters, 0, startAndReturnimmediately: true);
             }
             catch (Exception ex)
             {
@@ -258,5 +258,21 @@ namespace Extract.Dashboard.Forms
         }
 
         #endregion
+
+        private void dashboardDataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                // check to make sure the header wasn't double clicked
+                if (e.RowIndex >= 0)
+                {
+                    HandleViewButtonClick(sender, e);
+                }
+            }
+            catch(Exception ex)
+            {
+                ex.ExtractDisplay("ELI46129");
+            }
+        }
     }
 }
