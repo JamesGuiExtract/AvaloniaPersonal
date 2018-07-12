@@ -297,6 +297,9 @@ namespace Extract.Dashboard.Forms
                         d.Visible = false;
                     }
 
+                    SetColumnColors("Expected", Color.Coral);
+                    SetColumnColors("Found", Color.Aqua);
+
                     _loadingTimer = null;
                     _loading = false;
                     _loadingTask = null;
@@ -305,6 +308,20 @@ namespace Extract.Dashboard.Forms
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45705");
+            }
+        }
+
+        private void SetColumnColors(string containsString, Color color)
+        {
+            var columnsToChange = dataGridView.Columns.Cast<DataGridViewColumn>()
+                .Where(d => d.Name.Contains(containsString));
+            if (columnsToChange.Count() > 0)
+            {
+                dataGridView.EnableHeadersVisualStyles = false;
+                foreach (var col in columnsToChange)
+                {
+                    col.HeaderCell.Style.BackColor = color;
+                }
             }
         }
 
@@ -366,13 +383,13 @@ namespace Extract.Dashboard.Forms
                         Int64? id = r.Cells["ExpectedSetForFileID"]?.Value as Int64?;
                         Guid? guid = r.Cells["ExpectedGuid"]?.Value as Guid?;
                         string attributePath = r.Cells["ExpectedAttributePath"]?.Value as string;
-                        DisplayHighlights(id, guid, attributePath, Color.Aqua);
+                        DisplayHighlights(id, guid, attributePath, Color.Coral);
                         id = r.Cells["FoundSetForFileID"]?.Value as Int64?;
                         if (id != null)
                         {
                             guid = r.Cells["FoundGuid"]?.Value as Guid?;
                             attributePath = r.Cells["FoundAttributePath"]?.Value as string;
-                            DisplayHighlights(id, guid, attributePath, Color.Coral);
+                            DisplayHighlights(id, guid, attributePath, Color.Aqua);
                         }
                     }
                 }
