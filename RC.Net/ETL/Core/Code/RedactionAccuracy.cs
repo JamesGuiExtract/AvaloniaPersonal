@@ -92,13 +92,12 @@ namespace Extract.ETL
         const int _PROCESS_BATCH_SIZE = 100;
 
         /// <summary>
-        /// Query used to get the data used to create the records in ReportingRedactionAccuracy table
-        /// This query requires values for the following parameters
-        ///     @FoundSetName - Name of the Attribute set for found values
-        ///     @ExpectedSetName - Name of the Attribute set for Expected values
-        ///     @DatabaseServiceID - Id of the record in the DatabaseService table for this service instance
+        /// Query that is common to both UPDATE_ACCURACY_DATA_SQL and DELETE_OLD_DATA queries
+        /// This query requires 
+        ///     @LastInBatchID - last file task session id in the batch
+        ///     @LastProcessedID - Last processed file task session
         /// </summary>
-        static readonly string UPDATE_ACCURACY_DATA_SQL =
+        static readonly string GET_TOUCHED_FILES =
             @"
                 DECLARE @FilesTable TABLE (
                 	FileID INT
@@ -112,11 +111,19 @@ namespace Extract.ETL
                 
                 INSERT INTO @FilesTable
                     SELECT FileID FROM TouchedFiles 
+            ";
 
-                DELETE FROM ReportingRedactionAccuracy 
-                    WHERE DatabaseServiceID = @DatabaseServiceID
-                        AND FileID IN (SELECT FileID FROM @FilesTable)
-
+        /// <summary>
+        /// Query used to get the data used to create the records in ReportingRedactionAccuracy table
+        /// it uses the GET_TOUCHED_FILES query
+        /// This query requires values for the following parameters
+        ///     @LastInBatchID - last file task session id in the batch
+        ///     @LastProcessedID - Last processed file task session
+        ///     @FoundSetName - Name of the Attribute set for found values
+        ///     @ExpectedSetName - Name of the Attribute set for Expected values
+        /// </summary>
+        static readonly string UPDATE_ACCURACY_DATA_SQL = GET_TOUCHED_FILES +
+            @"
                 ; WITH
                  MostRecent AS (
                     SELECT AttributeSetName.Description
@@ -166,6 +173,21 @@ namespace Extract.ETL
                    AND ExpectedAttributeSet.AttributeSetNameID = expected.AttributeSetNameID
         ";
 
+        /// <summary>
+        /// Query used to Delete the old data from ReportingRedactionAccuracy
+        /// it uses the GET_TOUCHED_FILES query
+        /// This query requires values for the following parameters
+        ///     @LastInBatchID - last file task session id in the batch
+        ///     @LastProcessedID - Last processed file task session
+        ///     @DatabaseServiceID - Id of the record in the DatabaseService table for this service instance
+        /// </summary>
+        static readonly string DELETE_OLD_DATA = GET_TOUCHED_FILES +
+            @"
+                DELETE FROM ReportingRedactionAccuracy 
+                    WHERE DatabaseServiceID = @DatabaseServiceID
+                        AND FileID IN (SELECT FileID FROM @FilesTable)
+            ";
+
         #endregion
 
         #region Fields
@@ -174,6 +196,11 @@ namespace Extract.ETL
         /// Indicates whether the Process method is currently executing.
         /// </summary>
         bool _processing;
+
+        /// <summary>
+        /// List to hold the queries that will be ran together in the same transaction
+        /// </summary>
+        List<string> _queriesToRunInBatch = new List<string>();
 
         #endregion Fields
 
@@ -251,20 +278,12 @@ namespace Extract.ETL
                 {
                     cancelToken.ThrowIfCancellationRequested();
 
-                    // Records to calculate stats
-                    using (var scope = new TransactionScope(TransactionScopeOption.Required,
-                        new TransactionOptions()
-                        {
-                            IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
-                            Timeout = TransactionManager.MaximumTimeout
-                        },
-                        TransactionScopeAsyncFlowOption.Enabled))
+                    int lastInBatchToProcess = Math.Min(status.LastFileTaskSessionIDProcessed + _PROCESS_BATCH_SIZE, maxFileTaskSession);
+
                     using (var connection = NewSqlDBConnection())
                     using (SqlCommand cmd = connection.CreateCommand())
                     {
                         connection.Open();
-
-                        int lastInBatchToProcess = Math.Min(status.LastFileTaskSessionIDProcessed + _PROCESS_BATCH_SIZE, maxFileTaskSession);
 
                         // Set the timeout so that it waits indefinitely
                         cmd.CommandTimeout = 0;
@@ -276,13 +295,47 @@ namespace Extract.ETL
                         cmd.Parameters.AddWithValue("@LastProcessedID", status.LastFileTaskSessionIDProcessed);
                         cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
 
+                        _queriesToRunInBatch.Clear();
+                        _queriesToRunInBatch.Add(DELETE_OLD_DATA);
+
                         // Get VOA data for each file
-                        SaveAccuracy(connection, cmd, cancelToken);
+                        SaveAccuracy(cmd, cancelToken);
+                    }
 
-                        status.LastFileTaskSessionIDProcessed = lastInBatchToProcess;
+                    // Records to calculate stats
+                    using (var scope = new TransactionScope(TransactionScopeOption.Required,
+                        new TransactionOptions()
+                        {
+                            IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
+                            Timeout = TransactionManager.MaximumTimeout
+                        },
+                        TransactionScopeAsyncFlowOption.Enabled))
+                    {
 
-                        status.SaveStatus(connection, DatabaseServiceID);
+                        using (var saveConnection = NewSqlDBConnection())
+                        {
+                            saveConnection.Open();
+                            foreach (var q in _queriesToRunInBatch)
+                            {
+                                using (SqlCommand cmd = saveConnection.CreateCommand())
+                                {
+                                    cmd.CommandTimeout = 0;
+                                    cmd.CommandText = q;
+                                    cmd.Parameters.AddWithValue("@FoundSetName", FoundAttributeSetName);
+                                    cmd.Parameters.AddWithValue("@ExpectedSetName", ExpectedAttributeSetName);
+                                    cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                                    cmd.Parameters.AddWithValue("@LastProcessedID", status.LastFileTaskSessionIDProcessed);
+                                    cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
+                                    var saveTask = cmd.ExecuteNonQueryAsync();
+                                    saveTask.Wait(cancelToken);
+                                }
 
+                            }
+
+                            status.LastFileTaskSessionIDProcessed = lastInBatchToProcess;
+
+                            status.SaveStatus(saveConnection, DatabaseServiceID);
+                        }
                         scope.Complete();
                     }
                 }
@@ -369,7 +422,7 @@ namespace Extract.ETL
         /// </summary>
         /// <param name="cmd">Command to get the data needed to calculate the stats for the current block of data being processed</param>
         /// <param name="cancelToken"></param>
-        void SaveAccuracy(SqlConnection connection, SqlCommand cmd, CancellationToken cancelToken)
+        void SaveAccuracy(SqlCommand cmd, CancellationToken cancelToken)
         {
             using (SqlDataReader ExpectedAndFoundReader = cmd.ExecuteReader())
             {
@@ -469,10 +522,7 @@ namespace Extract.ETL
                                             ));
                                     }
 
-                                    // Add the data to the ReportingRedactionAccuracy table
-                                    var saveCmd = connection.CreateCommand();
-
-                                    saveCmd.CommandText = string.Format(CultureInfo.InvariantCulture,
+                                    _queriesToRunInBatch.Add( string.Format(CultureInfo.InvariantCulture,
                                         @"
                                             INSERT INTO [dbo].[ReportingRedactionAccuracy]
                                                     ([DatabaseServiceID]
@@ -495,9 +545,7 @@ namespace Extract.ETL
                                                     ,[ExpectedFAMUserID]
                                                     ,[ExpectedActionID])
                                                     VALUES
-                                                        {3};", DatabaseServiceID, fileID, page, string.Join(",\r\n", valuesToAdd));
-                                    var task = saveCmd.ExecuteNonQueryAsync();
-                                    task.Wait(cancelToken);
+                                                        {3};", DatabaseServiceID, fileID, page, string.Join(",\r\n", valuesToAdd)));
                                 }
                             }
                         }
