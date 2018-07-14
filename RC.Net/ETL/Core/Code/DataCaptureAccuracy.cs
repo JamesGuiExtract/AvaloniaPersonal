@@ -41,6 +41,27 @@ namespace Extract.ETL
         const int PROCESS_BATCH_SIZE = 100;
 
         /// <summary>
+        /// Query to get the affected files for the batch
+        /// Parameters:
+        ///     @FoundSetName - Name of the Attribute set for found values
+        ///     @ExpectedSetName - Name of the Attribute set for Expected values
+        ///     @StartFileTaskSessionSetID - The first FileTaskSession row used to define the affected files.
+        ///     @EndFileTaskSessionSetID - The last FileTaskSession row used to define the affected files.
+        /// </summary>
+        static readonly string AFFECTED_FILES =
+            @"
+                DECLARE @affectedFiles TABLE (FileID INT)
+				INSERT INTO @affectedFiles
+				SELECT DISTINCT FileID
+					FROM AttributeSetForFile
+					INNER JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
+					INNER JOIN FileTaskSession ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID
+					WHERE AttributeSetName.Description IN (@FoundSetName, @ExpectedSetName)
+                    AND FileTaskSession.DateTimeStamp IS NOT NULL
+					AND FileTaskSession.ID >= @StartFileTaskSessionSetID AND FileTaskSession.ID <= @EndFileTaskSessionSetID
+            ";
+
+        /// <summary>
         /// Query used to get the data used to create the records in ReportingDataCaptureAccuracy table
         /// This query will collect a list of all files affected by FileTaskSession rows in the range
         /// @StartFileTaskSessionSetID to @EndFileTaskSessionSetID, delete all related rows from 
@@ -53,17 +74,8 @@ namespace Extract.ETL
         ///     @StartFileTaskSessionSetID - The first FileTaskSession row used to define the affected files.
         ///     @EndFileTaskSessionSetID - The last FileTaskSession row used to define the affected files.
         /// </summary>
-        static readonly string UPDATE_ACCURACY_DATA_SQL =
+        static readonly string UPDATE_ACCURACY_DATA_SQL = AFFECTED_FILES +
             @"
-                DECLARE @affectedFiles TABLE (FileID INT)
-				INSERT INTO @affectedFiles
-				SELECT DISTINCT FileID
-					FROM AttributeSetForFile
-					INNER JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
-					INNER JOIN FileTaskSession ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID
-					WHERE AttributeSetName.Description IN (@FoundSetName, @ExpectedSetName)
-                    AND FileTaskSession.DateTimeStamp IS NOT NULL
-					AND FileTaskSession.ID >= @StartFileTaskSessionSetID AND FileTaskSession.ID <= @EndFileTaskSessionSetID
                 
                 DELETE FROM ReportingDataCaptureAccuracy 
                     WHERE DatabaseServiceID = @DatabaseServiceID
@@ -126,6 +138,23 @@ namespace Extract.ETL
 					WHERE RANK = 1
             ";
 
+        /// <summary>
+        /// Query to delete old data
+        /// Parameters:
+        ///     @FoundSetName - Name of the Attribute set for found values
+        ///     @ExpectedSetName - Name of the Attribute set for Expected values
+        ///     @StartFileTaskSessionSetID - The first FileTaskSession row used to define the affected files.
+        ///     @EndFileTaskSessionSetID - The last FileTaskSession row used to define the affected files.
+        /// </summary>
+        static readonly string DELETE_OLD_DATA = AFFECTED_FILES +
+            @"
+
+                DELETE FROM ReportingDataCaptureAccuracy
+                    WHERE DatabaseServiceID = @DatabaseServiceID
+                        AND FileID IN(SELECT FileID FROM @affectedFiles)
+
+            ";
+
         #endregion
 
         #region Fields
@@ -144,6 +173,11 @@ namespace Extract.ETL
         /// The current status info for this service.
         /// </summary>
         DataCaptureAccuracyStatus _status;
+
+        /// <summary>
+        /// List to hold the queries that will be ran together in the same transaction
+        /// </summary>
+        List<string> _queriesToRunInBatch = new List<string>();
 
         #endregion Fields
 
@@ -220,14 +254,6 @@ namespace Extract.ETL
         /// <param name="endFileTaskSessionID">The ID of the last file task session row to process.</param>
         void ProcessBatch(CancellationToken cancelToken, int endFileTaskSessionID)
         {
-            using (TransactionScope scope = new TransactionScope(
-                TransactionScopeOption.Required,
-                new TransactionOptions()
-                {
-                    IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
-                    Timeout = TransactionManager.MaximumTimeout,
-                },
-                TransactionScopeAsyncFlowOption.Enabled))
             using (var connection = NewSqlDBConnection())
             {
                 // Open the connection
@@ -236,9 +262,8 @@ namespace Extract.ETL
                 SqlCommand cmd = connection.CreateCommand();
                 // Set the timeout so that it waits indefinitely
                 cmd.CommandTimeout = 0;
-                // This command will first delete all stats for the files affected between
-                // LastFileTaskSessionIDProcessed and endFileTaskSessionID, then produce
-                // the data necessary to generate (or re-generate) stats for these files.
+
+                // This command gets the data to work with in this batch
                 cmd.CommandText = UPDATE_ACCURACY_DATA_SQL;
 
                 addParametersToCommand(cmd, endFileTaskSessionID);
@@ -277,19 +302,65 @@ namespace Extract.ETL
                             // Add the comparison results to the Results
                             var statsToStore = output.AggregateStatistics();
 
-                            StoreAccuracyData(connection, statsToStore, queryResultRow, cancelToken);
+                            AddAccuracyDataQueryToList(statsToStore, queryResultRow);
                         }
                     }
                 }
-
-                // If Canceled, there will have been an exception everything but saving the status is done 
-                LastFileTaskSessionIDProcessed = endFileTaskSessionID;
-                scope.Complete();
             }
 
-            // Getting errors when called from the above transaction scope (either before or after
-            // Complete). Avoiding that issue for now by moving SaveStatus out of that scope.
-            SaveStatus();
+            AddTheDataToTheDatabase(endFileTaskSessionID, cancelToken);
+        }
+
+
+        /// <summary>
+        /// Deletes the old records and adds the new data by executing the queries in _queriesToRunInBatch
+        /// </summary>
+        /// <param name="endFileTaskSessionID">The last fileTaskSessionID in the batch</param>
+        /// <param name="cancelToken">Cancel token</param>
+        void AddTheDataToTheDatabase(int endFileTaskSessionID, CancellationToken cancelToken)
+        {
+            using (TransactionScope scope = new TransactionScope(
+               TransactionScopeOption.Required,
+               new TransactionOptions()
+               {
+                   IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
+                   Timeout = TransactionManager.MaximumTimeout,
+               },
+               TransactionScopeAsyncFlowOption.Enabled))
+            {
+                using (var connection = NewSqlDBConnection())
+                {
+                    connection.Open();
+
+                    // delete the old records
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandTimeout = 0;
+                        cmd.CommandText = DELETE_OLD_DATA;
+                        addParametersToCommand(cmd, endFileTaskSessionID);
+                        var deleteTask = cmd.ExecuteNonQueryAsync();
+                        deleteTask.Wait(cancelToken);
+                    }
+
+                    // Run the queries to add the accuracy records
+                    foreach(var q in _queriesToRunInBatch)
+                    {
+                        using (var cmd = connection.CreateCommand())
+                        {
+                            cmd.CommandTimeout = 0;
+                            cmd.CommandText = q;
+                            var addTask = cmd.ExecuteNonQueryAsync();
+                            addTask.Wait(cancelToken);
+                        }
+                    }
+
+                    // If Canceled, there will have been an exception everything but saving the status is done 
+                    LastFileTaskSessionIDProcessed = endFileTaskSessionID;
+
+                    Status.SaveStatus(connection, DatabaseServiceID);
+                }
+                scope.Complete();
+            }
         }
 
         /// <summary>
@@ -392,15 +463,14 @@ namespace Extract.ETL
         }
 
         /// <summary>
-        /// Stores the accuracy data in <see paramref="statsToStore"/> to the
+        /// Creates and adds the accuracy data query to add the data in <see paramref="statsToStore"/> to the
         /// ReportingDataCaptureAccuracy table.
         /// </summary>
-        /// <param name="connection">The database connection to use.</param>
         /// <param name="statsToStore">The <see cref="AccuracyDetail"/> instances to store.</param>
         /// <param name="queryResultRow">The <see cref="UpdateQueryResultRow"/> used to generate the stats.
         /// </param>
-        void StoreAccuracyData(SqlConnection connection, IEnumerable<AccuracyDetail> statsToStore,
-            UpdateQueryResultRow queryResultRow, CancellationToken cancelToken)
+        void AddAccuracyDataQueryToList(IEnumerable<AccuracyDetail> statsToStore,
+            UpdateQueryResultRow queryResultRow)
         {
             var lookup = statsToStore.ToLookup(a => new { a.Path, a.Label });
 
@@ -436,10 +506,7 @@ namespace Extract.ETL
                     ));
             }
 
-            // Add the data to the ReportingDataCaptureAccuracy table
-            var saveCmd = connection.CreateCommand();
-
-            saveCmd.CommandText = string.Format(CultureInfo.InvariantCulture,
+            _queriesToRunInBatch.Add( string.Format(CultureInfo.InvariantCulture,
                 @"INSERT INTO [dbo].[ReportingDataCaptureAccuracy]
                     ([DatabaseServiceID]
                     ,[FoundAttributeSetForFileID]
@@ -457,11 +524,7 @@ namespace Extract.ETL
                     ,[ExpectedFAMUserID]
                     )
                 VALUES
-                    {1};", queryResultRow.ExpectedFileID, string.Join(",\r\n", valuesToAdd));
-
-            saveCmd.CommandTimeout = 0;
-            var task = saveCmd.ExecuteNonQueryAsync();
-            task.Wait(cancelToken);
+                    {0};", string.Join(",\r\n", valuesToAdd)));
             
         }
 
