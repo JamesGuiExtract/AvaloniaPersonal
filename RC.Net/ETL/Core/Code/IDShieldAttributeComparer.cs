@@ -245,6 +245,10 @@ namespace Extract.ETL
                         }
                     }
                 }
+                else if (expectedCount == 0 && foundCount == 0)
+                {
+                    pageAccuracy[1] = new[] { new AccuracyDetail(AccuracyDetailLabel.Expected, "", 0) }.ToList();
+                }
                 else
                 {
                     // Add any expected attribute counts as missed
