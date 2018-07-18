@@ -245,9 +245,10 @@ namespace Extract.ETL
                         }
                     }
                 }
-                // This is needed so that there will be a record of a comparison for cases where there were no expected or founds
                 else if (expectedCount == 0 && foundCount == 0)
                 {
+                    // Ensure at least one row is created for every comparison of two files. Otherwise these files
+                    // will not be incluced in dashboards.
                     pageAccuracy[1] = new[] { new AccuracyDetail(AccuracyDetailLabel.Expected, "", 0) }.ToList();
                 }
                 else
