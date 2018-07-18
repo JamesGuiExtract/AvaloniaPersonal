@@ -77,10 +77,6 @@ namespace Extract.ETL
         static readonly string UPDATE_ACCURACY_DATA_SQL = AFFECTED_FILES +
             @"
                 
-                DELETE FROM ReportingDataCaptureAccuracy 
-                    WHERE DatabaseServiceID = @DatabaseServiceID
-                        AND FileID IN (SELECT FileID FROM @affectedFiles)
-
 				;WITH ExpectedFTS AS (
 				SELECT DISTINCT affectedFiles.FileID, MAX(AttributeSetForFile.FileTaskSessionID) AS ID
 					FROM @affectedFiles affectedFiles
