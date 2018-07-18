@@ -2724,6 +2724,29 @@ bool CFileProcessingDB::unaffiliatedWorkflowFilesExist()
 		executeCmdQuery(ipConnection, strQuery, false, &nUnaffiliatedFileId);
 
 		return nUnaffiliatedFileId != -1;
+
+		if (nUnaffiliatedFileId != -1)
+		{
+			// https://extract.atlassian.net/browse/ISSUE-15404
+			// There seems to be some timing related issues with files getting assigned to workflows
+			// I don't immediately understand. In addition to only executing this check from FAMDBAdmin,
+			// upon finding an apparent unaffiliated file, we should re-check after a slight
+			// pause to ensure the file detected as unaffiated still is.
+			Sleep(500);
+
+			strQuery =
+				"	SELECT COALESCE(MAX([ID]), -1) FROM [FAMFile] \r\n"
+				"	LEFT JOIN [WorkflowFile] ON [FAMFile].[ID] = [FileID] \r\n"
+				"	WHERE [ID] = " + asString(nUnaffiliatedFileId) + " \r\n"
+				"	AND [WorkflowID] IS NULL";
+
+			long nDoubleCheckFileId = -1;
+			executeCmdQuery(ipConnection, strQuery, false, &nDoubleCheckFileId);
+
+			return (nUnaffiliatedFileId == nDoubleCheckFileId);
+		}
+
+		return false;
 	}
 
 	return false;
