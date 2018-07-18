@@ -361,7 +361,8 @@ namespace Extract.ETL
 	                            FROM FileTaskSession
 	                            LEFT JOIN FAMSession ON FAMSessionID = FAMSession.ID
 	                            LEFT JOIN ActiveFAM ON FAMSession.ID = ActiveFAM.FAMSessionID";
-                        return (int)cmd.ExecuteScalar();
+                        
+                        return (int)(cmd.ExecuteScalar() ?? -1);
                     }
                 }
             }
