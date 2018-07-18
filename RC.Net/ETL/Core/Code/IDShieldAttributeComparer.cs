@@ -245,6 +245,7 @@ namespace Extract.ETL
                         }
                     }
                 }
+                // This is needed so that there will be a record of a comparison for cases where there were no expected or founds
                 else if (expectedCount == 0 && foundCount == 0)
                 {
                     pageAccuracy[1] = new[] { new AccuracyDetail(AccuracyDetailLabel.Expected, "", 0) }.ToList();

@@ -343,14 +343,23 @@ namespace Extract.ETL
                     }
 
                     // Run the queries to add the accuracy records
-                    foreach(var q in _queriesToRunInBatch)
+                    foreach (var q in _queriesToRunInBatch)
                     {
-                        using (var cmd = connection.CreateCommand())
+                        try
                         {
-                            cmd.CommandTimeout = 0;
-                            cmd.CommandText = q;
-                            var addTask = cmd.ExecuteNonQueryAsync();
-                            addTask.Wait(cancelToken);
+                            using (var cmd = connection.CreateCommand())
+                            {
+                                cmd.CommandTimeout = 0;
+                                cmd.CommandText = q;
+                                var addTask = cmd.ExecuteNonQueryAsync();
+                                addTask.Wait(cancelToken);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            var ee = ex.AsExtract("ELI46166");
+                            ee.AddDebugData("Query", q, false);
+                            throw ee;
                         }
                     }
 
@@ -394,7 +403,8 @@ namespace Extract.ETL
             if (dataAccuracyQueryReader.Read())
             {
                 cancelToken.ThrowIfCancellationRequested();
-                queryResultRow = new UpdateQueryResultRow() {
+                queryResultRow = new UpdateQueryResultRow()
+                {
                     // Get the streams for the expected and found voa data (the thread will read the voa from the stream
                     ExpectedStream = dataAccuracyQueryReader.GetStream(expectedVOAColumn),
                     FoundStream = dataAccuracyQueryReader.GetStream(foundVOAColumn),
@@ -409,7 +419,8 @@ namespace Extract.ETL
                     FoundFAMUserID = dataAccuracyQueryReader.GetInt32(foundFAMUserIDColumn),
                     ExpectedDateTime = dataAccuracyQueryReader.GetDateTime(expectedDateTimeStampColumn),
                     ExpectedActionID = dataAccuracyQueryReader.GetInt32(expectedActionIDColumn),
-                    ExpectedFAMUserID = dataAccuracyQueryReader.GetInt32(expectedFAMUserIDColumn) };
+                    ExpectedFAMUserID = dataAccuracyQueryReader.GetInt32(expectedFAMUserIDColumn)
+                };
 
                 return true;
             }
@@ -426,7 +437,7 @@ namespace Extract.ETL
         /// to find the comparison attributes that correspond to this output document.
         /// </summary>
         /// <param name="foundAttributes">The "found" attribute hierarchy which is expected to have
-        /// data for multiple documents under parallel root-leve "Document" attributes.</param>
+        /// data for multiple documents under parallel root-level "Document" attributes.</param>
         /// <param name="queryResultRow">The <see cref="UpdateQueryResultRow"/> providing the data
         /// for this file's comparison.</param>
         /// <returns></returns>
@@ -472,6 +483,16 @@ namespace Extract.ETL
         void AddAccuracyDataQueryToList(IEnumerable<AccuracyDetail> statsToStore,
             UpdateQueryResultRow queryResultRow)
         {
+            // This is needed so a row gets put in for every file that has expected and found voa's saved
+            if (statsToStore.Count() == 0)
+            {
+                List<AccuracyDetail> list = new List<AccuracyDetail>();
+                list.Add(new AccuracyDetail(AccuracyDetailLabel.Correct, string.Empty, 0));
+                list.Add(new AccuracyDetail(AccuracyDetailLabel.Incorrect, string.Empty, 0));
+                list.Add(new AccuracyDetail(AccuracyDetailLabel.Expected, string.Empty, 0));
+
+                statsToStore = list;
+            }
             var lookup = statsToStore.ToLookup(a => new { a.Path, a.Label });
 
             var attributePaths = statsToStore
@@ -506,7 +527,7 @@ namespace Extract.ETL
                     ));
             }
 
-            _queriesToRunInBatch.Add( string.Format(CultureInfo.InvariantCulture,
+            _queriesToRunInBatch.Add(string.Format(CultureInfo.InvariantCulture,
                 @"INSERT INTO [dbo].[ReportingDataCaptureAccuracy]
                     ([DatabaseServiceID]
                     ,[FoundAttributeSetForFileID]
@@ -525,7 +546,7 @@ namespace Extract.ETL
                     )
                 VALUES
                     {0};", string.Join(",\r\n", valuesToAdd)));
-            
+
         }
 
         #endregion DatabaseService Methods
