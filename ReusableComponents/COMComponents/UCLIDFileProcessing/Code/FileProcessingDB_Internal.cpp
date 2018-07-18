@@ -2698,12 +2698,11 @@ void CFileProcessingDB::validateDBSchemaVersion(bool bCheckForUnaffiliatedFiles/
 			m_bProductSpecificDBSchemasAreValid = true;
 		}
 
-		// Removing assertions for now to solve false positive assertions at Hurley.
-		//if (bCheckForUnaffiliatedFiles && unaffiliatedWorkflowFilesExist())
-		//{
-		//	m_strCurrentConnectionStatus = gstrUNAFFILIATED_FILES;
-		//	throw UCLIDException("ELI43450", "Workflows exist, but there are unaffiliated files.");
-		//}
+		if (bCheckForUnaffiliatedFiles && unaffiliatedWorkflowFilesExist())
+		{
+			m_strCurrentConnectionStatus = gstrUNAFFILIATED_FILES;
+			throw UCLIDException("ELI43450", "Workflows exist, but there are unaffiliated files.");
+		}
 	}
 }
 //--------------------------------------------------------------------------------------------------
@@ -4036,7 +4035,7 @@ void CFileProcessingDB::removeSkipFileRecord(const _ConnectionPtr &ipConnection,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26805");
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::resetDBConnection()
+void CFileProcessingDB::resetDBConnection(bool bCheckForUnaffiliatedFiles/* = false */)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI03268");
 	try
@@ -4079,7 +4078,7 @@ void CFileProcessingDB::resetDBConnection()
 			_lastCodePos = "60";
 
 			// Validate the schema
-			validateDBSchemaVersion(true);
+			validateDBSchemaVersion(bCheckForUnaffiliatedFiles);
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26869");

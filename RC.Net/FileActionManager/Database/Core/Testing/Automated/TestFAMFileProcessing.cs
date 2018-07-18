@@ -1640,7 +1640,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileProcessingDb.SetDBInfoSetting("ConnectionRetryTimeout", "150", true, false);
 
                 // This causes the settings to be reloaded from the DBInfo table
-                fileProcessingDb.ResetDBConnection(true);
+                fileProcessingDb.ResetDBConnection(true, false);
 
                 // Get the current number of retries
                 fileProcessingDb.GetConnectionRetrySettings(out numberOfRetries, out retryTimeOut);
@@ -1665,7 +1665,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.ConnectionRetryTimeout == 0);
 
                 // This causes the settings to be reloaded from the DBInfo table
-                fileProcessingDb.ResetDBConnection(true);
+                fileProcessingDb.ResetDBConnection(true, false);
 
                 fileProcessingDb.GetConnectionRetrySettings(out numberOfRetries, out retryTimeOut);
 
@@ -1680,7 +1680,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileProcessingDb = new FileProcessingDB();
                 fileProcessingDb.DatabaseName = testDbName;
                 fileProcessingDb.DatabaseServer = "(local)";
-                fileProcessingDb.ResetDBConnection(true);
+                fileProcessingDb.ResetDBConnection(true, false);
 
                 fileProcessingDb.GetConnectionRetrySettings(out numberOfRetries, out retryTimeOut);
                 Assert.That(numberOfRetries == 20);

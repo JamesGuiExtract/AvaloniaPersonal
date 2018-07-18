@@ -212,7 +212,7 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		m_bCancelling = false;
 
 		// Reset the DB Connection
-		getFPMDB()->ResetDBConnection(VARIANT_FALSE);
+		getFPMDB()->ResetDBConnection(VARIANT_FALSE, VARIANT_FALSE);
 
 		// Before starting processing or supplying verify that the workflow configuration is correct
 		UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipSupplyingActionMgmtRole =
@@ -1301,7 +1301,7 @@ STDMETHODIMP CFileProcessingManager::RefreshDBSettings()
 	try
 	{
 		refreshDatabaseSettings();
-		m_ipFPMDB->ResetDBConnection(VARIANT_FALSE);
+		m_ipFPMDB->ResetDBConnection(VARIANT_FALSE, VARIANT_FALSE);
 		if (m_strActiveWorkflow == gstrALL_WORKFLOWS)
 		{
 			m_ipFPMDB->ActiveWorkflow = "";
@@ -1752,7 +1752,7 @@ void CFileProcessingManager::clear()
 		getFPMDB()->DatabaseServer = "";
 		getFPMDB()->DatabaseName = "";
 		getFPMDB()->AdvancedConnectionStringProperties = "";
-		getFPMDB()->ResetDBConnection(VARIANT_TRUE);
+		getFPMDB()->ResetDBConnection(VARIANT_TRUE, VARIANT_FALSE);
 
 		m_nMaxFilesFromDB = gnMAX_NUMBER_OF_FILES_FROM_DB;
 

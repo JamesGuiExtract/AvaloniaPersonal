@@ -676,7 +676,8 @@ STDMETHODIMP CFileProcessingDB::GetActionID(BSTR bstrActionName, long* pnActionI
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14986")
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::ResetDBConnection(VARIANT_BOOL bResetCredentials)
+STDMETHODIMP CFileProcessingDB::ResetDBConnection(VARIANT_BOOL bResetCredentials,
+												  VARIANT_BOOL vbCheckForUnnaffiliatedFiles)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	
@@ -695,7 +696,7 @@ STDMETHODIMP CFileProcessingDB::ResetDBConnection(VARIANT_BOOL bResetCredentials
 		}
 
 		// Call the internal reset db connection
-		resetDBConnection();
+		resetDBConnection(asCppBool(vbCheckForUnnaffiliatedFiles));
 
 		return S_OK;
 	}

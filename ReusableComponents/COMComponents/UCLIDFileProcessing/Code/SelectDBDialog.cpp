@@ -210,7 +210,7 @@ void SelectDBDialog::OnOK()
 					{
 						// [DotNetRCAndUtils:1113]
 						// Ensure m_ipFAMDB's credentials are reset when logging into a new DB.
-						m_ipFAMDB->ResetDBConnection(VARIANT_TRUE);
+						m_ipFAMDB->ResetDBConnection(VARIANT_TRUE, VARIANT_FALSE);
 					}
 					CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18162");
 
@@ -234,7 +234,7 @@ void SelectDBDialog::OnOK()
 					{
 						// [DotNetRCAndUtils:1113]
 						// Ensure m_ipFAMDB's credentials are reset when logging into a new DB.
-						m_ipFAMDB->ResetDBConnection(VARIANT_TRUE);
+						m_ipFAMDB->ResetDBConnection(VARIANT_TRUE, VARIANT_FALSE);
 					}
 					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35758");
 

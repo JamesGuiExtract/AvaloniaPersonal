@@ -551,7 +551,7 @@ void CFAMDBAdminDlg::OnDatabaseSetOptions()
 			uex.log();
 
 			// Reset the connection to update the cached settings in the FAMDB pointer
-			m_ipFAMDB->ResetDBConnection(VARIANT_FALSE);
+			m_ipFAMDB->ResetDBConnection(VARIANT_FALSE, VARIANT_FALSE);
 
 			MessageBox("Database settings have been updated.", "Settings Updated");
 		}
@@ -1174,7 +1174,7 @@ void CFAMDBAdminDlg::OnDBConfigChanged(string& rstrServer, string& rstrDatabase,
 		m_ipFAMDB->DatabaseName = rstrDatabase.c_str();
 
 		// Attempt to connect with the new settings
-		m_ipFAMDB->ResetDBConnection(VARIANT_FALSE);
+		m_ipFAMDB->ResetDBConnection(VARIANT_FALSE, VARIANT_TRUE);
 
 		// In case path tags were expanded, return the literal database connection properties we
 		// actually connected to.
@@ -1476,7 +1476,7 @@ bool CFAMDBAdminDlg::refreshWorkflowStatus()
 	try
 	{
 		// Force re-check for unaffiliated files.
-		m_ipFAMDB->ResetDBConnection(VARIANT_FALSE);
+		m_ipFAMDB->ResetDBConnection(VARIANT_FALSE, VARIANT_TRUE);
 
 		m_bIsDBGood = true;
 		m_bUnaffiliatedFiles = false;

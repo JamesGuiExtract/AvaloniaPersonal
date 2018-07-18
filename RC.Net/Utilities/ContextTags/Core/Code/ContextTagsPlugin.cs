@@ -721,7 +721,7 @@ namespace Extract.Utilities.ContextTags
                         famDB.DatabaseName = db.Database;
                         famDB.ConnectionRetryTimeout = 0;
                         famDB.NumberOfConnectionRetries = 0;
-                        famDB.ResetDBConnection(false);
+                        famDB.ResetDBConnection(false, false);
                         connected = true;
                         StrToStrMap workflowMap = famDB.GetWorkflows();
 

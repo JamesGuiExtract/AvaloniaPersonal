@@ -167,7 +167,7 @@ public:
 		IRandomMathCondition* pRandomCondition,long* pnNumRecordsOutput);
 	STDMETHOD(ResetDBLock)(void);
 	STDMETHOD(GetActionID)(BSTR bstrActionName, long* pnActionID);
-	STDMETHOD(ResetDBConnection)(VARIANT_BOOL bResetCredentials);
+	STDMETHOD(ResetDBConnection)(VARIANT_BOOL bResetCredentials, VARIANT_BOOL vbCheckForUnnaffiliatedFiles);
 	STDMETHOD(SetNotificationUIWndHandle)(long nHandle);
 	STDMETHOD(ShowLogin)(VARIANT_BOOL bShowAdmin, VARIANT_BOOL* pbLoginCancelled, 
 		VARIANT_BOOL* pbLoginValid);
@@ -1037,7 +1037,7 @@ private:
 		long nActionID);
 
 	// Internal reset DB connection function
-	void resetDBConnection();
+	void resetDBConnection(bool bCheckForUnaffiliatedFiles = false);
 
 	// Internal close all DB connections. Credentials will be maintained if bTemporaryClose is used
 	// as long as the re-connection is to the same database.

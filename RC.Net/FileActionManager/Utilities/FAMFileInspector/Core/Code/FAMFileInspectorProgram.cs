@@ -171,7 +171,7 @@ namespace Extract.FileActionManager.Utilities
                             famFileInspectorForm.ShowSelectDB(false))
                         {
                             // Checks schema
-                            famFileInspectorForm.FileProcessingDB.ResetDBConnection(true);
+                            famFileInspectorForm.FileProcessingDB.ResetDBConnection(true, false);
                             loggedIn = true;
 
                             famFileInspectorForm.ResetFileSelectionSettings();

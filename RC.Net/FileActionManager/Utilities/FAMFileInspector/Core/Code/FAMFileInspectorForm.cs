@@ -1118,7 +1118,7 @@ namespace Extract.FileActionManager.Utilities
 
                 if (UseDatabaseMode && !FileProcessingDB.IsConnected)
                 {
-                    FileProcessingDB.ResetDBConnection(false);
+                    FileProcessingDB.ResetDBConnection(false, false);
                 }
 
                 // After connecting, make sure the context menu options match whether the
@@ -2914,7 +2914,7 @@ namespace Extract.FileActionManager.Utilities
                     if (FileProcessingDB.ShowSelectDB("Select database", false, false))
                     {
                         // Checks schema
-                        FileProcessingDB.ResetDBConnection(true);
+                        FileProcessingDB.ResetDBConnection(true, false);
                         ResetFileSelectionSettings();
                         ResetSearch();
                         Show();
