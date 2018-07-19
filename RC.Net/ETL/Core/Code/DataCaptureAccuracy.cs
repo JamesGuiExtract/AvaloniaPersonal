@@ -144,11 +144,9 @@ namespace Extract.ETL
         /// </summary>
         static readonly string DELETE_OLD_DATA = AFFECTED_FILES +
             @"
-
                 DELETE FROM ReportingDataCaptureAccuracy
                     WHERE DatabaseServiceID = @DatabaseServiceID
                         AND FileID IN(SELECT FileID FROM @affectedFiles)
-
             ";
 
         #endregion
@@ -169,11 +167,6 @@ namespace Extract.ETL
         /// The current status info for this service.
         /// </summary>
         DataCaptureAccuracyStatus _status;
-
-        /// <summary>
-        /// List to hold the queries that will be ran together in the same transaction
-        /// </summary>
-        List<string> _queriesToRunInBatch = new List<string>();
 
         #endregion Fields
 
@@ -250,6 +243,8 @@ namespace Extract.ETL
         /// <param name="endFileTaskSessionID">The ID of the last file task session row to process.</param>
         void ProcessBatch(CancellationToken cancelToken, int endFileTaskSessionID)
         {
+            var queriesToRunInBatch = new List<string>();
+
             using (var connection = NewSqlDBConnection())
             {
                 // Open the connection
@@ -298,22 +293,23 @@ namespace Extract.ETL
                             // Add the comparison results to the Results
                             var statsToStore = output.AggregateStatistics();
 
-                            AddAccuracyDataQueryToList(statsToStore, queryResultRow);
+                            queriesToRunInBatch.Add(AddAccuracyDataQueryToList(statsToStore, queryResultRow));
                         }
                     }
                 }
             }
 
-            AddTheDataToTheDatabase(endFileTaskSessionID, cancelToken);
+            AddTheDataToTheDatabase(queriesToRunInBatch, endFileTaskSessionID, cancelToken);
         }
 
 
         /// <summary>
-        /// Deletes the old records and adds the new data by executing the queries in _queriesToRunInBatch
+        /// Deletes the old records and adds the new data by executing the queries in queriesToRunInBatch
         /// </summary>
         /// <param name="endFileTaskSessionID">The last fileTaskSessionID in the batch</param>
         /// <param name="cancelToken">Cancel token</param>
-        void AddTheDataToTheDatabase(int endFileTaskSessionID, CancellationToken cancelToken)
+        void AddTheDataToTheDatabase(List<string> queriesToRunInBatch, int endFileTaskSessionID,
+            CancellationToken cancelToken)
         {
             using (TransactionScope scope = new TransactionScope(
                TransactionScopeOption.Required,
@@ -339,7 +335,7 @@ namespace Extract.ETL
                     }
 
                     // Run the queries to add the accuracy records
-                    foreach (var q in _queriesToRunInBatch)
+                    foreach (var q in queriesToRunInBatch)
                     {
                         try
                         {
@@ -476,7 +472,7 @@ namespace Extract.ETL
         /// <param name="statsToStore">The <see cref="AccuracyDetail"/> instances to store.</param>
         /// <param name="queryResultRow">The <see cref="UpdateQueryResultRow"/> used to generate the stats.
         /// </param>
-        void AddAccuracyDataQueryToList(IEnumerable<AccuracyDetail> statsToStore,
+        string AddAccuracyDataQueryToList(IEnumerable<AccuracyDetail> statsToStore,
             UpdateQueryResultRow queryResultRow)
         {
             // This is needed so a row gets put in for every file that has expected and found voa's saved
@@ -523,26 +519,28 @@ namespace Extract.ETL
                     ));
             }
 
-            _queriesToRunInBatch.Add(string.Format(CultureInfo.InvariantCulture,
-                @"INSERT INTO [dbo].[ReportingDataCaptureAccuracy]
-                    ([DatabaseServiceID]
-                    ,[FoundAttributeSetForFileID]
-                    ,[ExpectedAttributeSetForFileID]
-                    ,[FileID]
-                    ,[Attribute]
-                    ,[Correct]
-                    ,[Expected]
-                    ,[Incorrect]
-                    ,[FoundDateTimeStamp]
-                    ,[FoundActionID]
-                    ,[FoundFAMUserID]
-                    ,[ExpectedDateTimeStamp]
-                    ,[ExpectedActionID]
-                    ,[ExpectedFAMUserID]
-                    )
-                VALUES
-                    {0};", string.Join(",\r\n", valuesToAdd)));
+            var queryToAdd =
+                string.Format(CultureInfo.InvariantCulture,
+                    @"INSERT INTO [dbo].[ReportingDataCaptureAccuracy]
+                        ([DatabaseServiceID]
+                        ,[FoundAttributeSetForFileID]
+                        ,[ExpectedAttributeSetForFileID]
+                        ,[FileID]
+                        ,[Attribute]
+                        ,[Correct]
+                        ,[Expected]
+                        ,[Incorrect]
+                        ,[FoundDateTimeStamp]
+                        ,[FoundActionID]
+                        ,[FoundFAMUserID]
+                        ,[ExpectedDateTimeStamp]
+                        ,[ExpectedActionID]
+                        ,[ExpectedFAMUserID]
+                        )
+                    VALUES
+                        {0};", string.Join(",\r\n", valuesToAdd));
 
+            return queryToAdd;
         }
 
         #endregion DatabaseService Methods
