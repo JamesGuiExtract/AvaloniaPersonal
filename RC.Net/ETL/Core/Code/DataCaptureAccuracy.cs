@@ -291,7 +291,7 @@ namespace Extract.ETL
                             .ToList();
 
                             // Add the comparison results to the Results
-                            var statsToStore = output.AggregateStatistics();
+                            var statsToStore = output.AggregateStatistics(cancelToken);
 
                             queriesToRunInBatch.Add(AddAccuracyDataQueryToList(statsToStore, queryResultRow));
                         }

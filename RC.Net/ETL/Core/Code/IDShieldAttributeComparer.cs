@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 using Extract.AttributeFinder;
 using Extract.DataCaptureStats;
 using UCLID_AFCORELib;
@@ -92,7 +93,7 @@ namespace Extract.ETL
         [CLSCompliant(false)]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "x")]
         public static Dictionary<Int32, List<AccuracyDetail>> CompareAttributes(IUnknownVector expected, IUnknownVector found,
-            string xPathOfSensitiveAttributes)
+            string xPathOfSensitiveAttributes, CancellationToken cancelToken)
         {
             try
             {
@@ -132,6 +133,8 @@ namespace Extract.ETL
                             
                         foreach (var foundAttribute in foundEnumerator)
                         {
+                            cancelToken.ThrowIfCancellationRequested();
+
                             // Include page in hash set only need to do this the first time through
                             if (expectedIndex == 0)
                             {
@@ -158,6 +161,8 @@ namespace Extract.ETL
 
                     for (expectedIndex = 0; expectedIndex < expectedCount; expectedIndex++)
                     {
+                        cancelToken.ThrowIfCancellationRequested();
+
                         bool foundCorrectRedaction = false;
 
                         // Add the expected count to the output
@@ -167,6 +172,8 @@ namespace Extract.ETL
 
                         for (int foundIndex = 0; foundIndex < foundCount; foundIndex++)
                         {
+                            cancelToken.ThrowIfCancellationRequested();
+
                             // if this the first time through the loop add the found count to the output
                             if (expectedIndex == 0)
                             {
@@ -235,6 +242,8 @@ namespace Extract.ETL
                     //--------------------------------------------------------
                     for (int foundIndex = 0; foundIndex < foundCount; foundIndex++)
                     {
+                        cancelToken.ThrowIfCancellationRequested();
+
                         // A found redaction is a false positive if it was not already found to overlap an
                         // expected redaction.
                         if (!OverlappingFounds.Contains(foundIndex))

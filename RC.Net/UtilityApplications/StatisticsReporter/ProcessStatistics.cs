@@ -271,7 +271,7 @@ namespace StatisticsReporter
         /// Delegate for the action that will be ran for each file
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public Func<IUnknownVector, IUnknownVector, string, string, IEnumerable<AccuracyDetail>> PerFileAction { get; set; }
+        public Func<IUnknownVector, IUnknownVector, string, string, CancellationToken,IEnumerable<AccuracyDetail>> PerFileAction { get; set; }
 
         #endregion
 
@@ -476,7 +476,8 @@ namespace StatisticsReporter
                                     var output = PerFileAction(ExpectedAttributes,
                                               FoundAttributes,
                                               Settings.FileSettings.XPathToIgnore,
-                                              Settings.FileSettings.XPathOfContainerOnlyAttributes)
+                                              Settings.FileSettings.XPathOfContainerOnlyAttributes,
+                                              default(CancellationToken))
                                               .ToList();
 
                                     // Add the comparison results to the Results

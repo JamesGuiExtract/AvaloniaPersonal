@@ -177,7 +177,7 @@ namespace Extract.ETL
         /// <summary>
         /// Size of the batch to process in each transaction
         /// </summary>
-        const int _BATCH_SIZE = 100;
+        const int _BATCH_SIZE = 10;
 
         /// <summary>
         /// String used to create the add attributes sql
@@ -506,7 +506,7 @@ namespace Extract.ETL
                         {
                             try
                             {
-                                addAttributes(connection, AttributesToStore, attributeSetForFileID);
+                                addAttributes(connection, AttributesToStore, attributeSetForFileID, cancelToken);
                             }
                             catch (Exception ex)
                             {
@@ -725,11 +725,12 @@ namespace Extract.ETL
         /// <param name="attributeSetForFileID">The ID of the AttributeSetForFileID record that contains the VOA being added</param>
         /// <param name="parentAttributeID">The ID of the parent Attribute record. if 0 it is a top level attribute</param>
         void addAttributes(SqlConnection connection, IUnknownVector attributes,
-            Int64 attributeSetForFileID,
+            Int64 attributeSetForFileID, CancellationToken cancelToken,
             Int64 parentAttributeID = 0)
         {
             foreach (var attribute in attributes.ToIEnumerable<IAttribute>())
             {
+                cancelToken.ThrowIfCancellationRequested();
                 if (!StoreEmptyAttributes && AttributeIsEmpty(attribute))
                 {
                     continue;
@@ -765,7 +766,7 @@ namespace Extract.ETL
                         Int64? attributeID = insertTask.Result as Int64?;
                         if (!(attributeID is null) && !(attribute.SubAttributes is null))
                         {
-                            addAttributes(connection, attribute.SubAttributes, attributeSetForFileID, (Int64)attributeID);
+                            addAttributes(connection, attribute.SubAttributes, attributeSetForFileID, cancelToken, (Int64)attributeID);
                         }
                     }
                     catch (Exception ex)

@@ -3,6 +3,7 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 
@@ -31,9 +32,11 @@ namespace Extract.DataCaptureStats
         /// <param name="containerXPath">The XPath to select attributes that will be considered as containers only</param>
         /// <remarks><see paramref="found"/> and <see paramref="expected"/> hierarchies may be modified
         /// by this method.</remarks>
+        /// <param name="cancelToken">CancellationToke to allow cancel of comparison</param>
         /// <returns></returns>
         public static IEnumerable<AccuracyDetail> CompareAttributes(IUnknownVector expected, IUnknownVector found,
-            string ignoreXPath = DefaultIgnoreXPath, string containerXPath = DefaultContainerXPath)
+            string ignoreXPath = DefaultIgnoreXPath, string containerXPath = DefaultContainerXPath,
+            CancellationToken cancelToken = default(CancellationToken))
         {
             try
             {
@@ -62,7 +65,7 @@ namespace Extract.DataCaptureStats
                     }
                 }
 
-                return CompareAttributesAfterXPathModifications(expected, found, containerAttributes);
+                return CompareAttributesAfterXPathModifications(expected, found, containerAttributes, cancelToken);
             }
             catch (Exception ex)
             {
@@ -405,7 +408,8 @@ namespace Extract.DataCaptureStats
         /// <param name="containerAttributes">The attributes that matched the container-only XPath pattern</param>
         /// <returns>An enumeration of <see cref="AccuracyDetail"/> items representing the result of the comparison</returns>
         private static IEnumerable<AccuracyDetail> CompareAttributesAfterXPathModifications(
-            IUnknownVector topLevelExpected, IUnknownVector topLevelFound, HashSet<IAttribute> containerAttributes)
+            IUnknownVector topLevelExpected, IUnknownVector topLevelFound, HashSet<IAttribute> containerAttributes,
+            CancellationToken canceToken)
         {
             ExtractException.Assert("ELI41502", "Unable to compare Attributes.",
                 topLevelFound != null && topLevelExpected != null);
@@ -469,6 +473,8 @@ namespace Extract.DataCaptureStats
                         expected.ToIEnumerable<IAttribute>().SelectMany((expectedAttribute, expectedIndex) =>
                             found.ToIEnumerable<IAttribute>().Select((foundAttribute, foundIndex) =>
                             {
+                                canceToken.ThrowIfCancellationRequested();
+
                                 // Compute the score for this attribute pair
                                 var score = ComputeScore(expectedAttribute, foundAttribute, containerAttributes);
 
@@ -498,6 +504,8 @@ namespace Extract.DataCaptureStats
                     AttributeScoreData bestMatch;
                     while ((bestMatch = attributeScores.LastOrDefault()) != null)
                     {
+                        canceToken.ThrowIfCancellationRequested();
+
                         // Mark the found attribute as used
                         foundAttributeUsedState[bestMatch.FoundIndex] = true;
 

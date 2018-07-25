@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Extract.DataCaptureStats
 {
@@ -20,12 +21,16 @@ namespace Extract.DataCaptureStats
         /// <param name="statisticsToAggregate">The collection of <see cref="AccuracyDetail"/> items to aggregate.</param>
         /// <returns>An <see cref="IEnumerable{AccuracyDetail}"/> where each label/path pair in the input has been summed.</returns>
         public static IEnumerable<AccuracyDetail> AggregateStatistics(this
-            IEnumerable<AccuracyDetail> statisticsToAggregate)
+            IEnumerable<AccuracyDetail> statisticsToAggregate, CancellationToken cancelToken = default(CancellationToken))
         {
             try
             {
                 return statisticsToAggregate.GroupBy(a => new { a.Path, a.Label })
-                    .Select(g => new AccuracyDetail(g.Key.Label, g.Key.Path, g.Sum(a => a.Value)));
+                    .Select(g => {
+                        cancelToken.ThrowIfCancellationRequested();
+                        return new AccuracyDetail(g.Key.Label, g.Key.Path, g.Sum(a => a.Value));
+                    }
+                );
             }
             catch (Exception ex)
             {

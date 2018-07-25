@@ -469,7 +469,8 @@ namespace Extract.ETL
                                 IUnknownVector FoundAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(foundStream);
 
                                 // Compare the VOAs
-                                var output = IDShieldAttributeComparer.CompareAttributes(ExpectedAttributes, FoundAttributes, XPathOfSensitiveAttributes).ToList();
+                                var output = IDShieldAttributeComparer.CompareAttributes(ExpectedAttributes, FoundAttributes, 
+                                    XPathOfSensitiveAttributes, cancelToken).ToList();
 
                                 // process output for each page
                                 foreach (var pageKeyPair in output)
@@ -477,7 +478,7 @@ namespace Extract.ETL
                                     int page = pageKeyPair.Key;
 
                                     // Add the comparison results to the Results
-                                    var statsToSave = pageKeyPair.Value.AggregateStatistics();
+                                    var statsToSave = pageKeyPair.Value.AggregateStatistics(cancelToken);
 
                                     var lookup = statsToSave.ToLookup(a => new { a.Path, a.Label });
 
