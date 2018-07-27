@@ -1570,6 +1570,21 @@ namespace Extract.Redaction.Verification
                 }
             }
 
+            if (_settings.General.VerifyFullPageCluesOnly)
+            {
+                int rowIndex = _redactionGridView.GetNextUnviewedFullPageClueRowIndex(0);
+                if (rowIndex >= 0)
+                {
+                    _redactionGridView.SelectOnly(rowIndex);
+
+                    MessageBox.Show("Must visit all full page clues before saving.",
+                        "Must visit all items",
+                        MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+
+                    return true;
+                }
+            }
+
             return false;
         }
 
@@ -2116,7 +2131,7 @@ namespace Extract.Redaction.Verification
                 }
 
                  // Go to the previous row (or page) if it exists
-                int previousRow = _redactionGridView.GetPreviousRowIndex();
+                int previousRow = _redactionGridView.GetPreviousRowIndex(_settings.General.VerifyFullPageCluesOnly);
                 int previousPage = _settings.General.VerifyAllPages ? GetPreviousPage() : -1;
                 if (GoToPreviousRowOrPage(previousRow, previousPage, checkAvailability))
                 {
@@ -2155,7 +2170,7 @@ namespace Extract.Redaction.Verification
                 }
                 
                 // Go to the next row (or page) if it exists
-                int nextRow = _redactionGridView.GetNextRowIndex();
+                int nextRow = _redactionGridView.GetNextRowIndex(_settings.General.VerifyFullPageCluesOnly);
                 int nextPage = _settings.General.VerifyAllPages ? GetNextPage() : -1;
                 if (GoToNextRowOrPage(nextRow, nextPage))
                 {

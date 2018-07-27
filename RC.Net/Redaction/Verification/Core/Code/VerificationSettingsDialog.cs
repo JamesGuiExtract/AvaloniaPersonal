@@ -1,5 +1,4 @@
 using Extract.FileActionManager.Forms;
-using Extract.Redaction;
 using Extract.Utilities.Forms;
 using System;
 using System.Windows.Forms;
@@ -170,12 +169,13 @@ namespace Extract.Redaction.Verification
             // Get the settings
             bool verifyAllPages = _verifyAllPagesCheckBox.Checked;
             bool verifyAllItems = _verifyAllItemsCheckBox.Checked;
+            bool verifyFullPageCluesOnly = _verifyFullPageCluesCheckBox.Checked;
             bool requireTypes = _requireTypeCheckBox.Checked;
             bool requireExemptions = _requireExemptionsCheckBox.Checked;
             bool allowSeamlessNavigation = _seamlessNavigationCheckBox.Checked;
             bool promptForSaveUntilCommit = _promptForSaveUntilCommit.Checked;
 
-            return new GeneralVerificationSettings(verifyAllPages, verifyAllItems, requireTypes,
+            return new GeneralVerificationSettings(verifyAllPages, verifyAllItems, verifyFullPageCluesOnly, requireTypes,
                 requireExemptions, allowSeamlessNavigation, promptForSaveUntilCommit);
         }
 
@@ -331,6 +331,13 @@ namespace Extract.Redaction.Verification
             _actionNameComboBox.Enabled = enabled;
             _actionNamePathTagsButton.Enabled = enabled;
             _actionStatusComboBox.Enabled = enabled;
+
+            // Enable or disable settings for verifyFullPageClues checkboax
+            enabled = !_verifyAllItemsCheckBox.Checked && !_verifyAllPagesCheckBox.Checked;
+            _verifyFullPageCluesCheckBox.Enabled = enabled;
+
+            _verifyAllPagesCheckBox.Enabled = !(enabled && _verifyFullPageCluesCheckBox.Checked);
+            _verifyAllItemsCheckBox.Enabled = !(enabled && _verifyFullPageCluesCheckBox.Checked);
         }
 
         /// <summary>
@@ -436,7 +443,8 @@ namespace Extract.Redaction.Verification
                 // General settings
                 _verifyAllPagesCheckBox.Checked = _settings.General.VerifyAllPages;
                 _verifyAllItemsCheckBox.Checked = _settings.General.VerifyAllItems;
-                _requireExemptionsCheckBox.Checked = _settings.General.RequireExemptions;                
+                _verifyFullPageCluesCheckBox.Checked = _settings.General.VerifyFullPageCluesOnly;
+                _requireExemptionsCheckBox.Checked = _settings.General.RequireExemptions;
                 _requireTypeCheckBox.Checked = _settings.General.RequireTypes;
                 _seamlessNavigationCheckBox.Checked = _settings.General.AllowSeamlessNavigation;
                 _feedback = _settings.Feedback;
@@ -722,7 +730,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void _redactionVerificationRadioButton_CheckedChanged(object sender, EventArgs e)
+        void _redactionVerificationRadioButton_CheckedChanged(object sender, EventArgs e)
         {
             try
             {
@@ -739,7 +747,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void _redactionQaRadioButton_CheckedChanged(object sender, EventArgs e)
+        void _redactionQaRadioButton_CheckedChanged(object sender, EventArgs e)
         {
             try
             {
@@ -764,7 +772,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void _redactionQaComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        void _redactionQaComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             try
             {
@@ -776,11 +784,24 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion Event Handlers
-
-        private void VerificationSettingsDialog_Load(object sender, EventArgs e)
+        /// <summary>
+        /// Handles the CheckedChanged event of _verifyAllPagesCheckBox, _verifyFullPageCluesCheckBox and 
+        /// _verifyAllItemsCheckbox controls
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        void HandleCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-
+            try
+            {
+                UpdateControls();
+            }
+            catch (Exception ex_)
+            {
+                ex_.ExtractDisplay("ELI46172");
+            }
         }
+
+        #endregion Event Handlers
     }
 }

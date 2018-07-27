@@ -70,6 +70,7 @@ namespace Extract.Redaction.Verification
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this._verifyFullPageCluesCheckBox = new System.Windows.Forms.CheckBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._redactionQaExplanatoryLabel = new System.Windows.Forms.Label();
@@ -297,12 +298,13 @@ namespace Extract.Redaction.Verification
             // _verifyAllItemsCheckBox
             // 
             this._verifyAllItemsCheckBox.AutoSize = true;
-            this._verifyAllItemsCheckBox.Location = new System.Drawing.Point(6, 29);
+            this._verifyAllItemsCheckBox.Location = new System.Drawing.Point(6, 31);
             this._verifyAllItemsCheckBox.Name = "_verifyAllItemsCheckBox";
             this._verifyAllItemsCheckBox.Size = new System.Drawing.Size(299, 17);
             this._verifyAllItemsCheckBox.TabIndex = 1;
             this._verifyAllItemsCheckBox.Text = "Require every suggested redaction or clue to be reviewed";
             this._verifyAllItemsCheckBox.UseVisualStyleBackColor = true;
+            this._verifyAllItemsCheckBox.CheckedChanged += new System.EventHandler(this.HandleCheckBox_CheckedChanged);
             // 
             // _launchFullScreenCheckBox
             // 
@@ -338,20 +340,20 @@ namespace Extract.Redaction.Verification
             // _requireExemptionsCheckBox
             // 
             this._requireExemptionsCheckBox.AutoSize = true;
-            this._requireExemptionsCheckBox.Location = new System.Drawing.Point(6, 75);
+            this._requireExemptionsCheckBox.Location = new System.Drawing.Point(6, 106);
             this._requireExemptionsCheckBox.Name = "_requireExemptionsCheckBox";
             this._requireExemptionsCheckBox.Size = new System.Drawing.Size(218, 17);
-            this._requireExemptionsCheckBox.TabIndex = 3;
+            this._requireExemptionsCheckBox.TabIndex = 4;
             this._requireExemptionsCheckBox.Text = "Require exemption codes to be specified";
             this._requireExemptionsCheckBox.UseVisualStyleBackColor = true;
             // 
             // _requireTypeCheckBox
             // 
             this._requireTypeCheckBox.AutoSize = true;
-            this._requireTypeCheckBox.Location = new System.Drawing.Point(6, 52);
+            this._requireTypeCheckBox.Location = new System.Drawing.Point(6, 81);
             this._requireTypeCheckBox.Name = "_requireTypeCheckBox";
             this._requireTypeCheckBox.Size = new System.Drawing.Size(205, 17);
-            this._requireTypeCheckBox.TabIndex = 2;
+            this._requireTypeCheckBox.TabIndex = 3;
             this._requireTypeCheckBox.Text = "Require redaction type to be specified";
             this._requireTypeCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -364,14 +366,15 @@ namespace Extract.Redaction.Verification
             this._verifyAllPagesCheckBox.TabIndex = 0;
             this._verifyAllPagesCheckBox.Text = "Require all pages to be visited";
             this._verifyAllPagesCheckBox.UseVisualStyleBackColor = true;
+            this._verifyAllPagesCheckBox.CheckedChanged += new System.EventHandler(this.HandleCheckBox_CheckedChanged);
             // 
             // _promptForSaveUntilCommit
             // 
             this._promptForSaveUntilCommit.AutoSize = true;
-            this._promptForSaveUntilCommit.Location = new System.Drawing.Point(6, 98);
+            this._promptForSaveUntilCommit.Location = new System.Drawing.Point(6, 131);
             this._promptForSaveUntilCommit.Name = "_promptForSaveUntilCommit";
             this._promptForSaveUntilCommit.Size = new System.Drawing.Size(398, 17);
-            this._promptForSaveUntilCommit.TabIndex = 4;
+            this._promptForSaveUntilCommit.TabIndex = 5;
             this._promptForSaveUntilCommit.Text = "Prompt to save changes before navigating away from uncommitted documents.";
             this._promptForSaveUntilCommit.UseVisualStyleBackColor = true;
             // 
@@ -432,6 +435,7 @@ namespace Extract.Redaction.Verification
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this._requireTypeCheckBox);
+            this.tabPage2.Controls.Add(this._verifyFullPageCluesCheckBox);
             this.tabPage2.Controls.Add(this._verifyAllItemsCheckBox);
             this.tabPage2.Controls.Add(this._verifyAllPagesCheckBox);
             this.tabPage2.Controls.Add(this._requireExemptionsCheckBox);
@@ -443,6 +447,17 @@ namespace Extract.Redaction.Verification
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Validation";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // _verifyFullPageCluesCheckBox
+            // 
+            this._verifyFullPageCluesCheckBox.AutoSize = true;
+            this._verifyFullPageCluesCheckBox.Location = new System.Drawing.Point(6, 56);
+            this._verifyFullPageCluesCheckBox.Name = "_verifyFullPageCluesCheckBox";
+            this._verifyFullPageCluesCheckBox.Size = new System.Drawing.Size(155, 17);
+            this._verifyFullPageCluesCheckBox.TabIndex = 2;
+            this._verifyFullPageCluesCheckBox.Text = "Review full page clues only";
+            this._verifyFullPageCluesCheckBox.UseVisualStyleBackColor = true;
+            this._verifyFullPageCluesCheckBox.CheckedChanged += new System.EventHandler(this.HandleCheckBox_CheckedChanged);
             // 
             // tabPage3
             // 
@@ -599,7 +614,6 @@ namespace Extract.Redaction.Verification
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Redaction: Verify sensitive data settings";
-            this.Load += new System.EventHandler(this.VerificationSettingsDialog_Load);
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
             groupBox4.ResumeLayout(false);
@@ -665,5 +679,6 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.Label _redactionVerifyExplanatoryTextLabel;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label _redactionQaExplanatoryLabel;
+        private System.Windows.Forms.CheckBox _verifyFullPageCluesCheckBox;
     }
 }

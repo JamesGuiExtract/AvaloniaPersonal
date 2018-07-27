@@ -17,10 +17,16 @@ namespace Extract.Redaction
         readonly bool _verifyAllPages;
 
         /// <summary>
-        /// <see langword="true"/> if all suggested redactons and clues must be visted;
+        /// <see langword="true"/> if all suggested redactions and clues must be visited;
         /// <see langword="false"/> otherwise. 
         /// </summary>
         readonly bool _verifyAllItems;
+
+        /// <summary>
+        /// <see langword="true"/> if only visiting pages with full page clues;
+        /// <see langword="false"/> otherwise. 
+        /// </summary>
+        readonly bool _verifyFullPageCluesOnly;
 
         /// <summary>
         /// <see langword="true"/> if all redactions require a redaction type; 
@@ -56,7 +62,7 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="GeneralVerificationSettings"/> class 
         /// with default settings.
         /// </summary>
-        public GeneralVerificationSettings() : this(true, true, true, false, true, false)
+        public GeneralVerificationSettings() : this(true, true, false, true, false, true, false)
         {
 
         }
@@ -65,11 +71,12 @@ namespace Extract.Redaction
         /// Initializes a new instance of the <see cref="GeneralVerificationSettings"/> class.
         /// </summary>
         public GeneralVerificationSettings(bool verifyAllPages, bool verifyAllItems,
-            bool requireTypes, bool requireExemptions, bool allowSeamlessNavigation,
-            bool promptForSaveUntilCommit)
+            bool verifyFullPageCluesOnly, bool requireTypes, bool requireExemptions, 
+            bool allowSeamlessNavigation, bool promptForSaveUntilCommit)
         {
             _verifyAllPages = verifyAllPages;
             _verifyAllItems = verifyAllItems;
+            _verifyFullPageCluesOnly = verifyFullPageCluesOnly;
             _requireTypes = requireTypes;
             _requireExemptions = requireExemptions;
             _allowSeamlessNavigation = allowSeamlessNavigation;
@@ -84,7 +91,7 @@ namespace Extract.Redaction
         /// Gets whether what all pages should be verified.
         /// </summary>
         /// <returns><see langword="true"/> if all pages should be verified;
-        /// <see langword="false"/> if only pages that contain redactions shoudl be verfied.
+        /// <see langword="false"/> if only pages that contain redactions should be verified.
         /// </returns>
         public bool VerifyAllPages
         {
@@ -95,9 +102,9 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Gets whether what all redactons and clues must be visted.
+        /// Gets whether what all redactions and clues must be visited.
         /// </summary>
-        /// <returns><see langword="true"/> if all suggested redactons and clues must be visted;
+        /// <returns><see langword="true"/> if all suggested redactions and clues must be visited;
         /// <see langword="false"/> otherwise. 
         /// </returns>
         public bool VerifyAllItems
@@ -109,7 +116,21 @@ namespace Extract.Redaction
         }
 
         /// <summary>
-        /// Gets whether whether the user is required to specify a type for all redactions.
+        /// Gets whether only full page clues should be visited
+        /// </summary>
+        /// <returns><see langword="true"/> if only visiting pages with full page clues;
+        /// <see langword="false"/> otherwise. 
+        /// </returns>
+        public bool VerifyFullPageCluesOnly
+        {
+            get
+            {
+                return _verifyFullPageCluesOnly;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the user is required to specify a type for all redactions.
         /// </summary>
         /// <returns><see langword="true"/> if all redactions require a redaction type;
         /// <see langword="false"/> if redactions can be saved without a redaction type.</returns>
@@ -191,8 +212,9 @@ namespace Extract.Redaction
                 bool requireExemptions = reader.ReadBoolean();
                 bool allowSeamlessNavigation = (reader.Version < 8) ? true : reader.ReadBoolean();
                 bool promptForSaveUntilCommit = (reader.Version < 8) ? false : reader.ReadBoolean();
+                bool verifyFullPageCluesOnly = (reader.Version < 12) ? false : reader.ReadBoolean();
 
-                return new GeneralVerificationSettings(verifyAllPages, verifyAllItems, requireTypes,
+                return new GeneralVerificationSettings(verifyAllPages, verifyAllItems, verifyFullPageCluesOnly, requireTypes,
                     requireExemptions, allowSeamlessNavigation, promptForSaveUntilCommit);
             }
             catch (Exception ex)
@@ -218,6 +240,7 @@ namespace Extract.Redaction
                 writer.Write(_requireExemptions);
                 writer.Write(_allowSeamlessNavigation);
                 writer.Write(_promptForSaveUntilCommit);
+                writer.Write(_verifyFullPageCluesOnly);
             }
             catch (Exception ex)
             {

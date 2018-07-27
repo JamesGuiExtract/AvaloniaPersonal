@@ -53,12 +53,13 @@ namespace IDShieldOnDemand
                 // Launch the verification UI with default settings except:
                 // VerifyAllPages is false
                 // VerifyAllItems is false
+                // VerifyFullCluesOnly is false
                 // Require types is false
                 // Seamless mode is false
                 // Slideshow feature is disabled
                 // Tags will be disabled (no access to database).
                 VerificationSettings settings = new VerificationSettings(
-                    new GeneralVerificationSettings(false, false, false, false, false, false),
+                    new GeneralVerificationSettings(false, false, false, false, false, false, false),
                     null,
                     @"<SourceDocName>.voa",
                     false,

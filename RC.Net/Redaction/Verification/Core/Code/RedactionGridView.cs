@@ -72,6 +72,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         static readonly string[] _CATEGORIES = Enum.GetNames(typeof(CategoryIndex));
 
+        /// <summary>
+        /// RedactionType that represents a full page clue
+        /// </summary>
+        static readonly string _FULL_PAGE_CLUE_TYPE = "FullPageClue";
+
         #endregion Constants
 
         #region Fields
@@ -1844,14 +1849,41 @@ namespace Extract.Redaction.Verification
                     "Unable to determine next unviewed row.", ex);
             }
         }
-        
+
+        /// <summary>
+        /// Gets the index of the first unviewed row with a full page clue that occurs at or after the specified row.
+        /// </summary>
+        /// <param name="startIndex">The first index to check for being unviewed.</param>
+        /// <returns>The index of the first unviewed row with a full page clue that occurs at or after 
+        /// <paramref name="startIndex"/>; or -1 if no such row exists.</returns>
+        public int GetNextUnviewedFullPageClueRowIndex(int startIndex)
+        {
+            try
+            {
+                for (int i = startIndex; i < _dataGridView.Rows.Count; i++)
+                {
+                    if (!_redactions[i].Visited && _redactions[i].RedactionType == _FULL_PAGE_CLUE_TYPE)
+                    {
+                        return i;
+                    }
+                }
+                return -1;
+
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI46170",
+                    "Unable to determine next unviewed full page clue", ex);
+            }
+        }
+
         /// <summary>
         /// Determines the index of the row before the currently selected row.
         /// </summary>
         /// <returns>The index of the row before the currently selected row.</returns>
         // This is performing a calculation, so is better suited as a method.
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public int GetPreviousRowIndex()
+        public int GetPreviousRowIndex(bool fullPageClue = false)
         {
             try
             {
@@ -1864,7 +1896,8 @@ namespace Extract.Redaction.Verification
                     int currentPage = _imageViewer.PageNumber;
                     for (int i = _dataGridView.Rows.Count - 1; i >= 0; i--)
                     {
-                        if (_redactions[i].PageNumber <= currentPage)
+                        if (_redactions[i].PageNumber <= currentPage
+                            && (!fullPageClue || _redactions[i].RedactionType == _FULL_PAGE_CLUE_TYPE))
                         {
                             return i;
                         }
@@ -1873,7 +1906,20 @@ namespace Extract.Redaction.Verification
                 else if (selectedRowIndex > 0)
                 {
                     // Return the previous row index, unless this is the first row of the grid
-                    return selectedRowIndex - 1;
+                    if (fullPageClue)
+                    {
+                        for (int i = selectedRowIndex - 1; i >= 0; i--)
+                        {
+                            if (_redactions[i].RedactionType == _FULL_PAGE_CLUE_TYPE)
+                            {
+                                return i;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        return selectedRowIndex - 1;
+                    }
                 }
 
                 return -1;
@@ -1891,7 +1937,7 @@ namespace Extract.Redaction.Verification
         /// <returns>The index of the row after the currently selected row.</returns>
         // This is performing a calculation, so is better suited as a method.
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public int GetNextRowIndex()
+        public int GetNextRowIndex(bool fullPageClue = false)
         {
             try
             {
@@ -1904,7 +1950,8 @@ namespace Extract.Redaction.Verification
                     int currentPage = _imageViewer.PageNumber;
                     for (int i = 0; i < _dataGridView.Rows.Count; i++)
                     {
-                        if (_redactions[i].PageNumber >= currentPage)
+                        if (_redactions[i].PageNumber >= currentPage
+                            && (!fullPageClue || _redactions[i].RedactionType == _FULL_PAGE_CLUE_TYPE))
                         {
                             return i;
                         }
@@ -1912,8 +1959,21 @@ namespace Extract.Redaction.Verification
                 }
                 else if (selectedRowIndex + 1 < _dataGridView.Rows.Count)
                 {
-                    // Return the next row index, unless this is the last row of the grid
-                    return selectedRowIndex + 1;
+                    if(fullPageClue)
+                    {
+                        for (int i = selectedRowIndex + 1; i <_dataGridView.Rows.Count; i++)
+                        {
+                            if (_redactions[i].RedactionType == _FULL_PAGE_CLUE_TYPE)
+                            {
+                                return i;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Return the next row index, unless this is the last row of the grid
+                        return selectedRowIndex + 1;
+                    }
                 }
 
                 return -1;
