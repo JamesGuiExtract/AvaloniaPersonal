@@ -119,23 +119,21 @@ bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfIn
 		}
 	}
 
-	if (bThrowIfInvalid)
-	{
-		UCLIDException ue("ELI38796", "DatabaseID is invalid.");
-		ue.addDebugInfo("SavedServer", m_strServer, true);
-		ue.addDebugInfo("SavedDatabase", m_strName, true);
-		ue.addDebugInfo("SavedCreation", 
-			(LPCSTR)m_ctCreated.Format(gstrDATE_TIME_FORMAT.c_str()), true);
-		ue.addDebugInfo("SavedRestored", 
-			(LPCSTR)m_ctRestored.Format(gstrDATE_TIME_FORMAT.c_str()), true);
-		ue.addDebugInfo("ExpectedServer", strServer, true);
-		ue.addDebugInfo("ExpectedDatabase", strDatabaseName, true);
-		ue.addDebugInfo("ExpectedCreationDate", 
-			(LPCSTR)ctCreationDate.Format(gstrDATE_TIME_FORMAT.c_str()), true);
-		ue.addDebugInfo("ExpectedRestoreDate",
-			(LPCSTR)ctRestoreDate.Format(gstrDATE_TIME_FORMAT.c_str()), true);
-		throw ue;
-	}
+	UCLIDException ue("ELI38796", "DatabaseID is invalid.");
+	ue.addDebugInfo("SavedServer", m_strServer, true);
+	ue.addDebugInfo("SavedDatabase", m_strName, true);
+	ue.addDebugInfo("SavedCreation", 
+		(LPCSTR)m_ctCreated.Format(gstrDATE_TIME_FORMAT.c_str()), true);
+	ue.addDebugInfo("SavedRestored", 
+		(LPCSTR)m_ctRestored.Format(gstrDATE_TIME_FORMAT.c_str()), true);
+	ue.addDebugInfo("ExpectedServer", strServer, true);
+	ue.addDebugInfo("ExpectedDatabase", strDatabaseName, true);
+	ue.addDebugInfo("ExpectedCreationDate", 
+		(LPCSTR)ctCreationDate.Format(gstrDATE_TIME_FORMAT.c_str()), true);
+	ue.addDebugInfo("ExpectedRestoreDate",
+		(LPCSTR)ctRestoreDate.Format(gstrDATE_TIME_FORMAT.c_str()), true);
+	(bThrowIfInvalid) ? throw ue : ue.log();
+	
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
