@@ -373,7 +373,7 @@ namespace Extract.ETL
 
                 RefreshStatus();
 
-                int maxFileTaskSession = MaxReportableFileTaskSessionId();
+                int maxFileTaskSession = MaxReportableFileTaskSessionId(true);
                 int currentLastProcessed = _status.StartingFileTaskSessionId();
 
                 // check if there is anything to do
@@ -666,7 +666,7 @@ namespace Extract.ETL
                 {
                     _status.LastIDProcessedForDashboardAttribute.TryAdd(a.ToString(), -1);
                 }
-
+                List<string> itemsToRemove = new List<string>();
                 foreach (var d in itemsToDelete)
                 {
                     using (var scope = new TransactionScope(TransactionScopeOption.Required,
@@ -677,7 +677,7 @@ namespace Extract.ETL
                         },
                         TransactionScopeAsyncFlowOption.Enabled))
                     {
-                        _status.LastIDProcessedForDashboardAttribute.Remove(d);
+                        itemsToRemove.Add(d);
                         using (var connection = NewSqlDBConnection())
                         {
                             connection.Open();
@@ -687,11 +687,15 @@ namespace Extract.ETL
                                 cmd.CommandTimeout = 0;
                                 cmd.CommandText = String.Format(CultureInfo.InvariantCulture,
                                     @"DELETE FROM DashboardAttributeFields
-                                                WHERE [Name] = '{0}' AND [AttributeSetForFileID = {1}",
+                                                WHERE [Name] = '{0}' AND [AttributeSetForFileID] = {1}",
                                     dashboardAttributeField.DashboardAttributeName, dashboardAttributeField.AttributeSetNameID);
                                 var task = cmd.ExecuteNonQueryAsync();
                                 task.Wait(_cancelToken);
                             }
+                        }
+                        foreach (var r in itemsToRemove)
+                        {
+                            _status.LastIDProcessedForDashboardAttribute.Remove(d);
                         }
                         SaveStatus();
                         scope.Complete();

@@ -345,7 +345,7 @@ namespace Extract.ETL
         /// a DateTimeStamp assigned, or the maximum FileTaskSession ID if no active session exists.
         /// </summary>
         /// <returns></returns>
-        protected int MaxReportableFileTaskSessionId()
+        protected int MaxReportableFileTaskSessionId(bool storeTaskOnly = false)
         {
             try
             {
@@ -359,8 +359,15 @@ namespace Extract.ETL
                             SELECT COALESCE(MIN(CASE WHEN ActiveFAM.ID IS NOT NULL AND DateTimeStamp IS NULL THEN FileTaskSession.ID END) - 1,
                                     MAX(FileTaskSession.ID))
 	                            FROM FileTaskSession
+								INNER JOIN TaskClass ON TaskClass.ID = FileTaskSession.TaskClassID
 	                            LEFT JOIN FAMSession ON FAMSessionID = FAMSession.ID
-	                            LEFT JOIN ActiveFAM ON FAMSession.ID = ActiveFAM.FAMSessionID";
+	                            LEFT JOIN ActiveFAM ON FAMSession.ID = ActiveFAM.FAMSessionID 
+                        ";
+
+                        if (storeTaskOnly)
+                        {
+                            cmd.CommandText += "WHERE TaskClass.GUID = 'B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006'";
+                        }
                         
                         return (int)(cmd.ExecuteScalar() ?? -1);
                     }

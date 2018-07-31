@@ -105,8 +105,9 @@ namespace Extract.ETL
                 
                 ;WITH TouchedFiles AS (
                 	SELECT FileTaskSession.ID FileTaskSessionID, FileID, FileTaskSession.DateTimeStamp
-                	FROM FileTaskSession 
+                	FROM FileTaskSession INNER JOIN TaskClass ON FileTaskSession.TaskClassID = TaskClass.ID
                 	WHERE FileTaskSession.ID > @LastProcessedID AND FileTaskSession.ID <= @LastInBatchID
+                        AND TaskClass.GUID = 'B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006'
                 )
                 
                 INSERT INTO @FilesTable
@@ -271,7 +272,7 @@ namespace Extract.ETL
                 }
 
                 // Get the maximum File task session id available
-                Int32 maxFileTaskSession = MaxReportableFileTaskSessionId();
+                Int32 maxFileTaskSession = MaxReportableFileTaskSessionId(true);
 
                 // Process the entries in chunks of 100 file task session
                 while (status.LastFileTaskSessionIDProcessed < maxFileTaskSession)
