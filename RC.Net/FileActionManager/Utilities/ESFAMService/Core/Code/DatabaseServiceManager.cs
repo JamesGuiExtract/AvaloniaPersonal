@@ -311,7 +311,7 @@ namespace Extract.FileActionManager.Utilities
                     "SELECT [ActiveFAM].[ID] FROM [ActiveFAM] " +
                     "   INNER JOIN [FAMSession] ON [FAMSessionID] = [FAMSession].[ID]" +
                     "   INNER JOIN [FPSFile] ON [FPSFileID] = [FPSFile].[ID]" +
-                    "   WHERE [FPSFileName] = 'ETL'").Any())
+                    "   WHERE [FPSFileName] LIKE 'ETL%'").Any())
                 {
                     // There is already another service executing ETL on this database;
                     // check every 5 minutes to see if other ETL services are still running.
