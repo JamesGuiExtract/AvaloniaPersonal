@@ -28,9 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DashboardViewerForm));
-            this.dashboardViewerMain = new DevExpress.DashboardWin.DashboardViewer(this.components);
+            this.dashboardViewerMain = new DevExpress.DashboardWin.DashboardViewer();
             this.splitContainerControl1 = new DevExpress.XtraEditors.SplitContainerControl();
             this.dashboardFlyoutPanel = new DevExpress.Utils.FlyoutPanel();
             this.flyoutPanelControl1 = new DevExpress.Utils.FlyoutPanelControl();
@@ -65,6 +64,7 @@
             this.dashboardViewerMain.DrillDownPerformed += new DevExpress.DashboardCommon.DrillActionEventHandler(this.HandleDashboardViewerMainDrillDownPerformed);
             this.dashboardViewerMain.DrillUpPerformed += new DevExpress.DashboardCommon.DrillActionEventHandler(this.HandleDashboardViewerMainDrillUpPerformed);
             this.dashboardViewerMain.DashboardItemDoubleClick += new DevExpress.DashboardWin.DashboardItemMouseActionEventHandler(this.HandleDashboardViewerMainDashboardItemDoubleClick);
+            this.dashboardViewerMain.PopupMenuShowing += new DevExpress.DashboardWin.DashboardPopupMenuShowingEventHandler(this.HandlePopupMenuShowing);
             // 
             // splitContainerControl1
             // 
@@ -181,6 +181,7 @@
             this.Name = "DashboardViewerForm";
             this.Text = "Dashboard";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DashboardViewerForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.dashboardViewerMain)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerControl1)).EndInit();
             this.splitContainerControl1.ResumeLayout(false);

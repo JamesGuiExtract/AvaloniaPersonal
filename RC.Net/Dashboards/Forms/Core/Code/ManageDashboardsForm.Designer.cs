@@ -34,6 +34,8 @@
             this._closeButton = new System.Windows.Forms.Button();
             this._renameDashboardButton = new System.Windows.Forms.Button();
             this._viewButton = new System.Windows.Forms.Button();
+            this._exportDashboardButton = new System.Windows.Forms.Button();
+            this._replaceDashboardButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dashboardDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -56,16 +58,16 @@
             this.dashboardDataGridView.Size = new System.Drawing.Size(434, 426);
             this.dashboardDataGridView.TabIndex = 0;
             this.dashboardDataGridView.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.HandleDashboardGridViewCellBeginEdit);
-            this.dashboardDataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dashboardDataGridView_CellDoubleClick);
+            this.dashboardDataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDashboardDataGridView_CellDoubleClick);
             this.dashboardDataGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDashboardGridViewCellEndEdit);
             // 
             // _importDashboardButton
             // 
             this._importDashboardButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._importDashboardButton.Location = new System.Drawing.Point(452, 71);
+            this._importDashboardButton.Location = new System.Drawing.Point(452, 129);
             this._importDashboardButton.Name = "_importDashboardButton";
             this._importDashboardButton.Size = new System.Drawing.Size(75, 23);
-            this._importDashboardButton.TabIndex = 3;
+            this._importDashboardButton.TabIndex = 5;
             this._importDashboardButton.Text = "Import";
             this._importDashboardButton.UseVisualStyleBackColor = true;
             this._importDashboardButton.Click += new System.EventHandler(this.HandleImportDashboardButtonClick);
@@ -73,10 +75,10 @@
             // _removeDashboardButton
             // 
             this._removeDashboardButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._removeDashboardButton.Location = new System.Drawing.Point(453, 100);
+            this._removeDashboardButton.Location = new System.Drawing.Point(453, 71);
             this._removeDashboardButton.Name = "_removeDashboardButton";
             this._removeDashboardButton.Size = new System.Drawing.Size(75, 23);
-            this._removeDashboardButton.TabIndex = 4;
+            this._removeDashboardButton.TabIndex = 3;
             this._removeDashboardButton.Text = "Remove";
             this._removeDashboardButton.UseVisualStyleBackColor = true;
             this._removeDashboardButton.Click += new System.EventHandler(this.HandleRemoveDashboardButtonClick);
@@ -88,7 +90,7 @@
             this._closeButton.Location = new System.Drawing.Point(453, 414);
             this._closeButton.Name = "_closeButton";
             this._closeButton.Size = new System.Drawing.Size(75, 23);
-            this._closeButton.TabIndex = 5;
+            this._closeButton.TabIndex = 7;
             this._closeButton.Text = "Close";
             this._closeButton.UseVisualStyleBackColor = true;
             // 
@@ -113,6 +115,28 @@
             this._viewButton.UseVisualStyleBackColor = true;
             this._viewButton.Click += new System.EventHandler(this.HandleViewButtonClick);
             // 
+            // _exportDashboardButton
+            // 
+            this._exportDashboardButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._exportDashboardButton.Location = new System.Drawing.Point(453, 158);
+            this._exportDashboardButton.Name = "_exportDashboardButton";
+            this._exportDashboardButton.Size = new System.Drawing.Size(75, 23);
+            this._exportDashboardButton.TabIndex = 6;
+            this._exportDashboardButton.Text = "Export";
+            this._exportDashboardButton.UseVisualStyleBackColor = true;
+            this._exportDashboardButton.Click += new System.EventHandler(this.HandleExportDashboardButton_Click);
+            // 
+            // _replaceDashboardButton
+            // 
+            this._replaceDashboardButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._replaceDashboardButton.Location = new System.Drawing.Point(453, 100);
+            this._replaceDashboardButton.Name = "_replaceDashboardButton";
+            this._replaceDashboardButton.Size = new System.Drawing.Size(75, 23);
+            this._replaceDashboardButton.TabIndex = 4;
+            this._replaceDashboardButton.Text = "Replace";
+            this._replaceDashboardButton.UseVisualStyleBackColor = true;
+            this._replaceDashboardButton.Click += new System.EventHandler(this.HandleReplaceDashboardButton_Click);
+            // 
             // ManageDashboardsForm
             // 
             this.AcceptButton = this._closeButton;
@@ -123,6 +147,8 @@
             this.Controls.Add(this._viewButton);
             this.Controls.Add(this._renameDashboardButton);
             this.Controls.Add(this._closeButton);
+            this.Controls.Add(this._exportDashboardButton);
+            this.Controls.Add(this._replaceDashboardButton);
             this.Controls.Add(this._removeDashboardButton);
             this.Controls.Add(this._importDashboardButton);
             this.Controls.Add(this.dashboardDataGridView);
@@ -147,5 +173,7 @@
         private System.Windows.Forms.Button _closeButton;
         private System.Windows.Forms.Button _renameDashboardButton;
         private System.Windows.Forms.Button _viewButton;
+        private System.Windows.Forms.Button _exportDashboardButton;
+        private System.Windows.Forms.Button _replaceDashboardButton;
     }
 }

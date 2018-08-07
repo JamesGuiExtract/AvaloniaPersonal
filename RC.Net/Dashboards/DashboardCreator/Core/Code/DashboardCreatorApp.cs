@@ -2,6 +2,7 @@
 using DevExpress.UserSkins;
 using Extract;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Windows.Forms;
 
@@ -13,7 +14,7 @@ namespace DashboardCreator
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             try
             {
@@ -21,17 +22,35 @@ namespace DashboardCreator
                 LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI45312",
                     Application.ProductName);
 
+                if (args.Length > 1)
+                {
+                    Usage();
+                }
+                string fileName = null;
+                for (int a = 0; a < args.Length; a++)
+                {
+                    if (string.IsNullOrEmpty(fileName))
+                    {
+                        fileName = args[a];
+                    }
+                }
+
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
                 BonusSkins.Register();
                 SkinManager.EnableFormSkins();
-                Application.Run(new DashboardCreatorForm());
+                Application.Run(new DashboardCreatorForm(fileName));
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45313");
             }
+        }
+
+        static void Usage()
+        {
+            UtilityMethods.ShowMessageBox("Usage: DashboardCreator [<DashboardFileName>]", "DashboardCreator usage", false);
         }
     }
 }

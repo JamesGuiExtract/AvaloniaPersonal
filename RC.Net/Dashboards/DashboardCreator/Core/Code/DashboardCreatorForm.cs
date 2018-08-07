@@ -1,11 +1,12 @@
 ﻿using DevExpress.DashboardCommon;
+using DevExpress.DashboardCommon.ViewerData;
 using DevExpress.DashboardWin;
-using DevExpress.DataAccess.ConnectionParameters;
 using DevExpress.XtraBars;
 using DevExpress.XtraBars.Ribbon;
 using Extract;
 using Extract.Dashboard.Forms;
 using Extract.Dashboard.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ using System.Xml.Linq;
 
 namespace DashboardCreator
 {
-    public partial class DashboardCreatorForm : RibbonForm
+    public partial class DashboardCreatorForm : RibbonForm, IExtractDashboardCommon
     {
 
         #region Fields
@@ -25,17 +26,141 @@ namespace DashboardCreator
         string _dashboardFileName;
 
         /// <summary>
-        /// The key used is the control name
+        /// Server name to override server name in dashboard config
+        /// if empty or null dashboard will be opened with configured server
         /// </summary>
-        Dictionary<string, GridDetailConfiguration> _customGridValues = new Dictionary<string, GridDetailConfiguration>();
+        string _serverName;
+
+        /// <summary>
+        /// Database name to override database name in dashboard config
+        /// if empty or null dashboard will be opened with configured database
+        /// </summary>
+        string _databaseName;
+
+        /// <summary>
+        /// Instance of <see cref="DashboardShared{T}"/> that contains shared code between Creator and Viewer
+        /// </summary>
+        DashboardShared<DashboardCreatorForm> _dashboardShared;
+
+        #endregion
+
+        #region IExtractDashboardCommon Implementation
+
+        /// <summary>
+        /// Gets the active dashboard from the underlying control
+        /// </summary>
+        public Dashboard Dashboard
+        {
+            get
+            {
+                return dashboardDesigner.Dashboard;
+            }
+        }
 
         /// <summary>
         /// Dictionary to track drill down level for Dashboard controls
         /// </summary>
-        Dictionary<string, int> _drillDownLevelForItem = new Dictionary<string, int>();
+        public Dictionary<string, int> DrillDownLevelForItem { get; } = new Dictionary<string, int>();
 
-        bool _drillDownLevelIncreased = false;
+        /// <summary>
+        /// Tracks if the Drill down level has increased for the control
+        /// </summary>
+        public Dictionary<string, bool> DrillDownLevelIncreased { get; } = new Dictionary<string, bool>();
 
+        /// <summary>
+        /// The server name to use for the Dashboard
+        /// </summary>
+        public string ServerName
+        {
+            get
+            {
+                return IsDatabaseOverridden ? _serverName : ConfiguredServerName; ;
+            }
+            set
+            {
+                _serverName = value;
+            }
+        }
+
+        /// <summary>
+        /// The DatabaseName to use for the dashboard
+        /// </summary>
+        public string DatabaseName
+        {
+            get
+            {
+                return IsDatabaseOverridden ? _databaseName : ConfiguredDatabaseName;
+            }
+
+            set
+            {
+                _databaseName = value;
+            }
+        }
+
+        /// <summary>
+        /// The Server configured in the Dashboard
+        /// </summary>
+        public string ConfiguredServerName { get; set; }
+
+        /// <summary>
+        /// The Database configured in the Dashboard
+        /// </summary>
+        public string ConfiguredDatabaseName { get; set; }
+
+        /// <summary>
+        /// Indicates that the Server and DatabaseName have been overridden
+        /// </summary>
+        public bool IsDatabaseOverridden
+        {
+            get
+            {
+                return !(string.IsNullOrWhiteSpace(_serverName) || string.IsNullOrWhiteSpace(_databaseName));
+            }
+        }
+
+        /// <summary>
+        /// List of files that were selected in the control when the Popup was 
+        /// displayed
+        /// </summary>
+        public IEnumerable<string> CurrentFilteredFiles { get; set; } = new List<string>();
+
+        /// <summary>
+        /// Since this instance is not a <see cref="DevExpress.DashboardWin.DashboardViewer"/> it should return null
+        /// </summary>
+        public DashboardViewer Viewer => null;
+        
+        /// <summary>
+        /// Since this instance has a <see cref="DevExpress.DashboardWin.DashboardDesigner"/> it should return the designer
+        /// </summary>
+        public DashboardDesigner Designer => dashboardDesigner;
+
+        /// <summary>
+        /// Gets the current filtered values for the named dashboard item
+        /// </summary>
+        /// <param name="dashboardItemName">Dashboard item name</param>
+        /// <returns>List of current <see cref="AxisPointTuple"/>s for the named control</returns>
+        public IList<AxisPointTuple> GetCurrentFilterValues(string dashboardItemName)
+        {
+            return dashboardDesigner.GetCurrentFilterValues(dashboardItemName);
+        }
+
+        /// <summary>
+        /// Calls the <see cref="FormsExtensionMethods.SafeBeginInvoke(Control, string, Action, bool, Action{Exception})"/> 
+        /// the specified <see paramref="action"/> asynchronously within a try/catch handler
+        /// that will display any exceptions.
+        /// </summary>
+        /// <param name="eliCode">The ELI code to associate with any exception.</param>
+        /// <param name="action">The <see cref="Action"/> to be invoked.</param>
+        /// <param name="displayExceptions"><see langword="true"/> to display any exception caught;
+        /// <see langword="false"/> to log instead.</param>
+        /// <param name="exceptionAction">A second action that should be executed in the case of an
+        /// exception an exception in <see paramref="action"/>.</param>
+        public void SafeBeginInvokeForShared(string eliCode, Action action,
+            bool displayExceptions = true, Action<Exception> exceptionAction = null)
+        {
+            this.SafeBeginInvoke(eliCode, action, displayExceptions, exceptionAction);
+        }
 
         #endregion
 
@@ -47,24 +172,56 @@ namespace DashboardCreator
         public DashboardCreatorForm()
         {
             InitializeComponent();
+            _dashboardShared = new DashboardShared<DashboardCreatorForm>(this);
+        }
+
+        /// <summary>
+        /// Constructor that loads the given fileName
+        /// </summary>
+        /// <param name="fileName">File containing the dashboard to open</param>
+        public DashboardCreatorForm(string fileName)
+        {
+            try
+            {
+                InitializeComponent();
+
+                _dashboardShared = new DashboardShared<DashboardCreatorForm>(this);
+
+                _dashboardFileName = fileName;
+                if (!string.IsNullOrWhiteSpace(_dashboardFileName))
+                {
+                    dashboardDesigner.Dashboard.LoadFromXml(_dashboardFileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46173");
+            }
         }
 
         #endregion
 
         #region Event Handlers
-        private void HandleConfigureDataConnection(object sender, DashboardConfigureDataConnectionEventArgs e)
+
+        void HandleDashboardCreatorForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             try
             {
-                // Set timeout to 0 (infinite) for all DataSources
-                foreach (var ds in dashboardDesigner.Dashboard.DataSources)
-                {
-                    var sqlDataSource = ds as DashboardSqlDataSource;
-                    if (sqlDataSource != null)
-                    {
-                        sqlDataSource.ConnectionOptions.DbCommandTimeout = 0;
-                    }
-                }
+                e.Cancel = !_dashboardShared.RequestDashboardClose(); 
+            }
+            catch ( Exception ex)
+            {
+                ex.ExtractDisplay("ELI46219");
+            }
+        }
+
+        void HandleDashboardDesignerConfigureDataConnection(object sender, DashboardConfigureDataConnectionEventArgs e)
+        {
+            try
+            {
+                _dashboardShared.HandleConfigureDataConnection(sender, e);
+
+                UpdateTitle();
             }
             catch (Exception ex)
             {
@@ -76,8 +233,8 @@ namespace DashboardCreator
         {
             try
             {
-                _drillDownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
-                _drillDownLevelIncreased = true;
+                DrillDownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
+                DrillDownLevelIncreased[e.DashboardItemName] = true;
             }
             catch (Exception ex)
             {
@@ -89,7 +246,7 @@ namespace DashboardCreator
         {
             try
             {
-                _drillDownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
+                DrillDownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
             }
             catch (Exception ex)
             {
@@ -101,7 +258,25 @@ namespace DashboardCreator
         {
             try
             {
-                _dashboardFileName = e.FilePath;
+                if (!string.IsNullOrWhiteSpace(e.FilePath))
+                {
+                    _dashboardFileName = e.FilePath;
+                    dashboardDesigner.Dashboard.LoadFromXml(_dashboardFileName);
+                    e.Handled = true;
+                }
+                else if (!string.IsNullOrWhiteSpace(e.DirectoryPath))
+                {
+                    OpenFileDialog openFileDialog = new OpenFileDialog();
+                    openFileDialog.Filter = "ESDX|*.esdx|All|*.*";
+                    openFileDialog.DefaultExt = "esdx";
+                    openFileDialog.InitialDirectory = e.DirectoryPath;
+                    if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        _dashboardFileName = openFileDialog.FileName;
+                        dashboardDesigner.Dashboard.LoadFromXml(_dashboardFileName);
+                    }
+                    e.Handled = true;
+                }
             }
             catch (Exception ex)
             {
@@ -117,7 +292,7 @@ namespace DashboardCreator
 
                 // get any existing configuration data for the control
                 GridDetailConfiguration configurationData;
-                if (!_customGridValues.ContainsKey(component))
+                if (!_dashboardShared.CustomGridValues.ContainsKey(component))
                 {
                     configurationData =
                         new GridDetailConfiguration
@@ -128,7 +303,7 @@ namespace DashboardCreator
                 }
                 else
                 {
-                    configurationData = _customGridValues[component];
+                    configurationData = _dashboardShared.CustomGridValues[component];
                 }
 
                 // Display the configuration
@@ -141,12 +316,12 @@ namespace DashboardCreator
                     if (string.IsNullOrWhiteSpace(configurationData.RowQuery))
                     {
                         // if updated configuration data has been cleared remove it from the dictionary
-                        _customGridValues.Remove(component);
+                        _dashboardShared.CustomGridValues.Remove(component);
                     }
                     else
                     {
                         // Save the updated configuration data in the dictionary
-                        _customGridValues[component] = configurationData;
+                        _dashboardShared.CustomGridValues[component] = configurationData;
                     }
                 }
             }
@@ -162,7 +337,9 @@ namespace DashboardCreator
             try
             {
                 ShowConfigureExtractSettingsMenuItem(e.Menu,
-                    dashboardDesigner.Dashboard.Items[e.DashboardItemName] is GridDashboardItem);
+                dashboardDesigner.Dashboard.Items[e.DashboardItemName] is GridDashboardItem);
+
+                _dashboardShared.HandlePopupMenuShowing(sender, e);
             }
             catch (Exception ex)
             {
@@ -175,29 +352,7 @@ namespace DashboardCreator
         {
             try
             {
-                if ((sender is DashboardDesigner dashboardDesigner) && _customGridValues.ContainsKey(e.DashboardItemName))
-                {
-                    Dashboard dashboard = dashboardDesigner.Dashboard;
-                    GridDashboardItem gridItem = dashboard.Items[e.DashboardItemName] as GridDashboardItem;
-                    if (gridItem is null)
-                    {
-                        return;
-                    }
-                    int drillLevel;
-                    _drillDownLevelForItem.TryGetValue(e.DashboardItemName, out drillLevel);
-
-                    // Get the data source
-                    DashboardSqlDataSource sqlDataSource = (DashboardSqlDataSource)gridItem.DataSource;
-                    SqlServerConnectionParametersBase sqlParameters = sqlDataSource.ConnectionParameters as SqlServerConnectionParametersBase;
-
-                    if (!gridItem.InteractivityOptions.IsDrillDownEnabled ||
-                        !_drillDownLevelIncreased && (gridItem.GetDimensions().Count - 1 == drillLevel))
-                    {
-                        DashboardHelper.DisplayDashboardDetailForm(gridItem, e, _customGridValues[e.DashboardItemName],
-                            sqlParameters.ServerName, sqlParameters.DatabaseName);
-                    }
-                }
-                _drillDownLevelIncreased = false;
+                _dashboardShared.HandleGridDashboardItemDoubleClick(sender, e);
             }
             catch (Exception ex)
             {
@@ -209,18 +364,20 @@ namespace DashboardCreator
         {
             try
             {
-                if (_customGridValues.Count > 0)
+                if (_dashboardShared.CustomGridValues.Count > 0)
                 {
                     XElement userData = new XElement(
                     "ExtractConfiguredGrids",
-                        _customGridValues.Select(kv =>
+                        _dashboardShared.CustomGridValues
+                        .Where(kvp => Dashboard.Items.Select(di => di.ComponentName).Contains(kvp.Key))
+                        .Select(kv =>
                             new XElement("Component", new XAttribute("Name", kv.Key),
                             new XElement("RowQuery", kv.Value.RowQuery))));
-                    dashboardDesigner.Dashboard.UserData = userData;
+                    Dashboard.UserData = userData;
                 }
                 else
                 {
-                    dashboardDesigner.Dashboard.UserData = null;
+                    Dashboard.UserData = null;
                 }
 
                 SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -233,10 +390,15 @@ namespace DashboardCreator
                     if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         _dashboardFileName = saveFileDialog.FileName;
-                        dashboardDesigner.Dashboard.SaveToXml(_dashboardFileName);
+                        Dashboard.SaveToXml(_dashboardFileName);
+                        UpdateTitle();
                     }
-                    e.Handled = true;
                 }
+                else
+                {
+                    Dashboard.SaveToXml(_dashboardFileName);
+                }
+                e.Handled = true;
             }
             catch (Exception ex)
             {
@@ -249,6 +411,7 @@ namespace DashboardCreator
             try
             {
                 _dashboardFileName = null;
+                UpdateTitle();
             }
             catch (Exception ex)
             {
@@ -260,16 +423,9 @@ namespace DashboardCreator
         {
             try
             {
-                if (_dashboardFileName is null)
-                {
-                    Text = "Dashboard creator";
-                    _customGridValues = new Dictionary<string, GridDetailConfiguration>();
-                }
-                else
-                {
-                    Text = _dashboardFileName + " - " + dashboardDesigner.Dashboard.Title.Text;
-                    _customGridValues = DashboardHelper.GridConfigurationsFromXML(dashboardDesigner.Dashboard?.UserData);
-                }
+                _dashboardShared.GridConfigurationsFromXML(Dashboard?.UserData);
+
+                UpdateTitle();
             }
             catch (Exception ex)
             {
@@ -294,7 +450,6 @@ namespace DashboardCreator
             }
         }
 
-
         void HandleFileOpenBarButtonItemItemClick(object sender, ItemClickEventArgs e)
         {
             try
@@ -317,9 +472,24 @@ namespace DashboardCreator
         #region Private methods
 
         /// <summary>
+        /// Update the title with the currently loaded dashboard file name
+        /// </summary>
+        void UpdateTitle()
+        {
+            if (_dashboardFileName is null)
+            {
+                Text = "Dashboard creator";
+            }
+            else
+            {
+                Text = _dashboardFileName + " - " + dashboardDesigner.Dashboard.Title.Text;
+            }
+        }
+
+        /// <summary>
         /// Enables or disables the 'Configure Extract settings' menu item
         /// </summary>
-        /// <param name="menu">the menu to show or hid the menu item </param>
+        /// <param name="menu">the menu to show or hide the menu item </param>
         /// <param name="show">if <c>true</c> make the menu item visible. if <c>false</c> hide the menu item</param>
         static void ShowConfigureExtractSettingsMenuItem(PopupMenu menu, bool show)
         {

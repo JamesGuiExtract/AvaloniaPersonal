@@ -1,10 +1,10 @@
 ﻿using DevExpress.DashboardCommon;
+using DevExpress.DashboardCommon.ViewerData;
 using DevExpress.DashboardWin;
-using DevExpress.DataAccess.ConnectionParameters;
 using DevExpress.XtraEditors;
 using Extract;
-using Extract.Dashboard.Forms;
 using Extract.Dashboard.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,7 +16,7 @@ using System.Xml.Linq;
 
 namespace DashboardViewer
 {
-    public partial class DashboardViewerForm : XtraForm
+    public partial class DashboardViewerForm : XtraForm, IExtractDashboardCommon
     {
         #region Constants
 
@@ -42,31 +42,14 @@ namespace DashboardViewer
         string _databaseName;
 
         /// <summary>
-        /// Server name configured for loaded dashboard
-        /// </summary>
-        string _serverConfiguredInDashboard;
-
-        /// <summary>
-        /// Database name configured for loaded dashboard
-        /// </summary>
-        string _databaseConfiguredInDashboard;
-
-        /// <summary>
-        /// The key used is the control name
-        /// </summary>
-        Dictionary<string, GridDetailConfiguration> _customGridValues = new Dictionary<string, GridDetailConfiguration>();
-
-        /// <summary>
-        /// Dictionary to track drill down level for dashboard items
-        /// </summary>
-        Dictionary<string, int> _drillDownLevelForItem = new Dictionary<string, int>();
-
-        /// <summary>
         /// Schema version for the active database
         /// </summary>
         int _databaseVersion = 0;
 
-        bool _drillDownLevelIncreased = false;
+        /// <summary>
+        /// Instance of <see cref="DashboardShared{T}"/> that contains shared code between Creator and Viewer
+        /// </summary>
+        DashboardShared<DashboardViewerForm> _dashboardShared;
 
         #endregion
 
@@ -81,7 +64,7 @@ namespace DashboardViewer
             {
                 try
                 {
-                    if (_databaseVersion == 0 && IsDatabaseOverridden())
+                    if (_databaseVersion == 0 && IsDatabaseOverridden)
                     {
                         using (var connection = NewSqlDBConnection())
                         {
@@ -111,6 +94,126 @@ namespace DashboardViewer
 
         #endregion
 
+        #region IExtractDashboardCommon Implementation
+
+        /// <summary>
+        /// Gets the active dashboard from the underlying control
+        /// </summary>
+        public Dashboard Dashboard
+        {
+            get
+            {
+                return dashboardViewerMain.Dashboard;
+            }
+        }
+
+        /// <summary>
+        /// Dictionary to track drill down level for Dashboard controls
+        /// </summary>
+        public Dictionary<string, int> DrillDownLevelForItem { get; } = new Dictionary<string, int>();
+
+        /// <summary>
+        /// Tracks if the Drill down level has increased for the control
+        /// </summary>
+        public Dictionary<string, bool> DrillDownLevelIncreased { get; } = new Dictionary<string, bool>();
+
+        /// <summary>
+        /// The server name to use for the Dashboard
+        /// </summary>
+        public string ServerName
+        {
+            get
+            {
+                return IsDatabaseOverridden ? _serverName : ConfiguredServerName; ;
+            }
+            set
+            {
+                _serverName = value;
+            }
+        }
+
+        /// <summary>
+        /// The DatabaseName to use for the dashboard
+        /// </summary>
+        public string DatabaseName
+        {
+            get
+            {
+                return IsDatabaseOverridden ? _databaseName : ConfiguredDatabaseName;
+            }
+
+            set
+            {
+                _databaseName = value;
+            }
+        }
+
+        /// <summary>
+        /// The Server configured in the Dashboard
+        /// </summary>
+        public string ConfiguredServerName { get; set; }
+
+        /// <summary>
+        /// The Database configured in the Dashboard
+        /// </summary>
+        public string ConfiguredDatabaseName { get; set; }
+
+        /// <summary>
+        /// Indicates that the Server and DatabaseName have been overridden
+        /// </summary>
+        public bool IsDatabaseOverridden
+        {
+            get
+            {
+                return !(string.IsNullOrWhiteSpace(_serverName) || string.IsNullOrWhiteSpace(_databaseName));
+            }
+        }
+
+        /// <summary>
+        /// List of files that were selected in the control when the Popup was 
+        /// displayed
+        /// </summary>
+        public IEnumerable<string> CurrentFilteredFiles { get; set; } = new List<string>();
+
+        /// <summary>
+        /// Since this has a <see cref="DevExpress.DashboardWin.DashboardViewer"/> return the instance of the viewer
+        /// </summary>
+        public DevExpress.DashboardWin.DashboardViewer Viewer => dashboardViewerMain;
+
+        /// <summary>
+        /// Since this does not have <see cref="DevExpress.DashboardWin.DashboardDesigner"/> return null
+        /// </summary>
+        public DevExpress.DashboardWin.DashboardDesigner Designer => null;
+
+        /// <summary>
+        /// Gets the current filtered values for the named dashboard item
+        /// </summary>
+        /// <param name="dashboardItemName">Dashboard item name</param>
+        /// <returns>List of current <see cref="AxisPointTuple"/>s for the named control</returns>
+        public IList<AxisPointTuple> GetCurrentFilterValues(string dashboardItemName)
+        {
+            return dashboardViewerMain.GetCurrentFilterValues(dashboardItemName);
+        }
+
+        /// <summary>
+        /// Calls the <see cref="FormsExtensionMethods.SafeBeginInvoke(Control, string, Action, bool, Action{Exception})"/> 
+        /// the specified <see paramref="action"/> asynchronously within a try/catch handler
+        /// that will display any exceptions.
+        /// </summary>
+        /// <param name="eliCode">The ELI code to associate with any exception.</param>
+        /// <param name="action">The <see cref="Action"/> to be invoked.</param>
+        /// <param name="displayExceptions"><see langword="true"/> to display any exception caught;
+        /// <see langword="false"/> to log instead.</param>
+        /// <param name="exceptionAction">A second action that should be executed in the case of an
+        /// exception an exception in <see paramref="action"/>.</param>
+        public void SafeBeginInvokeForShared(string eliCode, Action action,
+            bool displayExceptions = true, Action<Exception> exceptionAction = null)
+        {
+            this.SafeBeginInvoke(eliCode, action, displayExceptions, exceptionAction);
+        }
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -119,7 +222,9 @@ namespace DashboardViewer
         public DashboardViewerForm()
         {
             InitializeComponent();
-            dashboardToolStripMenuItem.Visible = IsDatabaseOverridden();
+
+            _dashboardShared = new DashboardShared<DashboardViewerForm>(this, true);
+            dashboardToolStripMenuItem.Visible = IsDatabaseOverridden;
         }
 
         /// <summary>
@@ -132,8 +237,10 @@ namespace DashboardViewer
             {
                 InitializeComponent();
 
+                _dashboardShared = new DashboardShared<DashboardViewerForm>(this, true);
+
                 dashboardViewerMain.DashboardSource = fileName;
-                dashboardToolStripMenuItem.Visible = IsDatabaseOverridden();
+                dashboardToolStripMenuItem.Visible = IsDatabaseOverridden;
             }
             catch (Exception ex)
             {
@@ -154,8 +261,10 @@ namespace DashboardViewer
             {
                 InitializeComponent();
 
-                _serverName = serverName;
-                _databaseName = databaseName;
+                _dashboardShared = new DashboardShared<DashboardViewerForm>(this, true);
+
+                ServerName = serverName;
+                DatabaseName = databaseName;
 
                 if (inDatabase)
                 {
@@ -188,8 +297,10 @@ namespace DashboardViewer
             {
                 InitializeComponent();
 
-                _serverName = serverName;
-                _databaseName = databaseName;
+                _dashboardShared = new DashboardShared<DashboardViewerForm>(this, true);
+
+                ServerName = serverName;
+                DatabaseName = databaseName;
                 dashboardToolStripMenuItem.Visible = AllowDatabaseDashboardSelection;
                 fileToolStripMenuItem.Visible = !AllowDatabaseDashboardSelection;
 
@@ -205,6 +316,29 @@ namespace DashboardViewer
         #endregion
 
         #region Event Handlers
+        void DashboardViewerForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                e.Cancel = !_dashboardShared.RequestDashboardClose();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46220");
+            }
+        }
+
+        void HandlePopupMenuShowing(object sender, DashboardPopupMenuShowingEventArgs e)
+        {
+            try
+            {
+                _dashboardShared.HandlePopupMenuShowing(sender, e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46206");
+            }
+        }
 
         #region Menu item event handlers
 
@@ -231,7 +365,7 @@ namespace DashboardViewer
         {
             try
             {
-                // Toggle the dashboard flyout panel - if it is displayed hide it if it is not displayed show it
+                // Toggle the dashboard fly-out panel - if it is displayed hide it if it is not displayed show it
                 if (dashboardFlyoutPanel.IsPopupOpen)
                 {
                     dashboardFlyoutPanel.HidePopup();
@@ -300,8 +434,8 @@ namespace DashboardViewer
         {
             try
             {
-                _drillDownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
-                _drillDownLevelIncreased = true;
+                DrillDownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
+                DrillDownLevelIncreased[e.DashboardItemName] = true;
             }
             catch (Exception ex)
             {
@@ -312,7 +446,7 @@ namespace DashboardViewer
         {
             try
             {
-                _drillDownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
+                DrillDownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
             }
             catch (Exception ex)
             {
@@ -323,30 +457,7 @@ namespace DashboardViewer
         {
             try
             {
-
-                if (sender is DevExpress.DashboardWin.DashboardViewer dashboardViewer
-                    && _customGridValues.ContainsKey(e.DashboardItemName))
-                {
-                    Dashboard dashboard = dashboardViewer.Dashboard;
-                    GridDashboardItem gridItem = dashboard.Items[e.DashboardItemName] as GridDashboardItem;
-
-                    if (gridItem is null)
-                    {
-                        return;
-                    }
-
-                    int drillLevel;
-                    _drillDownLevelForItem.TryGetValue(e.DashboardItemName, out drillLevel);
-
-                    if (!gridItem.InteractivityOptions.IsDrillDownEnabled ||
-                        !_drillDownLevelIncreased && (gridItem.GetDimensions().Count - 1 == drillLevel))
-                    {
-                        DashboardHelper.DisplayDashboardDetailForm(gridItem, e, _customGridValues[e.DashboardItemName],
-                            (IsDatabaseOverridden()) ? _serverName : _serverConfiguredInDashboard,
-                            (IsDatabaseOverridden()) ? _databaseName : _databaseConfiguredInDashboard);
-                    }
-                    _drillDownLevelIncreased = false;
-                }
+                _dashboardShared.HandleGridDashboardItemDoubleClick(sender, e);
             }
             catch (Exception ex)
             {
@@ -358,33 +469,9 @@ namespace DashboardViewer
         {
             try
             {
-                SqlServerConnectionParametersBase sqlParameters = e.ConnectionParameters as SqlServerConnectionParametersBase;
+                _dashboardShared.HandleConfigureDataConnection(sender, e);
 
-                // Only override SQL Server connection
-                if (sqlParameters == null)
-                {
-                    return;
-                }
-
-                _serverConfiguredInDashboard = sqlParameters.ServerName;
-                _databaseConfiguredInDashboard = sqlParameters.DatabaseName;
-
-                if (string.IsNullOrWhiteSpace(_serverName) || string.IsNullOrWhiteSpace(_databaseName))
-                {
-                    return;
-                }
-                sqlParameters.ServerName = _serverName;
-                sqlParameters.DatabaseName = _databaseName;
-
-                // Set timeout to 0 (infinite) for all DataSources
-                foreach (var ds in dashboardViewerMain.Dashboard.DataSources)
-                {
-                    var sqlDataSource = ds as DashboardSqlDataSource;
-                    if (sqlDataSource != null)
-                    {
-                        sqlDataSource.ConnectionOptions.DbCommandTimeout = 0;
-                    }
-                }
+                UpdateMainTitle();
             }
             catch (Exception ex)
             {
@@ -397,7 +484,7 @@ namespace DashboardViewer
             try
             {
                 UpdateMainTitle();
-                _customGridValues = DashboardHelper.GridConfigurationsFromXML(dashboardViewerMain.Dashboard?.UserData);
+                _dashboardShared.GridConfigurationsFromXML(Dashboard?.UserData);
             }
             catch (Exception ex)
             {
@@ -446,9 +533,9 @@ namespace DashboardViewer
         /// </summary>
         void UpdateMainTitle()
         {
-            if (dashboardViewerMain.Dashboard is null)
+            if (Dashboard is null)
             {
-                if (string.IsNullOrWhiteSpace(_serverName) && string.IsNullOrWhiteSpace(_databaseName))
+                if (!IsDatabaseOverridden)
                 {
                     Text = "Dashboard viewer";
                 }
@@ -460,28 +547,10 @@ namespace DashboardViewer
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(_serverName) && string.IsNullOrWhiteSpace(_databaseName))
-                {
-                    Text = string.Format(CultureInfo.InvariantCulture,
-                       "{0} Using {1} on {2}", dashboardViewerMain.Dashboard.Title.Text, _databaseConfiguredInDashboard,
-                       _serverConfiguredInDashboard);
+                Text = string.Format(CultureInfo.InvariantCulture,
+                    "{0} Using {1} on {2}", Dashboard.Title.Text, DatabaseName, ServerName);
 
-                }
-                else
-                {
-                    Text = string.Format(CultureInfo.InvariantCulture,
-                        "{0} Using {1} on {2}", dashboardViewerMain.Dashboard.Title.Text, _databaseName, _serverName);
-                }
             }
-        }
-
-        /// <summary>
-        /// Indicates if the server and database are being overridden.
-        /// </summary>
-        /// <returns><c>true</c> if the server and database are being overridden, <c>false</c> otherwise"/></returns>
-        bool IsDatabaseOverridden()
-        {
-            return !(string.IsNullOrWhiteSpace(_serverName) || string.IsNullOrWhiteSpace(_databaseName));
         }
 
         /// <summary>
@@ -491,7 +560,7 @@ namespace DashboardViewer
         {
             try
             {
-                if (!IsDatabaseOverridden() || !AllowDatabaseDashboardSelection)
+                if (!IsDatabaseOverridden || !AllowDatabaseDashboardSelection)
                 {
                     return;
                 }
@@ -523,8 +592,8 @@ namespace DashboardViewer
         {
             // Build the connection string from the settings
             SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = _serverName;
-            sqlConnectionBuild.InitialCatalog = _databaseName;
+            sqlConnectionBuild.DataSource = ServerName;
+            sqlConnectionBuild.InitialCatalog = DatabaseName;
             sqlConnectionBuild.IntegratedSecurity = true;
             sqlConnectionBuild.NetworkLibrary = "dbmssocn";
             sqlConnectionBuild.MultipleActiveResultSets = true;

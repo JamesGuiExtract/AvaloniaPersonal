@@ -3,11 +3,11 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Transactions;
 using System.Windows.Forms;
 using System.Xml.Linq;
-
 
 namespace Extract.Dashboard.Forms
 {
@@ -60,6 +60,86 @@ namespace Extract.Dashboard.Forms
         #endregion
 
         #region Event Handlers
+
+        void HandleExportDashboardButton_Click(object sender, EventArgs e)
+        {
+            if (dashboardDataGridView.CurrentRow != null)
+            {
+                string dashboardName = dashboardDataGridView.CurrentRow.Cells["DashboardName"].Value as string;
+
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.Filter = "ESDX|*.esdx|All|*.*";
+                saveFileDialog.DefaultExt = "esdx";
+                saveFileDialog.FileName = dashboardName + ".esdx";
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string fileName = saveFileDialog.FileName;
+                    if (File.Exists(fileName))
+                    {
+                        if (MessageBox.Show(
+                            string.Format(CultureInfo.InstalledUICulture, "{0} exists. Overwrite?", fileName), "File exists", MessageBoxButtons.YesNo) != DialogResult.Yes)
+                        {
+                            return;
+                        }
+                    }
+
+                    string dashboardDefinition = GetDashboardDefinition(dashboardName);
+                    File.WriteAllText(saveFileDialog.FileName, dashboardDefinition);
+                }
+            }
+        }
+        void HandleReplaceDashboardButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (dashboardDataGridView.CurrentRow != null)
+                {
+                    string dashboardName = dashboardDataGridView.CurrentRow.Cells["DashboardName"].Value as string;
+                    SelectDashboardToImportForm selectForm = new SelectDashboardToImportForm(true, dashboardName);
+                    if (selectForm.ShowDialog() == DialogResult.OK)
+                    {
+                        var xDoc = XDocument.Load(selectForm.DashboardFile);
+                        using (var connect = NewSqlDBConnection())
+                        using (var scope = new TransactionScope())
+                        {
+                            connect.Open();
+                            var command = connect.CreateCommand();
+                            command.CommandText =
+                                @"UPDATE Dashboard 
+                                    SET [Definition] = @Definition
+                                    WHERE [DashboardName] = @DashboardName
+                                ";
+
+                            command.Parameters.Add("@DashboardName", SqlDbType.NVarChar, 100).Value = dashboardName;
+                            command.Parameters.Add("@Definition", SqlDbType.Xml).Value = xDoc.ToString();
+                            command.ExecuteScalar();
+                            scope.Complete();
+                        }
+                        LoadDashboardGrid();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46178");
+            }
+        }
+
+        void HandleDashboardDataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                // check to make sure the header wasn't double clicked
+                if (e.RowIndex >= 0)
+                {
+                    HandleViewButtonClick(sender, e);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46129");
+            }
+        }
 
         void HandleViewButtonClick(object sender, EventArgs e)
         {
@@ -229,8 +309,8 @@ namespace Extract.Dashboard.Forms
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandText = "SELECT DashboardName FROM Dashboard";
-                    
-					DataTable dataTable = new DataTable();
+
+                    DataTable dataTable = new DataTable();
                     dataTable.Load(command.ExecuteReader());
                     dashboardDataGridView.DataSource = dataTable;
                 }
@@ -257,22 +337,27 @@ namespace Extract.Dashboard.Forms
             return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
-        #endregion
-
-        private void dashboardDataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        /// <summary>
+        /// Get the dashboard definition for the given dashboard name;
+        /// </summary>
+        /// <param name="dashboardName"></param>
+        /// <returns></returns>
+        string GetDashboardDefinition(string dashboardName)
         {
-            try
+            using (var connection = NewSqlDBConnection())
             {
-                // check to make sure the header wasn't double clicked
-                if (e.RowIndex >= 0)
+                connection.Open();
+                using (var command = connection.CreateCommand())
                 {
-                    HandleViewButtonClick(sender, e);
+                    command.CommandText =
+                        "SELECT Definition FROM Dashboard WHERE DashboardName = @DashboardName";
+
+                    command.Parameters.Add("@DashboardName", SqlDbType.NVarChar, 100).Value = dashboardName;
+                    return command.ExecuteScalar() as string;
                 }
             }
-            catch(Exception ex)
-            {
-                ex.ExtractDisplay("ELI46129");
-            }
         }
+
+        #endregion
     }
 }

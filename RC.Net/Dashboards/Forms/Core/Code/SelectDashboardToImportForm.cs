@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Threading;
 
 namespace Extract.Dashboard.Forms
 {
@@ -21,6 +14,12 @@ namespace Extract.Dashboard.Forms
 
         }
 
+        public SelectDashboardToImportForm(bool dashboardNameReadOnly, string dashboardName = "")
+        {
+            InitializeComponent();
+            DashboardName = dashboardName;
+            _dashboardNameTextBox.ReadOnly = dashboardNameReadOnly;
+        }
         #endregion
 
         #region Public properties
@@ -61,17 +60,17 @@ namespace Extract.Dashboard.Forms
 
         #region Events
 
-        private void HandleBrowseButtonClick(object sender, EventArgs e)
+        void HandleBrowseButtonClick(object sender, EventArgs e)
         {
             try
             {
-                    OpenFileDialog openDialog = new OpenFileDialog();
-                    openDialog.FileName = _dashboardFileTextBox.Text;
-                    openDialog.Filter = "ESDX|*.esdx|XML|*.xml|All|*.*";
-                    if (openDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        _dashboardFileTextBox.Text = openDialog.FileName;
-                    }
+                OpenFileDialog openDialog = new OpenFileDialog();
+                openDialog.FileName = _dashboardFileTextBox.Text;
+                openDialog.Filter = "ESDX|*.esdx|XML|*.xml|All|*.*";
+                if (openDialog.ShowDialog() == DialogResult.OK)
+                {
+                    _dashboardFileTextBox.Text = openDialog.FileName;
+                }
             }
             catch (Exception ex)
             {
