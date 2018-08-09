@@ -179,6 +179,13 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 {
                     previousValue = _encoder.AnswerCodeToName[e.RowIndex];
                     var newValue = (string)answerCategoriesDataGridView.Rows[e.RowIndex].Cells[1].Value;
+
+                    // Do nothing if value hasn't changed
+                    if (string.Equals(previousValue, newValue, StringComparison.Ordinal))
+                    {
+                        return;
+                    }
+
                     _encoder.ChangeAnswer(previousValue, newValue);
                 }
             }
