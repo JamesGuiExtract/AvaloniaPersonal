@@ -915,6 +915,15 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 	readObjectFromBSTR(ipObj, _bstrStream);
 	ASSERT_RESOURCE_ALLOCATION("ELI18352", ipObj != __nullptr);
 
+	// Attach the passed in parameters to the spatial string
+	// https://extract.atlassian.net/browse/ISSUE-15562
+	if (pOCRParameters != __nullptr)
+	{
+		IHasOCRParametersPtr ipHasOCRParameters(ipObj);
+		ASSERT_RESOURCE_ALLOCATION("ELI46179", ipHasOCRParameters != __nullptr);
+		ipHasOCRParameters->OCRParameters = pOCRParameters;
+	}
+
 	// return the spatial string
 	return ipObj;
 }
@@ -986,6 +995,15 @@ ISpatialStringPtr CScansoftOCR::recognizePrintedTextInImageZone(BSTR strImageFil
 	IPersistStreamPtr ipStream;
 	readObjectFromBSTR(ipStream, _bstrStream);
 	ASSERT_RESOURCE_ALLOCATION("ELI18353", ipStream != __nullptr);
+
+	// Attach the passed in parameters to the spatial string
+	// https://extract.atlassian.net/browse/ISSUE-15562
+	if (pOCRParameters != __nullptr)
+	{
+		IHasOCRParametersPtr ipHasOCRParameters(ipStream);
+		ASSERT_RESOURCE_ALLOCATION("ELI46180", ipHasOCRParameters != __nullptr);
+		ipHasOCRParameters->OCRParameters = pOCRParameters;
+	}
 
 	// return the stream as a spatial string
 	return (ISpatialStringPtr) ipStream;

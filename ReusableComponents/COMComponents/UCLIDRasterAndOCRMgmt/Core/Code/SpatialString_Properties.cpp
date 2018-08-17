@@ -551,6 +551,16 @@ STDMETHODIMP CSpatialString::GetSpecifiedPages(long nStartPageNum, long nEndPage
 					ue.addDebugInfo("Number of pages", nLastPageNumber);
 				}
 
+				ipReturn->OCREngineVersion = get_bstr_t(m_strOCREngineVersion);
+
+				// Set the OCR parameters
+				if (m_ipOCRParameters != __nullptr)
+				{
+					UCLID_RASTERANDOCRMGMTLib::IHasOCRParametersPtr ipHasOCRParameters(ipReturn);
+					ASSERT_RESOURCE_ALLOCATION("ELI46185", ipHasOCRParameters != __nullptr);
+					ipHasOCRParameters->OCRParameters = getOCRParameters();
+				}
+
 				*ppResultString = (ISpatialString*) ipReturn.Detach();
 				return S_OK;
 			}
@@ -607,6 +617,17 @@ STDMETHODIMP CSpatialString::GetSpecifiedPages(long nStartPageNum, long nEndPage
 						m_strSourceDocName.c_str(), m_ipPageInfoMap);
 				}
 			}
+		}
+
+		// Set the OCR engine version
+		ipReturn->OCREngineVersion = get_bstr_t(m_strOCREngineVersion);
+
+		// Set the OCR parameters
+		if (m_ipOCRParameters != __nullptr)
+		{
+			UCLID_RASTERANDOCRMGMTLib::IHasOCRParametersPtr ipHasOCRParameters(ipReturn);
+			ASSERT_RESOURCE_ALLOCATION("ELI46187", ipHasOCRParameters != __nullptr);
+			ipHasOCRParameters->OCRParameters = getOCRParameters();
 		}
 		
 		// Set the return value and return

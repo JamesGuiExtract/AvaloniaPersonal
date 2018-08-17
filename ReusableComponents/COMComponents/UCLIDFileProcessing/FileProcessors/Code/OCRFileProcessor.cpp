@@ -1294,6 +1294,10 @@ ISpatialStringPtr COCRFileProcessor::stitchWorkItems(const string &strInputFile,
 			ipSS->CreateFromSpatialStrings(ipPagesToStitch);
 		}
 
+		IHasOCRParametersPtr ipHasOCRParameters(ipSS);
+		ASSERT_RESOURCE_ALLOCATION("ELI46181", ipHasOCRParameters != __nullptr);
+		ipHasOCRParameters->OCRParameters = getOCRParameters();
+
 		return ipSS;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37133");

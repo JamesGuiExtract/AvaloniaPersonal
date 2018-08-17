@@ -753,6 +753,10 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 		ISpatialStringPtr ipResult( CLSID_SpatialString );
 		ASSERT_RESOURCE_ALLOCATION("ELI18561", ipResult != __nullptr);
 
+		// Set the OCR parameters of the result to those of the first page with content
+		// (no need to set them each time through the loop)
+		bool bUpdateOCRProperties = true;
+
 		// Step through each page of the document
 		for (long i=1; i <= nLastPageNumber; i++)
 		{
@@ -767,6 +771,23 @@ STDMETHODIMP CSelectPageRegion::raw_Process(IAFDocument* pDocument, IProgressSta
 			if (ipContentFromThisPage != __nullptr)
 			{
 				ipResult->Append( ipContentFromThisPage );
+
+				if (bUpdateOCRProperties)
+				{
+					ipResult->OCREngineVersion = ipContentFromThisPage->OCREngineVersion;
+
+					// Set the OCR parameters
+					IHasOCRParametersPtr ipThisPageParameters(ipContentFromThisPage);
+					ASSERT_RESOURCE_ALLOCATION("ELI46189", ipThisPageParameters != __nullptr);
+
+					IHasOCRParametersPtr ipResultParameters(ipResult);
+					ASSERT_RESOURCE_ALLOCATION("ELI46190", ipResultParameters != __nullptr);
+
+					ipResultParameters->OCRParameters = ipThisPageParameters->OCRParameters;
+
+					// No need to set the parameters again
+					bUpdateOCRProperties = false;
+				}
 			}
 		}
 

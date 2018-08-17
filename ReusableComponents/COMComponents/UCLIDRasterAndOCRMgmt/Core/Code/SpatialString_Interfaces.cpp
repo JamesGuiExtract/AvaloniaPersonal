@@ -283,6 +283,7 @@ STDMETHODIMP CSpatialString::IsDirty(void)
 // Version 11 - Removed m_bIsForcedRotation
 // Version 12 - Added OCR Engine Version information
 // Version 13 - Spatial coordinates are now stored as unsigned long instead of unsigned short
+// Version 14 - Added m_ipOCRParameters
 STDMETHODIMP CSpatialString::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())

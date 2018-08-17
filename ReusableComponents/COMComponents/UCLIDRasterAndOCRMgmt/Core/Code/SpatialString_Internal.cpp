@@ -609,6 +609,17 @@ UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialString::getSubString(long n
             ipSpatialString->CreateNonSpatialString(strSubStr.c_str(), m_strSourceDocName.c_str());
         }
 
+		// Set the OCR engine version
+		ipSpatialString->OCREngineVersion = get_bstr_t(m_strOCREngineVersion);
+
+		// Set the OCR parameters
+		if (m_ipOCRParameters != __nullptr)
+		{
+			UCLID_RASTERANDOCRMGMTLib::IHasOCRParametersPtr ipHasOCRParameters(ipSpatialString);
+			ASSERT_RESOURCE_ALLOCATION("ELI46183", ipHasOCRParameters != __nullptr);
+			ipHasOCRParameters->OCRParameters = getOCRParameters();
+		}
+
         return ipSpatialString;
     }
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25814");
@@ -3623,11 +3634,11 @@ void CSpatialString::copyFromSpatialString(UCLID_RASTERANDOCRMGMTLib::ISpatialSt
         }
 
 		// Copy OCR parameters
-		UCLID_RASTERANDOCRMGMTLib::IHasOCRParametersPtr ipOCRParams(ipSource);
-		ASSERT_RESOURCE_ALLOCATION("ELI45902", ipOCRParams != __nullptr);
-		ICopyableObjectPtr ipMap = ipOCRParams->OCRParameters;
-		ASSERT_RESOURCE_ALLOCATION("ELI45903", ipMap != __nullptr);
-		m_ipOCRParameters = ipMap->Clone();
+		UCLID_RASTERANDOCRMGMTLib::IHasOCRParametersPtr ipHasOCRParams(ipSource);
+		ASSERT_RESOURCE_ALLOCATION("ELI45902", ipHasOCRParams != __nullptr);
+		ICopyableObjectPtr ipTheOCRParams = ipHasOCRParams->OCRParameters;
+		ASSERT_RESOURCE_ALLOCATION("ELI45903", ipTheOCRParams != __nullptr);
+		m_ipOCRParameters = ipTheOCRParams->Clone();
 
         // Downgrade the spatial mode if needed
         reviewSpatialStringAndDowngradeIfNeeded();
@@ -4150,6 +4161,14 @@ UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialString::makeBlankPage(int n
 	ipZone->CreateFromLongRectangle(ipRect, nPage);
 	ipPage->CreatePseudoSpatialString(ipZone, textForPage.c_str(),
 		m_strSourceDocName.c_str(), ipPageInfos);
+
+	// Set the OCR parameters
+	if (m_ipOCRParameters != __nullptr)
+	{
+		UCLID_RASTERANDOCRMGMTLib::IHasOCRParametersPtr ipHasOCRParameters(ipPage);
+		ASSERT_RESOURCE_ALLOCATION("ELI46182", ipHasOCRParameters != __nullptr);
+		ipHasOCRParameters->OCRParameters = getOCRParameters();
+	}
 
 	return ipPage;
 }
