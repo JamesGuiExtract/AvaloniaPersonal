@@ -2647,7 +2647,7 @@ namespace Extract.AttributeFinder
                 // Pass the page count of each image along so that missing pages in the answer VOA can be filled in
                 var pageProtofeaturesAndCategories = pageProtofeatureCollection.Zip(answerFiles, (pages, answerFile) =>
                     {
-                        var answers = ExpandDeletionAnswerVOA(answerFile, pages.Count() + 1);
+                        var answers = ExpandDeletionAnswerVOA(answerFile, pages.Count());
                         return pages.Zip(answers, (pageProtofeatures, answer) =>
                             new { answer, pageProtofeatures });
                     })
