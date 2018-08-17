@@ -87,6 +87,18 @@ namespace LearningMachineTrainer
 
         public string NegativeClassName => Encoder.NegativeClassName;
 
+        [DataMember(Name = "_useUnknownCategory")]
+        public bool UseUnknownCategory { get; set; }
+
+        [DataMember(Name = "_unknownCategoryCutoff")]
+        public double UnknownCategoryCutoff { get; set; }
+
+        [DataMember(Name = "_translateUnknownCategory")]
+        public bool TranslateUnknownCategory { get; set; }
+
+        [DataMember(Name = "_translateUnknownCategoryTo")]
+        public string TranslateUnknownCategoryTo { get; set; }
+
         public static ILearningMachineModel LoadClassifier(string path)
         {
             using (var decompressor = new Decompressor())

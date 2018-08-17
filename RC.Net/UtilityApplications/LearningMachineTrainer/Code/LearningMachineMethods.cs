@@ -35,6 +35,14 @@ namespace LearningMachineTrainer
         string TrainingLog { get; set; }
 
         int RandomNumberSeed { get; }
+
+        bool UseUnknownCategory { get; }
+
+        double UnknownCategoryCutoff { get; }
+
+        bool TranslateUnknownCategory { get; }
+
+        string TranslateUnknownCategoryTo { get; }
     }
 
     public interface IClassifierModel
@@ -186,8 +194,8 @@ namespace LearningMachineTrainer
 
                 // Training mutates the trainInputs array in order to save memory so don't modify it again
                 // if training has taken place
-                var trainResult = GetAccuracyScore(model.Classifier, trainInputs, trainOutputs, false);
-                var testResult = GetAccuracyScore(model.Classifier, testInputs, testOutputs, true);
+                var trainResult = GetAccuracyScore(model, trainInputs, trainOutputs, testOnly);
+                var testResult = GetAccuracyScore(model, testInputs, testOutputs, true);
 
                 model.AccuracyData =
                     (train: new SerializableConfusionMatrix(model.Encoder, trainResult),
@@ -244,7 +252,7 @@ namespace LearningMachineTrainer
         /// <summary>
         /// Computes the accuracy or F1 score of the classifier
         /// </summary>
-        /// <param name="model">The <see cref="ILearningMachineModel"/> to use to compute answers</param>
+        /// <param name="model">The <see cref="ICLassifierModel"/> to use to compute answers</param>
         /// <param name="inputs">The feature vectors</param>
         /// <param name="outputs">The expected results</param>
         /// <param name="standardizeInputs">Whether to zero-center and normalize the input (will mutate the input)</param>
@@ -278,13 +286,13 @@ namespace LearningMachineTrainer
         }
 
         /// <summary>
-        /// Computes a confusion matrix
+        /// Computes a confusion matrix for the given inputs and outputs
         /// </summary>
-        /// <param name="model">The <see cref="ILearningMachineModel"/> to use to compute answers</param>
+        /// <remarks>This overload doesn't use an unknown category cutoff</remarks>
+        /// <param name="model">The <see cref="IClassifierModel"/> to use to compute answers</param>
         /// <param name="inputs">The feature vectors</param>
         /// <param name="outputs">The expected results</param>
         /// <param name="standardizeInputs">Whether to zero-center and normalize the input (will mutate the input)</param>
-        /// <returns></returns>
         public static AccuracyData GetAccuracyScore(IClassifierModel model, double[][] inputs, int[] outputs,
             bool standardizeInputs)
         {
@@ -310,7 +318,8 @@ namespace LearningMachineTrainer
                 }
                 else if (model is ISupportVectorMachineModel svm)
                 {
-                    predictions = inputs.Apply(v => SvmMethods.ComputeAnswer(svm, v));
+                    (int answerCode, double? score)[] predictionsAndScores = inputs.Apply(v => SvmMethods.ComputeAnswer(svm, v));
+                    predictions = predictionsAndScores.Select(t => t.answerCode).ToArray();
                 }
 
                 if (model.NumberOfClasses == 2)
@@ -321,6 +330,98 @@ namespace LearningMachineTrainer
                 else
                 {
                     var gc = new GeneralConfusionMatrix(model.NumberOfClasses, outputs, predictions);
+                    return new AccuracyData(gc);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45690");
+            }
+        }
+
+        /// <summary>
+        /// Computes a confusion matrix for the given inputs and outputs
+        /// </summary>
+        /// <remarks>This overload will use the unknown category cutoff if specified in the model</remarks>
+        /// <param name="model">The <see cref="ILearningMachineModel"/> to use to compute answers</param>
+        /// <param name="inputs">The feature vectors</param>
+        /// <param name="outputs">The expected results</param>
+        /// <param name="standardizeInputs">Whether to zero-center and normalize the input (will mutate the input)</param>
+        public static AccuracyData GetAccuracyScore(ILearningMachineModel model, double[][] inputs, int[] outputs,
+            bool standardizeInputs)
+        {
+            try
+            {
+                // Scale inputs
+                if (standardizeInputs
+                    && inputs.Any()
+                    && model.Classifier.FeatureMean != null
+                    && model.Classifier.FeatureScaleFactor != null)
+                {
+                    foreach (var v in inputs)
+                    {
+                        v.Subtract(model.Classifier.FeatureMean, inPlace: true);
+                    }
+                    inputs.ElementwiseDivide(model.Classifier.FeatureScaleFactor, inPlace: true);
+                }
+
+                int numberOfClasses = model.Classifier.NumberOfClasses;
+                int[] predictions = null;
+                if (model.Classifier is INeuralNetModel nn)
+                {
+                    predictions = inputs.Apply(v => NeuralNetMethods.ComputeAnswer(nn, v));
+                }
+                else if (model.Classifier is ISupportVectorMachineModel svm)
+                {
+                    (int answerCode, double? score)[] predictionsAndScores = inputs.Apply(v => SvmMethods.ComputeAnswer(svm, v));
+
+                    if (model.UseUnknownCategory)
+                    {
+                        bool unknownCategoryUsed = false;
+                        predictions = predictionsAndScores.Select(t =>
+                        {
+                            if (t.score.HasValue
+                                && t.score < model.UnknownCategoryCutoff)
+                            {
+                                if (model.TranslateUnknownCategory
+                                    && model.Encoder.AnswerNameToCode.TryGetValue(model.TranslateUnknownCategoryTo, out int answerCode))
+                                {
+                                    return answerCode;
+                                }
+
+                                // Use value beyond any that the classifier would use for unknown
+                                // rather than LearningMachineDataEncoder.UnknownCategoryCode to avoid
+                                // misleading 100% accuracy results
+                                // https://extract.atlassian.net/browse/ISSUE-13894
+                                unknownCategoryUsed = true;
+                                return model.Classifier.NumberOfClasses;
+                            }
+                            else
+                            {
+                                return t.answerCode;
+                            }
+                        })
+                        .ToArray();
+
+                        if (unknownCategoryUsed)
+                        {
+                            numberOfClasses++;
+                        }
+                    }
+                    else
+                    {
+                        predictions = predictionsAndScores.Select(t => t.answerCode).ToArray();
+                    }
+                }
+
+                if (numberOfClasses == 2)
+                {
+                    var cm = new ConfusionMatrix(predictions, outputs);
+                    return new AccuracyData(cm);
+                }
+                else
+                {
+                    var gc = new GeneralConfusionMatrix(model.Classifier.NumberOfClasses, outputs, predictions);
                     return new AccuracyData(gc);
                 }
             }
@@ -363,6 +464,97 @@ namespace LearningMachineTrainer
             }
         }
 
+        /// <summary>
+        /// Computes answer code and score for the input feature vector
+        /// </summary>
+        /// <param name="model">The <see cref="IClassifierModel"/> to perfom the computation</param>
+        /// <param name="inputs">The feature vector</param>
+        /// <param name="standardizeInputs">Whether to apply zero-center and normalize the input</param>
+        /// <returns>The answer code and score</returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public static (int answerCode, double? score) ComputeAnswer(this IClassifierModel model, double[] inputs, bool standardizeInputs = true)
+        {
+            try
+            {
+                // Scale inputs
+                if (standardizeInputs
+                    && model.FeatureMean != null
+                    && model.FeatureScaleFactor != null)
+                {
+                    inputs = inputs.Subtract(model.FeatureMean).ElementwiseDivide(model.FeatureScaleFactor);
+                }
+
+                if (model is INeuralNetModel nn)
+                {
+                    return (NeuralNetMethods.ComputeAnswer(nn, inputs), null);
+                }
+                else if (model is ISupportVectorMachineModel svm)
+                {
+                    return SvmMethods.ComputeAnswer(svm, inputs);
+                }
+                else
+                {
+                    throw new ArgumentException("Unknown IClassifierModel type");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46191");
+            }
+        }
+
+        /// <summary>
+        /// Trains the classifier to recognize classifications
+        /// </summary>
+        /// <param name="model">The <see cref="IClassifierModel"/> to be trained</param>
+        /// <param name="inputs">The input feature vectors</param>
+        /// <param name="outputs">The classes for each input</param>
+        /// <param name="randomGenerator">Optional random number generator to use for randomness</param>
+        public static void TrainClassifier(this IClassifierModel model, double[][] inputs, int[] outputs, Random randomGenerator = null)
+        {
+            try
+            {
+                TrainClassifier(model, inputs, outputs, randomGenerator, _ => { }, CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46193");
+            }
+        }
+
+        /// <summary>
+        /// Trains the classifier to recognize classifications
+        /// </summary>
+        /// <param name="model">The <see cref="IClassifierModel"/> to be trained</param>
+        /// <param name="inputs">The input feature vectors</param>
+        /// <param name="outputs">The classes for each input</param>
+        /// <param name="randomGenerator">Random number generator to use for randomness</param>
+        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
+        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        public static void TrainClassifier(this IClassifierModel model, double[][] inputs, int[] outputs,
+            Random randomGenerator, Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (model is INeuralNetModel nn)
+                {
+                    NeuralNetMethods.TrainClassifier(nn, inputs, outputs, randomGenerator, updateStatus, cancellationToken);
+                }
+                else if (model is ISupportVectorMachineModel svm)
+                {
+                    SvmMethods.TrainClassifier(svm, inputs, outputs, randomGenerator, updateStatus, cancellationToken);
+                }
+                else
+                {
+                    throw new ArgumentException("Unknown model type");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46194");
+            }
+        }
+
         #endregion Public Methods
 
         #region Private Methods
@@ -392,22 +584,6 @@ namespace LearningMachineTrainer
             }
         }
 
-        private static void TrainClassifier(this IClassifierModel model, double[][] inputs, int[] outputs,
-            Random rng, Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
-        {
-            if (model is INeuralNetModel nn)
-            {
-                NeuralNetMethods.TrainClassifier(nn, inputs, outputs, rng, updateStatus, cancellationToken);
-            }
-            else if (model is ISupportVectorMachineModel svm)
-            {
-                SvmMethods.TrainClassifier(svm, inputs, outputs, rng, updateStatus, cancellationToken);
-            }
-            else
-            {
-                throw new ArgumentException("Unknown model type");
-            }
-        }
         /// <summary>
         /// Knuth shuffle (a.k.a. the Fisher-Yates shuffle) for arrays.
         /// Performs an in-place random permutation of an array.

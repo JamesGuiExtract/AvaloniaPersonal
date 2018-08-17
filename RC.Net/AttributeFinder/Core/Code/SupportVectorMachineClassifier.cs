@@ -362,14 +362,6 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Computes answer code and score for the input feature vector
-        /// </summary>
-        /// <param name="inputs">The feature vector</param>
-        /// <param name="standardizeInputs">Whether to apply zero-center and normalize the input</param>
-        /// <returns>The answer code and score</returns>
-        public abstract (int answerCode, double? score) ComputeAnswer(double[] inputs, bool standardizeInputs = true);
-
-        /// <summary>
         /// Whether this instance has the same configured properties as another
         /// </summary>
         /// <param name="otherClassifier">The <see cref="ITrainableClassifier"/> to compare with this instance</param>

@@ -455,6 +455,9 @@
     <EmbeddedResource Include="Resources\TranslateToBestMatch\artificial2.csv" />
     <EmbeddedResource Include="Resources\TranslateToBestMatch\artificial_subdivisions1.dat" />
     <EmbeddedResource Include="Resources\TranslateToBestMatch\artificial_subdivisions2.dat" />
+    <EmbeddedResource Include="Resources\LearningMachine\TestWeightRatio.lm" />
+    <EmbeddedResource Include="Resources\LearningMachine\TestWeightRatio.train.csv" />
+    <EmbeddedResource Include="Resources\LearningMachine\TestWeightRatio.test.csv" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

@@ -92,7 +92,7 @@ namespace Extract.Testing.Utilities
                     // Add the temporary file to the dictionary
                     _files.Add(resourceName, tempFile);
                 }
-                else if (fileName != null && 
+                else if (!string.IsNullOrEmpty(fileName) &&
                     !fileName.Equals(tempFile.FileName, StringComparison.OrdinalIgnoreCase))
                 {
                     // Move the file to the new location

@@ -1443,7 +1443,7 @@ namespace Extract.AttributeFinder
                 testInputs = featureVectors.Submatrix(testIdx);
                 testOutputs = answerCodes.Submatrix(testIdx);
                 testFiles = ussPaths.Submatrix(testIdx);
-                testFileIndices = docIndex.Submatrix(trainIdx);
+                testFileIndices = docIndex.Submatrix(testIdx);
             }
             else
             {
@@ -1854,29 +1854,21 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Computes the accuracy or F1 score of the classifier
         /// </summary>
-        /// <param name="classifier">The <see cref="ITrainableClassifier"/> to use to compute answers</param>
+        /// <param name="classifier">The <see cref="IClassifierModel"/> to use to compute answers</param>
         /// <param name="inputs">The feature vectors</param>
         /// <param name="outputs">The expected results</param>
         /// <param name="standardizeInputs">Whether to apply zero-center and normalize the input</param>
         /// <returns>The F1 score if there are two classes else the overall agreement</returns>
-        public static double GetAccuracyScore(ITrainableClassifier classifier, double[][] inputs, int[] outputs,
+        public static double GetAccuracyScore(IClassifierModel classifier, double[][] inputs, int[] outputs,
             bool standardizeInputs = true)
         {
             try
             {
-                int[] predictions = inputs.Apply(v => classifier.ComputeAnswer(v, standardizeInputs))
-                    .Select(t => t.answerCode)
-                    .ToArray();
-                if (classifier.NumberOfClasses == 2)
-                {
-                    var cm = new ConfusionMatrix(predictions, outputs);
-                    return Double.IsNaN(cm.FScore) ? 0.0 : cm.FScore;
-                }
-                else
-                {
-                    var gc = new GeneralConfusionMatrix(classifier.NumberOfClasses, outputs, predictions);
-                    return gc.OverallAgreement;
-                }
+                var result = LearningMachineMethods.GetAccuracyScore(classifier, inputs, outputs, standardizeInputs);
+                return result.Match(
+                    gc => gc.OverallAgreement,
+                    cm => Double.IsNaN(cm.FScore) ? 0.0 : cm.FScore
+                );
             }
             catch (Exception e)
             {

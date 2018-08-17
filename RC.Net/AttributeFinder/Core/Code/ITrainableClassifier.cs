@@ -11,34 +11,6 @@ namespace Extract.AttributeFinder
     public interface ITrainableClassifier : IClassifierModel
     {
         /// <summary>
-        /// Trains the classifier to recognize classifications
-        /// </summary>
-        /// <param name="inputs">The input feature vectors</param>
-        /// <param name="outputs">The classes for each input</param>
-        /// <param name="randomGenerator">Optional random number generator to use for randomness</param>
-        void TrainClassifier(double[][] inputs, int[] outputs, Random randomGenerator=null);
-
-        /// <summary>
-        /// Trains the classifier to recognize classifications
-        /// </summary>
-        /// <param name="inputs">The input feature vectors</param>
-        /// <param name="outputs">The classes for each input</param>
-        /// <param name="randomGenerator">Random number generator to use for randomness</param>
-        /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
-        /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        void TrainClassifier(double[][] inputs, int[] outputs, Random randomGenerator, Action<StatusArgs> updateStatus,
-            CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Computes answer code and score for the input feature vector
-        /// </summary>
-        /// <param name="inputs">The feature vector</param>
-        /// <param name="standardizeInputs">Whether to apply zero-center and normalize the input</param>
-        /// <returns>The answer code and score</returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        (int answerCode, double? score) ComputeAnswer(double[] inputs, bool standardizeInputs = true);
-
-        /// <summary>
         /// Whether this instance has the same configured properties as another
         /// </summary>
         /// <param name="otherClassifier">The <see cref="ITrainableClassifier"/> to compare with this instance</param>

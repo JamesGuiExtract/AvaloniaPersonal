@@ -1,12 +1,9 @@
 ﻿using Accord.Math;
 using Accord.Neuro;
-using Accord.Statistics;
 using AForge.Neuro;
-using Extract.Utilities;
 using LearningMachineTrainer;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -321,40 +318,6 @@ namespace Extract.AttributeFinder
             catch (Exception e)
             {
                 throw e.AsExtract("ELI39722");
-            }
-        }
-
-        /// <summary>
-        /// Computes answer code and score for the input feature vector
-        /// </summary>
-        /// <remarks>Answer score will always be null</remarks>
-        /// <param name="inputs">The feature vector</param>
-        /// <param name="standardizeInputs">Whether to apply zero-center and normalize the input</param>
-        /// <returns>The answer code and score</returns>
-        public (int answerCode, double? score) ComputeAnswer(double[] inputs, bool standardizeInputs = true)
-        {
-            try
-            {
-                ExtractException.Assert("ELI39736", "This classifier has not been trained", IsTrained);
-
-                // Scale inputs
-                if (standardizeInputs
-                    && FeatureMean != null
-                    && FeatureScaleFactor != null)
-                {
-                    inputs = inputs.Subtract(FeatureMean).ElementwiseDivide(FeatureScaleFactor);
-                }
-
-                double[] responses = _classifier.Compute(inputs);
-
-                // Return index of highest value neuron in the output layer
-                responses.Max(out int imax);
-
-                return (imax, null);
-            }
-            catch (Exception e)
-            {
-                throw e.AsExtract("ELI39727");
             }
         }
 

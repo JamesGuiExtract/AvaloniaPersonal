@@ -96,47 +96,6 @@ namespace Extract.AttributeFinder
         #region Overrides
 
         /// <summary>
-        /// Computes answer code and score for the input feature vector
-        /// </summary>
-        /// <remarks>Answer score will be null unless <see cref="CalibrateMachineToProduceProbabilities"/>
-        /// was <see langword="true"/> when this instance was trained</remarks>
-        /// <param name="inputs">The feature vector</param>
-        /// <param name="standardizeInputs">Whether to apply zero-center and normalize the input</param>
-        /// <returns>The answer code and score</returns>
-        public override (int answerCode, double? score) ComputeAnswer(double[] inputs, bool standardizeInputs = true)
-        {
-            try
-            {
-                ExtractException.Assert("ELI39741", "This classifier has not been trained", IsTrained);
-
-                var classifier = (MultilabelSupportVectorMachine)Classifier;
-
-                // Scale inputs
-                if (standardizeInputs
-                    && FeatureMean != null
-                    && FeatureScaleFactor != null)
-                {
-                    inputs = inputs.Subtract(FeatureMean).ElementwiseDivide(FeatureScaleFactor);
-                }
-
-                classifier.Compute(inputs, out double[] responses);
-
-                double? max = responses.Max(out int imax);
-
-                // Only return score if classifier is probabilistic
-                if (!classifier.IsProbabilistic)
-                {
-                    max = null;
-                }
-                return (imax, max);
-            }
-            catch (Exception e)
-            {
-                throw e.AsExtract("ELI39742");
-            }
-        }
-
-        /// <summary>
         /// Whether this instance has the same configured properties as another
         /// </summary>
         /// <param name="otherClassifier">The <see cref="ITrainableClassifier"/> to compare with this instance</param>

@@ -51,7 +51,8 @@ namespace LearningMachineTrainer
     [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Svm")]
     public static class SvmMethods
     {
-        public static int ComputeAnswer(ISupportVectorMachineModel model, double[] inputs)
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public static (int answerCode, double? score) ComputeAnswer(ISupportVectorMachineModel model, double[] inputs)
         {
             try
             {
@@ -60,9 +61,16 @@ namespace LearningMachineTrainer
                     ((MultilabelSupportVectorMachine)ml.Classifier).Compute(inputs, out double[] responses);
 
                     double? max = responses.Max(out int imax);
-                    return imax;
+
+                    // Only return score if classifier is probabilistic
+                    if (!((MultilabelSupportVectorMachine)ml.Classifier).IsProbabilistic)
+                    {
+                        max = null;
+                    }
+                    return (imax, max);
                 }
-                return model.Classifier.Compute(inputs, out var _);
+
+                return (model.Classifier.Compute(inputs, out var _), null);
             }
             catch (Exception ex)
             {
@@ -396,7 +404,13 @@ namespace LearningMachineTrainer
             // Train classifier
             var teacher = new MulticlassSupportVectorLearning(classifier, inputs, outputs)
             {
-                Algorithm = (svm, classInputs, classOutputs, positiveClassIndex, negativeClassIndex) =>
+                // Accord source for MulticlassSupportVectorLearning indicates that positive class index
+                // is the final parameter:
+                //     // Transform it into a two-class problem
+                //     subOutputs.ApplyInPlace(x => x = (x == i) ? -1 : +1);
+                //     // Train the machine on the two-class problem.
+                //     var subproblem = configure(machine, subInputs, subOutputs, i, j);
+                Algorithm = (svm, classInputs, classOutputs, negativeClassIndex, positiveClassIndex) =>
                 {
                     var f = new SequentialMinimalOptimization(svm, classInputs, classOutputs)
                     {
@@ -459,6 +473,12 @@ namespace LearningMachineTrainer
             // Train classifier
             var teacher = new MultilabelSupportVectorLearning(classifier, inputs, outputs)
             {
+                // Accord source for MultilabelSupportVectorLearning indicates that positive class index
+                // is the penultimate parameter:
+                //     // Extract outputs for the given label
+                //     int[] subOutputs = outputs.GetColumn(i);
+                //     // Train the machine on the two-class problem.
+                //     configure(machine, inputs, subOutputs, i, -i).Run(false);
                 Algorithm = (svm, classInputs, classOutputs, positiveClassIndex, _) =>
                 {
                     var f = new SequentialMinimalOptimization(svm, classInputs, classOutputs)
