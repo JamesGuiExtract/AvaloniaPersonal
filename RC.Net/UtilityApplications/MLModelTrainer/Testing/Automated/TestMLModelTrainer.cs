@@ -346,7 +346,7 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                     trainer.Process(CancellationToken.None);
 
                     var trainingOutput = File.ReadAllText(dest.FileName);
-                    Assert.AreEqual(18346, trainingOutput.Length);
+                    Assert.AreEqual(18305, trainingOutput.Length);
                     Assert.AreEqual("Washington County , Oregon 1 000 123456 ", trainingOutput.Substring(0, 40));
                 }
             }
