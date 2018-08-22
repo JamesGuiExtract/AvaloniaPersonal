@@ -56,10 +56,9 @@ namespace Extract.Utilities.Test
                 }
             }
 
-            Assert.That(exception != null
-                && exception.Data.Values.OfType<string>().Contains("ELI39245")
-                && exception.Data["Context"].AsString() == "TestContext");
-
+            Assert.IsNotNull(exception);
+            Assert.Contains("ELI39245", exception.Data.Values.OfType<string>().ToList());
+            Assert.AreEqual(exception.Data["Context"].AsString(), "TestContext");
         }
 
         /// <summary>
@@ -86,9 +85,8 @@ namespace Extract.Utilities.Test
                     fileLock1.ReleaseLock();
                     fileLock2.GetLock(tempFile2.FileName);
 
-                    Assert.That(
-                        !File.Exists(tempFile1.FileName + ".ExtractLock") &&
-                        File.Exists(tempFile2.FileName + ".ExtractLock"));
+                    Assert.That(!File.Exists(tempFile1.FileName + ".ExtractLock"));
+                    Assert.That(File.Exists(tempFile2.FileName + ".ExtractLock"));
                 }
             }
         }
@@ -114,8 +112,8 @@ namespace Extract.Utilities.Test
                 }
             }
 
-            Assert.That(exception != null &&
-                exception.Data.Values.OfType<string>().Contains("ELI39245"));
+            Assert.IsNotNull(exception);
+            Assert.Contains("ELI39245", exception.Data.Values.OfType<string>().ToList());
         }
 
         #endregion Tests

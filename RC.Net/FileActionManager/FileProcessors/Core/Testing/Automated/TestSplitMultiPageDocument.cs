@@ -143,7 +143,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             }
         }
 
-        [Test, Category("Automated")]
+        [Test, Category("Interactive")]
         public static void TestSplitTifTwice()
         {
             string testDbName = "SplitMultiPageDocument_TestSplitTifTwice";
