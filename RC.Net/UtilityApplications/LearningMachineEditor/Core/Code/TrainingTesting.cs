@@ -317,7 +317,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// Run training process
         /// </summary>
         [SuppressMessage("Microsoft.Mobility", "CA1601:DoNotUseTimersThatPreventPowerStateChanges")]
-        private void TrainTestMachine(LearningMachine learningMachine, bool testOnly=false)
+        private void TrainTestMachine(LearningMachine learningMachine, bool testOnly = false)
         {
             testButton.Enabled = false;
             trainTestButton.Enabled = false;
@@ -348,14 +348,14 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
             // Write machine info to log
             _statusUpdates.Enqueue(new StatusArgs
-                {
-                    StatusMessage = new StringBuilder(4)
+            {
+                StatusMessage = new StringBuilder(4)
                       .Append("Time: ")
                       .AppendLine(DateTime.Now.ToString("s", CultureInfo.CurrentCulture))
                       .AppendLine(testOnly ? "Operation: Testing Machine" : "Operation: Training Machine")
                       .AppendLine(learningMachine.ToString())
                       .ToString()
-                });
+            });
 
             Func<Action<StatusArgs>, CancellationToken, ValueTuple<AccuracyData, AccuracyData>> operation = null;
             if (testOnly)
@@ -368,10 +368,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 {
                     operation = (u, c) =>
                     {
-                        if (!learningMachine.Encoder.AreEncodingsComputed)
-                        {
-                            learningMachine.ComputeEncodings(u, c);
-                        }
+                        ExtractException.Assert("ELI46198", "You must uncheck 'standardize features...' to use CSV data for training/testing",
+                            !learningMachine.StandardizeFeaturesForCsvOutput);
+
                         learningMachine.WriteDataToCsv(u, c);
                         return LearningMachineMethods.TrainAndTestWithCsvData(learningMachine, true, learningMachine.CsvOutputFile, u, c);
                     };
@@ -391,17 +390,35 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 {
                     operation = (u, c) =>
                     {
+                        ExtractException.Assert("ELI46199", "You must uncheck 'standardize features...' to use CSV data for training/testing",
+                            !learningMachine.StandardizeFeaturesForCsvOutput);
+
                         if (!learningMachine.Encoder.AreEncodingsComputed)
                         {
                             learningMachine.ComputeEncodings(u, c);
+
+                            // Preserve the computed encodings in case training fails
+                            _editor.CurrentLearningMachine = learningMachine;
                         }
                         learningMachine.WriteDataToCsv(u, c);
+
                         return LearningMachineMethods.TrainAndTestWithCsvData(learningMachine, false, learningMachine.CsvOutputFile, u, c);
                     };
                 }
                 else
                 {
-                    operation = learningMachine.TrainMachine;
+                    operation = (u, c) =>
+                    {
+                        // Compute encodings as a separate step so that if something fails during
+                        // training it won't need to be repeated
+                        if (!learningMachine.Encoder.AreEncodingsComputed)
+                        {
+                            learningMachine.ComputeEncodings(u, c);
+                            _editor.CurrentLearningMachine = learningMachine;
+                        }
+
+                        return learningMachine.TrainMachine(u, c);
+                    };
                 }
             }
 
@@ -434,7 +451,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 {
                     ue.Display();
                 }
-                else if(!cancellationToken.IsCancellationRequested)
+                else if (!cancellationToken.IsCancellationRequested)
                 {
                     _editor.CurrentLearningMachine = learningMachine;
 
@@ -472,9 +489,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 && !string.IsNullOrWhiteSpace(_editor.CurrentLearningMachine.CsvOutputFile);
 
             loadDataFromCsvRadioButton.Enabled =
-                !string.IsNullOrWhiteSpace(_editor.CurrentLearningMachine.CsvOutputFile);
+                 _editor.CurrentLearningMachine.Encoder.AreEncodingsComputed
+                && !string.IsNullOrWhiteSpace(_editor.CurrentLearningMachine.CsvOutputFile);
 
-            trainTestButton.Enabled = _editor.CurrentLearningMachine.InputConfig.TrainingSetPercentage > 0;
+            trainTestButton.Enabled = _editor.CurrentLearningMachine.InputConfig.TrainingSetPercentage > 0
+                || loadDataFromCsvRadioButton.Checked;
+
             clearLogToolStripMenuItem.Enabled = !string.IsNullOrWhiteSpace(_editor.CurrentLearningMachine.TrainingLog);
             detailsButton.Enabled = _editor.CurrentLearningMachine.AccuracyData != null;
 

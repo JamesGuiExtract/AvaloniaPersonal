@@ -1415,6 +1415,56 @@ namespace Extract.AttributeFinder.Test
         }
 
         // Write out features to a CSV and train a machine with the CSV
+        // Change answers after computing encodings
+        [Test, Category("LearningMachine")]
+        public static void CsvDocumentCategorizationNewCategories()
+        {
+            SetDocumentCategorizationFiles();
+            var inputConfig = new InputConfiguration
+            {
+                InputPath = _inputFolder.Last(),
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
+                TrainingSetPercentage = 80
+            };
+            var lm = new LearningMachine
+            {
+                InputConfig = inputConfig,
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
+                Classifier = new MulticlassSupportVectorMachineClassifier(),
+                CsvOutputFile = Path.Combine(_inputFolder.Last(), "features")
+            };
+            lm.ComputeEncodings();
+            lm.WriteDataToCsv(_ => { }, CancellationToken.None);
+
+            var trainPath = Path.Combine(_inputFolder.Last(), "features.train.csv");
+            var testPath = Path.Combine(_inputFolder.Last(), "features.test.csv");
+            Assert.That(File.Exists(trainPath));
+            Assert.That(File.Exists(testPath));
+
+            // Read data and change doc types
+            void changeAnswers(string csvPath)
+            {
+                var csv = File.ReadAllLines(csvPath);
+                for (int i = 0; i < csv.Length; i++)
+                {
+                    var record = csv[i].Split(',');
+                    record[2] += "New";
+                    csv[i] = string.Join(",", record);
+                }
+                File.WriteAllLines(csvPath, csv);
+            }
+            changeAnswers(trainPath);
+            changeAnswers(testPath);
+
+            var (trainingSet, testingSet) = lm.TrainAndTestWithCsvData(false, trainPath, testPath, _ => { }, CancellationToken.None);
+
+            Assert.Greater(trainingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
+            Assert.Greater(testingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
+        }
+
+        // Write out features to a CSV and train a machine with the CSV
         [Test, Category("LearningMachine")]
         public static void CsvPagination()
         {

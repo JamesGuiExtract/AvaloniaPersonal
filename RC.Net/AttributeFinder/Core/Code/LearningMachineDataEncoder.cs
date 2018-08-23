@@ -2546,6 +2546,9 @@ namespace Extract.AttributeFinder
         private void ComputePaginationEncodings(string[] ussFilePaths, string[] inputVOAFilePaths, string[] answerFiles,
             Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
         {
+            ExtractException.Assert("ELI46197", "Negative class name must be '" + NotFirstPageCategory + "'",
+                string.Equals(NegativeClassName, NotFirstPageCategory, StringComparison.OrdinalIgnoreCase));
+
             // Indent sub-status messages
             Action<StatusArgs> updateStatus2 = args =>
                 {
@@ -2623,6 +2626,9 @@ namespace Extract.AttributeFinder
         private void ComputeDeletionEncodings(string[] ussFilePaths, string[] inputVOAFilePaths, string[] answerFiles,
             Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
         {
+            ExtractException.Assert("ELI46196", "Negative class name must be '" + NotDeletedPageCategory + "'",
+                string.Equals(NegativeClassName, NotDeletedPageCategory, StringComparison.OrdinalIgnoreCase));
+
             // Indent sub-status messages
             Action<StatusArgs> updateStatus2 = args =>
                 {

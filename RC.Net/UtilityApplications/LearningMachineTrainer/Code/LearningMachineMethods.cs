@@ -156,10 +156,31 @@ namespace LearningMachineTrainer
                             updateStatus(new StatusArgs { StatusMessage = "Getting input data: {0:N0} records", Int32Value = 1 });
                         }
                     }
+
                     return (features.ToArray(), answers);
                 }
                 var (trainInputs, trainAnswers) = GetDataFromCsv(trainingCsv);
                 var (testInputs, testAnswers) = GetDataFromCsv(testingCsv);
+
+                // Check for suspiciously normalized feature vectors
+                // using the largest of the sets
+                var featureVectors = trainInputs.Length > testInputs.Length
+                    ? trainInputs
+                    : testInputs;
+                double[] mean = featureVectors.Mean();
+                double[] sigma = featureVectors.StandardDeviation(mean);
+                if (mean.All(m => Math.Abs(m) < 0.1)
+                    && sigma.All(s => s == 0 || Math.Abs(1 - s) < 0.5))
+                {
+                    updateStatus(new StatusArgs
+                    {
+                        StatusMessage = "WARNING: Feature vectors from \""
+                        + (featureVectors == trainInputs
+                            ? trainingCsv
+                            : testingCsv)
+                        + "\" appear to already be standardized"
+                    });
+                }
 
                 // If training then init the answer codes otherwise they need to stay the same as when the machine was
                 // trained.
@@ -192,9 +213,9 @@ namespace LearningMachineTrainer
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                // Training mutates the trainInputs array in order to save memory so don't modify it again
-                // if training has taken place
-                var trainResult = GetAccuracyScore(model, trainInputs, trainOutputs, testOnly);
+                // Training mutates the trainInputs array (standardizes the values) in order to save memory
+                // so if training has taken place (testOnly=false) don't standardize the inputs again 
+                var trainResult = GetAccuracyScore(model, trainInputs, trainOutputs, standardizeInputs: testOnly);
                 var testResult = GetAccuracyScore(model, testInputs, testOutputs, true);
 
                 model.AccuracyData =

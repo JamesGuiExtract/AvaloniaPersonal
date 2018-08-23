@@ -1308,6 +1308,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 attributeCategorizationInputPanel.Visible = false;
                 specifiedPagesCheckBox.Enabled = false;
 
+                // Disable the negative class name by default because it's value needs to be NotFirstPage
+                paginationNegativeClassNameTextBox.Enabled = _dangerMode;
+
                 // Adjust labels and browse buttons for pagination panel
                 if (textFileOrCsvRadioButton.Checked)
                 {
@@ -1334,6 +1337,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 attributeCategorizationInputPanel.Visible = false;
                 specifiedPagesCheckBox.Enabled = true;
 
+                // Disable the negative class name by default because it's value needs to be NotDeletedPage
+                paginationNegativeClassNameTextBox.Enabled = _dangerMode;
+
                 // Adjust labels and browse buttons for pagination panel
                 if (textFileOrCsvRadioButton.Checked)
                 {
@@ -1359,6 +1365,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 documentCategorizationFolderInputPanel.Visible = false;
                 paginationInputPanel.Visible = false;
                 specifiedPagesCheckBox.Enabled = false;
+
+                // Disable the negative class name by default because it's value should be ''
+                attributeCategorizationNegativeClassNameTextBox.Enabled = _dangerMode;
 
                 // Adjust labels and browse buttons for attribute categorization panel
                 if (textFileOrCsvRadioButton.Checked)
@@ -1561,6 +1570,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     paginationFeatureVoaTextBox,
                     attributeCategorizationCandidateVoaTextBox
                 );
+
+                // Class weight ratio
+                SyncControls(
+                    svmWeightRatioTextBox,
+                    neuralNetWeightRatioTextBox
+                );
             }
             finally
             {
@@ -1622,6 +1637,28 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 useAttributeFeatureFilterCheckBox.Checked = true;
                 useAutoBagOfWordsCheckBox.Checked = true;
                 useCrossValidationSetsCheckBox.Checked = true;
+                neuralNetWeightRatioTextBox.Text = "";
+            }
+            finally
+            {
+                _suspendMachineUpdates = false;
+            }
+        }
+
+        /// <summary>
+        /// Set negative class name to default value for current machine usage
+        /// </summary>
+        private void SetDefaultNegativeClassName()
+        {
+            _suspendMachineUpdates = true;
+            try
+            {
+                documentCategorizationCsvNegativeClassNameTextBox.Text = LearningMachineDataEncoder.UnknownCategoryName;
+                documentCategorizationFolderNegativeClassNameTextBox.Text = LearningMachineDataEncoder.UnknownCategoryName;
+                paginationNegativeClassNameTextBox.Text = deletionRadioButton.Checked
+                    ? LearningMachineDataEncoder.NotDeletedPageCategory
+                    : LearningMachineDataEncoder.NotFirstPageCategory;
+                attributeCategorizationNegativeClassNameTextBox.Text = "";
             }
             finally
             {
@@ -1809,6 +1846,16 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 {
                     _textValueOrCheckStateChangedSinceCreation = true;
                 }
+
+                if (!_dangerMode && !_suspendMachineUpdates && !_updatingMachine
+                    && (sender == documentCategorizationRadioButton
+                        || sender == paginationRadioButton
+                        || sender == deletionRadioButton
+                        || sender == attributeCategorizationRadioButton))
+                {
+                    SetDefaultNegativeClassName();
+                }
+
                 SetControlStates();
                 UpdateLearningMachine();
             }
@@ -2143,6 +2190,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 dangerModeButton.Text = "Danger mode";
             }
 
+            // Update any states that depend on the mode
+            SetControlStates();
         }
 
         #endregion Event Handlers

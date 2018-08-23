@@ -705,9 +705,9 @@
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(156, 151);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(106, 13);
+            this.label8.Size = new System.Drawing.Size(289, 13);
             this.label8.TabIndex = 14;
-            this.label8.Text = "Negative-class name";
+            this.label8.Text = "Negative-class name (e.g., for determining Precision/Recall)";
             // 
             // paginationNegativeClassNameTextBox
             // 
