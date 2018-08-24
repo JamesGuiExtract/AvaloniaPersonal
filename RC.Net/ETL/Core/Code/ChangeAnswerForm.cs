@@ -24,7 +24,7 @@ namespace Extract.ETL
                 {
                     string oldAnswer = _oldAnswerTextBox.Text;
                     string newAnswer = _newAnswerTextBox.Text;
-                    bool changedAnything = _service.ChangeAnswer(oldAnswer, newAnswer);
+                    bool changedAnything = _service.ChangeAnswer(oldAnswer, newAnswer, false);
 
                     if (!changedAnything)
                     {

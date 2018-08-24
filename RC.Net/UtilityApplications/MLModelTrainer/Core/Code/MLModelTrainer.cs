@@ -582,9 +582,10 @@ namespace Extract.UtilityApplications.MLModelTrainer
         /// </summary>
         /// <param name="oldAnswer">The answer to be changed (must exist in the LearningMachine)</param>
         /// <param name="newAnswer">The new answer to change to (must not exist in the LearningMachine)</param>
-        public override bool ChangeAnswer(string oldAnswer, string newAnswer)
+        /// <param name="silent">Whether to display exceptions and messages</param>
+        public override bool ChangeAnswer(string oldAnswer, string newAnswer, bool silent)
         {
-            return ChangeAnswer(oldAnswer, newAnswer, QualifiedModelDestination);
+            return ChangeAnswer(oldAnswer, newAnswer, QualifiedModelDestination, silent);
         }
 
         #endregion Public Methods

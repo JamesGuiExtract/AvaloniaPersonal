@@ -260,20 +260,29 @@ namespace Extract.ETL
         /// </summary>
         /// <param name="oldAnswer">The answer to be changed (must exist in the LearningMachine)</param>
         /// <param name="newAnswer">The new answer to change to (must not exist in the LearningMachine)</param>
-        public abstract bool ChangeAnswer(string oldAnswer, string newAnswer);
+        /// <param name="silent">Whether to display exceptions and messages</param>
+        public abstract bool ChangeAnswer(string oldAnswer, string newAnswer, bool silent);
 
         #endregion Abstract Methods
 
         #region Protected Methods
 
-        protected bool ChangeAnswer(string oldAnswer, string newAnswer, string lmPath)
+        protected bool ChangeAnswer(string oldAnswer, string newAnswer, string lmPath, bool silent)
         {
             try
             {
                 // Prevent unneeded work but allow a change in case
                 if (string.Equals(oldAnswer, newAnswer, StringComparison.Ordinal))
                 {
-                    (new ExtractException("ELI45991", "Both values are the same")).Display();
+                    var ex = new ExtractException("ELI45991", "Both values are the same");
+                    if (silent)
+                    {
+                        ex.Log();
+                    }
+                    else
+                    {
+                        ex.Display();
+                    }
                     return false;
                 }
 
@@ -289,7 +298,7 @@ namespace Extract.ETL
                             lm.Save(lmPath);
                             encoderUpdated = true;
                         }
-                        else
+                        else if (!silent)
                         {
                             string message = UtilityMethods.FormatCurrent($"Answer \"{oldAnswer}\" doesn't exist in",
                                 $" \"{lmPath}\"");
@@ -299,7 +308,10 @@ namespace Extract.ETL
                 }
                 catch (Exception ex)
                 {
-                    ex.ExtractDisplay("ELI45990");
+                    if (!silent)
+                    {
+                        ex.ExtractDisplay("ELI45990");
+                    }
                     return false;
                 }
 
@@ -338,7 +350,11 @@ namespace Extract.ETL
 
                 bool changedAnything = encoderUpdated || rowsChanged > 0;
 
-                if (!changedAnything)
+                if (silent)
+                {
+                    return changedAnything;
+                }
+                else if (!changedAnything)
                 {
                     string message = UtilityMethods.FormatCurrent($"Attempted to change \"{oldAnswer}\" to \"{newAnswer}\"",
                         $" but nothing was changed");

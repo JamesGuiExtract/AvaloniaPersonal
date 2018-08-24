@@ -212,6 +212,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
                 Dirty = false;
                 DialogResult = DialogResult.OK;
+                Close();
             }
             catch (Exception ex)
             {

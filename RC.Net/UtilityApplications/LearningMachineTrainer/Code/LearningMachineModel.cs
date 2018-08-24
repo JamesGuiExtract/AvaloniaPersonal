@@ -421,6 +421,9 @@ namespace LearningMachineTrainer
 
         [DataMember(Name = "_classifier")]
         public ActivationNetwork Classifier { get; set; }
+
+        [DataMember(Name = "_negativeToPositiveWeightRatio")]
+        public double? NegativeToPositiveWeightRatio { get; set; }
     }
 
     [Obfuscation(Feature = "renaming", Exclude = true)]
@@ -468,6 +471,12 @@ namespace LearningMachineTrainer
 
         [DataMember(Name = "_version")]
         public int Version { get; set; }
+
+        [DataMember(Name = "_calibrateMachineToProduceProbabilities")]
+        public bool CalibrateMachineToProduceProbabilities { get; set; }
+
+        [DataMember(Name = "_useClassProportionsForComplexityWeights")]
+        public bool UseClassProportionsForComplexityWeights { get; set; }
     }
 
     [Obfuscation(Feature = "renaming", Exclude = true)]
@@ -480,10 +489,5 @@ namespace LearningMachineTrainer
     [DataContract(Namespace = "http://schemas.datacontract.org/2004/07/Extract.AttributeFinder")]
     class MultilabelSupportVectorMachineModel : SupportVectorMachineModel, IMultilabelSupportVectorMachineModel
     {
-        [DataMember(Name = "_calibrateMachineToProduceProbabilities")]
-        public bool CalibrateMachineToProduceProbabilities { get; set; }
-
-        [DataMember(Name = "_useClassProportionsForComplexityWeights")]
-        public bool UseClassProportionsForComplexityWeights { get; set; }
     }
 }

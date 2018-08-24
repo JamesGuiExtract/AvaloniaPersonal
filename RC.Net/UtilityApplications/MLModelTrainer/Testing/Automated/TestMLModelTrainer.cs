@@ -14,7 +14,10 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
+using UCLID_AFCORELib;
+using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.UtilityApplications.MLModelTrainer.Test
 {
@@ -427,6 +430,80 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
             }
             finally
             {
+                // Remove the modified LM
+                _testFiles.RemoveFile("Resources.docClassifier.lm");
+
+                TestTrainingDataCollector.FinalCleanup();
+            }
+        }
+
+        // Train a learning machine classifier and then changing
+        // a document type
+        [Test, Category("MLModelTrainer")]
+        public static void LearningMachineRenameDocType()
+        {
+            try
+            {
+                TestTrainingDataCollector.Setup();
+                TestTrainingDataCollector.CreateDatabase();
+                TestTrainingDataCollector.Process(learningMachine: true);
+
+                _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
+                Directory.CreateDirectory(_inputFolder.Last());
+
+                var dest = _testFiles.GetFile("Resources.docClassifier.lm");
+                var uss = _testFiles.GetFile("Resources.Example02.tif.uss");
+
+                LearningMachine lm = LearningMachine.Load(dest);
+                Assert.That(!lm.IsTrained);
+
+                var trainer = new MLModelTrainer
+                {
+                    ModelType = ModelType.LearningMachine,
+                    ModelName = _MODEL_NAME,
+                    ModelDestination = dest,
+                    MaximumTrainingRecords = 10000,
+                    MaximumTestingRecords = 10000,
+                    DatabaseServer = "(local)",
+                    DatabaseName = TestTrainingDataCollector.DBName
+                };
+
+                trainer.Process(CancellationToken.None);
+
+                lm = LearningMachine.Load(dest);
+                Assert.That(lm.IsTrained);
+
+                var doc = new SpatialStringClass();
+                var voa = new IUnknownVectorClass();
+                doc.LoadFrom(uss, false);
+                lm.ComputeAnswer(doc, voa, false);
+                Assert.AreEqual("Mortgage", ((IAttribute)voa.At(0)).Value.String);
+
+                trainer.ChangeAnswer("Mortgage", "Egagtrom", true);
+
+                LearningMachine.ComputeAnswer(dest, doc, voa, false);
+                Assert.AreEqual("Egagtrom", ((IAttribute)voa.At(0)).Value.String);
+
+                // Verify that even if the machine isn't updated that it will be trainable with the
+                // modified data
+                // Overwrite the updated machine and sleep for a few ms to allow cache time to update
+                lm.Save(dest);
+                Thread.Sleep(100);
+
+                // Verify old doctype is predicted
+                LearningMachine.ComputeAnswer(dest, doc, voa, false);
+                Assert.AreEqual("Mortgage", ((IAttribute)voa.At(0)).Value.String);
+
+                // Retrain and confirm new doctype is predicted
+                trainer.Process(CancellationToken.None);
+                LearningMachine.ComputeAnswer(dest, doc, voa, false);
+                Assert.AreEqual("Egagtrom", ((IAttribute)voa.At(0)).Value.String);
+            }
+            finally
+            {
+                // Remove the modified LM
+                _testFiles.RemoveFile("Resources.docClassifier.lm");
+
                 TestTrainingDataCollector.FinalCleanup();
             }
         }

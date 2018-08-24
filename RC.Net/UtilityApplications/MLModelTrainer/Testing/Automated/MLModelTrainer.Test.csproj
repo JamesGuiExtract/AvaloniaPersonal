@@ -163,6 +163,7 @@
     <EmbeddedResource Include="Resources\copy.bat" />
     <EmbeddedResource Include="Resources\MLModelTrainerSettings.txt" />
     <EmbeddedResource Include="Resources\docClassifier.lm" />
+    <EmbeddedResource Include="Resources\Example02.tif.uss" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
