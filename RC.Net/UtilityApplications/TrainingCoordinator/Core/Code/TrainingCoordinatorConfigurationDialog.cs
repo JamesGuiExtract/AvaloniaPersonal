@@ -249,7 +249,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                 if (badCollectors.Any())
                 {
                     int idx = badCollectors.First();
-                    _dataCollectorsDataGridView.CurrentCell = _dataCollectorsDataGridView.Rows[idx].HeaderCell;
+                    _dataCollectorsDataGridView.Rows[idx].Selected = true;
                     throw new ExtractException("ELI45838",
                         UtilityMethods.FormatCurrent($"Data collector at index {idx} is not configured"));
                 }
@@ -262,7 +262,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                 if (badTrainers.Any())
                 {
                     int idx = badTrainers.First();
-                    _modelTrainersDataGridView.CurrentCell = _modelTrainersDataGridView.Rows[idx].HeaderCell;
+                    _modelTrainersDataGridView.Rows[idx].Selected = true;
                     throw new ExtractException("ELI45839",
                         UtilityMethods.FormatCurrent($"Model trainer at index {idx} is not configured"));
                 }
