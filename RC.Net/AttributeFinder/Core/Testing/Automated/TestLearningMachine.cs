@@ -366,7 +366,7 @@ namespace Extract.AttributeFinder.Test
                 InputConfig = new InputConfiguration
                 {
                     InputPath = _csvPath,
-                    InputPathType = InputType.TextFileOrCsv,
+                    InputPathType = InputType.TextFile,
                     AttributesPath = "<SourceDocName>.protofeatures.voa",
                     AnswerPath = "<SourceDocName>.eav",
                     TrainingSetPercentage = 50
@@ -407,7 +407,7 @@ namespace Extract.AttributeFinder.Test
                 InputConfig = new InputConfiguration
                 {
                     InputPath = _csvPath,
-                    InputPathType = InputType.TextFileOrCsv,
+                    InputPathType = InputType.Csv,
                     AttributesPath = "",
                     AnswerPath = "",
                     TrainingSetPercentage = 80
@@ -525,6 +525,35 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(1.0, results.Item2.Match(gcm => gcm.OverallAgreement, _ => Double.NaN));
         }
 
+
+        /// <summary>
+        /// Test that a simple list works for attribute categorization input
+        /// https://extract.atlassian.net/browse/ISSUE-14430
+        /// Learning machine editor: Attribute categorization from a file list requires CSV
+        /// </summary>
+        [Test, Category("LearningMachine")]
+        public static void TrainMachineAttributeCategorizationFromList()
+        {
+            SetPaginationFiles();
+            var files = Directory.GetFiles(_inputFolder.Last(), "*.tif");
+            File.WriteAllLines(_csvPath, files);
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                {
+                    InputPath = _csvPath,
+                    InputPathType = InputType.TextFile,
+                    AttributesPath = "<SourceDocName>.labeled_2_types.voa",
+                    TrainingSetPercentage = 80
+                },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.AttributeCategorization, null, "*@Feature"),
+                Classifier = new MulticlassSupportVectorMachineClassifier()
+            };
+            var (trainingSet, testingSet) = lm.TrainMachine();
+            Assert.AreEqual(1.0, trainingSet.Match(gcm => gcm.OverallAgreement, _ => Double.NaN));
+            Assert.AreEqual(1.0, testingSet.Match(gcm => gcm.OverallAgreement, _ => Double.NaN));
+        }
+
         [Test, Category("LearningMachine")]
         public static void TrainMachineFromCsvWithHeader()
         {
@@ -539,7 +568,7 @@ namespace Extract.AttributeFinder.Test
                 InputConfig = new InputConfiguration
                 {
                     InputPath = _csvPath,
-                    InputPathType = InputType.TextFileOrCsv,
+                    InputPathType = InputType.Csv,
                     AttributesPath = "",
                     AnswerPath = "",
                     TrainingSetPercentage = 80
@@ -570,7 +599,7 @@ namespace Extract.AttributeFinder.Test
                 InputConfig = new InputConfiguration
                 {
                     InputPath = _csvPath,
-                    InputPathType = InputType.TextFileOrCsv,
+                    InputPathType = InputType.Csv,
                     AttributesPath = "",
                     AnswerPath = "",
                     TrainingSetPercentage = 80
@@ -807,7 +836,7 @@ namespace Extract.AttributeFinder.Test
             inputConfig1.AnswerPath = inputConfig2.AnswerPath;
             Assert.AreEqual(inputConfig1, inputConfig2);
 
-            inputConfig1.InputPathType = InputType.TextFileOrCsv;
+            inputConfig1.InputPathType = InputType.TextFile;
             Assert.AreNotEqual(inputConfig1, inputConfig2);
             inputConfig1.InputPathType = inputConfig2.InputPathType;
             Assert.AreEqual(inputConfig1, inputConfig2);
@@ -919,7 +948,7 @@ namespace Extract.AttributeFinder.Test
                 InputConfig = new InputConfiguration
                 {
                     InputPath = _csvPath,
-                    InputPathType = InputType.TextFileOrCsv,
+                    InputPathType = InputType.TextFile,
                     AttributesPath = "<SourceDocName>.protofeatures.voa",
                     AnswerPath = "<SourceDocName>.eav",
                     TrainingSetPercentage = 50
@@ -1349,7 +1378,7 @@ namespace Extract.AttributeFinder.Test
                 InputConfig = new InputConfiguration
                 {
                     InputPath = _csvPath,
-                    InputPathType = InputType.TextFileOrCsv,
+                    InputPathType = InputType.Csv,
                     AttributesPath = "",
                     AnswerPath = "",
                     TrainingSetPercentage = 80
@@ -1412,56 +1441,6 @@ namespace Extract.AttributeFinder.Test
 
             // At least some are not integers
             Assert.That(trainInputs.SelectMany(a => a).Select(d => d % 1).Any(d => d != 0));
-        }
-
-        // Write out features to a CSV and train a machine with the CSV
-        // Change answers after computing encodings
-        [Test, Category("LearningMachine")]
-        public static void CsvDocumentCategorizationNewCategories()
-        {
-            SetDocumentCategorizationFiles();
-            var inputConfig = new InputConfiguration
-            {
-                InputPath = _inputFolder.Last(),
-                InputPathType = InputType.Folder,
-                AttributesPath = "",
-                AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
-                TrainingSetPercentage = 80
-            };
-            var lm = new LearningMachine
-            {
-                InputConfig = inputConfig,
-                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer(null, 5, 2000)),
-                Classifier = new MulticlassSupportVectorMachineClassifier(),
-                CsvOutputFile = Path.Combine(_inputFolder.Last(), "features")
-            };
-            lm.ComputeEncodings();
-            lm.WriteDataToCsv(_ => { }, CancellationToken.None);
-
-            var trainPath = Path.Combine(_inputFolder.Last(), "features.train.csv");
-            var testPath = Path.Combine(_inputFolder.Last(), "features.test.csv");
-            Assert.That(File.Exists(trainPath));
-            Assert.That(File.Exists(testPath));
-
-            // Read data and change doc types
-            void changeAnswers(string csvPath)
-            {
-                var csv = File.ReadAllLines(csvPath);
-                for (int i = 0; i < csv.Length; i++)
-                {
-                    var record = csv[i].Split(',');
-                    record[2] += "New";
-                    csv[i] = string.Join(",", record);
-                }
-                File.WriteAllLines(csvPath, csv);
-            }
-            changeAnswers(trainPath);
-            changeAnswers(testPath);
-
-            var (trainingSet, testingSet) = lm.TrainAndTestWithCsvData(false, trainPath, testPath, _ => { }, CancellationToken.None);
-
-            Assert.Greater(trainingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
-            Assert.Greater(testingSet.Match(gcm => gcm.OverallAgreement, cm => cm.Accuracy), 0.99);
         }
 
         // Write out features to a CSV and train a machine with the CSV
@@ -1557,7 +1536,7 @@ namespace Extract.AttributeFinder.Test
             var inputConfig = new InputConfiguration
             {
                 InputPath = _csvPath,
-                InputPathType = InputType.TextFileOrCsv,
+                InputPathType = InputType.Csv,
                 AttributesPath = "",
                 AnswerPath = "",
                 TrainingSetPercentage = 80

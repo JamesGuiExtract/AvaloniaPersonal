@@ -1530,9 +1530,21 @@ namespace Extract.AttributeFinder
             using (var unencryptedStream = new MemoryStream())
             using (var encryptedStream = new MemoryStream())
             {
+                // Change new enum values InputType.TextFile and InputType.CSV
+                // to old value for serializing so that machines can be used by older
+                // versions of the software
+                var objectToSerialize = InputConfig;
+                if (InputConfig.InputPathType == InputType.TextFile
+                    || InputConfig.InputPathType == InputType.Csv)
+                {
+                    objectToSerialize = InputConfig.ShallowClone();
+#pragma warning disable CS0612 // Type or member is obsolete
+                    objectToSerialize.InputPathType = InputType.TextFileOrCsv;
+#pragma warning restore CS0612 // Type or member is obsolete
+                }
                 var serializer = new NetDataContractSerializer();
                 serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
-                serializer.Serialize(unencryptedStream, InputConfig);
+                serializer.Serialize(unencryptedStream, objectToSerialize);
                 unencryptedStream.Position = 0;
                 ExtractEncryption.EncryptStream(unencryptedStream, encryptedStream, _CONVERGENCE_MATRIX, ml);
                 _encryptedInputConfig = encryptedStream.ToArray();
@@ -1623,6 +1635,23 @@ namespace Extract.AttributeFinder
 
             // Update property from persisted value
             LabelAttributesSettings = _labelAttributesPersistedSettings;
+
+            // Remove ambiguity with text file/csv file input
+#pragma warning disable CS0612 // Type or member is obsolete
+            if (InputConfig.InputPathType == InputType.TextFileOrCsv)
+#pragma warning restore CS0612 // Type or member is obsolete
+            {
+                if (Usage == LearningMachineUsage.AttributeCategorization
+                    || Usage == LearningMachineUsage.Deletion
+                    || Usage == LearningMachineUsage.Pagination)
+                {
+                    InputConfig.InputPathType = InputType.TextFile;
+                }
+                else
+                {
+                    InputConfig.InputPathType = InputType.Csv;
+                }
+            }
 
             // Update version number
             _version = _CURRENT_VERSION;

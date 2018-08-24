@@ -559,7 +559,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 if (CurrentLearningMachine.Usage == LearningMachineUsage.DocumentCategorization)
                 {
                     documentCategorizationRadioButton.Checked = true;
-                    if (inputConfig.InputPathType == InputType.TextFileOrCsv)
+                    if (inputConfig.InputPathType == InputType.Csv)
                     {
                         textFileOrCsvRadioButton.Checked = true;
                         documentCategorizationCsvTextBox.Text = inputConfig.InputPath ?? "";
@@ -590,7 +590,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     {
                         deletionRadioButton.Checked = true;
                     }
-                    textFileOrCsvRadioButton.Checked = inputConfig.InputPathType == InputType.TextFileOrCsv;
+                    textFileOrCsvRadioButton.Checked = inputConfig.InputPathType == InputType.TextFile;
                     paginationFileListOrFolderTextBox.Text = inputConfig.InputPath ?? "";
                     paginationFeatureVoaTextBox.Text = inputConfig.AttributesPath ?? "";
                     paginationAnswerVoaTextBox.Text = inputConfig.AnswerPath ?? "";
@@ -601,7 +601,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 else if (CurrentLearningMachine.Usage == LearningMachineUsage.AttributeCategorization)
                 {
                     attributeCategorizationRadioButton.Checked = true;
-                    textFileOrCsvRadioButton.Checked = inputConfig.InputPathType == InputType.TextFileOrCsv;
+                    textFileOrCsvRadioButton.Checked = inputConfig.InputPathType == InputType.TextFile;
                     attributeCategorizationFileListOrFolderTextBox.Text = inputConfig.InputPath ?? "";
                     attributeCategorizationCandidateVoaTextBox.Text = inputConfig.AttributesPath ?? "";
                     attributeCategorizationTrainingPercentageTextBox.Text = inputConfig.TrainingSetPercentage.ToString(CultureInfo.CurrentCulture);
@@ -822,7 +822,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             {
                 if (textFileOrCsvRadioButton.Checked)
                 {
-                    inputConfig.InputPathType = InputType.TextFileOrCsv;
+                    inputConfig.InputPathType = InputType.Csv;
                     inputPathTextBox = documentCategorizationCsvTextBox;
                     attributesPathTextBox = documentCategorizationCsvFeatureVoaTextBox;
                     inputConfig.AnswerPath = null;
@@ -844,7 +844,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             else if (paginationRadioButton.Checked || deletionRadioButton.Checked)
             {
                 inputConfig.InputPathType = textFileOrCsvRadioButton.Checked
-                    ? InputType.TextFileOrCsv
+                    ? InputType.TextFile
                     : InputType.Folder;
                 inputPathTextBox = paginationFileListOrFolderTextBox;
                 attributesPathTextBox = paginationFeatureVoaTextBox;
@@ -856,7 +856,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             else // LearningMachineUsage.AttributeCategorization
             {
                 inputConfig.InputPathType = textFileOrCsvRadioButton.Checked
-                    ? InputType.TextFileOrCsv
+                    ? InputType.TextFile
                     : InputType.Folder;
                 inputPathTextBox = attributeCategorizationFileListOrFolderTextBox;
                 attributesPathTextBox = attributeCategorizationCandidateVoaTextBox;

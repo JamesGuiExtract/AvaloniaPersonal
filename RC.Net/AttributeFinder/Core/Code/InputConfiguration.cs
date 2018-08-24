@@ -19,12 +19,23 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Input is a text file or CSV path
         /// </summary>
+        [Obsolete]
         TextFileOrCsv = 0,
 
         /// <summary>
         /// Input is a folder path
         /// </summary>
-        Folder = 1
+        Folder = 1,
+
+        /// <summary>
+        /// Input is a text file
+        /// </summary>
+        TextFile = 2,
+
+        /// <summary>
+        /// Input is a CSV path
+        /// </summary>
+        Csv = 3
     }
 
     /// <summary>
@@ -183,73 +194,70 @@ namespace Extract.AttributeFinder
                         updateStatus(new StatusArgs { StatusMessage = "Getting input files: {0:N0} files", Int32Value = 1 });
                     };
                 }
-                else if (InputPathType == InputType.TextFileOrCsv)
+                // Text file list
+                else if (InputPathType == InputType.TextFile)
                 {
-                    // Text file list
-                    if (!string.IsNullOrWhiteSpace(AnswerPath))
+                    foreach (var line in File.ReadLines(InputPath))
                     {
-                        foreach (var line in File.ReadLines(InputPath))
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        imageFiles.Add(line.Trim());
+                        updateStatus(new StatusArgs { StatusMessage = "Getting input files: {0:N0} files", Int32Value = 1 });
+                    }
+                }
+                // CSV of images and answers
+                else if (InputPathType == InputType.Csv)
+                {
+                    ExtractException.Assert("ELI39756", "Input file does not exist", File.Exists(InputPath));
+                    answers = new List<string>();
+                    using (var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser(InputPath))
+                    {
+                        csvReader.Delimiters = new[] { "," };
+                        csvReader.CommentTokens = new[] { "//", "#" };
+                        while (!csvReader.EndOfData)
                         {
                             cancellationToken.ThrowIfCancellationRequested();
 
-                            imageFiles.Add(line.Trim());
-                            updateStatus(new StatusArgs { StatusMessage = "Getting input files: {0:N0} files", Int32Value = 1 });
-                        }
-                    }
-                    // CSV of images and answers
-                    else
-                    {
-                        ExtractException.Assert("ELI39756", "Input file does not exist", File.Exists(InputPath));
-                        answers = new List<string>();
-                        using (var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser(InputPath))
-                        {
-                            csvReader.Delimiters = new[] { "," };
-                            csvReader.CommentTokens = new[] { "//", "#" };
-                            while (!csvReader.EndOfData)
+                            string[] fields;
+                            try
                             {
-                                cancellationToken.ThrowIfCancellationRequested();
+                                fields = csvReader.ReadFields();
+                            }
+                            catch (Exception e)
+                            {
+                                var ue = new ExtractException("ELI39767", "Error parsing CSV input file", e);
+                                ue.AddDebugData("CSV path", InputPath, false);
+                                throw ue;
+                            }
 
-                                string[] fields;
-                                try
-                                {
-                                    fields = csvReader.ReadFields();
-                                }
-                                catch (Exception e)
-                                {
-                                    var ue = new ExtractException("ELI39767", "Error parsing CSV input file", e);
-                                    ue.AddDebugData("CSV path", InputPath, false);
-                                    throw ue;
-                                }
+                            ExtractException.Assert("ELI39757", "CSV rows should contain exactly two fields",
+                                fields.Length == 2,
+                                "Field count", fields.Length,
+                                "Row number", imageFiles.Count + 1);
 
-                                ExtractException.Assert("ELI39757", "CSV rows should contain exactly two fields",
-                                    fields.Length == 2,
-                                    "Field count", fields.Length,
-                                    "Row number", imageFiles.Count + 1);
+                            string imageName = fields[0];
+                            string answer = fields[1];
 
-                                string imageName = fields[0];
-                                string answer = fields[1];
-
-                                // Ignore header row
-                                try
-                                {
-                                    // LineNumber is one more than the line number of last read fields
-                                    if (csvReader.LineNumber == 2
-                                        && (imageName.IndexOfAny(Path.GetInvalidPathChars()) >= 0 || !Path.IsPathRooted(imageName)))
-                                    {
-                                        continue;
-                                    }
-                                }
-                                catch (ArgumentException)
+                            // Ignore header row
+                            try
+                            {
+                                // LineNumber is one more than the line number of last read fields
+                                if (csvReader.LineNumber == 2
+                                    && (imageName.IndexOfAny(Path.GetInvalidPathChars()) >= 0 || !Path.IsPathRooted(imageName)))
                                 {
                                     continue;
                                 }
-
-                                ExtractException.Assert("ELI39758", "Image path must not be relative", Path.IsPathRooted(imageName));
-                                ExtractException.Assert("ELI39759", "File doesn't exist", File.Exists(imageName));
-                                imageFiles.Add(imageName);
-                                answers.Add(answer);
-                                updateStatus(new StatusArgs { StatusMessage = "Getting input files: {0:N0} files", Int32Value = 1 });
                             }
+                            catch (ArgumentException)
+                            {
+                                continue;
+                            }
+
+                            ExtractException.Assert("ELI39758", "Image path must not be relative", Path.IsPathRooted(imageName));
+                            ExtractException.Assert("ELI39759", "File doesn't exist", File.Exists(imageName));
+                            imageFiles.Add(imageName);
+                            answers.Add(answer);
+                            updateStatus(new StatusArgs { StatusMessage = "Getting input files: {0:N0} files", Int32Value = 1 });
                         }
                     }
                 }
@@ -436,6 +444,21 @@ namespace Extract.AttributeFinder
                 .Hash(InputPath)
                 .Hash(InputPathType)
                 .Hash(TrainingSetPercentage);
+        }
+
+        /// <summary>
+        /// Gets a memberwise clone of this instance
+        /// </summary>
+        public InputConfiguration ShallowClone()
+        {
+            try
+            {
+                return (InputConfiguration)MemberwiseClone();
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI46200");
+            }
         }
 
         #endregion Overrides
