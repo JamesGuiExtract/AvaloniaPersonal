@@ -101,6 +101,7 @@ namespace Extract.Utilities
         /// Creates an instance or returns null if <see paramref="item"/> is null
         /// </summary>
         /// <param name="item">The item to wrap in the union instance</param>
+        [SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
         public static Union<TCase1, TCase2> Maybe(TCase1 item)
         {
             if (item == null)
@@ -114,6 +115,7 @@ namespace Extract.Utilities
         /// Creates an instance or returns null if <see paramref="item"/> is null
         /// </summary>
         /// <param name="item">The item to wrap in the union instance</param>
+        [SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
         public static Union<TCase1, TCase2> Maybe(TCase2 item)
         {
             if (item == null)
@@ -234,6 +236,7 @@ namespace Extract.Utilities
         /// Creates an instance or returns null if <see paramref="item"/> is null
         /// </summary>
         /// <param name="item">The item to wrap in the union instance</param>
+        [SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
         public static Union<TCase1, TCase2, TCase3> Maybe(TCase1 item)
         {
             if (item == null)
@@ -247,6 +250,7 @@ namespace Extract.Utilities
         /// Creates an instance or returns null if <see paramref="item"/> is null
         /// </summary>
         /// <param name="item">The item to wrap in the union instance</param>
+        [SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
         public static Union<TCase1, TCase2, TCase3> Maybe(TCase2 item)
         {
             if (item == null)
@@ -260,6 +264,7 @@ namespace Extract.Utilities
         /// Creates an instance or returns null if <see paramref="item"/> is null
         /// </summary>
         /// <param name="item">The item to wrap in the union instance</param>
+        [SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
         public static Union<TCase1, TCase2, TCase3> Maybe(TCase3 item)
         {
             if (item == null)

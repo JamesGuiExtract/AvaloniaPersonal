@@ -38,7 +38,8 @@ namespace Extract.DataEntry
                 {
                     var old = _providerSource;
                     _providerSource = value;
-                    Provider = s => _providerSource.GetSuggestions(s);
+                    Provider = s => _providerSource.GetSuggestions(s,
+                        excludeLowScoring: true);
                     old?.Dispose();
                 }
             }
@@ -235,6 +236,10 @@ namespace Extract.DataEntry
                     _listBoxChild.Show();
 
                     int totalItemHeight = _listBoxChild.ItemHeight * (_listBoxChild.Items.Count + 1);
+                    if ((FormsMethods.GetVisibleScrollbars(_listBoxChild) & ScrollBars.Horizontal) != 0)
+                    {
+                        totalItemHeight += SystemInformation.HorizontalScrollBarHeight;
+                    }
                     _listBoxChild.Height = Math.Min(_ancestorForm.ClientSize.Height - _listBoxChild.Top, totalItemHeight);
 
                     // Select first item

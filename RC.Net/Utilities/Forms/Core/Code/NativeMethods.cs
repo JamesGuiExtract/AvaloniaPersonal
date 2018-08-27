@@ -392,6 +392,9 @@ namespace Extract.Utilities.Forms
         const uint _WS_VISIBLE = 0x10000000;
         const uint _WS_EX_TOPMOST = 0x0008;
 
+        const int _WS_VSCROLL = 0x00200000;
+        const int _WS_HSCROLL = 0x00100000;
+
         #endregion Constants
 
         #region Structs
@@ -687,6 +690,33 @@ namespace Extract.Utilities.Forms
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI27647", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets which scrollbars are visible on a control
+        /// </summary>
+        /// <param name="control">The control to examine</param>
+        public static ScrollBars GetVisibleScrollbars(Control control)
+        {
+            try
+            {
+                uint wndStyle = GetWindowLong(control.Handle, _GWL_STYLE);
+                bool hsVisible = (wndStyle & _WS_HSCROLL) != 0;
+                bool vsVisible = (wndStyle & _WS_VSCROLL) != 0;
+
+                if (hsVisible)
+                {
+                    return vsVisible ? ScrollBars.Both : ScrollBars.Horizontal;
+                }
+                else
+                {
+                    return vsVisible ? ScrollBars.Vertical : ScrollBars.None;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46222");
             }
         }
 

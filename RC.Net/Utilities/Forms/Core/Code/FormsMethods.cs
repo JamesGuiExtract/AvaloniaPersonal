@@ -164,6 +164,22 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
+        /// Gets which scrollbars are visible on a control
+        /// </summary>
+        /// <param name="control">The control to examine</param>
+        public static ScrollBars GetVisibleScrollbars(Control control)
+        {
+            try
+            {
+                return NativeMethods.GetVisibleScrollbars(control);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46221");
+            }
+        }
+
+        /// <summary>
         /// Searches the specified collections for <see cref="ToolStrip"/> objects containing
         /// <see cref="ToolStripSeparator"/> objects and removes the separators if they
         /// are the last item in the list or proceeded by another separator. If no visible

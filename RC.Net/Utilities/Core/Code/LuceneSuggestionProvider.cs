@@ -11,7 +11,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Extract.Utilities
 {
@@ -100,7 +99,8 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="searchPhrase">The substring or related phrase to search with</param>
         /// <param name="maxSuggestions">The maximim number of suggestions to return</param>
-        public IEnumerable<string> GetSuggestions(string searchPhrase, int maxSuggestions = int.MaxValue)
+        public IEnumerable<string> GetSuggestions(string searchPhrase, int maxSuggestions = int.MaxValue,
+            bool excludeLowScoring = false)
         {
             try
             {
@@ -108,9 +108,33 @@ namespace Extract.Utilities
                 {
                     return _items;
                 }
+                else if (excludeLowScoring)
+                {
+                    var result = GetSuggestionsAndScores(searchPhrase).ToList();
+
+                    // If the search phrase is at least two chars long, attempt to limit the results
+                    // to only the best by using the standard deviation + median of the scores as a threshold
+                    if (searchPhrase.Length > 1)
+                    {
+                        // Result is sorted by score
+                        var scores = result.Select(t => t.Item2).ToList();
+                        double mean = scores.Average();
+                        double median = scores[scores.Count / 2];
+                        double sigma = Math.Sqrt(scores.Sum(s => Math.Pow(s - mean, 2)) / scores.Count);
+                        double cutoff = median + sigma;
+                        var trimmed = result.Where(t => t.Item2 >= cutoff).Select(t => t.Item1).ToList();
+                        if (trimmed.Any())
+                        {
+                            return trimmed.Take(maxSuggestions);
+                        }
+                    }
+
+                    return result.Select(t => t.Item1).Take(maxSuggestions);
+                }
                 else
                 {
-                    return GetSuggestionsAndScores(searchPhrase, maxSuggestions).Select(t => t.Item1);
+                    return GetSuggestionsAndScores(searchPhrase, maxSuggestions)
+                        .Select(t => t.Item1);
                 }
             }
             catch (Exception ex)
@@ -125,7 +149,8 @@ namespace Extract.Utilities
         /// <param name="searchPhrase">The substring or related phrase to search with</param>
         /// <param name="maxSuggestions">The maximim number of suggestions to return</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public IEnumerable<Tuple<string, double>> GetSuggestionsAndScores(string searchPhrase, int maxSuggestions = int.MaxValue)
+        public IEnumerable<Tuple<string, double>> GetSuggestionsAndScores(string searchPhrase,
+            int maxSuggestions = int.MaxValue)
         {
             try
             {
@@ -143,34 +168,97 @@ namespace Extract.Utilities
                     return _items.Select(s => Tuple.Create(s, 0.0)).Take(maxSuggestions);
                 }
 
-                var escaped = QueryParser.Escape(string.Join(" ", terms));
+                bool lastTermMightBeIncomplete = !char.IsWhiteSpace(searchPhrase.Last());
+
+                string escaped = null;
+                escaped = QueryParser.Escape(string.Join(" ", terms));
 
                 var query = new BooleanQuery();
+                Query clause = null;
                 foreach (var field in _fields)
                 {
                     // Parse the search string into a query clause using the same analyzer
                     // that was used for building the index
-                    var parser = new QueryParser(Lucene.Net.Util.LuceneVersion.LUCENE_48, field, _analyzer);
-                    var clause = parser.Parse(escaped);
-                    query.Add(clause, Occur.SHOULD);
+                    if (escaped != null)
+                    {
+                        var parser = new QueryParser(Lucene.Net.Util.LuceneVersion.LUCENE_48, field, _analyzer);
+                        clause = parser.Parse(escaped);
+                        query.Add(clause, Occur.SHOULD);
+                    }
 
-                    // Add a SpanFirstQuery for the first term to give it extra weight.
-                    // This query will use position info and will only match items where
-                    // the term appears as the first term in the field
-                    clause = new SpanFirstQuery(new SpanTermQuery(
-                        new Term(field, terms.First())), 1);
-                    query.Add(clause, Occur.SHOULD);
-
-                    // Add a wildcard query based on the last term, since this
-                    // is likely an incomplete word being typed
+                    // Add a wildcard query if the last term is might be incomplete
                     var lastTerm = terms.Last();
-                    clause = new WildcardQuery(new Term(field, lastTerm + "*"));
-                    query.Add(clause, Occur.SHOULD);
+                    if (lastTermMightBeIncomplete)
+                    {
+                        // If there is only a single term, include a SpanFirstQuery with extra weight.
+                        // This query will use position info and will only match items where
+                        // the term appears as the first term in the field
+                        if (terms.Length == 1)
+                        {
+                            clause = new SpanFirstQuery(
+                                new SpanMultiTermQueryWrapper<PrefixQuery>(
+                                new PrefixQuery(new Term(field, lastTerm))), 1);
+                            clause.Boost = 1.1f;
+                            query.Add(clause, Occur.SHOULD);
+
+                            // Also add a non-span-first query
+                            // Exclude the first position from this query so as not to count first position twice
+                            // This query seems to count more than it should... so use 0.5 for the boost
+                            clause = new SpanNotQuery(
+                                include: new SpanMultiTermQueryWrapper<PrefixQuery>(
+                                    new PrefixQuery(new Term(field, lastTerm))),
+                                exclude: new SpanFirstQuery(
+                                    new SpanMultiTermQueryWrapper<PrefixQuery>(
+                                    new PrefixQuery(new Term(field, lastTerm))), 1));
+                            clause.Boost = 0.5f;
+                            query.Add(clause, Occur.SHOULD);
+                        }
+                        else
+                        {
+                            clause = new PrefixQuery(new Term(field, lastTerm));
+                            query.Add(clause, Occur.SHOULD);
+
+                            // Add another clause for all the other terms
+                            // so that the last word isn't counted twice
+                            foreach (var term in terms.Take(terms.Length - 1))
+                            {
+                                query.Add(new TermQuery(new Term(field, term)) {Boost = 0.5f}, Occur.SHOULD);
+                            }
+                        }
+                    }
+
+                    // Add a span first query to boost the first word if there is more than one
+                    // word or if not lastTermMightBeIncomplete (to compensate for the lacking prefix query above)
+                    if (terms.Length > 1 || !lastTermMightBeIncomplete)
+                    {
+                        clause = new SpanFirstQuery(new SpanTermQuery(
+                            new Term(field, terms.First())), 1);
+                        clause.Boost = 0.1f;
+                        query.Add(clause, Occur.SHOULD);
+                    }
 
                     // Add a fuzzy query for the last term in case it is a complete word
-                    if (lastTerm.Length > 1)
+                    if (!lastTermMightBeIncomplete && lastTerm.Length > 1)
                     {
-                        clause = new FuzzyQuery(new Term(field, lastTerm), lastTerm.Length > 3 ? 2 : 1);
+                        var lastTermFuzzyClause = new FuzzyQuery(
+                                new Term(field, lastTerm), lastTerm.Length > 3 ? 2 : 1);
+
+                        // Exclude the prefix query so as not to give double
+                        // weight to the final word while it is being typed
+                        if (lastTermMightBeIncomplete)
+                        {
+                            clause = new SpanNotQuery(
+                                include: new SpanMultiTermQueryWrapper<FuzzyQuery>(
+                                    lastTermFuzzyClause),
+                                exclude: new SpanMultiTermQueryWrapper<PrefixQuery>(
+                                    new PrefixQuery(new Term(field, lastTerm))));
+                        }
+                        else
+                        {
+                            clause = lastTermFuzzyClause;
+                        }
+
+                        clause.Boost = 0.1f;
                         query.Add(clause, Occur.SHOULD);
                     }
 
@@ -178,6 +266,7 @@ namespace Extract.Utilities
                     foreach (var term in terms.Take(terms.Length - 1).Where(t => t.Length > 1))
                     {
                         clause = new FuzzyQuery(new Term(field, term), term.Length > 3 ? 2 : 1);
+                        clause.Boost = 0.1f;
                         query.Add(clause, Occur.SHOULD);
                     }
 
