@@ -715,8 +715,15 @@ void CSpatialString::performReplace(const string& stdstrToFind, const string& st
                             // copy over the spatial information associated with the character at the calculated
                             // offset and override the actual char
                             CPPLetter letter = m_vecLetters[ulStartPos + ulOffset];
-                            letter.m_usGuess1 = letter.m_usGuess2 = letter.m_usGuess3 =
-                                (unsigned short) strActualReplacement[i];
+							unsigned short usChar = strActualReplacement[i];
+							letter.m_usGuess1 = letter.m_usGuess2 = letter.m_usGuess3 =
+								usChar;
+
+                            // Set newline chars to be non-spatial to prevent spatial string searcher issues
+                            if (usChar == '\r' || usChar == '\n')
+                            {
+                                letter.m_bIsSpatial = false;
+                            }
 
                             // push the letter into the vector of letters which will later be used to build
                             // a spatial replacement string

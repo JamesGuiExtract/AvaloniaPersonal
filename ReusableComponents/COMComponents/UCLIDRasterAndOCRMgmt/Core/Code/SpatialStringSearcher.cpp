@@ -1436,17 +1436,23 @@ UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialStringSearcher::createStrin
 		// in our rveciLetters vector.  Since we want to retain them 
 		// we add all non-spatial characters trailing any spatial character
 		// in our region
+		bool bLastSpatialCharWasWhitespace = isWhitespaceChar(cLastLetter);
 		for (unsigned int uiLetter = rveciLetters[ui] + 1; uiLetter < m_vecLetters.size(); uiLetter++)
 		{
 			// Stop once a spatial character is reached
+			// Also stop if the last char was a whitespace char but this one is not
+			// so as not to include extra, unexpected non-whitespace chars
+			// https://extract.atlassian.net/browse/ISSUE-15590
 			const LocalLetter& localLetter = m_vecLetters[uiLetter];
-			if (localLetter.letter.m_bIsSpatial)
+			if (localLetter.letter.m_bIsSpatial
+				|| bLastSpatialCharWasWhitespace
+				   && !isWhitespaceChar(localLetter.letter.m_usGuess1))
 			{
 				break;
 			}
 			// If the letter isn't spatial add it
 			addLocalLetter(vecNewLetters, localLetter, bAdjustHeight);
-			cLastLetter = (char) localLetter.letter.m_usGuess1;
+			cLastLetter = (char)localLetter.letter.m_usGuess1;
 
 			// update the word index for non-spatial letters [P16 #2849]
 			currWord = localLetter.m_uiWord;

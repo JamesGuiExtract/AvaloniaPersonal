@@ -143,3 +143,9 @@
 <SET>;GET_DATA_OUTOF_REGION
 <TESTCASE>;./Empty.uss;1;Empty.txt;
 
+// Locate image region returns extra text
+// https://extract.atlassian.net/browse/ISSUE-15590
+<SET>;GET_DATA_IN_REGION;
+<SET>;BOUNDS= 390, 1642, 1655, 2337;
+<SET>;BOUNDARY_DATA_TYPE=CHAR;
+<TESTCASE>;./ISSUE-15590.uss;1;ISSUE-15590.txt;
