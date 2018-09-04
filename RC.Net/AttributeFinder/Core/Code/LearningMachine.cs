@@ -1183,7 +1183,9 @@ namespace Extract.AttributeFinder
             Encoder.PrettyPrint(writer);
             writer.WriteLine("Classifier ({0}):", MachineType);
             Classifier.PrettyPrint(writer);
-            if (UseUnknownCategory)
+            if (Classifier is SupportVectorMachineClassifier svm
+                && svm.CalibrateMachineToProduceProbabilities
+                && UseUnknownCategory)
             {
                 writer.WriteLine("UnknownCategoryCutoff: {0}", UnknownCategoryCutoff);
             }

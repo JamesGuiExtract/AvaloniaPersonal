@@ -1,14 +1,9 @@
 ﻿using Accord.MachineLearning.VectorMachines;
-using Accord.MachineLearning.VectorMachines.Learning;
-using Accord.Math;
-using Accord.Statistics.Kernels;
 using LearningMachineTrainer;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Extract.AttributeFinder
 {
@@ -34,30 +29,11 @@ namespace Extract.AttributeFinder
         private int _version = _CURRENT_VERSION;
 
         // Backing fields for properties
-        private bool _calibrateMachineToProduceProbabilities;
         private bool _useClassProportionsForComplexityWeights;
 
         #endregion Fields
 
         #region Properties
-
-        /// <summary>
-        /// Whether or not to produce a probabilistic machine
-        /// </summary>
-        public bool CalibrateMachineToProduceProbabilities
-        {
-            get
-            {
-                return _calibrateMachineToProduceProbabilities;
-            }
-            set
-            {
-                if (value != _calibrateMachineToProduceProbabilities)
-                {
-                    _calibrateMachineToProduceProbabilities = value;
-                }
-            }
-        }
 
         /// <summary>
         /// This was used as a parameter to the SMO training algorithm but it is no longer used.
@@ -92,61 +68,6 @@ namespace Extract.AttributeFinder
         }
 
         #endregion Constructors
-
-        #region Overrides
-
-        /// <summary>
-        /// Whether this instance has the same configured properties as another
-        /// </summary>
-        /// <param name="otherClassifier">The <see cref="ITrainableClassifier"/> to compare with this instance</param>
-        /// <returns><see langword="true"/> if the configurations are the same, else <see langword="false"/></returns>
-        public override bool IsConfigurationEqualTo(ITrainableClassifier otherClassifier)
-        {
-            try
-            {
-                if (Object.ReferenceEquals(this, otherClassifier))
-                {
-                    return true;
-                }
-
-                var other = otherClassifier as MultilabelSupportVectorMachineClassifier;
-                if (other == null
-                    || !base.IsConfigurationEqualTo(other)
-                    || other.CalibrateMachineToProduceProbabilities != CalibrateMachineToProduceProbabilities
-                   )
-                {
-                    return false;
-                }
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                throw e.AsExtract("ELI39823");
-            }
-        }
-
-        /// <summary>
-        /// Pretty prints this object with supplied <see cref="System.CodeDom.Compiler.IndentedTextWriter"/>
-        /// </summary>
-        /// <param name="writer">The <see cref="System.CodeDom.Compiler.IndentedTextWriter"/> to use</param>
-        public override void PrettyPrint(System.CodeDom.Compiler.IndentedTextWriter writer)
-        {
-            try
-            {
-                base.PrettyPrint(writer);
-                var oldIndent = writer.Indent;
-                writer.Indent++;
-                writer.WriteLine("CalibrateMachineToProduceProbabilities: {0}", CalibrateMachineToProduceProbabilities);
-                writer.Indent = oldIndent;
-            }
-            catch (Exception e)
-            {
-                throw e.AsExtract("ELI40070");
-            }
-        }
-
-        #endregion Overrides
 
         #region IDisposable Members
 

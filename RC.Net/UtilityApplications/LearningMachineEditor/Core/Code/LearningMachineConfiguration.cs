@@ -173,7 +173,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     = documentCategorizationFolderInputPanel.Size
                     = documentCategorizationCsvInputPanel.Size;
                 svmPanel.Location = neuralNetPanel.Location;
-                multilabelSvmPanel.Left = svmPanel.Left;
+                probabilisticSvmPanel.Left = svmPanel.Left;
 
                 // Assign appropriate path tags
                 documentCategorizationCsvFeatureVoaPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
@@ -685,17 +685,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         ? classifier.TrainingAlgorithmCacheSize.Value.ToString(CultureInfo.CurrentCulture)
                         : "";
 
-                    // Additional options for multi-label SVM
-                    if (CurrentLearningMachine.MachineType == LearningMachineType.MultilabelSVM)
-                    {
-                        var multilabel = (MultilabelSupportVectorMachineClassifier)classifier;
-                        multilabelSvmCalibrateForProbabilitiesCheckBox.Checked = multilabel.CalibrateMachineToProduceProbabilities;
-
-                        multilabelSvmUseUnknownCheckBox.Checked = CurrentLearningMachine.UseUnknownCategory;
-                        multilabelSvmUnknownCutoffTextBox.Text = CurrentLearningMachine.UnknownCategoryCutoff.ToString("r", CultureInfo.CurrentCulture);
-                        multilabelSvmTranslateUnknownCheckbox.Checked = CurrentLearningMachine.TranslateUnknownCategory;
-                        multilabelSvmTranslateUnknownTextBox.Text = CurrentLearningMachine.TranslateUnknownCategoryTo ?? "";
-                    }
+                    // Probability options for SVM
+                    calibrateForProbabilitiesCheckBox.Checked = classifier.CalibrateMachineToProduceProbabilities;
+                    useUnknownCheckBox.Checked = CurrentLearningMachine.UseUnknownCategory;
+                    unknownCutoffTextBox.Text = CurrentLearningMachine.UnknownCategoryCutoff.ToString("r", CultureInfo.CurrentCulture);
+                    translateUnknownCheckbox.Checked = CurrentLearningMachine.TranslateUnknownCategory;
+                    translateUnknownTextBox.Text = CurrentLearningMachine.TranslateUnknownCategoryTo ?? "";
                 }
                 else
                 {
@@ -1155,11 +1150,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         }
 
         /// <summary>
-        /// Initializes a <see cref="CurrentLearningMachine"/> with classifier values
+        /// Initializes a <see cref="LearningMachine"/> with classifier values
         /// </summary>
-        /// <param name="classifier">The <see cref="SupportVectorMachineClassifier"/> to be initialized</param>
-        private void SetSVMClassifierValues(SupportVectorMachineClassifier classifier)
+        /// <param name="learningMachine">The <see cref="LearningMachine"/> to be initialized</param>
+        private void SetSVMClassifierValues(LearningMachine learningMachine)
         {
+            SupportVectorMachineClassifier classifier = (SupportVectorMachineClassifier)learningMachine.Classifier;
             double complexity;
             if (!double.TryParse(svmComplexityTextBox.Text, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
                 CultureInfo.InvariantCulture, out complexity)
@@ -1213,6 +1209,22 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             {
                 classifier.ScoreTypeToUseForComplexityChoosingAlgorithm = MachineScoreType.OverallAgreementOrF1;
             }
+
+            // Set probability values
+            classifier.CalibrateMachineToProduceProbabilities = calibrateForProbabilitiesCheckBox.Checked;
+            learningMachine.UseUnknownCategory = useUnknownCheckBox.Checked;
+
+            double unknownCategoryCutoff = 0;
+            if (!double.TryParse(unknownCutoffTextBox.Text, NumberStyles.Number, CultureInfo.InvariantCulture,
+                out unknownCategoryCutoff))
+            {
+                unknownCutoffTextBox.SetError(configurationErrorProvider,
+                    "Could not parse unknown category cutoff text as a number");
+                _valid = false;
+            }
+            learningMachine.UnknownCategoryCutoff = unknownCategoryCutoff;
+            learningMachine.TranslateUnknownCategory = translateUnknownCheckbox.Checked;
+            learningMachine.TranslateUnknownCategoryTo = translateUnknownTextBox.Text;
         }
 
         /// <summary>
@@ -1221,15 +1233,14 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// <param name="learningMachine">The <see cref="CurrentLearningMachine"/> to be initialized</param>
         private void SetMulticlassSVMClassifierValues(LearningMachine learningMachine)
         {
-            if (_dangerMode && learningMachine.Classifier is MulticlassSupportVectorMachineClassifier mc)
+            if (_dangerMode && learningMachine.Classifier is MulticlassSupportVectorMachineClassifier)
             {
-                SetSVMClassifierValues(mc);
+                SetSVMClassifierValues(learningMachine);
             }
             else
             {
-                var classifier = new MulticlassSupportVectorMachineClassifier();
-                learningMachine.Classifier = classifier;
-                SetSVMClassifierValues(classifier);
+                learningMachine.Classifier = new MulticlassSupportVectorMachineClassifier();
+                SetSVMClassifierValues(learningMachine);
             }
         }
 
@@ -1240,35 +1251,15 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// <param name="learningMachine">The <see cref="CurrentLearningMachine"/> to be initialized</param>
         private void SetMultilabelSVMClassifierValues(LearningMachine learningMachine)
         {
-            if (_dangerMode && learningMachine.Classifier is MultilabelSupportVectorMachineClassifier ml)
+            if (_dangerMode && learningMachine.Classifier is MultilabelSupportVectorMachineClassifier)
             {
-                ml.CalibrateMachineToProduceProbabilities = multilabelSvmCalibrateForProbabilitiesCheckBox.Checked;
-                SetSVMClassifierValues(ml);
+                SetSVMClassifierValues(learningMachine);
             }
             else
             {
-                var classifier = new MultilabelSupportVectorMachineClassifier()
-                {
-                    CalibrateMachineToProduceProbabilities = multilabelSvmCalibrateForProbabilitiesCheckBox.Checked,
-                };
-                learningMachine.Classifier = classifier;
-                SetSVMClassifierValues(classifier);
+                learningMachine.Classifier = new MultilabelSupportVectorMachineClassifier();
+                SetSVMClassifierValues(learningMachine);
             }
-
-            // Set values only associated with multilabel SVM at this time
-            learningMachine.UseUnknownCategory = multilabelSvmUseUnknownCheckBox.Checked;
-
-            double unknownCategoryCutoff = 0;
-            if (!double.TryParse(multilabelSvmUnknownCutoffTextBox.Text, NumberStyles.Number, CultureInfo.InvariantCulture,
-                out unknownCategoryCutoff))
-            {
-                multilabelSvmUnknownCutoffTextBox.SetError(configurationErrorProvider,
-                    "Could not parse unknown category cutoff text as a number");
-                _valid = false;
-            }
-            learningMachine.UnknownCategoryCutoff = unknownCategoryCutoff;
-            learningMachine.TranslateUnknownCategory = multilabelSvmTranslateUnknownCheckbox.Checked;
-            learningMachine.TranslateUnknownCategoryTo = multilabelSvmTranslateUnknownTextBox.Text;
         }
 
         /// <summary>
@@ -1393,7 +1384,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             if (machineType == LearningMachineType.ActivationNetwork)
             {
                 neuralNetPanel.Visible = true;
-                multilabelSvmPanel.Visible = false;
+                probabilisticSvmPanel.Visible = false;
                 svmPanel.Visible = false;
                 numberOfCandidateNetwordsTextBox.Enabled = useCrossValidationSetsCheckBox.Checked;
             }
@@ -1404,18 +1395,11 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 svmPanel.Visible = true;
                 svmScoreTypeGroupBox.Enabled = svmAutoComplexityCheckBox.Checked;
 
-                if (machineType == LearningMachineType.MultilabelSVM)
-                {
-                    multilabelSvmPanel.Visible = true;
-                    multilabelSvmUseUnknownCheckBox.Enabled = multilabelSvmCalibrateForProbabilitiesCheckBox.Checked;
-                    multilabelSvmUnknownCutoffTextBox.Enabled = multilabelSvmCalibrateForProbabilitiesCheckBox.Checked;
-                    multilabelSvmTranslateUnknownCheckbox.Enabled = multilabelSvmCalibrateForProbabilitiesCheckBox.Checked;
-                    multilabelSvmTranslateUnknownTextBox.Enabled = multilabelSvmTranslateUnknownCheckbox.Checked;
-                }
-                else
-                {
-                    multilabelSvmPanel.Visible = false;
-                }
+                probabilisticSvmPanel.Visible = true;
+                useUnknownCheckBox.Enabled = calibrateForProbabilitiesCheckBox.Checked;
+                unknownCutoffTextBox.Enabled = calibrateForProbabilitiesCheckBox.Checked && useUnknownCheckBox.Checked;
+                translateUnknownCheckbox.Enabled = calibrateForProbabilitiesCheckBox.Checked && useUnknownCheckBox.Checked;
+                translateUnknownTextBox.Enabled = calibrateForProbabilitiesCheckBox.Checked && translateUnknownCheckbox.Checked;
             }
         }
 
@@ -1599,9 +1583,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 svmWeightRatioTextBox.Text = "";
                 svmConditionallyApplyWeightRatioCheckBox.Checked = true;
                 svmCacheSizeTextBox.Text = "4000";
-                multilabelSvmCalibrateForProbabilitiesCheckBox.Checked = true;
-                multilabelSvmUnknownCutoffTextBox.Text = "0.5";
-                multilabelSvmUseUnknownCheckBox.Checked = true;
+                calibrateForProbabilitiesCheckBox.Checked = true;
+                unknownCutoffTextBox.Text = "0.5";
+                useUnknownCheckBox.Checked = true;
                 numberOfCandidateNetwordsTextBox.Text = "5";
                 paginationAnswerVoaTextBox.Text = "<SourceDocName>.evoa";
                 paginationFeatureVoaTextBox.Text = "<SourceDocName>.protofeatures.voa";

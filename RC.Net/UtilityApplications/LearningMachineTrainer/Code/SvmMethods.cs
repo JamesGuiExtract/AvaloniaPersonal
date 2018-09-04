@@ -34,6 +34,8 @@ namespace LearningMachineTrainer
         int? TrainingAlgorithmCacheSize { get; set; }
 
         int Version { get; set; }
+
+        bool CalibrateMachineToProduceProbabilities { get; set; }
     }
 
     [CLSCompliant(false)]
@@ -43,9 +45,7 @@ namespace LearningMachineTrainer
     [CLSCompliant(false)]
     [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Multilabel")]
     public interface IMultilabelSupportVectorMachineModel : ISupportVectorMachineModel
-    {
-        bool CalibrateMachineToProduceProbabilities { get; set; }
-    }
+    { }
     
     [CLSCompliant(false)]
     [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Svm")]
@@ -56,21 +56,17 @@ namespace LearningMachineTrainer
         {
             try
             {
-                if (model is IMultilabelSupportVectorMachineModel ml)
+                double? max = null;
+                int imax = model.Classifier.Compute(inputs, out double maxResponse);
+
+                // Return score if classifier is probabilistic
+                if (model.Classifier is MultilabelSupportVectorMachine ml && ml.IsProbabilistic
+                    || model.Classifier is MulticlassSupportVectorMachine mc && mc.IsProbabilistic)
                 {
-                    ((MultilabelSupportVectorMachine)ml.Classifier).Compute(inputs, out double[] responses);
-
-                    double? max = responses.Max(out int imax);
-
-                    // Only return score if classifier is probabilistic
-                    if (!((MultilabelSupportVectorMachine)ml.Classifier).IsProbabilistic)
-                    {
-                        max = null;
-                    }
-                    return (imax, max);
+                    max = maxResponse;
                 }
 
-                return (model.Classifier.Compute(inputs, out var _), null);
+                return (imax, max);
             }
             catch (Exception ex)
             {
@@ -186,7 +182,7 @@ namespace LearningMachineTrainer
                                     }
                                     else if (model is IMulticlassSupportVectorMachineModel mc)
                                     {
-                                        TrainMulticlass(mc, trainInputs, trainOutputs, complexity,
+                                        TrainMulticlass(mc, trainInputs, trainOutputs, complexity, choosingComplexity: true,
                                             updateStatus: _ => { }, cancellationToken: cancellationToken);
                                     }
                                     score = LearningMachineMethods.GetAccuracyScore(model, cvInputs, cvOutputs, false,
@@ -330,7 +326,7 @@ namespace LearningMachineTrainer
                         }
                         else if (model is IMulticlassSupportVectorMachineModel mc)
                         {
-                            TrainMulticlass(mc, inputs, outputs, model.Complexity,
+                            TrainMulticlass(mc, inputs, outputs, model.Complexity, choosingComplexity: false,
                                 updateStatus: updateStatus2, cancellationToken: cancellationToken);
                         }
 
@@ -392,9 +388,11 @@ namespace LearningMachineTrainer
         /// <param name="inputs">Array of feature vectors</param>
         /// <param name="outputs">Array of classes (category codes) for each input</param>
         /// <param name="complexity">Complexity value to use for training</param>
+        /// <param name="choosingComplexity">Whether this method is being called as part of figuring out what Complexity parameter is the best
+        /// (and thus no need to calibrate the machine for probabilities, e.g.)</param>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        private static void TrainMulticlass(IMulticlassSupportVectorMachineModel model, double[][] inputs, int[] outputs, double complexity,
+        private static void TrainMulticlass(IMulticlassSupportVectorMachineModel model, double[][] inputs, int[] outputs, double complexity, bool choosingComplexity,
             Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             // Build classifier
@@ -449,8 +447,42 @@ namespace LearningMachineTrainer
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            updateStatus(new StatusArgs { StatusMessage = "Training error: {0:N4}", DoubleValues = new[] { error } });
+            double likelihood = 0;
+            if (!choosingComplexity && model.CalibrateMachineToProduceProbabilities)
+            {
+                updateStatus(new StatusArgs { StatusMessage = "Calibrating..." });
+
+                int classes = classifier.Classes;
+                int total = (classes * (classes - 1)) / 2;
+                var pairs = new (int i, int j)[total];
+                for (int i = 0, k = 0; i < classes; i++)
+                {
+                    for (int j = 0; j < i; j++, k++)
+                    {
+                        pairs[k] = (i, j);
+                    }
+                }
+                Parallel.For(0, total, k =>
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    var (i, j) = pairs[k];
+                    var machine = classifier[i, j];
+                    int[] idx = outputs.Find(x => x == i || x == j);
+                    double[][] subInputs = inputs.Submatrix(idx);
+                    int[] subOutputs = outputs.Submatrix(idx);
+                    subOutputs.ApplyInPlace(x => x = (x == i) ? -1 : +1);
+
+                    var calibration = new ProbabilisticOutputCalibration(machine, subInputs, subOutputs);
+                    likelihood += calibration.Run() / subInputs.Length;
+                });
+                updateStatus(new StatusArgs { StatusMessage = "Calibrated. Average log-likelihood: {0:N4}",
+                    DoubleValues = new[] { likelihood / classifier.MachinesCount },
+                    ReplaceLastStatus = true });
+            }
+
             model.Classifier = classifier;
+            updateStatus(new StatusArgs { StatusMessage = "Training error: {0:N4}", DoubleValues = new[] { error } });
         }
 
         /// <summary>

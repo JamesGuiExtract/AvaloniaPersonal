@@ -33,6 +33,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LearningMachineConfiguration));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.machineStateToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.dangerModeToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.configurationTabControl = new System.Windows.Forms.TabControl();
             this.inputConfigurationTabPage = new System.Windows.Forms.TabPage();
             this.machineUsageGroupBox = new System.Windows.Forms.GroupBox();
@@ -134,12 +135,12 @@
             this.maxShingleSizeLabel = new System.Windows.Forms.Label();
             this.useAutoBagOfWordsCheckBox = new System.Windows.Forms.CheckBox();
             this.machineConfigurationTabPage = new System.Windows.Forms.TabPage();
-            this.multilabelSvmPanel = new System.Windows.Forms.Panel();
-            this.multilabelSvmCalibrateForProbabilitiesCheckBox = new System.Windows.Forms.CheckBox();
-            this.multilabelSvmUseUnknownCheckBox = new System.Windows.Forms.CheckBox();
-            this.multilabelSvmUnknownCutoffTextBox = new System.Windows.Forms.TextBox();
-            this.multilabelSvmTranslateUnknownTextBox = new System.Windows.Forms.TextBox();
-            this.multilabelSvmTranslateUnknownCheckbox = new System.Windows.Forms.CheckBox();
+            this.probabilisticSvmPanel = new System.Windows.Forms.Panel();
+            this.calibrateForProbabilitiesCheckBox = new System.Windows.Forms.CheckBox();
+            this.useUnknownCheckBox = new System.Windows.Forms.CheckBox();
+            this.unknownCutoffTextBox = new System.Windows.Forms.TextBox();
+            this.translateUnknownTextBox = new System.Windows.Forms.TextBox();
+            this.translateUnknownCheckbox = new System.Windows.Forms.CheckBox();
             this.svmPanel = new System.Windows.Forms.Panel();
             this.svmScoreTypeGroupBox = new System.Windows.Forms.GroupBox();
             this.svmUsePrecisionRadioButton = new System.Windows.Forms.RadioButton();
@@ -172,7 +173,6 @@
             this.saveMachineButton = new System.Windows.Forms.Button();
             this.newMachineButton = new System.Windows.Forms.Button();
             this.dangerModeButton = new System.Windows.Forms.Button();
-            this.dangerModeToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusStrip1.SuspendLayout();
             this.configurationTabControl.SuspendLayout();
             this.inputConfigurationTabPage.SuspendLayout();
@@ -187,7 +187,7 @@
             this.groupBox1.SuspendLayout();
             this.autoBagOfWordsGroupBox.SuspendLayout();
             this.machineConfigurationTabPage.SuspendLayout();
-            this.multilabelSvmPanel.SuspendLayout();
+            this.probabilisticSvmPanel.SuspendLayout();
             this.svmPanel.SuspendLayout();
             this.svmScoreTypeGroupBox.SuspendLayout();
             this.neuralNetPanel.SuspendLayout();
@@ -208,6 +208,12 @@
             // 
             this.machineStateToolStripStatusLabel.Name = "machineStateToolStripStatusLabel";
             this.machineStateToolStripStatusLabel.Size = new System.Drawing.Size(0, 17);
+            // 
+            // dangerModeToolStripStatusLabel
+            // 
+            this.dangerModeToolStripStatusLabel.Name = "dangerModeToolStripStatusLabel";
+            this.dangerModeToolStripStatusLabel.Size = new System.Drawing.Size(71, 17);
+            this.dangerModeToolStripStatusLabel.Text = "[Safe mode]";
             // 
             // configurationTabControl
             // 
@@ -1373,7 +1379,7 @@
             // 
             // machineConfigurationTabPage
             // 
-            this.machineConfigurationTabPage.Controls.Add(this.multilabelSvmPanel);
+            this.machineConfigurationTabPage.Controls.Add(this.probabilisticSvmPanel);
             this.machineConfigurationTabPage.Controls.Add(this.svmPanel);
             this.machineConfigurationTabPage.Controls.Add(this.machineTypeLabel);
             this.machineConfigurationTabPage.Controls.Add(this.neuralNetPanel);
@@ -1386,75 +1392,75 @@
             this.machineConfigurationTabPage.Text = "Machine configuration";
             this.machineConfigurationTabPage.UseVisualStyleBackColor = true;
             // 
-            // multilabelSvmPanel
+            // probabilisticSvmPanel
             // 
-            this.multilabelSvmPanel.Controls.Add(this.multilabelSvmCalibrateForProbabilitiesCheckBox);
-            this.multilabelSvmPanel.Controls.Add(this.multilabelSvmUseUnknownCheckBox);
-            this.multilabelSvmPanel.Controls.Add(this.multilabelSvmUnknownCutoffTextBox);
-            this.multilabelSvmPanel.Controls.Add(this.multilabelSvmTranslateUnknownTextBox);
-            this.multilabelSvmPanel.Controls.Add(this.multilabelSvmTranslateUnknownCheckbox);
-            this.multilabelSvmPanel.Location = new System.Drawing.Point(548, 340);
-            this.multilabelSvmPanel.Name = "multilabelSvmPanel";
-            this.multilabelSvmPanel.Size = new System.Drawing.Size(558, 89);
-            this.multilabelSvmPanel.TabIndex = 4;
+            this.probabilisticSvmPanel.Controls.Add(this.calibrateForProbabilitiesCheckBox);
+            this.probabilisticSvmPanel.Controls.Add(this.useUnknownCheckBox);
+            this.probabilisticSvmPanel.Controls.Add(this.unknownCutoffTextBox);
+            this.probabilisticSvmPanel.Controls.Add(this.translateUnknownTextBox);
+            this.probabilisticSvmPanel.Controls.Add(this.translateUnknownCheckbox);
+            this.probabilisticSvmPanel.Location = new System.Drawing.Point(548, 340);
+            this.probabilisticSvmPanel.Name = "probabilisticSvmPanel";
+            this.probabilisticSvmPanel.Size = new System.Drawing.Size(558, 89);
+            this.probabilisticSvmPanel.TabIndex = 4;
             // 
-            // multilabelSvmCalibrateForProbabilitiesCheckBox
+            // calibrateForProbabilitiesCheckBox
             // 
-            this.multilabelSvmCalibrateForProbabilitiesCheckBox.AutoSize = true;
-            this.multilabelSvmCalibrateForProbabilitiesCheckBox.Checked = true;
-            this.multilabelSvmCalibrateForProbabilitiesCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.multilabelSvmCalibrateForProbabilitiesCheckBox.Location = new System.Drawing.Point(7, 13);
-            this.multilabelSvmCalibrateForProbabilitiesCheckBox.Name = "multilabelSvmCalibrateForProbabilitiesCheckBox";
-            this.multilabelSvmCalibrateForProbabilitiesCheckBox.Size = new System.Drawing.Size(222, 17);
-            this.multilabelSvmCalibrateForProbabilitiesCheckBox.TabIndex = 0;
-            this.multilabelSvmCalibrateForProbabilitiesCheckBox.Text = "Calibrate machine to produce probabilities";
-            this.multilabelSvmCalibrateForProbabilitiesCheckBox.UseVisualStyleBackColor = true;
-            this.multilabelSvmCalibrateForProbabilitiesCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
+            this.calibrateForProbabilitiesCheckBox.AutoSize = true;
+            this.calibrateForProbabilitiesCheckBox.Checked = true;
+            this.calibrateForProbabilitiesCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.calibrateForProbabilitiesCheckBox.Location = new System.Drawing.Point(7, 13);
+            this.calibrateForProbabilitiesCheckBox.Name = "calibrateForProbabilitiesCheckBox";
+            this.calibrateForProbabilitiesCheckBox.Size = new System.Drawing.Size(222, 17);
+            this.calibrateForProbabilitiesCheckBox.TabIndex = 0;
+            this.calibrateForProbabilitiesCheckBox.Text = "Calibrate machine to produce probabilities";
+            this.calibrateForProbabilitiesCheckBox.UseVisualStyleBackColor = true;
+            this.calibrateForProbabilitiesCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
             // 
-            // multilabelSvmUseUnknownCheckBox
+            // useUnknownCheckBox
             // 
-            this.multilabelSvmUseUnknownCheckBox.AutoSize = true;
-            this.multilabelSvmUseUnknownCheckBox.Checked = true;
-            this.multilabelSvmUseUnknownCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.multilabelSvmUseUnknownCheckBox.Location = new System.Drawing.Point(7, 36);
-            this.multilabelSvmUseUnknownCheckBox.Name = "multilabelSvmUseUnknownCheckBox";
-            this.multilabelSvmUseUnknownCheckBox.Size = new System.Drawing.Size(280, 17);
-            this.multilabelSvmUseUnknownCheckBox.TabIndex = 1;
-            this.multilabelSvmUseUnknownCheckBox.Text = "Use Unknown category when max probability is below";
-            this.multilabelSvmUseUnknownCheckBox.UseVisualStyleBackColor = true;
-            this.multilabelSvmUseUnknownCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
+            this.useUnknownCheckBox.AutoSize = true;
+            this.useUnknownCheckBox.Checked = true;
+            this.useUnknownCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.useUnknownCheckBox.Location = new System.Drawing.Point(7, 36);
+            this.useUnknownCheckBox.Name = "useUnknownCheckBox";
+            this.useUnknownCheckBox.Size = new System.Drawing.Size(280, 17);
+            this.useUnknownCheckBox.TabIndex = 1;
+            this.useUnknownCheckBox.Text = "Use Unknown category when max probability is below";
+            this.useUnknownCheckBox.UseVisualStyleBackColor = true;
+            this.useUnknownCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
             // 
-            // multilabelSvmUnknownCutoffTextBox
+            // unknownCutoffTextBox
             // 
-            this.multilabelSvmUnknownCutoffTextBox.Location = new System.Drawing.Point(293, 33);
-            this.multilabelSvmUnknownCutoffTextBox.Name = "multilabelSvmUnknownCutoffTextBox";
-            this.multilabelSvmUnknownCutoffTextBox.Size = new System.Drawing.Size(44, 20);
-            this.multilabelSvmUnknownCutoffTextBox.TabIndex = 2;
-            this.multilabelSvmUnknownCutoffTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.multilabelSvmUnknownCutoffTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.multilabelSvmUnknownCutoffTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
+            this.unknownCutoffTextBox.Location = new System.Drawing.Point(293, 33);
+            this.unknownCutoffTextBox.Name = "unknownCutoffTextBox";
+            this.unknownCutoffTextBox.Size = new System.Drawing.Size(44, 20);
+            this.unknownCutoffTextBox.TabIndex = 2;
+            this.unknownCutoffTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.unknownCutoffTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.unknownCutoffTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
-            // multilabelSvmTranslateUnknownTextBox
+            // translateUnknownTextBox
             // 
-            this.multilabelSvmTranslateUnknownTextBox.Location = new System.Drawing.Point(237, 56);
-            this.multilabelSvmTranslateUnknownTextBox.Name = "multilabelSvmTranslateUnknownTextBox";
-            this.multilabelSvmTranslateUnknownTextBox.Size = new System.Drawing.Size(296, 20);
-            this.multilabelSvmTranslateUnknownTextBox.TabIndex = 4;
-            this.multilabelSvmTranslateUnknownTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
-            this.multilabelSvmTranslateUnknownTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
+            this.translateUnknownTextBox.Location = new System.Drawing.Point(237, 56);
+            this.translateUnknownTextBox.Name = "translateUnknownTextBox";
+            this.translateUnknownTextBox.Size = new System.Drawing.Size(296, 20);
+            this.translateUnknownTextBox.TabIndex = 4;
+            this.translateUnknownTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.translateUnknownTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
-            // multilabelSvmTranslateUnknownCheckbox
+            // translateUnknownCheckbox
             // 
-            this.multilabelSvmTranslateUnknownCheckbox.AutoSize = true;
-            this.multilabelSvmTranslateUnknownCheckbox.Checked = true;
-            this.multilabelSvmTranslateUnknownCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.multilabelSvmTranslateUnknownCheckbox.Location = new System.Drawing.Point(8, 59);
-            this.multilabelSvmTranslateUnknownCheckbox.Name = "multilabelSvmTranslateUnknownCheckbox";
-            this.multilabelSvmTranslateUnknownCheckbox.Size = new System.Drawing.Size(223, 17);
-            this.multilabelSvmTranslateUnknownCheckbox.TabIndex = 3;
-            this.multilabelSvmTranslateUnknownCheckbox.Text = "Translate Unknown category to this name";
-            this.multilabelSvmTranslateUnknownCheckbox.UseVisualStyleBackColor = true;
-            this.multilabelSvmTranslateUnknownCheckbox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
+            this.translateUnknownCheckbox.AutoSize = true;
+            this.translateUnknownCheckbox.Checked = true;
+            this.translateUnknownCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.translateUnknownCheckbox.Location = new System.Drawing.Point(8, 59);
+            this.translateUnknownCheckbox.Name = "translateUnknownCheckbox";
+            this.translateUnknownCheckbox.Size = new System.Drawing.Size(223, 17);
+            this.translateUnknownCheckbox.TabIndex = 3;
+            this.translateUnknownCheckbox.Text = "Translate Unknown category to this name";
+            this.translateUnknownCheckbox.UseVisualStyleBackColor = true;
+            this.translateUnknownCheckbox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
             // 
             // svmPanel
             // 
@@ -1802,12 +1808,6 @@
             this.dangerModeButton.UseVisualStyleBackColor = true;
             this.dangerModeButton.Click += new System.EventHandler(this.HandleDangerModeButton_Click);
             // 
-            // dangerModeToolStripStatusLabel
-            // 
-            this.dangerModeToolStripStatusLabel.Name = "dangerModeToolStripStatusLabel";
-            this.dangerModeToolStripStatusLabel.Size = new System.Drawing.Size(71, 17);
-            this.dangerModeToolStripStatusLabel.Text = "[Safe mode]";
-            // 
             // LearningMachineConfiguration
             // 
             this.AllowDrop = true;
@@ -1853,8 +1853,8 @@
             this.autoBagOfWordsGroupBox.PerformLayout();
             this.machineConfigurationTabPage.ResumeLayout(false);
             this.machineConfigurationTabPage.PerformLayout();
-            this.multilabelSvmPanel.ResumeLayout(false);
-            this.multilabelSvmPanel.PerformLayout();
+            this.probabilisticSvmPanel.ResumeLayout(false);
+            this.probabilisticSvmPanel.PerformLayout();
             this.svmPanel.ResumeLayout(false);
             this.svmPanel.PerformLayout();
             this.svmScoreTypeGroupBox.ResumeLayout(false);
@@ -1921,9 +1921,9 @@
         private System.Windows.Forms.Button computeFeaturesButton;
         private System.Windows.Forms.TabPage machineConfigurationTabPage;
         private System.Windows.Forms.Panel svmPanel;
-        private System.Windows.Forms.TextBox multilabelSvmUnknownCutoffTextBox;
-        private System.Windows.Forms.CheckBox multilabelSvmUseUnknownCheckBox;
-        private System.Windows.Forms.CheckBox multilabelSvmCalibrateForProbabilitiesCheckBox;
+        private System.Windows.Forms.TextBox unknownCutoffTextBox;
+        private System.Windows.Forms.CheckBox useUnknownCheckBox;
+        private System.Windows.Forms.CheckBox calibrateForProbabilitiesCheckBox;
         private System.Windows.Forms.CheckBox svmAutoComplexityCheckBox;
         private System.Windows.Forms.TextBox svmComplexityTextBox;
         private System.Windows.Forms.Label svmComplexityLabel;
@@ -1992,9 +1992,9 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox paginationNegativeClassNameTextBox;
         private System.Windows.Forms.RadioButton svmUseF1ScoreRadioButton;
-        private System.Windows.Forms.TextBox multilabelSvmTranslateUnknownTextBox;
-        private System.Windows.Forms.CheckBox multilabelSvmTranslateUnknownCheckbox;
-        private System.Windows.Forms.Panel multilabelSvmPanel;
+        private System.Windows.Forms.TextBox translateUnknownTextBox;
+        private System.Windows.Forms.CheckBox translateUnknownCheckbox;
+        private System.Windows.Forms.Panel probabilisticSvmPanel;
         private System.Windows.Forms.RadioButton svmUseRecallRadioButton;
         private System.Windows.Forms.RadioButton svmUsePrecisionRadioButton;
         private System.Windows.Forms.CheckBox svmConditionallyApplyWeightRatioCheckBox;

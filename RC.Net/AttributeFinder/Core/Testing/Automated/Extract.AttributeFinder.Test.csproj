@@ -88,6 +88,7 @@
     <Compile Include="TestLearningMachineOutputHandler.cs" />
     <Compile Include="TestAFUtils.cs" />
     <Compile Include="TestFKB.cs" />
+    <Compile Include="TestClassWeights.cs" />
     <Compile Include="TestTranslateToBestMatch.cs" />
     <Compile Include="TestLocateImageRegion.cs" />
     <Compile Include="TestLearningMachine.cs" />

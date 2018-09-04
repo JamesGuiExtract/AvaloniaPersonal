@@ -80,6 +80,9 @@ namespace Extract.AttributeFinder
         [NonSerialized]
         private bool _createCompactMachine = true;
 
+        [OptionalField(VersionAdded = 3)]
+        protected bool _calibrateMachineToProduceProbabilities;
+
         #endregion Fields
 
         #region Properties
@@ -214,6 +217,24 @@ namespace Extract.AttributeFinder
             set
             {
                 _createCompactMachine = value;
+            }
+        }
+
+        /// <summary>
+        /// Whether or not to produce a probabilistic machine
+        /// </summary>
+        public bool CalibrateMachineToProduceProbabilities
+        {
+            get
+            {
+                return _calibrateMachineToProduceProbabilities;
+            }
+            set
+            {
+                if (value != _calibrateMachineToProduceProbabilities)
+                {
+                    _calibrateMachineToProduceProbabilities = value;
+                }
             }
         }
 
@@ -383,7 +404,8 @@ namespace Extract.AttributeFinder
                     || other.PositiveToNegativeWeightRatio != PositiveToNegativeWeightRatio
                     || other.TrainingAlgorithmCacheSize != TrainingAlgorithmCacheSize
                     || other.ScoreTypeToUseForComplexityChoosingAlgorithm != ScoreTypeToUseForComplexityChoosingAlgorithm
-                    || other.ConditionallyApplyWeightRatio != ConditionallyApplyWeightRatio)
+                    || other.ConditionallyApplyWeightRatio != ConditionallyApplyWeightRatio
+                    || other.CalibrateMachineToProduceProbabilities != CalibrateMachineToProduceProbabilities)
                 {
                     return false;
                 }
@@ -430,6 +452,7 @@ namespace Extract.AttributeFinder
                 writer.WriteLine("WeightRatio: {0}", PositiveToNegativeWeightRatio);
                 writer.WriteLine("ConditionallyApplyWeightRatio: {0}", ConditionallyApplyWeightRatio);
                 writer.WriteLine("TrainingAlgorithmCacheSize: {0}", TrainingAlgorithmCacheSize);
+                writer.WriteLine("CalibrateMachineToProduceProbabilities: {0}", CalibrateMachineToProduceProbabilities);
                 writer.Indent = oldIndent;
             }
             catch (Exception e)
