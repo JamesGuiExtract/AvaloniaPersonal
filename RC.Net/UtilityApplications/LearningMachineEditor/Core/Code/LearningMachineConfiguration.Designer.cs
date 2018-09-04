@@ -156,6 +156,8 @@
             this.svmComplexityLabel = new System.Windows.Forms.Label();
             this.machineTypeLabel = new System.Windows.Forms.Label();
             this.neuralNetPanel = new System.Windows.Forms.Panel();
+            this.neuralNetWeightRatioTextBox = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.numberOfCandidateNetwordsTextBox = new System.Windows.Forms.TextBox();
             this.numberOfCandidateNetworksLabel = new System.Windows.Forms.Label();
             this.useCrossValidationSetsCheckBox = new System.Windows.Forms.CheckBox();
@@ -173,6 +175,7 @@
             this.saveMachineButton = new System.Windows.Forms.Button();
             this.newMachineButton = new System.Windows.Forms.Button();
             this.dangerModeButton = new System.Windows.Forms.Button();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.statusStrip1.SuspendLayout();
             this.configurationTabControl.SuspendLayout();
             this.inputConfigurationTabPage.SuspendLayout();
@@ -1061,6 +1064,7 @@
             this.standardizeFeaturesForCsvOutputCheckBox.Size = new System.Drawing.Size(328, 17);
             this.standardizeFeaturesForCsvOutputCheckBox.TabIndex = 13;
             this.standardizeFeaturesForCsvOutputCheckBox.Text = "Standardize features (subtract mean and divide by std deviation)";
+            this.toolTip1.SetToolTip(this.standardizeFeaturesForCsvOutputCheckBox, "Do not standardize features for LM use!");
             this.standardizeFeaturesForCsvOutputCheckBox.UseVisualStyleBackColor = true;
             this.standardizeFeaturesForCsvOutputCheckBox.CheckedChanged += new System.EventHandler(this.HandleControlStateChanged);
             // 
@@ -1566,6 +1570,8 @@
             this.svmWeightRatioTextBox.Size = new System.Drawing.Size(64, 20);
             this.svmWeightRatioTextBox.TabIndex = 5;
             this.svmWeightRatioTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.toolTip1.SetToolTip(this.svmWeightRatioTextBox, "Use a value < 1 to increase recall, > 1 to increase precision\r\n(works best with \"" +
+        "only apply weight ratio...\" checked)");
             this.svmWeightRatioTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             this.svmWeightRatioTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
             // 
@@ -1578,6 +1584,8 @@
             this.label5.TabIndex = 4;
             this.label5.Text = "Positive to negative class weight ratio (what portion of Complexity will be appli" +
     "ed to the positive class)";
+            this.toolTip1.SetToolTip(this.label5, "Use a value < 1 to increase recall, > 1 to increase precision\r\nCheck \'only apply " +
+        "weight ratio...\' for best results");
             // 
             // svmAutoComplexityCheckBox
             // 
@@ -1623,6 +1631,8 @@
             // 
             // neuralNetPanel
             // 
+            this.neuralNetPanel.Controls.Add(this.neuralNetWeightRatioTextBox);
+            this.neuralNetPanel.Controls.Add(this.label7);
             this.neuralNetPanel.Controls.Add(this.numberOfCandidateNetwordsTextBox);
             this.neuralNetPanel.Controls.Add(this.numberOfCandidateNetworksLabel);
             this.neuralNetPanel.Controls.Add(this.useCrossValidationSetsCheckBox);
@@ -1634,8 +1644,28 @@
             this.neuralNetPanel.Controls.Add(this.sizeOfHiddenLayersLabel);
             this.neuralNetPanel.Location = new System.Drawing.Point(1, 54);
             this.neuralNetPanel.Name = "neuralNetPanel";
-            this.neuralNetPanel.Size = new System.Drawing.Size(541, 208);
+            this.neuralNetPanel.Size = new System.Drawing.Size(541, 248);
             this.neuralNetPanel.TabIndex = 2;
+            // 
+            // neuralNetWeightRatioTextBox
+            // 
+            this.neuralNetWeightRatioTextBox.Location = new System.Drawing.Point(8, 217);
+            this.neuralNetWeightRatioTextBox.Name = "neuralNetWeightRatioTextBox";
+            this.neuralNetWeightRatioTextBox.Size = new System.Drawing.Size(64, 20);
+            this.neuralNetWeightRatioTextBox.TabIndex = 10;
+            this.neuralNetWeightRatioTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.toolTip1.SetToolTip(this.neuralNetWeightRatioTextBox, "Use a value < 1 to increase recall, > 1 to increase precision");
+            this.neuralNetWeightRatioTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            this.neuralNetWeightRatioTextBox.Leave += new System.EventHandler(this.HandleTextBox_Leave);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(5, 201);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(185, 13);
+            this.label7.TabIndex = 9;
+            this.label7.Text = "Negative to positive class weight ratio";
             // 
             // numberOfCandidateNetwordsTextBox
             // 
@@ -2010,6 +2040,9 @@
         private System.Windows.Forms.RadioButton deletionRadioButton;
         private System.Windows.Forms.Button dangerModeButton;
         private System.Windows.Forms.ToolStripStatusLabel dangerModeToolStripStatusLabel;
+        private System.Windows.Forms.TextBox neuralNetWeightRatioTextBox;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
 

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading;
 
 namespace Extract.AttributeFinder
@@ -19,6 +20,12 @@ namespace Extract.AttributeFinder
     [Obfuscation(Feature = "renaming", Exclude = true)]
     public class NeuralNetworkClassifier : INeuralNetModel, ITrainableClassifier, IIncrementallyTrainableClassifier
     {
+        #region Constants
+
+        const int _CURRENT_VERSION = 2;
+
+        #endregion Constants
+
         #region Private Fields
 
         /// <summary>
@@ -54,6 +61,12 @@ namespace Extract.AttributeFinder
         private int _numberOfClasses;
         private bool _isTrained;
         private DateTime _lastTrainedOn;
+
+        [OptionalField(VersionAdded = 2)]
+        private int _version = _CURRENT_VERSION;
+
+        [OptionalField(VersionAdded = 2)]
+        private double? _negativeToPositiveWeightRatio;
 
         #endregion Private Fields
 
@@ -276,6 +289,12 @@ namespace Extract.AttributeFinder
             set => _featureScaleFactor = value;
         }
 
+        public double? NegativeToPositiveWeightRatio
+        {
+            get => _negativeToPositiveWeightRatio;
+            set => _negativeToPositiveWeightRatio = value;
+        }
+
 
         /// <summary>
         /// Trains the classifier to recognize classifications
@@ -341,7 +360,8 @@ namespace Extract.AttributeFinder
                     || other.MaxTrainingIterations != MaxTrainingIterations
                     || other.NumberOfCandidateNetworksToBuild != NumberOfCandidateNetworksToBuild
                     || other.SigmoidAlpha != SigmoidAlpha
-                    || other.UseCrossValidationSets != UseCrossValidationSets)
+                    || other.UseCrossValidationSets != UseCrossValidationSets
+                    || other.NegativeToPositiveWeightRatio != NegativeToPositiveWeightRatio)
                 {
                     return false;
                 }
@@ -387,6 +407,10 @@ namespace Extract.AttributeFinder
                 writer.WriteLine("NumberOfCandidateNetworksToBuild: {0}", NumberOfCandidateNetworksToBuild);
                 writer.WriteLine("UseCrossValidationSets: {0}", UseCrossValidationSets);
                 writer.WriteLine("MaxTrainingIterations: {0}", MaxTrainingIterations);
+                if (NegativeToPositiveWeightRatio.HasValue)
+                {
+                    writer.WriteLine("WeightRatio: {0}", NegativeToPositiveWeightRatio);
+                }
                 writer.Indent = oldIndent;
             }
             catch (Exception e)
@@ -488,6 +512,34 @@ namespace Extract.AttributeFinder
             }
 
             return ann;
+        }
+
+        /// <summary>
+        /// Called when deserializing
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserializing]
+        private void OnDeserializing(StreamingContext context)
+        {
+            // Set optional fields
+            _version = 1; // _version added with version 2
+
+            _negativeToPositiveWeightRatio = null;
+        }
+
+        /// <summary>
+        /// Called when deserialized
+        /// </summary>
+        /// <param name="context">The context.</param>
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+            ExtractException.Assert("ELI46195", "Cannot load newer NeuralNetworkClassifier",
+                _version <= _CURRENT_VERSION,
+                "Current version", _CURRENT_VERSION,
+                "Version to load", _version);
+
+            _version = _CURRENT_VERSION;
         }
 
         #endregion Private Methods

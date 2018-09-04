@@ -29,6 +29,8 @@ namespace LearningMachineTrainer
         bool UseCrossValidationSets { get; set; }
 
         ActivationNetwork Classifier { get; set; }
+
+        double? NegativeToPositiveWeightRatio { get; set; }
     }
 
     [CLSCompliant(false)]
@@ -88,6 +90,19 @@ namespace LearningMachineTrainer
 
                 // Expand output into one-hot vectors
                 double[][] expandedOutputs = Accord.Statistics.Tools.Expand(outputs, model.NumberOfClasses, negative: -1.0, positive: 1.0);
+
+                // Apply weight ratio if specified
+                if (model.NegativeToPositiveWeightRatio is double ratio)
+                {
+                    for (int i = 0; i < expandedOutputs.Length; i++)
+                    {
+                        var val = expandedOutputs[i][0];
+                        if (val > 0)
+                        {
+                            expandedOutputs[i][0] = val * ratio;
+                        }
+                    }
+                }
 
                 int[] layers = model.HiddenLayers.Concat(new int[] { model.NumberOfClasses }).ToArray();
 

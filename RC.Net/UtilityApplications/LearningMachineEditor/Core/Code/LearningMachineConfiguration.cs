@@ -656,6 +656,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         numberOfCandidateNetwordsTextBox.Text = classifier.NumberOfCandidateNetworksToBuild.ToString(CultureInfo.CurrentCulture);
                     }
                     sigmoidAlphaTextBox.Text = classifier.SigmoidAlpha.ToString("r", CultureInfo.CurrentCulture);
+                    neuralNetWeightRatioTextBox.Text = classifier.NegativeToPositiveWeightRatio.HasValue
+                        ? classifier.NegativeToPositiveWeightRatio.Value.ToString("r", CultureInfo.CurrentCulture)
+                        : "";
                 }
 
                 // SVM
@@ -1128,6 +1131,19 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 _valid = false;
             }
 
+            string ratioText = neuralNetWeightRatioTextBox.Text;
+            bool isWeightRatioSpecified = !String.IsNullOrWhiteSpace(ratioText);
+            double weightRatio = 1;
+            if (isWeightRatioSpecified
+                && !double.TryParse(ratioText, NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent,
+                    CultureInfo.InvariantCulture, out weightRatio)
+                || weightRatio == 0)
+            {
+                neuralNetWeightRatioTextBox.SetError(configurationErrorProvider,
+                    "Weight ratio must be a number greater than zero");
+                _valid = false;
+            }
+
             if (_dangerMode && learningMachine.Classifier is NeuralNetworkClassifier nn)
             {
                 nn.HiddenLayers = hiddenLayers;
@@ -1135,6 +1151,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 nn.NumberOfCandidateNetworksToBuild = numberOfCandidateNetworks;
                 nn.SigmoidAlpha = sigmoidAlpha;
                 nn.UseCrossValidationSets = useCrossValidationSetsCheckBox.Checked;
+                nn.NegativeToPositiveWeightRatio = isWeightRatioSpecified ? weightRatio : (double?) null;
             }
             else
             {
@@ -1144,7 +1161,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     MaxTrainingIterations = maxTrainingIterations,
                     NumberOfCandidateNetworksToBuild = numberOfCandidateNetworks,
                     SigmoidAlpha = sigmoidAlpha,
-                    UseCrossValidationSets = useCrossValidationSetsCheckBox.Checked
+                    UseCrossValidationSets = useCrossValidationSetsCheckBox.Checked,
+                    NegativeToPositiveWeightRatio = isWeightRatioSpecified ? weightRatio : (double?) null
                 };
             }
         }
