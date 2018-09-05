@@ -195,7 +195,12 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                     _modelTrainersDataGridView.EndEdit();
                 }
 
-                if (DialogResult != DialogResult.OK)
+                // Check for dirty changes unless the OK button is the source of the close
+                if (DialogResult == DialogResult.OK)
+                {
+                    _settings.PropertyChanged -= HandleSettings_PropertyChanged;
+                }
+                else
                 {
                     switch (this.PromptForSaveChanges(Dirty))
                     {
@@ -205,7 +210,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                             break;
                         case DialogResult.No:
                             _settings.PropertyChanged -= HandleSettings_PropertyChanged;
-                            HandleCancelButton_Click(this, e);
+                            DialogResult = DialogResult.Cancel;
                             break;
                         case DialogResult.Cancel:
                             e.Cancel = true;
@@ -272,6 +277,9 @@ namespace Extract.UtilityApplications.TrainingCoordinator
 
                 Dirty = false;
                 DialogResult = DialogResult.OK;
+
+                // This is needed for running the configuration from the command line
+                Close();
             }
             catch (Exception ex)
             {
@@ -290,6 +298,9 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             try
             {
                 DialogResult = DialogResult.Cancel;
+
+                // This is needed for running the configuration from the command line
+                Close();
             }
             catch (Exception ex)
             {

@@ -153,6 +153,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         {
             try
             {
+                // Check for dirty changes unless the OK button is the source of the close
                 if (DialogResult != DialogResult.OK)
                 {
                     switch (this.PromptForSaveChanges(Dirty))
@@ -161,7 +162,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                             HandleOkButton_Click(this, e);
                             break;
                         case DialogResult.No:
-                            HandleCancelButton_Click(this, e);
+                            DialogResult = DialogResult.Cancel;
                             break;
                         case DialogResult.Cancel:
                             e.Cancel = true;
@@ -207,6 +208,9 @@ namespace Extract.UtilityApplications.TrainingDataCollector
 
                 Dirty = false;
                 DialogResult = DialogResult.OK;
+
+                // This is needed for running the configuration from the command line
+                Close();
             }
             catch (Exception ex)
             {
@@ -223,6 +227,9 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         void HandleCancelButton_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
+
+            // This is needed for running the configuration from the command line
+            Close();
         }
 
         /// <summary>
