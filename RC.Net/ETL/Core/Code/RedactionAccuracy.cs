@@ -33,7 +33,7 @@ namespace Extract.ETL
         /// Class for the DocumentVerificationTimes status stored in the DatabaseService record
         /// </summary>
         [DataContract]
-        public class RedactionAccuracyStatus : DatabaseServiceStatus
+        public class RedactionAccuracyStatus : DatabaseServiceStatus, IFileTaskSessionServiceStatus
         {
             #region RedactionAccuracyStatus constants
 

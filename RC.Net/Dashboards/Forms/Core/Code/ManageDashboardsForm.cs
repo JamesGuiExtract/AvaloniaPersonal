@@ -36,6 +36,7 @@ namespace Extract.Dashboard.Forms
                 InitializeComponent();
                 DatabaseName = databaseName;
                 DatabaseServer = databaseServer;
+                FAMUserID = GetFAMUserID();
             }
             catch (Exception ex)
             {
@@ -56,6 +57,11 @@ namespace Extract.Dashboard.Forms
         /// Database to connect to
         /// </summary>
         public string DatabaseName { get; set; }
+        
+        /// <summary>
+        /// FAMUserID for current session
+        /// </summary>
+        public int FAMUserID { get; set; }
 
         #endregion
 
@@ -106,11 +112,14 @@ namespace Extract.Dashboard.Forms
                             var command = connect.CreateCommand();
                             command.CommandText =
                                 @"UPDATE Dashboard 
-                                    SET [Definition] = @Definition
+                                    SET [Definition] = @Definition,
+                                        [FAMUserID] = @FAMUserID,
+                                        [LastImportedDate] = GETDATE()
                                     WHERE [DashboardName] = @DashboardName
                                 ";
 
                             command.Parameters.Add("@DashboardName", SqlDbType.NVarChar, 100).Value = dashboardName;
+                            command.Parameters.AddWithValue("@FAMUserID", FAMUserID);
                             command.Parameters.Add("@Definition", SqlDbType.Xml).Value = xDoc.ToString();
                             command.ExecuteScalar();
                             scope.Complete();
@@ -145,6 +154,7 @@ namespace Extract.Dashboard.Forms
         {
             try
             {
+
                 string dashboardName = dashboardDataGridView.CurrentCell?.Value as string;
                 if (string.IsNullOrWhiteSpace(dashboardName))
                 {
@@ -262,10 +272,11 @@ namespace Extract.Dashboard.Forms
                         var command = connect.CreateCommand();
 
                         command.CommandText =
-                            "INSERT INTO Dashboard ([DashboardName], [Definition]) " +
-                            "VALUES ( @DashboardName, @Definition)";
+                            "INSERT INTO Dashboard ([DashboardName], [Definition], [FAMUserID], [LastImportedDate]) " +
+                            "VALUES ( @DashboardName, @Definition, @FAMUserID, GETDATE())";
 
-                        command.Parameters.AddWithValue("@DashboardName", selectForm.DashboardName);
+                        command.Parameters.Add("@DashboardName", SqlDbType.NVarChar, 100).Value = selectForm.DashboardName;
+                        command.Parameters.AddWithValue("@FAMUserID", FAMUserID);
                         command.Parameters.Add("@Definition", SqlDbType.Xml).Value = xDoc.ToString();
 
                         command.ExecuteScalar();
@@ -308,11 +319,15 @@ namespace Extract.Dashboard.Forms
                 {
                     connection.Open();
                     var command = connection.CreateCommand();
-                    command.CommandText = "SELECT DashboardName FROM Dashboard";
+                    command.CommandText = 
+                        "SELECT DashboardName, FullUserName, LastImportedDate FROM Dashboard " +
+                            "INNER JOIN FAMUser ON Dashboard.FAMUserID = FAMUser.ID";
 
                     DataTable dataTable = new DataTable();
                     dataTable.Load(command.ExecuteReader());
                     dashboardDataGridView.DataSource = dataTable;
+                    dashboardDataGridView.Columns["FullUserName"].HeaderText = "User Imported";
+                    dashboardDataGridView.Columns["LastImportedDate"].HeaderText = "Last Imported";
                 }
             }
             catch (Exception ex)
@@ -335,6 +350,40 @@ namespace Extract.Dashboard.Forms
             sqlConnectionBuild.NetworkLibrary = "dbmssocn";
             sqlConnectionBuild.MultipleActiveResultSets = true;
             return new SqlConnection(sqlConnectionBuild.ConnectionString);
+        }
+
+		/// <summary>
+		/// Gets or creats a FAMUserId fro the current user
+		/// </summary>
+		/// <returns>ID of the user in the FAMUser table</returns>
+        int GetFAMUserID()
+        {
+            using (var connection = NewSqlDBConnection())
+            {
+                connection.Open();
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        DECLARE @FAMUserName nvarchar(50)= SUBSTRING(SUSER_SNAME(), CHARINDEX('\',SUSER_SNAME()) +1, 50)
+                        
+                        DECLARE @FAMUserID INT
+                        
+                        SELECT @FAMUserID = ID FROM FAMUser WHERE UserName = @FAMUserName
+                        
+                        IF @FAMUserID IS NULL
+                        BEGIN
+                        	INSERT INTO FAMUser(UserName, FullUserName)
+                        	VALUES ( @FAMUserName, @FAMUserName)
+                        
+                        	SELECT @FAMUserID = ID FROM FAMUser WHERE UserName = @FAMUserName
+                        END
+                        
+                        SELECT @FAMUserID AS FAMUserID";
+
+                    var result = cmd.ExecuteScalar() as int?;
+                    return result ?? 0;
+                }
+            }
         }
 
         /// <summary>

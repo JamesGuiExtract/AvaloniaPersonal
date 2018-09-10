@@ -200,4 +200,7 @@ private:
 
 	// Refreshed the current DB connection status.
 	void refreshDBStatus();
+
+	// Add or update the current FAMUser and return FAMUserID
+	long addOrUpdateFAMUser(_ConnectionPtr ipConnection);
 };

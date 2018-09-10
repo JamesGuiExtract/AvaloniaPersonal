@@ -1736,6 +1736,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 			vecQueries.push_back(gstrADD_FILE_HANDLER_WORKFLOW_FK);
 			vecQueries.push_back(gstrADD_WEB_APP_CONFIG_WORKFLOW_FK);
 			vecQueries.push_back(gstrADD_MLDATA_MLMODEL_FK);
+			vecQueries.push_back(gstrADD_DASHBOARD_FAMUSER_FK);
 			
 			// Add triggers
 			vecQueries.push_back(gstrCREATE_ACTION_ON_DELETE_TRIGGER);
@@ -1756,6 +1757,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_USERS_WITH_ACTIVE_VIEW);
 		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW);
 		vecQueries.push_back(gstrCREATE_PAGINATION_DATA_WITH_RANK_VIEW);
+		vecQueries.push_back(gstrCREATE_PROCESSING_DATA_VIEW);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);

@@ -35,7 +35,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 166;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 167;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2212,7 +2212,7 @@ int UpdateToSchemaVersion164(_ConnectionPtr ipConnection,
 
 		vector<string> vecQueries;
 
-		vecQueries.push_back(gstrCREATE_DASHBOARD_TABLE);
+		vecQueries.push_back(gstrCREATE_DASHBOARD_TABLE_V164);
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
@@ -2273,6 +2273,62 @@ int UpdateToSchemaVersion166(_ConnectionPtr ipConnection,
 		vecQueries.push_back(gstrCREATE_INPUT_EVENT_FAMUSER_WITH_TIMESTAMP_INDEX);
 		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW);
 		vecQueries.push_back(gstrCREATE_PAGINATION_DATA_WITH_RANK_VIEW);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46054");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion167(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 167;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_PROCESSING_DATA_VIEW);
+
+		vecQueries.push_back("ALTER TABLE dbo.[DatabaseService] ADD [LastFileTaskSessionIDProcessed] INT NULL");
+
+		// Add new columns to dashboard table
+		vecQueries.push_back("ALTER TABLE dbo.[Dashboard] ADD [FAMUserID] INT NULL");
+		vecQueries.push_back("ALTER TABLE dbo.[Dashboard] ADD [LastImportedDate] DATETIME NULL");
+
+		// Get the id of the current user from the database 
+		string strUserName = getCurrentUserName();
+		long lFAMUserID = getKeyID(ipConnection, "FAMUser", "UserName", strUserName);
+
+		string updateNewColumnsDataQuery =
+			"DECLARE @FAMUserName nvarchar(50) = SUBSTRING(SUSER_SNAME(), CHARINDEX('\',SUSER_SNAME()) +1, 50) \r\n" 
+			"DECLARE @FAMUserID INT \r\n" 
+			"SELECT @FAMUserID = ID FROM FAMUser WHERE UserName = @FAMUserName \r\n" 
+			"IF @FAMUserID IS NULL \r\n"
+			"BEGIN \r\n" 
+			"	INSERT INTO FAMUser(UserName, FullUserName) \r\n" 
+			"	VALUES(@FAMUserName, SUSER_SNAME()) \r\n" 
+			"\r\n" 
+			"	SELECT @FAMUserID = ID FROM FAMUser WHERE UserName = @FAMUserName \r\n " 
+			"END \r\n" 
+			"UPDATE [Dashboard] SET FAMUserID = @FAMUserID, LastImportedDate = GETDATE()";
+		vecQueries.push_back(updateNewColumnsDataQuery);
+		
+		vecQueries.push_back("ALTER TABLE dbo.[Dashboard] ALTER COLUMN [FAMUserID] INT NOT NULL");
+		vecQueries.push_back("ALTER TABLE dbo.[Dashboard] ALTER COLUMN [LastImportedDate] DATETIME NOT NULL");
+
+		vecQueries.push_back(gstrADD_DASHBOARD_FAMUSER_FK);
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
@@ -7331,7 +7387,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 163:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion164);
 				case 164:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion165);
 				case 165:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion166);
-				case 166:
+				case 166:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion167);
+				case 167:
 					break;
 
 				default:

@@ -294,3 +294,9 @@ static const string gstrCREATE_DATABASE_SERVICE_TABLE_159 =
 "	[Description] NVARCHAR(MAX) NULL, "
 "	[Settings] NVARCHAR(MAX) NOT NULL, "
 "   [Status] NVARCHAR(MAX) NULL) ";
+
+// used for schema version 164 to 166
+static const string gstrCREATE_DASHBOARD_TABLE_V164 =
+"CREATE TABLE [dbo].[Dashboard]( "
+"	[DashboardName] [nvarchar](100) NOT NULL CONSTRAINT [PK_Dashboard] PRIMARY KEY CLUSTERED, "
+"	[Definition] [xml] NOT NULL )";

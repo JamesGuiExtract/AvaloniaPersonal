@@ -499,13 +499,15 @@ namespace Extract.ETL.Management
                                                 ,[Settings]
                                                 ,[Enabled]
                                                 ,[Status]
+                                                ,[LastFileTaskSessionIDProcessed]
                                                 )
                                     OUTPUT inserted.id
                                     VALUES (
                                         @Description,
                                         @Settings,
                                         @Enabled,
-                                        @Status)";
+                                        @Status,
+                                        @LastFileTaskSession)";
 
                                 string status = hasStatus.Status?.ToJson();
                                 if (status != null)
@@ -515,6 +517,16 @@ namespace Extract.ETL.Management
                                 else
                                 {
                                     cmd.Parameters.AddWithValue("@Status", DBNull.Value);
+                                }
+                                var fileTaskSessionStatus = hasStatus.Status as IFileTaskSessionServiceStatus;
+                                int? lastFileTaskSession = fileTaskSessionStatus?.LastFileTaskSessionIDProcessed;
+                                if (lastFileTaskSession is null)
+                                {
+                                    cmd.Parameters.AddWithValue("@LastFileTaskSession", DBNull.Value);
+                                }
+                                else
+                                {
+                                    cmd.Parameters.AddWithValue("@LastFileTaskSession", lastFileTaskSession);
                                 }
                             }
 

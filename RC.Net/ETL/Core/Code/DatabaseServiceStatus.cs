@@ -61,14 +61,25 @@ namespace Extract.ETL
         {
             try
             {
+                var fileTaskSessionStatus = this as IFileTaskSessionServiceStatus;
+                int? lastFileTaskSession = fileTaskSessionStatus?.LastFileTaskSessionIDProcessed;
                 using (var cmd = connection.CreateCommand())
                 {
                     cmd.CommandText = @"
                         UPDATE [DatabaseService]
-                        SET [Status] = @Status
+                        SET [Status] = @Status,
+                            [LastFileTaskSessionIDProcessed] = @LastFileTaskSession
                         WHERE ID = @DatabaseServiceID";
                     cmd.Parameters.Add("@Status", SqlDbType.NVarChar).Value = this.ToJson();
                     cmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = databaseServiceId;
+                    if (lastFileTaskSession is null)
+                    {
+                        cmd.Parameters.AddWithValue("@LastFileTaskSession", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@LastFileTaskSession", lastFileTaskSession);
+                    }
                     cmd.ExecuteNonQuery();
                 }
             }

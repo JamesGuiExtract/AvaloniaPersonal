@@ -897,7 +897,7 @@ namespace Extract.ETL
         /// Class for the ExpandAttributesStatus stored in the DatabaseService record
         /// </summary>
         [DataContract]
-        public class ExpandAttributesStatus : DatabaseServiceStatus
+        public class ExpandAttributesStatus : DatabaseServiceStatus, IFileTaskSessionServiceStatus
         {
             const int _CURRENT_VERSION = 1;
 

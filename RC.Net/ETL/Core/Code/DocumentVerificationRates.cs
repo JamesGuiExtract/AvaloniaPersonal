@@ -26,7 +26,7 @@ namespace Extract.ETL
         /// Class for the DocumentVerificationTimes status stored in the DatabaseService record
         /// </summary>
         [DataContract]
-        public class DocumentVerificationStatus : DatabaseServiceStatus
+        public class DocumentVerificationStatus : DatabaseServiceStatus, IFileTaskSessionServiceStatus
         {
             #region DatabaseVerificationStatus constants
 

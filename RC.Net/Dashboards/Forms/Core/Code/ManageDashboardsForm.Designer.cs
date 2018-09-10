@@ -43,10 +43,12 @@
             // 
             this.dashboardDataGridView.AllowUserToAddRows = false;
             this.dashboardDataGridView.AllowUserToDeleteRows = false;
+            this.dashboardDataGridView.AllowUserToResizeRows = false;
             this.dashboardDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dashboardDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dashboardDataGridView.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dashboardDataGridView.BackgroundColor = System.Drawing.SystemColors.Control;
             this.dashboardDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dashboardDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;

@@ -467,9 +467,18 @@ static const string gstrCREATE_WEB_APP_CONFIG =
 
 static const string gstrCREATE_DASHBOARD_TABLE =
 	"CREATE TABLE [dbo].[Dashboard]( "
-	"	[DashboardName] [nvarchar](100) NOT NULL CONSTRAINT [PK_Dashboard] PRIMARY KEY CLUSTERED, "
-	"	[Definition] [xml] NOT NULL )";
-	
+	"	[DashboardName] [nvarchar](100) NOT NULL CONSTRAINT [PK_Dashboard] PRIMARY KEY CLUSTERED, \r\n"
+	"	[Definition] [xml] NOT NULL, \r\n"
+	"   [FAMUserID] INT NOT NULL, \r\n"
+	"   [LastImportedDate] DATETIME NOT NULL "
+	")";
+
+static const string gstrADD_DASHBOARD_FAMUSER_FK =
+	"ALTER TABLE dbo.[Dashboard] "
+	"WITH CHECK ADD CONSTRAINT [FK_Dashboard_FAMUser] FOREIGN KEY([FAMUserID]) "
+	"REFERENCES [FAMUser]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
 
 // Create table indexes SQL
 static const string gstrCREATE_DB_INFO_ID_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_DBInfo_ID] "
@@ -2097,7 +2106,8 @@ static const string gstrCREATE_DATABASE_SERVICE_TABLE =
 	"	[Description] NVARCHAR(MAX) NULL, "
 	"	[Settings] NVARCHAR(MAX) NOT NULL, "
 	"   [Status] NVARCHAR(MAX) NULL, "
-	"   [Enabled] BIT NOT NULL CONSTRAINT [DF_DatabaseServiceEnabled] DEFAULT 1) ";
+	"   [Enabled] BIT NOT NULL CONSTRAINT [DF_DatabaseServiceEnabled] DEFAULT 1, "
+	"	[LastFileTaskSessionIDProcessed] INT NULL) "; 
 
 static const string gstrCREATE_REPORTING_VERIFICATION_RATES =
 	"CREATE TABLE [dbo].[ReportingVerificationRates]( "
@@ -2209,3 +2219,59 @@ static const std::string gstrCREATE_PAGINATION_DATA_WITH_RANK_VIEW =
 	"				ON FAMSession.ID = FileTaskSession.FAMSessionID \r\n"
 	"				WHERE FileTaskSession.ActionID IS NOT NULL \r\n"
 	"				AND FileTaskSession.DateTimeStamp IS NOT NULL') \r\n";
+
+static const std::string gstrCREATE_PROCESSING_DATA_VIEW =
+	"IF OBJECT_ID('[dbo].[vPaginationDataWithRank]', 'V') IS NULL \r\n"
+	"		EXECUTE(' \r\n"
+	"			CREATE VIEW[dbo].[vProcessingData] \r\n"
+	"			AS \r\n"
+	"			WITH Combined(FileID, \r\n"
+	"				ASCName, \r\n"
+	"				ActionID, \r\n"
+	"				ASC_From, \r\n"
+	"				ASC_To, \r\n"
+	"				DateTimeStamp, \r\n"
+	"				TheRow, \r\n"
+	"				WorkflowName) \r\n"
+	"				AS(SELECT FileID, \r\n"
+	"					ACTION.ASCName, \r\n"
+	"					ActionID, \r\n"
+	"					ASC_From, \r\n"
+	"					ASC_To, \r\n"
+	"					DateTimeStamp, \r\n"
+	"					ROW_NUMBER() OVER(PARTITION BY FileID, \r\n"
+	"						ActionID ORDER BY FileID DESC,  \r\n"
+	"						ActionID ASC, \r\n"
+	"						DateTimeStamp DESC) AS TheRow, \r\n"
+	"					COALESCE(Workflow.Name, '''') WorkflowName \r\n"
+	"					FROM FileActionStateTransition \r\n"
+	"					INNER JOIN ACTION ON(FileActionStateTransition.ActionID = ACTION.ID) \r\n"
+	"					LEFT JOIN Workflow ON[Workflow].ID = [Action].WorkflowID \r\n"
+	"					WHERE(ASC_From = ''P'' \r\n"
+	"						OR ASC_From = ''R'') \r\n"
+	"					AND(ASC_To = ''R'' \r\n"
+	"						OR ASC_To = ''C'' \r\n"
+	"						OR ASC_To = ''F'')) \r\n"
+	"				SELECT f1.WorkflowName, \r\n"
+	"				f1.ASCName AS ASCName, \r\n"
+	"				f1.ActionID, \r\n"
+	"				DATEDIFF(Second, f1.DateTimeStamp, MAX(f2.DateTimeStamp)) AS TotalTime, \r\n"
+	"				f1.DateTimeStamp, \r\n"
+	"				COUNT(f1.FileID) AS FileCount, \r\n"
+	"				Sum(FAMFile.Pages) as Pages \r\n"
+	"				FROM Combined AS f1 \r\n"
+	"				INNER JOIN Combined AS f2 ON((F1.TheRow = f2.TheRow + 1) \r\n"
+	"					AND f1.FileID = f2.FileID \r\n"
+	"					AND f1.ASCName = f2.ASCName \r\n"
+	"					AND f1.ASC_To = f2.ASC_From) \r\n"
+	"				INNER JOIN FAMFile ON f1.FileID = FAMFile.ID \r\n"
+	"				WHERE f1.DateTimeStamp < f2.DateTimeStamp \r\n"
+	"				GROUP BY f1.WorkflowName, \r\n"
+	"				f1.ActionID, \r\n"
+	"				f1.ASCName, \r\n"
+	"				f1.ASC_From, \r\n"
+	"				f1.ASC_to, \r\n"
+	"				f1.DateTimeStamp, \r\n"
+	"				f2.ASCName, \r\n"
+	"				f2.ASC_From, \r\n"
+	"				f2.ASC_to') ";

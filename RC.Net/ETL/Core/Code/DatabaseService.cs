@@ -11,7 +11,14 @@ using System.Threading;
 
 namespace Extract.ETL
 {
-
+    /// <summary>
+    /// Interface to implement if DatabaseService uses LastFileTaskSessionID
+    /// This interface is used to save the LastFileTaskSessionIDProcessed to the DatabaseService record 
+    /// </summary>
+    public interface IFileTaskSessionServiceStatus
+    {
+        int LastFileTaskSessionIDProcessed { get; set; }
+    }
 
     /// <summary>
     /// Defines the base class for processes that will be performed by a service
@@ -255,15 +262,27 @@ namespace Extract.ETL
                 connection.Open();
                 try
                 {
+                    var fileTaskSessionStatus = status as IFileTaskSessionServiceStatus;
+                    int? lastFileTaskSession = fileTaskSessionStatus?.LastFileTaskSessionIDProcessed;
+
                     if (status == null)
                     {
                         using (var cmd = connection.CreateCommand())
                         {
                             cmd.CommandText = @"
                                 UPDATE [DatabaseService]
-                                SET [Status] = NULL
+                                SET [Status] = NULL,
+                                [LastFileTaskSessionIDProcessed] = @LastFileTaskSession
                                 WHERE ID = @DatabaseServiceID";
                             cmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
+                            if (lastFileTaskSession is null)
+                            {
+                                cmd.Parameters.AddWithValue("@LastFileTaskSession", DBNull.Value);
+                            }
+                            else
+                            {
+                                cmd.Parameters.AddWithValue("@LastFileTaskSession", lastFileTaskSession);
+                            }
                             cmd.ExecuteNonQuery();
                         }
                     }

@@ -1127,7 +1127,8 @@ void CFAMDBAdminDlg::OnToolsDashboards()
 	try
 	{
 		ManageDashboardsForm^ manage =
-			gcnew ManageDashboardsForm(marshal_as<String^>(m_ipFAMDB->DatabaseServer), marshal_as<String^>(m_ipFAMDB->DatabaseName));
+			gcnew ManageDashboardsForm(marshal_as<String^>(m_ipFAMDB->DatabaseServer), 
+								marshal_as<String^>(m_ipFAMDB->DatabaseName));
 
 		NativeWindow ^currentWindow = __nullptr;
 		try
@@ -1546,3 +1547,5 @@ void CFAMDBAdminDlg::refreshDBStatus()
 		asString(m_ipFAMDB->AdvancedConnectionStringProperties);
 	OnDBConfigChanged(strServer, strDatabaseName, strAdvConnStringProperties);
 }
+//--------------------------------------------------------------------------------------------------
+
