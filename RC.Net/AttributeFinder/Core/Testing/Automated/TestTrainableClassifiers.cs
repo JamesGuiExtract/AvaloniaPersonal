@@ -146,7 +146,7 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(1.0, f1Score);
 
             // Example has good probability score
-            Assert.Greater(classifier.ComputeAnswer(inputs[9]).Item2, 0.9);
+            Assert.Greater(classifier.ComputeAnswer(inputs[9]).score, 0.9);
         }
 
         // Test multi-label SVM without unknown category
@@ -167,7 +167,53 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(0.9, f1Score);
 
             // Has low probability
-            Assert.Less(classifier.ComputeAnswer(inputs[9]).Item2, 0.3);
+            Assert.Less(classifier.ComputeAnswer(inputs[9]).score, 0.3);
+        }
+
+        // Test multi-class SVM calibrated to produce probabilities
+        [Test, Category("TrainableClassifier")]
+        public static void PaginationMulticlassSVMProbabilities()
+        {
+            Tuple<double[][], int[]> results = GetPaginationData();
+            double[][] inputs = results.Item1;
+            int[] outputs = results.Item2;
+            var classifier = new MulticlassSupportVectorMachineClassifier { CalibrateMachineToProduceProbabilities = true };
+            classifier.TrainClassifier(inputs, outputs, new System.Random(0));
+            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, outputs, false);
+            Assert.AreEqual(1.0, f1Score);
+
+            // Example has good probability score
+            Assert.Greater(classifier.ComputeAnswer(inputs[9]).score, 0.9);
+        }
+
+        // Test multi-class SVM without unknown category
+        [Test, Category("TrainableClassifier")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Multilabel")]
+        public static void DocClassificationMulticlassSVMProbabilitiesWithoutOneExample()
+        {
+            Tuple<double[][], int[]> results = GetDocumentCategorizationData();
+            double[][] inputs = results.Item1;
+            int[] outputs = results.Item2;
+            var classifier = new MulticlassSupportVectorMachineClassifier { CalibrateMachineToProduceProbabilities = true };
+
+            // Train without one category
+            // Because of the way the multiclass, one-to-one, algorithm works, it needs to be the highest class that is removed to avoid an error
+            // when the learning algorithm tries to train a classifier that has zero examples (because the 0 class already has no examples).
+            // Removing the highest class number means that model.NumberOfClasses will be one less and the algorithm will train less machines
+            int maxClass = outputs.Length;
+            var subOutputs = outputs.Where(c => c != maxClass).ToArray();
+            var subInputs = inputs.Where((v, i) => outputs[i] != maxClass).ToArray();
+            classifier.TrainClassifier(subInputs, subOutputs, new Random(0));
+
+            // Adjust the outputs so that the missing class is now the unknown class (0)
+            var adjustedOutputs = outputs.Select(c => c == maxClass ? 0 : c).ToArray();
+            double f1Score = LearningMachine.GetAccuracyScore(classifier, inputs, adjustedOutputs, false);
+
+            // Gets one wrong
+            Assert.AreEqual(0.9, f1Score);
+
+            // Has low probability for missing class
+            Assert.Less(classifier.ComputeAnswer(inputs.Where((c, i) => outputs[i] == maxClass).First()).score, 0.3);
         }
 
         // Test neural net with pagination problem
