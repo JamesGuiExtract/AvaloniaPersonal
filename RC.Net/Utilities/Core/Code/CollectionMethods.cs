@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using UCLID_COMUTILSLib;
+using OCRParam = Extract.Utilities.Union<(int key, int value), (int key, double value), (string key, int value), (string key, double value), (string key, string value)>;
 
 namespace Extract.Utilities
 {
@@ -619,6 +620,61 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45450");
+            }
+        }
+
+        /// <summary>
+        /// Converts <see paramref="ocrParameters"/> into an <see cref="IEnumerable"/>.
+        /// </summary>
+        /// <param name="ocrParameters">The <see cref="IOCRParameters"/> to convert.</param>
+        /// <returns>An <see cref="IEnumerable"/> of type <see cref="OCRParam"/>.</returns>
+        [CLSCompliant(false)]
+        public static IEnumerable<OCRParam> ToIEnumerable(this IOCRParameters ocrParameters)
+        {
+            var variantVector = (IVariantVector)ocrParameters;
+            int size = variantVector.Size;
+            for (int i = 0; i < size; i++)
+            {
+                VariantPair keyValue = (VariantPair)variantVector[i];
+                keyValue.GetKeyValuePair(out object key, out object variantValue);
+
+                if (key is int parameter && variantValue is int value)
+                {
+                    yield return new OCRParam((parameter, value));
+                }
+                else if (key is int unknownParameter && variantValue is double unknownValue)
+                {
+                    yield return new OCRParam((unknownParameter, unknownValue));
+                }
+                else if (key is string namedSetting)
+                {
+                    if (variantValue is int namedSettingIntValue)
+                    {
+                        yield return new OCRParam((namedSetting, namedSettingIntValue));
+                    }
+                    else if (variantValue is double namedSettingDoubleValue)
+                    {
+                        yield return new OCRParam((namedSetting, namedSettingDoubleValue));
+                    }
+                    else if (variantValue is string namedSettingStringValue)
+                    {
+                        yield return new OCRParam((namedSetting, namedSettingStringValue));
+                    }
+                    else
+                    {
+                        var ue = new ExtractException("ELI46229", "Unsupported parameter");
+                        ue.AddDebugData("Key type", key.GetType().FullName, false);
+                        ue.AddDebugData("Value type", variantValue.GetType().FullName, false);
+                        throw ue;
+                    }
+                }
+                else
+                {
+                    var ue = new ExtractException("ELI46040", "Unsupported parameter");
+                    ue.AddDebugData("Key type", key.GetType().FullName, false);
+                    ue.AddDebugData("Value type", variantValue.GetType().FullName, false);
+                    throw ue;
+                }
             }
         }
 

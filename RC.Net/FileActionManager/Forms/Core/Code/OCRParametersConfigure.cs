@@ -572,14 +572,13 @@ namespace Extract.FileActionManager.Forms
 
                 SetDefaultRecognitionOptions();
 
-                for (int i = 0; i < _parameterMap.Size; i++)
+                foreach(var ocrParam in ((IOCRParameters)_parameterMap).ToIEnumerable())
                 {
-                    VariantPair keyValue = (VariantPair)_parameterMap[i];
-                    keyValue.GetKeyValuePair(out object key, out object variantValue);
-
-                    if (key is int parameter && variantValue is int value)
+                    // int * int
+                    ocrParam.Match(pair =>
                     {
-                        switch ((EOCRParameter)parameter)
+                        (int key, int value) = pair;
+                        switch ((EOCRParameter)key)
                         {
                             case EOCRParameter.kForceDespeckleMode:
                                 switch ((EForceDespeckleMode)value)
@@ -669,62 +668,61 @@ namespace Extract.FileActionManager.Forms
                                 break;
                             default:
                                 _enumSettings.Add(new KeyValueClass<int, string>
-                                    { Key = parameter, Value = value.ToString(CultureInfo.InvariantCulture) });
+                                { Key = key, Value = value.ToString(CultureInfo.InvariantCulture) });
                                 break;
                         }
-                    }
-                    else if (key is int unknownParameter && variantValue is double unknownValue)
+                    },
+                    // int * double
+                    pair =>
                     {
+                        (int key, double value) = pair;
                         _enumSettings.Add(new KeyValueClass<int, string>
-                            { Key = unknownParameter, Value = unknownValue.ToString("F1",CultureInfo.InvariantCulture) });
-                    }
-                    else if (key is string namedSetting)
+                        { Key = key, Value = value.ToString("F1", CultureInfo.InvariantCulture) });
+                    },
+                    // string * int
+                    pair =>
                     {
-                        if (variantValue is int namedSettingIntValue)
+                        (string key, int value) = pair;
+                        switch (key)
                         {
-                            switch (namedSetting)
-                            {
-                                case "Kernel.Img.Max.Pix.X":
-                                    _maxXNumericUpDown.Value = (uint)namedSettingIntValue;
-                                    break;
-                                case "Kernel.Img.Max.Pix.Y":
-                                    _maxYNumericUpDown.Value = (uint)namedSettingIntValue;
-                                    break;
-                                case "Kernel.OcrMgr.PreferAccurateEngine":
-                                    _preferAccuracteEngineCheckBox.Checked = namedSettingIntValue != 0;
-                                    break;
-                                default:
-                                    _stringSettings.Add(new KeyValueClass<string, string>
-                                    {
-                                        Key = namedSetting,
-                                        Value = namedSettingIntValue.ToString(CultureInfo.InvariantCulture)
-                                    });
-                                    break;
-                            }
+                            case "Kernel.Img.Max.Pix.X":
+                                _maxXNumericUpDown.Value = (uint)value;
+                                break;
+                            case "Kernel.Img.Max.Pix.Y":
+                                _maxYNumericUpDown.Value = (uint)value;
+                                break;
+                            case "Kernel.OcrMgr.PreferAccurateEngine":
+                                _preferAccuracteEngineCheckBox.Checked = value != 0;
+                                break;
+                            default:
+                                _stringSettings.Add(new KeyValueClass<string, string>
+                                {
+                                    Key = key,
+                                    Value = value.ToString(CultureInfo.InvariantCulture)
+                                });
+                                break;
                         }
-                        if (variantValue is double namedSettingDoubleValue)
-                        {
-                            _stringSettings.Add(new KeyValueClass<string, string>
-                            {
-                                Key = namedSetting,
-                                Value = namedSettingDoubleValue.ToString("F1", CultureInfo.InvariantCulture)
-                            });
-                        }
-                        else if (variantValue is string namedSettingStringValue)
-                        {
-                            _stringSettings.Add(new KeyValueClass<string, string>
-                            {
-                                Key = namedSetting,
-                                Value = namedSettingStringValue
-                            });
-                        }
-                    }
-                    else
+                    },
+                    // string * double
+                    pair =>
                     {
-                        var ue = new ExtractException("ELI46040", "Unsupported parameter");
-                        ue.AddDebugData("Key type", key.GetType().FullName, false);
-                        ue.AddDebugData("Value type", variantValue.GetType().FullName, false);
-                    }
+                        (string key, double value) = pair;
+                        _stringSettings.Add(new KeyValueClass<string, string>
+                        {
+                            Key = key,
+                            Value = value.ToString("F1", CultureInfo.InvariantCulture)
+                        });
+                    },
+                    // string * string
+                    pair =>
+                    {
+                        (string key, string value) = pair;
+                        _stringSettings.Add(new KeyValueClass<string, string>
+                        {
+                            Key = key,
+                            Value = value
+                        });
+                    });
                 }
             }
             finally

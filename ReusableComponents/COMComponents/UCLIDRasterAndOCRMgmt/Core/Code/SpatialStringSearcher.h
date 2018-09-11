@@ -258,7 +258,6 @@ private:
 	UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr m_ipSpatialString;
 	string m_strSourceDocName;
 	ILongToObjectMapPtr m_ipSpatialPageInfoMap;
-	IOCRParametersPtr m_ipOCRParameters;
 
 	long m_lStringLeft;
 	long m_lStringRight;

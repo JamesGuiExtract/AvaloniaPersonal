@@ -89,6 +89,7 @@
     <Compile Include="TestAFUtils.cs" />
     <Compile Include="TestFKB.cs" />
     <Compile Include="TestClassWeights.cs" />
+    <Compile Include="TestOCRParameters.cs" />
     <Compile Include="TestTranslateToBestMatch.cs" />
     <Compile Include="TestLocateImageRegion.cs" />
     <Compile Include="TestLearningMachine.cs" />
@@ -459,6 +460,11 @@
     <EmbeddedResource Include="Resources\LearningMachine\TestWeightRatio.lm" />
     <EmbeddedResource Include="Resources\LearningMachine\TestWeightRatio.train.csv" />
     <EmbeddedResource Include="Resources\LearningMachine\TestWeightRatio.test.csv" />
+    <EmbeddedResource Include="Resources\defaultOCRParams.rsd" />
+    <EmbeddedResource Include="Resources\TestOCRParamsPropagation.rsd" />
+    <EmbeddedResource Include="Resources\CallTestOCRParamsPropagation.rsd" />
+    <EmbeddedResource Include="Resources\CallTestOCRParamsPropagationByPage.rsd" />
+    <EmbeddedResource Include="Resources\CallTestOCRParamsPropagationByDocument.rsd" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

@@ -225,11 +225,6 @@ STDMETHODIMP CSpatialStringSearcher::InitSpatialStringSearcher(ISpatialString* p
 		m_ipSpatialString = ipSpatialString;
 		m_strSourceDocName = asString(m_ipSpatialString->SourceDocName);
 
-		// Set the OCR parameters
-		UCLID_RASTERANDOCRMGMTLib::IHasOCRParametersPtr ipHasOCRParameters(m_ipSpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI46184", ipHasOCRParameters != __nullptr);
-		m_ipOCRParameters = ipHasOCRParameters->OCRParameters;
-
 		// confirm that the string is spatial
 		if (m_ipSpatialString->GetMode() == kSpatialMode)
 		{
@@ -759,7 +754,6 @@ void CSpatialStringSearcher::clear()
 	// Release our pointer to the spatial string and its associated data items
 	m_ipSpatialPageInfoMap = __nullptr;
 	m_ipSpatialString = __nullptr;
-	m_ipOCRParameters = __nullptr;
 	m_strSourceDocName = "";
 
 	// Set the document boundaries to 0
@@ -1467,14 +1461,6 @@ UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialStringSearcher::createStrin
 			m_strSourceDocName.c_str(), m_ipSpatialPageInfoMap);
 
 		ipNewStr->OCREngineVersion = m_ipSpatialString->OCREngineVersion;
-
-		// Set the OCR parameters from the input
-		if (m_ipOCRParameters->Size > 0)
-		{
-			UCLID_RASTERANDOCRMGMTLib::IHasOCRParametersPtr ipHasOCRParameters(ipNewStr);
-			ASSERT_RESOURCE_ALLOCATION("ELI46186", ipHasOCRParameters != __nullptr);
-			ipHasOCRParameters->OCRParameters = m_ipOCRParameters;
-		}
 	}
 	else
 	{

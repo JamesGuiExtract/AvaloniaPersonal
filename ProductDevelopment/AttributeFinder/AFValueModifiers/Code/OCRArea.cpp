@@ -192,12 +192,8 @@ STDMETHODIMP COCRArea::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pOri
 		IIUnknownVectorPtr ipZones( ipSpatialString->GetOriginalImageRasterZones() );
 		ASSERT_RESOURCE_ALLOCATION("ELI19571", ipZones != __nullptr);
 
-		// create a spatial string to hold the result
-		ISpatialStringPtr ipResult(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI19572", ipResult != __nullptr);
-		
-		// set a flag to indicate ipResult is empty
-		bool bResultIsEmpty = true;
+		// spatial string to hold the result
+		ISpatialStringPtr ipResult = __nullptr;
 
 		// instantiate a new OCR engine if there is at least one zone to OCR
 		long lSize = ipZones->Size();
@@ -244,28 +240,35 @@ STDMETHODIMP COCRArea::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pOri
 			if(ipZoneText->IsEmpty() == VARIANT_FALSE)
 			{
 				// check if this is the first found text
-				if(bResultIsEmpty)
+				if(ipResult == __nullptr)
 				{
-					bResultIsEmpty = false;
+					ipResult = ipZoneText;
 				}
 				else
 				{
 					// the result already contains some found text.
 					// insert a line break between the previous and current found text.
 					ipResult->AppendString("\r\n");
-				}
 
-				// append the found text
-				ipResult->Append(ipZoneText);
+					// append the found text
+					ipResult->Append(ipZoneText);
+				}
 			}
 		}
 
 		// store the result if either:
 		// (a) the value should be cleared when the result is empty
 		// (b) the result is not empty
-		if(m_bClearIfNoneFound || !bResultIsEmpty)
+		if(m_bClearIfNoneFound || ipResult != __nullptr)
 		{
-			ipAttribute->Value = ipResult;
+			if (ipResult == __nullptr)
+			{
+				ipAttribute->Value->Clear();
+			}
+			else
+			{
+				ipAttribute->Value = ipResult;
+			}
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18463");
