@@ -54,7 +54,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomizableMessageBox.cs" />
     <Compile Include="DashboardHelper.cs" />
     <Compile Include="DashboardShared.cs" />
     <Compile Include="IExtractDashboardCommon.cs" />

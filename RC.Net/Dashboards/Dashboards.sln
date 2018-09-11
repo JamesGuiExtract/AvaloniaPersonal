@@ -51,6 +51,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LeadUtils", "..\..\Reusable
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.Forms", "..\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj", "{05449E7C-D300-4A2A-AD14-57CE9630B49B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Ftp", "..\Utilities\Ftp\Core\Code\Extract.Utilities.Ftp.csproj", "{D2DD8D8F-E632-429E-8646-B9489D21295F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -320,6 +322,18 @@ Global
 		{05449E7C-D300-4A2A-AD14-57CE9630B49B}.Template|Any CPU.Build.0 = Release|Any CPU
 		{05449E7C-D300-4A2A-AD14-57CE9630B49B}.Template|x86.ActiveCfg = Release|Any CPU
 		{05449E7C-D300-4A2A-AD14-57CE9630B49B}.Template|x86.Build.0 = Release|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Debug|x86.Build.0 = Debug|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Release|x86.ActiveCfg = Release|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Release|x86.Build.0 = Release|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Template|Any CPU.ActiveCfg = Release|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Template|Any CPU.Build.0 = Release|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Template|x86.ActiveCfg = Release|Any CPU
+		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Template|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
