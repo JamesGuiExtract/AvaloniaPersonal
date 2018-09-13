@@ -183,7 +183,7 @@ namespace DashboardViewer
         /// <summary>
         /// Since this does not have <see cref="DevExpress.DashboardWin.DashboardDesigner"/> return null
         /// </summary>
-        public DevExpress.DashboardWin.DashboardDesigner Designer => null;
+        public DashboardDesigner Designer => null;
 
         /// <summary>
         /// Gets the current filtered values for the named dashboard item
@@ -316,6 +316,7 @@ namespace DashboardViewer
         #endregion
 
         #region Event Handlers
+
         void DashboardViewerForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             try
@@ -341,6 +342,22 @@ namespace DashboardViewer
         }
 
         #region Menu item event handlers
+
+        void HandleToolStripButtonRefresh_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (Dashboard != null)
+                {
+                    dashboardViewerMain.ReloadData(false);
+                    _toolStripTextBoxlastRefresh.Text = DateTime.Now.ToString();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46235");
+            }
+        }
 
         void HandleDashboardsInDBListBoxControlMouseDoubleClick(object sender, MouseEventArgs e)
         {
@@ -390,6 +407,7 @@ namespace DashboardViewer
             try
             {
                 dashboardViewerMain.DashboardSource = string.Empty;
+                _toolStripTextBoxlastRefresh.Text = "";
             }
             catch (Exception ex)
             {
@@ -485,6 +503,7 @@ namespace DashboardViewer
             {
                 UpdateMainTitle();
                 _dashboardShared.GridConfigurationsFromXML(Dashboard?.UserData);
+                _toolStripTextBoxlastRefresh.Text = DateTime.Now.ToString();
             }
             catch (Exception ex)
             {
