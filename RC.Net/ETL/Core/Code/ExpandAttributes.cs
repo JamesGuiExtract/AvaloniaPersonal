@@ -907,7 +907,6 @@ namespace Extract.ETL
             /// <summary>
             /// The ID of the last FileTaskSession record processed
             /// </summary>
-            [DataMember]
             public Int32 LastFileTaskSessionIDProcessed { get; set; }
 
             /// <summary>

@@ -1,6 +1,7 @@
 ﻿using Extract.Code.Attributes;
 using Extract.Utilities;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.ComponentModel;
 using System.Data;
@@ -12,15 +13,6 @@ using System.Threading;
 namespace Extract.ETL
 {
     /// <summary>
-    /// Interface to implement if DatabaseService uses LastFileTaskSessionID
-    /// This interface is used to save the LastFileTaskSessionIDProcessed to the DatabaseService record 
-    /// </summary>
-    public interface IFileTaskSessionServiceStatus
-    {
-        int LastFileTaskSessionIDProcessed { get; set; }
-    }
-
-    /// <summary>
     /// Defines the base class for processes that will be performed by a service
     /// </summary>
     [DataContract]
@@ -30,9 +22,9 @@ namespace Extract.ETL
     {
         bool _enabled = true;
         int _databaseServiceID;
-        string _databaseService = "";
-        string _databaseName = "";
-        string _description = "";
+        string _databaseService = string.Empty;
+        string _databaseName = string.Empty;
+        string _description = string.Empty;
 
         /// <summary>
         /// Description of the database service item
@@ -312,15 +304,14 @@ namespace Extract.ETL
             {
                 return creator();
             }
-
             using (var connection = NewSqlDBConnection(enlist: false))
             {
                 connection.Open();
 
                 // need to get the previous status
                 var statusCmd = connection.CreateCommand();
-                statusCmd.CommandText = "SELECT Status FROM DatabaseService WHERE ID = @DatabaseServiceID";
-                statusCmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
+                statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID";
+                statusCmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
                 using (var statusResult = statusCmd.ExecuteReader())
                 {
                     if (!statusResult.HasRows)
@@ -330,10 +321,15 @@ namespace Extract.ETL
                         throw ee;
                     }
 
-                    string jsonStatus = "";
+                    string jsonStatus = string.Empty;
+                    Int32? lastFileTaskSessionID = null;
                     if (statusResult.Read() && !statusResult.IsDBNull(statusResult.GetOrdinal("Status")))
                     {
                         jsonStatus = statusResult.GetString(statusResult.GetOrdinal("Status"));
+                        if (!statusResult.IsDBNull(statusResult.GetOrdinal("LastFileTaskSessionIDProcessed")))
+                        {
+                            lastFileTaskSessionID = statusResult.GetInt32(statusResult.GetOrdinal("LastFileTaskSessionIDProcessed"));
+                        }
                     }
 
                     if (string.IsNullOrWhiteSpace(jsonStatus))
@@ -344,6 +340,41 @@ namespace Extract.ETL
                     {
                         if (DatabaseServiceStatus.FromJson(jsonStatus) is T status)
                         {
+                            var fileTaskSessionServiceStatus = status as IFileTaskSessionServiceStatus;
+                            if (fileTaskSessionServiceStatus != null)
+                            {
+                                // if the DatabaseService record doesn't have a value for LastFileTaskSessionIDProcessed set
+                                // it to the one in the status
+                                if (lastFileTaskSessionID is null)
+                                {
+                                    // Check for the Old value of LastFileTaskSessionIDProcessed in the json
+                                    JObject search = JObject.Parse(jsonStatus);
+                                    JToken lastFileTaskSessionFromStatus = search.SelectToken("LastFileTaskSessionIDProcessed");
+
+                                    // If there was a value in the json set the DatabaseService.LastFileTaskSessionIDProcessed column
+                                    // to that value
+                                    if (lastFileTaskSessionFromStatus != null)
+                                    {
+                                        // The LastFileTaskSessionIDProcessed in the DatabaseService record was null so
+                                        // set it to the value in the status record
+                                        using (var saveConnection = NewSqlDBConnection())
+                                        {
+                                            saveConnection.Open();
+                                            using (var saveCmd = saveConnection.CreateCommand())
+                                            {
+                                                lastFileTaskSessionID = lastFileTaskSessionFromStatus.Value<int>();
+                                                saveCmd.CommandText =
+                                                    "UPDATE DatabaseService Set LastFileTaskSessionIDProcessed = @LastFileTaskSessionID WHERE ID = @DatabaseServiceID";
+                                                saveCmd.Parameters.AddWithValue("@LastFileTaskSessionID", lastFileTaskSessionID);
+                                                saveCmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                                                saveCmd.ExecuteNonQuery();
+                                            }
+                                        }
+                                    }
+                                }
+                                fileTaskSessionServiceStatus.LastFileTaskSessionIDProcessed = lastFileTaskSessionID ??
+                                    fileTaskSessionServiceStatus.LastFileTaskSessionIDProcessed;
+                            }
                             return status;
                         }
                         else
@@ -387,7 +418,7 @@ namespace Extract.ETL
                         {
                             cmd.CommandText += "WHERE TaskClass.GUID = 'B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006'";
                         }
-                        
+
                         return (int)(cmd.ExecuteScalar() ?? -1);
                     }
                 }
@@ -441,12 +472,12 @@ namespace Extract.ETL
             {
                 return FromJson(ToJson());
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45662");
             }
         }
-        
+
         #endregion
 
         #region INotifyPropertyChanged
@@ -475,7 +506,7 @@ namespace Extract.ETL
             sqlConnectionBuild.NetworkLibrary = "dbmssocn";
             sqlConnectionBuild.MultipleActiveResultSets = true;
             sqlConnectionBuild.Enlist = enlist;
-            return new SqlConnection( sqlConnectionBuild.ConnectionString);
+            return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
         /// <summary>

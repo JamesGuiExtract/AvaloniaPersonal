@@ -7,6 +7,16 @@ using System.Runtime.Serialization;
 
 namespace Extract.ETL
 {
+
+    /// <summary>
+    /// Interface to implement if DatabaseService uses LastFileTaskSessionID
+    /// This interface is used to save the LastFileTaskSessionIDProcessed to the DatabaseService record 
+    /// </summary>
+    public interface IFileTaskSessionServiceStatus
+    {
+        int LastFileTaskSessionIDProcessed { get; set; }
+    }
+
     /// <summary>
     /// Defines the base class for database service status
     /// </summary>

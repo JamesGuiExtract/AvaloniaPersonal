@@ -759,7 +759,6 @@ namespace Extract.ETL
             /// <summary>
             /// The ID of the last MLData record processed
             /// </summary>
-            [DataMember]
             public int LastFileTaskSessionIDProcessed { get; set; }
 
             /// <summary>

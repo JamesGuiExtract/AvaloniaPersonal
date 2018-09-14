@@ -42,7 +42,6 @@ namespace Extract.ETL
             /// <summary>
             /// Maintains the last FileTaskSessionID that was processed successfully
             /// </summary>
-            [DataMember]
             public int LastFileTaskSessionIDProcessed { get; set; } = 0;
 
             /// <summary>
