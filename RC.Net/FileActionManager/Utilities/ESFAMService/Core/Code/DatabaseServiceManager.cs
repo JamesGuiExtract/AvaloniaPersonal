@@ -1,11 +1,8 @@
 ﻿using Extract.Database;
 using Extract.ETL;
-using Extract.Interfaces;
 using Extract.Utilities;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Linq;
@@ -16,16 +13,16 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.Utilities
 {
     // Manages the execution of all DatabaseService instances defined in a FAM database.
-    internal class DatabaseServiceManager : IDisposable
+    class DatabaseServiceManager : IDisposable
     {
         #region Fields
 
         // Map of the ScheduledEvent for each service to the corresponding service to execute.
         ConcurrentDictionary<ScheduledEvent, DatabaseService> _databaseServices =
             new ConcurrentDictionary<ScheduledEvent, DatabaseService>();
-		
-		// Map for indicating if the scheduledEvent is in the EventStarted event so that 
-		// if it is already waiting another will not be queued
+
+        // Map for indicating if the scheduledEvent is in the EventStarted event so that 
+        // if it is already waiting another will not be queued
         ConcurrentDictionary<ScheduledEvent, bool> _inEventStarted = new ConcurrentDictionary<ScheduledEvent, bool>();
 
         // Lock for accessing _inEventStarted
@@ -202,11 +199,28 @@ namespace Extract.FileActionManager.Utilities
                                 fileProcessingDB.DatabaseServer = _fileProcessingDb.DatabaseServer;
                                 fileProcessingDB.DatabaseName = _fileProcessingDb.DatabaseName;
 
-                                fileProcessingDB.RecordFAMSessionStart("ETL: " + dbService.Description, "", false, false);
-
-                                dbService.Process(_canceller.Token);
-
-                                fileProcessingDB.RecordFAMSessionStop();
+                                fileProcessingDB.RecordFAMSessionStart("ETL: " + dbService.Description, string.Empty, false, false);
+                                RecordProcessStart(dbService);
+                                try
+                                {
+                                    dbService.Process(_canceller.Token);
+                                }
+                                catch (ExtractException processExtractException)
+                                {
+                                    RecordProcessComplete(dbService, processExtractException.AsStringizedByteStream());
+                                    throw processExtractException;
+                                }
+                                catch (Exception processException)
+                                {
+                                    ExtractException ee = processException.AsExtract("ELI46237");
+                                    RecordProcessComplete(dbService, ee.AsStringizedByteStream());
+                                    throw ee;
+                                }
+                                finally
+                                {
+                                    fileProcessingDB.RecordFAMSessionStop();
+                                }
+                                RecordProcessComplete(dbService);
                             }
                             finally
                             {
@@ -300,6 +314,67 @@ namespace Extract.FileActionManager.Utilities
 
         #region Private Members
 
+        /// <summary>
+        /// Sets the MachineID, StartTime and EndTime in the DatabaseService record representing the start of a process
+        /// </summary>
+        /// <param name="dbService">The <see cref="DatabaseService"/> to record values for</param>
+        void RecordProcessStart(DatabaseService dbService)
+        {
+            using (var cmd = _oleDbConnection.CreateCommand())
+            {
+                cmd.CommandText =
+                    @"DECLARE @MachineID INT;
+                      DECLARE @MachineName NVARCHAR(MAX) = ?
+                        SELECT @MachineID = ID
+                        FROM Machine
+                        WHERE MachineName = @MachineName;
+                        IF(@MachineID is NULL)
+                            INSERT INTO Machine (MachineName) Select(@MachineName)
+                        
+                        SELECT @MachineID = ID
+                        FROM Machine
+                        WHERE MachineName = @MachineName;
+
+                        UPDATE DatabaseService 
+                        SET StartTime = GetDate(),
+                            EndTime = NULL,
+	                        MachineID = @MachineID
+                        WHERE ID = ?";
+
+                cmd.Parameters.AddWithValue("@MachineNameParameter", Environment.MachineName);
+                cmd.Parameters.AddWithValue("@DatabaseServiceID", dbService.DatabaseServiceID);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        /// <summary>
+        /// Sets the EndTime and if there is an exception the Exception fields in the DatabaseService record
+        /// for the given dbService
+        /// </summary>
+        /// <param name="dbService">The <see cref="DatabaseService"/> to save data for</param>
+        /// <param name="stringizedException">Stringized representation of the exception that was thrown</param>
+        void RecordProcessComplete(DatabaseService dbService, string stringizedException = null)
+        {
+            using (var cmd = _oleDbConnection.CreateCommand())
+            {
+                cmd.CommandText = "UPDATE DatabaseService SET EndTime = GetDate()";
+
+                if (string.IsNullOrEmpty(stringizedException))
+                {
+                    cmd.CommandText += ", Exception = ?";
+                    cmd.Parameters.AddWithValue("@Exception", DBNull.Value);
+                }
+                else
+                {
+                    cmd.CommandText += ", Exception = ?";
+                    cmd.Parameters.Add("@Exception", OleDbType.VarChar, stringizedException.Length + 1).Value = stringizedException;
+                }
+                cmd.CommandText += " WHERE ID = ?";
+                cmd.Parameters.AddWithValue("@DatabaseServiceID", dbService.DatabaseServiceID);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         void TryStart()
         {
             try
@@ -340,7 +415,7 @@ namespace Extract.FileActionManager.Utilities
             {
                 lock (_lock)
                 {
-                    _fileProcessingDb.RecordFAMSessionStart("ETL Manager", "", false, false);
+                    _fileProcessingDb.RecordFAMSessionStart("ETL Manager", string.Empty, false, false);
                     _fileProcessingDb.RegisterActiveFAM();
 
                     _running = true;
@@ -368,10 +443,6 @@ namespace Extract.FileActionManager.Utilities
                 {
                     Stop();
                 }
-
-                // _oleDbConnection only needed until the service has started.
-                _oleDbConnection.Dispose();
-                _oleDbConnection = null;
             }
             catch (Exception ex)
             {

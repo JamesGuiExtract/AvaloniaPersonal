@@ -1723,6 +1723,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_REPORTING_VERIFICATION_RATES_ACTION_FK);
 		vecQueries.push_back(gstrADD_REPORTING_VERIFICATION_RATES_TASK_CLASS_FK);
 		vecQueries.push_back(gstrADD_REPORTING_VERIFICATION_RATES_FILE_TASK_SESSION_FK);
+		vecQueries.push_back(gstrADD_DATABASESERVICE_MACHINE_FK);
 
 		if (bAddUserTables)
 		{

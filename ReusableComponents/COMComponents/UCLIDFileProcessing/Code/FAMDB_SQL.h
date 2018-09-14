@@ -2107,7 +2107,19 @@ static const string gstrCREATE_DATABASE_SERVICE_TABLE =
 	"	[Settings] NVARCHAR(MAX) NOT NULL, "
 	"   [Status] NVARCHAR(MAX) NULL, "
 	"   [Enabled] BIT NOT NULL CONSTRAINT [DF_DatabaseServiceEnabled] DEFAULT 1, "
-	"	[LastFileTaskSessionIDProcessed] INT NULL) "; 
+	"	[LastFileTaskSessionIDProcessed] INT NULL, "
+	"	[StartTime] DateTime NULL, "
+	"	[LastWrite] DateTime NULL, "
+	"	[EndTime] DateTime NULL, "
+	"	[MachineID] INT NULL, "
+	"	[Exception] NVARCHAR(MAX) NULL)";
+
+static const string gstrADD_DATABASESERVICE_MACHINE_FK =
+"ALTER TABLE [dbo].[DatabaseService] "
+"	WITH CHECK ADD CONSTRAINT [FK_DatabaseService_Machine] FOREIGN KEY([MachineID]) "
+"	REFERENCES [dbo].[Machine]([ID]) "
+"	ON UPDATE CASCADE "
+"	ON DELETE SET NULL";
 
 static const string gstrCREATE_REPORTING_VERIFICATION_RATES =
 	"CREATE TABLE [dbo].[ReportingVerificationRates]( "

@@ -78,7 +78,8 @@ namespace Extract.ETL
                     cmd.CommandText = @"
                         UPDATE [DatabaseService]
                         SET [Status] = @Status,
-                            [LastFileTaskSessionIDProcessed] = @LastFileTaskSession
+                            [LastFileTaskSessionIDProcessed] = @LastFileTaskSession,
+                            [LastWrite] = GetDate()
                         WHERE ID = @DatabaseServiceID";
                     cmd.Parameters.Add("@Status", SqlDbType.NVarChar).Value = this.ToJson();
                     cmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = databaseServiceId;

@@ -137,7 +137,7 @@ namespace Extract.ETL
             public override int GetHashCode()
             {
                 return ToString().GetHashCode();
-            }  
+            }
 
             #endregion
 
@@ -599,7 +599,7 @@ namespace Extract.ETL
         }
 
         #endregion
-        
+
         #region IHasConfigurableDatabaseServiceStatus
 
         /// <summary>

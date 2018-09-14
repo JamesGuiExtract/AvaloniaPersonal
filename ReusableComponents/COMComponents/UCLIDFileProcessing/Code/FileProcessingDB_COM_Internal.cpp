@@ -35,7 +35,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 167;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 168;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2338,6 +2338,39 @@ int UpdateToSchemaVersion167(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46054");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion168(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 168;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		vecQueries.push_back("ALTER TABLE dbo.[DatabaseService] ADD	[StartTime] DateTime NULL");
+		vecQueries.push_back("ALTER TABLE dbo.[DatabaseService] ADD	[LastWrite] DateTime NULL"); 
+		vecQueries.push_back("ALTER TABLE dbo.[DatabaseService] ADD	[EndTime] DateTime NULL");
+		vecQueries.push_back("ALTER TABLE dbo.[DatabaseService] ADD	[MachineID] INT NULL");
+		vecQueries.push_back("ALTER TABLE dbo.[DatabaseService] ADD	[Exception] NVARCHAR(MAX) NULL");
+
+		vecQueries.push_back(gstrADD_DATABASESERVICE_MACHINE_FK);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46236");
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -7388,7 +7421,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 164:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion165);
 				case 165:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion166);
 				case 166:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion167);
-				case 167:
+				case 167:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion168);
+				case 168:
 					break;
 
 				default:
