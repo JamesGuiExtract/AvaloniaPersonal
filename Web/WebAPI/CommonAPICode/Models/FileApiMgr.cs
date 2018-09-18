@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using static WebAPI.Utils;
@@ -25,32 +26,68 @@ namespace WebAPI.Models
         /// <returns>a FileApi instance</returns>
         static public FileApi GetInterface(ApiContext apiContext, ClaimsPrincipal sessionOwner = null)
         {
+            FileApi fileApi = null;
+
             try
             {
                 Contract.Assert(apiContext != null, "empty API context used");
 
                 lock (_lock)
                 {
-                    var fileApi = FindAvailable(apiContext, sessionOwner);
+                    Int32.TryParse(sessionOwner?.GetClaim("FAMSessionId"), out int requestedFAMSessionId);
+
+                    fileApi = FindAvailable(apiContext);
+
                     if (fileApi != null)
                     {
+                        var requestedSessionId = sessionOwner?.GetClaim(JwtRegisteredClaimNames.Jti);
+                        if (fileApi.Expired ||
+                            (!string.IsNullOrWhiteSpace(requestedSessionId) &&
+                                (fileApi.SessionId != apiContext.SessionId || requestedFAMSessionId != fileApi.FAMSessionId)))
+                        {
+                            // If a FAM session was requested the returned instance is expired or is not for that session,
+                            // abort the old session.
+                            fileApi?.AbortSession(requestedFAMSessionId);
+
+                            throw new RequestAssertion("ELI45230", "Session expired", StatusCodes.Status401Unauthorized);
+                        }
+
                         fileApi.InUse = true;
-                        return fileApi;
+                    }
+                    else
+                    {
+                        fileApi = new FileApi(apiContext, setInUse: true);
+                        
+                        // If a FAM session was requested but a new instance had to be created, abort the old session.
+                        if (requestedFAMSessionId > 0)
+                        {
+                            fileApi.AbortSession(requestedFAMSessionId);
+
+                            throw new RequestAssertion("ELI46255", "Session expired", StatusCodes.Status401Unauthorized);
+                        }
+
+                        _interfaces.Add(fileApi);
+                        Log.WriteLine(Inv($"Number of file API interfaces is now: {_interfaces.Count}"), "ELI43251");
                     }
 
-                    var fa = new FileApi(apiContext, setInUse: true, sessionOwner: sessionOwner);
-                    _interfaces.Add(fa);
-                    Log.WriteLine(Inv($"Number of file API interfaces is now: {_interfaces.Count}"), "ELI43251");
-
-                    return fa;
+                    return fileApi;
                 }
+            }
+            catch (RequestAssertion re)
+            {
+                // fileApi session is already aborted.
+                throw re;
             }
             catch (ExtractException ee)
             {
+                fileApi?.AbortSession();
+
                 throw new ExtractException("ELI43343", ee.Message, ee);
             }
             catch (Exception ex)
             {
+                fileApi?.AbortSession();
+
                 var ee = ex.AsExtract("ELI42160");
                 ee.AddDebugData("FileAPI factory failed for workflow:", apiContext.WorkflowName, encrypt: false);
                 ee.AddDebugData("database server name", apiContext.DatabaseServerName, encrypt: false);
@@ -60,59 +97,27 @@ namespace WebAPI.Models
             }
         }
 
-
-        /// <summary>
-        /// Make a new interface object - this is done whenever the default API context changes
-        /// </summary>
-        static public void MakeInterface(ApiContext apiContext, ClaimsPrincipal sessionOwner)
-        {
-            try
-            {
-                lock (_lock)
-                {
-                    // Only add the new interface if it is not already present and available
-                    var fileApi = FindAvailable(apiContext, sessionOwner);
-                    if (fileApi == null)
-                    {
-                        var fa = new FileApi(apiContext, setInUse: false, sessionOwner: sessionOwner);
-                        _interfaces.Add(fa);
-                        Log.WriteLine(Inv($"Number of file API interfaces is now: {_interfaces.Count}"), "ELI43252");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                var ee = ex.AsExtract("ELI42160");
-                ee.AddDebugData("FileAPI creation failed for workflow:", apiContext.WorkflowName, encrypt: false);
-                ee.AddDebugData("database server name", apiContext.DatabaseServerName, encrypt: false);
-                ee.AddDebugData("database name", apiContext.DatabaseName, encrypt: false);
-                Log.WriteLine(ee);
-
-                throw ee;
-            }
-        }
-
-
         /// <summary>
         /// Finds an available <see cref="FileApi"/> instance for the specified
         /// <see paramref="apiContext"/> and <see paramref="sessionOwner"/>.
         /// </summary>
         /// <param name="apiContext">the API context to use</param>
-        /// <param name="sessionOwner">The <see cref="ClaimsPrincipal"/> this returned instance should be
-        /// specific to or <c>null</c> if the instance need not be specific to a particular user.</param>
         /// <returns></returns>
-        static FileApi FindAvailable(ApiContext apiContext, ClaimsPrincipal sessionOwner = null)
+        static FileApi FindAvailable(ApiContext apiContext)
         {
-            var availableInstance = _interfaces.FirstOrDefault(instance =>
-                 ((sessionOwner == null && !instance.InUse) ||
-                    (sessionOwner != null && instance.SessionId.Equals(sessionOwner.GetClaim("jti")))) &&
-                 instance.Workflow.Name.IsEquivalent(apiContext.WorkflowName) &&
-                 instance.Workflow.DatabaseServerName.IsEquivalent(apiContext.DatabaseServerName) &&
-                 instance.Workflow.DatabaseName.IsEquivalent(apiContext.DatabaseName));
+            // Try first to look up an instance that was specificially associated with apiContext.
+            FileApi availableInstance =
+                _interfaces.FirstOrDefault(instance => apiContext.SessionId.Equals(instance.SessionId));
 
-            if (availableInstance != null && availableInstance.Expired)
+            // If that fails, look for an instance set up for apiContext's DB and workflow that has not
+            // been tied to a different context.
+            if (availableInstance == null)
             {
-                throw new RequestAssertion("ELI45230", "Session expired", StatusCodes.Status401Unauthorized);
+                availableInstance = _interfaces.FirstOrDefault(instance =>
+                    string.IsNullOrWhiteSpace(instance.SessionId) &&
+                    instance.Workflow.Name.IsEquivalent(apiContext.WorkflowName) &&
+                    instance.Workflow.DatabaseServerName.IsEquivalent(apiContext.DatabaseServerName) &&
+                    instance.Workflow.DatabaseName.IsEquivalent(apiContext.DatabaseName));
             }
 
             return availableInstance;

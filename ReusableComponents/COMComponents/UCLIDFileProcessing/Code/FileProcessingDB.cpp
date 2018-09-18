@@ -111,6 +111,13 @@ m_ipFAMTagManager(__nullptr)
 		m_strMachineName = getComputerName();
 		m_strFAMUserName = getCurrentUserName();
 		m_lDBLockTimeout = m_regFPCfgMgr.getDBLockTimeout();
+		
+		// https://extract.atlassian.net/browse/ISSUE-15247
+		// Until these threads are started signal them to indicate they are not running.
+		// Otherwise, this can cause ensureFAMRegistration to hang waiting for threads
+		// that aren't running.
+		m_eventPingThreadExited.signal();
+		m_eventStatsThreadExited.signal();
 
 		// If PDF support is licensed initialize support
 		// NOTE: no exception is thrown or logged if PDF support is not licensed.
@@ -4623,6 +4630,26 @@ STDMETHODIMP CFileProcessingDB::GetActiveUsers(BSTR bstrAction, IVariantVector**
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45523");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::AbortFAMSession(long nFAMSessionID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!AbortFAMSession_Internal(false, nFAMSessionID))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			AbortFAMSession_Internal(true, nFAMSessionID);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46252");
 }
 
 //-------------------------------------------------------------------------------------------------

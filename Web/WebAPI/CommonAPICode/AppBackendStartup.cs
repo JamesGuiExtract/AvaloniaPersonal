@@ -177,15 +177,7 @@ namespace WebAPI
 
             Utils.SetCurrentApiContext(databaseServer, databaseName, workflowName, dbConnectionRetries, dbConnectionTimeout);
 
-            // "Applying" the context values at startup is a convenient way of ensuring that the configured context is
-            // correct, as any problems will be asserted and logged, and the service will exit from starting up, so it
-            // will be obvious that there is a configuration issue. Apply is the default behavior; it can be explicitly
-            // switched off.
-            var applyContextOnStartup = Configuration["ApplyContextOnStartup"];
-            if (String.IsNullOrWhiteSpace(applyContextOnStartup) || applyContextOnStartup.IsEquivalent("true"))
-            {
-                Utils.ApplyCurrentApiContext();
-            }
+            Utils.ValidateCurrentApiContext();
 
             var timeoutValue = Configuration["TokenTimeoutSeconds"];
             if (!String.IsNullOrWhiteSpace(timeoutValue))

@@ -56,12 +56,13 @@ namespace WebAPI.Models
         /// This should be used only inside a using statement, so the fileApi in-use flag can be cleared.
         /// </summary>
         /// <param name="user">The <see cref="ClaimsPrincipal"/> this instance should be specific to.</param>
-        public DocumentData(ClaimsPrincipal user)
+        /// <param name="requireSession"><c>true</c> if an active FAM session is required; otherwise, <c>false</c>.</param>
+        public DocumentData(ClaimsPrincipal user, bool requireSession)
         {
             try
             {
-                _user = user;
-                _apiContext = ClaimsToContext(_user);
+                _apiContext = ClaimsToContext(user);
+                _user = requireSession ? user : null;
             }
             catch (Exception ex)
             {
@@ -93,6 +94,14 @@ namespace WebAPI.Models
             if (_fileApi != null)
             {
                 _fileApi.InUse = false;
+
+                // If a FAMSession was not started, end the session so this instance
+                // can be used by others.
+                if (_fileApi.FAMSessionId == 0)
+                {
+                    _fileApi.EndSession();
+                }
+
                 _fileApi = null;
             }
         }
@@ -100,20 +109,26 @@ namespace WebAPI.Models
         /// <summary>
         /// Opens a session for the specified <see paramref="user"/>.
         /// </summary>
-        /// <param name="user">The <see cref="ClaimsPrincipal"/> this instance is specific to.</param>
+        /// <param name="user">The <see cref="User"/> this instance is specific to.</param>
         /// <param name="remoteIpAddress">The IP address of the web application user.s</param>
-        public void OpenSession(ClaimsPrincipal user, string remoteIpAddress)
+        public void OpenSession(User user, string remoteIpAddress)
         {
             try
             {
-                _user = user;
                 FileApi.FileProcessingDB.RecordWebSessionStart(
-                    "WebRedactionVerification", FileApi.SessionId,
-                    remoteIpAddress, user.GetClaim("sub"));
+                    "WebRedactionVerification", _apiContext.SessionId,
+                    remoteIpAddress, user.Username);
                 FileApi.FileProcessingDB.RegisterActiveFAM();
+
+                // Once a FAM session has been established, tie the session to this context
+                FileApi.AssignSession(_apiContext);
+
+                _apiContext.FAMSessionId = FileApi.FAMSessionId;
             }
             catch (Exception ex)
             {
+                FileApi.AbortSession();
+
                 throw ex.AsExtract("ELI45225");
             }
         }
@@ -136,9 +151,14 @@ namespace WebAPI.Models
                 }
                 finally
                 {
-                    FileApi.FileProcessingDB.UnregisterActiveFAM();
-                    FileApi.FileProcessingDB.RecordFAMSessionStop();
-                    FileApi.Expired = true;
+                    try
+                    {
+                        FileApi.EndSession();
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractLog("ELI46270");
+                    }
                 }
             }
             catch (Exception ex)
@@ -174,7 +194,8 @@ namespace WebAPI.Models
         {
             try
             {
-                var stats = FileApi.FileProcessingDB.GetStats(FileApi.FileProcessingDB.ActiveActionID, false);
+                int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.VerifyAction);
+                var stats = FileApi.FileProcessingDB.GetStats(actionId, false);
                 var users = FileApi.FileProcessingDB.GetActiveUsers(FileApi.Workflow.VerifyAction);
 
                 var result = new QueueStatus();

@@ -27,8 +27,8 @@ namespace WebAPI.Models
         /// <param name="workflowName">workflow name</param>
         /// <param name="numberOfConnectionRetries">number of retries on DB connection, on failure</param>
         /// <param name="connectionRetryTimeout">timout interval for DB connection</param>
-        public ApiContext(string databaseServerName, 
-                          string databaseName, 
+        public ApiContext(string databaseServerName,
+                          string databaseName,
                           string workflowName,
                           string numberOfConnectionRetries = "",
                           string connectionRetryTimeout = "")
@@ -90,5 +90,15 @@ namespace WebAPI.Models
         /// workflow name
         /// </summary>
         public string WorkflowName { get; set; }
+
+        /// <summary>
+        /// Gets the session identifier for this context.
+        /// </summary>
+        public string SessionId { get; set; } = Guid.NewGuid().ToString();
+
+        /// <summary>
+        /// Gets the FAM Session ID to which the <see cref="SessionId"/> maps.
+        /// </summary>
+        public int FAMSessionId { get; set; }
     }
 }

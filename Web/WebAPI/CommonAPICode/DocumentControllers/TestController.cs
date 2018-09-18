@@ -47,7 +47,7 @@ namespace WebAPI.Controllers
                 RequestAssertion.AssertSpecified("ELI45210", args.WorkflowName, "workflow name cannot be empty");
 
                 Utils.SetCurrentApiContext(args.DatabaseServerName, args.DatabaseName, args.WorkflowName);
-                Utils.ApplyCurrentApiContext();
+                Utils.ValidateCurrentApiContext();
 
                 return Ok(args);
             }

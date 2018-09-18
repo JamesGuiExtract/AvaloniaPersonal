@@ -45,7 +45,7 @@ namespace WebAPI.Controllers
                 this.AssertModel("ELI45200");
                 
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: false))
                 {
                     data.AssertRequestFileId("ELI45199", Id);
 
@@ -80,7 +80,7 @@ namespace WebAPI.Controllers
                 var fileStream = file.OpenReadStream();
                 Contract.Assert(fileStream != null, "Null filestream");
 
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: false))
                 {
                     var result = await data.SubmitFile(file.FileName, fileStream);
                     return Ok(result);
@@ -106,7 +106,7 @@ namespace WebAPI.Controllers
                 this.AssertModel("ELI45195");
                 RequestAssertion.AssertSpecified("ELI45194", args?.Text, "Submitted text is empty");
 
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: false))
                 {
                     var result = await data.SubmitText(args.Text);
                     return Ok(result);
@@ -129,7 +129,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: false))
                 {
                     data.AssertRequestFileId("ELI45193", Id);
 
@@ -200,7 +200,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: false))
                 {
                     data.AssertRequestFileId("ELI45191", Id);
                     data.AssertRequestFileExists("ELI45192", Id);
@@ -232,7 +232,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: false))
                 {
                     data.AssertRequestFileId("ELI45202", Id);
                     data.AssertRequestFileExists("ELI45203", Id);
@@ -269,7 +269,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: false))
                 {
                     data.AssertRequestFileId("ELI45204", Id);
 
@@ -293,7 +293,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: false))
                 {
                     data.AssertRequestFileId("ELI45205", Id);
                     data.AssertRequestFileExists("ELI45206", Id);

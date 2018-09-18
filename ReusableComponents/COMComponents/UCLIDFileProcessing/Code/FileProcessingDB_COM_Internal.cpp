@@ -11923,3 +11923,66 @@ bool CFileProcessingDB::GetActiveUsers_Internal(bool bDBLocked, BSTR bstrAction,
 	}
 	return true;
 }
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::AbortFAMSession_Internal(bool bDBLocked, long nFAMSessionID)
+{
+	try
+	{
+		try
+		{
+			if (m_bFAMRegistered && m_nFAMSessionID == nFAMSessionID)
+			{
+				UCLIDException ue("ELI46244", "Unexpected session abort for active session.");
+				ue.addDebugInfo("FAMSessionID", m_nFAMSessionID);
+				throw ue;
+			}
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			ipConnection = getDBConnection();
+
+			string strQueryActiveFAM = "SELECT [ID] FROM [ActiveFAM] WHERE [FAMSessionID] = " + asString(nFAMSessionID);
+
+			_RecordsetPtr ipActiveFAMSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI46247", ipActiveFAMSet != __nullptr);
+
+			ipActiveFAMSet->Open(strQueryActiveFAM.c_str(),
+				_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly, adCmdText);
+
+			if (ipActiveFAMSet->adoEOF == VARIANT_FALSE)
+			{
+				FieldsPtr ipFields = ipActiveFAMSet->Fields;
+				long nActiveFAMID = getLongField(ipFields, "ID");
+
+				TransactionGuard tg(getDBConnection(), adXactRepeatableRead, &m_criticalSection);
+
+				UCLIDException uex("ELI46249", "Application Trace: Files were reverted to original status.");
+				revertLockedFilesToPreviousState(getDBConnection(), nActiveFAMID,
+					"FAM session is being reactivated.", &uex);
+
+				tg.CommitTrans();
+
+				UCLIDException ue("ELI46242",
+					"Application trace: FAM session has been aborted.");
+				ue.addDebugInfo("FAMSession ID", m_nFAMSessionID);
+				ue.addDebugInfo("ActiveFAM ID", m_nActiveFAMID);
+				ue.log();
+			}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI46241");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45532");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}

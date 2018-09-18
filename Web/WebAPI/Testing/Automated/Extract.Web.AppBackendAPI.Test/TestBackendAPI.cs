@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Net;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -91,12 +93,12 @@ namespace Extract.Web.WebAPI.Test
                         ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
 
                 var result = controller.Login(user);
-                var loginToken = result.AssertGoodResult<LoginToken>();
-                // Actually validating the token data looks tricky; verify that it looks right at least.
-                Assert.IsTrue(loginToken.access_token.ToString().StartsWith("eyJhb", StringComparison.OrdinalIgnoreCase));
+                var token = result.AssertGoodResult<JwtSecurityToken>();
 
                 // Login should register an active FAM session
                 Assert.IsTrue(fileProcessingDb.IsAnyFAMActive());
+
+                controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.Logout();
                 result.AssertGoodResult<GenericResult>();
@@ -127,7 +129,8 @@ namespace Extract.Web.WebAPI.Test
                         ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
 
                 var result = controller.Login(user);
-                result.AssertGoodResult<LoginToken>();
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.GetSettings();
                 var settings = result.AssertGoodResult<WebAppSettings>();
@@ -161,7 +164,8 @@ namespace Extract.Web.WebAPI.Test
                         ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
 
                 var result = controller.Login(user);
-                result.AssertGoodResult<LoginToken>();
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
                 var openDocumentResult = result.AssertGoodResult<DocumentId>();
@@ -206,7 +210,8 @@ namespace Extract.Web.WebAPI.Test
                         ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
 
                 var result = controller.Login(user);
-                result.AssertGoodResult<LoginToken>();
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
                 var openDocumentResult = result.AssertGoodResult<DocumentId>();
@@ -252,7 +257,8 @@ namespace Extract.Web.WebAPI.Test
                         ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
 
                 var result = controller1.Login(user1);
-                result.AssertGoodResult<LoginToken>();
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller1.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller1.GetQueueStatus();
                 var queueStatus = result.AssertGoodResult<QueueStatus>();
@@ -267,14 +273,12 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual(1, queueStatus.ActiveUsers);
                 Assert.AreEqual(3, queueStatus.PendingDocuments);
 
-                // In order to start a 2nd session with a different user, the static TestSessionID
-                // needs to be reset.
-                ApiTestUtils.ResetTestSessionID();
                 User user2 = ApiTestUtils.CreateUser("jon_doe", "123");
                 var controller2 = ApiTestUtils.CreateController<AppBackendController>(user2);
 
                 result = controller2.Login(user2);
-                result.AssertGoodResult<LoginToken>();
+                token = result.AssertGoodResult<JwtSecurityToken>();
+                controller2.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller1.GetQueueStatus();
                 queueStatus = result.AssertGoodResult<QueueStatus>();
@@ -330,7 +334,8 @@ namespace Extract.Web.WebAPI.Test
                         ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
 
                 var result = controller.Login(user);
-                result.AssertGoodResult<LoginToken>();
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
                 result = controller.CloseDocument(commit: false);
@@ -383,7 +388,8 @@ namespace Extract.Web.WebAPI.Test
                         ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
 
                 var result = controller.Login(user);
-                result.AssertGoodResult<LoginToken>();
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
                 var openDocumentResult = result.AssertGoodResult<DocumentId>();
@@ -394,6 +400,71 @@ namespace Extract.Web.WebAPI.Test
                 result = controller.Logout();
                 result.AssertGoodResult<GenericResult>();
 
+                Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void Test_AbandonedSession()
+        {
+            string dbName = "AppBackendAPI_Test_AbandonedSession";
+
+            try
+            {
+                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
+                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
+                        ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+
+                // Login to register an active FAM.
+                var result = controller.Login(user);
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
+
+                // Use it to open a document.
+                result = controller.OpenDocument();
+                var openDocumentResult = result.AssertGoodResult<DocumentId>();
+                Assert.AreEqual(1, openDocumentResult.Id);
+                Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
+
+                result = controller.GetQueueStatus();
+                var beforeQueueStatus = result.AssertGoodResult<QueueStatus>();
+
+                // Simulate the web service being stopped.
+                controller.Dispose();
+                FileApiMgr.ReleaseAll();
+
+                // Reset the default context to ensure no crossover of session IDs.
+                ApiTestUtils.SetDefaultApiContext(dbName);
+                var controller2 = ApiTestUtils.CreateController<AppBackendController>(user);
+
+                // Simulate a client that still has a token a previous instance of the service that has since been closed.
+                controller2.ApplyTokenClaimPrincipalToContext(token);
+
+                // DB should still report file 1 as processing
+                Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
+
+                // Should be able to query queue status despite new controller not having access to the document session.
+                result = controller2.GetQueueStatus();
+                var afterQueueStatus = result.AssertGoodResult<QueueStatus>();
+
+                // Document 1 should remain in processing state
+                Assert.AreEqual(beforeQueueStatus.PendingDocuments, afterQueueStatus.PendingDocuments);
+                Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
+
+                // Query that required access to the document session should generate an unauthorized
+                // error that should abort previous document session.
+                result = controller2.GetPageInfo();
+                result.AssertResultCode(HttpStatusCode.Unauthorized);
+
+                // Ensure document 1 has now been reset to pending.
                 Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
             }
             finally
@@ -422,7 +493,8 @@ namespace Extract.Web.WebAPI.Test
                 int fileId = fileRecord.FileID;
 
                 var result = controller.Login(user);
-                result.AssertGoodResult<LoginToken>();
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
                 var openDocumentResult = result.AssertGoodResult<DocumentId>();
@@ -476,7 +548,8 @@ namespace Extract.Web.WebAPI.Test
                 int fileId = fileRecord.FileID;
 
                 var result = controller.Login(user);
-                result.AssertGoodResult<LoginToken>();
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
                 var openDocumentResult = result.AssertGoodResult<DocumentId>();
@@ -532,7 +605,8 @@ namespace Extract.Web.WebAPI.Test
                     EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
 
                 var result = controller.Login(user);
-                result.AssertGoodResult<LoginToken>();
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
                 var openDocumentResult = result.AssertGoodResult<DocumentId>();
@@ -594,7 +668,8 @@ namespace Extract.Web.WebAPI.Test
                         ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
 
                 var result = controller.Login(user);
-                result.AssertGoodResult<LoginToken>();
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
                 result.AssertGoodResult<DocumentId>();
@@ -655,7 +730,8 @@ namespace Extract.Web.WebAPI.Test
                 fileProcessingDb.SetFileStatusToPending(fileId, _VERIFY_ACTION, false);
 
                 var result = controller.Login(user);
-                result.AssertGoodResult<LoginToken>();
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
                 result.AssertGoodResult<DocumentId>();
@@ -713,7 +789,8 @@ namespace Extract.Web.WebAPI.Test
                 int fileId = fileRecord.FileID;
 
                 var result = controller.Login(user);
-                result.AssertGoodResult<LoginToken>();
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
                 result.AssertGoodResult<DocumentId>();

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;     // for IHostingEnvironment
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
@@ -17,7 +18,6 @@ namespace WebAPI
     {
         private static IHostingEnvironment _environment = null;
         private static ApiContext _currentApiContext = null;
-        private static string _testSessionID;
         private static object _apiContextLock = new Object();
 
         /// <summary>
@@ -221,58 +221,6 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// Creates a session ID to use for unit tests. Once created, this will be used in place of
-        /// the JWT's jti claim when associating a call with an existing session.
-        /// </summary>
-        public static void CreateTestSessionID()
-        {
-            try
-            {
-                lock (_apiContextLock)
-                {
-                    if (string.IsNullOrWhiteSpace(_testSessionID))
-                    {
-                        _testSessionID = Guid.NewGuid().ToString();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45302");
-            }
-        }
-
-        /// <summary>
-        /// Creates a new session ID to use for unit tests when more than one session is needed.
-        /// </summary>
-        public static void ResetTestSessionID()
-        {
-            try
-            {
-                lock (_apiContextLock)
-                {
-                    _testSessionID = Guid.NewGuid().ToString();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45527");
-            }
-        }
-
-        /// <summary>
-        /// Gets a session ID to use for unit tests. This will be used in place of the JWT's jti
-        /// claim when associating a call with an existing session.
-        /// </summary>
-        public static string TestSessionID
-        {
-            get
-            {
-                return _testSessionID;
-            }
-        }
-
-        /// <summary>
         /// set the default API context instance
         /// </summary>
         /// <param name="databaseServerName">database server name</param>
@@ -329,13 +277,13 @@ namespace WebAPI
         /// "apply" the current API context - this creates a FileApi member using the context, useful for
         /// checking that the named workflow actually exists in the configured DatabaseServer/Database.
         /// </summary>
-        public static void ApplyCurrentApiContext()
+        public static void ValidateCurrentApiContext()
         {
             try
             {
                 lock (_apiContextLock)
                 {
-                    FileApiMgr.MakeInterface(CurrentApiContext, null);
+                    new FileApi(_currentApiContext, setInUse: false);
                 }
             }
             catch (Exception ex)
@@ -387,7 +335,14 @@ namespace WebAPI
                 Contract.Assert(!String.IsNullOrWhiteSpace(databaseName), "Database name is empty");
                 Contract.Assert(!String.IsNullOrWhiteSpace(workflowName), "Workflow name is empty");
 
-                return new ApiContext(databaseServerName, databaseName, workflowName);
+                var context = new ApiContext(databaseServerName, databaseName, workflowName);
+                context.SessionId = user.GetClaim(JwtRegisteredClaimNames.Jti);
+                context.FAMSessionId = user.Claims
+                    .Where(claim => claim.Type.Equals("FAMSessionId", StringComparison.OrdinalIgnoreCase))
+                    .Select(claim => Int32.TryParse(claim.Value, out int id) ? id : 0)
+                    .FirstOrDefault();
+
+                return context;
             }
             catch (Exception ex)
             {

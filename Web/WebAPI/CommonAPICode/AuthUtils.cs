@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -66,27 +67,26 @@ namespace WebAPI
         /// </summary>
         /// <param name="user">the User DTO instance</param>
         /// <param name="context">the user's context</param>
-        /// <returns>JSON-encoded JWT and a <see cref="ClaimsPrincipal"/> representing the authenticated user.
-        /// </returns>
-        internal static (LoginToken token, ClaimsPrincipal claimsPrincipal) GenerateToken(User user, ApiContext context)
+        /// <returns>JSON-encoded JWT.</returns>
+        internal static LoginToken GenerateToken(User user, ApiContext context)
         {
             try
             {
                 var now = DateTime.UtcNow;
-                string sessionID = Utils.TestSessionID ?? Guid.NewGuid().ToString();
 
                 // Specifically add the jti (nonce), iat (issued timestamp), and sub (subject/user) claims.
                 var claims = new Claim[]
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, user.Username),
-                    new Claim(JwtRegisteredClaimNames.Jti, sessionID),
+                    new Claim(JwtRegisteredClaimNames.Jti, context.SessionId),
                     new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(now).ToString(), ClaimValueTypes.Integer64),
 
                     // Add custom claims. The workflow name may be from the user login request.
-                    new Claim("WorkflowName", context.WorkflowName)
+                    new Claim("WorkflowName", context.WorkflowName),
+                    new Claim("FAMSessionId", context.FAMSessionId.ToString(CultureInfo.InvariantCulture))
                 };
 
-                var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(null, claims));
+                var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
 
                 // Create the JWT and write it to a string
                 var jwt = new JwtSecurityToken(
@@ -110,7 +110,7 @@ namespace WebAPI
                     expires_in = AuthUtils.TokenTimeoutInSeconds
                 };
 
-                return (responseToken, claimsPrincipal);
+                return responseToken;
             }
             catch (Exception ex)
             {

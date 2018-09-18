@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Net;
-using System.Security.Claims;
 using WebAPI.Models;
 
 using static WebAPI.Utils;
@@ -39,11 +38,16 @@ namespace WebAPI.Controllers
                 using (var data = new DocumentData(context))
                 {
                     userData.LoginUser(user);
-                    (LoginToken token, ClaimsPrincipal claimsPrincipal) = AuthUtils.GenerateToken(user, context);
+
                     // IPAddress is used to identify the caller via the "Machine" column in FAMSession. If no RemoteIpAddress
                     // exists, this is likely a unit test; assume 127.0.0.1.
                     string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
-                    data.OpenSession(claimsPrincipal, ipAddress);
+
+                    // Starts an active FAM session via FileProcessingDB and ties the active context to the session
+                    data.OpenSession(user, ipAddress);
+
+                    // Token is specific to user and FAMSessionId
+                    var token = AuthUtils.GenerateToken(user, context);
 
                     return Ok(token);
                 }
@@ -63,7 +67,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: true))
                 {
                     data.CloseSession();
 
@@ -91,7 +95,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: false))
                 {
                     var result = data.GetSettings();
 
@@ -114,7 +118,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: false))
                 {
                     var result = data.GetQueueStatus();
 
@@ -140,7 +144,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: true))
                 {
                     var documentId = data.OpenDocument(id);
 
@@ -164,7 +168,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: true))
                 {
                     data.CloseDocument(commit);
 
@@ -193,7 +197,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: true))
                 {
                     int fileId = data.DocumentSessionFileId;
                     data.AssertRequestFileId("ELI45172", fileId);
@@ -222,7 +226,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: true))
                 {
                     int fileId = data.DocumentSessionFileId;
                     var imageData = data.GetPageImage(fileId, page);
@@ -248,7 +252,7 @@ namespace WebAPI.Controllers
             try
             {
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: true))
                 {
                     // https://extract.atlassian.net/browse/WEB-59
                     // Per discussion with GGK, non-spatial attributes will not be sent to the web app.
@@ -276,7 +280,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: true))
                 {
                     data.UpdateDocumentResultSet(data.DocumentSessionFileId, documentData);
 
@@ -307,7 +311,7 @@ namespace WebAPI.Controllers
             try
             {
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
-                using (var data = new DocumentData(User))
+                using (var data = new DocumentData(User, requireSession: true))
                 {
                     var result = data.GetWordZoneData(page);
 

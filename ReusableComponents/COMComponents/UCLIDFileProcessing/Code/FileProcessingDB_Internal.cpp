@@ -5045,8 +5045,8 @@ void CFileProcessingDB::ensureFAMRegistration(string strActionName)
 
 		// Re-add a new ActiveFAM table entry. (The circumstances where this code will be used are
 		// rare, and not worth finding a way to pass on whether queuing is active).
-		UnregisterActiveFAM();
-		RegisterActiveFAM();
+		getThisAsCOMPtr()->UnregisterActiveFAM();
+		getThisAsCOMPtr()->RegisterActiveFAM();
 
 		END_CONNECTION_RETRY(ipConnection, "ELI37456");
 

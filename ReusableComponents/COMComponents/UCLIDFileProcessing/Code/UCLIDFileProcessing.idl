@@ -2006,6 +2006,11 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: Gets the names of all users with active FAM session for the specified action.
 		[id(194), helpstring("method GetActiveUsers")] HRESULT GetActiveUsers(
 			[in] BSTR bstrAction, [out, retval] IVariantVector** ppvecUserNames);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Intended to clean up a FAM session that is know to have been unexpectedly abandoned.
+		//			Removes the row from the ActiveFAM table and resetting the status of any files that
+		//			had been processing, but does not properly close out the FAMSession table row.
+		[id(195), helpstring("method AbortFAMSession")] HRESULT AbortFAMSession([in] long nFAMSessionID);
 	};
 
 	[

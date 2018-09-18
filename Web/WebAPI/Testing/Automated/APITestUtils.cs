@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
@@ -66,7 +67,6 @@ namespace Extract.Web.WebAPI.Test
         {
             try
             {
-                Utils.CreateTestSessionID();
                 FileProcessingDB fileProcessingDb = testManager.InitializeDatabase(dbResource, dbName);
                 ApiTestUtils.SetDefaultApiContext(dbName);
                 fileProcessingDb.ActiveWorkflow = ApiTestUtils.CurrentApiContext.WorkflowName;
@@ -93,7 +93,7 @@ namespace Extract.Web.WebAPI.Test
         {
             var apiContext = new ApiContext(databaseServer, databaseName, workflowName);
             Utils.SetCurrentApiContext(apiContext);
-            Utils.ApplyCurrentApiContext();
+            Utils.ValidateCurrentApiContext();
 
             return apiContext;
         }
@@ -126,21 +126,6 @@ namespace Extract.Web.WebAPI.Test
         }
 
         /// <summary>
-        /// Resets the test session identifier to allow a second test session to be opened.
-        /// </summary>
-        public static void ResetTestSessionID()
-        {
-            try
-            {
-                Utils.ResetTestSessionID();
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45526");
-            }
-        }
-
-        /// <summary>
         /// Creates a <see cref="User"/> instance.
         /// </summary>
         /// <param name="username">The username.</param>
@@ -164,7 +149,7 @@ namespace Extract.Web.WebAPI.Test
             var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username),
-                new Claim(JwtRegisteredClaimNames.Jti, Utils.TestSessionID),
+                new Claim(JwtRegisteredClaimNames.Jti, ApiTestUtils.CurrentApiContext.SessionId),
                 new Claim("WorkflowName", CurrentApiContext.WorkflowName)
             }));
 
@@ -208,6 +193,21 @@ namespace Extract.Web.WebAPI.Test
                     var objectResult = (ObjectResult)result;
                     Assert.AreEqual((int)HttpStatusCode.OK, objectResult.StatusCode);
 
+                    // If caller is looking for a JwtSecurityToken, re-create one from the claims in a LoginToken
+                    if (typeof(JwtSecurityToken).IsAssignableFrom(typeof(T)) && objectResult.Value is LoginToken loginToken)
+                    {
+                        var handler = new JwtSecurityTokenHandler();
+                        var token = handler.ReadToken(loginToken.access_token) as JwtSecurityToken;
+
+                        // We would expect a token issued by our API to use the our Issuer string
+                        // and to have a session ID claim.
+                        Assert.IsTrue(token.Issuer == Utils.Issuer);
+                        Assert.IsTrue(token.Claims.Any(claim =>
+                            claim.Type == JwtRegisteredClaimNames.Jti && !string.IsNullOrWhiteSpace(claim.Value)));
+
+                        return token as T;
+                    }
+
                     Assert.IsInstanceOf(typeof(T), objectResult.Value, "Unexpected result object type");
                     typedResult = (T)objectResult.Value;
                 }
@@ -217,6 +217,44 @@ namespace Extract.Web.WebAPI.Test
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45300");
+            }
+        }
+
+        /// <summary>
+        /// Validates a the <see cref="IActionResult"/> has the specified <see cref="HttpStatusCode"/>.
+        /// </summary>
+        public static void AssertResultCode(this IActionResult result, HttpStatusCode expectedCode)
+        {
+            try
+            {
+                Assert.IsInstanceOf(typeof(ObjectResult), result, "Unexpected result type");
+                var objectResult = (ObjectResult)result;
+                Assert.AreEqual((int)expectedCode, objectResult.StatusCode);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46262");
+            }
+        }
+
+    /// <summary>
+    /// Sets the context claim principal.
+    /// </summary>
+    /// <param name="controller">The <see cref="Controller"/> for which the context should be set.
+    /// </param>
+    /// <param name="securityToken">The <see cref="JwtSecurityToken"/> containing the claims necessary
+    /// to create the appropriate <see cref="ClaimsPrincipal"/>.</param>
+    public static void ApplyTokenClaimPrincipalToContext(this Controller controller, JwtSecurityToken securityToken)
+        {
+            try
+            {
+                var claimsIdentity = new ClaimsIdentity(securityToken.Claims);
+                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+                controller.ControllerContext.HttpContext.User = claimsPrincipal;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46261");
             }
         }
     }
