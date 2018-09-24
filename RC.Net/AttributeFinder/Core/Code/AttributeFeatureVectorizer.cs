@@ -523,7 +523,9 @@ namespace Extract.AttributeFinder
 
                     // Return BoW feature vector + exists/not exists value
                     case FeatureVectorizerType.DiscreteTerms:
-                        var features = _nonSerializedBagOfWords.Value.GetFeatureVector(values.ToArray()).Select(i => (double)i);
+                        var features = _nonSerializedBagOfWords
+                            .Value.GetFeatureVector(values.ToArray())
+                            .Select(i => (double)i);
                         return features.Concat(new[] { exists }).ToArray();
 
                     case FeatureVectorizerType.Bitmap:

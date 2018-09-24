@@ -1966,7 +1966,9 @@ namespace Extract.AttributeFinder
             var attributeFeatures = Enumerable.Empty<List<double[]>>();
             int numberOfExamples = attributes.Count();
 
-            var protoFeatureGroups = GetAttributesProtoFeatures(attributes);
+            // Prevent multiple enumerations (else large VOA files take a long time to process)
+            // https://extract.atlassian.net/browse/ISSUE-15605
+            var protoFeatureGroups = GetAttributesProtoFeatures(attributes).ToList();
 
             // NOTE: vectorizers return an empty enumerable if not enabled
             attributeFeatures = AttributeFeatureVectorizers
