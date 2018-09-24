@@ -2,10 +2,10 @@
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.DirectoryServices.AccountManagement;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Transactions;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -57,7 +57,7 @@ namespace Extract.Dashboard.Forms
         /// Database to connect to
         /// </summary>
         public string DatabaseName { get; set; }
-        
+
         /// <summary>
         /// FAMUserID for current session
         /// </summary>
@@ -106,7 +106,6 @@ namespace Extract.Dashboard.Forms
                     {
                         var xDoc = XDocument.Load(selectForm.DashboardFile);
                         using (var connect = NewSqlDBConnection())
-                        using (var scope = new TransactionScope())
                         {
                             connect.Open();
                             var command = connect.CreateCommand();
@@ -122,7 +121,6 @@ namespace Extract.Dashboard.Forms
                             command.Parameters.AddWithValue("@FAMUserID", FAMUserID);
                             command.Parameters.Add("@Definition", SqlDbType.Xml).Value = xDoc.ToString();
                             command.ExecuteScalar();
-                            scope.Complete();
                         }
                         LoadDashboardGrid();
                     }
@@ -181,7 +179,6 @@ namespace Extract.Dashboard.Forms
                 if (dashboardDataGridView.CurrentCell.Value as string != _originalCellValue)
                 {
                     using (var connection = NewSqlDBConnection())
-                    using (var scope = new TransactionScope())
                     {
                         connection.Open();
                         var command = connection.CreateCommand();
@@ -190,7 +187,6 @@ namespace Extract.Dashboard.Forms
                         command.Parameters.AddWithValue("@OldDashboardName", _originalCellValue);
                         command.Parameters.AddWithValue("@NewDashboardName", dashboardDataGridView.CurrentCell.Value as string);
                         command.ExecuteNonQuery();
-                        scope.Complete();
                     }
                 }
             }
@@ -235,7 +231,6 @@ namespace Extract.Dashboard.Forms
                     if (MessageBox.Show(message, "Remove dashboard from database", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
                     {
                         using (var connection = NewSqlDBConnection())
-                        using (var scope = new TransactionScope())
                         {
                             connection.Open();
                             var command = connection.CreateCommand();
@@ -243,7 +238,6 @@ namespace Extract.Dashboard.Forms
                             command.CommandText = "DELETE FROM Dashboard WHERE DashboardName = @DashboardName";
                             command.Parameters.AddWithValue("@DashboardName", dashboardName);
                             command.ExecuteNonQuery();
-                            scope.Complete();
                         }
                         // reload the grid
                         LoadDashboardGrid();
@@ -266,7 +260,6 @@ namespace Extract.Dashboard.Forms
                 {
                     var xDoc = XDocument.Load(selectForm.DashboardFile);
                     using (var connect = NewSqlDBConnection())
-                    using (var scope = new TransactionScope())
                     {
                         connect.Open();
                         var command = connect.CreateCommand();
@@ -280,7 +273,6 @@ namespace Extract.Dashboard.Forms
                         command.Parameters.Add("@Definition", SqlDbType.Xml).Value = xDoc.ToString();
 
                         command.ExecuteScalar();
-                        scope.Complete();
                     }
                     // reload the grid
                     LoadDashboardGrid();
@@ -319,7 +311,7 @@ namespace Extract.Dashboard.Forms
                 {
                     connection.Open();
                     var command = connection.CreateCommand();
-                    command.CommandText = 
+                    command.CommandText =
                         "SELECT DashboardName, FullUserName, LastImportedDate FROM Dashboard " +
                             "INNER JOIN FAMUser ON Dashboard.FAMUserID = FAMUser.ID";
 
@@ -352,10 +344,10 @@ namespace Extract.Dashboard.Forms
             return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
-		/// <summary>
-		/// Gets or creats a FAMUserId fro the current user
-		/// </summary>
-		/// <returns>ID of the user in the FAMUser table</returns>
+        /// <summary>
+        /// Gets or creates a FAMUserId for the current user
+        /// </summary>
+        /// <returns>ID of the user in the FAMUser table</returns>
         int GetFAMUserID()
         {
             using (var connection = NewSqlDBConnection())
@@ -373,12 +365,14 @@ namespace Extract.Dashboard.Forms
                         IF @FAMUserID IS NULL
                         BEGIN
                         	INSERT INTO FAMUser(UserName, FullUserName)
-                        	VALUES ( @FAMUserName, @FAMUserName)
+                        	VALUES ( @FAMUserName, @FullUserName)
                         
                         	SELECT @FAMUserID = ID FROM FAMUser WHERE UserName = @FAMUserName
                         END
                         
                         SELECT @FAMUserID AS FAMUserID";
+
+                    cmd.Parameters.Add("@FullUserName", SqlDbType.NVarChar, 128).Value = UserPrincipal.Current.DisplayName;
 
                     var result = cmd.ExecuteScalar() as int?;
                     return result ?? 0;

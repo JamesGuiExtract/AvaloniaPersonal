@@ -254,9 +254,6 @@ namespace Extract.ETL
                 connection.Open();
                 try
                 {
-                    var fileTaskSessionStatus = status as IFileTaskSessionServiceStatus;
-                    int? lastFileTaskSession = fileTaskSessionStatus?.LastFileTaskSessionIDProcessed;
-
                     if (status == null)
                     {
                         using (var cmd = connection.CreateCommand())
@@ -264,17 +261,9 @@ namespace Extract.ETL
                             cmd.CommandText = @"
                                 UPDATE [DatabaseService]
                                 SET [Status] = NULL,
-                                [LastFileTaskSessionIDProcessed] = @LastFileTaskSession
+                                [LastFileTaskSessionIDProcessed] = NULL
                                 WHERE ID = @DatabaseServiceID";
                             cmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
-                            if (lastFileTaskSession is null)
-                            {
-                                cmd.Parameters.AddWithValue("@LastFileTaskSession", DBNull.Value);
-                            }
-                            else
-                            {
-                                cmd.Parameters.AddWithValue("@LastFileTaskSession", lastFileTaskSession);
-                            }
                             cmd.ExecuteNonQuery();
                         }
                     }
@@ -372,8 +361,10 @@ namespace Extract.ETL
                                         }
                                     }
                                 }
-                                fileTaskSessionServiceStatus.LastFileTaskSessionIDProcessed = lastFileTaskSessionID ??
-                                    fileTaskSessionServiceStatus.LastFileTaskSessionIDProcessed;
+                                if (lastFileTaskSessionID != null)
+                                {
+                                    fileTaskSessionServiceStatus.LastFileTaskSessionIDProcessed = (int)lastFileTaskSessionID;
+                                }
                             }
                             return status;
                         }
