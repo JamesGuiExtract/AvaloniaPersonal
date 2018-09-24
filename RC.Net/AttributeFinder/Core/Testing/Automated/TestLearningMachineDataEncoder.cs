@@ -707,6 +707,34 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(3, answers.Distinct().Count());
         }
 
+        // This test took almost 3 minutes prior to fixing the code
+        // and now it takes under 3 _seconds_ on my dev machine so fail if
+        // it takes more than 10 seconds.
+        // https://extract.atlassian.net/browse/ISSUE-15605
+        [Test, Category("LearningMachineDataEncoder"), Timeout(10000)]
+        public static void AttributeCategorizationManyAttributes()
+        {
+            SetAttributeCategorizationFiles();
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(
+                LearningMachineUsage.AttributeCategorization, null, "*@Feature")
+            {
+                AttributesToTokenizeFilter = "*"
+            };
+            encoder.ComputeEncodings(_ussFiles, _voaFiles, null);
+
+            var text = new SpatialString();
+            var attributes = new IUnknownVector();
+            text.LoadFrom(_ussFiles[3], false);
+            attributes.LoadFrom(_voaFiles[3], false);
+            attributes = Enumerable.Repeat(attributes.ToIEnumerable<IAttribute>(), 10)
+                .SelectMany(a => a)
+                .ToIUnknownVector();
+
+            var (features, labels) = encoder.GetFeatureVectorAndAnswerCollections(new[] { text }, new[] { attributes }, null, false);
+
+            Assert.AreEqual(570, features.Length);
+        }
+
         // Test attribute categorization when not every attribute is a candidate
         // This test uses date attributes that are marked DOB, CollectionDate or not marked (don't have an AttributeType subattribute)
         [Test, Category("LearningMachineDataEncoder")]
