@@ -716,7 +716,7 @@ library UCLID_RASTERANDOCRMGMTLib
 		[id(39), helpstring("method GetSpecifiedPages")] HRESULT GetSpecifiedPages([in] long nStartPageNum, 
 			[in] long nEndPageNum, [out, retval] ISpatialString** ppResultString);
 		//-----------------------------------------------------------------------------------------
-		// REQUIRE: GetMode() != kNonSpatialMode
+		// REQUIRE: GetMode() != kNonSpatialMode or vbIncludeBlankPages and SourceDocName is not empty
 		// PROMISE: Return a collection of spatial strings. Each spatial string has spatial data from only
 		//			one page.
 		//			vbIncludeBlankPages == VARIANT_TRUE will create spatial strings for the pages

@@ -1690,13 +1690,23 @@ namespace Extract.AttributeFinder
                         string range = Enumerable
                             .Range(firstPageInRange, lastPageInRange - firstPageInRange + 1)
                             .ToRangeString();
-                        SpatialString ss;
+                        SpatialString ss = null;
                         if (sourceDocument != null)
                         {
-                            // Get OCRed text for the page range for the Document value
-                            ss = sourceDocument.GetSpecifiedPages(firstPageInRange, lastPageInRange);
+                            // If this logical document is the entire page range then
+                            // simply clone the input
+                            if (firstPageInRange == 1 && lastPageInRange == numberOfPages)
+                            {
+                                ss = (SpatialString)((ICopyableObject)sourceDocument).Clone();
+                            }
+                            // Else if it is spatial, get OCRed text for the page range for the Document value
+                            else if (sourceDocument.HasSpatialInfo())
+                            {
+                                ss = sourceDocument.GetSpecifiedPages(firstPageInRange, lastPageInRange);
+                            }
                         }
-                        else
+
+                        if (ss == null)
                         {
                             ss = new SpatialStringClass();
                         }
