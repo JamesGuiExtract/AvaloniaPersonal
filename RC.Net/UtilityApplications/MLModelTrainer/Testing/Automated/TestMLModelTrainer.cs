@@ -4,6 +4,7 @@ using Extract.Testing.Utilities;
 using Extract.Utilities;
 using Extract.UtilityApplications.TrainingDataCollector;
 using Extract.UtilityApplications.TrainingDataCollector.Test;
+using LearningMachineTrainer;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
@@ -427,6 +428,66 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
 
                 lm = LearningMachine.Load(dest);
                 Assert.That(lm.IsTrained);
+            }
+            finally
+            {
+                // Remove the modified LM
+                _testFiles.RemoveFile("Resources.docClassifier.lm");
+
+                TestTrainingDataCollector.FinalCleanup();
+            }
+        }
+
+        // Check to make sure the different classifier types are loadable by the trainer app
+        // https://extract.atlassian.net/browse/ISSUE-15486
+        [Test, Category("MLModelTrainer")]
+        public static void TestLearningMachineSerialization()
+        {
+            try
+            {
+                TestTrainingDataCollector.Setup();
+                TestTrainingDataCollector.CreateDatabase();
+                TestTrainingDataCollector.Process(learningMachine: true);
+
+                _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
+                Directory.CreateDirectory(_inputFolder.Last());
+
+                var dest = _testFiles.GetFile("Resources.docClassifier.lm");
+                LearningMachine lm = LearningMachine.Load(dest);
+
+                void train()
+                {
+
+                    Assert.That(!lm.IsTrained);
+                    var trainer = new MLModelTrainer
+                    {
+                        ModelType = ModelType.LearningMachine,
+                        ModelName = _MODEL_NAME,
+                        ModelDestination = dest,
+                        MaximumTrainingRecords = 10000,
+                        MaximumTestingRecords = 10000,
+                        DatabaseServer = "(local)",
+                        DatabaseName = TestTrainingDataCollector.DBName
+                    };
+
+                    trainer.Process(CancellationToken.None);
+
+                    lm = LearningMachine.Load(dest);
+                    Assert.That(lm.IsTrained);
+                }
+
+                Assert.That(lm.Classifier is IMulticlassSupportVectorMachineModel);
+                train();
+
+                lm.Classifier = new MultilabelSupportVectorMachineClassifier();
+                lm.Save(dest);
+                lm = LearningMachine.Load(dest);
+                train();
+
+                lm.Classifier = new NeuralNetworkClassifier();
+                lm.Save(dest);
+                lm = LearningMachine.Load(dest);
+                train();
             }
             finally
             {
