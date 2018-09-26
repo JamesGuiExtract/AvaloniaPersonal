@@ -5,6 +5,7 @@ using Extract;
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace DashboardViewer
@@ -25,7 +26,7 @@ namespace DashboardViewer
                 LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI45312",
                     Application.ProductName);
 
-                if (args.Length > 9)
+                if (args.Length > 9 || args.Contains("/?") || args.Contains("/h", StringComparer.OrdinalIgnoreCase))
                 {
                     Usage();
                     return;

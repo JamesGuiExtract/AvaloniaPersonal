@@ -4,6 +4,7 @@ using Extract;
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace DashboardCreator
@@ -22,7 +23,7 @@ namespace DashboardCreator
                 LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI45312",
                     Application.ProductName);
 
-                if (args.Length > 1)
+                if (args.Length > 1 || args.Contains("/?") || args.Contains("/h", StringComparer.OrdinalIgnoreCase))
                 {
                     Usage();
                 }
