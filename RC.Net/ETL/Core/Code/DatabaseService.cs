@@ -9,6 +9,7 @@ using System.Data.SqlClient;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.ETL
 {
@@ -22,9 +23,11 @@ namespace Extract.ETL
     {
         bool _enabled = true;
         int _databaseServiceID;
-        string _databaseService = string.Empty;
+        string _databaseServer = string.Empty;
         string _databaseName = string.Empty;
         string _description = string.Empty;
+
+        FileProcessingDB _famDB = null;
 
         /// <summary>
         /// Description of the database service item
@@ -87,13 +90,13 @@ namespace Extract.ETL
         {
             get
             {
-                return _databaseService;
+                return _databaseServer;
             }
             set
             {
-                if (_databaseService != value)
+                if (_databaseServer != value)
                 {
-                    _databaseService = value;
+                    _databaseServer = value;
 
                     if (this is IHasConfigurableDatabaseServiceStatus hasStatus)
                     {
@@ -141,6 +144,11 @@ namespace Extract.ETL
                 }
             }
         }
+
+        /// <summary>
+        /// If the DatabaseService can use multiple threads this is the max number of threads the service should use for processing
+        /// </summary>
+        public int NumberOfProcessingThreads { get; set; } = 1;
 
         [DataMember]
         public ScheduledEvent Schedule { get; set; }
@@ -212,7 +220,7 @@ namespace Extract.ETL
             try
             {
                 return JsonConvert.SerializeObject(this,
-                    new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects, Formatting = Formatting.Indented });
+                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects, Formatting = Formatting.Indented });
             }
             catch (Exception ex)
             {
@@ -229,11 +237,80 @@ namespace Extract.ETL
             try
             {
                 return (DatabaseService)JsonConvert.DeserializeObject(settings,
-                    new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
+                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects });
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45387");
+            }
+        }
+
+        /// <summary>
+        /// Starts a FAMSession and ActiveFAM record for the DatabaseService 
+        /// </summary>
+        /// <returns></returns>
+        public bool StartActiveSchedule()
+        {
+            if (IsScheduleActive())
+            {
+                return false;
+            }
+            if (_famDB is null)
+            {
+                _famDB = new FileProcessingDB();
+                _famDB.DatabaseName = _databaseName;
+                _famDB.DatabaseServer = _databaseServer;
+            }
+            _famDB.RecordFAMSessionStart("ETL: " + Description, string.Empty, false, false);
+            _famDB.RegisterActiveFAM();
+            return true;
+        }
+
+        /// <summary>
+        /// Stops and Active FAMSession for the service 
+        /// </summary>
+        public void StopActiveSchedule()
+        {
+            if (_famDB != null && _famDB.FAMSessionID > 0)
+            {
+                _famDB.UnregisterActiveFAM();
+                _famDB.RecordFAMSessionStop();
+                _famDB.CloseAllDBConnections();
+            }
+        }
+
+        /// <summary>
+        /// Checks if there is an active FAMSession from the database service registered in the database
+        /// This could be running on any machine
+        /// </summary>
+        /// <returns></returns>
+        public bool IsScheduleActive()
+        {
+            if (_famDB is null)
+            {
+                _famDB = new FileProcessingDB();
+                _famDB.DatabaseName = _databaseName;
+                _famDB.DatabaseServer = _databaseServer;
+            }
+
+            // Trigger to clean up timed out ActiveFAM instances.
+            _famDB.IsAnyFAMActive();
+
+            using (var connection = NewSqlDBConnection())
+            {
+                connection.Open();
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT [ActiveFAM].[ID] FROM [ActiveFAM] " +
+                    "   INNER JOIN [FAMSession] ON [FAMSessionID] = [FAMSession].[ID]" +
+                    "   INNER JOIN [FPSFile] ON [FPSFileID] = [FPSFile].[ID]" +
+                    "   WHERE [FPSFileName] = @ETLProcess";
+
+                    cmd.Parameters.Add("@ETLProcess", SqlDbType.NVarChar, 512).Value = "ETL: " + Description;
+                    var result = cmd.ExecuteScalar();
+
+                    return result != null;
+                }
             }
         }
 
@@ -399,10 +476,10 @@ namespace Extract.ETL
                         cmd.CommandText = @"
                             SELECT COALESCE(MIN(CASE WHEN ActiveFAM.ID IS NOT NULL AND DateTimeStamp IS NULL THEN FileTaskSession.ID END) - 1,
                                     MAX(FileTaskSession.ID))
-	                            FROM FileTaskSession
-								INNER JOIN TaskClass ON TaskClass.ID = FileTaskSession.TaskClassID
-	                            LEFT JOIN FAMSession ON FAMSessionID = FAMSession.ID
-	                            LEFT JOIN ActiveFAM ON FAMSession.ID = ActiveFAM.FAMSessionID 
+                                FROM FileTaskSession
+                                INNER JOIN TaskClass ON TaskClass.ID = FileTaskSession.TaskClassID
+                                LEFT JOIN FAMSession ON FAMSessionID = FAMSession.ID
+                                LEFT JOIN ActiveFAM ON FAMSession.ID = ActiveFAM.FAMSessionID 
                         ";
 
                         if (storeTaskOnly)
@@ -444,6 +521,12 @@ namespace Extract.ETL
                 // Dispose of managed resources
                 Schedule?.Dispose();
                 Schedule = null;
+
+                if (_famDB != null)
+                {
+                    _famDB.CloseAllDBConnections();
+                    _famDB = null;
+                }
             }
 
             // Dispose of unmanaged resources

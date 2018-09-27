@@ -3,6 +3,7 @@ using Extract.ETL;
 using Extract.Utilities;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Linq;
@@ -66,6 +67,23 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         object _processingLock = new object();
 
+        /// <summary>
+        /// Recommended number of threads the DatabaseService should use when processing, obtained from the NumberOfInstances column
+        /// int the ESFAMService.sdf FPSFile table
+        /// </summary>
+        int _numberOfThreads;
+
+        /// <summary>
+        /// The text that specifies the ETL process that should be ran "ETL" means all but the ones specified separately
+        /// if "ETL: ServiceDescription"  the ServiceDescription is the Description text for the DatabaseService to run
+        /// </summary>
+        string _etlString;
+
+        /// <summary>
+        /// A list used when the _etlString is "ETL" to exclude from running since they will be running separately
+        /// </summary>
+        List<string> _excludedETLProcesses = null;
+
         #endregion Fields
 
         #region Constructors
@@ -78,6 +96,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
+                _etlString = "ETL";
                 _oleDbConnection = new OleDbConnection(connectionString);
                 _oleDbConnection.Open();
 
@@ -93,6 +112,43 @@ namespace Extract.FileActionManager.Utilities
                 throw ex.AsExtract("ELI45412");
             }
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabaseServiceManager"/> class.
+        /// If the processString is "ETL" all enabled ETL processes that are not in the ETLProcesses list
+        /// excluding in the given processString will be processed on at a time
+        /// 
+        /// </summary>
+        /// <param name="processString">The string from the FAMService configuration format of "ETL" or "ETL: DatabaseServiceName</param>
+        /// <param name="ServerName">Database server name for ETL processes</param>
+        /// <param name="DatabaseName">Database Name for ETL processes</param>
+        /// <param name="ETLProcesses">The list of the ETL processes from FAM Service configuration format of "ETL" or "ETL: DatabaseServiceName"</param>
+        public DatabaseServiceManager(string processString, string ServerName, string DatabaseName, List<string> ETLProcesses, int numberOfThreads)
+        {
+            try
+            {
+                _numberOfThreads = numberOfThreads;
+                _etlString = processString;
+                if (processString == "ETL" && ETLProcesses != null)
+                {
+                    _excludedETLProcesses = ETLProcesses.Where(e => e != _etlString).ToList();
+                }
+                _fileProcessingDb = new FileProcessingDB();
+                _fileProcessingDb.DatabaseServer = ServerName;
+                _fileProcessingDb.DatabaseName = DatabaseName;
+
+                _oleDbConnection = new OleDbConnection(_fileProcessingDb.ConnectionString);
+                _oleDbConnection.Open();
+
+                TryStart();
+            }
+            catch (Exception ex)
+            {
+                _stoppedEvent.Set();
+                throw ex.AsExtract("ELI46271");
+            }
+        }
+
 
         #endregion Constructors
 
@@ -289,6 +345,7 @@ namespace Extract.FileActionManager.Utilities
                             {
                                 Thread.Sleep(1000);
                             }
+                            dbService.Value.StopActiveSchedule();
 
                             dbService.Value.Dispose();
                         }
@@ -382,11 +439,14 @@ namespace Extract.FileActionManager.Utilities
                 // Trigger to clean up timed out ActiveFAM instances.
                 _fileProcessingDb.IsAnyFAMActive();
 
-                if (DBMethods.GetQueryResultsAsStringArray(_oleDbConnection,
-                    "SELECT [ActiveFAM].[ID] FROM [ActiveFAM] " +
+                string query = "SELECT [ActiveFAM].[ID] FROM [ActiveFAM] " +
                     "   INNER JOIN [FAMSession] ON [FAMSessionID] = [FAMSession].[ID]" +
                     "   INNER JOIN [FPSFile] ON [FPSFileID] = [FPSFile].[ID]" +
-                    "   WHERE [FPSFileName] LIKE 'ETL%'").Any())
+                    "   WHERE [FPSFileName] LIKE '<ETLProcess>'";
+
+                query = query.Replace("<ETLProcess>", _etlString + " Manager");
+
+                if (DBMethods.GetQueryResultsAsStringArray(_oleDbConnection, query).Any())
                 {
                     // There is already another service executing ETL on this database;
                     // check every 5 minutes to see if other ETL services are still running.
@@ -399,7 +459,9 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 _stoppedEvent.Set();
-                new ExtractException("ELI45413", "ETL failed before start", ex).Log();
+                var e = new ExtractException("ELI45413", "ETL failed before start", ex);
+                e.AddDebugData("ETL process", _etlString, false);
+                e.Log();
                 return;
             }
 
@@ -415,25 +477,37 @@ namespace Extract.FileActionManager.Utilities
             {
                 lock (_lock)
                 {
-                    _fileProcessingDb.RecordFAMSessionStart("ETL Manager", string.Empty, false, false);
+                    _fileProcessingDb.RecordFAMSessionStart(_etlString + " Manager", string.Empty, false, false);
                     _fileProcessingDb.RegisterActiveFAM();
 
                     _running = true;
+                    string query = "SELECT [ID], [Settings] FROM [DatabaseService] WHERE Enabled = 1";
+                    if (!_etlString.Equals("ETL", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string etlDescription = _etlString.Substring(_etlString.IndexOf(":") + 1).Trim();
+                        query += " AND Description = '" + etlDescription + "'";
+                    }
 
-                    using (DataTable dbServiceDefinitions = DBMethods.ExecuteDBQuery(
-                                _oleDbConnection, "SELECT [ID], [Settings] FROM [DatabaseService] WHERE Enabled = 1"))
+                    using (DataTable dbServiceDefinitions = DBMethods.ExecuteDBQuery(_oleDbConnection, query))
                     {
                         foreach (DataRow dbServiceRow in dbServiceDefinitions.Rows)
                         {
                             var dbService = DatabaseService.FromJson((string)dbServiceRow["Settings"]);
 
-                            if (_databaseServices.TryAdd(dbService.Schedule, dbService))
+                            if (_excludedETLProcesses is null ||
+                                !_excludedETLProcesses.Contains("ETL: " + dbService.Description, StringComparer.OrdinalIgnoreCase))
                             {
                                 dbService.DatabaseServiceID = (int)dbServiceRow["ID"];
                                 dbService.DatabaseServer = _oleDbConnection.DataSource;
                                 dbService.DatabaseName = _oleDbConnection.Database;
-                                _inEventStarted[dbService.Schedule] = false;
-                                dbService.Schedule.EventStarted += HandleScheduleEvent_EventStarted;
+
+                                if (!dbService.IsScheduleActive() && _databaseServices.TryAdd(dbService.Schedule, dbService))
+                                {
+                                    _inEventStarted[dbService.Schedule] = false;
+                                    dbService.NumberOfProcessingThreads = _numberOfThreads;
+                                    dbService.StartActiveSchedule();
+                                    dbService.Schedule.EventStarted += HandleScheduleEvent_EventStarted;
+                                }
                             }
                         }
                     }

@@ -150,16 +150,25 @@ namespace Extract.FileActionManager.Utilities
         volatile int _threadsThatRequireAuthentication;
 
         /// <summary>
-        /// Associates all connection strings encountered for FAM instances with a
-        /// <see cref="DatabaseServiceManager"/> to run against the database.
+        /// List of <see cref="DatabaseServiceManager"/> to run against the database.
         /// </summary>
-        ConcurrentDictionary<string, DatabaseServiceManager> _databaseServiceManagers =
-            new ConcurrentDictionary<string, DatabaseServiceManager>();
+        ConcurrentBag<DatabaseServiceManager> _databaseServiceManagers = new ConcurrentBag<DatabaseServiceManager>();
 
         /// <summary>
         /// Mutex to provide synchronized access to data.
         /// </summary>
         readonly object _lock = new object();
+
+        /// <summary>
+        /// Database server to run the configured ETL processes
+        /// </summary>
+        string _etlDatabaseServer;
+
+        /// <summary>
+        /// Name of the database to run configured ETL processes 
+        /// </summary>
+        string _etlDatabaseName;
+
 
         #endregion Fields
 
@@ -205,8 +214,13 @@ namespace Extract.FileActionManager.Utilities
                 }
 
                 // Get the list of FPS file processing arguments from the database
-                List<ProcessingThreadArguments> fpsFileArguments =
+                List<ProcessingThreadArguments> processingFileArguments =
                     GetFpsFileProcessingArguments(dbManager);
+
+                // Get just the fps files
+                var fpsFileArguments = processingFileArguments
+                    .Where(f => f.FpsFileName.EndsWith(".fps", StringComparison.OrdinalIgnoreCase))
+                    .ToList();
 
                 // [DNRCAU #357] - Log application trace when service is starting
                 ExtractException ee2 = new ExtractException("ELI28772",
@@ -231,6 +245,37 @@ namespace Extract.FileActionManager.Utilities
                     // Start the thread in a Multithreaded apartment
                     thread.SetApartmentState(ApartmentState.MTA);
                     thread.Start(threadData);
+                }
+
+                // Get just the unique ETL processes
+                var etlArguments = dbManager.GetFpsFileData(true)
+                    .Where(d => d.FileName.StartsWith("ETL", StringComparison.OrdinalIgnoreCase))
+                    .GroupBy(g => g.FileName)
+                    .Select(g => g.First())
+                    .ToList();
+
+                // check for database settings for ETL
+                if (etlArguments.Count > 0)
+                {
+                    // Since there are ETL processes to run the settings need to have a database and server specified
+                    dbManager.Settings.TryGetValue("ETL_DBServer", out _etlDatabaseServer);
+                    dbManager.Settings.TryGetValue("ETL_DBName", out _etlDatabaseName);
+
+                    if (string.IsNullOrEmpty(_etlDatabaseServer) || string.IsNullOrEmpty(_etlDatabaseName))
+                    {
+                        ExtractException etlException = new ExtractException("ELI46269",
+                            "ETL processes are configured to run in the service but no database is configured in Settings.");
+                        etlException.AddDebugData("ETL_DBServer", _etlDatabaseServer ?? "", false);
+                        etlException.AddDebugData("ETL_DBName", _etlDatabaseName ?? "", false);
+                        throw etlException;
+                    }
+
+                    List<string> etlProcesses = etlArguments.Select(e => e.FileName).ToList();
+                    foreach (var etl in etlArguments)
+                    {
+                        _databaseServiceManagers.Add(
+                            new DatabaseServiceManager(etl.FileName, _etlDatabaseServer, _etlDatabaseName, etlProcesses, etl.NumberOfInstances ));
+                    }
                 }
             }
             catch (Exception ex)
@@ -537,19 +582,6 @@ namespace Extract.FileActionManager.Utilities
                         {
                             // Start processing
                             famProcess.Start(numberOfFilesToProcess);
-
-                            // Spawn a DatabaseServiceManager instance for the database if one has
-                            // not been spawned already.
-                            if (_databaseServiceManagers.TryAdd(famProcess.ConnectionString, null))
-                            {
-                                // Don't actually create the instance until we know this thread got
-                                // the slot in _databaseServiceManagers since the manager
-                                // constructor will start the manager. (Given time, that design might
-                                // be best reconsidered).
-                                ExtractException.Assert("ELI46062", "Failed to create service manager",
-                                    _databaseServiceManagers.TryUpdate(famProcess.ConnectionString,
-                                        new DatabaseServiceManager(famProcess.ConnectionString), null));
-                            }
 
                             ExtractException ee = new ExtractException("ELI29808",
                                 "Application trace: Started new FAM instance.");
@@ -1126,11 +1158,10 @@ namespace Extract.FileActionManager.Utilities
 
                 foreach (var dbServiceManager in _databaseServiceManagers)
                 {
-                    dbServiceManager.Value.Stop();
+                    dbServiceManager.Stop();
                 }
 
                 var stoppedEvents = _databaseServiceManagers
-                    .Values
                     .Select(mgr => mgr.StoppedWaitHandle)
                     .Cast<WaitHandle>()
                     .ToArray();
@@ -1172,7 +1203,15 @@ namespace Extract.FileActionManager.Utilities
                         _threadsStopped = null;
                     }
 
-                    CollectionMethods.ClearAndDispose(_databaseServiceManagers);
+                    // Dispose of the DatabaseServiceManagers
+                    for (int i = 0; i < _databaseServiceManagers.Count; i++)
+                    {
+                        DatabaseServiceManager manager;
+                        if (_databaseServiceManagers.TryTake(out manager))
+                        {
+                            manager.Dispose();
+                        }
+                    }
 
                     // Set the threads that required authentication back to 0
                     _threadsThatRequireAuthentication = 0;
