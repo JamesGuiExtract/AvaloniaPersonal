@@ -488,6 +488,7 @@ namespace Extract.ETL
             var lookup = statsToStore.ToLookup(a => new { a.Path, a.Label });
 
             var attributePaths = statsToStore
+                .Where( c => c.Label != AccuracyDetailLabel.ContainerOnly)
                 .Select(a => a.Path)
                 .Distinct()
                 .OrderBy(p => p)

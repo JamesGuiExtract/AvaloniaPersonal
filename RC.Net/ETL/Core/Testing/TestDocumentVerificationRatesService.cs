@@ -138,8 +138,7 @@ namespace Extract.ETL.Test
         static public void TestDocumentVerificationStatusSerialization()
         {
             DocumentVerificationStatus serviceStatus = new DocumentVerificationStatus();
-            serviceStatus.LastFileTaskSessionIDProcessed = 1;
-
+            
             string settings = serviceStatus.ToJson();
 
             DocumentVerificationStatus testStatus = (DocumentVerificationStatus) DocumentVerificationStatus.FromJson(settings);
@@ -195,14 +194,15 @@ namespace Extract.ETL.Test
                 CheckResults(rates, _PROCESS1_EXPECTED);
 
                 // Check the status
-                var status = GetStatus(rates);
+                var status = rates.Status as DocumentVerificationStatus;
+
                 Assert.AreEqual(status.LastFileTaskSessionIDProcessed, 1, "LastFileTaskSessionIDProcessed is 1.");
                 Assert.That(status.SetOfActiveFileTaskIds.Count == 0, "SetOfActiveFileTaskIds is no longer used.");
 
                 fileProcessingDb.UpdateFileTaskSession(fileTaskSessionID, 20.0, 2.0, 20.0);
                 rates.Process(_noCancel);
 
-                status = GetStatus(rates);
+                status = rates.Status as DocumentVerificationStatus;
                 Assert.AreEqual(status.LastFileTaskSessionIDProcessed, 2, "LastFileTaskSessionIDProcessed is 2.");
                 Assert.That(status.SetOfActiveFileTaskIds.Count == 0 , "SetOfActiveFileTaskIds is no longer used.");
 
