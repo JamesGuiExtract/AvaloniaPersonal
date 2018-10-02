@@ -30,7 +30,7 @@ namespace WebAPI.Models
 
             try
             {
-                Contract.Assert(apiContext != null, "empty API context used");
+                HTTPError.Assert("ELI46389", apiContext != null, "empty API context used");
 
                 lock (_lock)
                 {
@@ -43,13 +43,14 @@ namespace WebAPI.Models
                         var requestedSessionId = sessionOwner?.GetClaim(JwtRegisteredClaimNames.Jti);
                         if (fileApi.Expired ||
                             (!string.IsNullOrWhiteSpace(requestedSessionId) &&
-                                (fileApi.SessionId != apiContext.SessionId || requestedFAMSessionId != fileApi.FAMSessionId)))
+                                (requestedFAMSessionId != 0 &&
+                                 (fileApi.SessionId != apiContext.SessionId || requestedFAMSessionId != fileApi.FAMSessionId))))
                         {
                             // If a FAM session was requested the returned instance is expired or is not for that session,
                             // abort the old session.
                             fileApi?.AbortSession(requestedFAMSessionId);
 
-                            throw new RequestAssertion("ELI45230", "Session expired", StatusCodes.Status401Unauthorized);
+                            throw new HTTPError("ELI45230", StatusCodes.Status401Unauthorized, "Session expired");
                         }
 
                         fileApi.InUse = true;
@@ -63,7 +64,7 @@ namespace WebAPI.Models
                         {
                             fileApi.AbortSession(requestedFAMSessionId);
 
-                            throw new RequestAssertion("ELI46255", "Session expired", StatusCodes.Status401Unauthorized);
+                            throw new HTTPError("ELI46255", StatusCodes.Status401Unauthorized, "Session expired");
                         }
 
                         _interfaces.Add(fileApi);
@@ -73,7 +74,7 @@ namespace WebAPI.Models
                     return fileApi;
                 }
             }
-            catch (RequestAssertion re)
+            catch (HTTPError re)
             {
                 // fileApi session is already aborted.
                 throw re;

@@ -33,13 +33,16 @@ namespace WebAPI.Models
                           string numberOfConnectionRetries = "",
                           string connectionRetryTimeout = "")
         {
-            Contract.Assert(!String.IsNullOrWhiteSpace(databaseServerName), "Database server name is empty");
+            HTTPError.Assert("ELI46375", !String.IsNullOrWhiteSpace(databaseServerName),
+                "Database server name is empty");
             DatabaseServerName = databaseServerName;
 
-            Contract.Assert(!String.IsNullOrWhiteSpace(databaseName), "Database name is empty");
+            HTTPError.Assert("ELI46376", !String.IsNullOrWhiteSpace(databaseName),
+                "Database name is empty");
             DatabaseName = databaseName;
 
-            Contract.Assert(!String.IsNullOrWhiteSpace(workflowName), "Workflow name is empty");
+            HTTPError.Assert("ELI46377", !String.IsNullOrWhiteSpace(workflowName),
+                "Workflow name is empty");
             WorkflowName = workflowName;
 
             var numberOfRetries =
@@ -50,7 +53,7 @@ namespace WebAPI.Models
             bool parsed = Int32.TryParse(numberOfRetries, out int retries);
             if (parsed)
             {
-                Contract.Assert(retries > 0, "Number of DB connection retries must be > 0");
+                HTTPError.Assert("ELI46378", retries > 0, "Number of DB connection retries must be > 0");
                 NumberOfConnectionRetries = retries;
             }
 

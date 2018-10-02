@@ -1,11 +1,12 @@
 ﻿using UCLID_FILEPROCESSINGLib;
 using System;
 using static WebAPI.Utils;
+using System.Collections.Generic;
 
 namespace WebAPI.Models
 {
     /// <summary>
-    /// Workflow data model
+    /// Describes a workflow configuration.
     /// </summary>
     public class Workflow
     {
@@ -21,12 +22,11 @@ namespace WebAPI.Models
         {
             get
             {
-                Contract.Assert(_id > 0, "attempt to get Id, bad value: {0}", _id);
                 return _id;
             }
             private set
             {
-                Contract.Assert(value > 0, "attempt to set bad value for Id: {0}", value);
+                HTTPError.Assert("ELI46379", value > 0, "Invalid workflow ID", ("WorkflowID", value, false));
                 _id = value;
             }
         }
@@ -38,12 +38,12 @@ namespace WebAPI.Models
         {
             get
             {
-                Contract.Assert(!String.IsNullOrWhiteSpace(_name), "Attempt to get: {0}, bad value: {1}", GetMethodName(), _name);
                 return _name;
             }
             private set
             {
-                Contract.Assert(!String.IsNullOrWhiteSpace(value), "Attempt to set: {0}, to bad value: {1}", GetMethodName(), value);
+                HTTPError.Assert("ELI46381", !String.IsNullOrWhiteSpace(value),
+                    "Invalid workflow name", ("WorkflowName", value, false));
                 _name = value;
             }
         }
@@ -66,12 +66,12 @@ namespace WebAPI.Models
         /// <summary>
         /// Gets or sets the post verify action.
         /// </summary>
-        public string VerifyAction { get; set; }
+        public string EditAction { get; set; }
 
         /// <summary>
         /// The action to be queued after verification
         /// </summary>
-        public string PostVerifyAction { get; set; }
+        public string PostEditAction { get; set; }
 
         /// <summary>
         /// The exit action for the workflow
@@ -110,7 +110,8 @@ namespace WebAPI.Models
             }
             private set
             {
-                Contract.Assert(!String.IsNullOrWhiteSpace(value), "Attempt to set DatabaseServerName to an empty value");
+                HTTPError.Assert("ELI46382", !String.IsNullOrWhiteSpace(value),
+                    "Attempt to set DatabaseServerName to an empty value");
                 _databaseServerName = value;
             }
         }
@@ -126,7 +127,8 @@ namespace WebAPI.Models
             }
             private set
             {
-                Contract.Assert(!String.IsNullOrWhiteSpace(value), "Attempt to set DatabaseName to an empty value");
+                HTTPError.Assert("ELI46383", !String.IsNullOrWhiteSpace(value),
+                    "Attempt to set DatabaseName to an empty value");
                 _databaseName = value;
             }
         }
@@ -144,8 +146,8 @@ namespace WebAPI.Models
             Type = wd.Type;
             Description = wd.Description;
             StartAction = wd.StartAction;
-            VerifyAction = wd.VerifyAction;
-            PostVerifyAction = wd.PostVerifyAction;
+            EditAction = wd.EditAction;
+            PostEditAction = wd.PostEditAction;
             EndAction = wd.EndAction;
             PostWorkflowAction = wd.PostWorkflowAction;
             DocumentFolder = wd.DocumentFolder;
@@ -155,36 +157,5 @@ namespace WebAPI.Models
             DatabaseServerName = databaseServerName;
             DatabaseName = databaseName;
         }
-    }
-
-    /// <summary>
-    /// overall status information of a workflow
-    /// </summary>
-    public class WorkflowStatus : IResultData
-    {
-        /// <summary>
-        /// error information, when Error.ErrorOccurred == true
-        /// </summary>
-        public ErrorInfo Error { get; set; }
-
-        /// <summary>
-        /// number of documents processing
-        /// </summary>
-        public int NumberProcessing { get; set; }
-
-        /// <summary>
-        /// number of documents done processing
-        /// </summary>
-        public int NumberDone { get; set; }
-
-        /// <summary>
-        /// number of documents that have failed
-        /// </summary>
-        public int NumberFailed { get; set; }
-
-        /// <summary>
-        /// number of document submitted but that are no longer progressing through the workflow.
-        /// </summary>
-        public int NumberIncomplete { get; set; }
     }
 }

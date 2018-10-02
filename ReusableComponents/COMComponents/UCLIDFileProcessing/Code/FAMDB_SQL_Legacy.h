@@ -196,7 +196,7 @@ static const string gstrCREATE_WORKFLOW_V143 =
 	"	[OutputFileMetadataFieldID] INT, "
 	"	CONSTRAINT [IX_WorkflowName] UNIQUE NONCLUSTERED ([Name]))";
 
-// Used for schema versions 146 - 147
+// Used for schema versions 146 - 168
 static const string gstrCREATE_WORKFLOW_V146 =
 "CREATE TABLE [dbo].[Workflow]( "
 "	[ID] INT IDENTITY(1, 1) NOT NULL CONSTRAINT [PK_Workflow] PRIMARY KEY CLUSTERED, "
@@ -300,3 +300,10 @@ static const string gstrCREATE_DASHBOARD_TABLE_V164 =
 "CREATE TABLE [dbo].[Dashboard]( "
 "	[DashboardName] [nvarchar](100) NOT NULL CONSTRAINT [PK_Dashboard] PRIMARY KEY CLUSTERED, "
 "	[Definition] [xml] NOT NULL )";
+
+// used for schema version 145 to 168
+static const string gstrCREATE_WORKFLOWFILE_V145 =
+"CREATE TABLE dbo.[WorkflowFile]( "
+"	[WorkflowID] INT NOT NULL, "
+"	[FileID] INT NOT NULL, "
+"	CONSTRAINT [PK_WorkflowFile] PRIMARY KEY CLUSTERED ([WorkflowID], [FileID]));";

@@ -1,13 +1,11 @@
 ﻿using Extract;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Concurrent;
 
 namespace WebAPI.Models
 {
     /// <summary>
-    /// data model for User(Controller)
+    /// Data model for <see cref="UsersController"/>.
     /// </summary>
     public sealed class UserData: IDisposable
     {
@@ -64,8 +62,8 @@ namespace WebAPI.Models
                 }
                 catch (Exception ex)
                 {
-                    throw new RequestAssertion("ELI45178", "Unknown user or password",
-                        StatusCodes.Status401Unauthorized, ex);
+                    throw new HTTPError("ELI45178", StatusCodes.Status401Unauthorized,
+                        "Unknown user or password", ex);
                 }
 
                 // The workflow will have already been validated by FileApi constructor.

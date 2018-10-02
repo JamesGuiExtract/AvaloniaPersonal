@@ -1,7 +1,9 @@
 ﻿using Extract;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Formatters;              // for HttpNoContentOutputFormatter
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
@@ -78,6 +80,11 @@ namespace WebAPI
                             .AllowAnyHeader()
                             .AllowCredentials()));
 
+                // The ApplicationPartManager and ActionContextAccessor are need by Swashbuckle/Swagger
+                var manager = new ApplicationPartManager();
+                manager.ApplicationParts.Add(new AssemblyPart(typeof(Startup).Assembly));
+                services.AddSingleton(manager);
+                services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
                 services.AddMvc(options =>
                 {
                     // Remove the HttpNoContentOutputFormatter, so that null object will be represented
@@ -94,10 +101,10 @@ namespace WebAPI
 
                 services.AddSwaggerGen(config =>
                 {
-                    config.SwaggerDoc("ExtractAPI", 
+                    config.SwaggerDoc("DocumentAPI",
                         new Info
                         {
-                            Title = "ExtractAPI",
+                            Title = "Extract Document API",
                             Description = "Extract Document API documentation",
                             Contact = new Contact
                             {
@@ -105,7 +112,7 @@ namespace WebAPI
                                 Email = "developers@extractsystems.com",
                                 Url = "http://www.extractsystems.com"
                             },
-                            Version = "1.0",
+                            Version = "2.0",
                             License = new License
                             {
                                 Name = "Use under Extract Systems license",
@@ -153,7 +160,7 @@ namespace WebAPI
                 app.UseSwagger();
                 app.UseSwaggerUI(config =>
                 {
-                    config.SwaggerEndpoint("/swagger/ExtractAPI/swagger.json", "ExtractAPI");
+                    config.SwaggerEndpoint("/swagger/DocumentAPI/swagger.json", "DocumentAPI");
                 });
 
                 app.UseMvc();

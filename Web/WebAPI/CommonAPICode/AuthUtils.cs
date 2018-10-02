@@ -45,7 +45,8 @@ namespace WebAPI
             set
             {
                 var ts = TimeSpan.FromSeconds(Convert.ToDouble(value));
-                Contract.Assert(value > 0 && ts < TimeSpan.FromHours(24), "Invalid value for token timeout seconds: {0}", value);
+                HTTPError.Assert("ELI46374", value > 0 && ts < TimeSpan.FromHours(24),
+                    "Token timeout out of range", ("seconds", value, true));
                 _expiration = ts;
             }
         }
@@ -82,7 +83,7 @@ namespace WebAPI
                     new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(now).ToString(), ClaimValueTypes.Integer64),
 
                     // Add custom claims. The workflow name may be from the user login request.
-                    new Claim("WorkflowName", context.WorkflowName),
+                    new Claim(_WORKFLOW_NAME, context.WorkflowName),
                     new Claim("FAMSessionId", context.FAMSessionId.ToString(CultureInfo.InvariantCulture))
                 };
 

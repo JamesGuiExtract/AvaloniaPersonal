@@ -1,4 +1,6 @@
 ﻿using Extract;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,11 +13,10 @@ using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_IMAGEUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
+using static WebAPI.Utils;
 using AttributeDBMgr = AttributeDbMgrComponentsLib.AttributeDBMgr;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 using EActionStatus = UCLID_FILEPROCESSINGLib.EActionStatus;
-using static WebAPI.Utils;
-using Newtonsoft.Json;
 
 namespace WebAPI.Models
 {
@@ -24,6 +25,8 @@ namespace WebAPI.Models
     /// </summary>
     public sealed class DocumentData: IDisposable
     {
+        const string _WEB_VERIFY_TASK_GUID = "FD7867BD-815B-47B5-BAF4-243B8C44AABB";
+
         ApiContext _apiContext;
         AttributeDBMgr _attributeDbMgr;
         FileApi _fileApi;
@@ -140,7 +143,7 @@ namespace WebAPI.Models
         {
             try
             {
-                ExtractException.Assert("ELI45234", "No active user", _user != null);
+                HTTPError.AssertRequest("ELI45234", _user != null, "No active user");
 
                 try
                 {
@@ -170,14 +173,13 @@ namespace WebAPI.Models
         /// <summary>
         /// Gets the settings for the web application
         /// </summary>
-        public WebAppSettings GetSettings()
+        public WebAppSettingsResult GetSettings()
         {
             try
             {
                 var json = FileApi.FileProcessingDB.LoadWebAppSettings(-1, "RedactionVerificationSettings");
 
-                var result = JsonConvert.DeserializeObject<WebAppSettings>(json);
-                result.Error = Utils.MakeError(false, "", -1);
+                var result = JsonConvert.DeserializeObject<WebAppSettingsResult>(json);
 
                 return result;
             }
@@ -190,21 +192,19 @@ namespace WebAPI.Models
         /// <summary>
         /// Gets the number of document, pages and active users in the current verification queue.
         /// </summary>
-        public QueueStatus GetQueueStatus()
+        public QueueStatusResult GetQueueStatus()
         {
             try
             {
-                int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.VerifyAction);
+                int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.EditAction);
                 var stats = FileApi.FileProcessingDB.GetStats(actionId, false);
-                var users = FileApi.FileProcessingDB.GetActiveUsers(FileApi.Workflow.VerifyAction);
+                var users = FileApi.FileProcessingDB.GetActiveUsers(FileApi.Workflow.EditAction);
 
-                var result = new QueueStatus();
+                var result = new QueueStatusResult();
 
                 result.PendingDocuments = stats.NumDocumentsPending;
                 result.PendingPages = stats.NumPagesPending;
                 result.ActiveUsers = users.Size;
-
-                result.Error = Utils.MakeError(false, "", -1);
 
                 return result;
             }
@@ -219,7 +219,7 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <returns></returns>
-        public DocumentId OpenDocument(int id)
+        public DocumentIdResult OpenDocument(int id)
         {
             try
             {
@@ -230,10 +230,9 @@ namespace WebAPI.Models
                 // https://extract.atlassian.net/browse/WEB-55
                 if (FileApi.DocumentSession.IsOpen)
                 {
-                    return new DocumentId()
+                    return new DocumentIdResult()
                     {
-                        Id = FileApi.DocumentSession.FileId,
-                        Error = MakeError(isError: false, message: "", code: 0)
+                        Id = FileApi.DocumentSession.FileId
                     };
                 }
 
@@ -242,34 +241,33 @@ namespace WebAPI.Models
                 {
                     AssertRequestFileId("ELI45263", id);
 
-                    fileRecord = FileApi.FileProcessingDB.GetFileToProcess(id, FileApi.Workflow.VerifyAction);
+                    fileRecord = FileApi.FileProcessingDB.GetFileToProcess(id, FileApi.Workflow.EditAction);
+
+                    HTTPError.Assert("ELI46297", StatusCodes.Status423Locked, fileRecord != null,
+                        "Another application is editing the document", ("FileId", id, true));
                 }
                 else
                 {
-                    var fileRecords = FileApi.FileProcessingDB.GetFilesToProcess(FileApi.Workflow.VerifyAction, 1, false, "");
+                    var fileRecords = FileApi.FileProcessingDB.GetFilesToProcess(FileApi.Workflow.EditAction, 1, false, "");
                     if (fileRecords.Size() == 0)
                     {
-                        return new DocumentId()
+                        return new DocumentIdResult()
                         {
-                            Id = -1,
-                            Error = MakeError(isError: false, message: "", code: 0)
+                            Id = -1
                         };
                     }
                     fileRecord = (IFileRecord)fileRecords.At(0);
                 }
 
-                var documentId = new DocumentId()
+                var documentId = new DocumentIdResult()
                 {
-                    Id = fileRecord.FileID,
-                    Error = MakeError(isError: false, message: "", code: 0)
+                    Id = fileRecord.FileID
                 };
 
-                // The GUID used here is a placeholder JIRA until a TaskClass is created for the web app:
-                // https://extract.atlassian.net/browse/ISSUE-15079
                 FileApi.DocumentSession =
                 (
                     true,
-                    FileApi.FileProcessingDB.StartFileTaskSession("AD7F3F3F-20EC-4830-B014-EC118F6D4567", documentId.Id, fileRecord.ActionID),
+                    FileApi.FileProcessingDB.StartFileTaskSession(_WEB_VERIFY_TASK_GUID, documentId.Id, fileRecord.ActionID),
                     documentId.Id,
                     DateTime.Now
                 );
@@ -292,7 +290,6 @@ namespace WebAPI.Models
             try
             {
                 ExtractException.Assert("ELI45238", "No active user", _user != null);
-                AssertDocumentSession("ELI45239");
 
                 _cachedUssData = null;
 
@@ -303,20 +300,20 @@ namespace WebAPI.Models
                 int fileId = FileApi.DocumentSession.FileId;
                 if (commit)
                 {
-                    FileApi.FileProcessingDB.NotifyFileProcessed(fileId, FileApi.Workflow.VerifyAction, -1, true);
+                    FileApi.FileProcessingDB.NotifyFileProcessed(fileId, FileApi.Workflow.EditAction, -1, true);
                 }
                 else
                 {
-                    FileApi.FileProcessingDB.SetStatusForFile(fileId, FileApi.Workflow.VerifyAction, -1,
+                    FileApi.FileProcessingDB.SetStatusForFile(fileId, FileApi.Workflow.EditAction, -1,
                         EActionStatus.kActionPending, false, true, out EActionStatus oldStatus);
                 }
 
                 try
                 {
-                    if (commit && !string.IsNullOrWhiteSpace(FileApi.Workflow.PostVerifyAction))
+                    if (commit && !string.IsNullOrWhiteSpace(FileApi.Workflow.PostEditAction))
                     {
                         FileApi.FileProcessingDB.SetFileStatusToPending(fileId,
-                            FileApi.Workflow.PostVerifyAction, true);
+                            FileApi.Workflow.PostEditAction, true);
                     }
                 }
                 finally
@@ -331,7 +328,31 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// get the document attribute set
+        /// Marks the document as deleted in the workflow. Does not necessarily mean the document is
+        /// physically deleted, though depending on how the workflow is configured, it could be.
+        /// </summary>
+        public void DeleteDocument(int fileId)
+        {
+            try
+            {
+                AssertRequestFileId("ELI46346", fileId);
+
+                FileApi.FileProcessingDB.MarkFileDeleted(fileId, FileApi.Workflow.Id);
+
+                if (!string.IsNullOrWhiteSpace(FileApi.Workflow.PostWorkflowAction))
+                {
+                    FileApi.FileProcessingDB.SetFileStatusToPending(fileId,
+                        FileApi.Workflow.PostWorkflowAction, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46292");
+            }
+        }
+
+        /// <summary>
+        /// Gets the document attribute set
         /// </summary>
         /// <param name="fileId">The ID of the file for which to retrieve data.</param>
         /// <param name="includeNonSpatial"><c>true</c> to include non-spatial attributes in the resulting data;
@@ -342,12 +363,12 @@ namespace WebAPI.Models
         /// useful to 3rd party integrators.</param>
         /// <returns>DocumentAttributeSet instance, including error info iff there is an error</returns>
         /// <remarks>The DocumentData CTOR must be constructed with useAttributeDbMgr = true</remarks>
-        public DocumentAttributeSet GetDocumentResultSet(int fileId, 
-            bool includeNonSpatial = true, bool verboseSpatialData = true)
+        public DocumentDataResult GetDocumentData(int fileId, 
+            bool includeNonSpatial, bool verboseSpatialData)
         {
             try
             {
-                AssertFileInWorkflow(fileId);
+                AssertRequestFileId("ELI46348", fileId);
 
                 var results = GetAttributeSetForFile(fileId);
                 var mapper = new AttributeMapper(results, FileApi.Workflow.Type);
@@ -360,23 +381,51 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Updates the document result set.
+        /// Replaces the document attribute set.
         /// </summary>
         /// <param name="fileId">The file identifier.</param>
-        /// <param name="updatedData">The updated data.</param>
-        public void UpdateDocumentResultSet(int fileId, BareDocumentAttributeSet updatedData)
+        /// <param name="inputData">The updated data.</param>
+        public void PutDocumentResultSet(int fileId, DocumentDataInput inputData)
         {
             try
             {
-                AssertFileInWorkflow(fileId);
+                AssertRequestFileId("ELI46349", fileId);
 
                 var results = GetAttributeSetForFile(fileId);
                 var attribute = new AttributeClass() { Name = "Update"};
-                attribute.Value.ReplaceAndDowngradeToNonSpatial(updatedData.ToString());
+                attribute.Value.ReplaceAndDowngradeToNonSpatial(inputData.ToString());
                 results.PushBack(attribute);
 
                 string fileName = AttributeDbMgr.FAMDB.GetFileNameFromFileID(fileId);
-                var translator = new AttributeTranslator(fileName, updatedData);
+                var translator = new AttributeTranslator(fileName, inputData);
+
+                UpdateDocumentData(fileId, translator.ComAttributes);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI44889");
+            }
+        }
+
+        /// <summary>
+        /// Patches attributes in the existing document attribute set.
+        /// </summary>
+        /// <param name="fileId">The file identifier.</param>
+        /// <param name="patchData">The updated data.</param>
+        public void PatchDocumentData(int fileId, DocumentDataPatch patchData)
+        {
+            try
+            {
+                AssertRequestFileId("ELI46350", fileId);
+
+                var results = GetAttributeSetForFile(fileId);
+                var attribute = new AttributeClass() { Name = "Update" };
+                attribute.Value.ReplaceAndDowngradeToNonSpatial(patchData.ToString());
+                results.PushBack(attribute);
+
+                var existingData = GetAttributeSetForFile(fileId);
+                string fileName = AttributeDbMgr.FAMDB.GetFileNameFromFileID(fileId);
+                var translator = new AttributeTranslator(fileName, existingData, patchData);
 
                 UpdateDocumentData(fileId, translator.ComAttributes);
             }
@@ -396,16 +445,17 @@ namespace WebAPI.Models
         {
             try
             {
-                AssertFileInWorkflow(fileId);
+                AssertRequestFileId("ELI46351", fileId);
 
                 var attrSetName = FileApi.Workflow.OutputAttributeSet;
 
                 try
                 {
-                    Contract.Assert(!String.IsNullOrWhiteSpace(attrSetName),
-                                    "the workflow: {0}, has OutputAttributeSet that is empty",
-                                    FileApi.Workflow.Name);
-                    Contract.Assert(AttributeDbMgr != null, "AttributeDbMgr is null");
+                    HTTPError.Assert("ELI46333", StatusCodes.Status404NotFound,
+                        !String.IsNullOrWhiteSpace(attrSetName),
+                        "Document data not found for file",
+                        ("FileId", fileId, true), ("Workflow", FileApi.Workflow.Name, true));
+                    HTTPError.Assert("ELI46334", AttributeDbMgr != null, "AttributeDbMgr is null");
                 }
                 catch (Exception ex)
                 {
@@ -415,11 +465,25 @@ namespace WebAPI.Models
                 }
 
                 const int mostRecentSet = -1;
-                var results = AttributeDbMgr.GetAttributeSetForFile(fileId,
+                try
+                {
+                    var results = AttributeDbMgr.GetAttributeSetForFile(fileId,
                                                                      attributeSetName: attrSetName,
                                                                      relativeIndex: mostRecentSet,
                                                                      closeConnection: true);
-                return results;
+                    return results;
+                }
+                catch (Exception ex)
+                {
+                    var ee = ex.AsExtract("ELI46415");
+                    if (ee.EliCode == "ELI38763")
+                    {
+                        throw new HTTPError("ELI46416", StatusCodes.Status404NotFound,
+                            "Document data not found", ee);
+                    }
+
+                    throw ex;
+                }
             }
             catch (Exception ex)
             {
@@ -435,21 +499,33 @@ namespace WebAPI.Models
         /// <summary>
         /// Gets the word zone data.
         /// </summary>
+        /// <param name="fileId">The file identifier.</param>
         /// <param name="page">The page.</param>
-        public WordZoneData GetWordZoneData(int page)
+        public WordZoneDataResult GetWordZoneData(int fileId, int page)
         {
             try
             {
-                AssertDocumentSession("ELI45358");
+                SpatialString ussData = GetUssData(fileId);
+
+                HTTPError.Assert("ELI45362", StatusCodes.Status404NotFound,
+                    ussData != null,
+                    "Word data is not available for document");
                 
-                var ussFileName = GetSourceFileName(FileApi.DocumentSession.FileId) + ".uss";
+                HTTPError.AssertRequest("ELI46420",
+                        page > 0, "Invalid page number",
+                        ("Page", page, true), ("Test", "value", false));
 
-                ExtractException.Assert("ELI45362", "Word data is not available for document",
-                    File.Exists(ussFileName));
+                HTTPError.Assert("ELI46421", StatusCodes.Status404NotFound,
+                    page <= ussData.GetLastPageNumber(), "Page not found",
+                    ("Page", page, true), ("Test", "value", false));
 
-                var pageData = UssData.GetSpecifiedPages(page, page);
+                var pageData = ussData.GetSpecifiedPages(page, page);
                 var wordZoneData = pageData.MapSpatialStringToWordZoneData();
-                return wordZoneData;
+
+                return new WordZoneDataResult
+                {
+                    Zones = wordZoneData
+                };
             }
             catch (Exception ex)
             {
@@ -463,15 +539,15 @@ namespace WebAPI.Models
         /// <param name="fileName">file name</param>
         /// <param name="fileStream">filestream object</param>
         /// <returns>DocumentSubmitResult instance that contains error info iff an error occurs</returns>
-        public async Task<DocumentSubmitResult> SubmitFile(string fileName, Stream fileStream)
+        public async Task<DocumentIdResult> SubmitFile(string fileName, Stream fileStream)
         {
             try
             {
-                Contract.Assert(!String.IsNullOrWhiteSpace(fileName), "File name is empty");
+                HTTPError.AssertRequest("ELI46335", !String.IsNullOrWhiteSpace(fileName), "File name is empty");
 
                 var workflow = FileApi.Workflow;
                 var uploads = workflow.DocumentFolder;
-                Contract.Assert(!String.IsNullOrWhiteSpace(uploads), "folder path is null or empty");
+                HTTPError.Assert("ELI46336", !String.IsNullOrWhiteSpace(uploads), "Target location not configured.");
 
                 if (!Directory.Exists(uploads))
                 {
@@ -486,7 +562,7 @@ namespace WebAPI.Models
                     fs.Close();
                 }
 
-                return AddFile(fullPath, DocumentSubmitType.File);
+                return AddFile(fullPath);
             }
             catch (Exception ex)
             {
@@ -504,7 +580,7 @@ namespace WebAPI.Models
         /// <returns>a filename that can be used safely</returns>
         static string GetSafeFilename(string path, string filename)
         {
-            Contract.Assert(!String.IsNullOrWhiteSpace(path) && 
+            HTTPError.Assert("ELI46337", !String.IsNullOrWhiteSpace(path) && 
                             !String.IsNullOrWhiteSpace(filename), 
                             "Either path or filename is empty");
 
@@ -521,11 +597,9 @@ namespace WebAPI.Models
         /// Add file - this encapsulates fileProcessingDB.AddFile
         /// </summary>
         /// <param name="fullPath">path + filename - path is expected to exist at this point</param>
-        /// <param name="submitType">File or Text - affects the return value: [File|Text]+Id</param>
         /// <param name="caller">caller of this method - DO NOT SET, specified by compiler</param>
         /// <returns>DocumentSubmitresult instance that contains error info iff an error has occurred</returns>
-        public DocumentSubmitResult AddFile(string fullPath, 
-                                            DocumentSubmitType submitType, 
+        public DocumentIdResult AddFile(string fullPath, 
                                             [CallerMemberName] string caller = "")
         {
             try
@@ -533,9 +607,8 @@ namespace WebAPI.Models
                 // Now add the file to the FAM queue
                 var fileProcessingDB = FileApi.FileProcessingDB;
                 var workflow = FileApi.Workflow;
-                Contract.Assert(!String.IsNullOrWhiteSpace(workflow.StartAction), 
-                                "The workflow: {0}, must have a Start action",
-                                FileApi.WorkflowName);
+                HTTPError.Assert("ELI46338", !String.IsNullOrWhiteSpace(workflow.StartAction),
+                    "Workfow must have a start action", ("Workflow", FileApi.WorkflowName, true));
 
                 // Start a FAM session so that the active action is set. This in turn enables the output result file to be
                 // added to the FileMetadataFieldValue, for later retrieval by Get[File|Text]Result.
@@ -556,11 +629,12 @@ namespace WebAPI.Models
 
                 fileProcessingDB.RecordFAMSessionStop();
 
-                return MakeDocumentSubmitResult(fileId: fileRecord.FileID,
-                                                isError: false,
-                                                message: "",
-                                                code: 0,
-                                                submitType: submitType);
+                DocumentIdResult result = new DocumentIdResult()
+                {
+                    Id = fileRecord.FileID
+                };
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -573,7 +647,7 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="fileId">The FAM file ID for which data should be updated.</param>
         /// <param name="fileData">The file data.</param>
-        public void UpdateDocumentData(int fileId, IUnknownVector fileData)
+        void UpdateDocumentData(int fileId, IUnknownVector fileData)
         {
             try
             {
@@ -593,13 +667,16 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="submittedText">text to submit</param>
         /// <returns>DocumentSubmitResult instance that contains error info iff an error occurs</returns>
-        public async Task<DocumentSubmitResult> SubmitText(string submittedText)
+        public async Task<DocumentIdResult> SubmitText(string submittedText)
         {
             try
             {
+                HTTPError.AssertRequest("ELI46340", !String.IsNullOrEmpty(submittedText),
+                    "Text not provided");
                 var workflow = FileApi.Workflow; 
                 var uploads = workflow.DocumentFolder;
-                Contract.Assert(!String.IsNullOrWhiteSpace(uploads), "folder path is null or empty");
+                HTTPError.Assert("ELI46339", !String.IsNullOrWhiteSpace(uploads),
+                    "Target location not configured");
 
                 if (!Directory.Exists(uploads))
                 {
@@ -615,7 +692,7 @@ namespace WebAPI.Models
                     fs.Close();
                 }
 
-                return AddFile(fullPath, DocumentSubmitType.Text);
+                return AddFile(fullPath);
             }
             catch (Exception ex)
             {
@@ -628,11 +705,11 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="fileId">file id</param>
         /// <returns>List of ProcessingStatus, can contain error info</returns>
-        public ProcessingStatus GetStatus(int fileId)
+        public ProcessingStatusResult GetStatus(int fileId)
         {
             try
             {
-                AssertFileInWorkflow(fileId);
+                AssertRequestFileId("ELI46352", fileId);
 
                 EActionStatus status = EActionStatus.kActionFailed;
 
@@ -645,8 +722,12 @@ namespace WebAPI.Models
                     throw ex.AsExtract("ELI42109");
                 }
 
-                var ps = MakeProcessingStatus(ConvertToStatus(status, fileId));
-                return ps;
+                return new ProcessingStatusResult()
+                {
+                    DocumentStatus = ConvertToStatus(status, fileId),
+                    StatusText = Enum.GetName(typeof(DocumentProcessingStatus),
+                        ConvertToStatus(status, fileId)),
+                };
             }
             catch (Exception ex)
             {
@@ -687,22 +768,14 @@ namespace WebAPI.Models
 
             try
             {
-                AssertFileInWorkflow(fileId);
+                AssertRequestFileId("ELI46353", fileId);
 
                 filename = FileApi.FileProcessingDB.GetFileNameFromFileID(fileId);
 
-                try
-                {
-                    Contract.Assert(!String.IsNullOrWhiteSpace(filename), "Error getting the filename for fileId: {0}", fileId);
-                    Contract.Assert(System.IO.File.Exists(filename), "File: {0}, does not exist", filename);
-                }
-                catch (Exception ex)
-                {
-                    var ee = ex.AsExtract("ELI43580");
-                    ee.AddDebugData("MissingResource", ee.Message, false);
-                    ee.AddDebugData("Filename", filename, false);
-                    throw ee;
-                }
+                HTTPError.Assert("ELI46342", StatusCodes.Status404NotFound,
+                    File.Exists(filename), "File does not exist",
+                    ("fileId", fileId, true),
+                    ("Filename", filename, false));
 
                 return filename;
             }
@@ -715,17 +788,14 @@ namespace WebAPI.Models
         /// <summary>
         /// Gets the pages information.
         /// </summary>
-        /// <param name="fileId">The file identifier.</param>
-        public PagesInfo GetPagesInfo(int fileId)
+        /// <param name="fileId">The file ID</param>
+        public PagesInfoResult GetPagesInfo(int fileId)
         {
-            AssertFileInWorkflow(fileId);
+            AssertRequestFileId("ELI46354", fileId);
 
-            AssertRequestFileId("ELI45262", fileId);
-
-            var pagesInfo = new PagesInfo()
+            var pagesInfo = new PagesInfoResult()
             {
-                PageInfos = new List<PageInfo>(),
-                Error = MakeError(isError: false, message: "", code: 0)
+                PageInfos = new List<PageInfo>()
             };
 
             try
@@ -759,10 +829,10 @@ namespace WebAPI.Models
         {
             try
             {
-                AssertFileInWorkflow(fileId);
+                AssertRequestFileId("ELI46355", fileId);
 
                 AssertRequestFileId("ELI45172", fileId);
-                AssertRequestFileExists("ELI45173", fileId);
+                AssertFileExists("ELI45173", fileId);
                 AssertRequestFilePage("ELI45174", fileId, pageNum);
 
                 var fileName = GetSourceFileName(fileId);
@@ -788,15 +858,18 @@ namespace WebAPI.Models
 
             try
             {
-                AssertFileInWorkflow(fileId);
+                AssertRequestFileId("ELI46356", fileId);
 
                 try
                 {
                     getFileTag = FileApi.Workflow.OutputFileMetadataField;
-                    Contract.Assert(!String.IsNullOrWhiteSpace(getFileTag), "Workflow does not have a defined OutputFileMetaDataField");
+                    HTTPError.Assert("ELI46343", !String.IsNullOrWhiteSpace(getFileTag),
+                        "Workflow not configured to provide output data");
 
                     filename = FileApi.FileProcessingDB.GetMetadataFieldValue(fileId, getFileTag);
-                    Contract.Assert(!String.IsNullOrWhiteSpace(filename), "No result file found for file ID: {0}", fileId);
+                    HTTPError.Assert("ELI46344", StatusCodes.Status404NotFound,
+                        !String.IsNullOrWhiteSpace(filename), 
+                        "No result found for the specified file", ("FileId", fileId, true));
                 }
                 catch (Exception ex)
                 {
@@ -821,28 +894,101 @@ namespace WebAPI.Models
         /// GetTextResult implementation
         /// </summary>
         /// <param name="Id">file id</param>
+        /// <param name="page"></param>
         /// <returns>TextResult instance, may contain error info</returns>
-        public async Task<TextResult> GetTextResult(int Id = -1)
+        public PageTextResult GetText(int Id, int page = -1)
         {
             try
             {
-                AssertFileInWorkflow(Id);
+                AssertRequestFileId("ELI46357", Id);
 
-                var (filename, isError, errMessage) = GetResult(Id);
-                Contract.Assert(!isError, "Error returned from GetResult");
+                string fileName = GetSourceFileName(Id);
 
-                using (var fs = new FileStream(filename, FileMode.Open))
+                var pages = GetText(fileName, page);
+
+                return new PageTextResult
                 {
-                    byte[] buffer = new byte[fs.Length];
-                    int retcode = await fs.ReadAsync(buffer, offset: 0, count: Convert.ToInt32(fs.Length));
-                    string text = System.Text.Encoding.ASCII.GetString(buffer);
-
-                    return MakeTextResult(text);
-                }
+                    Pages = pages
+                };
             }
             catch (Exception ex)
             {
                 var ee = ex.AsExtract("ELI43247");
+                ee.AddDebugData("ID", Id, encrypt: false);
+                throw ee;
+            }
+        }
+
+        List<PageText> GetText(string fileName, int page)
+        {
+            var pages = new List<PageText>();
+
+            if (Path.GetExtension(fileName) == ".txt")
+            {
+                AssertFileExists("ELI46390", fileName);
+                string text = File.ReadAllText(fileName);
+                pages.Add(new PageText(0, text));
+            }
+            else
+            {
+                var documentText = GetUssData(fileName);
+
+                HTTPError.Assert("ELI46405", StatusCodes.Status404NotFound,
+                    documentText != null, "Document text not found");
+
+                if (page == -1)
+                {
+                    var spatialPages = documentText.GetPages(vbIncludeBlankPages: true, strTextForBlankPage: "");
+                    var pageCount = spatialPages.Size();
+                    for (int i = 0; i < pageCount; i++)
+                    {
+                        var spatialPage = (SpatialString)spatialPages.At(i);
+                        pages.Add(new PageText(i + 1, spatialPage.String));
+                    }
+                }
+                else
+                {
+                    HTTPError.AssertRequest("ELI46418",
+                        page > 0, "Invalid page number",
+                        ("Page", page, true),("Test", "value", false));
+
+                    HTTPError.Assert("ELI46419", StatusCodes.Status404NotFound,
+                        page <= documentText.GetLastPageNumber(), "Page not found",
+                        ("Page", page, true), ("Test", "value", false));
+
+                    var spatialPage = documentText.GetSpecifiedPages(page, page);
+                    pages.Add(new PageText(page, spatialPage.String));
+                }
+            }
+
+            return pages;
+        }
+
+        /// <summary>
+        /// GetTextResult implementation
+        /// </summary>
+        /// <param name="Id">file id</param>
+        /// <returns>TextResult instance, may contain error info</returns>
+        public PageTextResult GetTextResult(int Id)
+        {
+            try
+            {
+                AssertRequestFileId("ELI46358", Id);
+
+                var (filename, isError, errMessage) = GetResult(Id);
+
+                AssertFileExists("ELI46407", filename);
+
+                var pages = GetText(filename, -1);
+
+                return new PageTextResult
+                {
+                    Pages = pages
+                };
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI46307");
                 ee.AddDebugData("ID", Id, encrypt: false);
                 throw ee;
             }
@@ -853,15 +999,17 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="id">file Id</param>
         /// <returns>document type (string), wrapped in a TextResult</returns>
-        public TextResult GetDocumentType(int id)
+        public TextData GetDocumentType(int id)
         {
             try
             {
-                AssertFileInWorkflow(id);
-
                 var results = GetAttributeSetForFile(id);
                 var docType = GetDocumentType(results);
-                return MakeTextResult(docType);
+
+                return new TextData
+                {
+                    Text = docType
+                };
             }
             catch (Exception ex)
             {
@@ -877,7 +1025,7 @@ namespace WebAPI.Models
         {
             if (!FileApi.DocumentSession.IsOpen)
             {
-                throw new RequestAssertion(eliCode, "No document is currently open");
+                throw new HTTPError(eliCode, "No document is currently open");
             }
         }
 
@@ -889,11 +1037,11 @@ namespace WebAPI.Models
         /// <returns></returns>
         public void AssertRequestFileId(string eliCode, int fileId)
         {
-            if (!FileApi.FileProcessingDB.IsFileInWorkflow(fileId, FileApi.Workflow.Id))
-            {
-                throw new RequestAssertion(eliCode,
-                    Utils.Inv($"File Id: {fileId} is not in the workflow: {FileApi.Workflow.Name}"));
-            }
+            HTTPError.Assert(eliCode, StatusCodes.Status404NotFound,
+                FileApi.FileProcessingDB.IsFileInWorkflow(fileId, FileApi.Workflow.Id),
+                "File not in the workflow",
+                ("Workflow", FileApi.Workflow.Name, true),
+                ("FileId", fileId, true));
         }
 
         /// <summary>
@@ -911,8 +1059,10 @@ namespace WebAPI.Models
 
             if (page <= 0 || page > fileRecord.Pages)
             {
-                var ee = new RequestAssertion(eliCode,
-                    Utils.Inv($"Page {page} is not valid for file Id: {fileId}"));
+                var ee = new HTTPError(eliCode, StatusCodes.Status404NotFound,
+                    "Page is not valid for specified file");
+                ee.AddDebugData("FileId", fileId, false);
+                ee.AddDebugData("Page", page, false);
                 ee.AddDebugData("Filename", fileName, true);
                 throw ee;
             }
@@ -924,14 +1074,33 @@ namespace WebAPI.Models
         /// <param name="eliCode">The eli code.</param>
         /// <param name="fileId">The file identifier.</param>
         /// <returns></returns>
-        public void AssertRequestFileExists(string eliCode, int fileId)
+        public void AssertFileExists(string eliCode, int fileId)
         {
             string fileName = FileApi.FileProcessingDB.GetFileNameFromFileID(fileId);
 
+            try
+            {
+                AssertFileExists(eliCode, fileName);
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI46403");
+                ee.AddDebugData("FileID", fileId, false);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="eliCode"></param>
+        /// <param name="fileName"></param>
+        public void AssertFileExists(string eliCode, string fileName)
+        {
             if (!File.Exists(fileName))
             {
-                var ee = new RequestAssertion(eliCode, Utils.Inv($"File Id: {fileId} does not exist"));
-                ee.AddDebugData("Filename", fileName, true);
+                var ee = new HTTPError(eliCode, StatusCodes.Status404NotFound,
+                    "The requested file does not exist");
+                ee.AddDebugData("FileName", fileName, true);
                 throw ee;
             }
         }
@@ -1082,7 +1251,7 @@ namespace WebAPI.Models
         /// <value>
         /// The <see cref="SpatialString"/> representing the currently open document's OCR results.
         /// </value>
-        SpatialString UssData
+        SpatialString DocumentSessionUssData
         {
             get
             {
@@ -1098,27 +1267,47 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Utility method to enforce that the specified fileId is contained by the workflow
+        /// Gets the USS file data as a <see cref="SpatialString"/> for the specified file.
+        /// NOTE: Cached DocumentSessionUssData will be used if a document session is currently open.
         /// </summary>
-        /// <param name="fileId">file Id to test for inclusion</param>
-        /// <remarks>the result of this method is an exception iff fileId is not a member of the workflow</remarks>
-        void AssertFileInWorkflow(int fileId)
+        /// <param name="fileId">The ID for which the data is needed.</param>
+        /// <returns>A <see cref="SpatialString"/> representing the OCR data.</returns>
+        SpatialString GetUssData(int fileId)
         {
-            bool isInWorkflow = FileApi.FileProcessingDB.IsFileInWorkflow(fileId, FileApi.Workflow.Id);
+            SpatialString ussData;
+            if (FileApi.DocumentSession.IsOpen)
+            {
+                ExtractException.Assert("ELI46313", "Request for unexpected file",
+                    fileId < 1 || fileId == FileApi.DocumentSession.FileId);
 
-            try
-            {
-                Contract.Assert(isInWorkflow,
-                                "The specified file Id: {0}, is not in the workflow: {1}",
-                                fileId,
-                                FileApi.WorkflowName);
+                return DocumentSessionUssData;
             }
-            catch (Exception ex)
+            else
             {
-                var ee = ex.AsExtract("ELI43579");
-                ee.AddDebugData("MissingResource", ee.Message, false);
-                throw ee;
+                var fileName = GetSourceFileName(fileId);
+                ussData = GetUssData(fileName);
             }
+
+            return ussData;
+        }
+
+        /// <summary>
+        /// Gets the USS file data as a <see cref="SpatialString"/> for the specified file.
+        /// </summary>
+        /// <param name="fileName">The source document name of the file for which the data is needed.
+        /// </param>
+        /// <returns>A <see cref="SpatialString"/> representing the OCR data.</returns>
+        SpatialString GetUssData(string fileName)
+        {
+            var ussFileName = fileName + ".uss";
+            if (File.Exists(ussFileName))
+            {
+                var ussData = new SpatialString();
+                ussData.LoadFrom(ussFileName, false);
+                return ussData;
+            }
+
+            return null;
         }
 
         #endregion Private Members

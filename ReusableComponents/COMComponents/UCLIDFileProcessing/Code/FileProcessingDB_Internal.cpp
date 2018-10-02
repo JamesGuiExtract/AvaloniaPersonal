@@ -957,7 +957,7 @@ long CFileProcessingDB::getWorkflowID(_ConnectionPtr ipConnection, long nActionI
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42103");
 }
 //--------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::isFileInWorkflow(_ConnectionPtr ipConnection, long nFileID, long nWorkflowID)
+int CFileProcessingDB::isFileInWorkflow(_ConnectionPtr ipConnection, long nFileID, long nWorkflowID)
 {
 	try
 	{
@@ -967,21 +967,24 @@ bool CFileProcessingDB::isFileInWorkflow(_ConnectionPtr ipConnection, long nFile
 		}
 
 		string strQuery = (nWorkflowID > 0)
-			? Util::Format("SELECT COUNT(*) AS [ID] FROM [WorkflowFile] "
+			// Use ~ operator to invert deleted flag as we want 1 to indicate a file in the workflow
+			// and 0 for a file that has been deleted.
+			// Add + 0 to convert to int since bit fields are not allowed in aggregate functions
+			? Util::Format("SELECT COALESCE(MAX(~[DELETED]+0), -1) AS [ID] FROM [WorkflowFile] "
 				"WHERE [FileID] = %d AND [WorkflowID] = %d", nFileID, nWorkflowID)
 			: Util::Format(
-				"SELECT COUNT([ID]) AS [ID] FROM [FAMFile] WHERE [ID] = %d",
+				"SELECT COALESCE(MAX(1), -1) AS [ID] FROM [FAMFile] WHERE [ID] = %d",
 				nFileID);
 
-		long nCount = 0;
-		executeCmdQuery(ipConnection, strQuery, false, &nCount);
+		long nResult = -1;
+		executeCmdQuery(ipConnection, strQuery, false, &nResult);
 
-		return nCount > 0;
+		return nResult;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI43218");
 }
 //--------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::isFileInWorkflow(_ConnectionPtr ipConnection, string strFileName,
+int CFileProcessingDB::isFileInWorkflow(_ConnectionPtr ipConnection, string strFileName,
 										 long nWorkflowID)
 {
 	try
@@ -994,17 +997,20 @@ bool CFileProcessingDB::isFileInWorkflow(_ConnectionPtr ipConnection, string str
 		replaceVariable(strFileName, "'", "''");
 
 		string strQuery = (nWorkflowID > 0)
-			? Util::Format("SELECT COUNT(*) AS [ID] FROM [WorkflowFile] "
+			// Use ~ operator to invert deleted flag as we want 1 to indicate a file in the workflow
+			// and 0 for a file that has been deleted.
+			// Add + 0 to convert to int since bit fields are not allowed in aggregate functions
+			? Util::Format("SELECT COALESCE(MAX(~[DELETED]+0), -1) AS [ID] FROM [WorkflowFile] "
 				"INNER JOIN [FAMFile] ON [FileID] = [FAMFile].[ID] "
 				"WHERE [FileName] = '%s' AND [WorkflowID] = %d", strFileName.c_str(), nWorkflowID)
 			: Util::Format(
-				"SELECT COUNT([ID]) AS [ID] FROM [FAMFile] WHERE [FileName] = '%s'",
+				"SELECT COALESCE(MAX(1), -1) AS [ID] FROM [FAMFile] WHERE [FileName] = '%s'",
 				strFileName.c_str());
 
-		long nCount = 0;
-		executeCmdQuery(ipConnection, strQuery, false, &nCount);
+		long nResult = -1;
+		executeCmdQuery(ipConnection, strQuery, false, &nResult);
 
-		return nCount > 0;
+		return nResult;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI44849");
 }
@@ -1732,6 +1738,8 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 			vecQueries.push_back(gstrADD_WORKFLOW_STARTACTION_FK);
 			vecQueries.push_back(gstrADD_WORKFLOW_ENDACTION_FK);
 			vecQueries.push_back(gstrADD_WORKFLOW_POSTWORKFLOWACTION_FK);
+			vecQueries.push_back(gstrADD_WORKFLOW_EDITACTION_FK);
+			vecQueries.push_back(gstrADD_WORKFLOW_POSTEDITACTION_FK);
 			// Foreign key for OutputAttributeSetID is added in AttributeDBMgr
 			vecQueries.push_back(gstrADD_WORKFLOW_OUTPUTFILEMETADATAFIELD_FK);
 			vecQueries.push_back(gstrADD_FILE_HANDLER_WORKFLOW_FK);
@@ -6708,6 +6716,8 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 			", [WorkflowTypeCode] "
 			", [Description] "
 			", [StartActionID] "
+			", [EditActionID] "
+			", [PostEditActionID] "
 			", [EndActionID] "
 			", [PostWorkflowActionID] "
 			", [DocumentFolder] "
@@ -6755,6 +6765,13 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 		? ""
 		: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "PostWorkflowActionID")));
 	ipWorkflowDefinition->DocumentFolder = getStringField(ipFields, "DocumentFolder").c_str();
+	
+	ipWorkflowDefinition->EditAction = isNULL(ipFields, "EditActionID")
+		? ""
+		: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "EditActionID")));
+	ipWorkflowDefinition->PostEditAction = isNULL(ipFields, "PostEditActionID")
+		? ""
+		: get_bstr_t(getActionName(ipConnection, getLongField(ipFields, "PostEditActionID")));
 
 	if (isNULL(ipFields, "OutputAttributeSetID"))
 	{
@@ -6815,14 +6832,6 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 		: (_bstr_t)ipFields->Item["OutputFilePathInitializationFunction"]->GetValue();
 
 	ipWorkflowDefinition->LoadBalanceWeight = getLongField(ipFields, "LoadBalanceWeight");
-
-	string strSettings = getWebAppSettings(ipConnection, nID, "RedactionVerificationSettings");
-	if (!strSettings.empty())
-	{
-		
-		ipWorkflowDefinition->VerifyAction = get_bstr_t(getWebAppSetting(strSettings, "VerifyAction"));
-		ipWorkflowDefinition->PostVerifyAction = get_bstr_t(getWebAppSetting(strSettings, "PostVerifyAction"));
-	}
 
 	return ipWorkflowDefinition;
 }
@@ -6917,9 +6926,10 @@ vector<pair<string, string>> CFileProcessingDB::getWorkflowNamesAndIDs(_Connecti
 	return vecNamesAndIDs;
 }
 //-------------------------------------------------------------------------------------------------
-map<string, long> CFileProcessingDB::getWorkflowStatus(long nFileID)
+vector<tuple<long, string>> CFileProcessingDB::getWorkflowStatus(long nFileID, 
+																 bool bReturnFileStatuses/* = false*/)
 {
-	map<string, long> mapStatuses;
+	vector<tuple<long, string>> vecStatuses;
 
 	// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 	ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -6954,6 +6964,7 @@ map<string, long> CFileProcessingDB::getWorkflowStatus(long nFileID)
 		replaceVariable(strQuery, "<WorkflowID>", asString(nWorkflowID));
 		replaceVariable(strQuery, "<ActionIDs>", strActionIDs);
 		replaceVariable(strQuery, "<EndActionID>", asString(nEndActionID));
+		replaceVariable(strQuery, "<ReturnFileStatuses>", bReturnFileStatuses ? "1" : "0");
 
 		_RecordsetPtr ipWorkflowStatus(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI42138", ipWorkflowStatus);
@@ -6966,16 +6977,25 @@ map<string, long> CFileProcessingDB::getWorkflowStatus(long nFileID)
 			FieldsPtr ipFields = ipWorkflowStatus->Fields;
 			ASSERT_RESOURCE_ALLOCATION("ELI42139", ipFields != __nullptr);
 
-			string strStatus = getStringField(ipFields, "Status");
-			long nCount = getLongField(ipFields, "Count");
-			mapStatuses[strStatus] = nCount;
+			if (bReturnFileStatuses)
+			{
+				int nFileID = getLongField(ipFields, "FileID", 0);
+				string strStatus = getStringField(ipFields, "Status");
+				vecStatuses.push_back(make_tuple(nFileID, strStatus));
+			}
+			else
+			{
+				string strStatus = getStringField(ipFields, "Status");
+				long nCount = getLongField(ipFields, "Count");
+				vecStatuses.push_back(make_tuple(nCount, strStatus));
+			}
 
 			ipWorkflowStatus->MoveNext();
 		}
 
 	END_CONNECTION_RETRY(ipConnection, "ELI42142");
 
-	return mapStatuses;
+	return vecStatuses;
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::databaseUsingWorkflows(_ConnectionPtr ipConnection)

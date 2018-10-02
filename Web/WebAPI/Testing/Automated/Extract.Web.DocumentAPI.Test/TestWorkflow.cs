@@ -1,9 +1,14 @@
 ﻿using Extract;
 using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
+using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using UCLID_FILEPROCESSINGLib;
 using WebAPI;
+using WebAPI.Controllers;
 using WebAPI.Models;
 
 using WorkflowType = UCLID_FILEPROCESSINGLib.EWorkflowType;
@@ -20,7 +25,7 @@ namespace Extract.Web.WebAPI.Test
         /// test DB Manager, used to extract a database backup file from the resource, and the attach/detach it
         /// to the local database server. 
         /// </summary>
-        static FAMTestDBManager<TestDocumentAttributeSet> _testDbManager;
+        static FAMTestDBManager<TestWorkflow> _testDbManager;
 
         #endregion Fields
 
@@ -31,7 +36,7 @@ namespace Extract.Web.WebAPI.Test
         {
             GeneralMethods.TestSetup();
 
-            _testDbManager = new FAMTestDBManager<TestDocumentAttributeSet>();
+            _testDbManager = new FAMTestDBManager<TestWorkflow>();
         }
 
         [TestFixtureTearDown]
@@ -101,17 +106,91 @@ namespace Extract.Web.WebAPI.Test
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                var c = ApiTestUtils.SetDefaultApiContext(dbName);
-                FileApiMgr.GetInterface(c);
+                (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
+                    _testDbManager.InitializeEnvironment<TestWorkflow, UsersController>
+                        ("Resources.Demo_LabDE.bak", dbName, "admin", "a");
 
-                try
+                // Should cause file 1 to be counted as incomplete.
+                fileProcessingDb.SetStatusForFile(1, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out EActionStatus oldStatus);
+
+                // Should cause file 2 to be counted as complete.
+                fileProcessingDb.SetStatusForFile(2, "A02_Verify", -1, EActionStatus.kActionCompleted, false, false, out EActionStatus oldStatus2);
+                fileProcessingDb.SetStatusForFile(2, "Z_AdminAction", -1, EActionStatus.kActionCompleted, false, false, out EActionStatus oldStatus3);
+
+                // Should cause file 3 to be counted as failed.
+                fileProcessingDb.SetStatusForFile(3, "A02_Verify", -1, EActionStatus.kActionFailed, false, false, out EActionStatus oldStatus4);
+
+                var result = usersController.Login(user);
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+
+                var workflowController = user.CreateController<WorkflowController>();
+
+                var statusResult = workflowController.GetWorkflowStatus()
+                    .AssertGoodResult<WorkflowStatusResult>();
+
+                Assert.AreEqual(1, statusResult.NumberIncomplete,
+                    "Incorrect incomplete count");
+                Assert.AreEqual(15, statusResult.NumberProcessing,
+                    "Incorrect processing count");
+                Assert.AreEqual(1, statusResult.NumberDone,
+                    "Incorrect done count");
+                Assert.AreEqual(1, statusResult.NumberFailed,
+                    "Incorrect failed count");
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail("Exception: {0}, in: {1}", ex.Message, ApiTestUtils.GetMethodName());
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        /// <summary>
+        /// basic test that list of current workflows can be retrieved
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void Test_GetFileStatuses()
+        {
+            string dbName = "DocumentAPI_Test_GetFileStatuses";
+
+            try
+            {
+                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
+
+                (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
+                    _testDbManager.InitializeEnvironment<TestWorkflow, UsersController>
+                        ("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+
+                // Should cause file 1 to be counted as incomplete.
+                fileProcessingDb.SetStatusForFile(1, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out EActionStatus oldStatus);
+
+                // Should cause file 2 to be counted as complete.
+                fileProcessingDb.SetStatusForFile(2, "A02_Verify", -1, EActionStatus.kActionCompleted, false, false, out EActionStatus oldStatus2);
+                fileProcessingDb.SetStatusForFile(2, "Z_AdminAction", -1, EActionStatus.kActionCompleted, false, false, out EActionStatus oldStatus3);
+
+                // Should cause file 3 to be counted as failed.
+                fileProcessingDb.SetStatusForFile(3, "A02_Verify", -1, EActionStatus.kActionFailed, false, false, out EActionStatus oldStatus4);
+
+                var result = usersController.Login(user);
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+
+                var workflowController = user.CreateController<WorkflowController>();
+
+                var statusResult = workflowController.GetDocumentStatuses()
+                    .AssertGoodResult<FileStatusResult>();
+
+                foreach (var fileStatus in statusResult.FileStatuses)
                 {
-                    var workflowStatus = WorkflowData.GetWorkflowStatus(Utils.CurrentApiContext);
-                    Assert.IsTrue(workflowStatus.Error.ErrorOccurred == false, "status should NOT have the error flag set and it is");
-                }
-                catch (Exception)
-                {
-                    throw;
+                    switch (fileStatus.ID)
+                    {
+                        case 1: Assert.AreEqual("Incomplete", fileStatus.Status); break;
+                        case 2: Assert.AreEqual("Done", fileStatus.Status); break;
+                        case 3: Assert.AreEqual("Failed", fileStatus.Status); break;
+                        case 4: Assert.AreEqual("Processing", fileStatus.Status); break;
+                    }
                 }
             }
             catch (Exception ex)
@@ -125,6 +204,58 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
+        /// <summary>
+        /// basic test that list of current workflows can be retrieved
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void Test_GetFileDeletion()
+        {
+            string dbName = "DocumentAPI_Test_GetFileDeletion";
+
+            try
+            {
+                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
+
+                (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
+                    _testDbManager.InitializeEnvironment<TestWorkflow, UsersController>
+                        ("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+
+                var documentController = user.CreateController<DocumentController>();
+
+                // There are 18 completed files to begin with, there should be 17 after deletion.
+                documentController.DeleteDocument(3)
+                    .AssertResultCode(StatusCodes.Status204NoContent);
+
+                var workflowController = user.CreateController<WorkflowController>();
+
+                var workflowStatus = workflowController.GetWorkflowStatus()
+                    .AssertGoodResult<WorkflowStatusResult>();
+
+                Assert.AreEqual(0, workflowStatus.NumberIncomplete,
+                    "Incorrect incomplete count");
+                Assert.AreEqual(17, workflowStatus.NumberProcessing,
+                    "Incorrect processing count");
+                Assert.AreEqual(0, workflowStatus.NumberDone,
+                    "Incorrect done count");
+                Assert.AreEqual(0, workflowStatus.NumberFailed,
+                    "Incorrect failed count");
+
+                var fileStatuses = workflowController.GetDocumentStatuses()
+                    .AssertGoodResult<FileStatusResult>();
+
+                Assert.AreEqual(17, fileStatuses.FileStatuses.Count);
+                Assert.IsFalse(fileStatuses.FileStatuses.Any(status => status.ID == 3));
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail("Exception: {0}, in: {1}", ex.Message, ApiTestUtils.GetMethodName());
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
 
         #endregion Public Test Functions
     }

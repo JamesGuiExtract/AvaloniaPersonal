@@ -411,12 +411,15 @@ static const string gstrCREATE_WORKFLOW =
 	"	[OutputFileMetadataFieldID] INT, "
 	"	[OutputFilePathInitializationFunction] NVARCHAR(255) NULL, "
 	"	[LoadBalanceWeight] INT NOT NULL CONSTRAINT [DF_Workflow_LoadBalanceWeight] DEFAULT(1), "
+	"	[EditActionID] INT, "
+	"	[PostEditActionID] INT, "
 	"	CONSTRAINT [IX_WorkflowName] UNIQUE NONCLUSTERED ([Name]))";
 
 static const string gstrCREATE_WORKFLOWFILE =
 	"CREATE TABLE dbo.[WorkflowFile]( "
 	"	[WorkflowID] INT NOT NULL, "
 	"	[FileID] INT NOT NULL, "
+	"	[Deleted] BIT NOT NULL DEFAULT(0), "
 	"	CONSTRAINT [PK_WorkflowFile] PRIMARY KEY CLUSTERED ([WorkflowID], [FileID]));";
 
 static const string gstrCREATE_WORKFLOWCHANGE =
@@ -1111,6 +1114,20 @@ static const string gstrADD_WORKFLOW_ENDACTION_FK =
 static const string gstrADD_WORKFLOW_POSTWORKFLOWACTION_FK =
 	"ALTER TABLE [dbo].[Workflow]  "
 	" WITH CHECK ADD CONSTRAINT [FK_Workflow_PostWorkflowAction] FOREIGN KEY([PostWorkflowActionID]) "
+	" REFERENCES [dbo].[Action] ([ID])"
+	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
+	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Action table.
+
+static const string gstrADD_WORKFLOW_EDITACTION_FK =
+	"ALTER TABLE [dbo].[Workflow]  "
+	" WITH CHECK ADD CONSTRAINT [FK_Workflow_EditAction] FOREIGN KEY([EditActionID]) "
+	" REFERENCES [dbo].[Action] ([ID])"
+	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
+	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Action table.
+
+static const string gstrADD_WORKFLOW_POSTEDITACTION_FK =
+	"ALTER TABLE [dbo].[Workflow]  "
+	" WITH CHECK ADD CONSTRAINT [FK_Workflow_PostEditAction] FOREIGN KEY([PostEditActionID]) "
 	" REFERENCES [dbo].[Action] ([ID])"
 	" ON UPDATE NO ACTION "  // Anything except NO ACTION leads to errors about cascading
 	" ON DELETE NO ACTION";  // updates/deletes due to multiple FKs to Action table.
@@ -1970,13 +1987,14 @@ static const string gstrGET_WORKFLOW_STATUS =
 
 "DECLARE @workflowFileIDs TABLE (FileID INT) \r\n"
 "DECLARE @workflowStatuses TABLE \r\n"
-"	(P INT, R INT, S INT, F INT, C INT, \r\n"
+"	(FileID INT, P INT, R INT, S INT, F INT, C INT, \r\n"
 "	 EndStatus NVARCHAR(1), WorkflowStatus NVARCHAR(1)) \r\n"
 
 "INSERT INTO @workflowFileIDs (FileID) \r\n"
 "	SELECT DISTINCT [FileID] \r\n"
 "		FROM [WorkflowFile] \r\n"
 "			WHERE [WorkflowID] = <WorkflowID> \r\n"
+"			AND [DELETED] = 0 \r\n"
 "			AND (<FileID> < 1 OR <FileID> = [FileID]) \r\n"
 
 "DECLARE @fileID INT \r\n"
@@ -1988,12 +2006,14 @@ static const string gstrGET_WORKFLOW_STATUS =
 "FETCH NEXT FROM fileCursor INTO @fileID \r\n"
 "WHILE @@FETCH_STATUS = 0 \r\n"
 "BEGIN \r\n"
-"	SELECT @endStatus = [ActionStatus] \r\n"
+// https://extract.atlassian.net/browse/ISSUE-15647
+// Ensure that @endStatus is updated even if the file does not have a status in the end action.
+"	SELECT @endStatus = COALESCE(MAX([ActionStatus]), 'U') \r\n" 
 "		FROM [FileActionStatus] \r\n"
 "		WHERE [FileID] = @fileID AND [ActionID] = <EndActionID>; \r\n"
 
-"	INSERT INTO @workflowStatuses (P, R, S, F, C, EndStatus) \r\n"
-"	SELECT *, @endStatus FROM \r\n"
+"	INSERT INTO @workflowStatuses (FileID, P, R, S, F, C, EndStatus) \r\n"
+"	SELECT @fileID, *, @endStatus FROM \r\n"
 "	( \r\n"
 "		SELECT [FileID], [ActionStatus] FROM [FileActionStatus] \r\n"
 "			WHERE [FileID] = @fileID AND [ActionID] IN (<ActionIDs>) \r\n"
@@ -2029,10 +2049,21 @@ static const string gstrGET_WORKFLOW_STATUS =
 "WHERE [WorkflowStatus] IS NULL \r\n"
 "AND [F] > 0 \r\n"
 
-"SELECT \r\n"
-"	COALESCE([WorkflowStatus], 'U') AS [Status], COUNT(*) AS [Count] \r\n"
+" IF 1 = <ReturnFileStatuses> BEGIN \r\n"
+" SELECT \r\n"
+"		[FileID], \r\n"
+"		COALESCE([WorkflowStatus], 'U') AS [Status] \r\n"
 "	FROM @workflowStatuses \r\n"
-"	GROUP BY [WorkflowStatus] \r\n"
+"	ORDER BY FileID \r\n"
+"END \r\n"
+"ELSE BEGIN \r\n"
+"SELECT \r\n"
+"		COALESCE([WorkflowStatus], 'U') AS [Status], \r\n"
+"		COUNT(*) AS [Count] \r\n"
+"	FROM @workflowStatuses \r\n"
+"	WHERE 0 = <ReturnFileStatuses> \r\n"
+"	GROUP BY[WorkflowStatus] \r\n"
+"END \r\n"
 
 // Ensure NOCOUNT is set back to off
 "SET NOCOUNT OFF \r\n"

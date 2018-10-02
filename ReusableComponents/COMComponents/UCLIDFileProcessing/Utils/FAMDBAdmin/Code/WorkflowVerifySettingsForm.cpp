@@ -69,35 +69,6 @@ namespace Extract
 
 				auto settings = gcnew RedactionVerificationSettings();
 
-				// 0 is a blank value
-				if (_verifyActionComboBox->SelectedIndex > 0)
-				{
-					settings->VerifyAction = (String^)_verifyActionComboBox->SelectedItem;
-				}
-				else
-				{
-					System::Windows::Forms::MessageBox::Show("Verify action must be specified.");
-					return;
-				}
-
-				// 0 is a blank value
-				if (_postVerifyActionComboBox->SelectedIndex > 0)
-				{
-					settings->PostVerifyAction = (String^)_postVerifyActionComboBox->SelectedItem;
-
-					if (settings->VerifyAction == settings->PostVerifyAction)
-					{
-						System::Windows::Forms::MessageBox::Show(
-							"Verify and post-verify actions cannot be the same.");
-						return;
-					}
-				}
-				else
-				{
-					System::Windows::Forms::MessageBox::Show("Post-verify action must be specified.");
-					return;
-				}
-
 				settings->RedactionTypes = getConfiguredRedactionTypes();
 
 				_settings = settings;
@@ -116,10 +87,6 @@ namespace Extract
 
 		Void WorkflowVerifySettingsForm::loadActionsCombos()
 		{
-			// Clear the action lists so they can be reloaded
-			_verifyActionComboBox->Items->Clear();
-			_postVerifyActionComboBox->Items->Clear();
-
 			IVariantVectorPtr mainSequenceActions(CLSID_VariantVector);
 
 			// If this is a new workflow load all the actions
@@ -133,22 +100,6 @@ namespace Extract
 				{
 					mainSequenceActions->PushBack(properties->Item[1]);
 				}
-			}
-
-			// Load each of the action combo boxes
-			ListCtrlHelper::LoadListCtrl(_verifyActionComboBox, mainSequenceActions);
-			ListCtrlHelper::LoadListCtrl(_postVerifyActionComboBox, mainSequenceActions);
-
-			// Empty item at the first index
-			_verifyActionComboBox->Items->Insert(0, "");
-			_postVerifyActionComboBox->Items->Insert(0, "");
-
-			if (_settings != __nullptr)
-			{
-				_verifyActionComboBox->SelectedIndex =
-					_verifyActionComboBox->FindStringExact(_settings->VerifyAction);
-				_postVerifyActionComboBox->SelectedIndex =
-					_postVerifyActionComboBox->FindStringExact(_settings->PostVerifyAction);
 			}
 		}
 

@@ -18,23 +18,44 @@ namespace WebAPI.Controllers
     public class WorkflowController : Controller
     {
         /// <summary>
-        /// get status of specified workflow
+        /// Gets the overall status of a workflow (# of files in each state)
         /// </summary>
         /// <returns>a workflow status object</returns>
-        [HttpGet("GetWorkflowStatus")]
-        [Produces(typeof(WorkflowStatus))]
+        [HttpGet("Status")]
+        [ProducesResponseType(200, Type = typeof(WorkflowStatusResult))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
         public IActionResult GetWorkflowStatus()
         {
             try
             {
                 var result = WorkflowData.GetWorkflowStatus(ClaimsToContext(User));
-                return result.Error.ErrorOccurred ? (IActionResult)BadRequest(result) : Ok(result);
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI43660");
-                Log.WriteLine(ee);
-                return BadRequest(MakeWorkflowStatusError(ee.Message));
+                return this.GetAsHttpError(ex, "ELI46397");
+            }
+        }
+
+        /// <summary>
+        /// Gets the status of all files in the workflow
+        /// </summary>
+        /// <returns>a workflow status object</returns>
+        [HttpGet("DocumentStatuses")]
+        [ProducesResponseType(200, Type = typeof(FileStatusResult))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        public IActionResult GetDocumentStatuses()
+        {
+            try
+            {
+                var result = WorkflowData.GetDocumentStatuses(ClaimsToContext(User));
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI46413");
             }
         }
     }

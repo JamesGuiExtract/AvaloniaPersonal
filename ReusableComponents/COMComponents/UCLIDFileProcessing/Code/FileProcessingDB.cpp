@@ -4127,7 +4127,7 @@ STDMETHODIMP CFileProcessingDB::GetWorkflowStatus(long nFileID, EActionStatus* p
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42135");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetWorkflowStatusAllFiles(long *pnUnattempted, long *pnProcessing,
+STDMETHODIMP CFileProcessingDB::GetAggregateWorkflowStatus(long *pnUnattempted, long *pnProcessing,
 														  long *pnCompleted, long *pnFailed)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
@@ -4136,17 +4136,38 @@ STDMETHODIMP CFileProcessingDB::GetWorkflowStatusAllFiles(long *pnUnattempted, l
 	{
 		validateLicense();
 
-		if (!GetWorkflowStatusAllFiles_Internal(false, pnUnattempted, pnProcessing, pnCompleted, pnFailed))
+		if (!GetAggregateWorkflowStatus_Internal(false, pnUnattempted, pnProcessing, pnCompleted, pnFailed))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 				gstrMAIN_DB_LOCK);
 
-			GetWorkflowStatusAllFiles_Internal(true, pnUnattempted, pnProcessing, pnCompleted, pnFailed);
+			GetAggregateWorkflowStatus_Internal(true, pnUnattempted, pnProcessing, pnCompleted, pnFailed);
 		}
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42153");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetWorkflowStatusAllFiles(BSTR *pbstrStatusListing)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!GetWorkflowStatusAllFiles_Internal(false, pbstrStatusListing))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			GetWorkflowStatusAllFiles_Internal(true, pbstrStatusListing);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46408");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::LoginUser(BSTR bstrUserName, BSTR bstrPassword)
@@ -4650,6 +4671,26 @@ STDMETHODIMP CFileProcessingDB::AbortFAMSession(long nFAMSessionID)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46252");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::MarkFileDeleted(long nFileID, long nWorkflowID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		if (!MarkFileDeleted_Internal(false, nFileID, nWorkflowID))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			MarkFileDeleted_Internal(true, nFileID, nWorkflowID);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46298");
 }
 
 //-------------------------------------------------------------------------------------------------

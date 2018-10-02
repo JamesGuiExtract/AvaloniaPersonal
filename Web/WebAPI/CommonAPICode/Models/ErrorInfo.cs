@@ -1,24 +1,30 @@
-﻿namespace WebAPI.Models
+﻿using System.Collections.Generic;
+
+namespace WebAPI.Models
 {
-    // embed this into top-level returned POCO classes
     /// <summary>
-    /// standard error information for returned objects
+    /// Information descriping API errors
     /// </summary>
     public class ErrorInfo
     {
         /// <summary>
-        /// Boolean flag, true if an error has occurred
-        /// </summary>
-        public bool ErrorOccurred { get; set; }
-
-        /// <summary>
-        /// error message
+        /// Description of the error.
         /// </summary>
         public string Message { get; set; }
 
         /// <summary>
-        /// error code - non-zero signals an error
+        /// Code associated with the error
         /// </summary>
-        public int Code { get; set; }
+        public string Code { get; set; }
+
+        /// <summary>
+        /// Codes providing further context for the error
+        /// </summary>
+        public List<string> AdditionalCodes { get; set; }
+
+        /// <summary>
+        /// Parameters pertinent to the error.
+        /// </summary>
+        public List<string> ErrorDetails { get; set; }
     }
 }

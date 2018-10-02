@@ -2,6 +2,9 @@
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using UCLID_FILEPROCESSINGLib;
+using WebAPI.Controllers;
 using WebAPI.Models;
 
 namespace Extract.Web.WebAPI.Test
@@ -16,7 +19,7 @@ namespace Extract.Web.WebAPI.Test
         /// test DB Manager, used to extract a database backup file from the resource, and the attach/detach it
         /// to the local database server. 
         /// </summary>
-        static FAMTestDBManager<TestDocumentAttributeSet> _testDbManager;
+        static FAMTestDBManager<TestUsers> _testDbManager;
 
         #endregion Fields
 
@@ -27,7 +30,7 @@ namespace Extract.Web.WebAPI.Test
         {
             GeneralMethods.TestSetup();
 
-            _testDbManager = new FAMTestDBManager<TestDocumentAttributeSet>();
+            _testDbManager = new FAMTestDBManager<TestUsers>();
         }
 
         [TestFixtureTearDown]
@@ -53,27 +56,14 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
+                (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
+                    _testDbManager.InitializeEnvironment<TestUsers, UsersController>
+                        ("Resources.Demo_LabDE.bak", dbName, "admin", "a");
 
-                ApiTestUtils.SetDefaultApiContext(dbName);
+                var result = userController.Login(user);
+                var token = result.AssertGoodResult<JwtSecurityToken>();
 
-                try
-                {
-                    var user = new User()
-                    {
-                        Username = "admin",
-                        Password = "a"
-                    };
-
-                    using (var userData = new UserData(ApiTestUtils.CurrentApiContext))
-                    {
-                        userData.LoginUser(user);
-                    }
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
+                Assert.AreEqual("admin", token.Subject, "Unexpected token subject");
             }
             catch (Exception ex)
             {

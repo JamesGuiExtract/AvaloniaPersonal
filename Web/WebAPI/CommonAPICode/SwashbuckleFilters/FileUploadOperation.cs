@@ -24,7 +24,7 @@ namespace WebAPI.Filters
                 // “api” + [Controller name] + [Method Name] + [HTTP Verb]
                 // Or in other words, it is the URL of your controller method, but without “/” + [HTTP Verb]
                 //            if (operation.OperationId.ToLower() == "apidocumentuploadfilepost")
-                if (operation.OperationId.IsEquivalent("ApiDocumentSubmitFilePost"))
+                if (operation.OperationId.IsEquivalent("ApiDocumentPost"))
                 {
                     // Clear all parameters EXCEPT for the authorization parameter, if it exists. Not doing this
                     // creates an order dependency - the auth filter needs to be AFTER the file upload filter. If

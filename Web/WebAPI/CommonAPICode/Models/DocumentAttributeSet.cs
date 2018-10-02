@@ -3,30 +3,37 @@
 namespace WebAPI.Models
 {
     /// <summary>
-    /// Document attribute set - contains a (possibly empty) list of document attributes
+    /// Document attributes retrieved as an API call result.
     /// </summary>
-    public class DocumentAttributeSet : IResultData
+    public class DocumentDataResult
     {
         /// <summary>
         /// list of attributes - may be empty (on error WILL be empty)
         /// </summary>
-        public List<DocumentAttribute> Attributes { get; set; }
-
-        /// <summary>
-        /// Error info - Error == true if there has been an error
-        /// </summary>
-        public ErrorInfo Error { get; set; }
+        public List<DocumentAttribute> Attributes { get; set; } = new List<DocumentAttribute>();
     }
 
     /// <summary>
-    /// A document attribute set without <see cref="ErrorInfo"/> (for web API callers to use when
-    /// updating document data).
+    /// Document attributes to replace all existing data for a document.
     /// </summary>
-    public class BareDocumentAttributeSet
+    public class DocumentDataInput
     {
         /// <summary>
         /// A list of <see cref="DocumentAttribute"/> comprising the document data.
         /// </summary>
         public List<DocumentAttribute> Attributes { get; set; }
+    }
+
+    /// <summary>
+    /// Represents changes to make to an existing attribute set (add/update/delete). There is no
+    /// hierarchy to these attributes; each change is made using attribute a guid; changes are made
+    /// in the order they appear in the Attributes list.
+    /// </summary>
+    public class DocumentDataPatch
+    {
+        /// <summary>
+        /// Gets or sets the attributes to add/change/delete.
+        /// </summary>
+        public List<DocumentAttributePatch> Attributes { get; set; }
     }
 }

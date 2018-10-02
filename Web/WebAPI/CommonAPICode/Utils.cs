@@ -16,6 +16,11 @@ namespace WebAPI
     /// </summary>
     public static class Utils
     {
+        /// <summary>
+        /// The name of the workflow name claim used for ClaimsPrincipals
+        /// </summary>
+        public static string _WORKFLOW_NAME = "WorkflowName";
+
         private static IHostingEnvironment _environment = null;
         private static ApiContext _currentApiContext = null;
         private static object _apiContextLock = new Object();
@@ -33,84 +38,19 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// make an error info instance
-        /// </summary>
-        /// <param name="isError">true or false</param>
-        /// <param name="message">error message</param>
-        /// <param name="code">error code (-1 for error, 0 for no error)</param>
-        /// <returns>error info instance</returns>
-        public static ErrorInfo MakeError(bool isError, string message = "", int code = 0)
-        {
-            return new ErrorInfo
-            {
-                ErrorOccurred = isError,
-                Message = message,
-                Code = code
-            };
-        }
-
-        /// <summary>
-        /// makes a document attribute set for returning an error
-        /// </summary>
-        /// <param name="message">error mesasge</param>
-        /// <returns>DocumentAttributeSet instance with the error info set</returns>
-        public static DocumentAttributeSet MakeDocumentAttributeSetError(string message)
-        {
-            return new DocumentAttributeSet
-            {
-                Error = new ErrorInfo
-                {
-                    ErrorOccurred = true,
-                    Message = message,
-                    Code = -1
-                },
-
-                Attributes = null
-            };
-        }
-
-        /// <summary>
-        /// make a document attribute set for a successful return case
-        /// </summary>
-        /// <returns>new DocumentAttributeSet</returns>
-        public static DocumentAttributeSet MakeNewDocumentAttributeSet()
-        {
-            return new DocumentAttributeSet
-            {
-                Error = MakeError(isError: false),
-                Attributes = new List<DocumentAttribute>()
-            };
-        }
-
-        /// <summary>
-        /// makes a WorkflowStatus with an error message
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns>a workflow status instance with the error info set</returns>
-        public static WorkflowStatus MakeWorkflowStatusError(string message)
-        {
-            return new WorkflowStatus
-            {
-                Error = Utils.MakeError(isError: true,
-                                        message: message,
-                                        code: -1)
-            };
-        }
-
-        /// <summary>
         /// environment getter/setter
         /// </summary>
         public static IHostingEnvironment environment
         {
             get
             {
-                Contract.Assert(_environment != null, "environment is null");
+                HTTPError.Assert("ELI46363",_environment != null, "Environment is null");
                 return _environment;
             }
             
             set
             {
-                Contract.Assert(value != null, "environment is being set to null");
+                HTTPError.Assert("ELI46364", value != null, "Environment is being set to null");
                 _environment = value;
             }
         }
@@ -135,51 +75,6 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// makes a DocumentSubmitResult
-        /// </summary>
-        /// <param name="fileId">file id</param>
-        /// <param name="isError">true or false</param>
-        /// <param name="message">empty, or error message</param>
-        /// <param name="code">error code value, 0 (no error) or -1 (error)</param>
-        /// <param name="submitType">file or text submission type</param>
-        /// <returns>completed DocumentSubmitResult object</returns>
-        public static DocumentSubmitResult MakeDocumentSubmitResult(int fileId, 
-                                                                    bool isError = false, 
-                                                                    string message = "", 
-                                                                    int code = 0,
-                                                                    DocumentSubmitType submitType = DocumentSubmitType.File)
-        {
-            DocumentSubmitResult result = new DocumentSubmitResult()
-            {
-                Id = isError ? -1 : fileId,
-                Error = MakeError(isError: isError, message: message, code: code)
-            };
-
-            return result;
-        }
-
-        /// <summary>
-        /// routine to simplify making a ProcessingStatus instance
-        /// </summary>
-        /// <param name="status">status value</param>
-        /// <param name="isError">true if error, false otherwise, defaults to false</param>
-        /// <param name="message">error message, defaults to empty</param>
-        /// <param name="code">error code, defaults to zero (no error)</param>
-        /// <returns>completed ProcessingStatus object</returns>
-        public static ProcessingStatus MakeProcessingStatus(DocumentProcessingStatus status,
-                                                            bool isError = false,
-                                                            string message = "",
-                                                            int code = 0)
-        {
-            return new ProcessingStatus()
-            {
-                DocumentStatus = status,
-                StatusText = Enum.GetName(typeof(DocumentProcessingStatus), status),
-                Error = MakeError(isError, message, code)
-            };
-        }
-
-        /// <summary>
         /// returns the method name of the caller - do NOT set the default argument!
         /// </summary>
         /// <param name="caller">do not set this!</param>
@@ -187,22 +82,6 @@ namespace WebAPI
         public static string GetMethodName([CallerMemberName] string caller = null)
         {
             return caller;
-        }
-
-        /// <summary>
-        /// makes a TextResult object
-        /// </summary>
-        /// <param name="text">text of the TextResult</param>
-        /// <param name="isError">true if error</param>
-        /// <param name="errorMessage">error message</param>
-        /// <returns>completed TextResult object</returns>
-        public static TextResult MakeTextResult(string text, bool isError = false, string errorMessage = "")
-        {
-            return new TextResult
-            {
-                Text = text,
-                Error = MakeError(isError, errorMessage, isError == true ? -1 : 0)
-            };
         }
 
         /// <summary>
@@ -214,7 +93,8 @@ namespace WebAPI
             {
                 lock (_apiContextLock)
                 {
-                    Contract.Assert(_currentApiContext != null, "Default API context is not set");
+                    HTTPError.Assert("ELI46368", _currentApiContext != null,
+                        "Default API context is not set");
                     return _currentApiContext;
                 }
             }
@@ -327,13 +207,16 @@ namespace WebAPI
         {
             try
             {
-                var workflowName = user.Claims.Where(claim => claim.Type == "WorkflowName").Select(claim => claim.Value).FirstOrDefault();
+                var workflowName = user.Claims.Where(claim => claim.Type == _WORKFLOW_NAME).Select(claim => claim.Value).FirstOrDefault();
                 var databaseServerName = CurrentApiContext.DatabaseServerName;
                 var databaseName = CurrentApiContext.DatabaseName;
 
-                Contract.Assert(!String.IsNullOrWhiteSpace(databaseServerName), "Database server name is empty, from Claims");
-                Contract.Assert(!String.IsNullOrWhiteSpace(databaseName), "Database name is empty");
-                Contract.Assert(!String.IsNullOrWhiteSpace(workflowName), "Workflow name is empty");
+                HTTPError.Assert("ELI46369", !String.IsNullOrWhiteSpace(databaseServerName),
+                    "Database server name not provided");
+                HTTPError.Assert("ELI46370", !String.IsNullOrWhiteSpace(databaseName),
+                    "Database name is not provided");
+                HTTPError.Assert("ELI46371", !String.IsNullOrWhiteSpace(workflowName),
+                    "Workflow name is not provided");
 
                 var context = new ApiContext(databaseServerName, databaseName, workflowName);
                 context.SessionId = user.GetClaim(JwtRegisteredClaimNames.Jti);
@@ -359,8 +242,32 @@ namespace WebAPI
         public static string GetClaim(this ClaimsPrincipal claimsPrincipal, string claimName)
         {
             return claimsPrincipal.Claims
-                .Single(claim => claim.Type.Equals(claimName, StringComparison.OrdinalIgnoreCase))
-                .Value;
+                .SingleOrDefault(claim => claim.Type.Equals(claimName, StringComparison.OrdinalIgnoreCase))
+                ?.Value;
+        }
+
+        /// <summary>
+        /// Gets the username associated with the <see paramref="claimsPrincipal"/>.
+        /// </summary>
+        /// <param name="claimsPrincipal">The claims principal.</param>
+        /// <returns></returns>
+        public static string GetUsername(this ClaimsPrincipal claimsPrincipal)
+        {
+            var usernameClaim = claimsPrincipal.Claims
+                .SingleOrDefault(claim => 
+                    claim.Type.Equals(JwtRegisteredClaimNames.Sub, StringComparison.OrdinalIgnoreCase));
+
+            if (usernameClaim == null)
+            {
+                usernameClaim = claimsPrincipal.Claims
+                .SingleOrDefault(claim =>
+                    claim.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
+                        StringComparison.OrdinalIgnoreCase));
+            }
+
+            ExtractException.Assert("ELI46291", "Username not found", usernameClaim != null);
+
+            return usernameClaim.Value;
         }
 
         /// <summary>

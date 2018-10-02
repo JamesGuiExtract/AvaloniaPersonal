@@ -3,6 +3,7 @@ using Extract.FileActionManager.FileProcessors;
 using Extract.Imaging;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using System;
@@ -100,8 +101,8 @@ namespace Extract.Web.WebAPI.Test
 
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
-                result = controller.Logout();
-                result.AssertGoodResult<GenericResult>();
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
 
                 // Logout should close the FAM session
                 Assert.IsFalse(fileProcessingDb.IsAnyFAMActive());
@@ -133,13 +134,13 @@ namespace Extract.Web.WebAPI.Test
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.GetSettings();
-                var settings = result.AssertGoodResult<WebAppSettings>();
+                var settings = result.AssertGoodResult<WebAppSettingsResult>();
 
                 Assert.IsTrue(settings.RedactionTypes.SequenceEqual(
                     new[] { "DOB", "SSN",  "TestType" }), "Failed to retrieve redaction types");
 
-                result = controller.Logout();
-                result.AssertGoodResult<GenericResult>();
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
             }
             catch (Exception ex)
             {
@@ -168,28 +169,28 @@ namespace Extract.Web.WebAPI.Test
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentId>();
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(1, openDocumentResult.Id);
 
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
-                result = controller.CloseDocument(commit: false);
-                result.AssertGoodResult<GenericResult>();
+                controller.CloseDocument(commit: false)
+                    .AssertGoodResult<NoContentResult>();
 
                 Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
                 result = controller.OpenDocument();
-                result.AssertGoodResult<DocumentId>();
+                result.AssertGoodResult<DocumentIdResult>();
 
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
-                result = controller.CloseDocument(commit: true);
-                result.AssertGoodResult<GenericResult>();
+                controller.CloseDocument(commit: true)
+                    .AssertGoodResult<NoContentResult>();
 
                 Assert.AreEqual(EActionStatus.kActionCompleted, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
-                result = controller.Logout();
-                result.AssertGoodResult<GenericResult>();
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
             }
             finally
             {
@@ -214,29 +215,29 @@ namespace Extract.Web.WebAPI.Test
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentId>();
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(1, openDocumentResult.Id);
 
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
-                result = controller.CloseDocument(commit: false);
-                result.AssertGoodResult<GenericResult>();
+                controller.CloseDocument(commit: false)
+                    .AssertGoodResult<NoContentResult>();
 
                 Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
                 result = controller.OpenDocument(2);
-                openDocumentResult = result.AssertGoodResult<DocumentId>();
+                openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(2, openDocumentResult.Id);
 
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(2, _VERIFY_ACTION, false));
 
-                result = controller.CloseDocument(commit: true);
-                result.AssertGoodResult<GenericResult>();
+                controller.CloseDocument(commit: true)
+                    .AssertGoodResult<NoContentResult>();
 
                 Assert.AreEqual(EActionStatus.kActionCompleted, fileProcessingDb.GetFileStatus(2, _VERIFY_ACTION, false));
 
-                result = controller.Logout();
-                result.AssertGoodResult<GenericResult>();
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
             }
             finally
             {
@@ -261,15 +262,15 @@ namespace Extract.Web.WebAPI.Test
                 controller1.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller1.GetQueueStatus();
-                var queueStatus = result.AssertGoodResult<QueueStatus>();
+                var queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(1, queueStatus.ActiveUsers);
                 Assert.AreEqual(4, queueStatus.PendingDocuments);
 
                 result = controller1.OpenDocument();
-                result.AssertGoodResult<DocumentId>();
+                result.AssertGoodResult<DocumentIdResult>();
 
                 result = controller1.GetQueueStatus();
-                queueStatus = result.AssertGoodResult<QueueStatus>();
+                queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(1, queueStatus.ActiveUsers);
                 Assert.AreEqual(3, queueStatus.PendingDocuments);
 
@@ -281,39 +282,39 @@ namespace Extract.Web.WebAPI.Test
                 controller2.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller1.GetQueueStatus();
-                queueStatus = result.AssertGoodResult<QueueStatus>();
+                queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(2, queueStatus.ActiveUsers);
                 Assert.AreEqual(3, queueStatus.PendingDocuments);
 
-                result = controller1.CloseDocument(commit: true);
-                result.AssertGoodResult<GenericResult>();
+                controller1.CloseDocument(commit: true)
+                    .AssertGoodResult<NoContentResult>();
 
                 result = controller1.OpenDocument();
-                result.AssertGoodResult<DocumentId>();
+                result.AssertGoodResult<DocumentIdResult>();
 
                 result = controller2.GetQueueStatus();
-                queueStatus = result.AssertGoodResult<QueueStatus>();
+                queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(2, queueStatus.ActiveUsers);
                 Assert.AreEqual(2, queueStatus.PendingDocuments);
 
                 result = controller2.OpenDocument();
-                result.AssertGoodResult<DocumentId>();
+                result.AssertGoodResult<DocumentIdResult>();
 
                 result = controller2.GetQueueStatus();
-                queueStatus = result.AssertGoodResult<QueueStatus>();
+                queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(2, queueStatus.ActiveUsers);
                 Assert.AreEqual(1, queueStatus.PendingDocuments);
 
-                result = controller1.Logout();
-                result.AssertGoodResult<GenericResult>();
+                controller1.Logout()
+                    .AssertGoodResult<NoContentResult>();
 
                 result = controller2.GetQueueStatus();
-                queueStatus = result.AssertGoodResult<QueueStatus>();
+                queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(1, queueStatus.ActiveUsers);
                 Assert.AreEqual(2, queueStatus.PendingDocuments);
 
-                result = controller2.Logout();
-                result.AssertGoodResult<GenericResult>();
+                controller2.Logout()
+                    .AssertGoodResult<NoContentResult>();
             }
             finally
             {
@@ -338,36 +339,36 @@ namespace Extract.Web.WebAPI.Test
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
-                result = controller.CloseDocument(commit: false);
-                result.AssertGoodResult<GenericResult>();
+                controller.CloseDocument(commit: false)
+                    .AssertGoodResult<NoContentResult>();
 
                 Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(2, _VERIFY_ACTION, false));
 
                 result = controller.OpenDocument(2);
-                var openDocumentResult = result.AssertGoodResult<DocumentId>();
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(2, openDocumentResult.Id);
 
                 // Per GGK request, allow second call to OpenDocument to not fail and return the ID of the already
                 // open document.
                 // https://extract.atlassian.net/browse/WEB-55
                 result = controller.OpenDocument();
-                openDocumentResult = result.AssertGoodResult<DocumentId>();
+                openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(2, openDocumentResult.Id);
 
-                result = controller.CloseDocument(commit: false);
-                result.AssertGoodResult<GenericResult>();
+                controller.CloseDocument(commit: false)
+                    .AssertGoodResult<NoContentResult>();
 
                 // After document is closed, OpenDocument should open the first file in the queue,
                 // not the 2nd file that had been specified originally.
                 result = controller.OpenDocument();
-                openDocumentResult = result.AssertGoodResult<DocumentId>();
+                openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(1, openDocumentResult.Id);
 
-                result = controller.CloseDocument(commit: false);
-                result.AssertGoodResult<GenericResult>();
+                controller.CloseDocument(commit: false)
+                    .AssertGoodResult<NoContentResult>();
 
-                result = controller.Logout();
-                result.AssertGoodResult<GenericResult>();
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
             }
             finally
             {
@@ -392,13 +393,13 @@ namespace Extract.Web.WebAPI.Test
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentId>();
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(1, openDocumentResult.Id);
 
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
-                result = controller.Logout();
-                result.AssertGoodResult<GenericResult>();
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
 
                 Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
             }
@@ -430,12 +431,12 @@ namespace Extract.Web.WebAPI.Test
 
                 // Use it to open a document.
                 result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentId>();
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(1, openDocumentResult.Id);
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
                 result = controller.GetQueueStatus();
-                var beforeQueueStatus = result.AssertGoodResult<QueueStatus>();
+                var beforeQueueStatus = result.AssertGoodResult<QueueStatusResult>();
 
                 // Simulate the web service being stopped.
                 controller.Dispose();
@@ -453,7 +454,7 @@ namespace Extract.Web.WebAPI.Test
 
                 // Should be able to query queue status despite new controller not having access to the document session.
                 result = controller2.GetQueueStatus();
-                var afterQueueStatus = result.AssertGoodResult<QueueStatus>();
+                var afterQueueStatus = result.AssertGoodResult<QueueStatusResult>();
 
                 // Document 1 should remain in processing state
                 Assert.AreEqual(beforeQueueStatus.PendingDocuments, afterQueueStatus.PendingDocuments);
@@ -462,7 +463,7 @@ namespace Extract.Web.WebAPI.Test
                 // Query that required access to the document session should generate an unauthorized
                 // error that should abort previous document session.
                 result = controller2.GetPageInfo();
-                result.AssertResultCode(HttpStatusCode.Unauthorized);
+                result.AssertResultCode(StatusCodes.Status401Unauthorized);
 
                 // Ensure document 1 has now been reset to pending.
                 Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
@@ -497,11 +498,11 @@ namespace Extract.Web.WebAPI.Test
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentId>();
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(fileId, openDocumentResult.Id);
 
                 result = controller.GetPageInfo();
-                var pagesInfo = result.AssertGoodResult<PagesInfo>();
+                var pagesInfo = result.AssertGoodResult<PagesInfoResult>();
 
                 Assert.AreEqual(pagesInfo.PageCount, 4, "Unexpected page count");
                 Assert.AreEqual(pagesInfo.PageInfos.Count, 4, "Unexpected page infos count");
@@ -516,8 +517,8 @@ namespace Extract.Web.WebAPI.Test
                     Assert.AreEqual(0, pageInfo.DisplayOrientation, "Unexpected page orientation");
                 }
 
-                result = controller.Logout();
-                result.AssertGoodResult<GenericResult>();
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
             }
             finally
             {
@@ -552,11 +553,11 @@ namespace Extract.Web.WebAPI.Test
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentId>();
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(fileId, openDocumentResult.Id);
 
                 result = controller.GetPageInfo();
-                var pagesInfo = result.AssertGoodResult<PagesInfo>();
+                var pagesInfo = result.AssertGoodResult<PagesInfoResult>();
 
                 Assert.AreEqual(pagesInfo.PageCount, 4, "Unexpected page count");
                 Assert.AreEqual(pagesInfo.PageInfos.Count, 4, "Unexpected page infos count");
@@ -571,8 +572,8 @@ namespace Extract.Web.WebAPI.Test
                     Assert.AreEqual((page == 2) ? 270 : 0, pageInfo.DisplayOrientation, "Unexpected page orientation");
                 }
 
-                result = controller.Logout();
-                result.AssertGoodResult<GenericResult>();
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
             }
             finally
             {
@@ -609,7 +610,7 @@ namespace Extract.Web.WebAPI.Test
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentId>();
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
 
                 using (var codecs = new ImageCodecs())
                     for (int page = 1; page <= 4; page++)
@@ -644,8 +645,8 @@ namespace Extract.Web.WebAPI.Test
                         }
                     }
 
-                result = controller.Logout();
-                result.AssertGoodResult<GenericResult>();
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
             }
             finally
             {
@@ -672,20 +673,20 @@ namespace Extract.Web.WebAPI.Test
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
-                result.AssertGoodResult<DocumentId>();
+                result.AssertGoodResult<DocumentIdResult>();
 
                 result = controller.GetDocumentData();
-                var attributeSet = result.AssertGoodResult<DocumentAttributeSet>();
+                var attributeSet = result.AssertGoodResult<DocumentDataResult>();
 
                 Assert.IsTrue(attributeSet.Attributes.Count > 0);
                 foreach (var attribute in attributeSet.Attributes)
                 {
                     // Per discussion with GGK, non-spatial attributes will not be sent.
-                    Assert.IsTrue(attribute.HasPositionInfo);
+                    Assert.IsTrue(attribute.HasPositionInfo == true);
                 }
 
-                result = controller.Logout();
-                result.AssertGoodResult<GenericResult>();
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
             }
             finally
             {
@@ -734,29 +735,29 @@ namespace Extract.Web.WebAPI.Test
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
-                result.AssertGoodResult<DocumentId>();
+                result.AssertGoodResult<DocumentIdResult>();
 
                 result = controller.GetDocumentData();
-                var attributeSet = result.AssertGoodResult<DocumentAttributeSet>();
+                var attributeSet = result.AssertGoodResult<DocumentDataResult>();
 
                 var updatedAttributes = attributeSet.Attributes.Skip(1);
                 Assert.AreEqual(updatedAttributes.Count() + 1, attributeSet.Attributes.Count());
 
-                var updateAttributeSet = new BareDocumentAttributeSet()
+                var updateAttributeSet = new DocumentDataInput()
                 {
                     Attributes = new List<DocumentAttribute>(updatedAttributes)
                 };
 
-                result = controller.SaveDocumentData(updateAttributeSet);
-                result.AssertGoodResult<GenericResult>();
+                controller.SaveDocumentData(updateAttributeSet)
+                    .AssertGoodResult<NoContentResult>();
 
                 result = controller.GetDocumentData();
-                attributeSet = result.AssertGoodResult<DocumentAttributeSet>();
+                attributeSet = result.AssertGoodResult<DocumentDataResult>();
 
                 Assert.AreEqual(attributeSet.Attributes.Count(), updatedAttributes.Count());
 
-                result = controller.Logout();
-                result.AssertGoodResult<GenericResult>();
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
             }
             finally
             {
@@ -793,7 +794,7 @@ namespace Extract.Web.WebAPI.Test
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
-                result.AssertGoodResult<DocumentId>();
+                result.AssertGoodResult<DocumentIdResult>();
 
                 var documentText = new SpatialString();
                 documentText.LoadFrom(ussFileName, false);
@@ -806,7 +807,7 @@ namespace Extract.Web.WebAPI.Test
                     IUnknownVector pageWords = pageText.GetWords();
 
                     result = controller.GetPageWordZones(page);
-                    var wordZoneData = result.AssertGoodResult<WordZoneData>();
+                    var wordZoneData = result.AssertGoodResult<WordZoneDataResult>();
                     Assert.AreEqual(pageWords.Size(), wordZoneData.Zones.Count(), "Unexpected number of words");
 
                     for (int i = 0; i < wordZoneData.Zones.Count(); i++)
@@ -825,8 +826,8 @@ namespace Extract.Web.WebAPI.Test
                     }
                 }
 
-                result = controller.Logout();
-                result.AssertGoodResult<GenericResult>();
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
             }
             finally
             {

@@ -150,8 +150,9 @@ namespace Extract
 				// Set the description
 				ipWorkflowDefinition->Description = context.marshal_as<BSTR>(descriptionTextBox->Text);
 
-				// Used to add the actions that are part of the definition to the workflow
-				IIUnknownVectorPtr ipActions(CLSID_IUnknownVector);
+				// Maps every action configured to be used in the workflow with a boolean that indicates
+				// whether the actions should be defaulted as a main sequence action for new workflows
+				Dictionary<String^, Boolean> ^configuredActions = gcnew Dictionary<String^, Boolean>();
 
 				EWorkflowType workflowType = kUndefined;
 				if (workFlowTypeComboBox->SelectedIndex >= 0)
@@ -166,29 +167,40 @@ namespace Extract
 				{
 					startAction = (String^)startActionComboBox->SelectedItem;
 					ipWorkflowDefinition->StartAction = context.marshal_as<BSTR>(startAction);
-					if (!String::IsNullOrWhiteSpace(startAction))
-					{
-						IVariantVectorPtr ipActionInfo(CLSID_VariantVector);
-						ipActionInfo->PushBack(ipWorkflowDefinition->StartAction);
-						ipActionInfo->PushBack(VARIANT_TRUE);
-						
-						ipActions->PushBack(ipActionInfo);
-					}
+					configuredActions[startAction] = true;
 				}
+
+				String^ editAction;
+				if (editActionComboBox->SelectedIndex >= 0)
+				{
+					editAction = (String^)editActionComboBox->SelectedItem;
+					ipWorkflowDefinition->EditAction = context.marshal_as<BSTR>(editAction);
+					configuredActions[editAction] = false;
+				}
+
+				if (postEditActionComboBox->SelectedIndex >= 0)
+				{
+					String^ postEditAction = (String^)postEditActionComboBox->SelectedItem;
+					if (editAction->Equals(postEditAction, StringComparison::OrdinalIgnoreCase))
+					{
+						System::Windows::Forms::MessageBox::Show(
+							"Post edit workflow action cannot be same as the edit action");
+						postWorkflowActionComboBox->Focus();
+						return;
+					}
+
+					ipWorkflowDefinition->PostEditAction = context.marshal_as<BSTR>(postEditAction);
+					configuredActions[postEditAction] = false;
+				}
+
 				String^ endAction;
 				if (endActionComboBox->SelectedIndex >= 0)
 				{
 					endAction = (String^)endActionComboBox->SelectedItem;
 					ipWorkflowDefinition->EndAction = context.marshal_as<BSTR>(endAction);
-					if (!String::IsNullOrWhiteSpace(endAction))
-					{
-						IVariantVectorPtr ipActionInfo(CLSID_VariantVector);
-						ipActionInfo->PushBack(ipWorkflowDefinition->EndAction);
-						ipActionInfo->PushBack(VARIANT_TRUE);
-
-						ipActions->PushBack(ipActionInfo);
-					}
+					configuredActions[endAction] = true;
 				}
+				
 				// 0 is a blank value so the post action should always be able to be empty
 				if (postWorkflowActionComboBox->SelectedIndex > 0)
 				{
@@ -202,14 +214,7 @@ namespace Extract
 					}
 
 					ipWorkflowDefinition->PostWorkflowAction = context.marshal_as<BSTR>(postWorkflowAction);
-					if (!String::IsNullOrWhiteSpace(postWorkflowAction))
-					{
-						IVariantVectorPtr ipActionInfo(CLSID_VariantVector);
-						ipActionInfo->PushBack(ipWorkflowDefinition->PostWorkflowAction);
-						ipActionInfo->PushBack(VARIANT_FALSE);
-
-						ipActions->PushBack(ipActionInfo);
-					}
+					configuredActions[postWorkflowAction] = false;
 				}
 
 				if (outputAttributeSetComboBox->SelectedIndex >= 0)
@@ -233,8 +238,18 @@ namespace Extract
 					_workflowID = _ipfamDatabase->AddWorkflow(ipWorkflowDefinition->Name, workflowType);
 					ipWorkflowDefinition->ID = _workflowID;
 
-					if (ipActions->Size() > 0)
+					if (configuredActions->Count > 0)
 					{
+						IIUnknownVectorPtr ipActions(CLSID_IUnknownVector);
+						for each (KeyValuePair<String^, Boolean> ^item in configuredActions)
+						{
+							IVariantVectorPtr ipActionInfo(CLSID_VariantVector);
+							ipActionInfo->PushBack(context.marshal_as<BSTR>(item->Key));
+							ipActionInfo->PushBack(item->Value ? VARIANT_TRUE : VARIANT_FALSE);
+
+							ipActions->PushBack(ipActionInfo);
+						}
+
 						// Need to add the actions that are in the definition to the workflow
 						_ipfamDatabase->SetWorkflowActions(_workflowID, ipActions);
 					}
@@ -275,6 +290,12 @@ namespace Extract
 				
 				String^ value = marshal_as<String^>(ipWorkflowDefinition->StartAction);
 				startActionComboBox->SelectedIndex = startActionComboBox->FindStringExact(value);
+
+				value = marshal_as<String^>(ipWorkflowDefinition->EditAction);
+				editActionComboBox->SelectedIndex = editActionComboBox->FindStringExact(value);
+
+				value = marshal_as<String^>(ipWorkflowDefinition->PostEditAction);
+				postEditActionComboBox->SelectedIndex = postEditActionComboBox->FindStringExact(value);
 				
 				value = marshal_as<String^>(ipWorkflowDefinition->EndAction);
 				endActionComboBox->SelectedIndex = endActionComboBox->FindStringExact(value);
@@ -299,6 +320,7 @@ namespace Extract
 		{
 			IVariantVectorPtr mainSequenceActions(CLSID_VariantVector);
 			IVariantVectorPtr otherActions(CLSID_VariantVector);
+			IVariantVectorPtr allActions(CLSID_VariantVector);
 
 			// If this is a new workflow load all the actions
 			// if this is an existing workflow just load the actions associated with the workflow
@@ -308,6 +330,7 @@ namespace Extract
 				IStrToStrMapPtr actions = _ipfamDatabase->GetAllActions();
 				mainSequenceActions->Append(actions->GetKeys());
 				otherActions->Append(actions->GetKeys());
+				allActions->Append(actions->GetKeys());
 			}
 			else
 			{
@@ -324,14 +347,23 @@ namespace Extract
 					{
 						otherActions->PushBack(properties->Item[1]);
 					}
+
+					allActions->PushBack(properties->Item[1]);
 				}
 			}
-
 
 			// Load each of the action combo boxes
 			ListCtrlHelper::LoadListCtrl(startActionComboBox, mainSequenceActions);
 			// Empty item at the first index
 			startActionComboBox->Items->Insert(0, "");
+
+			ListCtrlHelper::LoadListCtrl(editActionComboBox, allActions);
+			// Empty item at the first index
+			editActionComboBox->Items->Insert(0, "");
+			
+			ListCtrlHelper::LoadListCtrl(postEditActionComboBox, allActions);
+			// Empty item at the first index
+			postEditActionComboBox->Items->Insert(0, "");
 
 			ListCtrlHelper::LoadListCtrl(endActionComboBox, mainSequenceActions);
 			// Empty item at the first index

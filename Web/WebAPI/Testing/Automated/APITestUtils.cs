@@ -144,7 +144,7 @@ namespace Extract.Web.WebAPI.Test
         /// Creates a controller of type <typeparam name="T"/>.
         /// </summary>
         /// <param name="user">The user for which the controller is to be used.</param>
-        public static T CreateController<T>(User user) where T : ControllerBase, new()
+        public static T CreateController<T>(this User user) where T : ControllerBase, new()
         {
             var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {
@@ -191,7 +191,8 @@ namespace Extract.Web.WebAPI.Test
                 {
                     Assert.IsInstanceOf(typeof(ObjectResult), result, "Unexpected result type");
                     var objectResult = (ObjectResult)result;
-                    Assert.AreEqual((int)HttpStatusCode.OK, objectResult.StatusCode);
+                    Assert.GreaterOrEqual(objectResult.StatusCode, 200);
+                    Assert.Less(objectResult.StatusCode, 300);
 
                     // If caller is looking for a JwtSecurityToken, re-create one from the claims in a LoginToken
                     if (typeof(JwtSecurityToken).IsAssignableFrom(typeof(T)) && objectResult.Value is LoginToken loginToken)
@@ -211,6 +212,16 @@ namespace Extract.Web.WebAPI.Test
                     Assert.IsInstanceOf(typeof(T), objectResult.Value, "Unexpected result object type");
                     typedResult = (T)objectResult.Value;
                 }
+                else
+                {
+                    if (result is StatusCodeResult statusCodeResult)
+                    {
+                        Assert.GreaterOrEqual(statusCodeResult.StatusCode, 200);
+                        Assert.Less(statusCodeResult.StatusCode, 300);
+                    }
+
+                    return typedResult;
+                }
 
                 return typedResult;
             }
@@ -221,15 +232,24 @@ namespace Extract.Web.WebAPI.Test
         }
 
         /// <summary>
-        /// Validates a the <see cref="IActionResult"/> has the specified <see cref="HttpStatusCode"/>.
+        /// Validates a the <see cref="IActionResult"/> has the specified HTTP status code.
         /// </summary>
-        public static void AssertResultCode(this IActionResult result, HttpStatusCode expectedCode)
+        public static void AssertResultCode(this IActionResult result, int expectedCode)
         {
             try
             {
-                Assert.IsInstanceOf(typeof(ObjectResult), result, "Unexpected result type");
-                var objectResult = (ObjectResult)result;
-                Assert.AreEqual((int)expectedCode, objectResult.StatusCode);
+                if (result is ObjectResult objectResult)
+                {
+                    Assert.AreEqual(expectedCode, objectResult.StatusCode);
+                }
+                else if (result is StatusCodeResult statusCodeResult)
+                {
+                    Assert.AreEqual(expectedCode, statusCodeResult.StatusCode);
+                }
+                else
+                {
+                    throw new Exception("Unexpected result type");
+                }
             }
             catch (Exception ex)
             {

@@ -756,11 +756,13 @@ library UCLID_FILEPROCESSINGLib
 		[propget, id(11), helpstring ("property OutputFilePathInitializationFunction")] HRESULT OutputFilePathInitializationFunction([out, retval] BSTR* pVal);
 		[propput, id(11), helpstring ("property OutputFilePathInitializationFunction")] HRESULT OutputFilePathInitializationFunction([in] BSTR newVal);
 		[propget, id(12), helpstring ("property LoadBalanceWeight")] HRESULT LoadBalanceWeight([out, retval] long* pnWeight);
-		[propput, id(12), helpstring ("property LoadBalanceWeight")] HRESULT LoadBalanceWeight([in] long nWeight);
-		[propget, id(13), helpstring ("property VerifyAction")] HRESULT VerifyAction([out, retval] BSTR* pVerifyAction);
-		[propput, id(13), helpstring ("property VerifyAction")] HRESULT VerifyAction([in] BSTR VerifyAction);
-		[propget, id(14), helpstring ("property PostVerifyAction")] HRESULT PostVerifyAction([out, retval] BSTR* pPostVerifyAction);
-		[propput, id(14), helpstring ("property PostVerifyAction")] HRESULT PostVerifyAction([in] BSTR PostVerifyAction);
+		[propput, id(12), helpstring ("property LoadBalanceWeight")] HRESULT LoadBalanceWeight([in] long nWeight);		
+		// Action that should be tied to attribute updates made via web API users or web applications
+		[propget, id(13), helpstring ("property EditAction")] HRESULT EditAction([out, retval] BSTR* pEditAction);
+		[propput, id(13), helpstring ("property EditAction")] HRESULT EditAction([in] BSTR EditAction);
+		// Action to be set run following and attribute data edit made via web API users or web applications
+		[propget, id(14), helpstring ("property PostEditAction")] HRESULT PostEditAction([out, retval] BSTR* pPostEditAction);
+		[propput, id(14), helpstring ("property PostEditAction")] HRESULT PostEditAction([in] BSTR PostEditAction);
 	}
 
 	[
@@ -1908,7 +1910,7 @@ library UCLID_FILEPROCESSINGLib
 		//			Failed = (EndAction <> Complete) and (any action X is failed)
 		//			Unattempted = (EndAction <> Complete) and (no X actions  are pending / processing)
 		//			Completed = (EndAction = Compete) and (no action X is pending or processing)
-		[id(174), helpstring("method GetWorkflowStatusAllFiles")] HRESULT GetWorkflowStatusAllFiles(
+		[id(174), helpstring("method GetAggregateWorkflowStatus")] HRESULT GetAggregateWorkflowStatus(
 			[out] long *pnUnattempted, [out] long *pnProcessing, [out] long *pnCompleted, [out] long *pnFailed);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Logs into the database with the specified username and password.
@@ -2011,6 +2013,15 @@ library UCLID_FILEPROCESSINGLib
 		//			Removes the row from the ActiveFAM table and resetting the status of any files that
 		//			had been processing, but does not properly close out the FAMSession table row.
 		[id(195), helpstring("method AbortFAMSession")] HRESULT AbortFAMSession([in] long nFAMSessionID);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Marks a file as deleted in the specified workflow;
+		[id(196), helpstring("method MarkFileDeleted")] HRESULT MarkFileDeleted([in] long nFileID, [in] long nWorkflowID);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: Returns the status of all files in the workflow via a delimited string where each file
+		//			status is delimited by a comma, and for each file the ID (on left) is delimted from the
+		//			single character status (R, C, F, U on right) by a colon.
+		[id(197), helpstring("method GetWorkflowStatusAllFiles")] HRESULT GetWorkflowStatusAllFiles(
+			[out, retval] BSTR *pbstrStatusListing);
 	};
 
 	[

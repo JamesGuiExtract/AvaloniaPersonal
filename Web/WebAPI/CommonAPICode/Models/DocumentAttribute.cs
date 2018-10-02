@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;                   // for Point
 
 namespace WebAPI.Models
@@ -32,6 +33,27 @@ namespace WebAPI.Models
         /// element was manually redacted
         /// </summary>
         Manual
+    }
+
+    /// <summary>
+    /// Specifies they type of operation to be performed on an attribute during a patch call.
+    /// </summary>
+    public enum PatchOperation
+    {
+        /// <summary>
+        /// Creates an attribute
+        /// </summary>
+        Create = 1,
+
+        /// <summary>
+        /// Update an attribute
+        /// </summary>
+        Update,
+
+        /// <summary>
+        /// Delete an attribute
+        /// </summary>
+        Delete
     }
 
     /// <summary>
@@ -147,10 +169,103 @@ namespace WebAPI.Models
     }
 
     /// <summary>
-    /// A document attribute - a feature that has been identified as significant according to the processing rules
+    /// Represents a VOA attribute
     /// </summary>
-    public class DocumentAttribute
+    /// <seealso cref="WebAPI.Models.DocumentAttributeCore" />
+    public class DocumentAttribute : DocumentAttributeCore
     {
+        /// <summary>
+        /// child attributes, 0..N
+        /// </summary>
+        public List<DocumentAttribute> ChildAttributes { get; set; }
+
+        /// <summary>
+        /// The average OCR recognition confidence of each character value in the defined attribute
+        /// </summary>
+        public int? AverageCharacterConfidence { get; set; }
+    }
+
+    /// <summary>
+    /// Data needed to add/update/delete an attribute.
+    /// </summary>
+    /// <seealso cref="WebAPI.Models.DocumentAttributeCore" />
+    public class DocumentAttributePatch : DocumentAttributeCore
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentAttributePatch"/> class.
+        /// </summary>
+        public DocumentAttributePatch()
+            : base()
+        {
+
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentAttributePatch"/> class.
+        /// </summary>
+        /// <param name="operation">The operation.</param>
+        public DocumentAttributePatch(PatchOperation operation)
+            : base()
+        {
+            Operation = operation;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentAttributePatch"/> class.
+        /// </summary>
+        /// <param name="source">The <see cref="DocumentAttributeCore"/> representing the target
+        /// attribute data.</param>
+        /// <param name="operation">Whether to create/update/delete</param>
+        public DocumentAttributePatch(DocumentAttributeCore source, PatchOperation operation)
+            :base(source)
+        {
+            Operation = operation;
+        }
+
+        /// <summary>
+        /// Whether to create/update/delete.
+        /// </summary>
+        public PatchOperation Operation { get; set; }
+
+        /// <summary>
+        /// In the case of a create operation, ParentAttributeID will specify the parent for the new
+        /// attribute (blank if the attribute is to be created at the root).
+        /// </summary>
+        public string ParentAttributeID { get; set; }
+    }
+
+    /// <summary>
+    /// The core attribute data to be shared by any model dealing with attributes.
+    /// </summary>
+    public class DocumentAttributeCore
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentAttributeCore"/> class.
+        /// </summary>
+        public DocumentAttributeCore()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocumentAttributeCore"/> class.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        public DocumentAttributeCore(DocumentAttributeCore source)
+        {
+            ID = source.ID;
+            Name = source.Name;
+            Value = source.Value;
+            Type = source.Type;
+            ConfidenceLevel = source.ConfidenceLevel;
+            HasPositionInfo = source.HasPositionInfo;
+            SpatialPosition = source.SpatialPosition;
+        }
+
+        /// <summary>
+        /// Gets or sets the identifier.
+        /// </summary>
+        public string ID { get; set; } = Guid.NewGuid().ToString();
+
         /// <summary>
         /// Name of the attribute
         /// </summary>
@@ -167,11 +282,6 @@ namespace WebAPI.Models
         public string Type { get; set; }
 
         /// <summary>
-        /// The average OCR recognition confidence of each character value in the defined attribute
-        /// </summary>
-        public int AverageCharacterConfidence { get; set; }
-
-        /// <summary>
         /// The confidence level of the redaction,
         /// based on ConfidenceLevel enumeration, expressed as a string name.
         /// </summary>
@@ -181,16 +291,11 @@ namespace WebAPI.Models
         /// Some attributes do not have position info - in that case this will be false and the LineInfo
         /// members will be empty.
         /// </summary>
-        public bool HasPositionInfo { get; set; }
+        public bool? HasPositionInfo { get; set; }
 
         /// <summary>
         /// The spatial position information of the attribute, inculding the page number, bounding rect, and zonal information (bounds plus skew)
         /// </summary>
         public Position SpatialPosition { get; set; }
-
-        /// <summary>
-        /// child attributes, 0..N
-        /// </summary>
-        public List<DocumentAttribute> ChildAttributes { get; set; }
     }
 }

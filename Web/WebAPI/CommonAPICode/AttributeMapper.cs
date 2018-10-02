@@ -1,4 +1,5 @@
-﻿using WebAPI.Models;
+﻿using Extract;
+using WebAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -91,7 +92,7 @@ namespace WebAPI
         /// </summary>
         /// <param name="originalName">original Attribute.Name</param>
         /// <returns>confidence level string</returns>
-        static private string DetermineRedactionConfidence(string originalName)
+        static internal string DetermineRedactionConfidence(string originalName)
         {
             string confidence;
             var found = mapRedactionConfidenceValues.TryGetValue(originalName, out confidence);
@@ -117,11 +118,13 @@ namespace WebAPI
 
             try
             {
+                docAttr.ID = ((IIdentifiableObject)attr).InstanceGUID.ToString();
                 docAttr.Name = DetermineName(attr.Name);
                 docAttr.Type = attr.Type;
 
                 SpatialString spatialString = attr.Value;
-                Contract.Assert(spatialString != null, "spatial string is null, attribute name: {0}", docAttr.Name);
+                HTTPError.Assert("ELI46365", spatialString != null,
+                    "spatial string is null", ("Attribute", docAttr.Name, false));
                 docAttr.Value = spatialString.String;
 
                 int minConf = 0;
@@ -179,21 +182,17 @@ namespace WebAPI
         /// extract software to represent spatial strings; <c>true</c> to include data that may be
         /// useful to 3rd party integrators.</param>
         /// <returns>corresponding DocumentAttributeSet</returns>
-        public DocumentAttributeSet MapAttributesToDocumentAttributeSet(bool includeNonSpatial, bool verboseSpatialData)
+        public DocumentDataResult MapAttributesToDocumentAttributeSet(bool includeNonSpatial, bool verboseSpatialData)
         {
             IAttribute attr = null;
 
             try
             {
-                var rootDocAttrSet = MakeNewDocumentAttributeSet();
+                var rootDocAttrSet = new DocumentDataResult();
 
                 for (int i = 0; i < _attributes.Size(); ++i)
                 {
                     attr = (IAttribute)_attributes.At(i);
-                    Contract.Assert(attr != null, 
-                                    "Invalid top-level attribute at index: {0}, unknownVector.Size: {1}", 
-                                    i, 
-                                    _attributes.Size());
 
                     // Do not transfer metadata attributes to the web API.
                     if (attr.Name.StartsWith("_") || (!includeNonSpatial && !attr.Value.HasSpatialInfo()))
@@ -209,16 +208,7 @@ namespace WebAPI
             }
             catch (Exception ex)
             {
-                if (attr != null)
-                {
-                    Log.WriteLine(Inv($"Exception: {ex.Message}, while processing attribute: {attr.Name}"), "ELI43254");
-                }
-                else
-                {
-                    Log.WriteLine(Inv($"Exception: {ex.Message}, while processing attribute (null)"), "ELI43255");
-                }
-
-                return MakeDocumentAttributeSetError(ex.Message);
+                throw ex.AsExtract("ELI46395");
             }
         }
     }

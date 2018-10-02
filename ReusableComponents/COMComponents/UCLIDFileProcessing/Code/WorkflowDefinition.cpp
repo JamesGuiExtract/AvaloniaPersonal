@@ -381,7 +381,7 @@ STDMETHODIMP CWorkflowDefinition::put_LoadBalanceWeight(LONG nWeight)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CWorkflowDefinition::get_VerifyAction(BSTR *pVal)
+STDMETHODIMP CWorkflowDefinition::get_EditAction(BSTR *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -389,27 +389,27 @@ STDMETHODIMP CWorkflowDefinition::get_VerifyAction(BSTR *pVal)
 	{
 		ASSERT_ARGUMENT("ELI45213", pVal != __nullptr);
 
-		*pVal = get_bstr_t(m_strVerifyAction).Detach();
+		*pVal = get_bstr_t(m_strEditAction).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45214");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CWorkflowDefinition::put_VerifyAction(BSTR newVal)
+STDMETHODIMP CWorkflowDefinition::put_EditAction(BSTR newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		m_strVerifyAction = asString(newVal);
+		m_strEditAction = asString(newVal);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45215");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CWorkflowDefinition::get_PostVerifyAction(BSTR *pVal)
+STDMETHODIMP CWorkflowDefinition::get_PostEditAction(BSTR *pVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -417,20 +417,20 @@ STDMETHODIMP CWorkflowDefinition::get_PostVerifyAction(BSTR *pVal)
 	{
 		ASSERT_ARGUMENT("ELI45216", pVal != __nullptr);
 
-		*pVal = get_bstr_t(m_strPostVerifyAction).Detach();
+		*pVal = get_bstr_t(m_strPostEditAction).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45217");
 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CWorkflowDefinition::put_PostVerifyAction(BSTR newVal)
+STDMETHODIMP CWorkflowDefinition::put_PostEditAction(BSTR newVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
-		m_strPostVerifyAction = asString(newVal);
+		m_strPostEditAction = asString(newVal);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45218");
 

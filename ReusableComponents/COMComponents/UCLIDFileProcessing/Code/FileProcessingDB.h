@@ -335,7 +335,8 @@ public:
 	STDMETHOD(GetStatsAllWorkflows)(BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
 	STDMETHOD(GetAllActions)(IStrToStrMap** pmapActionNameToID);
 	STDMETHOD(GetWorkflowStatus)(long nFileID, EActionStatus* peaStatus);
-	STDMETHOD(GetWorkflowStatusAllFiles)(long *pnUnattempted, long *pnProcessing, long *pnCompleted, long *pnFailed);
+	STDMETHOD(GetAggregateWorkflowStatus)(long *pnUnattempted, long *pnProcessing, long *pnCompleted, long *pnFailed);
+	STDMETHOD(GetWorkflowStatusAllFiles)(BSTR *pbstrStatusListing);
 	STDMETHOD(LoginUser)(BSTR bstrUserName, BSTR bstrPassword);
 	STDMETHOD(get_RunningAllWorkflows)(VARIANT_BOOL *pRunningAllWorkflows);
 	STDMETHOD(GetWorkflowID)(BSTR bstrWorkflowName, long *pnID);
@@ -360,6 +361,7 @@ public:
 	STDMETHOD(RecordWebSessionStart)(BSTR bstrType, BSTR bstrLoginId, BSTR bstrIpAddress, BSTR bstrUser);
 	STDMETHOD(GetActiveUsers)(BSTR bstrAction, IVariantVector** ppvecUserNames);
 	STDMETHOD(AbortFAMSession)(long nFAMSessionID);
+	STDMETHOD(MarkFileDeleted)(long nFileID, long nWorkflowID);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -741,10 +743,13 @@ private:
 	long getWorkflowID(_ConnectionPtr ipConnection, long nActionID);
 
 	// Indicates whether the specified file is in the specified workflow.
+	// -1 No record of file in workflow
+	// 0 File is marked deleted in workflow
+	// 1 File is in workflow
 	// If the specified workflow ID is -1, the current workflow will be tested.
 	// If there are no workflows defined, the result will indicate whether the file ID is present in the DB.
-	bool isFileInWorkflow(_ConnectionPtr ipConnection, long nFileID, long nWorkflowID);
-	bool isFileInWorkflow(_ConnectionPtr ipConnection, string strFileName, long nWorkflowID);
+	int isFileInWorkflow(_ConnectionPtr ipConnection, long nFileID, long nWorkflowID);
+	int isFileInWorkflow(_ConnectionPtr ipConnection, string strFileName, long nWorkflowID);
 
 	// Gets the currently active workflow. Should be checked instead of m_strActiveWorkflow in order
 	// to synchronize access.
@@ -1259,7 +1264,7 @@ private:
 
 	// Gets the status of a file in a workflow or all files in a workflow if nFileID = -1.
 	// Return value is a map of ActionStatus codes (R, F, C, U) to their respective counts.
-	map<string, long> getWorkflowStatus(long nFileID);
+	vector<tuple<long, string>> getWorkflowStatus(long nFileID, bool bReturnFileStatuses = false);
 
 	// Indicates whether any workflows are currently defined in the database.
 	bool databaseUsingWorkflows(_ConnectionPtr ipConnection);
@@ -1456,8 +1461,9 @@ private:
 	bool GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, IActionStatistics* *pStats);
 	bool GetAllActions_Internal(bool bDBLocked, IStrToStrMap** pmapActionNameToID);
 	bool GetWorkflowStatus_Internal(bool bDBLocked, long nFileID, EActionStatus* peaStatus);
-	bool GetWorkflowStatusAllFiles_Internal(bool bDBLocked, long *pnUnattempted, long *pnProcessing,
+	bool GetAggregateWorkflowStatus_Internal(bool bDBLocked, long *pnUnattempted, long *pnProcessing,
 		long *pnCompleted, long *pnFailed);
+	bool GetWorkflowStatusAllFiles_Internal(bool bDBLocked, BSTR *pbstrStatusListing);
 	bool GetWorkflowID_Internal(bool bDBLocked, BSTR bstrWorkflowName, long *pnID);
 	bool IsFileInWorkflow_Internal(bool bDBLocked, long nFileID, long nWorkflowID, VARIANT_BOOL *pbIsInWorkflow);
 	bool GetUsingWorkflows_Internal(bool bDBLocked, VARIANT_BOOL *pbUsingWorkflows);
@@ -1474,6 +1480,7 @@ private:
 	bool GetMLModels_Internal(bool bDBLocked, IStrToStrMap * * pmapModelNameToID);
 	bool GetActiveUsers_Internal(bool bDBLocked, BSTR bstrAction, IVariantVector** ppvecUserNames);
 	bool AbortFAMSession_Internal(bool bDBLocked, long nFAMSessionID);
+	bool MarkFileDeleted_Internal(bool bDBLocked, long nFileID, long nWorkflowID);
 	void InvalidatePreviousCachedInfoIfNecessary();
 };
 

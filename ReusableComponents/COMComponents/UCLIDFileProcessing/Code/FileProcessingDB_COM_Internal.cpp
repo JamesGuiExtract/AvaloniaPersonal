@@ -35,7 +35,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 168;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 169;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -1653,7 +1653,7 @@ int UpdateToSchemaVersion145(_ConnectionPtr ipConnection,
 
 		vector<string> vecQueries;
 
-		vecQueries.push_back(gstrCREATE_WORKFLOWFILE);
+		vecQueries.push_back(gstrCREATE_WORKFLOWFILE_V145);
 		vecQueries.push_back(gstrADD_WORKFLOWFILE_WORKFLOW_FK);
 		vecQueries.push_back(gstrADD_WORKFLOWFILE_FAMFILE_FK);
 
@@ -2370,6 +2370,36 @@ int UpdateToSchemaVersion168(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46236");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion169(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 169;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		vecQueries.push_back("ALTER TABLE [Workflow] ADD [EditActionID] INT");
+		vecQueries.push_back("ALTER TABLE [Workflow] ADD [PostEditActionID] INT");
+		vecQueries.push_back(gstrADD_WORKFLOW_EDITACTION_FK);
+		vecQueries.push_back(gstrADD_WORKFLOW_POSTEDITACTION_FK);
+		vecQueries.push_back("ALTER TABLE [WorkflowFile] ADD [Deleted] BIT NOT NULL DEFAULT(0)");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46296");
+}
 
 
 //-------------------------------------------------------------------------------------------------
@@ -2656,7 +2686,8 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					{
 						// NOTE: If the workflow/file pair is not yet in [WorkflowFile], it will be
 						// added as part of setStatusForFile below.
-						bAlreadyExistsInWorkflow = isFileInWorkflow(ipConnection, nID, nWorkflowID);
+						// -1 = not in WorkflowFile, 0 = marked deleted in WorkflowFile
+						bAlreadyExistsInWorkflow = isFileInWorkflow(ipConnection, nID, nWorkflowID) >= 0;
 					}
 				}
 
@@ -6583,7 +6614,7 @@ bool CFileProcessingDB::RecordWebSessionStart_Internal(bool bDBLocked)
 			UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
 				getWorkflowDefinition(ipConnection, getActiveWorkflowID(ipConnection));
 
-			string strActionName = asString(ipWorkflowDefinition->VerifyAction);
+			string strActionName = asString(ipWorkflowDefinition->EditAction);
 			setActiveAction(ipConnection, strActionName);
 
 			strFAMSessionQuery += asString(nMachineID) + ", " + asString(nUserID) + ", '"
@@ -7422,7 +7453,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 165:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion166);
 				case 166:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion167);
 				case 167:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion168);
-				case 168:
+				case 168:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion169);
+				case 169:
 					break;
 
 				default:
@@ -10320,7 +10352,8 @@ bool CFileProcessingDB::AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, l
 					addQueueEventRecord(ipConnection, nID, -1, asString(bstrFile), "P", llFileSize);
 				}
 
-				if (nWorkflowID > 0 && !isFileInWorkflow(ipConnection, nID, nWorkflowID))
+				// -1 = not in WorkflowFile, 0 = marked deleted in WorkflowFile
+				if (nWorkflowID > 0 && isFileInWorkflow(ipConnection, nID, nWorkflowID) == -1)
 				{
 					// In the case that the file did exist in the DB, but not the workflow, the
 					// [WorkflowFile] row will be added as part of the setStatusForFile call.
@@ -10635,6 +10668,8 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 					", [WorkflowTypeCode] "
 					", [Description] "
 					", [StartActionID] "
+					", [EditActionID] "
+					", [PostEditActionID] "
 					", [EndActionID] "
 					", [PostWorkflowActionID] "
 					", [DocumentFolder] "
@@ -10680,6 +10715,26 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 			{
 				setLongField(ipFields, "StartActionID",
 					getActionID(ipConnection, asString(ipWorkflowDefinition->StartAction), strOldWorkflowName));
+			}
+
+			if (ipWorkflowDefinition->EditAction.length() == 0)
+			{
+				setFieldToNull(ipFields, "EditActionID");
+			}
+			else
+			{
+				setLongField(ipFields, "EditActionID",
+					getActionID(ipConnection, asString(ipWorkflowDefinition->EditAction), strOldWorkflowName));
+			}
+
+			if (ipWorkflowDefinition->PostEditAction.length() == 0)
+			{
+				setFieldToNull(ipFields, "PostEditActionID");
+			}
+			else
+			{
+				setLongField(ipFields, "PostEditActionID",
+					getActionID(ipConnection, asString(ipWorkflowDefinition->PostEditAction), strOldWorkflowName));
 			}
 
 			if (ipWorkflowDefinition->EndAction.length() == 0)
@@ -11019,14 +11074,14 @@ bool CFileProcessingDB::GetWorkflowStatus_Internal(bool bDBLocked, long nFileID,
 		{
 			ASSERT_ARGUMENT("ELI42136", peaStatus != __nullptr);
 
-			map<string, long> mapStatuses = getWorkflowStatus(nFileID);
-			if (mapStatuses.empty())
+			vector<tuple<long, string>> vecStatuses = getWorkflowStatus(nFileID, false);
+			if (vecStatuses.empty())
 			{
 				*peaStatus = kActionUnattempted;
 			}
 			else
 			{
-				switch (mapStatuses.begin()->first[0])
+				switch (get<1>(vecStatuses[0])[0])
 				{
 					case 'R': *peaStatus = kActionProcessing; break;
 					case 'C': *peaStatus = kActionCompleted; break;
@@ -11050,7 +11105,7 @@ bool CFileProcessingDB::GetWorkflowStatus_Internal(bool bDBLocked, long nFileID,
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetWorkflowStatusAllFiles_Internal(bool bDBLocked, long *pnUnattempted, 
+bool CFileProcessingDB::GetAggregateWorkflowStatus_Internal(bool bDBLocked, long *pnUnattempted,
 											long *pnProcessing, long *pnCompleted, long *pnFailed)
 {
 	try
@@ -11067,19 +11122,53 @@ bool CFileProcessingDB::GetWorkflowStatusAllFiles_Internal(bool bDBLocked, long 
 			*pnCompleted = 0;
 			*pnFailed = 0;
 
-			map<string, long> mapStatuses = getWorkflowStatus(-1);
-			for each (auto iter in mapStatuses)
+			vector<tuple<long, string>> vecStatuses = getWorkflowStatus(-1, false);
+			for each (tuple<long, string> status in vecStatuses)
 			{
-				switch (iter.first[0])
+				switch (get<1>(status)[0])
 				{
-					case 'U': *pnUnattempted = iter.second; break;
-					case 'R': *pnProcessing = iter.second; break;
-					case 'C': *pnCompleted = iter.second; break;
-					case 'F': *pnFailed = iter.second; break;
+					case 'U': *pnUnattempted = get<0>(status); break;
+					case 'R': *pnProcessing = get<0>(status); break;
+					case 'C': *pnCompleted = get<0>(status); break;
+					case 'F': *pnFailed = get<0>(status); break;
 				}
 			}
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI42158");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetWorkflowStatusAllFiles_Internal(bool bDBLocked, BSTR *pbstrStatusListing)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI46409", pbstrStatusListing != __nullptr);
+
+			string strStatusListing;
+
+			vector<tuple<long, string>> vecStatuses = getWorkflowStatus(-1, true);
+
+			for each (tuple<long, string> status in vecStatuses)
+			{
+				string strStatusString = asString(get<0>(status)) + ":" + get<1>(status)[0] + ",";
+				strStatusListing += strStatusString;
+			}
+
+			*pbstrStatusListing = get_bstr_t(strStatusListing.c_str());
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46410");
 	}
 	catch (UCLIDException &ue)
 	{
@@ -11138,7 +11227,8 @@ bool CFileProcessingDB::IsFileInWorkflow_Internal(bool bDBLocked, long nFileID, 
 			ipConnection = getDBConnection();
 			validateDBSchemaVersion();
 
-			*pbIsInWorkflow = asVariantBool(isFileInWorkflow(ipConnection, nFileID, nWorkflowID));
+			// -1 = not in WorkflowFile, 0 = marked deleted in WorkflowFile, 1 = in workflow, not marked deleted
+			*pbIsInWorkflow = asVariantBool(isFileInWorkflow(ipConnection, nFileID, nWorkflowID) == 1);
 
 			END_CONNECTION_RETRY(ipConnection, "ELI43221");
 		}
@@ -11575,8 +11665,9 @@ bool CFileProcessingDB::IsFileNameInWorkflow_Internal(bool bDBLocked, BSTR bstrF
 			ipConnection = getDBConnection();
 			validateDBSchemaVersion();
 
+			// -1 = not in WorkflowFile, 0 = marked deleted in WorkflowFile, 1 = in workflow, not marked deleted
 			*pbIsInWorkflow = asVariantBool(
-				isFileInWorkflow(ipConnection, asString(bstrFileName), nWorkflowID));
+				isFileInWorkflow(ipConnection, asString(bstrFileName), nWorkflowID) == 1);
 
 			END_CONNECTION_RETRY(ipConnection, "ELI44847");
 		}
@@ -11975,6 +12066,45 @@ bool CFileProcessingDB::AbortFAMSession_Internal(bool bDBLocked, long nFAMSessio
 			END_CONNECTION_RETRY(ipConnection, "ELI46241");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45532");
+	}
+	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::MarkFileDeleted_Internal(bool bDBLocked, long nFileID, long nWorkflowID)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			ipConnection = getDBConnection();
+
+			TransactionGuard tg(ipConnection, adXactIsolated, &m_criticalSection);
+
+			string strMarkDeletedQuery = "UPDATE [WorkflowFile] SET [Deleted] = 1 "
+				"WHERE [FileID] = " + asString(nFileID) + " AND [WorkflowID] = " + asString(nWorkflowID);
+
+			long nAffected = executeCmdQuery(ipConnection, strMarkDeletedQuery.c_str(), false);
+
+			ASSERT_RUNTIME_CONDITION("ELI46299", nAffected == 1, "Failed to mark file deleted.");
+
+			tg.CommitTrans();
+			
+			END_CONNECTION_RETRY(ipConnection, "ELI46300");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46301");
 	}
 	catch (UCLIDException &ue)
 	{

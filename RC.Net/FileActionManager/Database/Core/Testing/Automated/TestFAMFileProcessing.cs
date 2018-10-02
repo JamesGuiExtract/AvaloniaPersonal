@@ -748,7 +748,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.GetWorkflowStatus(fileId1) == EActionStatus.kActionProcessing);
                 Assert.That(fileProcessingDb.GetWorkflowStatus(fileId2) == EActionStatus.kActionProcessing);
                 Assert.That(fileProcessingDb.GetWorkflowStatus(fileId3) == EActionStatus.kActionFailed);
-                fileProcessingDb.GetWorkflowStatusAllFiles(
+                fileProcessingDb.GetAggregateWorkflowStatus(
                     out int unattempted, out int processing, out int completed, out int failed);
                 Assert.That(unattempted == 0);
                 Assert.That(processing == 2);
@@ -772,7 +772,7 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.GetWorkflowStatus(fileId1) == EActionStatus.kActionUnattempted);
                 Assert.That(fileProcessingDb.GetWorkflowStatus(fileId2) == EActionStatus.kActionProcessing);
                 Assert.That(fileProcessingDb.GetWorkflowStatus(fileId3) == EActionStatus.kActionFailed);
-                fileProcessingDb.GetWorkflowStatusAllFiles(
+                fileProcessingDb.GetAggregateWorkflowStatus(
                     out unattempted, out processing, out completed, out failed);
                 Assert.That(unattempted == 1);
                 Assert.That(processing == 1);
@@ -786,7 +786,7 @@ namespace Extract.FileActionManager.Database.Test
                     EActionStatus.kActionPending, false, false, out previousStatus);
 
                 Assert.That(fileProcessingDb.GetWorkflowStatus(fileId2) == EActionStatus.kActionCompleted);
-                fileProcessingDb.GetWorkflowStatusAllFiles(
+                fileProcessingDb.GetAggregateWorkflowStatus(
                     out unattempted, out processing, out completed, out failed);
                 Assert.That(unattempted == 1);
                 Assert.That(processing == 0);

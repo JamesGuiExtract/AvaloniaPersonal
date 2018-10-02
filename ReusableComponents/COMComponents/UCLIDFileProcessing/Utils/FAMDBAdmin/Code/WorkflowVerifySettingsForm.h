@@ -150,8 +150,8 @@ namespace Extract {
 
 
 
-		private: System::Windows::Forms::Label^  label2;
-private: System::Windows::Forms::ComboBox^  _postVerifyActionComboBox;
+
+
 
 
 
@@ -181,9 +181,9 @@ private: System::Windows::Forms::DataGridView^  _redactionTypesDataGridView;
 
 
 private: System::Windows::Forms::DataGridViewTextBoxColumn^  _docTypeColumn;
-private: System::Windows::Forms::ComboBox^  _verifyActionComboBox;
 
-private: System::Windows::Forms::Label^  label3;
+
+
 
 
 
@@ -203,43 +203,18 @@ private: System::Windows::Forms::Label^  label3;
 			/// </summary>
 			void InitializeComponent(void)
 			{
-				this->label2 = (gcnew System::Windows::Forms::Label());
-				this->_postVerifyActionComboBox = (gcnew System::Windows::Forms::ComboBox());
 				this->okButton = (gcnew System::Windows::Forms::Button());
 				this->cancelButton = (gcnew System::Windows::Forms::Button());
 				this->label1 = (gcnew System::Windows::Forms::Label());
 				this->_redactionTypesDataGridView = (gcnew System::Windows::Forms::DataGridView());
 				this->_docTypeColumn = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
-				this->_verifyActionComboBox = (gcnew System::Windows::Forms::ComboBox());
-				this->label3 = (gcnew System::Windows::Forms::Label());
 				(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->_redactionTypesDataGridView))->BeginInit();
 				this->SuspendLayout();
-				// 
-				// label2
-				// 
-				this->label2->AutoSize = true;
-				this->label2->Location = System::Drawing::Point(13, 43);
-				this->label2->Name = L"label2";
-				this->label2->Size = System::Drawing::Size(88, 13);
-				this->label2->TabIndex = 2;
-				this->label2->Text = L"Post-verify action";
-				// 
-				// _postVerifyActionComboBox
-				// 
-				this->_postVerifyActionComboBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
-					| System::Windows::Forms::AnchorStyles::Right));
-				this->_postVerifyActionComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
-				this->_postVerifyActionComboBox->FormattingEnabled = true;
-				this->_postVerifyActionComboBox->Location = System::Drawing::Point(125, 39);
-				this->_postVerifyActionComboBox->Name = L"_postVerifyActionComboBox";
-				this->_postVerifyActionComboBox->Size = System::Drawing::Size(259, 21);
-				this->_postVerifyActionComboBox->Sorted = true;
-				this->_postVerifyActionComboBox->TabIndex = 3;
 				// 
 				// okButton
 				// 
 				this->okButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-				this->okButton->Location = System::Drawing::Point(228, 292);
+				this->okButton->Location = System::Drawing::Point(228, 245);
 				this->okButton->Name = L"okButton";
 				this->okButton->Size = System::Drawing::Size(75, 23);
 				this->okButton->TabIndex = 6;
@@ -252,7 +227,7 @@ private: System::Windows::Forms::Label^  label3;
 				this->cancelButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
 				this->cancelButton->CausesValidation = false;
 				this->cancelButton->DialogResult = System::Windows::Forms::DialogResult::Cancel;
-				this->cancelButton->Location = System::Drawing::Point(309, 292);
+				this->cancelButton->Location = System::Drawing::Point(309, 245);
 				this->cancelButton->Name = L"cancelButton";
 				this->cancelButton->Size = System::Drawing::Size(75, 23);
 				this->cancelButton->TabIndex = 7;
@@ -262,7 +237,7 @@ private: System::Windows::Forms::Label^  label3;
 				// label1
 				// 
 				this->label1->AutoSize = true;
-				this->label1->Location = System::Drawing::Point(13, 71);
+				this->label1->Location = System::Drawing::Point(13, 17);
 				this->label1->Name = L"label1";
 				this->label1->Size = System::Drawing::Size(84, 13);
 				this->label1->TabIndex = 4;
@@ -276,7 +251,7 @@ private: System::Windows::Forms::Label^  label3;
 				this->_redactionTypesDataGridView->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
 				this->_redactionTypesDataGridView->ColumnHeadersVisible = false;
 				this->_redactionTypesDataGridView->Columns->AddRange(gcnew cli::array< System::Windows::Forms::DataGridViewColumn^  >(1) { this->_docTypeColumn });
-				this->_redactionTypesDataGridView->Location = System::Drawing::Point(125, 66);
+				this->_redactionTypesDataGridView->Location = System::Drawing::Point(125, 12);
 				this->_redactionTypesDataGridView->Name = L"_redactionTypesDataGridView";
 				this->_redactionTypesDataGridView->Size = System::Drawing::Size(258, 220);
 				this->_redactionTypesDataGridView->TabIndex = 5;
@@ -287,42 +262,17 @@ private: System::Windows::Forms::Label^  label3;
 				this->_docTypeColumn->HeaderText = L"Doc Type";
 				this->_docTypeColumn->Name = L"_docTypeColumn";
 				// 
-				// _verifyActionComboBox
-				// 
-				this->_verifyActionComboBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
-					| System::Windows::Forms::AnchorStyles::Right));
-				this->_verifyActionComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
-				this->_verifyActionComboBox->FormattingEnabled = true;
-				this->_verifyActionComboBox->Location = System::Drawing::Point(125, 12);
-				this->_verifyActionComboBox->Name = L"_verifyActionComboBox";
-				this->_verifyActionComboBox->Size = System::Drawing::Size(259, 21);
-				this->_verifyActionComboBox->Sorted = true;
-				this->_verifyActionComboBox->TabIndex = 1;
-				// 
-				// label3
-				// 
-				this->label3->AutoSize = true;
-				this->label3->Location = System::Drawing::Point(13, 16);
-				this->label3->Name = L"label3";
-				this->label3->Size = System::Drawing::Size(65, 13);
-				this->label3->TabIndex = 0;
-				this->label3->Text = L"Verify action";
-				// 
 				// WorkflowVerifySettingsForm
 				// 
 				this->AcceptButton = this->okButton;
 				this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 				this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 				this->CancelButton = this->cancelButton;
-				this->ClientSize = System::Drawing::Size(395, 325);
-				this->Controls->Add(this->_verifyActionComboBox);
-				this->Controls->Add(this->label3);
+				this->ClientSize = System::Drawing::Size(395, 278);
 				this->Controls->Add(this->_redactionTypesDataGridView);
 				this->Controls->Add(this->label1);
 				this->Controls->Add(this->cancelButton);
 				this->Controls->Add(this->okButton);
-				this->Controls->Add(this->_postVerifyActionComboBox);
-				this->Controls->Add(this->label2);
 				this->MaximizeBox = false;
 				this->MinimizeBox = false;
 				this->MinimumSize = System::Drawing::Size(411, 316);

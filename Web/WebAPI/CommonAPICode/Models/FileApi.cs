@@ -33,7 +33,6 @@ namespace WebAPI.Models
                 FAMDBUtils dbUtils = new FAMDBUtils();
                 Type mgrType = Type.GetTypeFromProgID(dbUtils.GetFAMDBProgId());
                 _fileProcessingDB = (FileProcessingDB)Activator.CreateInstance(mgrType);
-                Contract.Assert(_fileProcessingDB != null, "Failed to create FileProcessingDB instance");
             }
             catch (Exception ex)
             {
@@ -130,7 +129,6 @@ namespace WebAPI.Models
         {
             get
             {
-                Contract.Assert(_workflow != null, "Workflow is not set (null)");
                 return _workflow;
             }
         }
@@ -277,10 +275,11 @@ namespace WebAPI.Models
                     throw ex.AsExtract("ELI43263");
                 }
 
-                Contract.Assert(Id > 0, "Invalid workflow name: {0}", workflowName);
+                HTTPError.Assert("ELI46387", Id > 0, "Invalid workflow name", ("Workflow", workflowName, false));
 
                 var definition = FileProcessingDB.GetWorkflowDefinition(Id);
-                Contract.Assert(definition != null, "Failed to get workflow definition for Id: {0}", Id);
+                HTTPError.Assert("ELI46388", definition != null,
+                    "Failed to get workflow definition", ("WorkflowID", Id, false));
 
                 var workflow = new Workflow(definition, DatabaseServer, DatabaseName);
                 return workflow;

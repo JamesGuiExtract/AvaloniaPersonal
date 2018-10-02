@@ -24,12 +24,15 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <param name="user">A User object (name, password, optional claim)</param>
         [HttpPost("Login")]
+        [ProducesResponseType(200, Type = typeof(LoginToken))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
         public IActionResult Login([FromBody] User user)
         {
             try
             {
-                RequestAssertion.AssertSpecified("ELI45183", user.Username, "Username is empty");
-                RequestAssertion.AssertSpecified("ELI45184", user.Password, "Password is empty");
+                HTTPError.AssertRequest("ELI45183", !string.IsNullOrEmpty(user.Username), "Username is empty");
+                HTTPError.AssertRequest("ELI45184", !string.IsNullOrEmpty(user.Password), "Password is empty");
 
                 // The user may have specified a workflow - if so then ensure that the API context uses
                 // the specified workflow.
@@ -63,6 +66,9 @@ namespace WebAPI.Controllers
         /// </summary>
         [HttpPost("Logout")]
         [Authorize]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
         public IActionResult Logout()
         {
             try
@@ -71,12 +77,7 @@ namespace WebAPI.Controllers
                 {
                     data.CloseSession();
 
-                    var result = new GenericResult()
-                    {
-                        Error = MakeError(isError: false, message: "", code: 0)
-                    };
-
-                    return Ok(result);
+                    return NoContent();
                 }
             }
             catch (Exception ex)
@@ -88,9 +89,11 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Gets settings for the application.
         /// </summary>
-        [HttpGet("GetSettings")]
-        [Produces(typeof(WebAppSettings))]
+        [HttpGet("Settings")]
         [Authorize]
+        [ProducesResponseType(200, Type = typeof(WebAppSettingsResult))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
         public IActionResult GetSettings()
         {
             try
@@ -111,9 +114,11 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Gets the number of document, pages and active users in the current verification queue.
         /// </summary>
-        [HttpGet("GetQueueStatus")]
-        [Produces(typeof(QueueStatus))]
+        [HttpGet("QueueStatus")]
         [Authorize]
+        [ProducesResponseType(200, Type = typeof(QueueStatusResult))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
         public IActionResult GetQueueStatus()
         {
             try
@@ -138,8 +143,12 @@ namespace WebAPI.Controllers
         /// <param name="id">The file ID to open. If -1, the next queued document will be opened.
         /// </param>
         [HttpPost("OpenDocument/{id}")]
-        [Produces(typeof(DocumentId))]
         [Authorize]
+        [ProducesResponseType(200, Type = typeof(DocumentIdResult))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404, Type = typeof(ErrorResult))]
+        [ProducesResponseType(423, Type = typeof(ErrorResult))]
         public IActionResult OpenDocument(int id = -1)
         {
             try
@@ -164,6 +173,9 @@ namespace WebAPI.Controllers
         /// verification; <c>false</c> to keep the specified document in verification.</param>
         [HttpPost("CloseDocument")]
         [Authorize]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
         public IActionResult CloseDocument(bool commit)
         {
             try
@@ -172,12 +184,7 @@ namespace WebAPI.Controllers
                 {
                     data.CloseDocument(commit);
 
-                    var result = new GenericResult()
-                    {
-                        Error = MakeError(isError: false, message: "", code: 0)
-                    };
-
-                    return Ok(result);
+                    return NoContent();
                 }
             }
             catch (Exception ex)
@@ -190,9 +197,11 @@ namespace WebAPI.Controllers
         /// Get page size and orientation info for a document
         /// </summary>
         /// <returns></returns>
-        [HttpGet("GetPageInfo")]
-        [Produces(typeof(PagesInfo))]
+        [HttpGet("PageInfo")]
         [Authorize]
+        [ProducesResponseType(200, Type = typeof(PagesInfoResult))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
         public IActionResult GetPageInfo()
         {
             try
@@ -201,7 +210,7 @@ namespace WebAPI.Controllers
                 {
                     int fileId = data.DocumentSessionFileId;
                     data.AssertRequestFileId("ELI45172", fileId);
-                    data.AssertRequestFileExists("ELI45173", fileId);
+                    data.AssertFileExists("ELI45173", fileId);
 
                     data.GetSourceFileName(fileId);
                     var pagesInfo = data.GetPagesInfo(fileId);
@@ -211,7 +220,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError<PagesInfo>(ex, "ELI45189");
+                return this.GetAsHttpError(ex, "ELI45189");
             }
         }
 
@@ -219,9 +228,12 @@ namespace WebAPI.Controllers
         /// Gets the specified document page as a PDF file.
         /// </summary>
         /// <returns></returns>
-        [HttpGet("GetDocumentPage/{Page}")]
-        [Produces(typeof(FileResult))]
+        [HttpGet("DocumentPage/{Page}")]
         [Authorize]
+        [ProducesResponseType(200, Type = typeof(FileResult))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404, Type = typeof(ErrorResult))]
         public IActionResult GetDocumentPage(int page)
         {
             try
@@ -244,9 +256,12 @@ namespace WebAPI.Controllers
         /// Gets the document data.
         /// </summary>
         /// <returns></returns>
-        [HttpGet("GetDocumentData")]
-        [ProducesResponseType(typeof(DocumentAttributeSet), 200)]
+        [HttpGet("DocumentData")]
         [Authorize]
+        [ProducesResponseType(200, Type = typeof(DocumentDataResult))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404, Type = typeof(ErrorResult))]
         public IActionResult GetDocumentData()
         {
             try
@@ -256,7 +271,7 @@ namespace WebAPI.Controllers
                 {
                     // https://extract.atlassian.net/browse/WEB-59
                     // Per discussion with GGK, non-spatial attributes will not be sent to the web app.
-                    var result = data.GetDocumentResultSet(
+                    var result = data.GetDocumentData(
                         data.DocumentSessionFileId, includeNonSpatial: false, verboseSpatialData: false);
 
                     return Ok(result);
@@ -273,23 +288,20 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <param name="documentData">The document data.</param>
         /// <returns></returns>
-        [HttpPost("SaveDocumentData")]
-        [Produces(typeof(GenericResult))]
+        [HttpPut("DocumentData")]
         [Authorize]
-        public IActionResult SaveDocumentData([FromBody] BareDocumentAttributeSet documentData)
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        public IActionResult SaveDocumentData([FromBody] DocumentDataInput documentData)
         {
             try
             {
                 using (var data = new DocumentData(User, requireSession: true))
                 {
-                    data.UpdateDocumentResultSet(data.DocumentSessionFileId, documentData);
+                    data.PutDocumentResultSet(data.DocumentSessionFileId, documentData);
 
-                    var result = new GenericResult()
-                    {
-                        Error = MakeError(isError: false, message: "", code: 0)
-                    };
-
-                    return Ok(result);
+                    return NoContent();
                 }
             }
             catch (Exception ex)
@@ -303,9 +315,12 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <param name="page">The page.</param>
         /// <returns></returns>
-        [HttpGet("GetPageWordZones")]
-        [Produces(typeof(WordZoneData))]
+        [HttpGet("PageWordZones")]
         [Authorize]
+        [ProducesResponseType(200, Type = typeof(WordZoneDataResult))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404, Type = typeof(ErrorResult))]
         public IActionResult GetPageWordZones(int page)
         {
             try
@@ -313,7 +328,8 @@ namespace WebAPI.Controllers
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
                 using (var data = new DocumentData(User, requireSession: true))
                 {
-                    var result = data.GetWordZoneData(page);
+                    int fileId = data.DocumentSessionFileId;
+                    var result = data.GetWordZoneData(fileId, page);
 
                     return Ok(result);
                 }

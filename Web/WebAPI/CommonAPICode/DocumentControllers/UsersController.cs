@@ -23,12 +23,15 @@ namespace WebAPI.Controllers
         /// <param name="user">A User object (name, password, optional claim)</param>
         // POST api/Users/Login
         [HttpPost("Login")]
+        [ProducesResponseType(200, Type = typeof(LoginToken))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
         public IActionResult Login([FromBody] User user)
         {
             try
             {
-                RequestAssertion.AssertSpecified("ELI45185", user.Username, "Username is empty");
-                RequestAssertion.AssertSpecified("ELI45186", user.Password, "Password is empty");
+                HTTPError.AssertRequest("ELI45185", !string.IsNullOrEmpty(user.Username), "Username is empty");
+                HTTPError.AssertRequest("ELI45186", !string.IsNullOrEmpty(user.Password), "Password is empty");
 
                 // The user may have specified a workflow - if so then ensure that the API context uses
                 // the specified workflow.

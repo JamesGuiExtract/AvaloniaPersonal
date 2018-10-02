@@ -15,14 +15,6 @@ namespace Extract {
 			RedactionVerificationSettings();
 			~RedactionVerificationSettings();
 
-			// The name of the action in which redaction verification is to occur.
-			[DataMember]
-			property String ^ VerifyAction;
-
-			// The name of the action to set to pending following verification.
-			[DataMember]
-			property String ^ PostVerifyAction;
-
 			// A enumeration of strings representing the types that should be available to apply to
 			// redactions.
 			[DataMember]

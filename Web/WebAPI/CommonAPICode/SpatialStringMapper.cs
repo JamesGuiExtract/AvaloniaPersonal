@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using WebAPI.Models;
@@ -33,25 +34,16 @@ namespace WebAPI
                 }
 
                 var pageInfos = spatialString.SpatialPageInfos;
-                Contract.Assert(pageInfos != null, "spatial string: {0}, has null spatialPageInfos", spatialString.String);
-
                 IUnknownVector zones = spatialString.GetOriginalImageRasterZones();
-                Contract.Assert(zones != null, "spatial string: {0}, has null imageRasterZones", spatialString.String);
 
                 var numberOfZones = zones.Size();
                 for (int i = 0; i < numberOfZones; ++i)
                 {
                     RasterZone zone = (RasterZone)zones.At(i);
-                    Contract.Assert(zone != null,
-                                    "null raster zone, index: {0}, numberOfZones: {1}, spatialString: {2}",
-                                    i,
-                                    numberOfZones,
-                                    spatialString.String);
 
                     var spatialLineZone = MakeSpatialZone(zone, spatialString.String);
 
                     var thisPageInfo = (SpatialPageInfo)pageInfos.GetValue(zone.PageNumber);
-                    Contract.Assert(thisPageInfo != null, "pageInfos.getValue returned null for spatialString: {0}", spatialString.String);
 
                     var spatialLineBounds = includeBounds ? MakeSpatialLineBounds(spatialString, zone, thisPageInfo) : null;
 
@@ -74,17 +66,17 @@ namespace WebAPI
         /// </summary>
         /// <param name="spatialString">The spatial string.</param>
         /// <returns></returns>
-        public static WordZoneData MapSpatialStringToWordZoneData(this SpatialString spatialString)
+        public static List<SpatialLineZone> MapSpatialStringToWordZoneData(this SpatialString spatialString)
         {
             try
             {
-                var wordZoneData = new WordZoneData();
+                var wordZoneData = new List<SpatialLineZone>();
                 var words = spatialString.GetWords();
                 int count = words.Size();
                 for (int i = 0; i < count; i++)
                 {
                     var word = (SpatialString)words.At(i);
-                    wordZoneData.Zones.Add(word.MakeLineInfo(false).Single().SpatialLineZone);
+                    wordZoneData.Add(word.MakeLineInfo(false).Single().SpatialLineZone);
                 }
 
                 return wordZoneData;
@@ -110,7 +102,6 @@ namespace WebAPI
                 Position position = new Position();
 
                 IUnknownVector lines = spatialString.GetLines();
-                Contract.Assert(lines != null, "null return from SpatialString.GetLines, spatial string: {0}", spatialString.String);
 
                 SortedSet<int> setOfPages = new SortedSet<int>();
                 var lineCount = lines.Size();
@@ -122,7 +113,6 @@ namespace WebAPI
                     for (int i = 0; i < lineCount; ++i)
                     {
                         SpatialString line = (SpatialString)lines.At(i);
-                        Contract.Assert(line != null, "Failed to get SpatialString line from index: {0}, spatial string: {1}", i, spatialString.String);
                         if (!line.HasSpatialInfo())
                         {
                             continue;
@@ -149,6 +139,40 @@ namespace WebAPI
             }
         }
 
+        /// <summary>
+        /// Returns an enumeration of all <see paramref="attributes"/> and their subattributes, recursively.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s to enumerate.</param>
+        /// <returns>An enumeration of <see paramref="attribute"/> and its subattributes, recursively</returns>
+        public static IEnumerable<(IAttribute attribute, IAttribute parent)> Enumerate(this IUnknownVector attributes)
+        {
+            foreach (var attribute in attributes.ToIEnumerable<IAttribute>())
+            {
+                yield return (attribute, null);
+
+                foreach (var (descendant, parent) in Enumerate(attribute.SubAttributes))
+                {
+                    yield return (descendant, parent ?? attribute);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Converts <see paramref="comVector"/> into an enumerable.
+        /// </summary>
+        /// <typeparam name="T">The type of object in the vector.</typeparam>
+        /// <param name="comVector">The <see cref="IIUnknownVector"/> to convert.</param>
+        /// <returns>An enumerable of type <see paramref="T"/>.</returns>
+        public static IEnumerable<T> ToIEnumerable<T>(this IIUnknownVector comVector)
+        {
+            int size = comVector.Size();
+
+            for (int i = 0; i < size; i++)
+            {
+                yield return (T)comVector.At(i);
+            }
+        }
+
         #endregion Methods
 
         #region Private Members
@@ -169,11 +193,9 @@ namespace WebAPI
             bounds.PageNumber = zone.PageNumber;
 
             LongRectangle pageBounds = new LongRectangle();
-            Contract.Assert(pageBounds != null, "pageBounds allocation failed");
 
             pageBounds.SetBounds(0, 0, pageInfo.Width, pageInfo.Height);
             var rect = zone.GetRectangularBounds(pageBounds);
-            Contract.Assert(rect != null, "zone.getrectangularBounds returned null bounds");
 
             bounds.Top = rect.Top;
             bounds.Left = rect.Left;
