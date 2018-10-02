@@ -3,6 +3,7 @@ using Extract.Code.Attributes;
 using Extract.DataCaptureStats;
 using Extract.Utilities;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -243,7 +244,7 @@ namespace Extract.ETL
         /// <param name="endFileTaskSessionID">The ID of the last file task session row to process.</param>
         void ProcessBatch(CancellationToken cancelToken, int endFileTaskSessionID)
         {
-            var queriesToRunInBatch = new List<string>();
+            var queriesToRunInBatch = new ConcurrentQueue<string>();
 
             using (var connection = NewSqlDBConnection())
             {
@@ -258,45 +259,77 @@ namespace Extract.ETL
                 cmd.CommandText = UPDATE_ACCURACY_DATA_SQL;
 
                 addParametersToCommand(cmd, endFileTaskSessionID);
+                
+				// Keep track of active threads
+                CountdownEvent threadCountdown = new CountdownEvent(1);
+
+                Semaphore threadSemaphore = new Semaphore(NumberOfProcessingThreads, NumberOfProcessingThreads);
 
                 using (SqlDataReader ExpectedAndFoundReader = cmd.ExecuteReader())
                 {
                     // Get VOA and other relevant data for each file needed to calculate capture statistics.
                     while (ReadDataAccuracyQueryData(ExpectedAndFoundReader, cancelToken, out var queryResultRow))
                     {
-                        // Put the expected and found streams in usings so they will be disposed
-                        using (queryResultRow.ExpectedStream)
-                        using (queryResultRow.FoundStream)
+                        // Increment the number of pending threads
+                        threadCountdown.AddCount();
+
+                        // Get Semaphore before creating the thread
+                        threadSemaphore.WaitOne();
+
+                        // Create a thread pool thread to do the comparison
+                        ThreadPool.QueueUserWorkItem(delegate
                         {
-                            // Get the VOAs from the streams
-                            IUnknownVector expectedAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(queryResultRow.ExpectedStream);
-                            IUnknownVector foundAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(queryResultRow.FoundStream);
-
-                            // If the original file ID differs from the expected file ID, search the
-                            // original file's attribute hierarchy to find the comparison attributes
-                            // in a proposed document pagination hierarchy.
-                            // We know to be searching the pagination source document data because
-                            // if manual pagination had triggered rule execution on the expected file
-                            // (or even rules had been run after-the-fact on the expected file), the
-                            // more recent storage of the found attribute set would trigger that to
-                            // be used as the comparison.
-                            if (queryResultRow.ExpectedFileID != queryResultRow.OriginalFileID)
+                            try
                             {
-                                foundAttributes = GetFoundAttributesFromPaginationSource(foundAttributes, queryResultRow);
+                                // Put the expected and found streams in usings so they will be disposed
+                                using (queryResultRow.ExpectedStream)
+                                using (queryResultRow.FoundStream)
+                                {
+                                    // Get the VOAs from the streams
+                                    IUnknownVector expectedAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(queryResultRow.ExpectedStream);
+                                    IUnknownVector foundAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(queryResultRow.FoundStream);
+
+                                    // If the original file ID differs from the expected file ID, search the
+                                    // original file's attribute hierarchy to find the comparison attributes
+                                    // in a proposed document pagination hierarchy.
+                                    // We know to be searching the pagination source document data because
+                                    // if manual pagination had triggered rule execution on the expected file
+                                    // (or even rules had been run after-the-fact on the expected file), the
+                                    // more recent storage of the found attribute set would trigger that to
+                                    // be used as the comparison.
+                                    if (queryResultRow.ExpectedFileID != queryResultRow.OriginalFileID)
+                                    {
+                                        foundAttributes = GetFoundAttributesFromPaginationSource(foundAttributes, queryResultRow);
+                                    }
+
+                                    // Compare the VOAs
+                                    var output = AttributeTreeComparer.CompareAttributes(expectedAttributes,
+                                    foundAttributes, XPathOfAttributesToIgnore, XPathOfContainerOnlyAttributes, cancelToken)
+                                    .ToList();
+
+                                    // Add the comparison results to the Results
+                                    var statsToStore = output.AggregateStatistics(cancelToken).ToList();
+
+                                    queriesToRunInBatch.Enqueue(AddAccuracyDataQueryToList(statsToStore, queryResultRow));
+                                }
                             }
+                            catch (Exception ex)
+                            {
+                                ex.AsExtract("ELI41544").Log();
+                            }
+                            finally
+                            {
+                                // Decrement the number of pending threads
+                                threadCountdown.Signal();
 
-                            // Compare the VOAs
-                            var output = AttributeTreeComparer.CompareAttributes(expectedAttributes,
-                            foundAttributes, XPathOfAttributesToIgnore, XPathOfContainerOnlyAttributes)
-                            .ToList();
-
-                            // Add the comparison results to the Results
-                            var statsToStore = output.AggregateStatistics(cancelToken).ToList();
-
-                            queriesToRunInBatch.Add(AddAccuracyDataQueryToList(statsToStore, queryResultRow));
-                        }
+                                // Release semaphore after thread has been created
+                                threadSemaphore.Release();
+                            }
+                        });
                     }
                 }
+                threadCountdown.Signal();
+                WaitHandle.WaitAny(new WaitHandle[] { threadCountdown.WaitHandle, cancelToken.WaitHandle });
             }
 
             AddTheDataToTheDatabase(queriesToRunInBatch, endFileTaskSessionID, cancelToken);
@@ -308,7 +341,7 @@ namespace Extract.ETL
         /// </summary>
         /// <param name="endFileTaskSessionID">The last fileTaskSessionID in the batch</param>
         /// <param name="cancelToken">Cancel token</param>
-        void AddTheDataToTheDatabase(List<string> queriesToRunInBatch, int endFileTaskSessionID,
+        void AddTheDataToTheDatabase(ConcurrentQueue<string> queriesToRunInBatch, int endFileTaskSessionID,
             CancellationToken cancelToken)
         {
             using (TransactionScope scope = new TransactionScope(
@@ -472,7 +505,7 @@ namespace Extract.ETL
         /// <param name="statsToStore">The <see cref="AccuracyDetail"/> instances to store.</param>
         /// <param name="queryResultRow">The <see cref="UpdateQueryResultRow"/> used to generate the stats.
         /// </param>
-        string AddAccuracyDataQueryToList(IEnumerable<AccuracyDetail> statsToStore,
+        string AddAccuracyDataQueryToList(List<AccuracyDetail> statsToStore,
             UpdateQueryResultRow queryResultRow)
         {
             statsToStore = statsToStore.Where(c => c.Label != AccuracyDetailLabel.ContainerOnly).ToList();

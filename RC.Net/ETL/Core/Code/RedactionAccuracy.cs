@@ -3,6 +3,7 @@ using Extract.Code.Attributes;
 using Extract.DataCaptureStats;
 using Extract.Utilities;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -197,11 +198,6 @@ namespace Extract.ETL
         /// </summary>
         bool _processing;
 
-        /// <summary>
-        /// List to hold the queries that will be ran together in the same transaction
-        /// </summary>
-        List<string> _queriesToRunInBatch = new List<string>();
-
         #endregion Fields
 
         #region Constructors
@@ -276,6 +272,8 @@ namespace Extract.ETL
                 // Process the entries in chunks of 100 file task session
                 while (status.LastFileTaskSessionIDProcessed < maxFileTaskSession)
                 {
+                    ConcurrentQueue<string> queriesToRunInBatch = new ConcurrentQueue<string>(); 
+
                     cancelToken.ThrowIfCancellationRequested();
 
                     int lastInBatchToProcess = Math.Min(status.LastFileTaskSessionIDProcessed + _PROCESS_BATCH_SIZE, maxFileTaskSession);
@@ -295,11 +293,10 @@ namespace Extract.ETL
                         cmd.Parameters.AddWithValue("@LastProcessedID", status.LastFileTaskSessionIDProcessed);
                         cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
 
-                        _queriesToRunInBatch.Clear();
-                        _queriesToRunInBatch.Add(DELETE_OLD_DATA);
+                        queriesToRunInBatch.Enqueue(DELETE_OLD_DATA);
 
                         // Get VOA data for each file
-                        SaveAccuracy(cmd, cancelToken);
+                        SaveAccuracy(cmd, queriesToRunInBatch, cancelToken);
                     }
 
                     // Records to calculate stats
@@ -315,7 +312,7 @@ namespace Extract.ETL
                         using (var saveConnection = NewSqlDBConnection())
                         {
                             saveConnection.Open();
-                            foreach (var q in _queriesToRunInBatch)
+                            foreach (var q in queriesToRunInBatch)
                             {
                                 using (SqlCommand cmd = saveConnection.CreateCommand())
                                 {
@@ -422,7 +419,7 @@ namespace Extract.ETL
         /// </summary>
         /// <param name="cmd">Command to get the data needed to calculate the stats for the current block of data being processed</param>
         /// <param name="cancelToken"></param>
-        void SaveAccuracy(SqlCommand cmd, CancellationToken cancelToken)
+        void SaveAccuracy(SqlCommand cmd, ConcurrentQueue<string> queriesToRunInBatch, CancellationToken cancelToken)
         {
             using (SqlDataReader ExpectedAndFoundReader = cmd.ExecuteReader())
             {
@@ -438,6 +435,11 @@ namespace Extract.ETL
                 int expectedDateTimeStampColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedDateTimeStamp");
                 int expectedActionIDColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedActionID");
                 int expectedFAMUserIDColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedFAMUserID");
+
+                Semaphore threadSemaphore = new Semaphore(NumberOfProcessingThreads, NumberOfProcessingThreads);
+                
+                // keep track of number of active threads
+                CountdownEvent threadCountDown = new CountdownEvent(1);
 
                 // Process the found records
                 while (ExpectedAndFoundReader.Read())
@@ -457,11 +459,17 @@ namespace Extract.ETL
                     Int32 expectedActionID = ExpectedAndFoundReader.GetInt32(expectedActionIDColumn);
                     Int32 expectedFAMUserID = ExpectedAndFoundReader.GetInt32(expectedFAMUserIDColumn);
 
-                    try
+                    // Get Semaphore before creating the thread
+                    threadSemaphore.WaitOne();
+                    threadCountDown.AddCount();
+
+                    // Create a thread pool thread to do the comparison
+                    ThreadPool.QueueUserWorkItem(delegate
                     {
-                        // Put the expected and found streams in usings so they will be disposed
-                        using (expectedStream)
+                        try
                         {
+                            // Put the expected and found streams in usings so they will be disposed
+                            using (expectedStream)
                             using (foundStream)
                             {
                                 // Get the VOAs from the streams
@@ -469,7 +477,7 @@ namespace Extract.ETL
                                 IUnknownVector FoundAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(foundStream);
 
                                 // Compare the VOAs
-                                var output = IDShieldAttributeComparer.CompareAttributes(ExpectedAttributes, FoundAttributes, 
+                                var output = IDShieldAttributeComparer.CompareAttributes(ExpectedAttributes, FoundAttributes,
                                     XPathOfSensitiveAttributes, cancelToken).ToList();
 
                                 // process output for each page
@@ -478,7 +486,7 @@ namespace Extract.ETL
                                     int page = pageKeyPair.Key;
 
                                     // Add the comparison results to the Results
-                                    var statsToSave = pageKeyPair.Value.AggregateStatistics(cancelToken);
+                                    var statsToSave = pageKeyPair.Value.AggregateStatistics(cancelToken).ToList();
 
                                     var lookup = statsToSave.ToLookup(a => new { a.Path, a.Label });
 
@@ -523,41 +531,50 @@ namespace Extract.ETL
                                             ));
                                     }
 
-                                    _queriesToRunInBatch.Add( string.Format(CultureInfo.InvariantCulture,
+                                    queriesToRunInBatch.Enqueue(string.Format(CultureInfo.InvariantCulture,
                                         @"
-                                            INSERT INTO [dbo].[ReportingRedactionAccuracy]
-                                                    ([DatabaseServiceID]
-                                                    ,[FoundAttributeSetForFileID]
-                                                    ,[ExpectedAttributeSetForFileID]
-                                                    ,[FileID]
-                                                    ,[Page]
-                                                    ,[Attribute]
-                                                    ,[Expected]
-                                                    ,[Found]
-                                                    ,[Correct]
-                                                    ,[FalsePositives]
-                                                    ,[OverRedacted]
-                                                    ,[UnderRedacted]
-                                                    ,[Missed]
-                                                    ,[FoundDateTimeStamp]
-                                                    ,[FoundFAMUserID]
-                                                    ,[FoundActionID]
-													,[ExpectedDateTimeStamp]
-                                                    ,[ExpectedFAMUserID]
-                                                    ,[ExpectedActionID])
-                                                    VALUES
-                                                        {3};", DatabaseServiceID, fileID, page, string.Join(",\r\n", valuesToAdd)));
+                                        INSERT INTO [dbo].[ReportingRedactionAccuracy]
+                                                ([DatabaseServiceID]
+                                                ,[FoundAttributeSetForFileID]
+                                                ,[ExpectedAttributeSetForFileID]
+                                                ,[FileID]
+                                                ,[Page]
+                                                ,[Attribute]
+                                                ,[Expected]
+                                                ,[Found]
+                                                ,[Correct]
+                                                ,[FalsePositives]
+                                                ,[OverRedacted]
+                                                ,[UnderRedacted]
+                                                ,[Missed]
+                                                ,[FoundDateTimeStamp]
+                                                ,[FoundFAMUserID]
+                                                ,[FoundActionID]
+									,[ExpectedDateTimeStamp]
+                                                ,[ExpectedFAMUserID]
+                                                ,[ExpectedActionID])
+                                                VALUES
+                                                    {3};", DatabaseServiceID, fileID, page, string.Join(",\r\n", valuesToAdd)));
                                 }
                             }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.AsExtract("ELI45383").Log();
-                    }
-                }
-            }
+                        catch (Exception ex)
+                        {
+                            ex.AsExtract("ELI45383").Log();
+                        }
+                        finally
+                        {
+                            // Release semaphore after thread has been created
+                            threadSemaphore.Release();
 
+                            // Decrement the number of pending threads
+                            threadCountDown.Signal();
+                        }
+                    });
+                }
+                threadCountDown.Signal();
+                WaitHandle.WaitAny(new WaitHandle[] { threadCountDown.WaitHandle, cancelToken.WaitHandle });
+            }
         }
 
         /// <summary>
