@@ -116,26 +116,28 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseServiceManager"/> class.
         /// If the processString is "ETL" all enabled ETL processes that are not in the ETLProcesses list
-        /// excluding in the given processString will be processed on at a time
+        /// excluding in the given processString will be processed one at a time
         /// 
         /// </summary>
         /// <param name="processString">The string from the FAMService configuration format of "ETL" or "ETL: DatabaseServiceName</param>
-        /// <param name="ServerName">Database server name for ETL processes</param>
-        /// <param name="DatabaseName">Database Name for ETL processes</param>
-        /// <param name="ETLProcesses">The list of the ETL processes from FAM Service configuration format of "ETL" or "ETL: DatabaseServiceName"</param>
-        public DatabaseServiceManager(string processString, string ServerName, string DatabaseName, List<string> ETLProcesses, int numberOfThreads)
+        /// <param name="serverName">Database server name for ETL processes</param>
+        /// <param name="databaseName">Database Name for ETL processes</param>
+        /// <param name="etlProcesses">The list of the ETL processes from FAM Service configuration format of "ETL" or "ETL: DatabaseServiceName"</param>
+        public DatabaseServiceManager(string processString, string serverName, string databaseName, List<string> etlProcesses, int numberOfThreads)
         {
             try
             {
                 _numberOfThreads = numberOfThreads;
                 _etlString = processString;
-                if (processString == "ETL" && ETLProcesses != null)
+                if (processString == "ETL" && etlProcesses != null)
                 {
-                    _excludedETLProcesses = ETLProcesses.Where(e => e != _etlString).ToList();
+                    _excludedETLProcesses = etlProcesses
+                        .Where(e => !e.Equals(_etlString, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
                 }
                 _fileProcessingDb = new FileProcessingDB();
-                _fileProcessingDb.DatabaseServer = ServerName;
-                _fileProcessingDb.DatabaseName = DatabaseName;
+                _fileProcessingDb.DatabaseServer = serverName;
+                _fileProcessingDb.DatabaseName = databaseName;
 
                 _oleDbConnection = new OleDbConnection(_fileProcessingDb.ConnectionString);
                 _oleDbConnection.Open();
@@ -442,9 +444,9 @@ namespace Extract.FileActionManager.Utilities
                 string query = "SELECT [ActiveFAM].[ID] FROM [ActiveFAM] " +
                     "   INNER JOIN [FAMSession] ON [FAMSessionID] = [FAMSession].[ID]" +
                     "   INNER JOIN [FPSFile] ON [FPSFileID] = [FPSFile].[ID]" +
-                    "   WHERE [FPSFileName] LIKE '<ETLProcess>'";
+                    "   WHERE [FPSFileName] = '<ETLProcess>'";
 
-                query = query.Replace("<ETLProcess>", _etlString + " Manager");
+                query = query.Replace("<ETLProcess>", _etlString.Replace("'","''") + " Manager");
 
                 if (DBMethods.GetQueryResultsAsStringArray(_oleDbConnection, query).Any())
                 {
@@ -485,7 +487,7 @@ namespace Extract.FileActionManager.Utilities
                     if (!_etlString.Equals("ETL", StringComparison.OrdinalIgnoreCase))
                     {
                         string etlDescription = _etlString.Substring(_etlString.IndexOf(":") + 1).Trim();
-                        query += " AND Description = '" + etlDescription + "'";
+                        query += " AND Description = '" + etlDescription.Replace("'","''") + "'";
                     }
 
                     using (DataTable dbServiceDefinitions = DBMethods.ExecuteDBQuery(_oleDbConnection, query))

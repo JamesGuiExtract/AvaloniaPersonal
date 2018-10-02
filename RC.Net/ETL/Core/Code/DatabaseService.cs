@@ -251,19 +251,26 @@ namespace Extract.ETL
         /// <returns></returns>
         public bool StartActiveSchedule()
         {
-            if (IsScheduleActive())
+            try
             {
-                return false;
+                if (IsScheduleActive())
+                {
+                    return false;
+                }
+                if (_famDB is null)
+                {
+                    _famDB = new FileProcessingDB();
+                    _famDB.DatabaseName = _databaseName;
+                    _famDB.DatabaseServer = _databaseServer;
+                }
+                _famDB.RecordFAMSessionStart("ETL: " + Description, string.Empty, false, false);
+                _famDB.RegisterActiveFAM();
+                return true;
             }
-            if (_famDB is null)
+            catch (Exception ex)
             {
-                _famDB = new FileProcessingDB();
-                _famDB.DatabaseName = _databaseName;
-                _famDB.DatabaseServer = _databaseServer;
+                throw ex.AsExtract("ELI46281");
             }
-            _famDB.RecordFAMSessionStart("ETL: " + Description, string.Empty, false, false);
-            _famDB.RegisterActiveFAM();
-            return true;
         }
 
         /// <summary>
@@ -271,11 +278,18 @@ namespace Extract.ETL
         /// </summary>
         public void StopActiveSchedule()
         {
-            if (_famDB != null && _famDB.FAMSessionID > 0)
+            try
             {
-                _famDB.UnregisterActiveFAM();
-                _famDB.RecordFAMSessionStop();
-                _famDB.CloseAllDBConnections();
+                if (_famDB != null && _famDB.FAMSessionID > 0)
+                {
+                    _famDB.UnregisterActiveFAM();
+                    _famDB.RecordFAMSessionStop();
+                    _famDB.CloseAllDBConnections();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46282");
             }
         }
 
@@ -286,31 +300,38 @@ namespace Extract.ETL
         /// <returns></returns>
         public bool IsScheduleActive()
         {
-            if (_famDB is null)
+            try
             {
-                _famDB = new FileProcessingDB();
-                _famDB.DatabaseName = _databaseName;
-                _famDB.DatabaseServer = _databaseServer;
-            }
-
-            // Trigger to clean up timed out ActiveFAM instances.
-            _famDB.IsAnyFAMActive();
-
-            using (var connection = NewSqlDBConnection())
-            {
-                connection.Open();
-                using (var cmd = connection.CreateCommand())
+                if (_famDB is null)
                 {
-                    cmd.CommandText = "SELECT [ActiveFAM].[ID] FROM [ActiveFAM] " +
-                    "   INNER JOIN [FAMSession] ON [FAMSessionID] = [FAMSession].[ID]" +
-                    "   INNER JOIN [FPSFile] ON [FPSFileID] = [FPSFile].[ID]" +
-                    "   WHERE [FPSFileName] = @ETLProcess";
-
-                    cmd.Parameters.Add("@ETLProcess", SqlDbType.NVarChar, 512).Value = "ETL: " + Description;
-                    var result = cmd.ExecuteScalar();
-
-                    return result != null;
+                    _famDB = new FileProcessingDB();
+                    _famDB.DatabaseName = _databaseName;
+                    _famDB.DatabaseServer = _databaseServer;
                 }
+
+                // Trigger to clean up timed out ActiveFAM instances.
+                _famDB.IsAnyFAMActive();
+
+                using (var connection = NewSqlDBConnection())
+                {
+                    connection.Open();
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = "SELECT [ActiveFAM].[ID] FROM [ActiveFAM] " +
+                        "   INNER JOIN [FAMSession] ON [FAMSessionID] = [FAMSession].[ID]" +
+                        "   INNER JOIN [FPSFile] ON [FPSFileID] = [FPSFile].[ID]" +
+                        "   WHERE [FPSFileName] = @ETLProcess";
+
+                        cmd.Parameters.Add("@ETLProcess", SqlDbType.NVarChar, 512).Value = "ETL: " + Description;
+                        var result = cmd.ExecuteScalar();
+
+                        return result != null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46283");
             }
         }
 
@@ -320,17 +341,18 @@ namespace Extract.ETL
         /// <param name="status">The <see cref="DatabaseServiceStatus"/> instance to save</param>
         public void SaveStatus(DatabaseServiceStatus status)
         {
-            if (DatabaseServiceID <= 0)
+            try
             {
-                return;
-            }
-
-            // Save status to the DB
-            using (var connection = NewSqlDBConnection())
-            {
-                connection.Open();
-                try
+                if (DatabaseServiceID <= 0)
                 {
+                    return;
+                }
+
+                // Save status to the DB
+                using (var connection = NewSqlDBConnection())
+                {
+                    connection.Open();
+
                     if (status == null)
                     {
                         using (var cmd = connection.CreateCommand())
@@ -348,11 +370,12 @@ namespace Extract.ETL
                     {
                         status.SaveStatus(connection, DatabaseServiceID);
                     }
+
                 }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI45716");
-                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45716");
             }
         }
 

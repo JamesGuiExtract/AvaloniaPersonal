@@ -291,7 +291,7 @@ namespace Extract.ETL
                             .ToList();
 
                             // Add the comparison results to the Results
-                            var statsToStore = output.AggregateStatistics(cancelToken);
+                            var statsToStore = output.AggregateStatistics(cancelToken).ToList();
 
                             queriesToRunInBatch.Add(AddAccuracyDataQueryToList(statsToStore, queryResultRow));
                         }
@@ -475,8 +475,10 @@ namespace Extract.ETL
         string AddAccuracyDataQueryToList(IEnumerable<AccuracyDetail> statsToStore,
             UpdateQueryResultRow queryResultRow)
         {
+            statsToStore = statsToStore.Where(c => c.Label != AccuracyDetailLabel.ContainerOnly).ToList();
+
             // This is needed so a row gets put in for every file that has expected and found voa's saved
-            if (statsToStore.Count() == 0)
+            if (!statsToStore.Any())
             {
                 List<AccuracyDetail> list = new List<AccuracyDetail>();
                 list.Add(new AccuracyDetail(AccuracyDetailLabel.Correct, string.Empty, 0));
@@ -488,7 +490,6 @@ namespace Extract.ETL
             var lookup = statsToStore.ToLookup(a => new { a.Path, a.Label });
 
             var attributePaths = statsToStore
-                .Where( c => c.Label != AccuracyDetailLabel.ContainerOnly)
                 .Select(a => a.Path)
                 .Distinct()
                 .OrderBy(p => p)
