@@ -98,7 +98,8 @@ namespace Extract.Utilities
         /// Get suggestions for a search string
         /// </summary>
         /// <param name="searchPhrase">The substring or related phrase to search with</param>
-        /// <param name="maxSuggestions">The maximim number of suggestions to return</param>
+        /// <param name="maxSuggestions">The maximum number of suggestions to return</param>
+        /// <param name="excludeLowScoring">Whether to return the best suggestions</param>
         public IEnumerable<string> GetSuggestions(string searchPhrase, int maxSuggestions = int.MaxValue,
             bool excludeLowScoring = false)
         {
@@ -147,7 +148,7 @@ namespace Extract.Utilities
         /// Get suggestions for a search string
         /// </summary>
         /// <param name="searchPhrase">The substring or related phrase to search with</param>
-        /// <param name="maxSuggestions">The maximim number of suggestions to return</param>
+        /// <param name="maxSuggestions">The maximum number of suggestions to return</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public IEnumerable<Tuple<string, double>> GetSuggestionsAndScores(string searchPhrase,
             int maxSuggestions = int.MaxValue)
@@ -240,23 +241,8 @@ namespace Extract.Utilities
                     // Add a fuzzy query for the last term in case it is a complete word
                     if (!lastTermMightBeIncomplete && lastTerm.Length > 1)
                     {
-                        var lastTermFuzzyClause = new FuzzyQuery(
+                        clause = new FuzzyQuery(
                                 new Term(field, lastTerm), lastTerm.Length > 3 ? 2 : 1);
-
-                        // Exclude the prefix query so as not to give double
-                        // weight to the final word while it is being typed
-                        if (lastTermMightBeIncomplete)
-                        {
-                            clause = new SpanNotQuery(
-                                include: new SpanMultiTermQueryWrapper<FuzzyQuery>(
-                                    lastTermFuzzyClause),
-                                exclude: new SpanMultiTermQueryWrapper<PrefixQuery>(
-                                    new PrefixQuery(new Term(field, lastTerm))));
-                        }
-                        else
-                        {
-                            clause = lastTermFuzzyClause;
-                        }
 
                         clause.Boost = 0.1f;
                         query.Add(clause, Occur.SHOULD);

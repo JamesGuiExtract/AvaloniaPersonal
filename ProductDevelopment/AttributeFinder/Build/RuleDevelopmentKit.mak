@@ -179,6 +179,7 @@ CopyTestFiles:
 	@XCOPY "$(AFRootDirectory)\InputValidators\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\InputValidators\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\IndustrySpecific\Redaction\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\IndustrySpecific\Redaction\InteractiveTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\InteractiveTest\" /s /e /y /I
+	@XCOPY "$(AFRootDirectory)\IndustrySpecific\Redaction\RedactionTester\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\RedactionTester\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\IndustrySpecific\DataEntry\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\IndustrySpecific\DataEntry\AutomatedTest\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\IndustrySpecific\DataEntry\InteractiveTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\IndustrySpecific\DataEntry\InteractiveTest\" /s /e /y /I
 	@XCOPY "$(AFRootDirectory)\IndustrySpecific\LabResults\AutomatedTest\*.*" "$(TestingFilesDirectory)\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\AutomatedTest\" /s /e /y /I

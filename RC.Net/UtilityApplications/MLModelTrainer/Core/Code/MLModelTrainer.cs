@@ -1050,15 +1050,11 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
                     using (var reader = cmd.ExecuteReader())
                     {
-                        if (reader.Read())
+                        while (reader.Read())
                         {
-                            do
-                            {
-                                int id = reader.GetInt32(0);
-                                string line = reader.GetString(1);
-                                yield return (line, id);
-                            }
-                            while (reader.Read());
+                            int id = reader.GetInt32(0);
+                            string line = reader.GetString(1);
+                            yield return (line, id);
                         }
                     }
                 }

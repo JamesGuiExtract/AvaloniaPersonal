@@ -730,7 +730,7 @@ namespace Extract.AttributeFinder.Test
                 .SelectMany(a => a)
                 .ToIUnknownVector();
 
-            var (features, labels) = encoder.GetFeatureVectorAndAnswerCollections(new[] { text }, new[] { attributes }, null, false);
+            var (features, _) = encoder.GetFeatureVectorAndAnswerCollections(new[] { text }, new[] { attributes }, null, false);
 
             Assert.AreEqual(570, features.Length);
         }

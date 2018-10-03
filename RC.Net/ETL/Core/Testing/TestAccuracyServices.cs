@@ -8,6 +8,7 @@ using System.Threading;
 using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
+using static System.DateTime;
 
 namespace Extract.ETL.Test
 {
@@ -67,6 +68,8 @@ namespace Extract.ETL.Test
                   | /*/Test/OrderStatus
                   | (/*/Test/CollectionTime | /*/Test/ResultTime)[text()='00:00']";
 
+        static readonly CultureInfo _CULTURE = CultureInfo.CurrentCulture;
+
         #endregion
 
         #region Fields
@@ -85,20 +88,20 @@ namespace Extract.ETL.Test
         static DataEntryAccuracyList _FIRST_RUN_EXPECTED_RESULTS = new DataEntryAccuracyList
         {
 
-            (2, 4, "PatientInfo/DOB",                            1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
-            (2, 4, "PatientInfo/Name/First",                     1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
-            (2, 4, "PatientInfo/Name/Last",                      1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
-            (2, 4, "PhysicianInfo/OrderingPhysicianName/Code",   0, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
-            (2, 4, "PhysicianInfo/OrderingPhysicianName/First",  1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
-            (2, 4, "PhysicianInfo/OrderingPhysicianName/Last",   1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
-            (2, 4, "PhysicianInfo/OrderingPhysicianName/Middle", 1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
-            (2, 4, "Test/CollectionDate",                        1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
-            (2, 4, "Test/CollectionTime",                        0, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
-            (2, 4, "Test/Component",                             3, 3, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
-            (2, 4, "Test/Component/Range",                       1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
-            (2, 4, "Test/Component/Units",                       3, 3, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
-            (2, 4, "Test/Component/Value",                       3, 3, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4),
-            (2, 4, "Test/Name",                                  1, 1, 0,  1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/3/2018 10:44:24 AM"), 3, 4)
+            (2, 4, "PatientInfo/DOB",                            1, 1, 0,  1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/3/2018 10:44:24 AM", _CULTURE), 3, 4),
+            (2, 4, "PatientInfo/Name/First",                     1, 1, 0,  1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/3/2018 10:44:24 AM", _CULTURE), 3, 4),
+            (2, 4, "PatientInfo/Name/Last",                      1, 1, 0,  1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/3/2018 10:44:24 AM", _CULTURE), 3, 4),
+            (2, 4, "PhysicianInfo/OrderingPhysicianName/Code",   0, 1, 0,  1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/3/2018 10:44:24 AM", _CULTURE), 3, 4),
+            (2, 4, "PhysicianInfo/OrderingPhysicianName/First",  1, 1, 0,  1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/3/2018 10:44:24 AM", _CULTURE), 3, 4),
+            (2, 4, "PhysicianInfo/OrderingPhysicianName/Last",   1, 1, 0,  1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/3/2018 10:44:24 AM", _CULTURE), 3, 4),
+            (2, 4, "PhysicianInfo/OrderingPhysicianName/Middle", 1, 1, 0,  1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/3/2018 10:44:24 AM", _CULTURE), 3, 4),
+            (2, 4, "Test/CollectionDate",                        1, 1, 0,  1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/3/2018 10:44:24 AM", _CULTURE), 3, 4),
+            (2, 4, "Test/CollectionTime",                        0, 1, 0,  1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/3/2018 10:44:24 AM", _CULTURE), 3, 4),
+            (2, 4, "Test/Component",                             3, 3, 0,  1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/3/2018 10:44:24 AM", _CULTURE), 3, 4),
+            (2, 4, "Test/Component/Range",                       1, 1, 0,  1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/3/2018 10:44:24 AM", _CULTURE), 3, 4),
+            (2, 4, "Test/Component/Units",                       3, 3, 0,  1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/3/2018 10:44:24 AM", _CULTURE), 3, 4),
+            (2, 4, "Test/Component/Value",                       3, 3, 0,  1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/3/2018 10:44:24 AM", _CULTURE), 3, 4),
+            (2, 4, "Test/Name",                                  1, 1, 0,  1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/3/2018 10:44:24 AM", _CULTURE), 3, 4)
         };
 
         /// <summary>
@@ -106,20 +109,20 @@ namespace Extract.ETL.Test
         /// </summary>
         static DataEntryAccuracyList _RERUN_FILE_EXPECTED_RESULTS = new DataEntryAccuracyList
         {
-            (2, 5, "PatientInfo/DOB",                            1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
-            (2, 5, "PatientInfo/Name/First",                     1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
-            (2, 5, "PatientInfo/Name/Last",                      1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
-            (2, 5, "PhysicianInfo/OrderingPhysicianName/Code",   0, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
-            (2, 5, "PhysicianInfo/OrderingPhysicianName/First",  1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
-            (2, 5, "PhysicianInfo/OrderingPhysicianName/Last",   1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
-            (2, 5, "PhysicianInfo/OrderingPhysicianName/Middle", 1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
-            (2, 5, "Test/CollectionDate",                        1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
-            (2, 5, "Test/CollectionTime",                        0, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
-            (2, 5, "Test/Component",                             1, 1, 2, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
-            (2, 5, "Test/Component/Range",                       1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
-            (2, 5, "Test/Component/Units",                       1, 1, 2, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
-            (2, 5, "Test/Component/Value",                       0, 1, 3, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4),
-            (2, 5, "Test/Name",                                  1, 1, 0, 1, DateTime.Parse("1/3/2018 10:40:03 AM"), 3, 1, DateTime.Parse("1/6/2018 10:49:09 AM"), 3, 4)
+            (2, 5, "PatientInfo/DOB",                            1, 1, 0, 1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/6/2018 10:49:09 AM", _CULTURE), 3, 4),
+            (2, 5, "PatientInfo/Name/First",                     1, 1, 0, 1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/6/2018 10:49:09 AM", _CULTURE), 3, 4),
+            (2, 5, "PatientInfo/Name/Last",                      1, 1, 0, 1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/6/2018 10:49:09 AM", _CULTURE), 3, 4),
+            (2, 5, "PhysicianInfo/OrderingPhysicianName/Code",   0, 1, 0, 1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/6/2018 10:49:09 AM", _CULTURE), 3, 4),
+            (2, 5, "PhysicianInfo/OrderingPhysicianName/First",  1, 1, 0, 1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/6/2018 10:49:09 AM", _CULTURE), 3, 4),
+            (2, 5, "PhysicianInfo/OrderingPhysicianName/Last",   1, 1, 0, 1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/6/2018 10:49:09 AM", _CULTURE), 3, 4),
+            (2, 5, "PhysicianInfo/OrderingPhysicianName/Middle", 1, 1, 0, 1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/6/2018 10:49:09 AM", _CULTURE), 3, 4),
+            (2, 5, "Test/CollectionDate",                        1, 1, 0, 1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/6/2018 10:49:09 AM", _CULTURE), 3, 4),
+            (2, 5, "Test/CollectionTime",                        0, 1, 0, 1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/6/2018 10:49:09 AM", _CULTURE), 3, 4),
+            (2, 5, "Test/Component",                             1, 1, 2, 1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/6/2018 10:49:09 AM", _CULTURE), 3, 4),
+            (2, 5, "Test/Component/Range",                       1, 1, 0, 1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/6/2018 10:49:09 AM", _CULTURE), 3, 4),
+            (2, 5, "Test/Component/Units",                       1, 1, 2, 1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/6/2018 10:49:09 AM", _CULTURE), 3, 4),
+            (2, 5, "Test/Component/Value",                       0, 1, 3, 1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/6/2018 10:49:09 AM", _CULTURE), 3, 4),
+            (2, 5, "Test/Name",                                  1, 1, 0, 1, Parse("1/3/2018 10:40:03 AM", _CULTURE), 3, 1, Parse("1/6/2018 10:49:09 AM", _CULTURE), 3, 4)
         }
         ;
         #endregion
