@@ -35,7 +35,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 169;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 170;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2400,7 +2400,41 @@ int UpdateToSchemaVersion169(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46296");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion170(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 170;
 
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		vecQueries.push_back("ALTER TABLE dbo.[DatabaseService] ALTER COLUMN [Description] NVARCHAR(256) NOT NULL");
+		vecQueries.push_back(gstrCREATE_DATABASE_SERVICE_DESCRIPTION_INDEX); 
+		vecQueries.push_back("ALTER TABLE dbo.[DatabaseService] ADD [ActiveServiceMachineID] INT NULL");
+		vecQueries.push_back("ALTER TABLE dbo.[DatabaseService] ADD [NextScheduledRunTime] DateTime NULL");
+		vecQueries.push_back("ALTER TABLE dbo.[DatabaseService] ADD [ActiveFAMID] INT NULL");
+		vecQueries.push_back(gstrCREATE_DATABASE_SERVICE_UPDATE_TRIGGER);
+		vecQueries.push_back(gstrADD_DATABASESERVICE_ACTIVEFAM_FK);
+		vecQueries.push_back(gstrADD_DATABASESERVICE_ACTIVE_MACHINE_FK);
+		vecQueries.push_back("ALTER TABLE dbo.[FAMFile] ADD [AddedDateTime] [datetime] NOT NULL CONSTRAINT [DF_FAMFile_AddedDateTime] DEFAULT(GETDATE())");
+		vecQueries.push_back("ALTER TABLE dbo.[WorkflowFile] ADD [AddedDateTime] [datetime] NOT NULL CONSTRAINT [DF_WorkflowFile_AddedDateTime] DEFAULT(GETDATE())");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46287");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -7454,7 +7488,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 166:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion167);
 				case 167:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion168);
 				case 168:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion169);
-				case 169:
+				case 169:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion170);
+				case 170:
 					break;
 
 				default:

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Transactions;
 using System.Windows.Forms;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.ETL.Management
 {
@@ -146,6 +147,8 @@ namespace Extract.ETL.Management
         /// </summary>
         BindingList<DatabaseServiceData> _listOfDataToDisplay;
 
+        FileProcessingDB _famDB;
+
         #endregion
 
         #region Constructors
@@ -171,6 +174,7 @@ namespace Extract.ETL.Management
                 DatabaseServer = serverName;
                 DatabaseName = databaseName;
                 LoadDataGrid();
+                EnableButtons();
             }
             catch (Exception ex)
             {
@@ -186,6 +190,20 @@ namespace Extract.ETL.Management
         string DatabaseServer { get; set; }
 
         string DatabaseName { get; set; }
+
+        FileProcessingDB FamDB
+        {
+            get
+            {
+                if (_famDB is null)
+                {
+                    _famDB = new FileProcessingDB();
+                    _famDB.DatabaseServer = DatabaseServer;
+                    _famDB.DatabaseName = DatabaseName;
+                }
+                return _famDB;
+            }
+        }
 
         #endregion
 
@@ -242,7 +260,6 @@ namespace Extract.ETL.Management
                     _databaseServicesDataGridView.Columns["Enabled"].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
                     _databaseServicesDataGridView.Columns["Enabled"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
                     _databaseServicesDataGridView.Columns["Description"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-
                 }
             }
             catch (Exception ex)
@@ -332,7 +349,18 @@ namespace Extract.ETL.Management
                 tmpService = serviceEditForm.Service;
 
             }
-            return (configured) ? tmpService :  null;
+            return (configured) ? tmpService : null;
+        }
+
+        /// <summary>
+        /// Enables or Disables buttons on the form
+        /// </summary>
+        void EnableButtons()
+        {
+            bool enable = _databaseServicesDataGridView.Rows.Count > 0;
+            _modifyButton.Enabled = enable;
+            _deleteButton.Enabled = enable;
+            _restartETLButton.Enabled = FamDB.GetDBInfoSetting("ETLRestart", false) != "1";
         }
 
         #endregion
@@ -376,6 +404,7 @@ namespace Extract.ETL.Management
                         currentData.Enabled = newEnabledValue;
                     }
                 }
+                EnableButtons();
             }
             catch (Exception ex)
             {
@@ -402,7 +431,7 @@ namespace Extract.ETL.Management
                 DatabaseServiceData currentData = row.DataBoundItem as DatabaseServiceData;
 
                 var service = EditService(currentData.Service, "Modify {0} database service.", currentData.ID);
-                
+
                 if (service != null)
                 {
                     using (var trans = new TransactionScope())
@@ -447,6 +476,7 @@ namespace Extract.ETL.Management
                         currentData.Description = service.Description;
                         currentData.Service = service;
                     }
+                    EnableButtons();
                 }
             }
             catch (Exception ex)
@@ -459,14 +489,14 @@ namespace Extract.ETL.Management
         {
             try
             {
-                SelectTypeByExtractCategoryForm<DatabaseService> typeForm = 
+                SelectTypeByExtractCategoryForm<DatabaseService> typeForm =
                     new SelectTypeByExtractCategoryForm<DatabaseService>("DatabaseService");
                 if (typeForm.ShowDialog() == DialogResult.OK)
                 {
                     DatabaseService service = typeForm.TypeSelected;
 
                     service = EditService(service, "Add {0} database service.");
-                    
+
                     if (service != null)
                     {
                         using (var trans = new TransactionScope())
@@ -533,7 +563,7 @@ namespace Extract.ETL.Management
                             Int32 id = (Int32)cmd.ExecuteScalar();
                             trans.Complete();
 
-                            var newRcd = new DatabaseServiceData()
+                            var newRcd = new DatabaseServiceData
                             {
                                 ID = id,
                                 Description = service.Description,
@@ -545,6 +575,7 @@ namespace Extract.ETL.Management
                             int rowAdded = _databaseServicesDataGridView.Rows.GetLastRow(DataGridViewElementStates.None);
                             _databaseServicesDataGridView.CurrentCell = _databaseServicesDataGridView.Rows[rowAdded].Cells["Enabled"];
                         }
+                        EnableButtons();
                     }
                 }
             }
@@ -588,6 +619,7 @@ namespace Extract.ETL.Management
                         _listOfDataToDisplay.Remove((DatabaseServiceData)row.DataBoundItem);
                     }
                 }
+                EnableButtons();
             }
             catch (Exception ex)
             {
@@ -600,6 +632,7 @@ namespace Extract.ETL.Management
             try
             {
                 LoadDataGrid();
+                EnableButtons();
             }
             catch (Exception ex)
             {
@@ -611,7 +644,7 @@ namespace Extract.ETL.Management
         {
             try
             {
-                if (e.RowIndex >=0)
+                if (e.RowIndex >= 0)
                 {
                     HandleModifyButtonClick(sender, e);
                 }
@@ -620,6 +653,20 @@ namespace Extract.ETL.Management
             {
                 ex.ExtractDisplay("ELI45664");
             }
+        }
+
+        void HandleRestartETLButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                FamDB.SetDBInfoSetting("ETLRestart", "1", true, false);
+                EnableButtons();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46311");
+            }
+
         }
 
         #endregion

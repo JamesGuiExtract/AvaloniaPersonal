@@ -38,7 +38,9 @@ static const string gstrCREATE_FAM_FILE_TABLE = "CREATE TABLE [dbo].[FAMFile]("
 	"[FileName] [nvarchar](255) NULL,"
 	"[FileSize] [bigint] NOT NULL CONSTRAINT [DF_FAMFile_FileSize]  DEFAULT ((0)),"
 	"[Pages] [int] NOT NULL CONSTRAINT [DF_FAMFile_Pages]  DEFAULT ((0)),"
-	"[Priority] [int] NOT NULL CONSTRAINT [DF_FAMFile_Priority] DEFAULT((3)))";
+	"[Priority] [int] NOT NULL CONSTRAINT [DF_FAMFile_Priority] DEFAULT((3)), "
+	"[AddedDateTime] [datetime] NOT NULL CONSTRAINT [DF_FAMFile_AddedDateTime] DEFAULT(GETDATE())"
+	")";
 
 static const string gstrCREATE_QUEUE_EVENT_CODE_TABLE = "CREATE TABLE [dbo].[QueueEventCode]("
 	"[Code] [nvarchar](1) NOT NULL CONSTRAINT [PK_QueueEventCode] PRIMARY KEY CLUSTERED ,"
@@ -420,6 +422,7 @@ static const string gstrCREATE_WORKFLOWFILE =
 	"	[WorkflowID] INT NOT NULL, "
 	"	[FileID] INT NOT NULL, "
 	"	[Deleted] BIT NOT NULL DEFAULT(0), "
+	"	[AddedDateTime] [datetime] NOT NULL CONSTRAINT [DF_WorkflowFile_AddedDateTime] DEFAULT(GETDATE()), "
 	"	CONSTRAINT [PK_WorkflowFile] PRIMARY KEY CLUSTERED ([WorkflowID], [FileID]));";
 
 static const string gstrCREATE_WORKFLOWCHANGE =
@@ -2134,7 +2137,7 @@ static const string gstrGET_ATTRIBUTE_VALUE =
 static const string gstrCREATE_DATABASE_SERVICE_TABLE =
 	"CREATE TABLE [dbo].[DatabaseService]( "
 	"	[ID][int] IDENTITY(1, 1) NOT NULL CONSTRAINT[PK_DatabaseService] PRIMARY KEY CLUSTERED, "
-	"	[Description] NVARCHAR(MAX) NULL, "
+	"	[Description] NVARCHAR(256) NOT NULL, "
 	"	[Settings] NVARCHAR(MAX) NOT NULL, "
 	"   [Status] NVARCHAR(MAX) NULL, "
 	"   [Enabled] BIT NOT NULL CONSTRAINT [DF_DatabaseServiceEnabled] DEFAULT 1, "
@@ -2143,7 +2146,47 @@ static const string gstrCREATE_DATABASE_SERVICE_TABLE =
 	"	[LastWrite] DateTime NULL, "
 	"	[EndTime] DateTime NULL, "
 	"	[MachineID] INT NULL, "
-	"	[Exception] NVARCHAR(MAX) NULL)";
+	"	[Exception] NVARCHAR(MAX) NULL, "
+	"   [ActiveServiceMachineID] INT NULL, "
+	"   [NextScheduledRunTime] DateTime NULL, "
+	"	[ActiveFAMID] INT NULL"
+	")";
+
+static const string gstrCREATE_DATABASE_SERVICE_UPDATE_TRIGGER =
+	"CREATE TRIGGER[dbo].[DatabaseServiceUpdateTrigger] \r\n"
+	"	ON[dbo].[DatabaseService] \r\n"
+	"AFTER UPDATE \r\n"
+	"AS \r\n"
+	"BEGIN \r\n"
+	"-- SET NOCOUNT ON added to prevent extra result sets from \r\n"
+	"-- interfering with SELECT statements. \r\n"
+	"	SET NOCOUNT ON; \r\n"
+	"	\r\n"
+	"	UPDATE DS\r\n"
+	"	SET ActiveServiceMachineID = NULL, \r\n"
+	"	NextScheduledRunTime = NULL \r\n"
+	"	FROM DatabaseService DS \r\n"
+	"	INNER JOIN inserted I ON DS.ID = I.ID \r\n"
+	"	WHERE I.ActiveFAMID IS NULL \r\n"
+	"	END\r\n";
+
+static const string gstrCREATE_DATABASE_SERVICE_DESCRIPTION_INDEX = 
+	"CREATE UNIQUE NONCLUSTERED INDEX "
+	"[IX_DatabaseService_Description] ON [DatabaseService]([Description])";
+
+static const string gstrADD_DATABASESERVICE_ACTIVEFAM_FK =
+	"ALTER TABLE [dbo].[DatabaseService] "
+	"	WITH CHECK ADD CONSTRAINT [FK_DatabaseService_ActiveFAM] FOREIGN KEY([ActiveFAMID]) "
+	"	REFERENCES [dbo].[ActiveFAM]([ID]) "
+	"	ON UPDATE CASCADE "
+	"	ON DELETE SET NULL";
+
+static const string gstrADD_DATABASESERVICE_ACTIVE_MACHINE_FK =
+"ALTER TABLE [dbo].[DatabaseService] "
+"	WITH CHECK ADD CONSTRAINT [FK_DatabaseService_Active_Machine] FOREIGN KEY([ActiveServiceMachineID]) "
+"	REFERENCES [dbo].[Machine]([ID]) "
+"	ON UPDATE NO ACTION "
+"	ON DELETE NO ACTION";
 
 static const string gstrADD_DATABASESERVICE_MACHINE_FK =
 "ALTER TABLE [dbo].[DatabaseService] "

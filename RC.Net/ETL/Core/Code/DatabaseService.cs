@@ -9,7 +9,7 @@ using System.Data.SqlClient;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading;
-using UCLID_FILEPROCESSINGLib;
+using System.Transactions;
 
 namespace Extract.ETL
 {
@@ -26,8 +26,7 @@ namespace Extract.ETL
         string _databaseServer = string.Empty;
         string _databaseName = string.Empty;
         string _description = string.Empty;
-
-        FileProcessingDB _famDB = null;
+        int _activeFAMID;
 
         /// <summary>
         /// Description of the database service item
@@ -246,25 +245,158 @@ namespace Extract.ETL
         }
 
         /// <summary>
-        /// Starts a FAMSession and ActiveFAM record for the DatabaseService 
+        /// Sets the MachineID, StartTime and EndTime in the DatabaseService record representing the start of a process
         /// </summary>
-        /// <returns></returns>
-        public bool StartActiveSchedule()
+        public void RecordProcessStart()
         {
             try
             {
-                if (IsScheduleActive())
+                using (var connection = NewSqlDBConnection())
                 {
-                    return false;
+                    connection.Open();
+
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText =
+                            @"DECLARE @MachineID INT;
+                        SELECT @MachineID = ID
+                        FROM Machine
+                        WHERE MachineName = @MachineName;
+
+                        UPDATE DatabaseService 
+                        SET StartTime = GetDate(),
+                            EndTime = NULL,
+                            NextScheduledRunTime = @NextScheduledRunTime,
+	                        MachineID = @MachineID
+                        WHERE ID = @DatabaseServiceID AND ActiveFAMID = @ActiveFAMID";
+
+                        cmd.Parameters.Add("@MachineName", SqlDbType.NVarChar, 50).Value = Environment.MachineName;
+                        cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                        cmd.Parameters.AddWithValue("@ActiveFAMID", _activeFAMID);
+                        cmd.Parameters.AddWithValue("@NextScheduledRunTime", Schedule?.GetNextOccurrence());
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected < 1)
+                        {
+                            ExtractException ee = new ExtractException("ELI46294", "Unable to Record process start");
+                            ee.AddDebugData("SQL", cmd.CommandText, false);
+                            ee.AddDebugData("@DatabaseServiceID", DatabaseServiceID, false);
+                            ee.AddDebugData("@ActiveFAMID", _activeFAMID, false);
+                            ee.AddDebugData("@MachineName", Environment.MachineName, false);
+                            throw ee;
+                        }
+                    }
                 }
-                if (_famDB is null)
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46293");
+            }
+        }
+
+        /// <summary>
+        /// Sets the EndTime and if there is an exception the Exception fields in the DatabaseService record
+        /// for the given dbService
+        /// </summary>
+        /// <param name="stringizedException">Stringized representation of the exception that was thrown</param>
+        public void RecordProcessComplete(string stringizedException = null)
+        {
+            try
+            {
+                using (var connection = NewSqlDBConnection())
                 {
-                    _famDB = new FileProcessingDB();
-                    _famDB.DatabaseName = _databaseName;
-                    _famDB.DatabaseServer = _databaseServer;
+                    connection.Open();
+
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText =
+                            @"UPDATE DatabaseService 
+                                SET     EndTime = GetDate(),
+                                        NextScheduledRunTime = @NextScheduledRunTime,
+                                        Exception = @Exception
+                              WHERE ID = @DatabaseServiceID AND ActiveFAMID = @ActiveFAMID";
+
+                        if (string.IsNullOrEmpty(stringizedException))
+                        {
+                            cmd.Parameters.AddWithValue("@Exception", DBNull.Value);
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@Exception", stringizedException);
+                        }
+                        cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                        cmd.Parameters.AddWithValue("@ActiveFAMID", _activeFAMID);
+                        cmd.Parameters.AddWithValue("@NextScheduledRunTime", Schedule?.GetNextOccurrence());
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected < 1)
+                        {
+                            ExtractException ee = new ExtractException("ELI46294", "Unable to Record process start");
+                            ee.AddDebugData("SQL", cmd.CommandText, false);
+                            ee.AddDebugData("@DatabaseServiceID", DatabaseServiceID, false);
+                            ee.AddDebugData("@ActiveFAMID", _activeFAMID, false);
+                            throw ee;
+                        }
+                    }
                 }
-                _famDB.RecordFAMSessionStart("ETL: " + Description, string.Empty, false, false);
-                _famDB.RegisterActiveFAM();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46295");
+            }
+        }
+
+        /// <summary>
+        /// Starts a FAMSession and ActiveFAM record for the DatabaseService 
+        /// </summary>
+        /// <returns><c>true</c> if the Schedual is active with activeFAMID. Otherwise <c>false</c></returns>
+        public bool StartActiveSchedule(int activeFAMID)
+        {
+            try
+            {
+                using (var scope = new TransactionScope(TransactionScopeOption.Required,
+                    new TransactionOptions
+                    {
+                        IsolationLevel = System.Transactions.IsolationLevel.Serializable
+                    }))
+                using (var connection = NewSqlDBConnection())
+                {
+                    connection.Open();
+                    // check the existing value - since this is done within a transaction another process will not be able to change
+                    // it after this process reads it
+                    using (var cmdExisting = connection.CreateCommand())
+                    {
+                        cmdExisting.CommandText = "SELECT [ActiveFAMID] FROM DatabaseService WHERE ID = @DatabaseServiceID";
+                        cmdExisting.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+
+                        var result = cmdExisting.ExecuteScalar();
+                        if (result != DBNull.Value)
+                        {
+                            return (int?)result == _activeFAMID;
+                        }
+                    }
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText =
+                            @"DECLARE @MachineID INT;
+                              SELECT @MachineID = ID
+                              FROM Machine
+                              WHERE MachineName = @MachineName;
+                              UPDATE [DatabaseService] 
+                              SET     ActiveFAMID = @ActiveFAMID,
+                                      NextScheduledRunTime = @NextScheduledRunTime,
+                                      ActiveServiceMachineID = @MachineID
+                              WHERE ID = @DatabaseServiceID";
+                        cmd.Parameters.AddWithValue("@ActiveFAMID", activeFAMID);
+                        cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                        cmd.Parameters.Add("@MachineName", SqlDbType.NVarChar, 50).Value = Environment.MachineName;
+                        cmd.Parameters.AddWithValue("@NextScheduledRunTime", Schedule?.GetNextOccurrence());
+                        cmd.ExecuteNonQuery();
+                        _activeFAMID = activeFAMID;
+                    }
+                    scope.Complete();
+                }
+
                 return true;
             }
             catch (Exception ex)
@@ -280,58 +412,27 @@ namespace Extract.ETL
         {
             try
             {
-                if (_famDB != null && _famDB.FAMSessionID > 0)
-                {
-                    _famDB.UnregisterActiveFAM();
-                    _famDB.RecordFAMSessionStop();
-                    _famDB.CloseAllDBConnections();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI46282");
-            }
-        }
-
-        /// <summary>
-        /// Checks if there is an active FAMSession from the database service registered in the database
-        /// This could be running on any machine
-        /// </summary>
-        /// <returns></returns>
-        public bool IsScheduleActive()
-        {
-            try
-            {
-                if (_famDB is null)
-                {
-                    _famDB = new FileProcessingDB();
-                    _famDB.DatabaseName = _databaseName;
-                    _famDB.DatabaseServer = _databaseServer;
-                }
-
-                // Trigger to clean up timed out ActiveFAM instances.
-                _famDB.IsAnyFAMActive();
-
+                // I only want to stop the active schedule if the current process is the one that started it
                 using (var connection = NewSqlDBConnection())
                 {
                     connection.Open();
                     using (var cmd = connection.CreateCommand())
                     {
-                        cmd.CommandText = "SELECT [ActiveFAM].[ID] FROM [ActiveFAM] " +
-                        "   INNER JOIN [FAMSession] ON [FAMSessionID] = [FAMSession].[ID]" +
-                        "   INNER JOIN [FPSFile] ON [FPSFileID] = [FPSFile].[ID]" +
-                        "   WHERE [FPSFileName] = @ETLProcess";
-
-                        cmd.Parameters.Add("@ETLProcess", SqlDbType.NVarChar, 512).Value = "ETL: " + Description;
-                        var result = cmd.ExecuteScalar();
-
-                        return result != null;
+                        cmd.CommandText =
+                            @"UPDATE [DatabaseService] 
+                                SET     ActiveFAMID = NULL,
+                                        ActiveServiceMachineID = NULL,
+                                        NextScheduledRunTime = NULL
+                            WHERE ID = @DatabaseServiceID AND ActiveFAMID = @ActiveFAMID";
+                        cmd.Parameters.AddWithValue("@ActiveFAMID", _activeFAMID);
+                        cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                        cmd.ExecuteNonQuery();
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI46283");
+                throw ex.AsExtract("ELI46282");
             }
         }
 
@@ -544,12 +645,6 @@ namespace Extract.ETL
                 // Dispose of managed resources
                 Schedule?.Dispose();
                 Schedule = null;
-
-                if (_famDB != null)
-                {
-                    _famDB.CloseAllDBConnections();
-                    _famDB = null;
-                }
             }
 
             // Dispose of unmanaged resources

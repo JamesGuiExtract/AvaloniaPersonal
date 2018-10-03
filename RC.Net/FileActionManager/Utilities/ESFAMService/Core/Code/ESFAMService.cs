@@ -6,6 +6,8 @@ using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -14,13 +16,14 @@ using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Utilities
 {
     /// <summary>
     /// Class that manages the FAM service start/stop and FAMProcess.exe instances.
     /// </summary>
-    internal sealed partial class ESFAMService : ServiceBase
+    sealed partial class ESFAMService : ServiceBase
     {
         #region Private Internal Class
 
@@ -169,6 +172,20 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         string _etlDatabaseName;
 
+        /// <summary>
+        /// List of the enabled services from the database that have DatabaseServiceManagers records in _databaseServiceManagers
+        /// </summary>
+        List<string> _listOfEnabledServices;
+
+        /// <summary>
+        /// Timer to periodically check for changes in the enabled DatabaseServices
+        /// </summary>
+        System.Timers.Timer _checkForETLChangesTimer;
+
+        /// <summary>
+        /// FAM database used by the ETL Polling
+        /// </summary>
+        FileProcessingDB _etlFAMDB;
 
         #endregion Fields
 
@@ -246,37 +263,7 @@ namespace Extract.FileActionManager.Utilities
                     thread.SetApartmentState(ApartmentState.MTA);
                     thread.Start(threadData);
                 }
-
-                // Get just the unique ETL processes
-                var etlArguments = dbManager.GetFpsFileData(true)
-                    .Where(d => d.FileName.StartsWith("ETL", StringComparison.OrdinalIgnoreCase))
-                    .GroupBy(g => g.FileName)
-                    .Select(g => g.First())
-                    .ToList();
-
-                // check for database settings for ETL
-                if (etlArguments.Count > 0)
-                {
-                    // Since there are ETL processes to run the settings need to have a database and server specified
-                    dbManager.Settings.TryGetValue("ETL_DBServer", out _etlDatabaseServer);
-                    dbManager.Settings.TryGetValue("ETL_DBName", out _etlDatabaseName);
-
-                    if (string.IsNullOrEmpty(_etlDatabaseServer) || string.IsNullOrEmpty(_etlDatabaseName))
-                    {
-                        ExtractException etlException = new ExtractException("ELI46269",
-                            "ETL processes are configured to run in the service but no database is configured in Settings.");
-                        etlException.AddDebugData("ETL_DBServer", _etlDatabaseServer ?? "", false);
-                        etlException.AddDebugData("ETL_DBName", _etlDatabaseName ?? "", false);
-                        throw etlException;
-                    }
-
-                    List<string> etlProcesses = etlArguments.Select(e => e.FileName).ToList();
-                    foreach (var etl in etlArguments)
-                    {
-                        _databaseServiceManagers.Add(
-                            new DatabaseServiceManager(etl.FileName, _etlDatabaseServer, _etlDatabaseName, etlProcesses, etl.NumberOfInstances ));
-                    }
-                }
+                StartETL(dbManager);
             }
             catch (Exception ex)
             {
@@ -285,7 +272,6 @@ namespace Extract.FileActionManager.Utilities
                 throw ee;
             }
         }
-
         /// <summary>
         /// Called when the service is stopping.
         /// </summary>
@@ -487,7 +473,7 @@ namespace Extract.FileActionManager.Utilities
         {
             FileProcessingManagerProcessClass famProcess = null;
             Process process = null;
-            string fpsFileName = "";
+            string fpsFileName = string.Empty;
             int processID = 0;
             bool keepProcessing = false;
             try
@@ -496,9 +482,9 @@ namespace Extract.FileActionManager.Utilities
                 ProcessingThreadArguments arguments = (ProcessingThreadArguments)threadParameters;
                 int numberOfFilesToProcess = arguments.NumberOfFilesToProcess;
 
-				// Log Application to indicate this thread is starting.
+                // Log Application to indicate this thread is starting.
                 ExtractException eeStarted = new ExtractException("ELI39766", "Application Trace: Service FAMProcess thread has started.");
-                eeStarted.AddDebugData("ThreadID", Thread.CurrentThread.ManagedThreadId,false);
+                eeStarted.AddDebugData("ThreadID", Thread.CurrentThread.ManagedThreadId, false);
                 eeStarted.Log();
 
                 if (!File.Exists(arguments.FpsFileName))
@@ -554,14 +540,14 @@ namespace Extract.FileActionManager.Utilities
                             ee.AddDebugData("FPS File Name", fpsFileName, false);
                             throw ee;
                         }
-                        
+
                         // [LegacyRCAndUtils:6389]
                         // Check for whether the process wants to keep processing now rather than after
                         // it is done with this batch of files, when it is not at risk of having been
                         // shut down unexpectedly.
                         keepProcessing = famProcess.KeepProcessingAsFilesAdded;
                         bool isProcessingEnabled = famProcess.IsProcessingEnabled;
-                        
+
                         // Everything should be initialized now
                         processInitialized = true;
 
@@ -679,8 +665,8 @@ namespace Extract.FileActionManager.Utilities
                             }
                         }
                     }
-					// Log Application trace to show that the FAM instance is stopped
-                    ExtractException eeClosed = 
+                    // Log Application trace to show that the FAM instance is stopped
+                    ExtractException eeClosed =
                         new ExtractException("ELI39764", "Application Trace: FAM instance has stopped.");
                     eeClosed.AddDebugData("FPS Filename", fpsFileName, false);
                     eeClosed.AddDebugData("Process ID", processID, false);
@@ -718,7 +704,7 @@ namespace Extract.FileActionManager.Utilities
                     }
                 }
 
-				// Log Application trace exception to indicate this thread is exiting.
+                // Log Application trace exception to indicate this thread is exiting.
                 ExtractException eeThreadExited = new ExtractException("ELI39765", "Application Trace: Service FAMProcess thread has exited.");
                 eeThreadExited.AddDebugData("ThreadID", Thread.CurrentThread.ManagedThreadId, false);
                 eeThreadExited.Log();
@@ -735,7 +721,7 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         /// <param name="process">The process to wait for exit</param>
         /// <param name="fpsFileName">The FPS file that is being processed</param>
-        private static void WaitForProcessToExitAndDispose(ref Process process, string fpsFileName)
+        static void WaitForProcessToExitAndDispose(ref Process process, string fpsFileName)
         {
             try
             {
@@ -899,7 +885,7 @@ namespace Extract.FileActionManager.Utilities
                 {
                     process.Dispose();
                 }
-                
+
                 process = null;
                 famProcess = null;
             }
@@ -921,7 +907,7 @@ namespace Extract.FileActionManager.Utilities
         {
             if (process == null || process.HasExited)
             {
-                return (_stopProcessing.WaitOne(0)) ? 
+                return (_stopProcessing.WaitOne(0)) ?
                     ProcessWaitResult.StopRequested : ProcessWaitResult.ProcessExited;
             }
 
@@ -942,6 +928,195 @@ namespace Extract.FileActionManager.Utilities
         #endregion Thread Methods
 
         #region Methods
+
+        /// <summary>
+        /// Checks for ETL processes in the <see cref="FAMServiceDatabaseManager"/> and starts any that are configured.
+        /// A polling thread will also be started that will check periodically if there are changes in the configured Database
+        /// </summary>
+        /// <param name="dbManager"></param>
+        void StartETL(FAMServiceDatabaseManager dbManager)
+        {
+            // Get just the unique ETL processes
+            var etlArguments = dbManager.GetFpsFileData(true)
+                .Where(d => d.FileName.StartsWith("ETL", StringComparison.OrdinalIgnoreCase))
+                .GroupBy(g => g.FileName)
+                .Select(g => g.First())
+                .ToList();
+
+            // Get the ETL database and server if configured
+            dbManager.Settings.TryGetValue("ETL_DBServer", out _etlDatabaseServer);
+            dbManager.Settings.TryGetValue("ETL_DBName", out _etlDatabaseName);
+
+            // check for database settings for ETL
+            if (etlArguments.Any())
+            {
+                if (string.IsNullOrEmpty(_etlDatabaseServer) || string.IsNullOrEmpty(_etlDatabaseName))
+                {
+                    ExtractException etlException = new ExtractException("ELI46269",
+                        "ETL processes are configured to run in the service but no database is configured in Settings.");
+                    etlException.AddDebugData("ETL_DBServer", _etlDatabaseServer ?? string.Empty, false);
+                    etlException.AddDebugData("ETL_DBName", _etlDatabaseName ?? string.Empty, false);
+                    throw etlException;
+                }
+
+                _listOfEnabledServices = GetListOfEnabledServicesFromDB();
+
+                // Start the DatabaseServiceManagers
+                List<string> etlProcesses = etlArguments.Select(e => e.FileName).ToList();
+                new Thread(() =>
+                {
+                    try
+                    {
+                        // if _stopProcessing is set return without starting the DatabaseServiceManagers
+                        if (WaitHandle.WaitAny(new WaitHandle[] { _startThreads, _stopProcessing }) == 1)
+                        {
+                            return;
+                        }
+
+                        foreach (var etl in etlArguments)
+                        {
+                            _databaseServiceManagers.Add(
+                                new DatabaseServiceManager(etl.FileName, _etlDatabaseServer, _etlDatabaseName, etlProcesses, etl.NumberOfInstances));
+                        }
+                    }
+                    catch (ThreadAbortException)
+                    {
+                        // Don't log or throw ThreadAboartException
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractLog("ELI46288");
+                    }
+                }
+                ).Start();
+            }
+
+            // if the etlDatabaseServer and etlDatabaseName is not configured there is no way to poll for ETL changes
+            if (!string.IsNullOrEmpty(_etlDatabaseServer) && !string.IsNullOrEmpty(_etlDatabaseName))
+            {
+                if (_etlFAMDB is null || _etlFAMDB.DatabaseServer != _etlDatabaseServer || _etlFAMDB.DatabaseName != _etlDatabaseName)
+                {
+                    _etlFAMDB = new FileProcessingDB();
+                    _etlFAMDB.DatabaseName = _etlDatabaseName;
+                    _etlFAMDB.DatabaseServer = _etlDatabaseServer;
+                }
+                _etlFAMDB.SetDBInfoSetting("ETLRestart", "0", true, false);
+
+                _checkForETLChangesTimer?.Dispose();
+                _checkForETLChangesTimer = null;
+
+                _checkForETLChangesTimer = new System.Timers.Timer(30000);
+                _checkForETLChangesTimer.Elapsed += (o, e) =>
+                {
+                    try
+                    {
+                        _checkForETLChangesTimer.Stop();
+
+                        string restartSetting = _etlFAMDB.GetDBInfoSetting("ETLRestart", false);
+                        if (restartSetting != "1")
+                        {
+                            _checkForETLChangesTimer.Start();
+                            return;
+                        }
+
+                        StopAndRestartETL();
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractLog("ELI46302");
+                    }
+                };
+                _checkForETLChangesTimer.Start();
+                _etlFAMDB.RecordFAMSessionStart("ETL Polling", string.Empty, false, false);
+                _etlFAMDB.RegisterActiveFAM();
+            }
+        }
+
+        /// <summary>
+        /// Stops any running ETL processing, cleans up the processing and call StartETL to restart using the new settings
+        /// </summary>
+        void StopAndRestartETL()
+        {
+            // Stop the ETL services
+            foreach (var dbServiceManager in _databaseServiceManagers)
+            {
+                dbServiceManager.Stop();
+            }
+
+            try
+            {
+                if (_etlFAMDB != null)
+                {
+                    _etlFAMDB.RecordFAMSessionStop();
+                    _etlFAMDB.UnregisterActiveFAM();
+                    _etlFAMDB.CloseAllDBConnections();
+                    _etlFAMDB = null;
+                }
+            }
+            catch (Exception etlFAMException)
+            {
+                etlFAMException.ExtractLog("ELI46309");
+            }
+
+            var stoppedEvents = _databaseServiceManagers
+                .Select(mgr => mgr.StoppedWaitHandle)
+                .Cast<WaitHandle>()
+                .ToArray();
+
+            if (stoppedEvents.Any())
+            {
+                // Wait for all the services to stop
+                WaitHandle.WaitAll(stoppedEvents);
+            }
+
+            // Dispose of the DatabaseServiceManagers
+            for (int i = 0; i < _databaseServiceManagers.Count; i++)
+            {
+                DatabaseServiceManager manager;
+                if (_databaseServiceManagers.TryTake(out manager))
+                {
+                    manager.Dispose();
+                }
+            }
+
+            // Get the Service config file
+            var dbManager = new FAMServiceDatabaseManager(_databaseFile);
+            StartETL(dbManager);
+        }
+
+        /// <summary>
+        /// Gets a list of the Enabled DatabaseServices from the database
+        /// </summary>
+        /// <returns></returns>
+        List<string> GetListOfEnabledServicesFromDB()
+        {
+            // if the Server and Database are not setup return empty list
+            if (string.IsNullOrEmpty(_etlDatabaseServer) || string.IsNullOrEmpty(_etlDatabaseName))
+            {
+                return new List<string>();
+            }
+
+            // Build the connection string from the settings
+            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
+            sqlConnectionBuild.DataSource = _etlDatabaseServer;
+            sqlConnectionBuild.InitialCatalog = _etlDatabaseName;
+            sqlConnectionBuild.IntegratedSecurity = true;
+            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
+            sqlConnectionBuild.MultipleActiveResultSets = true;
+
+            using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+            {
+                connection.Open();
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT Settings FROM DatabaseService WHERE Enabled = 1";
+                    var result = cmd.ExecuteReader().Cast<IDataRecord>()
+                        .Select(r => r.GetString(r.GetOrdinal("Settings"))).ToList();
+                    result.Sort();
+                    return result;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the list of dependent services from the service database.
@@ -993,7 +1168,7 @@ namespace Extract.FileActionManager.Utilities
             // Iterate through the list of dependent services and get the controllers
             // for each one
             List<ServiceController> dependentServices = new List<ServiceController>();
-            for (int i=0; i < dependentServiceNames.Count; i++)
+            for (int i = 0; i < dependentServiceNames.Count; i++)
             {
                 string serviceName = dependentServiceNames[i];
                 ServiceController controller;
@@ -1113,7 +1288,7 @@ namespace Extract.FileActionManager.Utilities
                 }
 
                 List<ProcessingThreadArguments> fpsFiles = new List<ProcessingThreadArguments>();
-                foreach(var fpsFileData in dbManager.GetFpsFileData(true))
+                foreach (var fpsFileData in dbManager.GetFpsFileData(true))
                 {
                     int numberToProcess = fpsFileData.NumberOfFilesToProcess == -1 ?
                         globalNumberOfFilesToProcess : fpsFileData.NumberOfFilesToProcess;
@@ -1159,6 +1334,21 @@ namespace Extract.FileActionManager.Utilities
                 foreach (var dbServiceManager in _databaseServiceManagers)
                 {
                     dbServiceManager.Stop();
+                }
+
+                try
+                {
+                    if (_etlFAMDB != null)
+                    {
+                        _etlFAMDB.RecordFAMSessionStop();
+                        _etlFAMDB.UnregisterActiveFAM();
+                        _etlFAMDB.CloseAllDBConnections();
+                        _etlFAMDB = null;
+                    }
+                }
+                catch (Exception etlFAMException)
+                {
+                    etlFAMException.ExtractLog("ELI46310");
                 }
 
                 var stoppedEvents = _databaseServiceManagers

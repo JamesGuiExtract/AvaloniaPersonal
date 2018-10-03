@@ -36,6 +36,7 @@
             this._modifyButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this._databaseServicesDataGridView = new System.Windows.Forms.DataGridView();
+            this._restartETLButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this._databaseServicesDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -46,7 +47,7 @@
             this._closeButton.Location = new System.Drawing.Point(588, 349);
             this._closeButton.Name = "_closeButton";
             this._closeButton.Size = new System.Drawing.Size(75, 23);
-            this._closeButton.TabIndex = 0;
+            this._closeButton.TabIndex = 7;
             this._closeButton.Text = "Close";
             this._closeButton.UseVisualStyleBackColor = true;
             // 
@@ -56,7 +57,7 @@
             this._addButton.Location = new System.Drawing.Point(588, 23);
             this._addButton.Name = "_addButton";
             this._addButton.Size = new System.Drawing.Size(75, 23);
-            this._addButton.TabIndex = 3;
+            this._addButton.TabIndex = 2;
             this._addButton.Text = "Add...";
             this._addButton.UseVisualStyleBackColor = true;
             this._addButton.Click += new System.EventHandler(this.HandleAddButtonClick);
@@ -67,7 +68,7 @@
             this._deleteButton.Location = new System.Drawing.Point(588, 83);
             this._deleteButton.Name = "_deleteButton";
             this._deleteButton.Size = new System.Drawing.Size(75, 23);
-            this._deleteButton.TabIndex = 3;
+            this._deleteButton.TabIndex = 4;
             this._deleteButton.Text = "Delete";
             this._deleteButton.UseVisualStyleBackColor = true;
             this._deleteButton.Click += new System.EventHandler(this.HandleDeleteButtonClick);
@@ -78,7 +79,7 @@
             this._refreshButton.Location = new System.Drawing.Point(588, 112);
             this._refreshButton.Name = "_refreshButton";
             this._refreshButton.Size = new System.Drawing.Size(75, 23);
-            this._refreshButton.TabIndex = 3;
+            this._refreshButton.TabIndex = 5;
             this._refreshButton.Text = "Refresh";
             this._refreshButton.UseVisualStyleBackColor = true;
             this._refreshButton.Click += new System.EventHandler(this.HandleRefreshButtonClick);
@@ -122,9 +123,20 @@
             this._databaseServicesDataGridView.RowsDefaultCellStyle = dataGridViewCellStyle1;
             this._databaseServicesDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this._databaseServicesDataGridView.Size = new System.Drawing.Size(566, 349);
-            this._databaseServicesDataGridView.TabIndex = 5;
+            this._databaseServicesDataGridView.TabIndex = 1;
             this._databaseServicesDataGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDatabaseServicesDataGridViewCellContentClick);
             this._databaseServicesDataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDatabaseServicesDataGridViewCellDoubleClick);
+            // 
+            // _restartETLButton
+            // 
+            this._restartETLButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._restartETLButton.Location = new System.Drawing.Point(588, 320);
+            this._restartETLButton.Name = "_restartETLButton";
+            this._restartETLButton.Size = new System.Drawing.Size(75, 23);
+            this._restartETLButton.TabIndex = 6;
+            this._restartETLButton.Text = "Restart ETL";
+            this._restartETLButton.UseVisualStyleBackColor = true;
+            this._restartETLButton.Click += new System.EventHandler(this.HandleRestartETLButtonClick);
             // 
             // ManageDatabaseServicesForm
             // 
@@ -138,6 +150,7 @@
             this.Controls.Add(this._deleteButton);
             this.Controls.Add(this._modifyButton);
             this.Controls.Add(this._addButton);
+            this.Controls.Add(this._restartETLButton);
             this.Controls.Add(this._closeButton);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -162,5 +175,6 @@
         private System.Windows.Forms.Button _modifyButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.DataGridView _databaseServicesDataGridView;
+        private System.Windows.Forms.Button _restartETLButton;
     }
 }

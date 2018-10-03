@@ -258,27 +258,28 @@ namespace Extract.FileActionManager.Utilities
                                 fileProcessingDB.DatabaseName = _fileProcessingDb.DatabaseName;
 
                                 fileProcessingDB.RecordFAMSessionStart("ETL: " + dbService.Description, string.Empty, false, false);
-                                RecordProcessStart(dbService);
+                                dbService.RecordProcessStart();
+
                                 try
                                 {
                                     dbService.Process(_canceller.Token);
                                 }
                                 catch (ExtractException processExtractException)
                                 {
-                                    RecordProcessComplete(dbService, processExtractException.AsStringizedByteStream());
+                                    dbService.RecordProcessComplete(processExtractException.AsStringizedByteStream());
                                     throw processExtractException;
                                 }
                                 catch (Exception processException)
                                 {
                                     ExtractException ee = processException.AsExtract("ELI46237");
-                                    RecordProcessComplete(dbService, ee.AsStringizedByteStream());
+                                    dbService.RecordProcessComplete(ee.AsStringizedByteStream());
                                     throw ee;
                                 }
                                 finally
                                 {
                                     fileProcessingDB.RecordFAMSessionStop();
                                 }
-                                RecordProcessComplete(dbService);
+                                dbService.RecordProcessComplete();
                             }
                             finally
                             {
@@ -327,10 +328,6 @@ namespace Extract.FileActionManager.Utilities
 
                     _running = false;
 
-                    _fileProcessingDb.UnregisterActiveFAM();
-                    _fileProcessingDb.RecordFAMSessionStop();
-                    _fileProcessingDb.CloseAllDBConnections();
-
                     foreach (var dbService in _databaseServices)
                     {
                         dbService.Value.Enabled = false;
@@ -360,6 +357,13 @@ namespace Extract.FileActionManager.Utilities
 
                     _databaseServices.Clear();
 
+                    lock (_lock)
+                    {
+                        _fileProcessingDb.UnregisterActiveFAM();
+                        _fileProcessingDb.RecordFAMSessionStop();
+                        _fileProcessingDb.CloseAllDBConnections();
+                    }
+
                     _stoppedEvent.Set();
                 });
             }
@@ -373,67 +377,6 @@ namespace Extract.FileActionManager.Utilities
 
         #region Private Members
 
-        /// <summary>
-        /// Sets the MachineID, StartTime and EndTime in the DatabaseService record representing the start of a process
-        /// </summary>
-        /// <param name="dbService">The <see cref="DatabaseService"/> to record values for</param>
-        void RecordProcessStart(DatabaseService dbService)
-        {
-            using (var cmd = _oleDbConnection.CreateCommand())
-            {
-                cmd.CommandText =
-                    @"DECLARE @MachineID INT;
-                      DECLARE @MachineName NVARCHAR(MAX) = ?
-                        SELECT @MachineID = ID
-                        FROM Machine
-                        WHERE MachineName = @MachineName;
-                        IF(@MachineID is NULL)
-                            INSERT INTO Machine (MachineName) Select(@MachineName)
-                        
-                        SELECT @MachineID = ID
-                        FROM Machine
-                        WHERE MachineName = @MachineName;
-
-                        UPDATE DatabaseService 
-                        SET StartTime = GetDate(),
-                            EndTime = NULL,
-	                        MachineID = @MachineID
-                        WHERE ID = ?";
-
-                cmd.Parameters.AddWithValue("@MachineNameParameter", Environment.MachineName);
-                cmd.Parameters.AddWithValue("@DatabaseServiceID", dbService.DatabaseServiceID);
-                cmd.ExecuteNonQuery();
-            }
-        }
-
-        /// <summary>
-        /// Sets the EndTime and if there is an exception the Exception fields in the DatabaseService record
-        /// for the given dbService
-        /// </summary>
-        /// <param name="dbService">The <see cref="DatabaseService"/> to save data for</param>
-        /// <param name="stringizedException">Stringized representation of the exception that was thrown</param>
-        void RecordProcessComplete(DatabaseService dbService, string stringizedException = null)
-        {
-            using (var cmd = _oleDbConnection.CreateCommand())
-            {
-                cmd.CommandText = "UPDATE DatabaseService SET EndTime = GetDate()";
-
-                if (string.IsNullOrEmpty(stringizedException))
-                {
-                    cmd.CommandText += ", Exception = ?";
-                    cmd.Parameters.AddWithValue("@Exception", DBNull.Value);
-                }
-                else
-                {
-                    cmd.CommandText += ", Exception = ?";
-                    cmd.Parameters.Add("@Exception", OleDbType.VarChar, stringizedException.Length + 1).Value = stringizedException;
-                }
-                cmd.CommandText += " WHERE ID = ?";
-                cmd.Parameters.AddWithValue("@DatabaseServiceID", dbService.DatabaseServiceID);
-                cmd.ExecuteNonQuery();
-            }
-        }
-
         void TryStart()
         {
             try
@@ -446,7 +389,7 @@ namespace Extract.FileActionManager.Utilities
                     "   INNER JOIN [FPSFile] ON [FPSFileID] = [FPSFile].[ID]" +
                     "   WHERE [FPSFileName] = '<ETLProcess>'";
 
-                query = query.Replace("<ETLProcess>", _etlString.Replace("'","''") + " Manager");
+                query = query.Replace("<ETLProcess>", _etlString.Replace("'", "''") + " Manager");
 
                 if (DBMethods.GetQueryResultsAsStringArray(_oleDbConnection, query).Any())
                 {
@@ -484,14 +427,22 @@ namespace Extract.FileActionManager.Utilities
 
                     _running = true;
                     string query = "SELECT [ID], [Settings] FROM [DatabaseService] WHERE Enabled = 1";
-                    if (!_etlString.Equals("ETL", StringComparison.OrdinalIgnoreCase))
+
+                    bool runAll = _etlString.Equals("ETL", StringComparison.OrdinalIgnoreCase);
+                    if (!runAll)
                     {
                         string etlDescription = _etlString.Substring(_etlString.IndexOf(":") + 1).Trim();
-                        query += " AND Description = '" + etlDescription.Replace("'","''") + "'";
+                        query += " AND Description = '" + etlDescription.Replace("'", "''") + "'";
                     }
 
                     using (DataTable dbServiceDefinitions = DBMethods.ExecuteDBQuery(_oleDbConnection, query))
                     {
+                        if (!runAll && dbServiceDefinitions.Rows.Count == 0)
+                        {
+                            ExtractException ee = new ExtractException("ELI46289", "Configured database service does not exist or is not enabled.");
+                            ee.AddDebugData("ServiceConfigLine", _etlString, false);
+                            throw ee;
+                        }
                         foreach (DataRow dbServiceRow in dbServiceDefinitions.Rows)
                         {
                             var dbService = DatabaseService.FromJson((string)dbServiceRow["Settings"]);
@@ -503,12 +454,18 @@ namespace Extract.FileActionManager.Utilities
                                 dbService.DatabaseServer = _oleDbConnection.DataSource;
                                 dbService.DatabaseName = _oleDbConnection.Database;
 
-                                if (!dbService.IsScheduleActive() && _databaseServices.TryAdd(dbService.Schedule, dbService))
+                                if (dbService.StartActiveSchedule(_fileProcessingDb.ActiveFAMID))
                                 {
-                                    _inEventStarted[dbService.Schedule] = false;
-                                    dbService.NumberOfProcessingThreads = _numberOfThreads;
-                                    dbService.StartActiveSchedule();
-                                    dbService.Schedule.EventStarted += HandleScheduleEvent_EventStarted;
+                                    if (_databaseServices.TryAdd(dbService.Schedule, dbService))
+                                    {
+                                        _inEventStarted[dbService.Schedule] = false;
+                                        dbService.NumberOfProcessingThreads = _numberOfThreads;
+                                        dbService.Schedule.EventStarted += HandleScheduleEvent_EventStarted;
+                                    }
+                                    else
+                                    {
+                                        dbService.StopActiveSchedule();
+                                    }
                                 }
                             }
                         }
@@ -523,6 +480,15 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 new ExtractException("ELI45415", "ETL failed to start", ex).Log();
+                // Call stop to do clean up
+                try
+                {
+                    Stop();
+                }
+                catch (Exception stopException)
+                {
+                    stopException.ExtractLog("ELI46290");
+                }
             }
         }
 

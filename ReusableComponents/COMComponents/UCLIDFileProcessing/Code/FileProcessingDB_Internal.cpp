@@ -1643,6 +1643,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		{
 			vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_VALUE_INDEX);
 			vecQueries.push_back(gstrCREATE_DB_INFO_ID_INDEX);
+			vecQueries.push_back(gstrCREATE_DATABASE_SERVICE_DESCRIPTION_INDEX);
 		}
 
 		// Add Foreign keys 
@@ -1730,6 +1731,8 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_REPORTING_VERIFICATION_RATES_TASK_CLASS_FK);
 		vecQueries.push_back(gstrADD_REPORTING_VERIFICATION_RATES_FILE_TASK_SESSION_FK);
 		vecQueries.push_back(gstrADD_DATABASESERVICE_MACHINE_FK);
+		vecQueries.push_back(gstrADD_DATABASESERVICE_ACTIVEFAM_FK);
+		vecQueries.push_back(gstrADD_DATABASESERVICE_ACTIVE_MACHINE_FK);
 
 		if (bAddUserTables)
 		{
@@ -1750,6 +1753,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 			// Add triggers
 			vecQueries.push_back(gstrCREATE_ACTION_ON_DELETE_TRIGGER);
 			vecQueries.push_back(gstrCREATE_WORKFLOW_ON_DELETE_TRIGGER);
+			vecQueries.push_back(gstrCREATE_DATABASE_SERVICE_UPDATE_TRIGGER);
 		}
 
 		// Don't create the FK between the Secure counter tables unless at least one
