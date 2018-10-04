@@ -625,10 +625,10 @@ namespace Extract.Utilities
             {
                 // use a guid as an event name
                 string cancelEventName = @"Global\" + Guid.NewGuid().ToString(); ;
-                NamedTokenSource namedTokenSource = new NamedTokenSource(cancelEventName);
 
                 // Register the Cancel method for the named token with the passed in cancel token
                 // this will cause the 
+                using (var namedTokenSource = new NamedTokenSource(cancelEventName))
                 using (var tokenRegistration = cancelToken.Register(() => namedTokenSource.Cancel()))
                 {
                     using (var tempFile = new TemporaryFile(".uex", false))
@@ -731,10 +731,10 @@ namespace Extract.Utilities
             {
                 // use a guid as an event name
                 string cancelEventName = @"Global\" + Guid.NewGuid().ToString(); ;
-                NamedTokenSource namedTokenSource = new NamedTokenSource(cancelEventName);
 
                 // Register the Cancel method for the named token with the passed in cancel token
                 // this will cause the 
+                using (var namedTokenSource = new NamedTokenSource(cancelEventName))
                 using (var tokenRegistration = cancelToken.Register(() => namedTokenSource.Cancel()))
                 {
                     using (var tempFile = new TemporaryFile(".uex", false))

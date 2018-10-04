@@ -171,7 +171,7 @@ namespace Extract.AttributeFinder.Rules
 
         /// <summary>
         /// Parses the <see paramref="pDocument"/> and returns a vector of found
-        /// <see cref="ComAttribute"/> objects.
+        /// <see cref="IAttribute"/> objects.
         /// </summary>
         /// <param name="pDocument">The <see cref="AFDocument"/> to parse.</param>
         /// <param name="pProgressStatus">The <see cref="ProgressStatus"/> to indicate processing
@@ -490,11 +490,13 @@ namespace Extract.AttributeFinder.Rules
         /// Searches for matching templates and creates the attributes associated with the best match
         /// </summary>
         /// <param name="templateLibrary">The (encrypted) template library file</param>
-        /// <param name="imagePath">The path to the source document</param>
-        /// <param name="pageInfoMap">The map of page numbers to page info of the source document</param>
+        /// <param name="input">The spatial string used to determine which pages to apply the templates to</param>
+        /// <param name="options">Optional options to pass along to the the redaction predictor</param>
         private static IUnknownVector ApplyTemplate(string templateLibrary, SpatialString input, string options)
         {
-            var pages = input.GetPages(false, "")
+            var pageVector = input.GetPages(false, "");
+            pageVector.ReportMemoryUsage();
+            var pages = pageVector
                 .ToIEnumerable<SpatialString>()
                 .Select(s => s.GetFirstPageNumber())
                 .ToRangeString();
