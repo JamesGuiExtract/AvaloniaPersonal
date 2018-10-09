@@ -333,14 +333,22 @@ namespace LearningMachineTrainer
                 }
 
                 int[] predictions = null;
-                if (model is INeuralNetModel nn)
+                switch (model)
                 {
-                    predictions = inputs.Apply(v => NeuralNetMethods.ComputeAnswer(nn, v));
-                }
-                else if (model is ISupportVectorMachineModel svm)
-                {
-                    (int answerCode, double? score)[] predictionsAndScores = inputs.Apply(v => SvmMethods.ComputeAnswer(svm, v));
-                    predictions = predictionsAndScores.Select(t => t.answerCode).ToArray();
+                    case INeuralNetModel nn:
+                    {
+                        (int answerCode, double score)[] predictionsAndScores = inputs.Apply(v => NeuralNetMethods.ComputeAnswer(nn, v));
+                        predictions = predictionsAndScores.Select(t => t.answerCode).ToArray();
+                        break;
+                    }
+                    case ISupportVectorMachineModel svm:
+                    {
+                        (int answerCode, double? score)[] predictionsAndScores = inputs.Apply(v => SvmMethods.ComputeAnswer(svm, v));
+                        predictions = predictionsAndScores.Select(t => t.answerCode).ToArray();
+                        break;
+                    }
+                    default:
+                        throw new ArgumentException("Unknown IClassifierModel type");
                 }
 
                 if (model.NumberOfClasses == 2)
@@ -388,51 +396,68 @@ namespace LearningMachineTrainer
 
                 int numberOfClasses = model.Classifier.NumberOfClasses;
                 int[] predictions = null;
-                if (model.Classifier is INeuralNetModel nn)
+                (int answerCode, double? score)[] predictionsAndScores = new (int answerCode, double? score)[inputs.Length];
+                switch (model.Classifier)
                 {
-                    predictions = inputs.Apply(v => NeuralNetMethods.ComputeAnswer(nn, v));
-                }
-                else if (model.Classifier is ISupportVectorMachineModel svm)
-                {
-                    (int answerCode, double? score)[] predictionsAndScores = inputs.Apply(v => SvmMethods.ComputeAnswer(svm, v));
-
-                    if (model.UseUnknownCategory)
+                    case INeuralNetModel nn:
                     {
-                        bool unknownCategoryUsed = false;
-                        predictions = predictionsAndScores.Select(t =>
+                        for (int i = 0; i < inputs.Length; i++)
                         {
-                            if (t.score.HasValue
-                                && t.score < model.UnknownCategoryCutoff)
-                            {
-                                if (model.TranslateUnknownCategory
-                                    && model.Encoder.AnswerNameToCode.TryGetValue(model.TranslateUnknownCategoryTo, out int answerCode))
-                                {
-                                    return answerCode;
-                                }
-
-                                // Use value beyond any that the classifier would use for unknown
-                                // rather than LearningMachineDataEncoder.UnknownCategoryCode to avoid
-                                // misleading 100% accuracy results
-                                // https://extract.atlassian.net/browse/ISSUE-13894
-                                unknownCategoryUsed = true;
-                                return model.Classifier.NumberOfClasses;
-                            }
-                            else
-                            {
-                                return t.answerCode;
-                            }
-                        })
-                        .ToArray();
-
-                        if (unknownCategoryUsed)
-                        {
-                            numberOfClasses++;
+                            predictionsAndScores[i] = NeuralNetMethods.ComputeAnswer(nn, inputs[i]);
                         }
+
+                        break;
                     }
-                    else
+                    case ISupportVectorMachineModel svm:
                     {
-                        predictions = predictionsAndScores.Select(t => t.answerCode).ToArray();
+                        for (int i = 0; i < inputs.Length; i++)
+                        {
+                            predictionsAndScores[i] = SvmMethods.ComputeAnswer(svm, inputs[i]);
+                        }
+
+                        break;
                     }
+
+                    default:
+                        throw new ArgumentException("Unknown IClassifierModel type");
+                }
+
+                if (model.UseUnknownCategory)
+                {
+                    bool unknownCategoryUsed = false;
+                    predictions = predictionsAndScores.Select(t =>
+                    {
+                        if (t.score.HasValue
+                            && t.score < model.UnknownCategoryCutoff)
+                        {
+                            if (model.TranslateUnknownCategory
+                                && model.Encoder.AnswerNameToCode.TryGetValue(model.TranslateUnknownCategoryTo, out int answerCode))
+                            {
+                                return answerCode;
+                            }
+
+                            // Use value beyond any that the classifier would use for unknown
+                            // rather than LearningMachineDataEncoder.UnknownCategoryCode to avoid
+                            // misleading 100% accuracy results
+                            // https://extract.atlassian.net/browse/ISSUE-13894
+                            unknownCategoryUsed = true;
+                            return model.Classifier.NumberOfClasses;
+                        }
+                        else
+                        {
+                            return t.answerCode;
+                        }
+                    })
+                    .ToArray();
+
+                    if (unknownCategoryUsed)
+                    {
+                        numberOfClasses++;
+                    }
+                }
+                else
+                {
+                    predictions = predictionsAndScores.Select(t => t.answerCode).ToArray();
                 }
 
                 if (numberOfClasses == 2)
@@ -505,17 +530,14 @@ namespace LearningMachineTrainer
                     inputs = inputs.Subtract(model.FeatureMean).ElementwiseDivide(model.FeatureScaleFactor);
                 }
 
-                if (model is INeuralNetModel nn)
+                switch (model)
                 {
-                    return (NeuralNetMethods.ComputeAnswer(nn, inputs), null);
-                }
-                else if (model is ISupportVectorMachineModel svm)
-                {
-                    return SvmMethods.ComputeAnswer(svm, inputs);
-                }
-                else
-                {
-                    throw new ArgumentException("Unknown IClassifierModel type");
+                    case INeuralNetModel nn:
+                        return NeuralNetMethods.ComputeAnswer(nn, inputs);
+                    case ISupportVectorMachineModel svm:
+                        return SvmMethods.ComputeAnswer(svm, inputs);
+                    default:
+                        throw new ArgumentException("Unknown IClassifierModel type");
                 }
             }
             catch (Exception ex)
@@ -557,17 +579,16 @@ namespace LearningMachineTrainer
         {
             try
             {
-                if (model is INeuralNetModel nn)
+                switch (model)
                 {
-                    NeuralNetMethods.TrainClassifier(nn, inputs, outputs, randomGenerator, updateStatus, cancellationToken);
-                }
-                else if (model is ISupportVectorMachineModel svm)
-                {
-                    SvmMethods.TrainClassifier(svm, inputs, outputs, randomGenerator, updateStatus, cancellationToken);
-                }
-                else
-                {
-                    throw new ArgumentException("Unknown model type");
+                    case INeuralNetModel nn:
+                        NeuralNetMethods.TrainClassifier(nn, inputs, outputs, randomGenerator, updateStatus, cancellationToken);
+                        break;
+                    case ISupportVectorMachineModel svm:
+                        SvmMethods.TrainClassifier(svm, inputs, outputs, randomGenerator, updateStatus, cancellationToken);
+                        break;
+                    default:
+                        throw new ArgumentException("Unknown model type");
                 }
             }
             catch (Exception ex)
@@ -580,12 +601,6 @@ namespace LearningMachineTrainer
 
         #region Private Methods
 
-        /// <summary>
-        /// Computes answer code to name mappings
-        /// </summary>
-        /// <param name="answers">The answer names/categories. Can contain repeats</param>
-        /// <param name="negativeCategory">The value to be used for the negative category if there
-        /// are only two categories total</param>
         private static void InitializeAnswerCodeMappings(this ILearningMachineModel model, IEnumerable<string> answers)
         {
             if (model.NegativeClassName == null)
@@ -612,7 +627,7 @@ namespace LearningMachineTrainer
         /// </summary>
         /// <typeparam name="T">The type of the objects in the array</typeparam>
         /// <param name="array">The array to shuffle</param>
-        /// <param name="randomNumberGenerator">An instance of <see cref="System.Random"/> to be used
+        /// <param name="rng">An instance of <see cref="System.Random"/> to be used
         /// to generate the permutation. If <see langword="null"/> then a thread-local, static instance
         /// will be used.</param>
         private static void Shuffle<T>(T[] array, Random rng)

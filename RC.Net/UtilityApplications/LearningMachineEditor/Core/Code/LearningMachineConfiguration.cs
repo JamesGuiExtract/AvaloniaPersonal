@@ -173,7 +173,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                     = documentCategorizationFolderInputPanel.Size
                     = documentCategorizationCsvInputPanel.Size;
                 svmPanel.Location = neuralNetPanel.Location;
-                probabilisticSvmPanel.Left = svmPanel.Left;
+                unknownCategoryPanel.Left = svmPanel.Left;
 
                 // Assign appropriate path tags
                 documentCategorizationCsvFeatureVoaPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
@@ -644,6 +644,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 csvOutputTextBox.Text = CurrentLearningMachine.CsvOutputFile ?? "";
                 standardizeFeaturesForCsvOutputCheckBox.Checked = CurrentLearningMachine.StandardizeFeaturesForCsvOutput;
 
+                // Probability options
+                useUnknownCheckBox.Checked = CurrentLearningMachine.UseUnknownCategory;
+                unknownCutoffTextBox.Text = CurrentLearningMachine.UnknownCategoryCutoff.ToString("r", CultureInfo.CurrentCulture);
+                translateUnknownCheckbox.Checked = CurrentLearningMachine.TranslateUnknownCategory;
+                translateUnknownTextBox.Text = CurrentLearningMachine.TranslateUnknownCategoryTo ?? "";
+
                 // Neural net
                 if (CurrentLearningMachine.MachineType == LearningMachineType.ActivationNetwork)
                 {
@@ -688,12 +694,8 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         ? classifier.TrainingAlgorithmCacheSize.Value.ToString(CultureInfo.CurrentCulture)
                         : "";
 
-                    // Probability options for SVM
+                    // Probability option for SVM
                     calibrateForProbabilitiesCheckBox.Checked = classifier.CalibrateMachineToProduceProbabilities;
-                    useUnknownCheckBox.Checked = CurrentLearningMachine.UseUnknownCategory;
-                    unknownCutoffTextBox.Text = CurrentLearningMachine.UnknownCategoryCutoff.ToString("r", CultureInfo.CurrentCulture);
-                    translateUnknownCheckbox.Checked = CurrentLearningMachine.TranslateUnknownCategory;
-                    translateUnknownTextBox.Text = CurrentLearningMachine.TranslateUnknownCategoryTo ?? "";
                 }
                 else
                 {
@@ -1057,6 +1059,18 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             var machineType = machineTypeComboBox.ToEnumValue<LearningMachineType>();
             learningMachine.CsvOutputFile = csvOutputTextBox.Text;
             learningMachine.StandardizeFeaturesForCsvOutput = standardizeFeaturesForCsvOutputCheckBox.Checked;
+            learningMachine.UseUnknownCategory = useUnknownCheckBox.Checked;
+
+            if (!double.TryParse(unknownCutoffTextBox.Text, NumberStyles.Number, CultureInfo.InvariantCulture,
+                out var unknownCategoryCutoff))
+            {
+                unknownCutoffTextBox.SetError(configurationErrorProvider,
+                    "Could not parse unknown category cutoff text as a number");
+                _valid = false;
+            }
+            learningMachine.UnknownCategoryCutoff = unknownCategoryCutoff;
+            learningMachine.TranslateUnknownCategory = translateUnknownCheckbox.Checked;
+            learningMachine.TranslateUnknownCategoryTo = translateUnknownTextBox.Text;
 
             // Neural Network Classifier
             if (machineType == LearningMachineType.ActivationNetwork)
@@ -1230,19 +1244,6 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
             // Set probability values
             classifier.CalibrateMachineToProduceProbabilities = calibrateForProbabilitiesCheckBox.Checked;
-            learningMachine.UseUnknownCategory = useUnknownCheckBox.Checked;
-
-            double unknownCategoryCutoff = 0;
-            if (!double.TryParse(unknownCutoffTextBox.Text, NumberStyles.Number, CultureInfo.InvariantCulture,
-                out unknownCategoryCutoff))
-            {
-                unknownCutoffTextBox.SetError(configurationErrorProvider,
-                    "Could not parse unknown category cutoff text as a number");
-                _valid = false;
-            }
-            learningMachine.UnknownCategoryCutoff = unknownCategoryCutoff;
-            learningMachine.TranslateUnknownCategory = translateUnknownCheckbox.Checked;
-            learningMachine.TranslateUnknownCategoryTo = translateUnknownTextBox.Text;
         }
 
         /// <summary>
@@ -1411,9 +1412,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             if (machineType == LearningMachineType.ActivationNetwork)
             {
                 neuralNetPanel.Visible = true;
-                probabilisticSvmPanel.Visible = false;
                 svmPanel.Visible = false;
                 numberOfCandidateNetwordsTextBox.Enabled = useCrossValidationSetsCheckBox.Checked;
+                useUnknownCheckBox.Enabled = true;
+                unknownCutoffTextBox.Enabled = useUnknownCheckBox.Checked;
+                translateUnknownCheckbox.Enabled = useUnknownCheckBox.Checked;
+                translateUnknownTextBox.Enabled = translateUnknownCheckbox.Checked;
             }
             else if (machineType == LearningMachineType.MulticlassSVM
                 || machineType == LearningMachineType.MultilabelSVM)
@@ -1422,7 +1426,6 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 svmPanel.Visible = true;
                 svmScoreTypeGroupBox.Enabled = svmAutoComplexityCheckBox.Checked;
 
-                probabilisticSvmPanel.Visible = true;
                 useUnknownCheckBox.Enabled = calibrateForProbabilitiesCheckBox.Checked;
                 unknownCutoffTextBox.Enabled = calibrateForProbabilitiesCheckBox.Checked && useUnknownCheckBox.Checked;
                 translateUnknownCheckbox.Enabled = calibrateForProbabilitiesCheckBox.Checked && useUnknownCheckBox.Checked;

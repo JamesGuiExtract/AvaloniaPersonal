@@ -38,19 +38,27 @@ namespace LearningMachineTrainer
     {
         private static readonly int _WINDOW_SIZE = 20;
 
-        public static int ComputeAnswer(INeuralNetModel model, double[] inputs)
+        public static (int answerCode, double score) ComputeAnswer(INeuralNetModel model, double[] inputs)
         {
             double[] responses = model.Classifier.Compute(inputs);
 
             // Return index of highest value neuron in the output layer
             responses.Max(out int imax);
 
-            return imax;
+            // The output of the bipolar sigmoid activation function ranges between -1 and 1 so rescale to between 0 and 1
+            responses.ApplyInPlace(x => (x + 1) / 2);
+            double max = responses[imax];
+
+            // Convert to a 'probability'
+            double probability = max / responses.Sum();
+
+            return (imax, probability);
         }
 
         /// <summary>
         /// Trains the classifier to recognize classifications
         /// </summary>
+        /// <param name="model">The <see cref="INeuralNetModel"/> to train</param>
         /// <param name="inputs">The input feature vectors</param>
         /// <param name="outputs">The classes for each input</param>
         /// <param name="randomGenerator">Random number generator to use for randomness</param>
@@ -62,7 +70,7 @@ namespace LearningMachineTrainer
         {
             try
             {
-                // Standarize inputs and store mean and sigma values
+                // Standardize inputs and store mean and sigma values
                 (model.FeatureMean, model.FeatureScaleFactor) = inputs.Standardize();
 
                 // Indent sub-status messages

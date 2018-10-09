@@ -135,7 +135,7 @@
             this.maxShingleSizeLabel = new System.Windows.Forms.Label();
             this.useAutoBagOfWordsCheckBox = new System.Windows.Forms.CheckBox();
             this.machineConfigurationTabPage = new System.Windows.Forms.TabPage();
-            this.probabilisticSvmPanel = new System.Windows.Forms.Panel();
+            this.unknownCategoryPanel = new System.Windows.Forms.Panel();
             this.calibrateForProbabilitiesCheckBox = new System.Windows.Forms.CheckBox();
             this.useUnknownCheckBox = new System.Windows.Forms.CheckBox();
             this.unknownCutoffTextBox = new System.Windows.Forms.TextBox();
@@ -190,7 +190,7 @@
             this.groupBox1.SuspendLayout();
             this.autoBagOfWordsGroupBox.SuspendLayout();
             this.machineConfigurationTabPage.SuspendLayout();
-            this.probabilisticSvmPanel.SuspendLayout();
+            this.unknownCategoryPanel.SuspendLayout();
             this.svmPanel.SuspendLayout();
             this.svmScoreTypeGroupBox.SuspendLayout();
             this.neuralNetPanel.SuspendLayout();
@@ -1383,7 +1383,7 @@
             // 
             // machineConfigurationTabPage
             // 
-            this.machineConfigurationTabPage.Controls.Add(this.probabilisticSvmPanel);
+            this.machineConfigurationTabPage.Controls.Add(this.unknownCategoryPanel);
             this.machineConfigurationTabPage.Controls.Add(this.svmPanel);
             this.machineConfigurationTabPage.Controls.Add(this.machineTypeLabel);
             this.machineConfigurationTabPage.Controls.Add(this.neuralNetPanel);
@@ -1396,24 +1396,23 @@
             this.machineConfigurationTabPage.Text = "Machine configuration";
             this.machineConfigurationTabPage.UseVisualStyleBackColor = true;
             // 
-            // probabilisticSvmPanel
+            // unknownCategoryPanel
             // 
-            this.probabilisticSvmPanel.Controls.Add(this.calibrateForProbabilitiesCheckBox);
-            this.probabilisticSvmPanel.Controls.Add(this.useUnknownCheckBox);
-            this.probabilisticSvmPanel.Controls.Add(this.unknownCutoffTextBox);
-            this.probabilisticSvmPanel.Controls.Add(this.translateUnknownTextBox);
-            this.probabilisticSvmPanel.Controls.Add(this.translateUnknownCheckbox);
-            this.probabilisticSvmPanel.Location = new System.Drawing.Point(548, 340);
-            this.probabilisticSvmPanel.Name = "probabilisticSvmPanel";
-            this.probabilisticSvmPanel.Size = new System.Drawing.Size(558, 89);
-            this.probabilisticSvmPanel.TabIndex = 4;
+            this.unknownCategoryPanel.Controls.Add(this.useUnknownCheckBox);
+            this.unknownCategoryPanel.Controls.Add(this.unknownCutoffTextBox);
+            this.unknownCategoryPanel.Controls.Add(this.translateUnknownTextBox);
+            this.unknownCategoryPanel.Controls.Add(this.translateUnknownCheckbox);
+            this.unknownCategoryPanel.Location = new System.Drawing.Point(548, 354);
+            this.unknownCategoryPanel.Name = "unknownCategoryPanel";
+            this.unknownCategoryPanel.Size = new System.Drawing.Size(558, 59);
+            this.unknownCategoryPanel.TabIndex = 4;
             // 
             // calibrateForProbabilitiesCheckBox
             // 
             this.calibrateForProbabilitiesCheckBox.AutoSize = true;
             this.calibrateForProbabilitiesCheckBox.Checked = true;
             this.calibrateForProbabilitiesCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.calibrateForProbabilitiesCheckBox.Location = new System.Drawing.Point(7, 13);
+            this.calibrateForProbabilitiesCheckBox.Location = new System.Drawing.Point(7, 281);
             this.calibrateForProbabilitiesCheckBox.Name = "calibrateForProbabilitiesCheckBox";
             this.calibrateForProbabilitiesCheckBox.Size = new System.Drawing.Size(222, 17);
             this.calibrateForProbabilitiesCheckBox.TabIndex = 0;
@@ -1426,7 +1425,7 @@
             this.useUnknownCheckBox.AutoSize = true;
             this.useUnknownCheckBox.Checked = true;
             this.useUnknownCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.useUnknownCheckBox.Location = new System.Drawing.Point(7, 36);
+            this.useUnknownCheckBox.Location = new System.Drawing.Point(7, 6);
             this.useUnknownCheckBox.Name = "useUnknownCheckBox";
             this.useUnknownCheckBox.Size = new System.Drawing.Size(280, 17);
             this.useUnknownCheckBox.TabIndex = 1;
@@ -1436,7 +1435,7 @@
             // 
             // unknownCutoffTextBox
             // 
-            this.unknownCutoffTextBox.Location = new System.Drawing.Point(293, 33);
+            this.unknownCutoffTextBox.Location = new System.Drawing.Point(293, 3);
             this.unknownCutoffTextBox.Name = "unknownCutoffTextBox";
             this.unknownCutoffTextBox.Size = new System.Drawing.Size(44, 20);
             this.unknownCutoffTextBox.TabIndex = 2;
@@ -1446,7 +1445,7 @@
             // 
             // translateUnknownTextBox
             // 
-            this.translateUnknownTextBox.Location = new System.Drawing.Point(237, 56);
+            this.translateUnknownTextBox.Location = new System.Drawing.Point(237, 26);
             this.translateUnknownTextBox.Name = "translateUnknownTextBox";
             this.translateUnknownTextBox.Size = new System.Drawing.Size(296, 20);
             this.translateUnknownTextBox.TabIndex = 4;
@@ -1458,7 +1457,7 @@
             this.translateUnknownCheckbox.AutoSize = true;
             this.translateUnknownCheckbox.Checked = true;
             this.translateUnknownCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.translateUnknownCheckbox.Location = new System.Drawing.Point(8, 59);
+            this.translateUnknownCheckbox.Location = new System.Drawing.Point(7, 29);
             this.translateUnknownCheckbox.Name = "translateUnknownCheckbox";
             this.translateUnknownCheckbox.Size = new System.Drawing.Size(223, 17);
             this.translateUnknownCheckbox.TabIndex = 3;
@@ -1468,6 +1467,7 @@
             // 
             // svmPanel
             // 
+            this.svmPanel.Controls.Add(this.calibrateForProbabilitiesCheckBox);
             this.svmPanel.Controls.Add(this.svmScoreTypeGroupBox);
             this.svmPanel.Controls.Add(this.svmConditionallyApplyWeightRatioCheckBox);
             this.svmPanel.Controls.Add(this.svmCacheSizeTextBox);
@@ -1479,7 +1479,7 @@
             this.svmPanel.Controls.Add(this.svmComplexityLabel);
             this.svmPanel.Location = new System.Drawing.Point(548, 54);
             this.svmPanel.Name = "svmPanel";
-            this.svmPanel.Size = new System.Drawing.Size(558, 280);
+            this.svmPanel.Size = new System.Drawing.Size(558, 299);
             this.svmPanel.TabIndex = 3;
             // 
             // svmScoreTypeGroupBox
@@ -1883,8 +1883,8 @@
             this.autoBagOfWordsGroupBox.PerformLayout();
             this.machineConfigurationTabPage.ResumeLayout(false);
             this.machineConfigurationTabPage.PerformLayout();
-            this.probabilisticSvmPanel.ResumeLayout(false);
-            this.probabilisticSvmPanel.PerformLayout();
+            this.unknownCategoryPanel.ResumeLayout(false);
+            this.unknownCategoryPanel.PerformLayout();
             this.svmPanel.ResumeLayout(false);
             this.svmPanel.PerformLayout();
             this.svmScoreTypeGroupBox.ResumeLayout(false);
@@ -2024,7 +2024,7 @@
         private System.Windows.Forms.RadioButton svmUseF1ScoreRadioButton;
         private System.Windows.Forms.TextBox translateUnknownTextBox;
         private System.Windows.Forms.CheckBox translateUnknownCheckbox;
-        private System.Windows.Forms.Panel probabilisticSvmPanel;
+        private System.Windows.Forms.Panel unknownCategoryPanel;
         private System.Windows.Forms.RadioButton svmUseRecallRadioButton;
         private System.Windows.Forms.RadioButton svmUsePrecisionRadioButton;
         private System.Windows.Forms.CheckBox svmConditionallyApplyWeightRatioCheckBox;

@@ -249,6 +249,11 @@ namespace Extract.AttributeFinder.Test
             // Network performance hurt by extra features
             Assert.Greater(f1Score, 0.85);
             Assert.Less(f1Score, 0.93);
+
+            // Example has good probability score
+            var aScore = classifier.ComputeAnswer(inputs[9]).score;
+            Assert.Greater(aScore, 0.95);
+            Assert.Less(aScore, 0.98);
         }
 
         // Test multi-class SVM with doc classification problem
