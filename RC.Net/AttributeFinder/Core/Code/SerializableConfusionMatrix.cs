@@ -44,7 +44,9 @@ namespace Extract.AttributeFinder
             {
                 int[,] sourceData = null;
 
-                var labels = encoder.AnswerCodeToName;
+                // Clone the list so that the encoder isn't modified
+                // https://extract.atlassian.net/browse/ISSUE-15642
+                var labels = new List<string>(encoder.AnswerCodeToName);
 
                 accuracyData.Match(gcm =>
                 {
