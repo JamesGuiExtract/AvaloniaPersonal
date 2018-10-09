@@ -495,6 +495,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         && _currentLearningMachine.Classifier.IsConfigurationEqualTo(_previousLearningMachine.Classifier))
                     {
                         _currentLearningMachine.Classifier = _previousLearningMachine.Classifier;
+                        _currentLearningMachine.AccuracyData = _previousLearningMachine.AccuracyData;
                         machineStateToolStripStatusLabel.Text = "";
                     }
                     else if (_previousLearningMachine.IsTrained)
