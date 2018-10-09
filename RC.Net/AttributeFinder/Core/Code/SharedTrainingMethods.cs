@@ -81,11 +81,10 @@ namespace Extract.AttributeFinder
                         },
                         cm =>
                         {
-                            var positiveCategoryCodes = learningMachine.Encoder.AnswerNameToCode.Values
-                                .Where(code => code != 0);
-                            ExtractException.Assert("ELI41410", "Internal logic exception: There should be exactly one postive category in order to use a confusion matrix",
-                                positiveCategoryCodes.Count() == 1);
-                            string positiveCategory = learningMachine.Encoder.AnswerCodeToName[positiveCategoryCodes.First()];
+                            var positiveCategoryCodes = learningMachine.Encoder.AnswerCodeToName.Count - 1;
+                            ExtractException.Assert("ELI41410", "Internal logic exception: There should be exactly one positive category in order to use a confusion matrix",
+                                positiveCategoryCodes == 1);
+                            string positiveCategory = learningMachine.Encoder.AnswerCodeToName[positiveCategoryCodes];
 
                             statusUpdates.Enqueue(new StatusArgs
                             {
@@ -115,8 +114,11 @@ namespace Extract.AttributeFinder
                         writeAccuracyData(trainingAccuracyData, trainingAccuracyData2);
                     }
 
-                    statusUpdates.Enqueue(new StatusArgs { StatusMessage = "Testing Set Accuracy:" });
-                    writeAccuracyData(testingAccuracyData, testingAccuracyData2);
+                    if (testingAccuracyData != null)
+                    {
+                        statusUpdates.Enqueue(new StatusArgs {StatusMessage = "Testing Set Accuracy:"});
+                        writeAccuracyData(testingAccuracyData, testingAccuracyData2);
+                    }
                 }
                 else
                 {

@@ -69,7 +69,7 @@ namespace Extract.AttributeFinder.Test
                 TrainingAlgorithmCacheSize = 2000
             };
 
-            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, _ => { }, CancellationToken.None);
+            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, false, _ => { }, CancellationToken.None);
             testResult.Match(_ => throw new ArgumentException("Not expected"),
                 confusionMatrix => Assert.AreEqual(0.81, Math.Round(confusionMatrix.Recall, 2)));
         }
@@ -89,7 +89,7 @@ namespace Extract.AttributeFinder.Test
                 TrainingAlgorithmCacheSize = 2000
             };
 
-            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, _ => { }, CancellationToken.None);
+            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, false, _ => { }, CancellationToken.None);
             testResult.Match(_ => throw new ArgumentException("Not expected"),
                 confusionMatrix => Assert.AreEqual(0.88, Math.Round(confusionMatrix.Recall, 2)));
         }
@@ -109,7 +109,7 @@ namespace Extract.AttributeFinder.Test
                 TrainingAlgorithmCacheSize = 2000
             };
 
-            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, _ => { }, CancellationToken.None);
+            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, false, _ => { }, CancellationToken.None);
             testResult.Match(_ => throw new ArgumentException("Not expected"),
                 confusionMatrix => Assert.AreEqual(0.73, Math.Round(confusionMatrix.Recall, 2)));
         }
@@ -128,7 +128,7 @@ namespace Extract.AttributeFinder.Test
                 TrainingAlgorithmCacheSize = 2000
             };
 
-            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, _ => { }, CancellationToken.None);
+            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, false, _ => { }, CancellationToken.None);
             testResult.Match(_ => throw new ArgumentException("Not expected"),
                 confusionMatrix => Assert.AreEqual(0.81, Math.Round(confusionMatrix.Recall, 2)));
         }
@@ -149,7 +149,7 @@ namespace Extract.AttributeFinder.Test
                 TrainingAlgorithmCacheSize = 2000
             };
 
-            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, _ => { }, CancellationToken.None);
+            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, false, _ => { }, CancellationToken.None);
             testResult.Match(_ => throw new ArgumentException("Not expected"),
                 confusionMatrix => Assert.AreEqual(0.85, Math.Round(confusionMatrix.Recall, 2)));
         }
@@ -170,7 +170,7 @@ namespace Extract.AttributeFinder.Test
                 TrainingAlgorithmCacheSize = 2000
             };
 
-            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, _ => { }, CancellationToken.None);
+            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, false, _ => { }, CancellationToken.None);
             testResult.Match(_ => throw new ArgumentException("Not expected"),
                 confusionMatrix => Assert.AreEqual(0.78, Math.Round(confusionMatrix.Recall, 2)));
         }
@@ -189,7 +189,7 @@ namespace Extract.AttributeFinder.Test
                 NegativeToPositiveWeightRatio = 1
             };
 
-            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, _ => { }, CancellationToken.None);
+            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, false, _ => { }, CancellationToken.None);
             testResult.Match(_ => throw new ArgumentException("Not expected"),
                 confusionMatrix => Assert.AreEqual(0.85, Math.Round(confusionMatrix.Recall, 2)));
         }
@@ -209,7 +209,7 @@ namespace Extract.AttributeFinder.Test
                 NegativeToPositiveWeightRatio = .1
             };
 
-            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, _ => { }, CancellationToken.None);
+            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, false, _ => { }, CancellationToken.None);
             testResult.Match(_ => throw new ArgumentException("Not expected"),
                 confusionMatrix => Assert.AreEqual(0.89, Math.Round(confusionMatrix.Recall, 2)));
         }
@@ -229,7 +229,7 @@ namespace Extract.AttributeFinder.Test
                 NegativeToPositiveWeightRatio = 10
             };
 
-            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, _ => { }, CancellationToken.None);
+            var (_, testResult) = lm.TrainAndTestWithCsvData(false, train, test, false, _ => { }, CancellationToken.None);
             testResult.Match(_ => throw new ArgumentException("Not expected"),
                 confusionMatrix => Assert.AreEqual(0.83, Math.Round(confusionMatrix.Recall, 2)));
         }

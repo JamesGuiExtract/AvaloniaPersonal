@@ -27,6 +27,7 @@ using System.Runtime.Serialization.Formatters;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using LearningMachineTrainer;
 using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.AttributeFinder
@@ -1078,7 +1079,7 @@ namespace Extract.AttributeFinder
                     documentsForCategory[category.Label] = (int)category.Value;
                 }
 
-                TermInfo getTermInfo(BytesRef termBytes)
+                TermInfo getTermInfo(BytesRef termBytes, int i)
                 {
                     var term = new Term("shingles", termBytes);
                     double augmentedTermFrequency = 0.0;
@@ -1094,7 +1095,17 @@ namespace Extract.AttributeFinder
                         double maxTf = documentsForCategory[categoryName];
                         augmentedTermFrequency += tf / maxTf;
                     }
-                    updateStatus(new StatusArgs { StatusMessage = "Scoring Terms... Terms processed: {0:N0}", Int32Value = 1 });
+
+                    // This count need not be precise, nor be updated for every word
+                    if (i % LearningMachineMethods.UpdateFrequency == 0)
+                    {
+                        updateStatus(new StatusArgs
+                        {
+                            StatusMessage = "Scoring Terms... Terms processed: {0:N0}",
+                            Int32Value = LearningMachineMethods.UpdateFrequency
+                        });
+                    }
+
                     cancellationToken.ThrowIfCancellationRequested();
 
                     var termInfo = new TermInfo(
@@ -1120,7 +1131,7 @@ namespace Extract.AttributeFinder
                     }
                 }
 
-                var topTerms = new LimitedSizeSortedSet<TermInfo>(topDocFreqTerms.Select(t => getTermInfo(t.Item1)), new TfIdfComparer(), MaxFeatures);
+                var topTerms = new LimitedSizeSortedSet<TermInfo>(topDocFreqTerms.Select((t, i) => getTermInfo(t.Item1, i)), new TfIdfComparer(), MaxFeatures);
                 string[] topTermsArray = new string[topTerms.Count];
                 int count = 0;
                 foreach(var term in topTerms.Reverse())

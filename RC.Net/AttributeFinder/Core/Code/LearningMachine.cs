@@ -570,15 +570,15 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Computes an answer for the input data. Modifies <see paramref="attributeVector"/> with the answer
+        /// Computes an answer for the input data. Modifies attributeVector with the answer
         /// </summary>
         /// <remarks>If <see paramref="preserveInputAttributes"/>=<see langword="true"/> and
         /// <see cref="Usage"/>=<see cref="LearningMachineUsage.Pagination"/> then the input Page <see cref="ComAttribute"/>s will be
         /// moved to be subattributes of the resulting Document <see cref="ComAttribute"/>s.</remarks>
-        /// <param name="document">The <see cref="SpatialString"/> used for encoding auto-BoW features</param>
+        /// <param name="document">The <see cref="ISpatialString"/> used for encoding auto-BoW features</param>
         /// <param name="attributeVector">The VOA used for encoding attribute features</param>
         /// <param name="preserveInputAttributes">Whether to preserve the input <see cref="ComAttribute"/>s or not.</param>
-        public void ComputeAnswer(SpatialString document, IUnknownVector attributeVector, bool preserveInputAttributes)
+        public void ComputeAnswer(ISpatialString document, IUnknownVector attributeVector, bool preserveInputAttributes)
         {
             try
             {
@@ -586,33 +586,51 @@ namespace Extract.AttributeFinder
 
                 ExtractException.Assert("ELI41629", "Attribute vector cannot be null", attributeVector != null);
 
+                string unknownCategory = TranslateUnknownCategoryTo;
+                if (UseUnknownCategory && !TranslateUnknownCategory)
+                {
+                    switch (Usage)
+                    {
+                        case LearningMachineUsage.AttributeCategorization:
+                            unknownCategory = "";
+                            break;
+                        case LearningMachineUsage.Deletion:
+                            unknownCategory = LearningMachineDataEncoder.NotDeletedPageCategory;
+                            break;
+                        case LearningMachineUsage.DocumentCategorization:
+                            unknownCategory = _UNKNOWN_CATEGORY;
+                            break;
+                        case LearningMachineUsage.Pagination:
+                            unknownCategory = LearningMachineDataEncoder.NotFirstPageCategory;
+                            break;
+                        default:
+                            throw new ArgumentException(
+                                UtilityMethods.FormatCurrent($"Unknown machine learning usage! {Usage}"));
+                    }
+                }
+
                 IEnumerable<double[]> inputs = Encoder.GetFeatureVectors(document, attributeVector);
-                var outputs = inputs.Select(v => Classifier.ComputeAnswer(v));
+                var outputsAndScores = inputs.Select(v => Classifier.ComputeAnswer(v));
+                var outputs = (UseUnknownCategory
+                        ? outputsAndScores
+                            .Select(t =>
+                                t.score is double score && score < UnknownCategoryCutoff
+                                    ? unknownCategory
+                                    : Encoder.AnswerCodeToName[t.answerCode])
+                        : outputsAndScores.Select(t => Encoder.AnswerCodeToName[t.answerCode]))
+                    .ToList();
+
                 if (Usage == LearningMachineUsage.DocumentCategorization)
                 {
-                    IEnumerable<ComAttribute> categories = outputs.Select(res =>
-                        {
-                            string category;
-                            if (UseUnknownCategory && res.score != null && res.score < UnknownCategoryCutoff)
-                            {
-                                category = TranslateUnknownCategory
-                                    ? TranslateUnknownCategoryTo
-                                    : _UNKNOWN_CATEGORY;
-                            }
-                            else
-                            {
-                                category = Encoder.AnswerCodeToName[res.answerCode];
-                            }
-                            var ss = new SpatialStringClass();
-                            ss.CreateNonSpatialString(category, document.SourceDocName);
-                            return new ComAttribute { Name = "DocumentType", Value = ss };
-                        });
                     if (!preserveInputAttributes)
                     {
                         attributeVector.Clear();
                     }
-                    foreach (var attr in categories)
+                    foreach (var category in outputs)
                     {
+                        var ss = new SpatialStringClass();
+                        ss.CreateNonSpatialString(category, document.SourceDocName);
+                        var attr = new ComAttribute { Name = "DocumentType", Value = ss };
                         attributeVector.PushBack(attr);
                     }
                 }
@@ -637,7 +655,7 @@ namespace Extract.AttributeFinder
                     }
 
                     List<bool> isFirstPageList = outputs
-                        .Select(answerAndScore => answerAndScore.Item1 == LearningMachineDataEncoder.FirstPageCategoryCode)
+                        .Select(answer => string.Equals(answer, LearningMachineDataEncoder.FirstPageCategory, StringComparison.OrdinalIgnoreCase))
                         .ToList();
                     int numberOfPages = isFirstPageList.Count + 1;
 
@@ -662,7 +680,7 @@ namespace Extract.AttributeFinder
                     }
 
                     List<bool> isDeletedPageList = outputs
-                        .Select(answerAndScore => answerAndScore.answerCode == LearningMachineDataEncoder.DeletedPageCategoryCode)
+                        .Select(answer => answer == LearningMachineDataEncoder.DeletedPageCategory)
                         .ToList();
                     int numberOfPages = isDeletedPageList.Count;
 
@@ -688,7 +706,7 @@ namespace Extract.AttributeFinder
                             attribute.SubAttributes.Clear();
                         }
 
-                        string category = Encoder.AnswerCodeToName[attrAndAnswer.Item2.answerCode];
+                        string category = attrAndAnswer.Item2;
                         attribute.SubAttributes.PushBack(
                             attributeCreator.Create(LearningMachineDataEncoder.CategoryAttributeName, category));
                     }
@@ -703,73 +721,6 @@ namespace Extract.AttributeFinder
                 throw e.AsExtract("ELI39770");
             }
         }
-
-        /// <summary>
-        /// Computes accuracy score(s) of this machine
-        /// </summary>
-        /// <remarks>Unlike the static version of this method, the instance version is affected
-        /// by <see cref="UseUnknownCategory"/> and <see cref="UnknownCategoryCutoff"/> settings</remarks>
-        /// <param name="inputs">The feature vectors</param>
-        /// <param name="outputs">The expected results</param>
-        /// <param name="standardizeInputs">Whether to apply zero-center and normalize the input</param>
-        /// <returns>The answer code and score</returns>
-        /// <returns>An <see cref="AccuracyData"/> instance </returns>
-        public AccuracyData GetAccuracyScore(double[][] inputs, int[] outputs, bool standardizeInputs = true)
-        {
-            try
-            {
-                bool unknownCategoryUsed = false;
-                int[] predictions = inputs.Apply(v => Classifier.ComputeAnswer(v, standardizeInputs))
-                    .Select(t =>
-                        {
-                            if (UseUnknownCategory && t.score.HasValue
-                                && t.score < UnknownCategoryCutoff)
-                            {
-                                if (TranslateUnknownCategory
-                                    && Encoder.AnswerNameToCode.TryGetValue(TranslateUnknownCategoryTo, out int answerCode))
-                                {
-                                    return answerCode;
-                                }
-
-                                // Use value beyond any that the classifier would use for unknown
-                                // rather than LearningMachineDataEncoder.UnknownCategoryCode to avoid
-                                // misleading 100% accuracy results
-                                // https://extract.atlassian.net/browse/ISSUE-13894
-                                unknownCategoryUsed = true;
-                                return Classifier.NumberOfClasses;
-                            }
-                            else
-                            {
-                                return t.answerCode;
-                            }
-                        })
-
-                    .ToArray();
-
-                int numberOfClasses = unknownCategoryUsed
-                    ? Classifier.NumberOfClasses + 1
-                    : Classifier.NumberOfClasses;
-
-                AccuracyData accuracyData;
-                if (numberOfClasses == 2)
-                {
-                    var confusionMatrix = new ConfusionMatrix(predictions, outputs);
-                    accuracyData = new AccuracyData(confusionMatrix);
-                }
-                else
-                {
-                    var confusionMatrix = new GeneralConfusionMatrix(numberOfClasses, outputs, predictions);
-                    accuracyData = new AccuracyData(confusionMatrix);
-                }
-
-                return accuracyData;
-            }
-            catch (Exception e)
-            {
-                throw e.AsExtract("ELI39868");
-            }
-        }
-
 
         /// <summary>
         /// Whether this instance is configured the same as another
@@ -977,7 +928,7 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
-        /// <remarks>The CSV fields are: "ussFileName", "answer", features...</remarks>
+        /// <remarks>The CSV fields are: "ussFileName", "index", "answer", features...</remarks>
         public void WriteDataToCsv(Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             try
@@ -1234,7 +1185,7 @@ namespace Extract.AttributeFinder
             if (InputConfig.TrainingSetPercentage > 0)
             {
                 var rng = new Random(RandomNumberSeed);
-                GetIndexesOfSubsetsByCategory(answerCodes,
+                LearningMachineMethods.GetIndexesOfSubsetsByCategory(answerCodes,
                     InputConfig.TrainingSetPercentage / 100.0, out List<int> trainIdx, out List<int> testIdx, rng);
 
                 // Training set
@@ -1255,8 +1206,8 @@ namespace Extract.AttributeFinder
 
                 // Training mutates the trainInputs array in order to save memory so don't modify it again
                 // if training has taken place
-                var trainResult = GetAccuracyScore(trainInputs, trainOutputs, standardizeInputs: testOnly);
-                var testResult = GetAccuracyScore(testInputs, testOutputs);
+                var trainResult = LearningMachineMethods.GetAccuracyScore(this, trainInputs, trainOutputs, standardizeInputs: testOnly);
+                var testResult = LearningMachineMethods.GetAccuracyScore(this, testInputs, testOutputs, standardizeInputs: true);
                 AccuracyData =
                     (train: new SerializableConfusionMatrix(Encoder, trainResult),
                     test: new SerializableConfusionMatrix(Encoder, testResult));
@@ -1265,7 +1216,7 @@ namespace Extract.AttributeFinder
             // If no training data, just test testing set
             else
             {
-                var testResult = GetAccuracyScore(featureVectors, answerCodes);
+                var testResult = LearningMachineMethods.GetAccuracyScore(this, featureVectors, answerCodes, standardizeInputs: true);
                 AccuracyData = (train: null, test: new SerializableConfusionMatrix(Encoder, testResult));
                 return (null, testResult);
             }
@@ -1274,6 +1225,8 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Returns a connection to the specified database
         /// </summary>
+        /// <param name="databaseServer">The DB server to connect to</param>
+        /// <param name="databaseName">The DB name to connect to</param>
         /// <param name="enlist">Whether to enlist in a transaction scope if there is one</param>
         static SqlConnection NewSqlDBConnection(string databaseServer, string databaseName, bool enlist = true)
         {
@@ -1409,7 +1362,7 @@ namespace Extract.AttributeFinder
         {
             if (StandardizeFeaturesForCsvOutput)
             {
-                StandardizeFeatures(featureVectors);
+                featureVectors.Standardize();
             }
 
             var docIndex = ussPaths.GroupBy(p => p)
@@ -1432,7 +1385,7 @@ namespace Extract.AttributeFinder
             if (InputConfig.TrainingSetPercentage > 0)
             {
                 var rng = new Random(RandomNumberSeed);
-                GetIndexesOfSubsetsByCategory(answerCodes,
+                LearningMachineMethods.GetIndexesOfSubsetsByCategory(answerCodes,
                     InputConfig.TrainingSetPercentage / 100.0, out List<int> trainIdx, out List<int> testIdx, rng);
 
                 // Training set
@@ -1483,39 +1436,6 @@ namespace Extract.AttributeFinder
             var testingData = zip(testFiles, testFileIndices, testInputs, testOutputs, "testing");
 
             return (trainingData, testingData);
-        }
-
-        /// <summary>
-        /// Standardizes feature values by subracting the mean and dividing by the standard deviation
-        /// </summary>
-        /// <param name="featureVectors">Feature vectors for the training data</param>
-        /// <returns>The calculated mean and standard deviation</returns>
-        public static (double[] mean, double[] sigma) StandardizeFeatures(double[][] featureVectors)
-        {
-            try
-            {
-                var mean = featureVectors.Mean();
-                var sigma = featureVectors.StandardDeviation(mean);
-
-                // Prevent divide by zero
-                if (sigma.Any(factor => factor == 0))
-                {
-                    sigma.ApplyInPlace(factor => factor + 0.0001);
-                }
-
-                // Standardize input
-                foreach (var v in featureVectors)
-                {
-                    v.Subtract(mean, inPlace: true);
-                }
-                featureVectors.ElementwiseDivide(sigma, inPlace: true);
-
-                return (mean, sigma);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45536");
-            }
         }
 
         /// <summary>
@@ -1850,47 +1770,6 @@ namespace Extract.AttributeFinder
         #endregion IDisposable Members
 
         #region Static Methods
-
-        /// <summary>
-        /// Split data into two subset by computing the indexes of random subsets of each category. At least one example
-        /// of each category will be represented in each subset so the subsets may overlap by one.
-        /// </summary>
-        /// <param name="categories">Category codes for each example in the set of data</param>
-        /// <param name="subset1Fraction">The fraction of indexes to be selected for the first subset</param>
-        /// <param name="subset1Indexes">The indexes selected for the first subset</param>
-        /// <param name="subset2Indexes">The indexes selected for the second subset</param>
-        /// <param name="randomGenerator">Optional random number generator used to select the subsets</param>
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
-        public static void GetIndexesOfSubsetsByCategory<TCategory>(TCategory[] categories, double subset1Fraction,
-            out List<int> subset1Indexes, out List<int> subset2Indexes, Random randomGenerator=null)
-            where TCategory : IComparable
-        {
-            try
-            {
-                ExtractException.Assert("ELI39761", "Fraction must be between 0 and 1", subset1Fraction <= 1 && subset1Fraction >= 0);
-                subset1Indexes = new List<int>();
-                subset2Indexes = new List<int>();
-                foreach(var category in categories.Distinct())
-                {
-                    // Retrieve the indexes for this category
-                    int[] idx = categories.Find(x => x.CompareTo(category) == 0);
-                    if (idx.Length > 0)
-                    {
-                        int subset1Size = Math.Max((int)Math.Round(idx.Length * subset1Fraction), 1);
-                        int subset2Size = Math.Max(idx.Length - subset1Size, 1);
-                        Utilities.CollectionMethods.Shuffle(idx, randomGenerator);
-                        var subset1 = idx.Submatrix(0, subset1Size - 1);
-                        var subset2 = idx.Submatrix(idx.Length - subset2Size, idx.Length - 1);
-                        subset1Indexes.AddRange(subset1);
-                        subset2Indexes.AddRange(subset2);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                throw e.AsExtract("ELI39738");
-            }
-        }
 
         /// <summary>
         /// Computes the accuracy or F1 score of the classifier

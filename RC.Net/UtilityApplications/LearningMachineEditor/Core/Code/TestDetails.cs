@@ -24,6 +24,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         bool _normalizeByColumn = true;
         bool _testingAccuracy = true;
         bool _updateInProgress = false;
+        bool _formLoaded = false;
 
         #endregion Fields
 
@@ -51,7 +52,9 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
                 _cm = cm;
 
-                groupBox3.Enabled = cm.train != null;
+                groupBox3.Enabled = cm.train != null && cm.test != null;
+
+                _testingAccuracy = cm.test != null;
 
                 _memoizedGetColorFromHue = ((Func<int, Color>)GetColorFromHue).Memoize();
             }
@@ -79,6 +82,17 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 testDetailsDataGridView.CellPainting += DataGridView_CellPainting;
                 testDetailsDataGridView.CellValueNeeded += TestDetailsDataGridView_CellValueNeeded;
                 testDetailsDataGridView.CellValuePushed += TestDetailsDataGridView_CellValuePushed;
+
+                if (_testingAccuracy)
+                {
+                    showAccuracyForTestingSetRadioButton.Checked = true;
+                }
+                else
+                {
+                    showAccuracyForTrainingSetRadioButton.Checked = true;
+                }
+
+                _formLoaded = true;
 
                 InitDataGridView();
             }
@@ -229,70 +243,85 @@ namespace Extract.UtilityApplications.LearningMachineEditor
 
         private void TestDetailsDataGridView_CellValueNeeded(object sender, DataGridViewCellValueEventArgs e)
         {
-            if (e.RowIndex >= CM.Labels.Length && e.ColumnIndex >= CM.Labels.Length)
+            try
             {
-                return;
+                if (e.RowIndex >= CM.Labels.Length && e.ColumnIndex >= CM.Labels.Length)
+                {
+                    return;
+                }
+                else if (e.RowIndex == CM.Labels.Length)
+                {
+                    e.Value = CM.ColumnTotals[e.ColumnIndex];
+                }
+                else if (e.ColumnIndex == CM.Labels.Length)
+                {
+                    e.Value = CM.RowTotals[e.RowIndex];
+                }
+                else
+                {
+                    e.Value = CM.Data[e.RowIndex][e.ColumnIndex];
+                }
             }
-            else if (e.RowIndex == CM.Labels.Length)
+            catch (Exception ex)
             {
-                e.Value = CM.ColumnTotals[e.ColumnIndex];
-            }
-            else if (e.ColumnIndex == CM.Labels.Length)
-            {
-                e.Value = CM.RowTotals[e.RowIndex];
-            }
-            else
-            {
-                e.Value = CM.Data[e.RowIndex][e.ColumnIndex];
+                ex.ExtractDisplay("ELI46327");
             }
         }
 
         private void TestDetailsDataGridView_CellValuePushed(object sender, DataGridViewCellValueEventArgs e)
         {
-            if (e.RowIndex >= CM.Labels.Length && e.ColumnIndex >= CM.Labels.Length)
+            try
             {
-                return;
-            }
-
-            if (e.RowIndex == CM.Labels.Length)
-            {
-                // Read-only
-                e.Value = CM.ColumnTotals[e.ColumnIndex];
-            }
-            else if (e.ColumnIndex == CM.Labels.Length)
-            {
-                // Read-only
-                e.Value = CM.RowTotals[e.RowIndex];
-            }
-            else
-            {
-                int oldVal;
-                int newVal;
-                int dif;
-                try
+                if (e.RowIndex >= CM.Labels.Length && e.ColumnIndex >= CM.Labels.Length)
                 {
-                    oldVal = CM.Data[e.RowIndex][e.ColumnIndex];
-                    newVal = Convert.ToInt32(e.Value, CultureInfo.InvariantCulture);
-                    dif = newVal - oldVal;
-                }
-                catch
-                {
-                    e.Value = CM.Data[e.RowIndex][e.ColumnIndex];
                     return;
                 }
-                CM.Data[e.RowIndex][e.ColumnIndex] = newVal;
-                CM.RowTotals[e.RowIndex] += dif;
-                CM.ColumnTotals[e.ColumnIndex] += dif;
 
-                testDetailsDataGridView.InvalidateCell(testDetailsDataGridView
-                    .Rows[e.RowIndex]
-                    .Cells[CM.Labels.Length]);
+                if (e.RowIndex == CM.Labels.Length)
+                {
+                    // Read-only
+                    e.Value = CM.ColumnTotals[e.ColumnIndex];
+                }
+                else if (e.ColumnIndex == CM.Labels.Length)
+                {
+                    // Read-only
+                    e.Value = CM.RowTotals[e.RowIndex];
+                }
+                else
+                {
+                    int oldVal;
+                    int newVal;
+                    int dif;
+                    try
+                    {
+                        oldVal = CM.Data[e.RowIndex][e.ColumnIndex];
+                        newVal = Convert.ToInt32(e.Value, CultureInfo.InvariantCulture);
+                        dif = newVal - oldVal;
+                    }
+                    catch
+                    {
+                        e.Value = CM.Data[e.RowIndex][e.ColumnIndex];
+                        return;
+                    }
 
-                testDetailsDataGridView.InvalidateCell(testDetailsDataGridView
-                    .Rows[CM.Labels.Length]
-                    .Cells[e.ColumnIndex]);
+                    CM.Data[e.RowIndex][e.ColumnIndex] = newVal;
+                    CM.RowTotals[e.RowIndex] += dif;
+                    CM.ColumnTotals[e.ColumnIndex] += dif;
 
-                SetScoreTextBoxValue();
+                    testDetailsDataGridView.InvalidateCell(testDetailsDataGridView
+                        .Rows[e.RowIndex]
+                        .Cells[CM.Labels.Length]);
+
+                    testDetailsDataGridView.InvalidateCell(testDetailsDataGridView
+                        .Rows[CM.Labels.Length]
+                        .Cells[e.ColumnIndex]);
+
+                    SetScoreTextBoxValue();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46326");
             }
         }
 
@@ -301,20 +330,27 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// </summary>
         private void DataGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            // Vertical text from column 0
-            if (e.RowIndex == -1 && e.ColumnIndex >= 0)
+            try
             {
-                e.PaintBackground(e.CellBounds, true);
-                e.Graphics.TranslateTransform(e.CellBounds.Left , e.CellBounds.Bottom);
-                e.Graphics.RotateTransform(270);
-                e.Graphics.DrawString(e.FormattedValue.ToString(),e.CellStyle.Font,Brushes.Black,5,5);
-                e.Graphics.ResetTransform();
-                e.Handled = true;
+                // Vertical text from column 0
+                if (e.RowIndex == -1 && e.ColumnIndex >= 0)
+                {
+                    e.PaintBackground(e.CellBounds, true);
+                    e.Graphics.TranslateTransform(e.CellBounds.Left, e.CellBounds.Bottom);
+                    e.Graphics.RotateTransform(270);
+                    e.Graphics.DrawString(e.FormattedValue.ToString(), e.CellStyle.Font, Brushes.Black, 5, 5);
+                    e.Graphics.ResetTransform();
+                    e.Handled = true;
+                }
+                else if (e.RowIndex >= 0 && e.RowIndex < CM.RowTotals.Length
+                                         && e.ColumnIndex >= 0 && e.ColumnIndex < CM.ColumnTotals.Length)
+                {
+                    e.CellStyle.BackColor = GetColorValue(e.RowIndex, e.ColumnIndex);
+                }
             }
-            else if (e.RowIndex >= 0 && e.RowIndex < CM.RowTotals.Length
-                && e.ColumnIndex >= 0 && e.ColumnIndex < CM.ColumnTotals.Length)
+            catch (Exception ex)
             {
-                e.CellStyle.BackColor = GetColorValue(e.RowIndex, e.ColumnIndex);
+                ex.ExtractDisplay("ELI46325");
             }
         }
 
@@ -323,10 +359,17 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// </summary>
         private void HandleNormalizeByColumnsRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            _normalizeByColumn = normalizeByColumnsRadioButton.Checked;
+            try
+            {
+                _normalizeByColumn = normalizeByColumnsRadioButton.Checked;
 
-            _memoizedGetMaxValue = ((Func<int, int>)GetMaxValue).Memoize();
-            testDetailsDataGridView.Refresh();
+                _memoizedGetMaxValue = ((Func<int, int>)GetMaxValue).Memoize();
+                testDetailsDataGridView.Refresh();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46324");
+            }
         }
 
         /// <summary>
@@ -334,10 +377,22 @@ namespace Extract.UtilityApplications.LearningMachineEditor
         /// </summary>
         private void HandleShowAccuracyForTrainingSetRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            _testingAccuracy = showAccuracyForTestingSetRadioButton.Checked;
-            InitDataGridView();
-            testDetailsDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCellsExceptHeader);
-            testDetailsDataGridView.Refresh();
+            try
+            {
+                if (!_formLoaded)
+                {
+                    return;
+                }
+                _testingAccuracy = showAccuracyForTestingSetRadioButton.Checked;
+                InitDataGridView();
+                testDetailsDataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCellsExceptHeader);
+                testDetailsDataGridView.Refresh();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46323");
+                
+            }
         }
 
         /// <summary>

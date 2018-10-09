@@ -309,8 +309,8 @@ namespace Extract.AttributeFinder
         /// </summary>
         public static readonly int FirstPageCategoryCode = 1;
 
-        // Private values used for pagination categories
-        static readonly string _FIRST_PAGE_CATEGORY = "FirstPage";
+        // Values used for pagination categories
+        public static readonly string FirstPageCategory = "FirstPage";
         public static readonly string NotFirstPageCategory = "NotFirstPage";
         static readonly int _NOT_FIRST_PAGE_CATEGORY_CODE = 0;
 
@@ -324,8 +324,8 @@ namespace Extract.AttributeFinder
 
         public static readonly int DeletedPageCategoryCode = 1;
 
-        // Private values used for deletion categories
-        static readonly string _DELETED_PAGE_CATEGORY = "DeletedPage";
+        // Values used for deletion categories
+        public static readonly string DeletedPageCategory = "DeletedPage";
         public static readonly string NotDeletedPageCategory = "NotDeletedPage";
         static readonly int _NOT_DELETED_PAGE_CATEGORY_CODE = 0;
 
@@ -796,20 +796,20 @@ namespace Extract.AttributeFinder
                         if (pageRange.startPage > 1)
                         {
                             // Since documentBreaks starts at page 2, startPage - 2 is the index of the starting page
-                            documentBreaks[pageRange.startPage - 2] = _FIRST_PAGE_CATEGORY;
+                            documentBreaks[pageRange.startPage - 2] = FirstPageCategory;
                         }
 
                         // In case of gaps between documents, set a document break after each end page.
                         if (pageRange.hasEndPage && pageRange.endPage + 1 < numberOfPages)
                         {
                             // Since documentBreaks starts at page 2, endPage - 1 is the index of the next starting page
-                            documentBreaks[pageRange.endPage - 1] = _FIRST_PAGE_CATEGORY;
+                            documentBreaks[pageRange.endPage - 1] = FirstPageCategory;
                         }
                         // If no end page then set a break after start page (this is a one-page sub-document)
                         else if (!pageRange.hasEndPage && pageRange.startPage + 1 < numberOfPages)
                         {
                             // Since documentBreaks starts at page 2, startPage - 1 is the index of the next starting page
-                            documentBreaks[pageRange.startPage - 1] = _FIRST_PAGE_CATEGORY;
+                            documentBreaks[pageRange.startPage - 1] = FirstPageCategory;
                         }
                     }
                 }
@@ -878,7 +878,7 @@ namespace Extract.AttributeFinder
                 {
                     for (int i = pageRange.startPage - 1; i < pageRange.endPage; i++)
                     {
-                        pages[i] = _DELETED_PAGE_CATEGORY;
+                        pages[i] = DeletedPageCategory;
                     }
                 }
 
@@ -2610,8 +2610,8 @@ namespace Extract.AttributeFinder
             ExtractException.Assert("ELI45689", "Internal logic error", AnswerCodeToName.Count == 0);
             AnswerCodeToName.Add(NotFirstPageCategory);
             AnswerNameToCode.Add(NotFirstPageCategory, _NOT_FIRST_PAGE_CATEGORY_CODE);
-            AnswerCodeToName.Add(_FIRST_PAGE_CATEGORY);
-            AnswerNameToCode.Add(_FIRST_PAGE_CATEGORY, FirstPageCategoryCode);
+            AnswerCodeToName.Add(FirstPageCategory);
+            AnswerNameToCode.Add(FirstPageCategory, FirstPageCategoryCode);
         }
 
         /// <summary>
@@ -2690,8 +2690,8 @@ namespace Extract.AttributeFinder
             ExtractException.Assert("ELI45842", "Internal logic error", AnswerCodeToName.Count == 0);
             AnswerCodeToName.Add(NotDeletedPageCategory);
             AnswerNameToCode.Add(NotDeletedPageCategory, _NOT_DELETED_PAGE_CATEGORY_CODE);
-            AnswerCodeToName.Add(_DELETED_PAGE_CATEGORY);
-            AnswerNameToCode.Add(_DELETED_PAGE_CATEGORY, DeletedPageCategoryCode);
+            AnswerCodeToName.Add(DeletedPageCategory);
+            AnswerNameToCode.Add(DeletedPageCategory, DeletedPageCategoryCode);
         }
 
         /// <summary>
@@ -2730,14 +2730,33 @@ namespace Extract.AttributeFinder
             {
                 updateStatus(new StatusArgs { StatusMessage = "Collecting labels from VOAs:" });
                 answers = labeledCandidateAttributesFiles
-                    .SelectMany(voa =>
+                    .SelectMany((voa, i) =>
                     {
                         var labels = CollectLabelsFromLabeledCandidateAttributesFile(voa);
-                        updateStatus(new StatusArgs { StatusMessage = "Files processed: {0:N0}", Int32Value = 1, Indent = 1 });
+                        if (i % LearningMachineMethods.UpdateFrequency == 0)
+                        {
+                            updateStatus(new StatusArgs
+                            {
+                                StatusMessage = "Files processed: {0:N0}",
+                                Int32Value = LearningMachineMethods.UpdateFrequency,
+                                Indent = 1
+                            });
+                        }
+
                         return labels;
                     })
                     .Distinct(StringComparer.OrdinalIgnoreCase) // https://extract.atlassian.net/browse/ISSUE-14761
                     .ToList();
+
+                if (answers.Count % LearningMachineMethods.UpdateFrequency > 0)
+                {
+                    updateStatus(new StatusArgs
+                    {
+                        StatusMessage = "Files processed: {0:N0}",
+                        Int32Value = answers.Count % LearningMachineMethods.UpdateFrequency,
+                        Indent = 1
+                    });
+                }
             }
 
             if (labeledCandidateAttributesFiles.Length > 0)
@@ -2839,7 +2858,7 @@ namespace Extract.AttributeFinder
             InitializeAnswerCodeMappings(answers, NegativeClassName);
         }
 
-        static internal IEnumerable<string> CollectLabelsFromLabeledCandidateAttributes(IUnknownVector attributes)
+        internal static IEnumerable<string> CollectLabelsFromLabeledCandidateAttributes(IUnknownVector attributes)
         {
             return attributes
                 .ToIEnumerable<ComAttribute>()
@@ -2871,7 +2890,7 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <param name="attributesFilePath">The attributes file path</param>
         /// <returns>A collection of labels for each candidate attribute</returns>
-        static internal IEnumerable<string> CollectLabelsFromLabeledCandidateAttributesFile(string attributesFilePath)
+        internal static IEnumerable<string> CollectLabelsFromLabeledCandidateAttributesFile(string attributesFilePath)
         {
             try
             {

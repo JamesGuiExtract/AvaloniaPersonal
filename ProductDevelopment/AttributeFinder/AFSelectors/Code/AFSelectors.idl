@@ -243,6 +243,11 @@ library UCLID_AFSELECTORSLib
 	coclass QueryBasedAS
 	{
 		[default] interface IQueryBasedAS;
+		interface IAttributeSelector;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
 	};
 
 	[

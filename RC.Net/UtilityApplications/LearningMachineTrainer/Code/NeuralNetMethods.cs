@@ -38,21 +38,29 @@ namespace LearningMachineTrainer
     {
         private static readonly int _WINDOW_SIZE = 20;
 
-        public static (int answerCode, double score) ComputeAnswer(INeuralNetModel model, double[] inputs)
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public static (int answerCode, double? score) ComputeAnswer(INeuralNetModel model, double[] inputs)
         {
-            double[] responses = model.Classifier.Compute(inputs);
+            try
+            {
+                double[] responses = model.Classifier.Compute(inputs);
 
-            // Return index of highest value neuron in the output layer
-            responses.Max(out int imax);
+                // Return index of highest value neuron in the output layer
+                responses.Max(out int imax);
 
-            // The output of the bipolar sigmoid activation function ranges between -1 and 1 so rescale to between 0 and 1
-            responses.ApplyInPlace(x => (x + 1) / 2);
-            double max = responses[imax];
+                // The output of the bipolar sigmoid activation function ranges between -1 and 1 so rescale to between 0 and 1
+                responses.ApplyInPlace(x => (x + 1) / 2);
+                double max = responses[imax];
 
-            // Convert to a 'probability'
-            double probability = max / responses.Sum();
+                // Convert to a 'probability'
+                double probability = max / responses.Sum();
 
-            return (imax, probability);
+                return (imax, probability);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46330");
+            }
         }
 
         /// <summary>
@@ -183,11 +191,12 @@ namespace LearningMachineTrainer
         /// <summary>
         /// Trains a classifier by running the training algorithm
         /// </summary>
-        /// <param name="trainInputs">Feature vectors to train with</param>
-        /// <param name="trainOutputs">Classes (category codes) for each training input</param>
+        /// <param name="inputs">Feature vectors to train with</param>
+        /// <param name="expandedOutputs">Classes (one-hot vector) for each training input</param>
         /// <param name="layers">Sizes of hidden and output layers</param>
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
+        /// <param name="model"></param>
         /// <returns>The resulting network</returns>
         private static ActivationNetwork TrainClassifier(INeuralNetModel model, double[][] inputs, double[][] expandedOutputs, int[] layers,
             Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
@@ -214,9 +223,10 @@ namespace LearningMachineTrainer
         }
 
         /// <summary>
-        /// Trains a classifier using a cross-validation set to stop before <see cref="MaxTrainingIterations"/> are reached.
-        /// Assumes that <see cref="MaxTrainingIterations"/> is at least <see cref="_WINDOW_SIZE"/>
+        /// Trains a classifier using a cross-validation set to stop before <see paramref="model.MaxTrainingIterations"/> are reached.
+        /// Assumes that <see paramref="model.MaxTrainingIterations"/> is at least <see cref="_WINDOW_SIZE"/>
         /// </summary>
+        /// <param name="model">The <see cref="INeuralNetModel"/> to train</param>
         /// <param name="trainInputs">Feature vectors to train with</param>
         /// <param name="trainOutputs">Classes (category codes) for each training input</param>
         /// <param name="cvInputs">Cross-validation set; feature vectors to check training progress against</param>

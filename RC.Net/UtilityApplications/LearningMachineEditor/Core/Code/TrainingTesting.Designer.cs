@@ -53,6 +53,7 @@
             this.clearLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cancelButton = new System.Windows.Forms.Button();
             this.computeFeaturesGroupBox = new System.Windows.Forms.GroupBox();
+            this.updateCsvsWithPredictionsCheckBox = new System.Windows.Forms.CheckBox();
             this.saveFeatureVectorsToCsvsCheckBox = new System.Windows.Forms.CheckBox();
             this.loadDataFromCsvRadioButton = new System.Windows.Forms.RadioButton();
             this.recomputeFeaturesRadioButton = new System.Windows.Forms.RadioButton();
@@ -185,6 +186,7 @@
             // 
             this.computeFeaturesGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.computeFeaturesGroupBox.Controls.Add(this.updateCsvsWithPredictionsCheckBox);
             this.computeFeaturesGroupBox.Controls.Add(this.saveFeatureVectorsToCsvsCheckBox);
             this.computeFeaturesGroupBox.Controls.Add(this.loadDataFromCsvRadioButton);
             this.computeFeaturesGroupBox.Controls.Add(this.recomputeFeaturesRadioButton);
@@ -195,6 +197,19 @@
             this.computeFeaturesGroupBox.TabIndex = 1;
             this.computeFeaturesGroupBox.TabStop = false;
             // 
+            // updateCsvsWithPredictionsCheckBox
+            // 
+            this.updateCsvsWithPredictionsCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.updateCsvsWithPredictionsCheckBox.AutoSize = true;
+            this.updateCsvsWithPredictionsCheckBox.Checked = true;
+            this.updateCsvsWithPredictionsCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.updateCsvsWithPredictionsCheckBox.Location = new System.Drawing.Point(299, 88);
+            this.updateCsvsWithPredictionsCheckBox.Name = "updateCsvsWithPredictionsCheckBox";
+            this.updateCsvsWithPredictionsCheckBox.Size = new System.Drawing.Size(226, 17);
+            this.updateCsvsWithPredictionsCheckBox.TabIndex = 13;
+            this.updateCsvsWithPredictionsCheckBox.Text = "Update CSVs with predictions/probabilities";
+            this.updateCsvsWithPredictionsCheckBox.UseVisualStyleBackColor = true;
+            // 
             // saveFeatureVectorsToCsvsCheckBox
             // 
             this.saveFeatureVectorsToCsvsCheckBox.AutoSize = true;
@@ -204,6 +219,7 @@
             this.saveFeatureVectorsToCsvsCheckBox.TabIndex = 12;
             this.saveFeatureVectorsToCsvsCheckBox.Text = "Save feature vectors to CSVs";
             this.saveFeatureVectorsToCsvsCheckBox.UseVisualStyleBackColor = true;
+            this.saveFeatureVectorsToCsvsCheckBox.CheckedChanged += new System.EventHandler(this.HandleSaveFeatureVectorsToCsvsCheckBox_CheckedChanged);
             // 
             // loadDataFromCsvRadioButton
             // 
@@ -300,5 +316,6 @@
         private System.Windows.Forms.Button detailsButton;
         private System.Windows.Forms.RadioButton loadDataFromCsvRadioButton;
         private System.Windows.Forms.CheckBox saveFeatureVectorsToCsvsCheckBox;
+        private System.Windows.Forms.CheckBox updateCsvsWithPredictionsCheckBox;
     }
 }

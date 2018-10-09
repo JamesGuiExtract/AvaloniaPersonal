@@ -43,5 +43,42 @@ namespace Extract
         {
             Extract64.Core.ExceptionMethods.LogException(ex, fileName);
         }
+
+        /// <summary>
+        /// Returns a quoted version of the supplied string if quotes are needed, else the original string.
+        /// <example>For quote char as single-quote and the input value is "Hello World"
+        /// then the result will be "Hello World" but if the input is "Hello World's Best Dad" then
+        /// the output will be "'Hello World''s Best Dad'".</example>
+        /// </summary>
+        /// <param name="value">The <see cref="String"/> to quote.</param>
+        /// <param name="quote">The char to use for quoting</param>
+        /// <param name="delimiter">A string the presence of which requires the string be quoted (e.g., comma in CSV)</param>
+        /// <returns>A quoted version of the input string.</returns>
+        public static string QuoteIfNeeded(this string value, string quote, string delimiter)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    return value;
+                }
+                else if (string.IsNullOrWhiteSpace(value))
+                {
+                    return quote + value + quote;
+                }
+                else if (value.Contains(quote) || value.Contains(delimiter))
+                {
+                    return quote + value.Replace(quote, quote + quote) + quote;
+                }
+                else
+                {
+                    return value;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46332");
+            }
+        }
     }
 }

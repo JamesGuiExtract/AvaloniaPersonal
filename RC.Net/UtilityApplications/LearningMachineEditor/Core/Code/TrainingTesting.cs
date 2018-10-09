@@ -309,6 +309,18 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
         }
 
+        private void HandleSaveFeatureVectorsToCsvsCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateControlsAndFlags();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46328");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Methods
@@ -358,11 +370,12 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             });
 
             Func<Action<StatusArgs>, CancellationToken, ValueTuple<AccuracyData, AccuracyData>> operation = null;
+            bool updateCsvs = updateCsvsWithPredictionsCheckBox.Checked;
             if (testOnly)
             {
                 if (loadDataFromCsvRadioButton.Checked)
                 {
-                    operation = (u, c) => LearningMachineMethods.TrainAndTestWithCsvData(learningMachine, true, learningMachine.CsvOutputFile, u, c);
+                    operation = (u, c) => LearningMachineMethods.TrainAndTestWithCsvData(learningMachine, true, learningMachine.CsvOutputFile, updateCsvs, u, c);
                 }
                 else if (saveFeatureVectorsToCsvsCheckBox.Checked)
                 {
@@ -372,7 +385,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                             !learningMachine.StandardizeFeaturesForCsvOutput);
 
                         learningMachine.WriteDataToCsv(u, c);
-                        return LearningMachineMethods.TrainAndTestWithCsvData(learningMachine, true, learningMachine.CsvOutputFile, u, c);
+                        return LearningMachineMethods.TrainAndTestWithCsvData(learningMachine, true, learningMachine.CsvOutputFile, updateCsvs, u, c);
                     };
                 }
                 else
@@ -384,7 +397,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             {
                 if (loadDataFromCsvRadioButton.Checked)
                 {
-                    operation = (u, c) => LearningMachineMethods.TrainAndTestWithCsvData(learningMachine, false, learningMachine.CsvOutputFile, u, c);
+                    operation = (u, c) => LearningMachineMethods.TrainAndTestWithCsvData(learningMachine, false, learningMachine.CsvOutputFile, updateCsvs, u, c);
                 }
                 else if (saveFeatureVectorsToCsvsCheckBox.Checked)
                 {
@@ -402,7 +415,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                         }
                         learningMachine.WriteDataToCsv(u, c);
 
-                        return LearningMachineMethods.TrainAndTestWithCsvData(learningMachine, false, learningMachine.CsvOutputFile, u, c);
+                        return LearningMachineMethods.TrainAndTestWithCsvData(learningMachine, false, learningMachine.CsvOutputFile, updateCsvs, u, c);
                     };
                 }
                 else
@@ -507,6 +520,10 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             {
                 recomputeFeaturesRadioButton.Checked = true;
             }
+
+            updateCsvsWithPredictionsCheckBox.Enabled =
+                saveFeatureVectorsToCsvsCheckBox.Enabled && saveFeatureVectorsToCsvsCheckBox.Checked
+                || loadDataFromCsvRadioButton.Enabled && loadDataFromCsvRadioButton.Checked;
 
             _processing = false;
         }

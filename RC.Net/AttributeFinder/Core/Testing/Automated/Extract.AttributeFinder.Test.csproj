@@ -304,6 +304,36 @@
     <EmbeddedResource Include="Resources\LearningMachine\Paginator.lm" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_001.tif" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_002.tif" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_003.tif" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_004.tif" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_005.tif" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_006.tif" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_007.tif" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_001.tif.eav" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_001.tif.uss" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_002.tif.eav" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_002.tif.uss" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_003.tif.eav" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_003.tif.uss" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_004.tif.eav" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_004.tif.uss" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_005.tif.eav" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_005.tif.uss" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_006.tif.eav" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_006.tif.uss" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_007.tif.eav" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_007.tif.uss" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_001.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_002.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_003.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_004.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_005.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_006.tif.protofeatures.voa" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_007.tif.protofeatures.voa" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example01.tif" />
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example02.tif" />
     <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example03.tif" />

@@ -124,7 +124,7 @@ namespace Extract.AttributeFinder.Test
                 {
                     int seed = rng.Next();
                     System.Collections.Generic.List<int> subset1Indexes, subset2Indexes;
-                    LearningMachine.GetIndexesOfSubsetsByCategory(categories, subset1Fraction, out subset1Indexes, out subset2Indexes, new Random(seed));
+                    LearningMachineMethods.GetIndexesOfSubsetsByCategory(categories, subset1Fraction, out subset1Indexes, out subset2Indexes, new Random(seed));
 
                     // Check size of subset1
                     Assert.AreEqual(Math.Max(Math.Round(size * subset1Fraction), 1), subset1Indexes.Count);
@@ -178,7 +178,7 @@ namespace Extract.AttributeFinder.Test
                 foreach (var subset1Fraction in fractions)
                 {
                     System.Collections.Generic.List<int> subset1Indexes, subset2Indexes;
-                    LearningMachine.GetIndexesOfSubsetsByCategory(categories, subset1Fraction, out subset1Indexes, out subset2Indexes);
+                    LearningMachineMethods.GetIndexesOfSubsetsByCategory(categories, subset1Fraction, out subset1Indexes, out subset2Indexes);
 
                     // Check if counts make sense
                     Assert.GreaterOrEqual(subset1Indexes.Count + subset2Indexes.Count, size);
@@ -328,6 +328,182 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.FScore), testCM.FScoreMicroAverage());
             Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.Recall), testCM.RecallMicroAverage());
             Assert.AreEqual(results.testingSet.Match(_ => Double.NaN, cm => cm.Precision), testCM.PrecisionMicroAverage());
+        }
+
+        // Test that pagination LMs use unknown category threshold at run time
+        // https://extract.atlassian.net/browse/ISSUE-15643
+        [Test, Category("LearningMachine")]
+        public static void ProbabilityFilterPagination()
+        {
+            SetPaginationFiles();
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = "<SourceDocName>.protofeatures.voa",
+                    AnswerPath = "<SourceDocName>.eav",
+                    TrainingSetPercentage = 50
+                },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, autoBagOfWords: new SpatialStringFeatureVectorizer("", 5, 2000), attributeFilter: "*@Feature"),
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = true }
+            };
+            lm.TrainMachine();
+
+            lm.InputConfig.GetInputData(out var spatialStringFilePaths, out var attributeFilePaths,
+                out var answerFiles);
+            var (inputs, answers) = lm.Encoder.GetFeatureVectorAndAnswerCollections(spatialStringFilePaths, attributeFilePaths, answerFiles);
+
+            // Second page of second doc should be a divider but is predicted to be NotFirstPage with a low score
+            var (anAnswer, aScore) = lm.Classifier.ComputeAnswer(inputs[3]);
+            Assert.AreEqual(lm.Encoder.AnswerNameToCode["NotFirstPage"], anAnswer);
+            Assert.AreNotEqual(answers[3], anAnswer);
+
+            // With low score
+            Assert.Greater(aScore, 0.5);
+            Assert.Less(aScore, 0.6);
+
+            // Confirm that the lm will predict a different value depending on unknown category settings
+            var doc = new SpatialStringClass();
+            doc.LoadFrom(spatialStringFilePaths[1], false);
+            var attrr = new IUnknownVectorClass();
+            attrr.LoadFrom(attributeFilePaths[1], false);
+
+            // Confirm default behavior misses the break
+            lm.ComputeAnswer(doc, attrr, false);
+            Assert.AreEqual(1, attrr.Size());
+
+            // Set threshold and confirm that NotFirstPage is the default Unknown category
+            lm.UseUnknownCategory = true;
+            lm.UnknownCategoryCutoff = 0.6;
+            attrr.LoadFrom(attributeFilePaths[1], false);
+            lm.ComputeAnswer(doc, attrr, false);
+            Assert.AreEqual(1, attrr.Size());
+                
+            // Confirm that FirstPage can be used instead, which improves the recall
+            lm.TranslateUnknownCategory = true;
+            lm.TranslateUnknownCategoryTo = "FirstPage";
+            attrr.LoadFrom(attributeFilePaths[1], false);
+            lm.ComputeAnswer(doc, attrr, false);
+            Assert.AreEqual(2, attrr.Size());
+        }
+
+        // Confirm that accuracy can be improved on input that has more cover pages
+        // than the training data by using the probability threshold value to reduce false positives
+        [Test, Category("LearningMachine")]
+        public static void ProbabilityFilterPaginationCoverPages()
+        {
+            SetPaginationFiles();
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = "<SourceDocName>.protofeatures.voa",
+                    AnswerPath = "<SourceDocName>.eav",
+                    TrainingSetPercentage = 100
+                },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, attributeFilter: "*@Feature"),
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = true }
+            };
+            lm.TrainMachine();
+
+            SetPaginationFiles(withCoverPages: true);
+
+            lm.InputConfig.InputPath = _inputFolder.Last();
+            lm.InputConfig.TrainingSetPercentage = 0;
+
+            // Result has poor precision (high false positive rate)
+            var (_, testResults) = lm.TestMachine();
+            testResults.Match(gcm => throw new Exception("Not expecting a general confusion matrix!"),
+                cm =>
+                {
+                    Assert.AreEqual(0.56, Math.Round(cm.FScore, 2));
+                    Assert.AreEqual(0.41, Math.Round(cm.Precision, 2));
+                    Assert.AreEqual(0.88, Math.Round(cm.Recall, 2));
+                });
+
+            // Fix with the unknown category cutoff feature
+            lm.UseUnknownCategory = true;
+            lm.UnknownCategoryCutoff = 0.96;
+            lm.TranslateUnknownCategory = true;
+            lm.TranslateUnknownCategoryTo = "NotFirstPage";
+            (_, testResults) = lm.TestMachine();
+            testResults.Match(gcm => throw new Exception("Not expecting a general confusion matrix!"),
+                cm =>
+                {
+                    Assert.AreEqual(1.0, Math.Round(cm.Precision, 2));
+                    Assert.AreEqual(0.88, Math.Round(cm.Recall, 2));
+                    Assert.AreEqual(0.93, Math.Round(cm.FScore, 2));
+                });
+        }
+
+        // Test that deletion LMs use unknown category threshold at run time
+        // https://extract.atlassian.net/browse/ISSUE-15643
+        [Test, Category("LearningMachine")]
+        public static void ProbabilityFilterDeletion()
+        {
+            SetPaginationFiles(withCoverPages: true);
+
+            string tempPath = Path.Combine(_inputFolder.Last(), Path.GetRandomFileName());
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = "",
+                    AnswerPath = "<SourceDocName>.eav",
+                    TrainingSetPercentage = 50
+                },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Deletion,
+                    autoBagOfWords: new SpatialStringFeatureVectorizer("", 5, 2000), attributeFilter: "*@Feature"),
+                Classifier = new NeuralNetworkClassifier {UseCrossValidationSets = true},
+                CsvOutputFile = tempPath
+            };
+            lm.ComputeEncodings();
+            lm.WriteDataToCsv(_ => { }, CancellationToken.None);
+            string trainCSV = tempPath + ".train.csv";
+            string testCSV = tempPath + ".test.csv";
+
+            // Train and output the predictions and probabilities back to the CSVs
+            lm.TrainAndTestWithCsvData(false, trainCSV, testCSV, true, _ => { }, CancellationToken.None);
+
+            var predictions = GetPredictionsFromCsv(testCSV);
+
+            // Pagination_003.tif is predicted to be two deleted pages (should only be first page, which is
+            // part of the training set)
+            var (path, prediction, probability) = predictions[4];
+            Assert.AreEqual("Resources.LearningMachine.PaginationWithCoverPages.Pagination_003.tif.uss",
+                Path.GetFileName(path));
+            Assert.AreEqual("DeletedPage", prediction);
+
+            // With low score
+            Assert.Greater(probability, 0.5);
+            Assert.Less(probability, 0.6);
+
+            // Confirm that the lm will predict a different value depending on unknown category settings
+            var doc = new SpatialStringClass();
+            doc.LoadFrom(path, false);
+            var attrr = new IUnknownVectorClass();
+
+            // Confirm default behavior predicts both pages as deleted
+            lm.ComputeAnswer(doc, attrr, false);
+            Assert.AreEqual("1-2", ((IAttribute) attrr.At(0)).Value.String);
+
+            // Set threshold and confirm that NotDeletedPage is the default Unknown category
+            lm.UseUnknownCategory = true;
+            lm.UnknownCategoryCutoff = 0.6;
+            lm.ComputeAnswer(doc, attrr, false);
+            Assert.AreEqual("1", ((IAttribute) attrr.At(0)).Value.String);
+
+            // Confirm that DeletedPage can be used instead
+            lm.TranslateUnknownCategory = true;
+            lm.TranslateUnknownCategoryTo = "DeletedPage";
+            lm.ComputeAnswer(doc, attrr, false);
+            Assert.AreEqual("1-2", ((IAttribute) attrr.At(0)).Value.String);
         }
 
         [Test, Category("LearningMachine")]
@@ -1580,14 +1756,16 @@ namespace Extract.AttributeFinder.Test
 
         // Helper method to build folder structure for pagination testing
         // These images are stapled together from Demo_LabDE images
-        private static void SetPaginationFiles()
+        private static void SetPaginationFiles(bool withCoverPages = false)
         {
             _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
             Directory.CreateDirectory(_inputFolder.Last());
 
             for (int i = 0; i < 7; i++)
             {
-                var baseName = "Resources.LearningMachine.Pagination.Pagination_{0:D3}.tif{1}";
+                var baseName = withCoverPages
+                    ? "Resources.LearningMachine.PaginationWithCoverPages.Pagination_{0:D3}.tif{1}"
+                    : "Resources.LearningMachine.Pagination.Pagination_{0:D3}.tif{1}";
 
                 string resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, "");
                 string path = Path.Combine(_inputFolder.Last(), resourceName);
@@ -1601,29 +1779,32 @@ namespace Extract.AttributeFinder.Test
                 path = Path.Combine(_inputFolder.Last(), resourceName);
                 _testFiles.GetFile(resourceName, path);
 
-                resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".voa");
-                path = Path.Combine(_inputFolder.Last(), resourceName);
-                _testFiles.GetFile(resourceName, path);
-
-                resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".candidates.voa");
-                path = Path.Combine(_inputFolder.Last(), resourceName);
-                _testFiles.GetFile(resourceName, path);
-
-                resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".labeled.voa");
-                path = Path.Combine(_inputFolder.Last(), resourceName);
-                _testFiles.GetFile(resourceName, path);
-
-                resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".labeled_2_types.voa");
-                path = Path.Combine(_inputFolder.Last(), resourceName);
-                _testFiles.GetFile(resourceName, path);
-
-                resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".labeled_3_types.voa");
-                path = Path.Combine(_inputFolder.Last(), resourceName);
-                _testFiles.GetFile(resourceName, path);
-
                 resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i+1, ".eav");
                 path = Path.Combine(_inputFolder.Last(), resourceName);
                 _testFiles.GetFile(resourceName, path);
+
+                if (!withCoverPages)
+                {
+                    resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i + 1, ".voa");
+                    path = Path.Combine(_inputFolder.Last(), resourceName);
+                    _testFiles.GetFile(resourceName, path);
+
+                    resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i + 1, ".candidates.voa");
+                    path = Path.Combine(_inputFolder.Last(), resourceName);
+                    _testFiles.GetFile(resourceName, path);
+
+                    resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i + 1, ".labeled.voa");
+                    path = Path.Combine(_inputFolder.Last(), resourceName);
+                    _testFiles.GetFile(resourceName, path);
+
+                    resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i + 1, ".labeled_2_types.voa");
+                    path = Path.Combine(_inputFolder.Last(), resourceName);
+                    _testFiles.GetFile(resourceName, path);
+
+                    resourceName = string.Format(CultureInfo.CurrentCulture, baseName, i + 1, ".labeled_3_types.voa");
+                    path = Path.Combine(_inputFolder.Last(), resourceName);
+                    _testFiles.GetFile(resourceName, path);
+                }
             }
         }
 
@@ -1696,6 +1877,30 @@ namespace Extract.AttributeFinder.Test
             }
         }
 
+        private static List<(string, string, double)> GetPredictionsFromCsv(string path)
+        {
+            var result = new List<(string, string, double)>();
+            using (var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser(path))
+            {
+                csvReader.Delimiters = new[] { "," };
+
+                // Check for header row
+                if (!csvReader.EndOfData)
+                {
+                    var fields = csvReader.ReadFields();
+                    
+                    int ussPathIndex = Array.IndexOf(fields, "Path");
+                    int predictionIndex = Array.IndexOf(fields, "Prediction");
+                    int probabilityIndex = Array.IndexOf(fields, "Probability");
+                    while (!csvReader.EndOfData && (fields = csvReader.ReadFields()) != null)
+                    {
+                        result.Add((fields[ussPathIndex], fields[predictionIndex], double.Parse(fields[probabilityIndex])));
+                    }
+                }
+            }
+
+            return result;
+        }
         #endregion Helper Methods
     }
 }

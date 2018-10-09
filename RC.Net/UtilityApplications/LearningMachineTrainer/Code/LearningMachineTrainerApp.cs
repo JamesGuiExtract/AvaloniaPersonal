@@ -278,13 +278,13 @@ namespace LearningMachineTrainer
 
             var maintask = Task.Factory.StartNew(() =>
                 testOnly
-                ?  lm.TrainAndTestWithCsvData(true, null, csvName, a => statusUpdates.Enqueue(a), CancellationToken.None)
-                :  lm.TrainAndTestWithCsvData(false, csvName, null, a => statusUpdates.Enqueue(a), CancellationToken.None)
+                ?  lm.TrainAndTestWithCsvData(true, null, csvName, false, a => statusUpdates.Enqueue(a), cancelToken)
+                :  lm.TrainAndTestWithCsvData(false, csvName, null, false, a => statusUpdates.Enqueue(a), cancelToken)
             )
             // Handle cleanup
             .ContinueWith(task =>
             {
-                Exception failed = SharedTrainingMethods.RunCleanup(task, lm, testOnly, sw, statusUpdates, CancellationToken.None);
+                Exception failed = SharedTrainingMethods.RunCleanup(task, lm, testOnly, sw, statusUpdates, cancelToken);
 
                 // Flush log
                 StatusArgs _;
@@ -329,7 +329,7 @@ namespace LearningMachineTrainer
 
                     returnCode = 0;
                 }
-            }); // End of ContinueWith
+            }, cancelToken); // End of ContinueWith
 
             maintask.Wait();
 
