@@ -51,6 +51,11 @@ namespace DashboardViewer
         /// </summary>
         DashboardShared<DashboardViewerForm> _dashboardShared;
 
+        /// <summary>
+        /// Name of the dashboard being displayed from the database
+        /// </summary>
+        string _dashboardName = String.Empty;
+
         #endregion
 
         #region Private properties
@@ -239,8 +244,10 @@ namespace DashboardViewer
 
                 _dashboardShared = new DashboardShared<DashboardViewerForm>(this, true);
 
+                _dashboardName = fileName;
                 dashboardViewerMain.DashboardSource = fileName;
                 dashboardToolStripMenuItem.Visible = IsDatabaseOverridden;
+                UpdateMainTitle();
             }
             catch (Exception ex)
             {
@@ -265,6 +272,7 @@ namespace DashboardViewer
 
                 ServerName = serverName;
                 DatabaseName = databaseName;
+                _dashboardName = dashboard;
 
                 if (inDatabase)
                 {
@@ -406,8 +414,10 @@ namespace DashboardViewer
         {
             try
             {
+                _dashboardName = string.Empty;
                 dashboardViewerMain.DashboardSource = string.Empty;
                 _toolStripTextBoxlastRefresh.Text = "";
+                UpdateMainTitle();
             }
             catch (Exception ex)
             {
@@ -424,6 +434,8 @@ namespace DashboardViewer
                 {
                     dashboardViewerMain.DashboardSource = string.Empty;
                     dashboardViewerMain.DashboardSource = filename;
+                    _dashboardName = filename;
+                    UpdateMainTitle();
                 }
             }
             catch (Exception ex)
@@ -528,6 +540,8 @@ namespace DashboardViewer
                 return;
             }
 
+            _dashboardName = dashboardName;
+
             using (var connection = NewSqlDBConnection())
             {
                 connection.Open();
@@ -545,6 +559,7 @@ namespace DashboardViewer
                     }
                 }
             }
+            UpdateMainTitle();
         }
 
         /// <summary>
@@ -564,11 +579,15 @@ namespace DashboardViewer
                         "Dashboard viewer Using {0} on {1}", _databaseName, _serverName);
                 }
             }
+            else if (string.IsNullOrEmpty(_dashboardName))
+            {
+                Text = string.Format(CultureInfo.InvariantCulture,
+                    "Using {0} on {1}", DatabaseName, ServerName);
+            }
             else
             {
                 Text = string.Format(CultureInfo.InvariantCulture,
-                    "{0} Using {1} on {2}", Dashboard.Title.Text, DatabaseName, ServerName);
-
+                    "\"{0}\" - Using {1} on {2}", _dashboardName, DatabaseName, ServerName);
             }
         }
 
