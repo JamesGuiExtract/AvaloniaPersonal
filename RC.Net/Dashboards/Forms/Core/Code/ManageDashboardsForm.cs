@@ -320,6 +320,7 @@ namespace Extract.Dashboard.Forms
                     dashboardDataGridView.DataSource = dataTable;
                     dashboardDataGridView.Columns["FullUserName"].HeaderText = "User Imported";
                     dashboardDataGridView.Columns["LastImportedDate"].HeaderText = "Last Imported";
+                    EnableButtons();
                 }
             }
             catch (Exception ex)
@@ -399,6 +400,19 @@ namespace Extract.Dashboard.Forms
                     return command.ExecuteScalar() as string;
                 }
             }
+        }
+
+        /// <summary>
+        /// Enables or disables buttons based on the content of the dashbaordDataGridView
+        /// </summary>
+        void EnableButtons()
+        {
+            bool enable = dashboardDataGridView.CurrentCell?.RowIndex >= 0;
+            _viewButton.Enabled = enable;
+            _renameDashboardButton.Enabled = enable;
+            _removeDashboardButton.Enabled = enable;
+            _replaceDashboardButton.Enabled = enable;
+            _exportDashboardButton.Enabled = enable;
         }
 
         #endregion
