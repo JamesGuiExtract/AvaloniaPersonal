@@ -1,11 +1,14 @@
 ﻿using DevExpress.DashboardCommon;
-using DevExpress.DashboardCommon.ViewerData;
 using DevExpress.DashboardWin;
+using DevExpress.DashboardWin.Native;
 using DevExpress.DataAccess.ConnectionParameters;
 using DevExpress.XtraBars;
+using DevExpress.XtraGrid;
+using DevExpress.XtraGrid.Views.Grid;
 using Extract.Dashboard.Forms;
 using Extract.FileActionManager.Forms;
 using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -336,21 +339,47 @@ namespace Extract.Dashboard.Utilities
 
             // Get the filenames from the grid control
             var axisPointTuples = _dashboardForm.GetCurrentFilterValues(e.DashboardItemName)
-                .Where(ap=> ap.GetAxisPoint().Dimension.DataMember == "FileName");
+                .Where(ap => ap.GetAxisPoint().Dimension.DataMember == "FileName");
 
             // Check if the AxisPoint of the mouse click is in the selection
             var clickAccessPoint = e.GetAxisPoint();
-            IEnumerable<string> files = new List<string>();
-            if (axisPointTuples.FirstOrDefault(ap => ap.GetAxisPoint().Value == clickAccessPoint.Value) != null)
+            List<string> files = new List<string>();
+            if (axisPointTuples.FirstOrDefault(ap => ap.GetAxisPoint().Value == clickAccessPoint?.Value) != null)
             {
-                files = axisPointTuples.Select(a => (string)a.GetAxisPoint().Value);
+                files = axisPointTuples.Select(a => (string)a.GetAxisPoint().Value).ToList();
             }
-            else if (clickAccessPoint != null && clickAccessPoint.Dimension.DataMember == "FileName")
+            else if (grid.InteractivityOptions.MasterFilterMode != DashboardItemMasterFilterMode.None &&
+                clickAccessPoint?.Dimension.DataMember == "FileName")
             {
-                files = new List<string>() { clickAccessPoint.Value as string };
-                
+                files = new List<string> { clickAccessPoint.Value as string };
+
                 _dashboardForm?.Viewer?.SetMasterFilter(e.DashboardItemName, e.Data.CreateTuple(clickAccessPoint));
                 _dashboardForm?.Designer?.SetMasterFilter(e.DashboardItemName, e.Data.CreateTuple(clickAccessPoint));
+            }
+            else if (clickAccessPoint != null)
+            {
+                GridControl gridcontrol;
+                if (_dashboardForm.Viewer != null)
+                {
+                    gridcontrol = (GridControl)((IUnderlyingControlProvider)_dashboardForm?.Viewer).GetUnderlyingControl(e.DashboardItemName);
+                }
+                else
+                {
+                    gridcontrol = (GridControl)((IUnderlyingControlProvider)_dashboardForm?.Designer).GetUnderlyingControl(e.DashboardItemName);
+                }
+                GridView view = (GridView)gridcontrol.MainView;
+                view.OptionsBehavior.AllowIncrementalSearch = true;
+                var fileNameColumn = view.Columns.FirstOrDefault(c => c.Caption == "FileName");
+                if (fileNameColumn != null)
+                {
+
+                    view.FocusedColumn = fileNameColumn;
+
+                    view.FocusedRowHandle = 0;
+                    view.StartIncrementalSearch(clickAccessPoint.Value as string);
+                    view.StopIncrementalSearch();
+                    files = new List<string> { clickAccessPoint.Value as string };
+                }
             }
 
             int numberOfFiles = files.Count();
@@ -483,13 +512,13 @@ namespace Extract.Dashboard.Utilities
         {
             // Add the common File Menu actions
             List<BarButtonItem> items = new List<BarButtonItem>();
-            FileHandlerItem handlerItem = new FileHandlerItem() { AllowMultipleFiles = true };
-            Dictionary<string, object> menuItemData = new Dictionary<string, object>()
+            FileHandlerItem handlerItem = new FileHandlerItem { AllowMultipleFiles = true };
+            Dictionary<string, object> menuItemData = new Dictionary<string, object>
             {
                 { "FileHanderRecord", handlerItem },
                 { _BEGIN_GROUP, false }
             };
-            Dictionary<string, object> menuItemDataBeginGroup = new Dictionary<string, object>()
+            Dictionary<string, object> menuItemDataBeginGroup = new Dictionary<string, object>
             {
                 { "FileHanderRecord", handlerItem },
                 { _BEGIN_GROUP, true }
@@ -521,9 +550,9 @@ namespace Extract.Dashboard.Utilities
             newItem = new BarButtonItem();
             newItem.Caption = "Open file location";
             newItem.Name = "openFileLocation";
-            newItem.Tag = new Dictionary<string, object>()
+            newItem.Tag = new Dictionary<string, object>
             {
-                { "FileHanderRecord", new FileHandlerItem() { AllowMultipleFiles = false } },
+                { "FileHanderRecord", new FileHandlerItem { AllowMultipleFiles = false } },
                 { _BEGIN_GROUP, true }
 
             };
@@ -536,7 +565,7 @@ namespace Extract.Dashboard.Utilities
                 newItem = new BarButtonItem();
                 newItem.Caption = "Export To Excel";
                 newItem.Name = "exportToExcel";
-                newItem.Tag = new Dictionary<string, object>()
+                newItem.Tag = new Dictionary<string, object>
                 {
                     { "FileHanderRecord", null },
                     { _BEGIN_GROUP, true }
@@ -577,7 +606,7 @@ namespace Extract.Dashboard.Utilities
 
                         var results = cmd.ExecuteReader().Cast<IDataRecord>();
 
-                        var fileHandlers = results.Select(row => new FileHandlerItem()
+                        var fileHandlers = results.Select(row => new FileHandlerItem
                         {
                             Name = (string)row["AppName"],
                             ApplicationPath = (string)row["ApplicationPath"],
@@ -598,7 +627,7 @@ namespace Extract.Dashboard.Utilities
 
                             if (!firstInGroupSet)
                             {
-                                menuItem.Tag = new Dictionary<string, object>()
+                                menuItem.Tag = new Dictionary<string, object>
                                 {
                                     { "FileHanderRecord", fileHander },
                                     { _BEGIN_GROUP, true }
@@ -607,7 +636,7 @@ namespace Extract.Dashboard.Utilities
                             }
                             else
                             {
-                                menuItem.Tag = new Dictionary<string, object>()
+                                menuItem.Tag = new Dictionary<string, object>
                                 {
                                     { "FileHanderRecord", fileHander },
                                     { _BEGIN_GROUP, false }
@@ -643,7 +672,7 @@ namespace Extract.Dashboard.Utilities
 
                 FileHandlerItem handlerItem = (FileHandlerItem)nullableHandlerItem;
 
-                if (_dashboardForm.CurrentFilteredFiles?.Count()  == 0)
+                if (_dashboardForm.CurrentFilteredFiles?.Count() == 0)
                 {
                     return;
                 }
@@ -982,7 +1011,14 @@ namespace Extract.Dashboard.Utilities
             {
                 if (_menuItems != null)
                 {
-                    _menuItems.ForEach(m => menu.RemoveLink(menu.ItemLinks.Single(l => l.Item == m)));
+                    _menuItems.ForEach(m =>
+                    {
+                        var link = menu.ItemLinks.SingleOrDefault(l => l.Item == m);
+                        if (link != null)
+                        {
+                            menu.RemoveLink(link);
+                        }
+                    });
                     _menuItems = null;
                 }
             }
@@ -1018,7 +1054,7 @@ namespace Extract.Dashboard.Utilities
         /// <param name="action">The action to run on a background thread.</param>
         void ShowMessageBoxWhileBlocking(string messageText, string caption, Action action)
         {
-            Extract.Utilities.Forms.CustomizableMessageBox messageBox = new Extract.Utilities.Forms.CustomizableMessageBox();
+            var messageBox = new CustomizableMessageBox();
             messageBox.UseDefaultOkButton = false;
             messageBox.Caption = caption;
             messageBox.Text = messageText;

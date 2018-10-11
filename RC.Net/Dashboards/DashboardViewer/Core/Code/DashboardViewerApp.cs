@@ -144,7 +144,7 @@ namespace DashboardViewer
         static void Usage()
         {
             UtilityMethods.ShowMessageBox("Usage: " +
-                "\r\nDashboardViewer [<DashboardFileName>] [(/Server | /s) <ServerName> (/Database | /d) <DatabaseName>] " +
+                "\r\nDashboardViewer [<DashboardFileName>] [(/Server | /s) <ServerName> (/Database | /d) <DatabaseName> [(/Dashboard | /b) <DashboardName>]] " +
                 "\r\n\r\n<DashboardFileName> -dashboard to open. " +
                 "\r\n\r\n/Server or /s <ServerName> - Server name. Requires /Database." +
                 "\r\n\r\n/Database or /d <DatabaseName> - Database name. Requires /Server." +

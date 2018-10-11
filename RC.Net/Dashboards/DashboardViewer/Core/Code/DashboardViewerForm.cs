@@ -56,6 +56,11 @@ namespace DashboardViewer
         /// </summary>
         string _dashboardName = String.Empty;
 
+        /// <summary>
+        /// If <c>true</c> _dashboardName is from the database, if <c>false</c> represents a filename
+        /// </summary>
+        bool _inDatabase = false;
+
         #endregion
 
         #region Private properties
@@ -178,7 +183,7 @@ namespace DashboardViewer
         /// List of files that were selected in the control when the Popup was 
         /// displayed
         /// </summary>
-        public IEnumerable<string> CurrentFilteredFiles { get; set; } = new List<string>();
+        public List<string> CurrentFilteredFiles { get; set; } = new List<string>();
 
         /// <summary>
         /// Since this has a <see cref="DevExpress.DashboardWin.DashboardViewer"/> return the instance of the viewer
@@ -229,7 +234,6 @@ namespace DashboardViewer
             InitializeComponent();
 
             _dashboardShared = new DashboardShared<DashboardViewerForm>(this, true);
-            dashboardToolStripMenuItem.Visible = IsDatabaseOverridden;
         }
 
         /// <summary>
@@ -245,9 +249,6 @@ namespace DashboardViewer
                 _dashboardShared = new DashboardShared<DashboardViewerForm>(this, true);
 
                 _dashboardName = fileName;
-                dashboardViewerMain.DashboardSource = fileName;
-                dashboardToolStripMenuItem.Visible = IsDatabaseOverridden;
-                UpdateMainTitle();
             }
             catch (Exception ex)
             {
@@ -273,20 +274,7 @@ namespace DashboardViewer
                 ServerName = serverName;
                 DatabaseName = databaseName;
                 _dashboardName = dashboard;
-
-                if (inDatabase)
-                {
-                    LoadDashboardFromDatabase(dashboard);
-                }
-                else
-                {
-                    dashboardViewerMain.DashboardSource = dashboard;
-                }
-
-                dashboardToolStripMenuItem.Visible = AllowDatabaseDashboardSelection;
-                fileToolStripMenuItem.Visible = !inDatabase || !AllowDatabaseDashboardSelection;
-
-                UpdateMainTitle();
+                _inDatabase = inDatabase;
             }
             catch (Exception ex)
             {
@@ -309,11 +297,6 @@ namespace DashboardViewer
 
                 ServerName = serverName;
                 DatabaseName = databaseName;
-                dashboardToolStripMenuItem.Visible = AllowDatabaseDashboardSelection;
-                fileToolStripMenuItem.Visible = !AllowDatabaseDashboardSelection;
-
-                UpdateMainTitle();
-                dashboardFlyoutPanel.ShowPopup();
             }
             catch (Exception ex)
             {
@@ -358,7 +341,7 @@ namespace DashboardViewer
                 if (Dashboard != null)
                 {
                     dashboardViewerMain.ReloadData(false);
-                    _toolStripTextBoxlastRefresh.Text = DateTime.Now.ToString();
+                    _toolStripTextBoxlastRefresh.Text = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 }
             }
             catch (Exception ex)
@@ -515,11 +498,41 @@ namespace DashboardViewer
             {
                 UpdateMainTitle();
                 _dashboardShared.GridConfigurationsFromXML(Dashboard?.UserData);
-                _toolStripTextBoxlastRefresh.Text = DateTime.Now.ToString();
+                _toolStripTextBoxlastRefresh.Text = DateTime.Now.ToString(CultureInfo.CurrentCulture);
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45311");
+            }
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            if (_inDatabase)
+            {
+                if (!string.IsNullOrEmpty(_dashboardName))
+                {
+                    LoadDashboardFromDatabase(_dashboardName);
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(_dashboardName))
+                {
+                    dashboardViewerMain.DashboardSource = _dashboardName;
+                }
+            }
+
+            dashboardToolStripMenuItem.Visible = AllowDatabaseDashboardSelection;
+            fileToolStripMenuItem.Visible = !_inDatabase || !AllowDatabaseDashboardSelection;
+
+            UpdateMainTitle();
+            if (_inDatabase && string.IsNullOrEmpty(_dashboardName))
+            {
+                LoadDashboardList();
+                dashboardFlyoutPanel.ShowPopup();
             }
         }
 
