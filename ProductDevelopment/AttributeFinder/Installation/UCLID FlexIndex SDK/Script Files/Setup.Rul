@@ -132,7 +132,7 @@ Dlg_SdStartCopy:
    	InstallDotNET();
    	                                
 	// Install Inlite Key drivers
-   	InstallInliteKeyDrivers();
+   	//InstallInliteKeyDrivers();
    	                        
 	// Install Crystal Reports
    	InstallCrystalReports();  

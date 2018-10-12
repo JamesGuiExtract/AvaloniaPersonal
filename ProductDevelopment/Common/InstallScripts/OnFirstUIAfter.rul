@@ -32,13 +32,13 @@ begin
 	InstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFAMService.exe\"");
 
 	// Install the ESFDRSService.exe 
-	InstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFDRSService.exe\"");
+	//InstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFDRSService.exe\"");
 
 	// Install the Extract.ExceptionService
-	InstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "Extract.ExceptionService.exe\"");
+	//InstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "Extract.ExceptionService.exe\"");
 	
 	// Install the ESIPCService
-	InstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESIPCService.exe\"");   
+	//InstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESIPCService.exe\"");   
 	
 	// Install the Nuance licenses
 	InstallNuanceLicense();
