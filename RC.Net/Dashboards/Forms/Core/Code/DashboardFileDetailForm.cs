@@ -251,7 +251,7 @@ namespace Extract.Dashboard.Forms
 
                             var command = connection.CreateCommand();
                             command.CommandTimeout = 0;
-                            command.CommandText = _gridDetailConfiguration.RowQuery;
+                            command.CommandText = _gridDetailConfiguration.RowQuery + " OPTION (RECOMPILE)";
 
                             // add the column values as parameters for the query
                             foreach (var kp in _columnValues)
