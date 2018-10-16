@@ -285,6 +285,10 @@
       <Project>{6b284a4d-132c-4fe4-858f-06a9c476b19b}</Project>
       <Name>Extract.FileActionManager.Database.Test</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
+      <Name>Extract.Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\CommonAPICode\DocumentAPI.csproj">
       <Project>{d18e4b70-2d88-4730-a72c-ccc9fd58d516}</Project>
       <Name>DocumentAPI</Name>

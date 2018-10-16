@@ -65,10 +65,6 @@ namespace Extract.Web.WebAPI.Test
 
                 Assert.AreEqual("admin", token.Subject, "Unexpected token subject");
             }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
-            }
             finally
             {
                 FileApiMgr.ReleaseAll();

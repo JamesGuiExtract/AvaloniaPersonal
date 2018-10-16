@@ -191,8 +191,8 @@ namespace Extract.Web.WebAPI.Test
                 {
                     Assert.IsInstanceOf(typeof(ObjectResult), result, "Unexpected result type");
                     var objectResult = (ObjectResult)result;
-                    Assert.GreaterOrEqual(objectResult.StatusCode, 200);
-                    Assert.Less(objectResult.StatusCode, 300);
+                    Assert.GreaterOrEqual(objectResult.StatusCode, 200, "Invalid API return code");
+                    Assert.Less(objectResult.StatusCode, 300, "API call failed");
 
                     // If caller is looking for a JwtSecurityToken, re-create one from the claims in a LoginToken
                     if (typeof(JwtSecurityToken).IsAssignableFrom(typeof(T)) && objectResult.Value is LoginToken loginToken)
@@ -216,8 +216,8 @@ namespace Extract.Web.WebAPI.Test
                 {
                     if (result is StatusCodeResult statusCodeResult)
                     {
-                        Assert.GreaterOrEqual(statusCodeResult.StatusCode, 200);
-                        Assert.Less(statusCodeResult.StatusCode, 300);
+                        Assert.GreaterOrEqual(statusCodeResult.StatusCode, 200, "Invalid API return code");
+                        Assert.Less(statusCodeResult.StatusCode, 300, "API call failed");
                     }
 
                     return typedResult;

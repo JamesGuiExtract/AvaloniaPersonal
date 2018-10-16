@@ -1,5 +1,6 @@
 ﻿using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
+using Extract.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +38,6 @@ namespace Extract.Web.WebAPI.Test
         static readonly string _VERIFY_ACTION = "A02_Verify";
         static readonly string _TEST_FILE1 = "Resources.C413.tif";
         static readonly string _TEST_FILE1_USS = "Resources.C413.tif.uss";
-        //static readonly string _TEST_FILE1_VOA = "Resources.TestImage003.tif.voa";
 
         static readonly string _WBC_ATTRIBUTE_GUID = "7b493421-299a-423c-80b2-b37043597081";
         static readonly string _HEMOGLOBIN_ATTRIBUTE_GUID = "0ec90152-3c89-4d22-84a0-17322b17b888";
@@ -189,10 +189,6 @@ namespace Extract.Web.WebAPI.Test
                         filename);
                 }
             }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
-            }
             finally
             {
                 FileApiMgr.ReleaseAll();
@@ -217,11 +213,7 @@ namespace Extract.Web.WebAPI.Test
                 var submitResult = result.AssertGoodResult<DocumentIdResult>();
 
                 var sourceFilename = fileProcessingDb.GetFileNameFromFileID(submitResult.Id);
-                Assert.IsNotNullOrEmpty(sourceFilename);
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
+                Assert.IsNotNullOrEmpty(sourceFilename, "Failed to post text");
             }
             finally
             {
@@ -247,10 +239,6 @@ namespace Extract.Web.WebAPI.Test
                         "Unexpected processing state");
                 }
             }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
-            }
             finally
             {
                 FileApiMgr.ReleaseAll();
@@ -258,40 +246,45 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
-        /// <summary>
-        /// Test GetFileResulot - note that this tests the internal GetResult() function
-        /// </summary>
         [Test, Category("Automated")]
         public static void Test_GetOutputFile()
         {
             string dbName = "DocumentAPI_Test_GetOutputFile";
+            var tempFiles = new List<string>();
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
                     InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "admin", "a");
 
+                var workflowId = fileProcessingDb.GetWorkflowID(ApiTestUtils.CurrentApiContext.WorkflowName);
+                var workflow = fileProcessingDb.GetWorkflowDefinition(workflowId);
+                var metadataFieldName = workflow.OutputFileMetadataField;
+
                 for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
                 {
+                    string outputFileName = FileSystemMethods.GetTemporaryFileName();
+                    File.WriteAllText(outputFileName, fileProcessingDb.GetFileNameFromFileID(i));
+                    tempFiles.Add(outputFileName);
+
+                    fileProcessingDb.SetMetadataFieldValue(i, metadataFieldName, outputFileName);
+
                     var result = controller.GetOutputFile(i);
                     var fileResult = result.AssertGoodResult<PhysicalFileResult>();
 
-                    var workflowId = fileProcessingDb.GetWorkflowID(ApiTestUtils.CurrentApiContext.WorkflowName);
-                    var workflow = fileProcessingDb.GetWorkflowDefinition(workflowId);
-                    var metadataFieldName = workflow.OutputFileMetadataField;
-                    string expectedFileName = fileProcessingDb.GetMetadataFieldValue(i, workflow.OutputFileMetadataField);
-
-                    Assert.AreEqual(expectedFileName, fileResult.FileName, "Unexpected filename");
+                    Assert.AreEqual(Path.GetFileName(outputFileName), fileResult.FileDownloadName,
+                        "Output file path incorrect");
                 }
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
             }
             finally
             {
                 FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
+
+                foreach (string tempFile in tempFiles)
+                {
+                    File.Delete(tempFile);
+                }
             }
         }
 
@@ -320,16 +313,13 @@ namespace Extract.Web.WebAPI.Test
                         .AssertGoodResult<NoContentResult>();
 
                     // Ensure guid is removed from suggested download filename.
-                    Assert.AreEqual(Path.GetFileName(filename), documentResult.FileDownloadName);
+                    Assert.AreEqual(Path.GetFileName(filename), documentResult.FileDownloadName,
+                        "Invalid download filename format");
 
                     // Ensure error is returned if we attempt to get document after deletion.
                     controller.GetDocument(submitResult.Id)
                         .AssertResultCode(StatusCodes.Status404NotFound);
                 }
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
             }
             finally
             {
@@ -365,42 +355,46 @@ namespace Extract.Web.WebAPI.Test
                 var pagesInfoResult = controller.GetPageInfo(fileId)
                     .AssertGoodResult<PagesInfoResult>();
 
-                Assert.AreEqual(expectedPageCount, pagesInfoResult.PageCount);
+                Assert.AreEqual(expectedPageCount, pagesInfoResult.PageCount,
+                    "PageInfo page count incorrect.");
 
                 var pageTextResult = controller.GetText(fileId)
                     .AssertGoodResult<PageTextResult>();
 
-                Assert.AreEqual(expectedPageCount, pageTextResult.Pages.Count);
+                Assert.AreEqual(expectedPageCount, pageTextResult.Pages.Count,
+                    "PageText page count incorrect.");
                 for (int page = 1; page <= expectedPageCount; page++)
                 {
                     var expectedPage = (SpatialString)expectedPages.At(page - 1);
                     var expectedPageInfo = expectedPage.GetPageInfo(page);
                     var pageInfo = pagesInfoResult.PageInfos[page - 1];
-                    Assert.AreEqual(page, pageInfo.Page);
-                    Assert.AreEqual(expectedPageInfo.Height, pageInfo.Height);
-                    Assert.AreEqual(expectedPageInfo.Width, pageInfo.Width);
+                    Assert.AreEqual(page, pageInfo.Page, "Incorrect PageInfo page number");
+                    Assert.AreEqual(expectedPageInfo.Height, pageInfo.Height, "Incorrect page height");
+                    Assert.AreEqual(expectedPageInfo.Width, pageInfo.Width, "Incorrect page width");
                     // Last page is upside down
-                    Assert.AreEqual(page == 5 ? 180 : 0, pageInfo.DisplayOrientation);
+                    Assert.AreEqual(page == 5 ? 180 : 0, pageInfo.DisplayOrientation,
+                        "Incorrect page orientation");
 
                     var pageText = pageTextResult.Pages[page - 1];
-                    Assert.AreEqual(page, pageText.Page);
-                    Assert.AreEqual(expectedPage.String, pageText.Text);
+                    Assert.AreEqual(page, pageText.Page, "Incorrect PageText page number");
+                    Assert.AreEqual(expectedPage.String, pageText.Text, "Incorrect page text");
 
                     var singlePageResult = controller.GetPageText(fileId, page)
                         .AssertGoodResult<PageTextResult>();
 
-                    Assert.AreEqual(page, singlePageResult.Pages.Single().Page);
-                    Assert.AreEqual(expectedPage.String, singlePageResult.Pages.Single().Text);
+                    Assert.AreEqual(page, singlePageResult.Pages.Single().Page,
+                        "Incorrect single page number");
+                    Assert.AreEqual(expectedPage.String, singlePageResult.Pages.Single().Text,
+                        "Incorrect single page text");
                 }
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
             }
             finally
             {
                 FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
+
+                _testFiles.RemoveFile(_TEST_FILE1);
+                _testFiles.RemoveFile(_TEST_FILE1_USS);
             }
         }
 
@@ -478,11 +472,8 @@ namespace Extract.Web.WebAPI.Test
                 var result = controller.GetOutputText(1);
                 var textResult = result.AssertGoodResult<PageTextResult>();
 
-                Assert.AreEqual(File.ReadAllText(filename), textResult.Pages.First().Text);
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
+                Assert.AreEqual(File.ReadAllText(filename), textResult.Pages.First().Text,
+                    "Incorrect text result");
             }
             finally
             {
@@ -505,7 +496,7 @@ namespace Extract.Web.WebAPI.Test
                 {
                     var textResult = controller.GetDocumentType(i)
                         .AssertGoodResult<global::WebAPI.Models.TextData>();
-                    Assert.IsTrue(!string.IsNullOrEmpty(textResult.Text));
+                    Assert.IsTrue(!string.IsNullOrEmpty(textResult.Text), "Document type result is empty");
 
                     switch (i)
                     {
@@ -521,10 +512,6 @@ namespace Extract.Web.WebAPI.Test
                             break;
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
             }
             finally
             {
@@ -556,10 +543,6 @@ namespace Extract.Web.WebAPI.Test
 
                     bool success = CompareXmlToDocumentAttributeSet(xmlFileName, documentDataResult);
                 }
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
             }
             finally
             {
@@ -653,37 +636,36 @@ namespace Extract.Web.WebAPI.Test
                 data = controller.GetDocumentData(1)
                     .AssertGoodResult<DocumentDataResult>();
 
-                Assert.AreEqual(2, data.Attributes.Count);
+                Assert.AreEqual(2, data.Attributes.Count,
+                    "Incorrect number of remaining attributes");
 
-                Assert.AreEqual(0, data.Attributes.Count(a => a.ID == deletedID));
+                Assert.AreEqual(0, data.Attributes.Count(a => a.ID == deletedID),
+                    "Attribute failed to delete");
 
                 var updatedAttribute = data.Attributes.Single(a => a.ID == updatedID);
-                Assert.AreEqual("Updated", updatedAttribute.Value);
+                Assert.AreEqual("Updated", updatedAttribute.Value,
+                    "Attribute failed to update");
                 // Ensure zone of updated attribute was set correctly based on the supplied SpatialLineZone
                 var zone = updatedAttribute.SpatialPosition.LineInfo
                     .Single()
                     .SpatialLineZone;
-                Assert.AreEqual(1, zone.PageNumber);
-                Assert.AreEqual(0, zone.StartX);
-                Assert.AreEqual(25, zone.StartY);
-                Assert.AreEqual(100, zone.EndX);
-                Assert.AreEqual(25, zone.EndY);
-                Assert.AreEqual(51, zone.Height);
+                Assert.AreEqual(1, zone.PageNumber, "Incorrect page");
+                Assert.AreEqual(0, zone.StartX, "Incorrect StartX");
+                Assert.AreEqual(25, zone.StartY, "Incorrect StartY");
+                Assert.AreEqual(100, zone.EndX, "Incorrect EndX");
+                Assert.AreEqual(25, zone.EndY, "Incorrect EndY");
+                Assert.AreEqual(51, zone.Height, "Incorrect height");
 
                 var addedAttribute = data.Attributes.Single(a => a.ID == addedAttributeID);
                 // Ensure bounds were set correctly based on the supplied SpatialLineZone
                 var bounds = addedAttribute.SpatialPosition.LineInfo
                     .Single()
                     .SpatialLineBounds;
-                Assert.AreEqual(1, bounds.PageNumber);
-                Assert.AreEqual(1000, bounds.Left);
-                Assert.AreEqual(1450, bounds.Top);
-                Assert.AreEqual(2000, bounds.Right);
-                Assert.AreEqual(1550, bounds.Bottom);
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
+                Assert.AreEqual(1, bounds.PageNumber, "Incorrect page");
+                Assert.AreEqual(1000, bounds.Left, "Incorrect left boundary");
+                Assert.AreEqual(1450, bounds.Top, "Incorrect top boundary");
+                Assert.AreEqual(2000, bounds.Right, "Incorrect right boundary");
+                Assert.AreEqual(1550, bounds.Bottom, "Incorrect bottom boundary");
             }
             finally
             {
@@ -705,7 +687,14 @@ namespace Extract.Web.WebAPI.Test
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
                     InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "admin", "a");
 
+                var testFilename = _testFiles.GetFile(_TEST_FILE1);
+                var ussFilename = _testFiles.GetFile(_TEST_FILE1_USS);
+
                 int fileId = 4;
+                string fileName = fileProcessingDb.GetFileNameFromFileID(fileId);
+                var fileRecord = fileProcessingDb.GetFileRecord(fileName, _VERIFY_ACTION);
+                fileProcessingDb.RenameFile(fileRecord, testFilename);
+
                 var data = controller.GetDocumentData(fileId)
                     .AssertGoodResult<DocumentDataResult>();
 
@@ -767,46 +756,49 @@ namespace Extract.Web.WebAPI.Test
                 var data2 = controller.GetDocumentData(fileId)
                     .AssertGoodResult<DocumentDataResult>();
 
-                Assert.AreEqual(data.Attributes.Count + 1, data2.Attributes.Count);
+                Assert.AreEqual(data.Attributes.Count + 1, data2.Attributes.Count,
+                    "Incorrect number of remaining attribute");
 
                 var addedAttribute = data2.Attributes
                     .SingleOrDefault(b => b.ID == attributeToAdd.ID);
-                Assert.IsNotNull(addedAttribute);
-                Assert.AreEqual("At Root", addedAttribute.Value);
+                Assert.IsNotNull(addedAttribute, "Failed to create attribute");
+                Assert.AreEqual("At Root", addedAttribute.Value,
+                    "Added attribute value incorrect");
 
                 var addedAttribute2 = data2.Attributes
                     .SingleOrDefault(b => b.ID == attributeToAdd2.ID);
-                Assert.IsNull(addedAttribute2);
+                Assert.IsNull(addedAttribute2, "Attribute incorrectly create at root");
                 var parentAttribute = data2.Attributes
                     .SelectMany(a => a.ChildAttributes)
                     .SingleOrDefault(b => b.ID == _HEMOGLOBIN_ATTRIBUTE_GUID);
                 addedAttribute2 = parentAttribute.ChildAttributes
                     .SingleOrDefault(a => a.ID == attributeToAdd2.ID);
-                Assert.IsNotNull(addedAttribute2);
+                Assert.IsNotNull(addedAttribute2, "Failed to create attribute");
                 var bounds = addedAttribute2.SpatialPosition.LineInfo
                     .Single()
                     .SpatialLineBounds;
-                Assert.AreEqual(2, bounds.PageNumber);
-                Assert.AreEqual(1000, bounds.Left);
-                Assert.AreEqual(1450, bounds.Top);
-                Assert.AreEqual(2000, bounds.Right);
-                Assert.AreEqual(1550, bounds.Bottom);
+                Assert.AreEqual(2, bounds.PageNumber, "Incorrect page number");
+                Assert.AreEqual(1000, bounds.Left, "Incorrect left boundary");
+                Assert.AreEqual(1450, bounds.Top, "Incorrect top boundary");
+                Assert.AreEqual(2000, bounds.Right, "Incorrect right boundary");
+                Assert.AreEqual(1550, bounds.Bottom, "Incorrect bottom boundary");
 
                 var editedAttribute = data2.Attributes.SelectMany(a => a.ChildAttributes)
                     .Single(b => b.ID == _WBC_ATTRIBUTE_GUID);
-                Assert.AreEqual("Edited", editedAttribute.Value);
-                Assert.AreEqual(attributeToUpdate.ChildAttributes.Count, editedAttribute.ChildAttributes.Count);
+                Assert.AreEqual("Edited", editedAttribute.Value, "Incorrect edited value");
+                Assert.AreEqual(attributeToUpdate.ChildAttributes.Count, editedAttribute.ChildAttributes.Count,
+                    "Edited attribute children have been modified");
 
-                Assert.IsFalse(data2.Attributes.Any(a => a.ID == attributeToDelete.ID));
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
+                Assert.IsFalse(data2.Attributes.Any(a => a.ID == attributeToDelete.ID),
+                    "Failed to delete attribute");
             }
             finally
             {
                 FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
+
+                _testFiles.RemoveFile(_TEST_FILE1);
+                _testFiles.RemoveFile(_TEST_FILE1_USS);
             }
         }
 
@@ -832,10 +824,6 @@ namespace Extract.Web.WebAPI.Test
 
                     Assert.IsTrue(success);
                 }
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
             }
             finally
             {
@@ -870,10 +858,6 @@ namespace Extract.Web.WebAPI.Test
                     Assert.IsTrue(success);
                 }
             }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
-            }
             finally
             {
                 FileApiMgr.ReleaseAll();
@@ -884,27 +868,19 @@ namespace Extract.Web.WebAPI.Test
         [Test, Category("Automated")]
         public static void TestManyLineAttribute()
         {
-            try
-            {
-                var voa = new IUnknownVector();
-                var ss = new SpatialString();
-                string tempUssFileName = _testFiles.GetFile("Resources.Image1.pdf.uss");
-                Assert.That(File.Exists(tempUssFileName));
+            var voa = new IUnknownVector();
+            var ss = new SpatialString();
+            string tempUssFileName = _testFiles.GetFile("Resources.Image1.pdf.uss");
+            Assert.That(File.Exists(tempUssFileName));
 
-                ss.LoadFrom(tempUssFileName, bSetDirtyFlagToTrue: false);
-                var attr = new AttributeClass { Name = "Manual", Value = ss };
-                voa.PushBack(attr);
+            ss.LoadFrom(tempUssFileName, bSetDirtyFlagToTrue: false);
+            var attr = new AttributeClass { Name = "Manual", Value = ss };
+            voa.PushBack(attr);
 
-                var mapper = new AttributeMapper(voa, UCLID_FILEPROCESSINGLib.EWorkflowType.kExtraction);
-                var docAttrr = mapper.MapAttributesToDocumentAttributeSet(includeNonSpatial: true, verboseSpatialData: true);
-                Assert.IsFalse(docAttrr.Attributes.Any(a =>
-                    a.SpatialPosition.Pages.Count != a.SpatialPosition.Pages.Distinct().Count()));
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Exception reported: {0}", ex.Message);
-                throw;
-            }
+            var mapper = new AttributeMapper(voa, UCLID_FILEPROCESSINGLib.EWorkflowType.kExtraction);
+            var docAttrr = mapper.MapAttributesToDocumentAttributeSet(includeNonSpatial: true, verboseSpatialData: true);
+            Assert.IsFalse(docAttrr.Attributes.Any(a =>
+                a.SpatialPosition.Pages.Count != a.SpatialPosition.Pages.Distinct().Count()));
         }
 
         #endregion Public Test Functions
@@ -931,28 +907,21 @@ namespace Extract.Web.WebAPI.Test
 
         public static void ModifyTable(string dbName, string command)
         {
-            try
+            using (var cmd = new SqlCommand())
             {
-                using (var cmd = new SqlCommand())
+                // NOTE: "Pooling=false;" keeps the connection from being pooled, and 
+                // allows the conneciton to REALLY close, so the DB can be removed later.
+                string connectionString = "Server=(local);Database=" + dbName + ";Trusted_Connection=True;Pooling=false;";
+                using (var conn = new SqlConnection(connectionString))
                 {
-                    // NOTE: "Pooling=false;" keeps the connection from being pooled, and 
-                    // allows the conneciton to REALLY close, so the DB can be removed later.
-                    string connectionString = "Server=(local);Database=" + dbName + ";Trusted_Connection=True;Pooling=false;";
-                    using (var conn = new SqlConnection(connectionString))
-                    {
-                        conn.Open();
+                    conn.Open();
 
-                        cmd.Connection = conn;
-                        cmd.CommandText = command;
-                        cmd.ExecuteNonQuery();
+                    cmd.Connection = conn;
+                    cmd.CommandText = command;
+                    cmd.ExecuteNonQuery();
 
-                        conn.Close();
-                    }
+                    conn.Close();
                 }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Error: {0}", ex.Message);
             }
         }
 
@@ -968,11 +937,6 @@ namespace Extract.Web.WebAPI.Test
                     return data.GetDocumentData(fileId, includeNonSpatial: true, verboseSpatialData: true);
                 }
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
-                throw;
-            }
             finally
             {
                 FileApiMgr.ReleaseAll();
@@ -981,176 +945,147 @@ namespace Extract.Web.WebAPI.Test
 
         static bool CompareXmlToDocumentAttributeSet(string xmlFile, DocumentDataResult documentAttributes)
         {
-            try
-            {
-                var xmlDoc = new XmlDocument();
-                xmlDoc.Load(xmlFile);
-                var root = xmlDoc.FirstChild;
+            var xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlFile);
+            var root = xmlDoc.FirstChild;
 
-                int nonMetadataAttributes = 0;
-                for (int i = 0; i < root.ChildNodes.Count; ++i)
+            int nonMetadataAttributes = 0;
+            for (int i = 0; i < root.ChildNodes.Count; ++i)
+            {
+                var childNode = root.ChildNodes[i];
+                if (!childNode.Name.StartsWith("_"))
                 {
-                    var childNode = root.ChildNodes[i];
-                    if (!childNode.Name.StartsWith("_"))
-                    {
-                        var attr = documentAttributes.Attributes[i];
-                        CompareParentNodeToAttribute(childNode, attr);
-                        nonMetadataAttributes++;
-                    }
+                    var attr = documentAttributes.Attributes[i];
+                    CompareParentNodeToAttribute(childNode, attr);
+                    nonMetadataAttributes++;
                 }
+            }
 
-                Assert.IsTrue(nonMetadataAttributes == documentAttributes.Attributes.Count,
-                    "xml attributes count: {0}, != documentAttributes count: {1}",
-                    nonMetadataAttributes,
-                    documentAttributes.Attributes.Count);
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
-            }
+            Assert.IsTrue(nonMetadataAttributes == documentAttributes.Attributes.Count,
+                "xml attributes count: {0}, != documentAttributes count: {1}",
+                nonMetadataAttributes,
+                documentAttributes.Attributes.Count);
 
             return true;
         }
 
         static void CompareParentNodeToAttribute(XmlNode parentNode, DocumentAttribute docAttr, bool topLevel = true)
         {
-            try
+            if (topLevel)
             {
-                if (topLevel)
-                {
-                    Debug.WriteLine($"Node: {parentNode.Name}");
-                }
-                else
-                {
-                    Debug.WriteLine($"\tNode: {parentNode.Name}");
-                }
+                Debug.WriteLine($"Node: {parentNode.Name}");
+            }
+            else
+            {
+                Debug.WriteLine($"\tNode: {parentNode.Name}");
+            }
 
-                var fullTextChildNode = TestParentNode(parentNode, docAttr);
-                if (fullTextChildNode == null)
+            var fullTextChildNode = TestParentNode(parentNode, docAttr);
+            if (fullTextChildNode == null)
+            {
+                return;     // only get here on an exception, don't throw any more...
+            }
+
+            var lastNode = fullTextChildNode;
+
+            if ((bool)docAttr.HasPositionInfo)
+            {
+                XmlNode nextNode = null;
+
+                for (int i = 0; i < docAttr.SpatialPosition.LineInfo.Count; ++i)
                 {
-                    return;     // only get here on an exception, don't throw any more...
-                }
-
-                var lastNode = fullTextChildNode;
-
-                if ((bool)docAttr.HasPositionInfo)
-                {
-                    XmlNode nextNode = null;
-
-                    for (int i = 0; i < docAttr.SpatialPosition.LineInfo.Count; ++i)
+                    // process SpatialLine, and then it's nested child element LineText,
+                    // and then the SpatialLineZone and SpatialLinebounds elements.
+                    // if there node siblings, then continue the iteration with 
+                    // the next pair(s) of SpatialLineZone and SpatialLineBounds 
+                    // elements, otherwise restart the sequence testing.
+                    if (nextNode == null || nextNode.NextSibling == null)
                     {
-                        // process SpatialLine, and then it's nested child element LineText,
-                        // and then the SpatialLineZone and SpatialLinebounds elements.
-                        // if there node siblings, then continue the iteration with 
-                        // the next pair(s) of SpatialLineZone and SpatialLineBounds 
-                        // elements, otherwise restart the sequence testing.
-                        if (nextNode == null || nextNode.NextSibling == null)
+
+                        var spatialLineNode = lastNode.NextSibling;
+                        AssertNodeName(spatialLineNode, "SpatialLine");
+
+                        // last node at the nesting level of the spatialLine node - not the sub elements
+                        lastNode = spatialLineNode;
+
+                        TestSpatialLinePageNumber(spatialLineNode, docAttr.SpatialPosition.LineInfo[i].SpatialLineZone.PageNumber, i);
+
+                        if (spatialLineNode.ChildNodes.Count == 0)
                         {
-
-                            var spatialLineNode = lastNode.NextSibling;
-                            AssertNodeName(spatialLineNode, "SpatialLine");
-
-                            // last node at the nesting level of the spatialLine node - not the sub elements
-                            lastNode = spatialLineNode;
-
-                            TestSpatialLinePageNumber(spatialLineNode, docAttr.SpatialPosition.LineInfo[i].SpatialLineZone.PageNumber, i);
-
-                            if (spatialLineNode.ChildNodes.Count == 0)
-                            {
-                                continue;
-                            }
-
-                            nextNode = spatialLineNode.ChildNodes[0];
-                            AssertNodeName(nextNode, "LineText");
-
-                            TestLineText(nextNode, docAttr.SpatialPosition.LineInfo[i].SpatialLineZone.Text, i);
+                            continue;
                         }
 
-                        nextNode = nextNode.NextSibling;
-                        AssertNodeName(nextNode, "SpatialLineZone");
+                        nextNode = spatialLineNode.ChildNodes[0];
+                        AssertNodeName(nextNode, "LineText");
 
-                        TestSpatialLineZone(nextNode, docAttr.SpatialPosition.LineInfo[i].SpatialLineZone, i);
-
-                        nextNode = nextNode.NextSibling;
-                        AssertNodeName(nextNode, "SpatialLineBounds");
-
-                        TestSpatialLineBounds(nextNode, docAttr.SpatialPosition.LineInfo[i].SpatialLineBounds, i);
+                        TestLineText(nextNode, docAttr.SpatialPosition.LineInfo[i].SpatialLineZone.Text, i);
                     }
-                }
 
-                // Now process all the childAttribute items.
-                for (int i = 0; i < docAttr.ChildAttributes.Count; ++i)
-                {
-                    var childDocAttr = docAttr.ChildAttributes[i];
+                    nextNode = nextNode.NextSibling;
+                    AssertNodeName(nextNode, "SpatialLineZone");
 
-                    Assert.IsTrue(lastNode != null, "last node is empty, child attribute index: {0}", i);
-                    lastNode = lastNode.NextSibling;
+                    TestSpatialLineZone(nextNode, docAttr.SpatialPosition.LineInfo[i].SpatialLineZone, i);
 
-                    CompareParentNodeToAttribute(lastNode, childDocAttr, topLevel: false);
+                    nextNode = nextNode.NextSibling;
+                    AssertNodeName(nextNode, "SpatialLineBounds");
+
+                    TestSpatialLineBounds(nextNode, docAttr.SpatialPosition.LineInfo[i].SpatialLineBounds, i);
                 }
             }
-            catch (Exception ex)
+
+            // Now process all the childAttribute items.
+            for (int i = 0; i < docAttr.ChildAttributes.Count; ++i)
             {
-                Assert.Fail($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
+                var childDocAttr = docAttr.ChildAttributes[i];
+
+                Assert.IsTrue(lastNode != null, "last node is empty, child attribute index: {0}", i);
+                lastNode = lastNode.NextSibling;
+
+                CompareParentNodeToAttribute(lastNode, childDocAttr, topLevel: false);
             }
         }
 
         static void TestSpatialLineBounds(XmlNode spatialLineBounds, SpatialLineBounds bounds, int i)
         {
-            try
-            {
-                //< SpatialLineBounds Top = "92" Left = "1858" Bottom = "3136" Right = "2283" />
-                var attributes = spatialLineBounds.Attributes;
-                Assert.IsTrue(attributes != null, "null spatialLinebounds attrubtes, index: {0}", i);
+            //< SpatialLineBounds Top = "92" Left = "1858" Bottom = "3136" Right = "2283" />
+            var attributes = spatialLineBounds.Attributes;
+            Assert.IsTrue(attributes != null, "null spatialLinebounds attrubtes, index: {0}", i);
 
-                var top = attributes[Top];
-                AssertSame(top.Name, top.Value, $"LineInfo[{i}].SpatialLineBounds.Top", bounds.Top.ToString());
+            var top = attributes[Top];
+            AssertSame(top.Name, top.Value, $"LineInfo[{i}].SpatialLineBounds.Top", bounds.Top.ToString());
 
-                var left = attributes[Left];
-                AssertSame(left.Name, left.Value, $"LineInfo[{i}].SpatialLineBounds.Left", bounds.Left.ToString());
+            var left = attributes[Left];
+            AssertSame(left.Name, left.Value, $"LineInfo[{i}].SpatialLineBounds.Left", bounds.Left.ToString());
 
-                var bottom = attributes[Bottom];
-                AssertSame(bottom.Name, bottom.Value, $"LineInfo[{i}].SpatialLineBounds.Bottom", bounds.Bottom.ToString());
+            var bottom = attributes[Bottom];
+            AssertSame(bottom.Name, bottom.Value, $"LineInfo[{i}].SpatialLineBounds.Bottom", bounds.Bottom.ToString());
 
-                var right = attributes[Right];
-                AssertSame(right.Name, right.Value, $"LineInfo[{i}].SpatialLineBounds.Right", bounds.Right.ToString());
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
-            }
+            var right = attributes[Right];
+            AssertSame(right.Name, right.Value, $"LineInfo[{i}].SpatialLineBounds.Right", bounds.Right.ToString());
         }
 
         static XmlNode TestParentNode(XmlNode parentNode, DocumentAttribute docAttr)
         {
-            try
+            // Test Name first - this is unusual because the xml attribute name is the tag name of the root attribute,
+            // and the value of the ES_attribute is in the 0th child element Fulltext as the value.
+            // Get AverageCharConfidence
+            //<LabInfo>
+            //    <FullText AverageCharConfidence = "86">N/A</FullText>
+            var childNode = parentNode.ChildNodes[FullTextIndex];
+            AssertNodeName(childNode, "FullText");
+
+            string nodeName = GetParentNodeName(parentNode);
+            AssertSame(nodeName, childNode.InnerText, docAttr.Name, docAttr.Value);
+
+            // e.g. LabDE.PhysicianInfo has a child element FullText that doesn't have a AverageCharacterConfidence
+            // attribute.
+            if (childNode.Attributes.Count > 0)
             {
-                // Test Name first - this is unusual because the xml attribute name is the tag name of the root attribute,
-                // and the value of the ES_attribute is in the 0th child element Fulltext as the value.
-                // Get AverageCharConfidence
-                //<LabInfo>
-                //    <FullText AverageCharConfidence = "86">N/A</FullText>
-                var childNode = parentNode.ChildNodes[FullTextIndex];
-                AssertNodeName(childNode, "FullText");
-
-                string nodeName = GetParentNodeName(parentNode);
-                AssertSame(nodeName, childNode.InnerText, docAttr.Name, docAttr.Value);
-
-                // e.g. LabDE.PhysicianInfo has a child element FullText that doesn't have a AverageCharacterConfidence
-                // attribute.
-                if (childNode.Attributes.Count > 0)
-                {
-                    string xmlCharConfidence = childNode.Attributes[AvgCharConf].Value;
-                    AssertSame(childNode.Name, xmlCharConfidence, "averageCharacterConfidence", docAttr.AverageCharacterConfidence.ToString());
-                }
-
-                return childNode;
+                string xmlCharConfidence = childNode.Attributes[AvgCharConf].Value;
+                AssertSame(childNode.Name, xmlCharConfidence, "averageCharacterConfidence", docAttr.AverageCharacterConfidence.ToString());
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
-                throw;
-            }
+
+            return childNode;
         }
 
         static string GetParentNodeName(XmlNode parentNode)
@@ -1175,71 +1110,50 @@ namespace Extract.Web.WebAPI.Test
         /// <param name="index"></param>
         static void TestSpatialLinePageNumber(XmlNode spatialLineNode, int? pageNumber, int index)
         {
-            try
+            if (pageNumber == null)
             {
-                if (pageNumber == null)
+                if (spatialLineNode.Attributes != null)
                 {
-                    if (spatialLineNode.Attributes != null)
-                    {
-                        Assert.IsTrue(spatialLineNode.Attributes["PageNumber"] == null,
-                                      "pageNumber is null but xml spatialLineNode has a PageNumber attribute");
-                    }
-
-                    return;
+                    Assert.IsTrue(spatialLineNode.Attributes["PageNumber"] == null,
+                                    "pageNumber is null but xml spatialLineNode has a PageNumber attribute");
                 }
 
-                var xmlPageNumber = spatialLineNode.Attributes[0];
-                AssertSame(spatialLineNode.Name,
-                           xmlPageNumber.Value,
-                           $"docAttr.SpatialPosition.Pages[{index}]",
-                           pageNumber.ToString());
+                return;
             }
-            catch (Exception ex)
-            {
-                Assert.Fail($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
-            }
+
+            var xmlPageNumber = spatialLineNode.Attributes[0];
+            AssertSame(spatialLineNode.Name,
+                        xmlPageNumber.Value,
+                        $"docAttr.SpatialPosition.Pages[{index}]",
+                        pageNumber.ToString());
         }
 
         static void TestLineText(XmlNode lineTextNode, string text, int index)
         {
-            try
-            {
-                AssertSame(lineTextNode.Name,
-                           lineTextNode.InnerText,
-                           $"docAttr.SpatialPosition.LineInfo[{index}].SpatialLineZone.Text",
-                           text);
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
-            }
+            AssertSame(lineTextNode.Name,
+                        lineTextNode.InnerText,
+                        $"docAttr.SpatialPosition.LineInfo[{index}].SpatialLineZone.Text",
+                        text);
         }
 
         //<SpatialLineZone StartX = "1878" StartY="1612" EndX="2264" EndY="1617" Height="3041"/>
         static void TestSpatialLineZone(XmlNode spatialLineZoneNode, SpatialLineZone zone, int i)
         {
-            try
-            {
-                //< SpatialLineZone StartX = "1878" StartY = "1612" EndX = "2264" EndY = "1617" Height = "3041" />
-                var attributes = spatialLineZoneNode.Attributes;
-                Assert.IsTrue(attributes != null, "null spatialLineZoneNode attributes, index: {0}", i);
+            //< SpatialLineZone StartX = "1878" StartY = "1612" EndX = "2264" EndY = "1617" Height = "3041" />
+            var attributes = spatialLineZoneNode.Attributes;
+            Assert.IsTrue(attributes != null, "null spatialLineZoneNode attributes, index: {0}", i);
 
-                var startX = attributes[StartX];
-                AssertSame(startX.Name, startX.Value, $"LineInfo[{i}].SpatialLineZone.StartX", zone.StartX.ToString());
+            var startX = attributes[StartX];
+            AssertSame(startX.Name, startX.Value, $"LineInfo[{i}].SpatialLineZone.StartX", zone.StartX.ToString());
 
-                var startY = attributes[StartY];
-                AssertSame(startY.Name, startY.Value, $"LineInfo[{i}].SpatialLineZone.StartY", zone.StartY.ToString());
+            var startY = attributes[StartY];
+            AssertSame(startY.Name, startY.Value, $"LineInfo[{i}].SpatialLineZone.StartY", zone.StartY.ToString());
 
-                var endX = attributes[EndX];
-                AssertSame(endX.Name, endX.Value, $"LineInfo[{i}].SpatialLineZone.EndX", zone.EndX.ToString());
+            var endX = attributes[EndX];
+            AssertSame(endX.Name, endX.Value, $"LineInfo[{i}].SpatialLineZone.EndX", zone.EndX.ToString());
 
-                var endY = attributes[EndY];
-                AssertSame(endY.Name, endY.Value, $"LineInfo[{i}].SpatialLineZone.EndY", zone.EndY.ToString());
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail($"Exception: {ex.Message}, in method: {ApiTestUtils.GetMethodName()}");
-            }
+            var endY = attributes[EndY];
+            AssertSame(endY.Name, endY.Value, $"LineInfo[{i}].SpatialLineZone.EndY", zone.EndY.ToString());
         }
 
         static void AssertSame(string xmlName, string xmlValue, string attrName, string attrValue)

@@ -107,10 +107,6 @@ namespace Extract.Web.WebAPI.Test
                 // Logout should close the FAM session
                 Assert.IsFalse(fileProcessingDb.IsAnyFAMActive());
             }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
-            }
             finally
             {
                 FileApiMgr.ReleaseAll();
@@ -141,10 +137,6 @@ namespace Extract.Web.WebAPI.Test
 
                 controller.Logout()
                     .AssertGoodResult<NoContentResult>();
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail("Failed: {0}", ex.Message);
             }
             finally
             {

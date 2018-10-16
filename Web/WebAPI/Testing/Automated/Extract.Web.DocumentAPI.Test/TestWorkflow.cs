@@ -83,10 +83,6 @@ namespace Extract.Web.WebAPI.Test
                     throw;
                 }
             }
-            catch (Exception ex)
-            {
-                Assert.Fail("Exception: {0}, in: {1}", ex.Message, ApiTestUtils.GetMethodName());
-            }
             finally
             {
                 FileApiMgr.ReleaseAll();
@@ -136,10 +132,6 @@ namespace Extract.Web.WebAPI.Test
                     "Incorrect done count");
                 Assert.AreEqual(1, statusResult.NumberFailed,
                     "Incorrect failed count");
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail("Exception: {0}, in: {1}", ex.Message, ApiTestUtils.GetMethodName());
             }
             finally
             {
