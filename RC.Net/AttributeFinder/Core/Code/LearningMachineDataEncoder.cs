@@ -1184,11 +1184,19 @@ namespace Extract.AttributeFinder
         /// <returns>A tuple where the first item is an enumeration of feature vectors, the second
         /// item answer codes for each example and the third item the uss path for each example</returns>
         /// <returns></returns>
-        public (double[][] featureVectors, int[] answerCodes, string[] ussPathsPerExample) GetFeatureVectorAndAnswerCollections
-            (string[] ussFilePaths, string[] inputVOAFilePaths, AttributeOrAnswerCollection answersOrAnswerFiles,
-                bool runRuleSetForFeatures, bool runRuleSetIfMissing, string ruleSetPath,
-                LabelAttributes labelAttributesSettings, string alternateComponentDataDir,
-                Action<StatusArgs> updateStatus, CancellationToken cancellationToken, bool updateAnswerCodes)
+        public (double[][] featureVectors, int[] answerCodes, string[] ussPathsPerExample)
+            GetFeatureVectorAndAnswerCollections(
+                string[] ussFilePaths,
+                string[] inputVOAFilePaths,
+                AttributeOrAnswerCollection answersOrAnswerFiles,
+                bool runRuleSetForFeatures,
+                bool runRuleSetIfMissing,
+                string ruleSetPath,
+                LabelAttributes labelAttributesSettings,
+                string alternateComponentDataDir,
+                Action<StatusArgs> updateStatus,
+                CancellationToken cancellationToken,
+                bool updateAnswerCodes)
         {
             try
             {

@@ -969,12 +969,22 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Writes out feature vectors and answers as CSV to a database
+        /// Gets feature vectors and answers as CSV to be written to a database
         /// </summary>
         /// <remarks>The CSV fields are: "answer", features...</remarks>
-        public void WriteDataToDatabase(CancellationToken cancelToken, string databaseServer, string databaseName, string attributeSetName, 
-            string modelName, long lowestIDToProcess, long highestIDToProcess, bool useAttributeSetForExpected,
-            bool runRuleSetForFeatures, bool runRuleSetIfFeaturesAreMissing, string featureRuleSetName)
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public (IList<IList<string>> trainingData, IList<IList<string>> testingData)
+            GetDataToWriteDataToDatabase(
+                CancellationToken cancelToken,
+                string databaseServer,
+                string databaseName,
+                string attributeSetName,
+                long lowestIDToProcess,
+                long highestIDToProcess,
+                bool useAttributeSetForExpected,
+                bool runRuleSetForFeatures,
+                bool runRuleSetIfFeaturesAreMissing,
+                string featureRuleSetName)
         {
             try
             {
@@ -988,7 +998,7 @@ namespace Extract.AttributeFinder
                 // It is possible that all files are missing so just return without doing anything if no images are found
                 if (imageFiles.Length == 0)
                 {
-                    return;
+                    return (new string[0][], new string[0][]);
                 }
 
                 InputConfig.GetRelatedInputData(imageFiles, answers, runRuleSetForFeatures,
@@ -1002,46 +1012,26 @@ namespace Extract.AttributeFinder
 
                 // Compute the data
                 var (featureVectors, answerCodes, ussPathsPerExample) = Encoder.GetFeatureVectorAndAnswerCollections(
-                    ussFiles, voaFiles, answersOrAnswerFiles,
-                    runRuleSetForFeatures, runRuleSetIfFeaturesAreMissing, featureRuleSetName,
-                    LabelAttributesSettings, altCDD,
-                    _ => { }, cancelToken, updateAnswerCodes: true);
-
+                    ussFiles,
+                    voaFiles,
+                    answersOrAnswerFiles,
+                    runRuleSetForFeatures,
+                    runRuleSetIfFeaturesAreMissing,
+                    featureRuleSetName,
+                    LabelAttributesSettings,
+                    altCDD,
+                    _ => { },
+                    cancelToken,
+                    updateAnswerCodes: true);
                 // It is possible that no files in a batch have any candidate attributes so that even though there are images
                 // there will be no feature vectors to write
                 if (featureVectors.Length == 0)
                 {
-                    return;
+                    return (new string[0][], new string[0][]);
                 }
 
                 var (trainingData, testingData) = CombineFeatureVectorsAndAnswers(featureVectors, answerCodes, ussPathsPerExample, _ => { }, cancelToken);
-
-                void WriteCsvToDB(IEnumerable<IEnumerable<string>> data, bool isTrainingSet)
-                {
-                    using (var connection = NewSqlDBConnection(databaseServer, databaseName))
-                    {
-                        connection.Open();
-
-                        var cmdText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
-                        SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
-                        FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName";
-                        foreach (var record in data)
-                        {
-                            using (var cmd = new SqlCommand(cmdText, connection))
-                            {
-                                cmd.Parameters.AddWithValue("@IsTrainingData", isTrainingSet.ToString());
-                                cmd.Parameters.AddWithValue("@ModelName", modelName);
-                                var ussPath = record.First();
-                                cmd.Parameters.AddWithValue("@Data", string.Join(",", record.Skip(2).Select(s => s.QuoteIfNeeded("\"", ","))));
-                                cmd.Parameters.AddWithValue("@FileName", ussPath.Substring(0, ussPath.Length - 4));
-                                cmd.ExecuteNonQuery();
-                            }
-                        }
-                    }
-                }
-
-                WriteCsvToDB(trainingData, true);
-                WriteCsvToDB(testingData, false);
+                return (trainingData.ToArray(), testingData.ToArray());
             }
             catch (Exception ex)
             {
@@ -1352,7 +1342,7 @@ namespace Extract.AttributeFinder
         /// Prepares training/testing data for writing to CSV or DB by zipping the separate collections together and,
         /// if <see cref="StandardizeFeaturesForCsvOutput"/> = <c>true</c>, converts to the features to Z-scores
         /// </summary>
-        private (IEnumerable<IEnumerable<string>> training, IEnumerable<IEnumerable<string>> testing)
+        private (IEnumerable<IList<string>> training, IEnumerable<IList<string>> testing)
             CombineFeatureVectorsAndAnswers(
             double[][] featureVectors,
             int[] answerCodes,
@@ -1412,7 +1402,7 @@ namespace Extract.AttributeFinder
             int numColumns = featureVectors[0].Length + 1;
 
             // Zip each subset together
-            IEnumerable<IEnumerable<string>> zip(string[] subsetFiles, int[] subsetFileIndices, double[][] subsetInputs, int[] subsetOutputs, string setName)
+            IEnumerable<List<string>> zip(string[] subsetFiles, int[] subsetFileIndices, double[][] subsetInputs, int[] subsetOutputs, string setName)
             {
                 for (int num = 0; num < subsetFiles.Length; num++)
                 {
@@ -1803,11 +1793,11 @@ namespace Extract.AttributeFinder
         /// <see cref="Usage"/>=<see cref="LearningMachineUsage.Pagination"/> then the input Page <see cref="ComAttribute"/>s will be
         /// returned as subattributes of the resulting Document <see cref="ComAttribute"/>s.</remarks>
         /// <param name="learningMachinePath">Path to saved <see cref="LearningMachine"/></param>
-        /// <param name="document">The <see cref="SpatialString"/> used for encoding auto-BoW features</param>
+        /// <param name="document">The <see cref="ISpatialString"/> used for encoding auto-BoW features</param>
         /// <param name="attributeVector">The VOA used for encoding attribute features</param>
         /// <param name="preserveInputAttributes">Whether to preserve the input <see cref="ComAttribute"/>s or not.</param>
         /// <returns>A VOA representation of the computed answer</returns>
-        public static void ComputeAnswer(string learningMachinePath, SpatialString document,
+        public static void ComputeAnswer(string learningMachinePath, ISpatialString document,
             IUnknownVector attributeVector, bool preserveInputAttributes)
         {
             try

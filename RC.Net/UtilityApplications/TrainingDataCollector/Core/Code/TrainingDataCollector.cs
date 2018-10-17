@@ -8,6 +8,8 @@ using Extract.ETL;
 using Extract.Utilities;
 using Extract.Code.Attributes;
 using System.Transactions;
+using System.Data.SqlClient;
+using System.Linq;
 
 namespace Extract.UtilityApplications.TrainingDataCollector
 {
@@ -247,29 +249,17 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                         settings.PercentToUseForTestingSet = 100 - TrainingPercent;
                     }
 
-                    // Collect/add data in batches of 500 records at a time to mitigate memory issues
-                    for (int i = 0; i < availableIDs.Count; i += 500)
-                    {
-                        long lowestIDToProcess = availableIDs[i];
-                        long highestIDToProcess = availableIDs[Math.Min(i + 499, availableIDs.Count - 1)];
-
-                        LastIDProcessed = highestIDToProcess;
-
-                        settings.FirstIDToProcess = lowestIDToProcess;
-                        settings.LastIDToProcess = highestIDToProcess;
-
-                        using (var ts = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions
-                            { IsolationLevel = IsolationLevel.ReadCommitted,
-                              Timeout = TransactionManager.MaximumTimeout }))
+                    ProcessInVariableBatches(availableIDs,
+                        executeBeforeTransaction: (lowestIDToProcess, highestIDToProcess) =>
+                        {
+                            settings.FirstIDToProcess = lowestIDToProcess;
+                            settings.LastIDToProcess = highestIDToProcess;
+                        },
+                        executeInTransaction: () =>
                         {
                             NERAnnotator.NERAnnotator.Process(settings, _ => { }, cancelToken);
-
-                            // Save status to the DB each loop
-                            SaveStatus();
-
-                            ts.Complete();
-                        }
-                    }
+                        },
+                        cancellationToken: cancelToken);
                 }
                 else if (ModelType == ModelType.LearningMachine)
                 {
@@ -279,27 +269,25 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                         {
                             machine.InputConfig.TrainingSetPercentage = TrainingPercent;
                         }
-                        // Collect/add data in batches of 500 records at a time to mitigate memory issues
-                        for (int i = 0; i < availableIDs.Count; i += 500)
-                        {
-                            using (var ts = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions
-                                { IsolationLevel = IsolationLevel.ReadCommitted,
-                                  Timeout = TransactionManager.MaximumTimeout }))
+
+                        IEnumerable<IEnumerable<string>> trainingData = null;
+                        IEnumerable<IEnumerable<string>> testingData = null;
+
+                        ProcessInVariableBatches(availableIDs,
+                            executeBeforeTransaction: (lowestIDToProcess, highestIDToProcess) =>
                             {
-                                long lowestIDToProcess = availableIDs[i];
-                                long highestIDToProcess = availableIDs[Math.Min(i + 499, availableIDs.Count - 1)];
-                                machine.WriteDataToDatabase(cancelToken, DatabaseServer, DatabaseName, AttributeSetName, QualifiedModelName,
-                                        lowestIDToProcess, highestIDToProcess, UseAttributeSetForExpecteds,
-                                        RunRulesetForCandidateOrFeatures, RunRulesetIfVoaIsMissing, QualifiedFeatureRulesetPath);
-
-                                LastIDProcessed = highestIDToProcess;
-
-                                // Save status to the DB each loop
-                                SaveStatus();
-
-                                ts.Complete();
-                            }
-                        }
+                                (trainingData, testingData) = machine.GetDataToWriteDataToDatabase(cancelToken,
+                                    DatabaseServer, DatabaseName, AttributeSetName,
+                                    lowestIDToProcess, highestIDToProcess, UseAttributeSetForExpecteds,
+                                    RunRulesetForCandidateOrFeatures, RunRulesetIfVoaIsMissing,
+                                    QualifiedFeatureRulesetPath);
+                            },
+                            executeInTransaction: () =>
+                            {
+                                WriteCsvToDB(trainingData, true);
+                                WriteCsvToDB(testingData, false);
+                            },
+                            cancellationToken: cancelToken);
                     }
                 }
                 else
@@ -518,6 +506,119 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             else
             {
                 SaveStatus(_status);
+            }
+        }
+
+        /// <summary>
+        /// Runs data collection and storage actions for batches of files,
+        /// retrying with small batch size if there is a failure
+        /// </summary>
+        private void ProcessInVariableBatches(List<long> availableIDs,
+            Action<long, long> executeBeforeTransaction, Action executeInTransaction,
+            CancellationToken cancellationToken)
+        {
+            Random rng = new Random();
+            // Collect/add data in batches of 500 records at a time to mitigate memory issues
+            int batchSize = 500;
+            for (int i = 0; i < availableIDs.Count; i += batchSize)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                long lowestIDToProcess = availableIDs[i];
+
+                void Run()
+                {
+                    long highestIDToProcess = 
+                        availableIDs[Math.Min(i + batchSize - 1, availableIDs.Count - 1)];
+
+                    executeBeforeTransaction(lowestIDToProcess, highestIDToProcess);
+
+                    using (var ts = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions
+                    {
+                        IsolationLevel = IsolationLevel.ReadCommitted,
+                        Timeout = TransactionManager.MaximumTimeout
+                    }))
+                    {
+                        executeInTransaction();
+
+                        // Save status to the DB each loop
+                        LastIDProcessed = highestIDToProcess;
+                        SaveStatus();
+
+                        ts.Complete();
+                    }
+                }
+
+                try
+                {
+                    Run();
+
+                    // In case batch size has been decreased unnecessarily much,
+                    // increase it for the next iteration
+                    if (batchSize < 500)
+                    {
+                        batchSize = Math.Min(batchSize * 2, 500);
+                    }
+                }
+                // In case some giant file has caused a transaction to timeout
+                // retry with smaller batch size
+                catch (Exception ex)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var uex = new ExtractException("ELI46425", UtilityMethods.FormatCurrent(
+                            $"Application trace: Error processing with batch size of {batchSize}. ",
+                            $"Retrying with batch size of 1"),
+                        ex);
+                    uex.Log();
+                    batchSize = 1;
+
+                    try
+                    {
+                        Run();
+                    }
+                    catch (Exception ex2)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        var uex2 = new ExtractException("ELI46427", UtilityMethods.FormatCurrent(
+                                $"Application trace: Error processing with batch size of {batchSize}. ",
+                                $"Skipping file"),
+                            ex2);
+                        uex2.Log();
+
+                        // Since batch size of 1 failed, the first file may just be impossible to process
+                        // so skip it and try with normal batch size
+                        i++;
+                        batchSize = 500;
+                        Run();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Writes LearningMachine data to DB
+        /// </summary>
+        private void WriteCsvToDB(IEnumerable<IEnumerable<string>> data, bool isTrainingSet)
+        {
+            using (var connection = NewSqlDBConnection())
+            {
+                connection.Open();
+
+                var cmdText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
+                SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
+                FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName";
+                foreach (var record in data)
+                {
+                    using (var cmd = new SqlCommand(cmdText, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@IsTrainingData", isTrainingSet.ToString());
+                        cmd.Parameters.AddWithValue("@ModelName", QualifiedModelName);
+                        var ussPath = record.First();
+                        cmd.Parameters.AddWithValue("@Data", string.Join(",", record.Skip(2).Select(s => s.QuoteIfNeeded("\"", ","))));
+                        cmd.Parameters.AddWithValue("@FileName", ussPath.Substring(0, ussPath.Length - 4));
+                        cmd.ExecuteNonQuery();
+                    }
+                }
             }
         }
 
