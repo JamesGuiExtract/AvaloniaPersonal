@@ -5,7 +5,7 @@ using System;
 namespace WebAPI.Models
 {
     /// <summary>
-    /// Data model for <see cref="UsersController"/>.
+    /// Data model for UsersController.
     /// </summary>
     public sealed class UserData: IDisposable
     {

@@ -18,9 +18,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="AppBackendControllers\**" />
+    <Compile Remove="AppBackendFiles\**" />
     <Content Remove="AppBackendControllers\**" />
+    <Content Remove="AppBackendFiles\**" />
     <EmbeddedResource Remove="AppBackendControllers\**" />
+    <EmbeddedResource Remove="AppBackendFiles\**" />
     <None Remove="AppBackendControllers\**" />
+    <None Remove="AppBackendFiles\**" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="AppBackendStartup.Auth.cs" />
@@ -139,6 +143,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="DocumentAPIFiles\appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="DocumentAPIFiles\web.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="web.config">

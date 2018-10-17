@@ -17,9 +17,13 @@
     <DefineConstants>TRACE;DEBUG;Add_Test_Controller;NET46</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="DocumentAPIFiles\**" />
     <Compile Remove="DocumentControllers\**" />
+    <Content Remove="DocumentAPIFiles\**" />
     <Content Remove="DocumentControllers\**" />
+    <EmbeddedResource Remove="DocumentAPIFiles\**" />
     <EmbeddedResource Remove="DocumentControllers\**" />
+    <None Remove="DocumentAPIFiles\**" />
     <None Remove="DocumentControllers\**" />
   </ItemGroup>
   <ItemGroup>
@@ -140,7 +144,7 @@
     <Content Update="AppBackendFiles\web.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="appsettings.json">
+    <Content Update="AppBackendFiles\appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
