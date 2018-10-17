@@ -478,7 +478,18 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
-                return AttributeSelector != null;
+                if (AttributeSelector == null)
+                {
+                    return false;
+                }
+
+                if (AttributeSelector is IMustBeConfiguredObject mustBeConfigured
+                    && !mustBeConfigured.IsConfigured())
+                {
+                    return false;
+                }
+
+                return !string.IsNullOrWhiteSpace(SourceListPath);
             }
             catch (Exception ex)
             {
