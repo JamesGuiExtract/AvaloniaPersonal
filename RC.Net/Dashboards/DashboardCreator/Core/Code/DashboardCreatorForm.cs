@@ -9,6 +9,7 @@ using Extract.Dashboard.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
@@ -123,7 +124,7 @@ namespace DashboardCreator
         /// List of files that were selected in the control when the Popup was 
         /// displayed
         /// </summary>
-        public List<string> CurrentFilteredFiles { get; set; } = new List<string>();
+        public Collection<string> CurrentFilteredFiles { get; } = new Collection<string>();
 
         /// <summary>
         /// Since this instance is not a <see cref="DevExpress.DashboardWin.DashboardViewer"/> it should return null

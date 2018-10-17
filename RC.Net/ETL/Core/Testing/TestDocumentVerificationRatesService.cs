@@ -272,28 +272,6 @@ namespace Extract.ETL.Test
             }
         }
 
-        static DocumentVerificationStatus GetStatus (DocumentVerificationRates rates)
-        {
-            using (var connection = GetConnection(rates))
-            {
-                connection.Open();
-                var cmd = connection.CreateCommand();
-                cmd.CommandText = string.Format(CultureInfo.InvariantCulture,
-                    "SELECT [Status] FROM DatabaseService WHERE ID = {0}", rates.DatabaseServiceID);
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        if (!reader.IsDBNull(0))
-                        {
-                            return (DocumentVerificationStatus)DocumentVerificationStatus.FromJson(reader.GetString(0));
-                        }
-                    }
-                }
-            }
-            return new DocumentVerificationStatus();
-        }
-
         static SqlConnection GetConnection(DocumentVerificationRates rates)
         {
             // Build the connection string from the settings

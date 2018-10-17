@@ -147,7 +147,10 @@ namespace Extract.ETL.Management
         /// </summary>
         BindingList<DatabaseServiceData> _listOfDataToDisplay;
 
-        FileProcessingDB _famDB;
+        /// <summary>
+        /// The Current value of the ETLRestart field from the DBInfo table
+        /// </summary>
+        DateTime _EtlRestartTime;
 
         #endregion
 
@@ -173,6 +176,7 @@ namespace Extract.ETL.Management
                 InitializeComponent();
                 DatabaseServer = serverName;
                 DatabaseName = databaseName;
+
                 LoadDataGrid();
                 EnableButtons();
             }
@@ -191,20 +195,6 @@ namespace Extract.ETL.Management
 
         string DatabaseName { get; set; }
 
-        FileProcessingDB FamDB
-        {
-            get
-            {
-                if (_famDB is null)
-                {
-                    _famDB = new FileProcessingDB();
-                    _famDB.DatabaseServer = DatabaseServer;
-                    _famDB.DatabaseName = DatabaseName;
-                }
-                return _famDB;
-            }
-        }
-
         #endregion
 
         #region Private Methods
@@ -221,45 +211,62 @@ namespace Extract.ETL.Management
                 {
                     connection.Open();
 
-                    var command = connection.CreateCommand();
-                    command.CommandText = _DatabaseServiceSql;
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = _DatabaseServiceSql;
 
-                    table.Load(command.ExecuteReader());
+                        table.Load(command.ExecuteReader());
 
-                    var dataToDisplay = table.AsEnumerable()
-                        .Select(r =>
-                        {
-                            var service = DatabaseService.FromJson(r.Field<string>("Settings"));
+                        var dataToDisplay = table.AsEnumerable()
+                            .Select(r =>
+                            {
+                                var service = DatabaseService.FromJson(r.Field<string>("Settings"));
 
                             // An empty settings string results in a null service object
                             return service == null
-                            ? null
-                            : new DatabaseServiceData
-                            {
-                                ID = r.Field<Int32>("ID"),
-                                Description = r.Field<string>("Description"),
-                                Service = service,
-                                ServiceType = service.ExtractCategoryType,
-                                Enabled = r.Field<bool>("Enabled")
-                            };
-                        })
-                        .Where(s => s != null)
-                        .ToList();
+                                ? null
+                                : new DatabaseServiceData
+                                {
+                                    ID = r.Field<Int32>("ID"),
+                                    Description = r.Field<string>("Description"),
+                                    Service = service,
+                                    ServiceType = service.ExtractCategoryType,
+                                    Enabled = r.Field<bool>("Enabled")
+                                };
+                            })
+                            .Where(s => s != null)
+                            .ToList();
 
-                    _listOfDataToDisplay = new BindingList<DatabaseServiceData>(dataToDisplay);
-                    BindingSource bindingSource = new BindingSource();
-                    bindingSource.DataSource = _listOfDataToDisplay;
+                        _listOfDataToDisplay = new BindingList<DatabaseServiceData>(dataToDisplay);
+                        BindingSource bindingSource = new BindingSource();
+                        bindingSource.DataSource = _listOfDataToDisplay;
 
-                    _databaseServicesDataGridView.DataSource = bindingSource;
+                        _databaseServicesDataGridView.DataSource = bindingSource;
 
-                    // Hide the ID column
-                    _databaseServicesDataGridView.Columns["ID"].Visible = false;
-                    _databaseServicesDataGridView.Columns["Service"].Visible = false;
-                    _databaseServicesDataGridView.Columns["ServiceType"].HeaderText = "Service Type";
-                    _databaseServicesDataGridView.Columns["ServiceType"].MinimumWidth = 150;
-                    _databaseServicesDataGridView.Columns["Enabled"].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
-                    _databaseServicesDataGridView.Columns["Enabled"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-                    _databaseServicesDataGridView.Columns["Description"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                        // Hide the ID column
+                        _databaseServicesDataGridView.Columns["ID"].Visible = false;
+                        _databaseServicesDataGridView.Columns["Service"].Visible = false;
+                        _databaseServicesDataGridView.Columns["ServiceType"].HeaderText = "Service Type";
+                        _databaseServicesDataGridView.Columns["ServiceType"].MinimumWidth = 150;
+                        _databaseServicesDataGridView.Columns["Enabled"].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+                        _databaseServicesDataGridView.Columns["Enabled"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+                        _databaseServicesDataGridView.Columns["Description"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    }
+
+                    // This is not a field or property because ManagerDatabaseServicesForm is used by FAMDBAdmin and
+                    // if FileProcessingDB is a property or field FAMDBAdmin doesn't always compile(C++ CLR project)
+                    FileProcessingDB famDB = new FileProcessingDB();
+                    famDB.DatabaseServer = DatabaseServer;
+                    famDB.DatabaseName = DatabaseName;
+
+                    // Get the ETLRestart
+                    string etlRestartString = famDB.GetDBInfoSetting("ETLRestart", false);
+                    //  if it is empty set it to current datetime or if it doesn't parse as a date
+                    if (string.IsNullOrEmpty(etlRestartString) || !DateTime.TryParse(etlRestartString, out _EtlRestartTime))
+                    {
+                        _EtlRestartTime = DateTime.Now;
+                        famDB.SetDBInfoSetting("ETLRestart", _EtlRestartTime.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz"), true, false);
+                    }
                 }
             }
             catch (Exception ex)
@@ -360,7 +367,6 @@ namespace Extract.ETL.Management
             bool enable = _databaseServicesDataGridView.Rows.Count > 0;
             _modifyButton.Enabled = enable;
             _deleteButton.Enabled = enable;
-            _restartETLButton.Enabled = FamDB.GetDBInfoSetting("ETLRestart", false) != "1";
         }
 
         #endregion
@@ -659,7 +665,16 @@ namespace Extract.ETL.Management
         {
             try
             {
-                FamDB.SetDBInfoSetting("ETLRestart", "1", true, false);
+                _EtlRestartTime = DateTime.Now;
+
+                // This is not a field or property because ManagerDatabaseServicesForm is used by FAMDBAdmin and
+                // if FileProcessingDB is a property or field FAMDBAdmin doesn't always compile(C++ CLR project)
+                FileProcessingDB famDB = new FileProcessingDB();
+                famDB.DatabaseServer = DatabaseServer;
+                famDB.DatabaseName = DatabaseName;
+
+                famDB.SetDBInfoSetting("ETLRestart", _EtlRestartTime.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz"), true, false);
+                
                 EnableButtons();
             }
             catch (Exception ex)

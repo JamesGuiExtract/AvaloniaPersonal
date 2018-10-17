@@ -64,6 +64,7 @@ static const string gstrLICENSE_CONTACT_PHONE = "LicenseContactPhone";
 
 static const string gstrINPUT_ACTIVITY_TIMEOUT = "InputActivityTimeout";
 
+static const string gstrETL_RESTART = "ETLRestart";
 
 // Feature names
 static const string gstrFEATURE_FILE_HANDLER_COPY_NAMES = "Files: Copy filenames";

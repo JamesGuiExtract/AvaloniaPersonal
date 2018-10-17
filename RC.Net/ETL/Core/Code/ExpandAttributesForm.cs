@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -115,6 +116,7 @@ namespace Extract.ETL
                 {
                     cmd.CommandText = "Select ID, Description FROM AttributeSetName";
                     DataTable attributeSets = new DataTable();
+                    attributeSets.Locale = CultureInfo.CurrentCulture;
                     attributeSets.Load(cmd.ExecuteReader());
                     if (attributeSets.Rows.Count < 1)
                     {

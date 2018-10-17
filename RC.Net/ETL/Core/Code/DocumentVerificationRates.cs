@@ -49,7 +49,7 @@ namespace Extract.ETL
             /// NOTE: This is no longer used and if it has values the ReportingVerificationRates Table will be cleared
             /// </summary>
             [DataMember]
-            public HashSet<Int32> SetOfActiveFileTaskIds { get; protected set; } = new HashSet<int>();
+            public HashSet<Int32> SetOfActiveFileTaskIds { get; } = new HashSet<int>();
 
             #endregion
 
@@ -399,7 +399,7 @@ namespace Extract.ETL
         /// Gets a <see cref="TransactionScope"/> that has been configured 
         /// </summary>
         /// <returns>Configured <see cref="TransactionScope"/></returns>
-        TransactionScope GetNewTransactionScope()
+        static TransactionScope GetNewTransactionScope()
         {
             return new TransactionScope(
                 TransactionScopeOption.Required,

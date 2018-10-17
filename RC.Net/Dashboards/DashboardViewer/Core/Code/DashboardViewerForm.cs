@@ -7,6 +7,7 @@ using Extract.Dashboard.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
@@ -183,7 +184,7 @@ namespace DashboardViewer
         /// List of files that were selected in the control when the Popup was 
         /// displayed
         /// </summary>
-        public List<string> CurrentFilteredFiles { get; set; } = new List<string>();
+        public Collection<string> CurrentFilteredFiles { get; } = new Collection<string>();
 
         /// <summary>
         /// Since this has a <see cref="DevExpress.DashboardWin.DashboardViewer"/> return the instance of the viewer
@@ -508,31 +509,38 @@ namespace DashboardViewer
 
         protected override void OnLoad(EventArgs e)
         {
-            base.OnLoad(e);
-
-            if (_inDatabase)
+            try
             {
-                if (!string.IsNullOrEmpty(_dashboardName))
+                base.OnLoad(e);
+
+                if (_inDatabase)
                 {
-                    LoadDashboardFromDatabase(_dashboardName);
+                    if (!string.IsNullOrEmpty(_dashboardName))
+                    {
+                        LoadDashboardFromDatabase(_dashboardName);
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(_dashboardName))
+                    {
+                        dashboardViewerMain.DashboardSource = _dashboardName;
+                    }
+                }
+
+                dashboardToolStripMenuItem.Visible = AllowDatabaseDashboardSelection;
+                fileToolStripMenuItem.Visible = !_inDatabase || !AllowDatabaseDashboardSelection;
+
+                UpdateMainTitle();
+                if (_inDatabase && string.IsNullOrEmpty(_dashboardName))
+                {
+                    LoadDashboardList();
+                    dashboardFlyoutPanel.ShowPopup();
                 }
             }
-            else
+            catch (Exception ex)
             {
-                if (!string.IsNullOrEmpty(_dashboardName))
-                {
-                    dashboardViewerMain.DashboardSource = _dashboardName;
-                }
-            }
-
-            dashboardToolStripMenuItem.Visible = AllowDatabaseDashboardSelection;
-            fileToolStripMenuItem.Visible = !_inDatabase || !AllowDatabaseDashboardSelection;
-
-            UpdateMainTitle();
-            if (_inDatabase && string.IsNullOrEmpty(_dashboardName))
-            {
-                LoadDashboardList();
-                dashboardFlyoutPanel.ShowPopup();
+                ex.ExtractDisplay("ELI46428");
             }
         }
 

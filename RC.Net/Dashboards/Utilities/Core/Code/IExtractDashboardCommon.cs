@@ -2,6 +2,7 @@
 using DevExpress.DashboardWin;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
@@ -54,7 +55,7 @@ namespace Extract.Dashboard.Utilities
         /// List of files that were selected in the control when the Popup was 
         /// displayed
         /// </summary>
-        List<string> CurrentFilteredFiles { get; set; }
+        Collection<string> CurrentFilteredFiles { get; }
 
         /// <summary>
         /// If the control that is implementing this interface has a <see cref="DevExpress.DashboardWin.DashboardViewer"/>

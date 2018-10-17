@@ -768,14 +768,6 @@ namespace Extract.ETL
             cmd.Parameters["@EndFileTaskSessionSetID"].Value = endFileTaskSessionId;
         }
 
-        /// <summary>
-        /// Saves the current <see cref="DatabaseServiceStatus"/> to the DB
-        /// </summary>
-        void SaveStatus()
-        {
-            SaveStatus(_status);
-        }
-
         #endregion Private Methods
 
         #region Private Classes

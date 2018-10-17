@@ -187,6 +187,11 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         FileProcessingDB _etlFAMDB;
 
+        /// <summary>
+        /// Last time the ETL Process was started
+        /// </summary>
+        DateTime _lastETLStart;
+
         #endregion Fields
 
         #region Constructors
@@ -944,8 +949,8 @@ namespace Extract.FileActionManager.Utilities
                 .ToList();
 
             // Get the ETL database and server if configured
-            dbManager.Settings.TryGetValue("ETL_DBServer", out _etlDatabaseServer);
-            dbManager.Settings.TryGetValue("ETL_DBName", out _etlDatabaseName);
+            dbManager.Settings.TryGetValue("DatabaseServer", out _etlDatabaseServer);
+            dbManager.Settings.TryGetValue("DatabaseName", out _etlDatabaseName);
 
             // check for database settings for ETL
             if (etlArguments.Any())
@@ -954,8 +959,8 @@ namespace Extract.FileActionManager.Utilities
                 {
                     ExtractException etlException = new ExtractException("ELI46269",
                         "ETL processes are configured to run in the service but no database is configured in Settings.");
-                    etlException.AddDebugData("ETL_DBServer", _etlDatabaseServer ?? string.Empty, false);
-                    etlException.AddDebugData("ETL_DBName", _etlDatabaseName ?? string.Empty, false);
+                    etlException.AddDebugData("DatabaseServer", _etlDatabaseServer ?? string.Empty, false);
+                    etlException.AddDebugData("DatabaseName", _etlDatabaseName ?? string.Empty, false);
                     throw etlException;
                 }
 
@@ -991,6 +996,8 @@ namespace Extract.FileActionManager.Utilities
                 ).Start();
             }
 
+            _lastETLStart = DateTime.Now;
+
             // if the etlDatabaseServer and etlDatabaseName is not configured there is no way to poll for ETL changes
             if (!string.IsNullOrEmpty(_etlDatabaseServer) && !string.IsNullOrEmpty(_etlDatabaseName))
             {
@@ -1000,8 +1007,7 @@ namespace Extract.FileActionManager.Utilities
                     _etlFAMDB.DatabaseName = _etlDatabaseName;
                     _etlFAMDB.DatabaseServer = _etlDatabaseServer;
                 }
-                _etlFAMDB.SetDBInfoSetting("ETLRestart", "0", true, false);
-
+                
                 _checkForETLChangesTimer?.Dispose();
                 _checkForETLChangesTimer = null;
 
@@ -1013,7 +1019,16 @@ namespace Extract.FileActionManager.Utilities
                         _checkForETLChangesTimer.Stop();
 
                         string restartSetting = _etlFAMDB.GetDBInfoSetting("ETLRestart", false);
-                        if (restartSetting != "1")
+                        DateTime restartTime;
+                        if (!DateTime.TryParse(restartSetting, out restartTime))
+                        {
+                            ExtractException restartInvalid = new ExtractException("ELI46424", 
+                                "ETLRestart value in DBInfo should be a date time string");
+                            restartInvalid.AddDebugData("ETLRestart", restartSetting, false);
+                            throw restartInvalid;
+                        }
+                        
+                        if (restartTime <= _lastETLStart)
                         {
                             _checkForETLChangesTimer.Start();
                             return;

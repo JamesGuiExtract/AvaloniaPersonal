@@ -322,7 +322,7 @@ namespace Extract.Dashboard.Utilities
             if (grid is null)
             {
                 // Reset the file list
-                _dashboardForm.CurrentFilteredFiles = new List<string>();
+                _dashboardForm.CurrentFilteredFiles.Clear();
                 return;
             }
 
@@ -376,7 +376,12 @@ namespace Extract.Dashboard.Utilities
                     view.FocusedColumn = fileNameColumn;
 
                     view.FocusedRowHandle = 0;
+                    // Added as part of the fix for https://extract.atlassian.net/browse/ISSUE-15625
+                    // StartIncrementalSearch starts an interactive search in the grid (user types and the grid is 
+                    // searched incrementally. There may be a better way to focus the item clicked and if found can 
+                    // be used here
                     view.StartIncrementalSearch(clickAccessPoint.Value as string);
+                    // StopIncrementalSearch is called so that if a user does type on the keyboard the search will not change
                     view.StopIncrementalSearch();
                     files = new List<string> { clickAccessPoint.Value as string };
                 }
@@ -394,8 +399,7 @@ namespace Extract.Dashboard.Utilities
                 }
 
             }
-            _dashboardForm.CurrentFilteredFiles = files;
-
+            files.ForEach(f => _dashboardForm.CurrentFilteredFiles.Add(f));
         }
 
         public void HandleGridDashboardItemDoubleClick(object sender, DashboardItemMouseActionEventArgs e)

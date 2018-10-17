@@ -2206,6 +2206,9 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrLICENSE_CONTACT_PHONE] = "";
 	mapDefaultValues[gstrINPUT_ACTIVITY_TIMEOUT] = "30";
 
+	CTime ct = CTime::GetCurrentTime();
+	mapDefaultValues[gstrETL_RESTART] = ct.Format(_T("%Y-%m-%dT%H:%M:%S")).operator LPCSTR();
+
 	// Create a new database ID  or use existing if it has been set
 	ByteStream bsDatabaseID;
 

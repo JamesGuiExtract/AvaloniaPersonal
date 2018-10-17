@@ -67,7 +67,7 @@ namespace Extract.FileActionManager.Database
         /// The default number of files to process before respawning the FAMProcess
         /// <para><b>Note:</b></para>
         /// A value of 0 indicates that the process should keep processing until it is
-        /// stopped and will not be respawned. Negative values are not allowed.
+        /// stopped and will not be re-spawned. Negative values are not allowed.
         /// </summary>
         public static readonly int DefaultNumberOfFilesToProcess = 1000;
 
@@ -80,6 +80,16 @@ namespace Extract.FileActionManager.Database
         /// Array used to trim quotes from file names in the FPS file table.
         /// </summary>
         static readonly char[] _TRIM_QUOTES = new char[] { '"' };
+
+        /// <summary>
+        /// The setting key for the DatabaseServer that will be used for database specific operations for the ESFAMService
+        /// </summary>
+        static readonly string DatabaseServerKey = "DatabaseServer";
+
+        /// <summary>
+        /// The setting key for the DatabaseName that will be used for database specific operations for the ESFAMService
+        /// </summary>
+        static readonly string DatabaseNameKey = "DatabaseName";
 
         #endregion Constants
 
@@ -378,6 +388,16 @@ namespace Extract.FileActionManager.Database
                 Name = DatabaseHelperMethods.DatabaseSchemaManagerKey,
                 Value = DBSchemaManager
             });
+            items.Add(new Settings()
+            {
+                Name = DatabaseServerKey,
+                Value = ""
+            });
+            items.Add(new Settings()
+            {
+                Name = DatabaseNameKey,
+                Value = ""
+            });
 
             return items;
         }
@@ -615,15 +635,21 @@ namespace Extract.FileActionManager.Database
                         {
                             case 2:
                                 UpdateFromVersion2SchemaTo6();
+                                UpdateToVersion7();
                                 break;
 
                             case 3:
                             case 4:
                                 UpdateFromVersion3Or4SchemaTo6(backUpFileName);
+                                UpdateToVersion7();
                                 break;
 
                             case 5:
                                 UpdateFromVersion5SchemaTo6();
+                                UpdateToVersion7();
+                                break;
+                            case 6:
+                                UpdateToVersion7();
                                 break;
 
                             default:
@@ -659,7 +685,7 @@ namespace Extract.FileActionManager.Database
         /// <summary>
         /// Updates the database from the version 2 schema to the version 6 schema.
         /// <para><b>Note:</b></para>
-        /// This should not be called unles <see cref="BackupDatabase"/> has been
+        /// This should not be called unless <see cref="BackupDatabase"/> has been
         /// called first.
         /// </summary>
         void UpdateFromVersion2SchemaTo6()
@@ -701,7 +727,7 @@ namespace Extract.FileActionManager.Database
         /// <summary>
         /// Updates the database from either version 3 or 4 schema to the version 6 schema.
         /// <para><b>Note:</b></para>
-        /// This should not be called unles <see cref="BackupDatabase"/> has been
+        /// This should not be called unless <see cref="BackupDatabase"/> has been
         /// called first. The <see cref="string"/> returned from the call should be
         /// passed into this method.
         /// </summary>
@@ -783,7 +809,7 @@ namespace Extract.FileActionManager.Database
         /// <summary>
         /// Updates the database from version 5 schema to the version 6 schema.
         /// <para><b>Note:</b></para>
-        /// This should not be called unles <see cref="BackupDatabase"/> has been
+        /// This should not be called unless <see cref="BackupDatabase"/> has been
         /// called first.
         /// </summary>
         void UpdateFromVersion5SchemaTo6()
@@ -901,6 +927,73 @@ namespace Extract.FileActionManager.Database
                 {
                     currentDb.Dispose();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Updates the Database to version 7 - Adds DatabaseServer and DatabaseName values to settings
+        /// </summary>
+        void UpdateToVersion7()
+        {
+            try
+            {
+                using (FAMServiceDatabaseV6 currentDb = new FAMServiceDatabaseV6(_databaseFile))
+                {
+                    if (currentDb.Connection.State != ConnectionState.Open)
+                    {
+                        currentDb.Connection.Open();
+                    }
+                    using (DbTransaction trans = currentDb.Connection.BeginTransaction())
+                    {
+                        currentDb.Transaction = trans;
+
+                        var databaseServerSetting = currentDb.Settings
+                            .Where(s => s.Name == DatabaseServerKey)
+                            .FirstOrDefault();
+
+                        // Add DatabaseServer and DatabaseName settings if they don't exist
+                        if (databaseServerSetting is null)
+                        {
+                            currentDb.Settings.InsertOnSubmit(new Settings()
+                            {
+                                Name = DatabaseServerKey,
+                                Value = ""
+                            });
+                        }
+
+                        var databaseNameSetting = currentDb.Settings
+                            .Where(s => s.Name == DatabaseNameKey)
+                            .FirstOrDefault();
+                        if (databaseNameSetting is null)
+                        {
+                            currentDb.Settings.InsertOnSubmit(new Settings()
+                            {
+                                Name = DatabaseNameKey,
+                                Value = ""
+                            });
+                        }
+
+                        // Update the schema version to 7
+                        var setting = currentDb.Settings
+                            .Where(s => s.Name == ServiceDBSchemaVersionKey)
+                            .FirstOrDefault();
+                        if (setting.Value is null)
+                        {
+                            var ee = new ExtractException("ELI46429",
+                                "No Service db schema version key found.");
+                            ee.AddDebugData("Database File", _databaseFile, false);
+                            throw ee;
+                        }
+                        setting.Value = "7";
+
+                        currentDb.SubmitChanges(ConflictMode.FailOnFirstConflict);
+                        trans.Commit();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46426");
             }
         }
 

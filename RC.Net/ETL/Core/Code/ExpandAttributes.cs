@@ -331,7 +331,7 @@ namespace Extract.ETL
         /// List of Dashboard attributes to be saved to DashboardAttributeFields
         /// </summary>
         [DataMember]
-        public BindingList<DashboardAttributeField> DashboardAttributes = new BindingList<DashboardAttributeField>();
+        public BindingList<DashboardAttributeField> DashboardAttributes { get; } = new BindingList<DashboardAttributeField>();
 
         #endregion
 
@@ -695,7 +695,7 @@ namespace Extract.ETL
                         }
                         foreach (var r in itemsToRemove)
                         {
-                            _status.LastIDProcessedForDashboardAttribute.Remove(d);
+                            _status.LastIDProcessedForDashboardAttribute.Remove(r);
                         }
                         SaveStatus();
                         scope.Complete();
@@ -913,7 +913,7 @@ namespace Extract.ETL
             /// Dictionary contains the last ID processed for each of the defined attributes
             /// </summary>
             [DataMember]
-            public Dictionary<string, Int32> LastIDProcessedForDashboardAttribute =
+            public Dictionary<string, Int32> LastIDProcessedForDashboardAttribute { get; } =
                 new Dictionary<string, Int32>();
 
             /// <summary>
@@ -939,9 +939,17 @@ namespace Extract.ETL
             /// <returns>The Minimum FileTaskSession that needs to be processed</returns>
             public Int32 StartingFileTaskSessionId()
             {
-                return (LastIDProcessedForDashboardAttribute.Count() > 0) ?
-                    Math.Min(LastFileTaskSessionIDProcessed, LastIDProcessedForDashboardAttribute.Values.Min()) + 1 :
-                    LastFileTaskSessionIDProcessed;
+                try
+                {
+                    return (LastIDProcessedForDashboardAttribute.Count() > 0) ?
+                        Math.Min(LastFileTaskSessionIDProcessed, LastIDProcessedForDashboardAttribute.Values.Min()) + 1 :
+                        LastFileTaskSessionIDProcessed;
+
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI46423");
+                }
             }
         }
 

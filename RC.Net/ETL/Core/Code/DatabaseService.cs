@@ -349,8 +349,8 @@ namespace Extract.ETL
         /// <summary>
         /// Starts a FAMSession and ActiveFAM record for the DatabaseService 
         /// </summary>
-        /// <returns><c>true</c> if the Schedual is active with activeFAMID. Otherwise <c>false</c></returns>
-        public bool StartActiveSchedule(int activeFAMID)
+        /// <returns><c>true</c> if the Schedule is active with activeFAMID. Otherwise <c>false</c></returns>
+        public bool StartActiveSchedule(int activeFamID)
         {
             try
             {
@@ -387,12 +387,12 @@ namespace Extract.ETL
                                       NextScheduledRunTime = @NextScheduledRunTime,
                                       ActiveServiceMachineID = @MachineID
                               WHERE ID = @DatabaseServiceID";
-                        cmd.Parameters.AddWithValue("@ActiveFAMID", activeFAMID);
+                        cmd.Parameters.AddWithValue("@ActiveFAMID", activeFamID);
                         cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
                         cmd.Parameters.Add("@MachineName", SqlDbType.NVarChar, 50).Value = Environment.MachineName;
                         cmd.Parameters.AddWithValue("@NextScheduledRunTime", Schedule?.GetNextOccurrence());
                         cmd.ExecuteNonQuery();
-                        _activeFAMID = activeFAMID;
+                        _activeFAMID = activeFamID;
                     }
                     scope.Complete();
                 }
@@ -610,8 +610,10 @@ namespace Extract.ETL
                         {
                             cmd.CommandText += "WHERE TaskClass.GUID = 'B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006'";
                         }
-
-                        return (int)(cmd.ExecuteScalar() ?? -1);
+                        var result = cmd.ExecuteScalar();
+                        
+                        // The value returned could be a DBNull value so check
+                        return (int)((result == DBNull.Value) ? -1 : result);
                     }
                 }
             }

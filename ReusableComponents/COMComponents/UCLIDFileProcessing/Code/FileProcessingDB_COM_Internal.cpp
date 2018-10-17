@@ -2426,6 +2426,7 @@ int UpdateToSchemaVersion170(_ConnectionPtr ipConnection,
 		vecQueries.push_back(gstrADD_DATABASESERVICE_ACTIVE_MACHINE_FK);
 		vecQueries.push_back("ALTER TABLE dbo.[FAMFile] ADD [AddedDateTime] [datetime] NOT NULL CONSTRAINT [DF_FAMFile_AddedDateTime] DEFAULT(GETDATE())");
 		vecQueries.push_back("ALTER TABLE dbo.[WorkflowFile] ADD [AddedDateTime] [datetime] NOT NULL CONSTRAINT [DF_WorkflowFile_AddedDateTime] DEFAULT(GETDATE())");
+		vecQueries.push_back("INSERT INTO DBINFO ([Name], [Value]) VALUES ('ETLRestart', CONVERT(NVARCHAR(MAX), SYSDATETIMEOFFSET(), 126 ))");
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 

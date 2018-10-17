@@ -17,7 +17,7 @@ namespace Extract.FileActionManager.Database
         /// <summary>
         /// The current schema version for the FAM service database
         /// </summary>
-        public static readonly int CurrentSchemaVersion = 6;
+        public static readonly int CurrentSchemaVersion = 7;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FAMServiceDatabase"/> class.
