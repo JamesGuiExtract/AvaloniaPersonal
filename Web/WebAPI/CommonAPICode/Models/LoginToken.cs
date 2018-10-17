@@ -11,12 +11,12 @@ namespace WebAPI.Models
     public class LoginToken
     {
         /// <summary>
-        /// The JWT Bearer token to identify a caller in subsequent API calls.
+        /// The JWT Bearer token to identify a caller in subsequent API calls
         /// </summary>
         public string access_token { get; set; }
 
         /// <summary>
-        /// The number of seconds before this token expires.
+        /// The number of seconds before this token expires
         /// </summary>
         public int expires_in { get; set; }
     }

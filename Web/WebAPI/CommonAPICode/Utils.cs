@@ -133,7 +133,7 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// set the default API context instance - an overload of above for convenience
+        /// Set the default API context instance - an overload of above for convenience
         /// NOTE: this overload is used only by nunit tests currently
         /// </summary>
         /// <param name="apiContext"></param>
@@ -154,7 +154,7 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// "apply" the current API context - this creates a FileApi member using the context, useful for
+        /// Validates the current API context - this creates a FileApi member using the context, useful for
         /// checking that the named workflow actually exists in the configured DatabaseServer/Database.
         /// </summary>
         public static void ValidateCurrentApiContext()
@@ -175,7 +175,7 @@ namespace WebAPI
 
 
         /// <summary>
-        /// the JWT Issuer (iss: )
+        /// The JWT Issuer (iss: )
         /// </summary>
         public static string Issuer
         {
@@ -186,7 +186,7 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// the JWT Audience (aud: )
+        /// The JWT Audience (aud: )
         /// </summary>
         public static string Audience
         {
@@ -197,7 +197,7 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// create an ApiContext object from Claims.
+        /// Creates an ApiContext object from Claims.
         /// The JWT is expected to have non-empty values for all of the API context members
         /// NOTE: This function is only intended for use by Controller methods
         /// </summary>
@@ -271,7 +271,7 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// create an ApiContext object.
+        /// Creates an ApiContext object.
         /// </summary>
         /// <param name="workflowName">the user-specified workflow name</param>
         /// <returns> an API context object</returns>

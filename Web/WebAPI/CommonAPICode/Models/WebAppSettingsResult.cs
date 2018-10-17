@@ -8,7 +8,7 @@ namespace WebAPI.Models
     public class WebAppSettingsResult
     {
         /// <summary>
-        /// The redaction types that should be available to select.
+        /// The redaction types that should be available to select
         /// </summary>
         public IEnumerable<string> RedactionTypes;
     }

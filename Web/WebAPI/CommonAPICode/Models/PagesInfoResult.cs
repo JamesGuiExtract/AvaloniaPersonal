@@ -4,28 +4,28 @@ using UCLID_RASTERANDOCRMGMTLib;
 namespace WebAPI.Models
 {
     /// <summary>
-    /// Data model for information on all pages in a document.
+    /// Data model for information on all pages in a document
     /// </summary>
     public class PagesInfoResult
     {
         /// <summary>
-        /// Gets or sets the page count.
+        /// The page count
         /// </summary>
         public int PageCount { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="PageInfo"/>s.
+        /// The <see cref="PageInfo"/>s
         /// </summary>
         public List<PageInfo> PageInfos { get; set; }
     }
 
     /// <summary>
-    /// Data for a specific document page.
+    /// Data for a specific document page
     /// </summary>
     public class PageInfo
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PageInfo"/> class.
+        /// Initializes a new instance of the <see cref="PageInfo"/> class
         /// </summary>
         /// <param name="page"></param>
         /// <param name="spatialPageInfo"></param>
@@ -44,22 +44,22 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Gets or sets the page.
+        /// The page
         /// </summary>
         public int Page { get; set; }
 
         /// <summary>
-        /// Gets or sets the orientation (in degrees) the page should display in by default.
+        /// The orientation (in degrees) the page should display in by default
         /// </summary>
         public int DisplayOrientation { get; set; }
 
         /// <summary>
-        /// Gets or sets the width of the page (in pixels).
+        /// The width of the page (in pixels)
         /// </summary>
         public int Width { get; set; }
 
         /// <summary>
-        /// Gets or sets the height of the page (in pixels).
+        /// The height of the page (in pixels)
         /// </summary>
         public int Height { get; set; }
     }

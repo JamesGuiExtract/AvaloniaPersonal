@@ -9,13 +9,13 @@ namespace WebAPI.Models
     public class PageTextResult
     {
         /// <summary>
-        /// Gets or sets the pages.
+        /// The pages
         /// </summary>
         public List<PageText> Pages { get; set; }
     }
 
     /// <summary>
-    /// The text of a particular document page.
+    /// The text of a particular document page
     /// </summary>
     public class PageText
     {
@@ -31,12 +31,12 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Gets or sets the page.
+        /// The page
         /// </summary>
         public int Page { get; set; }
 
         /// <summary>
-        /// Gets or sets the text of the result
+        /// The text of the result
         /// </summary>
         public string Text { get; set; }
     }

@@ -57,16 +57,14 @@ namespace WebAPI.Models
     }
 
     /// <summary>
-    /// Spatial-line "zone" - a possibly skewed rectangular area. The skew
-    /// is represented by height relative to the starting point. Typically 
-    /// the end point is vertically displayed by one (when there is no skew), 
-    /// so that start and end determine a line, which defines a rectangle 
-    /// when the height is applied.
+    /// A rectangular area defined by a center line between two points
+    /// and a height. The height is the length of the sides perpendicular to the defining line.
+    /// The zone extends half of height in both directions from the center line.
     /// </summary>
     public class SpatialLineZone // page coordinates - raster zone
     {
         /// <summary>
-        /// The page number where the attribute exists, or -1 when the attribute doesn't have spatial info.
+        /// The page number where the attribute exists, or -1 when the attribute doesn't have spatial info
         /// </summary>
         public int PageNumber { get; set; }
 
@@ -76,27 +74,27 @@ namespace WebAPI.Models
         public string Text { get; set; }
 
         /// <summary>
-        /// left side of zone
+        /// The x coordinate of the start of the defining line
         /// </summary>
         public int StartX { get; set; }
 
         /// <summary>
-        /// top of zone 
+        /// The y coordinate of the start of the defining line
         /// </summary>
         public int StartY { get; set; }
 
         /// <summary>
-        /// right side of zone
+        /// The x coordinate of the end of the defining line
         /// </summary>
         public int EndX { get; set; }
 
         /// <summary>
-        /// bottom side of zone
+        /// The y coordinate of the end of the defining line
         /// </summary>
         public int EndY { get; set; }
 
         /// <summary>
-        /// The height of the bounding rect, relative to the Start point.
+        /// The height of the rectangle (length of the sides perpendicular to the defining line)
         /// </summary>
         public int Height { get; set; }
     }
@@ -107,7 +105,7 @@ namespace WebAPI.Models
     public class SpatialLineBounds // page coordinates
     {
         /// <summary>
-        /// The start page number where the attribute exists, or -1 when the attribute doesn't have spatial info.
+        /// The start page number where the attribute exists, or -1 when the attribute doesn't have spatial info
         /// </summary>
         public int PageNumber { get; set; }
 
@@ -117,22 +115,22 @@ namespace WebAPI.Models
         public string Text { get; set; }
 
         /// <summary>
-        /// the top of the bounding rectangle.
+        /// The top of the bounding rectangle
         /// </summary>
         public int Top { get; set; }
 
         /// <summary>
-        /// the left edge of the bounding rectangle.
+        /// The left edge of the bounding rectangle
         /// </summary>
         public int Left { get; set; }
 
         /// <summary>
-        /// The bottom of the bounding rectangle.
+        /// The bottom of the bounding rectangle
         /// </summary>
         public int Bottom { get; set; }
 
         /// <summary>
-        /// The right edge of the bounding rectangle.
+        /// The right edge of the bounding rectangle
         /// </summary>
         public int Right { get; set; }
     }
@@ -154,7 +152,7 @@ namespace WebAPI.Models
     }
 
     /// <summary>
-    /// The position information of the attribute, and the associated page number of the document that the attribute is found on.
+    /// The position information of the attribute, and the associated page number of the document that the attribute is found on
     /// </summary>
     public class Position
     {
@@ -235,7 +233,7 @@ namespace WebAPI.Models
     }
 
     /// <summary>
-    /// The core attribute data to be shared by any model dealing with attributes.
+    /// The core attribute data to be shared by any model dealing with attributes
     /// </summary>
     public class DocumentAttributeCore
     {
@@ -262,7 +260,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Gets or sets the identifier.
+        /// The identifier
         /// </summary>
         public string ID { get; set; } = Guid.NewGuid().ToString();
 

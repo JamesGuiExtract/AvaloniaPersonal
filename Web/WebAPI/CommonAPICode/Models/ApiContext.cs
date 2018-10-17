@@ -20,7 +20,7 @@ namespace WebAPI.Models
         const string _defaultRetryTimeout = "120";
 
         /// <summary>
-        /// this class maintains the essential API context data - Database server name, database name, and workflow name
+        /// This class maintains the essential API context data - Database server name, database name, and workflow name
         /// </summary>
         /// <param name="databaseServerName">server name</param>
         /// <param name="databaseName">database name</param>
@@ -70,37 +70,37 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Number of times to retry DB connection on failure
+        /// The number of times to retry DB connection on failure
         /// </summary>
         public int NumberOfConnectionRetries { get; private set; }
 
         /// <summary>
-        /// retry interval in seconds
+        /// The retry interval in seconds
         /// </summary>
         public int ConnectionRetryTimeout { get; private set; }
 
         /// <summary>
-        /// database server name
+        /// The database server name
         /// </summary>
         public string DatabaseServerName { get; private set; }
 
         /// <summary>
-        /// database name
+        /// The database name
         /// </summary>
         public string DatabaseName { get; private set; }
 
         /// <summary>
-        /// workflow name
+        /// The workflow name
         /// </summary>
         public string WorkflowName { get; set; }
 
         /// <summary>
-        /// Gets the session identifier for this context.
+        /// The session identifier for this context.
         /// </summary>
         public string SessionId { get; set; } = Guid.NewGuid().ToString();
 
         /// <summary>
-        /// Gets the FAM Session ID to which the <see cref="SessionId"/> maps.
+        /// The FAM Session ID to which the <see cref="SessionId"/> maps.
         /// </summary>
         public int FAMSessionId { get; set; }
     }

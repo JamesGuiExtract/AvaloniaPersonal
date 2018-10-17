@@ -46,7 +46,7 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// Gets the The HTTP status code value to return.
+        /// The HTTP status code value to return.
         /// </summary>
         public int StatusCode
         {

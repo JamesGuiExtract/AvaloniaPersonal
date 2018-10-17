@@ -11,12 +11,12 @@ namespace WebAPI
     public class ServerOptions
     {
         /// <summary>
-        /// The database server to connect too.
+        /// The database server to connect too
         /// </summary>
         public string DatabaseServer { get; set; }
 
         /// <summary>
-        /// The database to use.
+        /// The database to use
         /// </summary>
         public string DatabaseName { get; set; }
     }

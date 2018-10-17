@@ -7,7 +7,7 @@ namespace WebAPI.Models
     public class ErrorResult
     {
         /// <summary>
-        /// The <see cref="ErrorInfo"/> describing the error.
+        /// The <see cref="ErrorInfo"/> describing the error
         /// </summary>
         public ErrorInfo Error { get; set; } = new ErrorInfo();
     }

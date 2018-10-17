@@ -10,7 +10,7 @@ namespace WebAPI.Models
     public class DocumentIdResult
     {
         /// <summary>
-        /// The ID of the document.
+        /// The ID of the document
         /// </summary>
         public int Id { get; set; }
     }

@@ -1175,11 +1175,8 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Gets the image converter.
+        /// The image converter
         /// </summary>
-        /// <value>
-        /// The image converter.
-        /// </value>
         ImageConverter ImageConverter
         {
             get
@@ -1229,11 +1226,8 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Gets the document session file identifier.
+        /// The document session file identifier
         /// </summary>
-        /// <value>
-        /// The document session file identifier.
-        /// </value>
         public int DocumentSessionFileId
         {
             get
@@ -1245,12 +1239,9 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Gets the <see cref="SpatialString"/> from the uss file representing the currently open
-        /// document's OCR results.
+        /// The <see cref="SpatialString"/> from the uss file representing the currently open
+        /// document's OCR results
         /// </summary>
-        /// <value>
-        /// The <see cref="SpatialString"/> representing the currently open document's OCR results.
-        /// </value>
         SpatialString DocumentSessionUssData
         {
             get

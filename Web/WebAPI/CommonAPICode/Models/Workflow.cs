@@ -16,7 +16,7 @@ namespace WebAPI.Models
         private string _databaseName;
 
         /// <summary>
-        /// The Id of the Workflow, used to get by Id.
+        /// The ID of the Workflow, used to get-by-ID
         /// </summary>
         public int Id
         {
@@ -32,7 +32,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Name of the workflow
+        /// The name of the workflow
         /// </summary>
         public string Name
         {
@@ -49,22 +49,22 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// the workflow Type value
+        /// The workflow type
         /// </summary>
         public EWorkflowType Type { get; set; }
 
         /// <summary>
-        /// description of the workflow
+        /// Description of the workflow
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// the entry action for the workflow
+        /// The entry action for the workflow
         /// </summary>
         public string StartAction { get; set; }
 
         /// <summary>
-        /// Gets or sets the post verify action.
+        /// The post verify action
         /// </summary>
         public string EditAction { get; set; }
 

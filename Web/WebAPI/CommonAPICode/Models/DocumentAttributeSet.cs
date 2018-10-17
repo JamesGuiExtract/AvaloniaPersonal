@@ -32,7 +32,7 @@ namespace WebAPI.Models
     public class DocumentDataPatch
     {
         /// <summary>
-        /// Gets or sets the attributes to add/change/delete.
+        /// The attributes to add/change/delete
         /// </summary>
         public List<DocumentAttributePatch> Attributes { get; set; }
     }

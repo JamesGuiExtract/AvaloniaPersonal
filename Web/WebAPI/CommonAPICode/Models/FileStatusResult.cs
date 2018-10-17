@@ -11,13 +11,13 @@ namespace WebAPI.Models
     public class FileStatusResult
     {
         /// <summary>
-        /// The list of all file statuses.
+        /// The list of all file statuses
         /// </summary>
         public List<FileStatus> FileStatuses { get; set; }
     }
 
     /// <summary>
-    /// The status of a particular file in a workflow.
+    /// The status of a particular file in a workflow
     /// </summary>
     public class FileStatus
     {

@@ -34,7 +34,7 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// gets/sets the Token timeout interval used in JWTs
+        /// The Token timeout interval used in JWTs
         /// </summary>
         public static int TokenTimeoutInSeconds
         {

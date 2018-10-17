@@ -6,27 +6,27 @@ using System.Threading.Tasks;
 namespace WebAPI.Models
 {
     /// <summary>
-    /// overall status information of a workflow
+    /// The overall status information of a workflow
     /// </summary>
     public class WorkflowStatusResult
     {
         /// <summary>
-        /// number of documents processing
+        /// The number of documents processing
         /// </summary>
         public int NumberProcessing { get; set; }
 
         /// <summary>
-        /// number of documents done processing
+        /// The number of documents done processing
         /// </summary>
         public int NumberDone { get; set; }
 
         /// <summary>
-        /// number of documents that have failed
+        /// The number of documents that have failed
         /// </summary>
         public int NumberFailed { get; set; }
 
         /// <summary>
-        /// number of document submitted but that are no longer progressing through the workflow.
+        /// The number of document submitted but that are no longer progressing through the workflow.
         /// </summary>
         public int NumberIncomplete { get; set; }
     }

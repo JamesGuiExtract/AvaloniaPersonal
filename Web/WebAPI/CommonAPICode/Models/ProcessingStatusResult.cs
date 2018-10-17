@@ -37,7 +37,7 @@
         Failed,
 
         /// <summary>
-        /// The document was submitted for processing, but is no longer progressing in the workflow.
+        /// The document was submitted for processing, but is no longer progressing in the workflow
         /// </summary>
         Incomplete,
 

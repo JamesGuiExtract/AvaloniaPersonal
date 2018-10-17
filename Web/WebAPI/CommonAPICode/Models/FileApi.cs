@@ -90,7 +90,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Gets/sets the database server name configured for this instance
+        /// The database server name configured for this instance
         /// </summary>
         public string DatabaseServer
         {
@@ -101,7 +101,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Gets/sets the database name configured for this instance
+        /// The database name configured for this instance
         /// </summary>
         public string DatabaseName
         {
@@ -134,7 +134,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Gets session ID (for instances specific to a <see cref="ClaimsPrincipal"/>.
+        /// The session ID (for instances specific to a <see cref="ClaimsPrincipal"/>
         /// </summary>
         public string SessionId
         {
@@ -145,7 +145,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Gets the ID of the session in the FAM database with which this instance has been associated.
+        /// The ID of the session in the FAM database with which this instance has been associated
         /// </summary>
         public int FAMSessionId
         {
@@ -161,12 +161,12 @@ namespace WebAPI.Models
         public bool InUse { get; set; }
 
         /// <summary>
-        /// Gets or sets the open state, ID, file ID and start time of a document session.
+        /// The open state, ID, file ID and start time of a document session
         /// </summary>
         public (bool IsOpen, int Id, int FileId, DateTime StartTime) DocumentSession { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether the session is expired.
+        /// A value indicating whether the session is expired.
         /// </summary>
         public bool Expired
         {
