@@ -64,7 +64,7 @@ namespace WebAPI
 
         /// <summary>
         /// This method creates a <see cref="ClaimsPrincipal"/> representing the authenticated
-        /// <see paramref="user"/>.
+        /// user.
         /// </summary>
         /// <param name="user">the User DTO instance</param>
         /// <param name="context">the user's context</param>
@@ -123,7 +123,7 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// Get this datetime as a Unix epoch timestamp (seconds since Jan 1, 1970, midnight UTC).
+        /// Gets this datetime as a Unix epoch timestamp (seconds since Jan 1, 1970, midnight UTC).
         /// </summary>
         /// <param name="date">The date to convert.</param>
         /// <returns>Seconds since Unix epoch.</returns>

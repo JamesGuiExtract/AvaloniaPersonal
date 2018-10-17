@@ -16,7 +16,7 @@ namespace WebAPI
     internal static class ControllerExceptionHandler
     {
         /// <summary>
-        /// Asserts that the specified <see paramref="controller"/> is valid.
+        /// Asserts that the specified controller is valid.
         /// </summary>
         /// <param name="controller">The controller to validate.</param>
         /// <param name="eliCode">The eli code to assign on error.</param>

@@ -234,7 +234,7 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// Gets the value for the specified <see paramref="claimName"/>.
+        /// Gets the value for the specified claimName.
         /// </summary>
         /// <param name="claimsPrincipal">The claims principal.</param>
         /// <param name="claimName">Name of the claim.</param>
@@ -247,7 +247,7 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// Gets the username associated with the <see paramref="claimsPrincipal"/>.
+        /// Gets the username associated with the claimsPrincipal.
         /// </summary>
         /// <param name="claimsPrincipal">The claims principal.</param>
         /// <returns></returns>

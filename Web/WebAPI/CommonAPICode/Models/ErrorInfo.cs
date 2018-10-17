@@ -3,7 +3,7 @@
 namespace WebAPI.Models
 {
     /// <summary>
-    /// Information descriping API errors
+    /// Information describing API errors
     /// </summary>
     public class ErrorInfo
     {

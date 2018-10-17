@@ -36,7 +36,7 @@ namespace WebAPI.Models
         public int Page { get; set; }
 
         /// <summary>
-        /// the Text of the result
+        /// Gets or sets the text of the result
         /// </summary>
         public string Text { get; set; }
     }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace WebAPI.Models
 {
     /// <summary>
-    /// Represents text as an API argument or return value.
+    /// Represents text of an API argument or return value.
     /// </summary>
     public class TextData
     {

@@ -2,7 +2,7 @@
 namespace WebAPI.Models
 {
     /// <summary>
-    /// An API return value with <see cref="ErrorInfo"/> regarding and error that occurred.
+    /// An API return value with <see cref="ErrorInfo"/> regarding an error that occurred.
     /// </summary>
     public class ErrorResult
     {

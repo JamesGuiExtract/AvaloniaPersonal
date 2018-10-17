@@ -60,7 +60,7 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get the source document
+        /// Gets the source document
         /// </summary>
         /// <param name="Id">The document ID</param>
         /// <returns>The original image file associated with the file id</returns>
@@ -155,7 +155,7 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Gets the text of a specified document. If the document submitted as an image file,
+        /// Gets the text of a specified document. If the document was submitted as an image file,
         /// the result will be the OCR text for the document (divided into pages). If the document
         /// was submitted as text, the result will be the submitted text.
         /// </summary>
@@ -272,7 +272,7 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get each word from a document page along with its spatial location on the document.
+        /// Gets each word from a document page along with its spatial location on the document.
         /// </summary>
         /// <param name="Id">The document ID</param>
         /// <param name="Page">The page number</param>
@@ -300,7 +300,7 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get the document type
+        /// Gets the document type
         /// </summary>
         /// <param name="Id">The document ID</param>
         /// <returns>string containing the type of the document</returns>
@@ -328,7 +328,7 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get the found data for a document
+        /// Gets the found data for a document
         /// </summary>
         /// <param name="Id">The document ID</param>
         /// <returns>A <see cref="DocumentDataResult"/> containing the document data.</returns>
@@ -425,7 +425,7 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Adds, updates or deletes specified attributes in the document data.
+        /// Adds, updates or deletes specified document data attributes.
         /// </summary>
         /// <param name="Id">The document ID</param>
         /// <param name="documentData">The changes to apply to the document data</param>
@@ -490,7 +490,7 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get the output file for the specified input document (e.g., a redacted copy or a searchable PDF)
+        /// Gets the output file for the specified input document (e.g., a redacted copy or a searchable PDF)
         /// </summary>
         /// <param name="Id">The document ID</param>
         /// <returns>A <see cref="PhysicalFileResult"/>.</returns>
@@ -529,7 +529,7 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Get the output text result; valid only for submitted text.
+        /// Gets the output text result; valid only for submitted text.
         /// </summary>
         /// <param name="Id">The document ID</param>
         /// <returns>TextResult instance</returns>

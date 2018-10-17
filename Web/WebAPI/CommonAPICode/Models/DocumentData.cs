@@ -110,7 +110,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Opens a session for the specified <see paramref="user"/>.
+        /// Opens a session for the specified user.
         /// </summary>
         /// <param name="user">The <see cref="User"/> this instance is specific to.</param>
         /// <param name="remoteIpAddress">The IP address of the web application user.s</param>
@@ -643,7 +643,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Updates the document data for the specified <see paramref="fileId"/> in the FAM DB.
+        /// Updates the document data for the specified fileId in the FAM DB.
         /// </summary>
         /// <param name="fileId">The FAM file ID for which data should be updated.</param>
         /// <param name="fileData">The file data.</param>

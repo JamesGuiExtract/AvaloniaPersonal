@@ -100,10 +100,9 @@ namespace WebAPI.Models
 
         /// <summary>
         /// Finds an available <see cref="FileApi"/> instance for the specified
-        /// <see paramref="apiContext"/> and <see paramref="sessionOwner"/>.
+        /// apiContext and sessionOwner.
         /// </summary>
         /// <param name="apiContext">the API context to use</param>
-        /// <returns></returns>
         static FileApi FindAvailable(ApiContext apiContext)
         {
             // Try first to look up an instance that was specificially associated with apiContext.

@@ -18,7 +18,7 @@ namespace WebAPI.Controllers
     public class UsersController : Controller
     {
         /// <summary>
-        /// Authenticates <see paramref="user"/>, and if successful returns a JWT.
+        /// Authenticates a user and, if successful, returns a JSON Web Token.
         /// </summary>
         /// <param name="user">A User object (name, password, optional claim)</param>
         // POST api/Users/Login

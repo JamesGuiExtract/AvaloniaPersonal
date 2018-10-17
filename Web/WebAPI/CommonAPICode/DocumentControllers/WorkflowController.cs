@@ -18,7 +18,7 @@ namespace WebAPI.Controllers
     public class WorkflowController : Controller
     {
         /// <summary>
-        /// Gets the overall status of a workflow (# of files in each state)
+        /// Gets the overall status of the workflow (# of files in each state)
         /// </summary>
         /// <returns>a workflow status object</returns>
         [HttpGet("Status")]

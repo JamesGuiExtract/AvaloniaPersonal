@@ -79,7 +79,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Get the fileProcessingDB instance
+        /// Gets the fileProcessingDB instance
         /// </summary>
         public FileProcessingDB FileProcessingDB
         {
@@ -90,7 +90,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// get/set the database server name configured for this instance
+        /// Gets/sets the database server name configured for this instance
         /// </summary>
         public string DatabaseServer
         {
@@ -101,7 +101,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Get/set the database name configured for this instance
+        /// Gets/sets the database name configured for this instance
         /// </summary>
         public string DatabaseName
         {

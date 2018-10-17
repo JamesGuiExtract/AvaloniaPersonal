@@ -140,10 +140,10 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// Returns an enumeration of all <see paramref="attributes"/> and their subattributes, recursively.
+        /// Returns an enumeration of all attributes and their subattributes, recursively.
         /// </summary>
         /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s to enumerate.</param>
-        /// <returns>An enumeration of <see paramref="attribute"/> and its subattributes, recursively</returns>
+        /// <returns>An enumeration of the attribute and its subattributes, recursively</returns>
         public static IEnumerable<(IAttribute attribute, IAttribute parent)> Enumerate(this IUnknownVector attributes)
         {
             foreach (var attribute in attributes.ToIEnumerable<IAttribute>())
@@ -158,11 +158,11 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// Converts <see paramref="comVector"/> into an enumerable.
+        /// Converts comVector into an enumerable.
         /// </summary>
         /// <typeparam name="T">The type of object in the vector.</typeparam>
         /// <param name="comVector">The <see cref="IIUnknownVector"/> to convert.</param>
-        /// <returns>An enumerable of type <see paramref="T"/>.</returns>
+        /// <returns>An enumerable of type T.</returns>
         public static IEnumerable<T> ToIEnumerable<T>(this IIUnknownVector comVector)
         {
             int size = comVector.Size();

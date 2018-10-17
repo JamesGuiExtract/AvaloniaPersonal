@@ -185,7 +185,7 @@ namespace WebAPI
 
         /// <summary>
         /// Converts the specified <see cref="DocumentAttribute"/> to a COM <see cref="IAttribute"/>
-        /// and optionally maps it into <see paramref="targetComAttribute"/> or else creates a new attribute.
+        /// and optionally maps it into targetComAttribute or else creates a new attribute.
         /// When mapping into an exising attribute, existing field values will be left as is unless specified
         /// in the incoming data Position data which, if specified, which will entirely replace any existing
         /// spatial data. Spatial data can be specified via either <see cref="SpatialLineZone"/>
@@ -195,7 +195,7 @@ namespace WebAPI
         /// <param name="attributeModel">The <see cref="DocumentAttribute"/> to convert.</param>
         /// <param name="targetComAttribute">The <see cref="IAttribute"/> to be updated or <c>null</c>
         /// to retrun a new COM attribute.</param>
-        /// <returns>A COM <see cref="IAttribute"/> representation of <see paramref="attribute"/>.
+        /// <returns>A COM IAttribute representation of the attribute.
         /// This value will always be a hybrid attribute if spatial, never a true spatial attribute.
         /// </returns>
         IAttribute ConvertAttribute(DocumentAttributeCore attributeModel, IAttribute targetComAttribute = null)
@@ -306,7 +306,7 @@ namespace WebAPI
         /// (not <see cref="SpatialLineBounds"/>).
         /// </summary>
         /// <param name="attribute">The <see cref="DocumentAttribute"/> to convert.</param>
-        /// <returns>A COM <see cref="IAttribute"/> representation of <see paramref="attribute"/>.
+        /// <returns>A COM IAttribute representation of the attribute.
         /// This value will always be a hybrid attribute if spatial, never a true spatial attribute.
         /// </returns>
         IAttribute ConvertAttribute(DocumentAttribute attribute)
@@ -326,8 +326,8 @@ namespace WebAPI
         }
 
         /// <summary>
-        /// Gets an attribute and its parent from <see paramref="attributes"/> by
-        /// <see paramref="guidString"/> that specifies the target attribute's ID.
+        /// Gets an attribute and its parent from attributes by
+        /// guidString that specifies the target attribute's ID.
         /// </summary>
         /// <param name="guidString">The unique identifier string for the attribute.</param>
         /// <param name="attributes">The attributes to search</param>
