@@ -31,6 +31,9 @@
     <Compile Remove="AppBackendStartup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Remove="appsettings.json" />
+  </ItemGroup>
+  <ItemGroup>
     <COMReference Include="UCLID_FILEPROCESSINGLib.dll">
       <Guid>5fbc9199-d162-4f14-bad9-090f6ab576c5</Guid>
       <VersionMajor>1</VersionMajor>
@@ -142,9 +145,6 @@
     <Content Update="app.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Update="DocumentAPIFiles\appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -155,4 +155,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="Copy DocumentAPIFiles\appSettings.json $(ProjectDir)" />
+  </Target>
 </Project>

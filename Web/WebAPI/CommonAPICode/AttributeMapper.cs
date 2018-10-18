@@ -2,7 +2,6 @@
 using WebAPI.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;

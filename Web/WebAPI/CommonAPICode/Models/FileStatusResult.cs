@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace WebAPI.Models
 {
@@ -22,12 +19,12 @@ namespace WebAPI.Models
     public class FileStatus
     {
         /// <summary>
-        /// 
+        /// The document ID
         /// </summary>
         public int ID { get; set; }
 
         /// <summary>
-        /// 
+        /// The status of the file
         /// </summary>
         public string Status { get; set; }
     }

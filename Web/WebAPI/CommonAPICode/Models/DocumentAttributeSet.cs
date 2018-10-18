@@ -3,31 +3,31 @@
 namespace WebAPI.Models
 {
     /// <summary>
-    /// Document attributes retrieved as an API call result.
+    /// A result containing the data for a document
     /// </summary>
     public class DocumentDataResult
     {
         /// <summary>
-        /// list of attributes - may be empty (on error WILL be empty)
+        /// A list of attributes (fields) comprising the document data
         /// </summary>
         public List<DocumentAttribute> Attributes { get; set; } = new List<DocumentAttribute>();
     }
 
     /// <summary>
-    /// Document attributes to replace all existing data for a document.
+    /// Document data representation intended to replace all existing data for a document.
     /// </summary>
     public class DocumentDataInput
     {
         /// <summary>
-        /// A list of <see cref="DocumentAttribute"/> comprising the document data.
+        /// A list of attributes (fields) comprising the document data
         /// </summary>
         public List<DocumentAttribute> Attributes { get; set; }
     }
 
     /// <summary>
-    /// Represents changes to make to an existing attribute set (add/update/delete). There is no
-    /// hierarchy to these attributes; each change is made using attribute a guid; changes are made
-    /// in the order they appear in the Attributes list.
+    /// Represents changes to make to existing document data (add/update/delete of specific attributes).
+    /// There is no hierarchy to these attributes; each change is made using attribute a guid; changes
+    /// are made in the order they appear in the Attributes list.
     /// </summary>
     public class DocumentDataPatch
     {

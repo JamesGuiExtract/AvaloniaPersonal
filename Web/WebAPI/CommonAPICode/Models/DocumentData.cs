@@ -510,7 +510,11 @@ namespace WebAPI.Models
                 HTTPError.Assert("ELI45362", StatusCodes.Status404NotFound,
                     ussData != null,
                     "Word data is not available for document");
-                
+
+                HTTPError.Assert("ELI46431", StatusCodes.Status404NotFound,
+                    ussData.HasSpatialInfo(), "Spatial data not available",
+                    ("Page", page, true), ("Test", "value", false));
+
                 HTTPError.AssertRequest("ELI46420",
                         page > 0, "Invalid page number",
                         ("Page", page, true), ("Test", "value", false));
@@ -801,6 +805,10 @@ namespace WebAPI.Models
             try
             {
                 var fileName = GetSourceFileName(fileId);
+
+                HTTPError.Assert("ELI46433", StatusCodes.Status404NotFound,
+                    Path.GetExtension(fileName) != ".txt",
+                    "Page info does not exist for text documents");
 
                 IIUnknownVector spatialPageInfos = ImageUtils.GetSpatialPageInfos(fileName);
                 int count = spatialPageInfos.Size();

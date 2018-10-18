@@ -39,6 +39,7 @@ namespace WebAPI.Models
                 case EOrientation.kRotDown: DisplayOrientation = 180; break;
                 case EOrientation.kRotLeft: DisplayOrientation = 270; break;
             }
+            Skew = spatialPageInfo.Deskew;
             Width = spatialPageInfo.Width;
             Height = spatialPageInfo.Height;
         }
@@ -52,6 +53,11 @@ namespace WebAPI.Models
         /// The orientation (in degrees) the page should display in by default
         /// </summary>
         public int DisplayOrientation { get; set; }
+
+        /// <summary>
+        /// The predominant angle of the text on the page (in degrees)
+        /// </summary>
+        public double Skew { get; set; }
 
         /// <summary>
         /// The width of the page (in pixels)

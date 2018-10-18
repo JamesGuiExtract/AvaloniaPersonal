@@ -59,16 +59,25 @@ namespace WebAPI.Models
                               $"DatabaseServerName: {DatabaseServer}, ",
                               $"DatabaseName: {DatabaseName}"), "ELI43250");
             }
-            catch (Exception exp)
+            catch (HTTPError httpError)
             {
-                // Close DB connection
                 try
                 {
                     _fileProcessingDB.CloseAllDBConnections();
                 }
                 catch { }
 
-                var ee = exp.AsExtract("ELI43264");
+                throw httpError;
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    _fileProcessingDB.CloseAllDBConnections();
+                }
+                catch { }
+
+                var ee = ex.AsExtract("ELI43264");
                 ee.AddDebugData("Message", "Exception reported from MakeAssociatedWorkflow", encrypt: false);
                 ee.AddDebugData("Workflow name", WorkflowName, encrypt: false);
                 ee.AddDebugData("Database server name", DatabaseServer, encrypt: false);
@@ -270,12 +279,11 @@ namespace WebAPI.Models
                 {
                     Id = FileProcessingDB.GetWorkflowID(workflowName);
                 }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI43263");
-                }
+                // Assume any excption retrieving the workflow is because the workflow name is invalid
+                catch { }
 
-                HTTPError.Assert("ELI46387", Id > 0, "Invalid workflow name", ("Workflow", workflowName, false));
+                HTTPError.AssertRequest("ELI46387", Id > 0, "Invalid workflow name",
+                    ("Workflow", workflowName, false));
 
                 var definition = FileProcessingDB.GetWorkflowDefinition(Id);
                 HTTPError.Assert("ELI46388", definition != null,

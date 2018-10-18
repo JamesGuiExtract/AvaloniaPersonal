@@ -25,7 +25,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI45277");
+                throw ex.AsExtract("ELI45277");
             }
         }
 

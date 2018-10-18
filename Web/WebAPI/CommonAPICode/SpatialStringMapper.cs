@@ -76,7 +76,10 @@ namespace WebAPI
                 for (int i = 0; i < count; i++)
                 {
                     var word = (SpatialString)words.At(i);
-                    wordZoneData.Add(word.MakeLineInfo(false).Single().SpatialLineZone);
+                    if (word.HasSpatialInfo())
+                    {
+                        wordZoneData.Add(word.MakeLineInfo(false).Single().SpatialLineZone);
+                    }
                 }
 
                 return wordZoneData;
@@ -99,6 +102,11 @@ namespace WebAPI
         {
             try
             {
+                if (!spatialString.HasSpatialInfo())
+                {
+                    return null;
+                }
+
                 Position position = new Position();
 
                 IUnknownVector lines = spatialString.GetLines();

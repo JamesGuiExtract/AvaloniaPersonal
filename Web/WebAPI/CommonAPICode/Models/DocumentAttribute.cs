@@ -136,17 +136,17 @@ namespace WebAPI.Models
     }
 
     /// <summary>
-    /// a line or partial line of text with the corresponding bounds and spatial position (including skew)
+    /// Describes the location of a line (or partial line) of text
     /// </summary>
     public class SpatialLine
     {
         /// <summary>
-        /// The zone - includes skew
+        /// A rectangle that may be skewed with respect to the page
         /// </summary>
         public SpatialLineZone SpatialLineZone { get; set; }
 
         /// <summary>
-        /// The bounds - the rectangular boundary that completely encloses the attribute
+        /// The smallest non-skewed rectangular boundary that completely encloses text
         /// </summary>
         public SpatialLineBounds SpatialLineBounds { get; set; }
     }
@@ -157,9 +157,10 @@ namespace WebAPI.Models
     public class Position
     {
         /// <summary>
-        /// a list of the pages that the attribute spans (if any)
+        /// A list of the pages that the attribute spans (if any)
         /// </summary>
         public List<int> Pages { get; set; }
+
         /// <summary>
         /// The list of lines of spatial information for the attribute - may span pages
         /// </summary>
@@ -167,13 +168,13 @@ namespace WebAPI.Models
     }
 
     /// <summary>
-    /// Represents a VOA attribute
+    /// Represents a single field in a document's data.
     /// </summary>
     /// <seealso cref="WebAPI.Models.DocumentAttributeCore" />
     public class DocumentAttribute : DocumentAttributeCore
     {
         /// <summary>
-        /// child attributes, 0..N
+        /// The descendant attribute of this attribute
         /// </summary>
         public List<DocumentAttribute> ChildAttributes { get; set; }
 
@@ -221,7 +222,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Whether to create/update/delete.
+        /// Whether to create/update/delete an attribute
         /// </summary>
         public PatchOperation Operation { get; set; }
 
@@ -260,7 +261,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// The identifier
+        /// The attribute ID
         /// </summary>
         public string ID { get; set; } = Guid.NewGuid().ToString();
 
@@ -280,19 +281,19 @@ namespace WebAPI.Models
         public string Type { get; set; }
 
         /// <summary>
-        /// The confidence level of the redaction,
-        /// based on ConfidenceLevel enumeration, expressed as a string name.
+        /// The confidence level of the redaction
         /// </summary>
         public string ConfidenceLevel { get; set; }
 
         /// <summary>
-        /// Some attributes do not have position info - in that case this will be false and the LineInfo
-        /// members will be empty.
+        /// Some attributes do not have position info - in that case this will be false and the Position
+        /// member will be null.
         /// </summary>
         public bool? HasPositionInfo { get; set; }
 
         /// <summary>
-        /// The spatial position information of the attribute, inculding the page number, bounding rect, and zonal information (bounds plus skew)
+        /// The spatial position information of the attribute, inculding the page number,
+        /// bounding rect, and zonal information (bounds plus skew)
         /// </summary>
         public Position SpatialPosition { get; set; }
     }

@@ -3,22 +3,22 @@
 namespace WebAPI.Models
 {
     /// <summary>
-    /// User model
+    /// Information needed to authenticate an API user
     /// </summary>
     public class User
     {
         /// <summary>
-        /// user name
+        /// User name
         /// </summary>
         public string Username { get; set; }
 
         /// <summary>
-        /// user password
+        /// User password
         /// </summary>
         public string Password { get; set; }
 
         /// <summary>
-        /// user-specified workflow name that overrides the default workflow
+        /// Optional user-specified workflow name that overrides the default workflow
         /// </summary>
         public string WorkflowName { get; set; }
     }

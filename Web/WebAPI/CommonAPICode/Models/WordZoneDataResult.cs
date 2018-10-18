@@ -11,8 +11,8 @@ namespace WebAPI.Models
     public class WordZoneDataResult
     {
         /// <summary>
-        /// Gets a list of <see cref="SpatialLineZone"/>s instances, each of which represents one word
-        /// from OCR results.
+        /// Gets a list of SpatialLineZones instances, each of which represents one word
+        /// from OCR results. NOTE: Non-spatial text will not be included in these zones.
         /// </summary>
         public List<SpatialLineZone> Zones { get; set; } = new List<SpatialLineZone>();
     }

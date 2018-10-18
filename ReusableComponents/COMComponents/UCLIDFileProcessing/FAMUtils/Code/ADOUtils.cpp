@@ -864,14 +864,13 @@ long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQ
 			ue = uexOuter;
 		}
 
-		if (!bDisplayExceptions)
+		if (bDisplayExceptions)
 		{
-			// Rethrow the exception
-			throw ue;
+			ue.display();
+			return 0;
 		}
-		// Display exception
-		ue.display();
-		return 0;
+		
+		throw ue;
 	} 
 	return vtRecordsAffected.lVal;
 }

@@ -6964,6 +6964,8 @@ vector<tuple<long, string>> CFileProcessingDB::getWorkflowStatus(long nFileID,
 
 		string strActionIDs = asString(vecIncludedActionIDs, true, ",");
 		string strEndAction = asString(ipWorkflowDefinition->EndAction);
+		ASSERT_RUNTIME_CONDITION("ELI46432", !strEndAction.empty(),
+			"Workflow has not been properly configured; EndAction not defined.");
 		long nEndActionID = getActionID(ipConnection, strEndAction);
 
 		string strQuery = gstrGET_WORKFLOW_STATUS;

@@ -3,12 +3,12 @@
 namespace WebAPI.Models
 {
     /// <summary>
-    /// Information describing API errors
+    /// Describes the reason for a failed call.
     /// </summary>
     public class ErrorInfo
     {
         /// <summary>
-        /// Description of the error.
+        /// Description of the error
         /// </summary>
         public string Message { get; set; }
 
@@ -23,7 +23,7 @@ namespace WebAPI.Models
         public List<string> AdditionalCodes { get; set; }
 
         /// <summary>
-        /// Parameters pertinent to the error.
+        /// Parameters pertinent to the error
         /// </summary>
         public List<string> ErrorDetails { get; set; }
     }

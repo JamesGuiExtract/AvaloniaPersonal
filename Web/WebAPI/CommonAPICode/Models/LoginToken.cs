@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 namespace WebAPI.Models
 {
     /// <summary>
-    /// Data model for a login response.
+    /// Returned in response to a successful login
     /// </summary>
     public class LoginToken
     {
         /// <summary>
-        /// The JWT Bearer token to identify a caller in subsequent API calls
+        /// The JSON web (bearer) token to identify a caller in subsequent API calls
         /// </summary>
         public string access_token { get; set; }
 
