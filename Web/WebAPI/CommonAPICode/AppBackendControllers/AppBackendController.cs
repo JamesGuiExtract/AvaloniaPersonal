@@ -22,7 +22,8 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Authenticates a user. The returned JWT token will be used to access session/document state in subsequent calls.
         /// </summary>
-        /// <param name="user">A User object (name, password, optional claim)</param>
+        /// <param name="user">Login credentials. WorkflowName is optional;
+        /// specify only if a special workflow is required.</param>
         [HttpPost("Login")]
         [ProducesResponseType(200, Type = typeof(LoginToken))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]

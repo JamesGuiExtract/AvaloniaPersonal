@@ -20,8 +20,8 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Authenticates a user and, if successful, returns a JSON Web Token.
         /// </summary>
-        /// <param name="user">A User object (name, password, optional claim)</param>
-        // POST api/Users/Login
+        /// <param name="user">Login credentials. WorkflowName is optional;
+        /// specify only if a special workflow is required.</param>
         [HttpPost("Login")]
         [ProducesResponseType(200, Type = typeof(LoginToken))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]

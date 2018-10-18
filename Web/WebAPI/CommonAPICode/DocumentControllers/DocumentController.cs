@@ -221,7 +221,7 @@ namespace WebAPI.Controllers
         /// <param name="Id">The document ID</param>
         /// <returns></returns>
         [HttpGet("{Id}/PageInfo")]
-        [ProducesResponseType(200, Type = typeof(ProcessingStatusResult))]
+        [ProducesResponseType(200, Type = typeof(PagesInfoResult))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404, Type = typeof(ErrorResult))]
@@ -250,7 +250,7 @@ namespace WebAPI.Controllers
         /// <returns>TextResult instance</returns>
         /// <param name="Page">The page number for which text should be retrieved.</param>
         [HttpGet("{Id}/Page/{Page}/Text")]
-        [ProducesResponseType(200, Type = typeof(TextData))]
+        [ProducesResponseType(200, Type = typeof(PageTextResult))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404, Type = typeof(ErrorResult))]
@@ -534,7 +534,7 @@ namespace WebAPI.Controllers
         /// <param name="Id">The document ID</param>
         /// <returns>TextResult instance</returns>
         [HttpGet("{Id}/OutputText")]
-        [ProducesResponseType(200, Type = typeof(TextData))]
+        [ProducesResponseType(200, Type = typeof(PageTextResult))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404, Type = typeof(ErrorResult))]
