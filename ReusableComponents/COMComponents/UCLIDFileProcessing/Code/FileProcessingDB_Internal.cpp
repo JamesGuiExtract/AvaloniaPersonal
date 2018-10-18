@@ -4251,7 +4251,10 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 			{
 				ipProdSpecMgrs = removeProductSpecificDB(true, retainUserValues);
 				ASSERT_RESOURCE_ALLOCATION("ELI38283", ipProdSpecMgrs != __nullptr);
-					
+				
+				// Clear Status info from DatabaseService table - this needs to be done before tables are dropped
+				executeCmdQuery(ipConnection, gstr_CLEAR_DATABASE_SERVICE_STATUS_FIELDS);
+				
 				dropTables(retainUserValues);
 			}
 

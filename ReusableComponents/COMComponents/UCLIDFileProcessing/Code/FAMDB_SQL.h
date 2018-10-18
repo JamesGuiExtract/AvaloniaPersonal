@@ -2361,3 +2361,17 @@ static const std::string gstrCREATE_PROCESSING_DATA_VIEW =
 	"				f2.ASCName, \r\n"
 	"				f2.ASC_From, \r\n"
 	"				f2.ASC_to') ";
+
+static const string gstr_CLEAR_DATABASE_SERVICE_STATUS_FIELDS =
+	"UPDATE[dbo].[DatabaseService] \r\n"
+	"SET\r\n"
+		"[Status] = NULL,\r\n"
+		"[LastFileTaskSessionIDProcessed] = NULL,\r\n"
+		"[StartTime] = NULL,\r\n"
+		"[LastWrite] = NULL,\r\n"
+		"[EndTime] = NULL,\r\n"
+		"[MachineID] = NULL,\r\n"
+		"[Exception] = NULL,\r\n"
+		"[ActiveServiceMachineID] = NULL,\r\n"
+		"[NextScheduledRunTime] = NULL,\r\n"
+		"[ActiveFAMID] = NULL;\r\n";
