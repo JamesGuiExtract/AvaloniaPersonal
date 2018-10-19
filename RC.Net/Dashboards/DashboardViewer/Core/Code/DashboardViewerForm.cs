@@ -62,6 +62,9 @@ namespace DashboardViewer
         /// </summary>
         bool _inDatabase = false;
 
+        // Indicates if there is a filter
+        bool _filtered = false;
+
         #endregion
 
         #region Private properties
@@ -334,6 +337,23 @@ namespace DashboardViewer
         }
 
         #region Menu item event handlers
+        void HandleToolStripButtonClearMasterFilterClick(object sender, EventArgs e)
+        {
+            try
+            {
+                foreach (var item in dashboardViewerMain.Dashboard.Items)
+                {
+                    if (dashboardViewerMain.CanClearMasterFilter(item.ComponentName))
+                    {
+                        dashboardViewerMain.ClearMasterFilter(item.ComponentName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46434");
+            }
+        }
 
         void HandleToolStripButtonRefresh_Click(object sender, EventArgs e)
         {
@@ -400,7 +420,7 @@ namespace DashboardViewer
             {
                 _dashboardName = string.Empty;
                 dashboardViewerMain.DashboardSource = string.Empty;
-                _toolStripTextBoxlastRefresh.Text = "";
+                _toolStripTextBoxlastRefresh.Text = string.Empty;
                 UpdateMainTitle();
             }
             catch (Exception ex)
@@ -443,6 +463,32 @@ namespace DashboardViewer
         #endregion
 
         #region DashboardViewer event handlers
+
+        void HandleDashboardViewerMainMasterFilterCleared(object sender, MasterFilterClearedEventArgs e)
+        {
+            try
+            {
+                _filtered = false;
+                UpdateMainTitle();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46436");
+            }
+        }
+
+        void HandleDashboardViewerMainMasterFilterSet(object sender, MasterFilterSetEventArgs e)
+        {
+            try
+            {
+                _filtered = true;
+                UpdateMainTitle();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46435");
+            }
+        }
 
         void HandleDashboardViewerMainDrillDownPerformed(object sender, DrillActionEventArgs e)
         {
@@ -588,6 +634,7 @@ namespace DashboardViewer
         /// </summary>
         void UpdateMainTitle()
         {
+            toolStripButtonClearMasterFilter.Enabled = _filtered;
             if (Dashboard is null)
             {
                 if (!IsDatabaseOverridden)
@@ -608,7 +655,7 @@ namespace DashboardViewer
             else
             {
                 Text = string.Format(CultureInfo.InvariantCulture,
-                    "\"{0}\" - Using {1} on {2}", _dashboardName, DatabaseName, ServerName);
+                    "\"{0}\" - Using {1} on {2}{3}", _dashboardName, DatabaseName, ServerName, (_filtered) ? "-Filtered" : string.Empty);
             }
         }
 

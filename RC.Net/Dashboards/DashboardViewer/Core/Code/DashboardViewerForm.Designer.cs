@@ -45,6 +45,7 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this._toolStripButtonRefresh = new System.Windows.Forms.ToolStripButton();
             this._toolStripTextBoxlastRefresh = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripButtonClearMasterFilter = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.dashboardViewerMain)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerControl1)).BeginInit();
             this.splitContainerControl1.SuspendLayout();
@@ -66,6 +67,8 @@
             this.dashboardViewerMain.TabIndex = 0;
             this.dashboardViewerMain.DashboardChanged += new System.EventHandler(this.HandleDashboardViewerMainDashboardChanged);
             this.dashboardViewerMain.ConfigureDataConnection += new DevExpress.DashboardCommon.DashboardConfigureDataConnectionEventHandler(this.HandleDashboardViewerMainConfigureDataConnection);
+            this.dashboardViewerMain.MasterFilterSet += new DevExpress.DashboardCommon.MasterFilterSetEventHandler(this.HandleDashboardViewerMainMasterFilterSet);
+            this.dashboardViewerMain.MasterFilterCleared += new DevExpress.DashboardCommon.MasterFilterClearedEventHandler(this.HandleDashboardViewerMainMasterFilterCleared);
             this.dashboardViewerMain.DrillDownPerformed += new DevExpress.DashboardCommon.DrillActionEventHandler(this.HandleDashboardViewerMainDrillDownPerformed);
             this.dashboardViewerMain.DrillUpPerformed += new DevExpress.DashboardCommon.DrillActionEventHandler(this.HandleDashboardViewerMainDrillUpPerformed);
             this.dashboardViewerMain.DashboardItemDoubleClick += new DevExpress.DashboardWin.DashboardItemMouseActionEventHandler(this.HandleDashboardViewerMainDashboardItemDoubleClick);
@@ -144,26 +147,26 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.openToolStripMenuItem.Text = "&Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.HandleOpenToolStripMenuItemClick);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.closeToolStripMenuItem.Text = "&Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.HandleCloseToolStripMenuItemClick);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(100, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.HandleExitToolStripMenuItemClick);
             // 
@@ -179,7 +182,8 @@
             this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._toolStripButtonRefresh,
-            this._toolStripTextBoxlastRefresh});
+            this._toolStripTextBoxlastRefresh,
+            this.toolStripButtonClearMasterFilter});
             this.toolStrip1.Location = new System.Drawing.Point(0, 24);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(953, 25);
@@ -204,7 +208,17 @@
             this._toolStripTextBoxlastRefresh.Name = "_toolStripTextBoxlastRefresh";
             this._toolStripTextBoxlastRefresh.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this._toolStripTextBoxlastRefresh.ReadOnly = true;
-            this._toolStripTextBoxlastRefresh.Size = new System.Drawing.Size(150, 25);
+            this._toolStripTextBoxlastRefresh.Size = new System.Drawing.Size(142, 25);
+            // 
+            // toolStripButtonClearMasterFilter
+            // 
+            this.toolStripButtonClearMasterFilter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButtonClearMasterFilter.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonClearMasterFilter.Image")));
+            this.toolStripButtonClearMasterFilter.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButtonClearMasterFilter.Name = "toolStripButtonClearMasterFilter";
+            this.toolStripButtonClearMasterFilter.Size = new System.Drawing.Size(85, 22);
+            this.toolStripButtonClearMasterFilter.Text = "Clear all filters";
+            this.toolStripButtonClearMasterFilter.Click += new System.EventHandler(this.HandleToolStripButtonClearMasterFilterClick);
             // 
             // DashboardViewerForm
             // 
@@ -254,6 +268,7 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton _toolStripButtonRefresh;
         private System.Windows.Forms.ToolStripTextBox _toolStripTextBoxlastRefresh;
+        private System.Windows.Forms.ToolStripButton toolStripButtonClearMasterFilter;
         //private Extract.Imaging.Forms.ImageViewer _imageViewer;
     }
 }
