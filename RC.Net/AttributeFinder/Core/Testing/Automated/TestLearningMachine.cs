@@ -10,6 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UCLID_AFCORELib;
@@ -395,6 +396,7 @@ namespace Extract.AttributeFinder.Test
         public static void ProbabilityFilterPaginationCoverPages()
         {
             SetPaginationFiles();
+            string tempPath = Path.Combine(_inputFolder.Last(), Path.GetRandomFileName());
             var lm = new LearningMachine
             {
                 InputConfig = new InputConfiguration
@@ -406,7 +408,8 @@ namespace Extract.AttributeFinder.Test
                     TrainingSetPercentage = 100
                 },
                 Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, attributeFilter: "*@Feature"),
-                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = true }
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = true },
+                CsvOutputFile = tempPath
             };
             lm.TrainMachine();
 
@@ -420,23 +423,23 @@ namespace Extract.AttributeFinder.Test
             testResults.Match(gcm => throw new Exception("Not expecting a general confusion matrix!"),
                 cm =>
                 {
-                    Assert.AreEqual(0.56, Math.Round(cm.FScore, 2));
-                    Assert.AreEqual(0.41, Math.Round(cm.Precision, 2));
-                    Assert.AreEqual(0.88, Math.Round(cm.Recall, 2));
+                    Assert.AreEqual(0.54, Math.Round(cm.FScore, 2));
+                    Assert.AreEqual(0.37, Math.Round(cm.Precision, 2));
+                    Assert.AreEqual(1, Math.Round(cm.Recall, 2));
                 });
 
             // Fix with the unknown category cutoff feature
             lm.UseUnknownCategory = true;
-            lm.UnknownCategoryCutoff = 0.96;
+            lm.UnknownCategoryCutoff = 0.885;
             lm.TranslateUnknownCategory = true;
             lm.TranslateUnknownCategoryTo = "NotFirstPage";
             (_, testResults) = lm.TestMachine();
             testResults.Match(gcm => throw new Exception("Not expecting a general confusion matrix!"),
                 cm =>
                 {
-                    Assert.AreEqual(1.0, Math.Round(cm.Precision, 2));
-                    Assert.AreEqual(0.88, Math.Round(cm.Recall, 2));
-                    Assert.AreEqual(0.93, Math.Round(cm.FScore, 2));
+                    Assert.AreEqual(0.75, Math.Round(cm.Precision, 2));
+                    Assert.AreEqual(0.86, Math.Round(cm.Recall, 2));
+                    Assert.AreEqual(0.8, Math.Round(cm.FScore, 2));
                 });
         }
 
@@ -461,7 +464,8 @@ namespace Extract.AttributeFinder.Test
                 Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Deletion,
                     autoBagOfWords: new SpatialStringFeatureVectorizer("", 5, 2000), attributeFilter: "*@Feature"),
                 Classifier = new NeuralNetworkClassifier {UseCrossValidationSets = true},
-                CsvOutputFile = tempPath
+                CsvOutputFile = tempPath,
+                RandomNumberSeed = 1
             };
             lm.ComputeEncodings();
             lm.WriteDataToCsv(_ => { }, CancellationToken.None);
@@ -473,37 +477,94 @@ namespace Extract.AttributeFinder.Test
 
             var predictions = GetPredictionsFromCsv(testCSV);
 
-            // Pagination_003.tif is predicted to be two deleted pages (should only be first page, which is
-            // part of the training set)
-            var (path, prediction, probability) = predictions[4];
-            Assert.AreEqual("Resources.LearningMachine.PaginationWithCoverPages.Pagination_003.tif.uss",
+            // Page 2 of Pagination_004.tif is predicted to be deleted but should not be
+            var (path, prediction, probability) = predictions[3];
+            Assert.AreEqual("Resources.LearningMachine.PaginationWithCoverPages.Pagination_004.tif.uss",
                 Path.GetFileName(path));
             Assert.AreEqual("DeletedPage", prediction);
 
-            // With low score
-            Assert.Greater(probability, 0.5);
-            Assert.Less(probability, 0.6);
+            // With somewhat low score
+            Assert.Greater(probability, 0.7);
+            Assert.Less(probability, 0.8);
 
             // Confirm that the lm will predict a different value depending on unknown category settings
             var doc = new SpatialStringClass();
             doc.LoadFrom(path, false);
             var attrr = new IUnknownVectorClass();
 
-            // Confirm default behavior predicts both pages as deleted
+            // Confirm default behavior predicts page 2 as deleted
             lm.ComputeAnswer(doc, attrr, false);
-            Assert.AreEqual("1-2", ((IAttribute) attrr.At(0)).Value.String);
+            var range = ((IAttribute) attrr.At(0)).Value.String;
+            Assert.AreEqual("1-2,4", range);
 
             // Set threshold and confirm that NotDeletedPage is the default Unknown category
             lm.UseUnknownCategory = true;
-            lm.UnknownCategoryCutoff = 0.6;
+            lm.UnknownCategoryCutoff = 0.8;
             lm.ComputeAnswer(doc, attrr, false);
-            Assert.AreEqual("1", ((IAttribute) attrr.At(0)).Value.String);
+            range = ((IAttribute) attrr.At(0)).Value.String;
+            Assert.AreEqual("1,4", range);
 
             // Confirm that DeletedPage can be used instead
             lm.TranslateUnknownCategory = true;
             lm.TranslateUnknownCategoryTo = "DeletedPage";
             lm.ComputeAnswer(doc, attrr, false);
-            Assert.AreEqual("1-2", ((IAttribute) attrr.At(0)).Value.String);
+            range = ((IAttribute) attrr.At(0)).Value.String;
+            Assert.AreEqual("1-2,4,9-10", range);
+        }
+
+        // Verifies that deleted page ranges are created without error when there are two ranges
+        // separated by more than one page
+        // https://extract.atlassian.net/browse/ISSUE-15668
+        [Test, Category("LearningMachine")]
+        public static void DeletionModeMultipleSeparatedRanges()
+        {
+            SetPaginationFiles(withCoverPages: true);
+
+            string tempPath = Path.Combine(_inputFolder.Last(), Path.GetRandomFileName());
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = "",
+                    AnswerPath = "<SourceDocName>.eav",
+                    TrainingSetPercentage = 100
+                },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Deletion,
+                    autoBagOfWords: new SpatialStringFeatureVectorizer("", 5, 2000), attributeFilter: "*@Feature"),
+                Classifier = new NeuralNetworkClassifier {UseCrossValidationSets = true},
+                CsvOutputFile = tempPath
+            };
+            lm.ComputeEncodings();
+            lm.TrainMachine();
+
+            List<string> ranges = new List<string>();
+            foreach (var path in Directory.GetFiles(_inputFolder.Last(), "*.uss"))
+            {
+                var doc = new SpatialStringClass();
+                doc.LoadFrom(path, false);
+                var attrr = new IUnknownVectorClass();
+
+                lm.ComputeAnswer(doc, attrr, false);
+                Assert.That(attrr.Size() == 0 || attrr.Size() == 1);
+
+                if (attrr.Size() == 1)
+                {
+                    var range = ((IAttribute) attrr.At(0)).Value.String;
+                    ranges.Add(range);
+                }
+            }
+
+            var expected = new List<string>
+            {
+                "3,5",
+                "1,3",
+                "1",
+                "1,3,9",
+                "1,4"
+            };
+            CollectionAssert.AreEqual(expected, ranges);
         }
 
         [Test, Category("LearningMachine")]
@@ -1358,15 +1419,15 @@ namespace Extract.AttributeFinder.Test
                 Assert.GreaterOrEqual(labeledAttributes.Size(), 1);
 
                 var xPathContext = new XPathContext(labeledAttributes);
-                var labeledAsDOB = xPathContext.FindAllOfType<ComAttribute>("/*/*[AttributeType = 'DOB']");
-                var labeledAsCollectionDate = xPathContext.FindAllOfType<ComAttribute>("/*/*[AttributeType = 'CollectionDate']");
+                var labeledAsDOB = xPathContext.FindAllOfType<ComAttribute>("/*/*[AttributeType = 'DOB']").ToList();
+                var labeledAsCollectionDate = xPathContext.FindAllOfType<ComAttribute>("/*/*[AttributeType = 'CollectionDate']").ToList();
                 Assert.GreaterOrEqual(labeledAsDOB.Count(), 1);
                 Assert.GreaterOrEqual(labeledAsCollectionDate.Count(), labeledAsDOB.Count());
                 Assert.Greater(labeledAttributes.Size(), labeledAsDOB.Count() + labeledAsCollectionDate.Count());
             }
 
             var specificFile = Directory.GetFiles(_inputFolder.Last(), "*.nunit_labeled2.voa").First();
-            var attributes = afutil.GetAttributesFromFile(specificFile).ToIEnumerable<ComAttribute>();
+            var attributes = afutil.GetAttributesFromFile(specificFile).ToIEnumerable<ComAttribute>().ToList();
             var collectionDateIndexes = attributes.Select((a, i) =>
                 a.SubAttributes.ToIEnumerable<ComAttribute>()
                     .FirstOrDefault(sa => sa.Name == "AttributeType")?.Value.String == "CollectionDate"

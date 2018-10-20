@@ -1673,7 +1673,7 @@ namespace Extract.AttributeFinder
             try
             {
                 int firstPageInRange = Enumerable.Range(1, numberOfPages)
-                    .FirstOrDefault(n => isDeletedPage(n));
+                    .FirstOrDefault(isDeletedPage);
 
                 if (firstPageInRange == 0)
                 {
@@ -1702,8 +1702,9 @@ namespace Extract.AttributeFinder
                         // Next page is not deleted so find next deleted page to set up next page range
                         if (nextPageNumber <= numberOfPages)
                         {
-                            firstPageInRange = Enumerable.Range(nextPageNumber, numberOfPages - nextPageNumber)
-                                .FirstOrDefault(n => isDeletedPage(n));
+                            firstPageInRange = nextPageNumber =
+                                Enumerable.Range(nextPageNumber, numberOfPages - nextPageNumber)
+                                    .FirstOrDefault(isDeletedPage);
                             if (firstPageInRange == 0)
                             {
                                 break;
