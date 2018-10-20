@@ -211,7 +211,8 @@ namespace Extract.AttributeFinder
                     var attributesVector = attributes.ToIUnknownVector();
                     var attributesToTokenize = LearningMachineDataEncoder._afUtility.Value.QueryAttributes(attributesVector,
                         queryForAttributesToTokenize, bRemoveMatches: true)
-                        .ToIEnumerable<ComAttribute>();
+                        .ToIEnumerable<ComAttribute>()
+                        .ToList();
 
                     if (!attributesToTokenize.Any())
                     {
@@ -238,13 +239,12 @@ namespace Extract.AttributeFinder
         /// Gets the proto-feature values for the <see paramref="name"/>
         /// </summary>
         /// <param name="name">The name of the proto-feature</param>
-        /// <returns>An enumerable of values for the <see paramref="name"/></returns>
-        public IEnumerable<string> GetProtoFeatureValues(string name)
+        /// <returns>A list of values for the <see paramref="name"/></returns>
+        public List<string> GetProtoFeatureValues(string name)
         {
-            List<string> values;
-            if (_nameToFeatureValues == null || !_nameToFeatureValues.TryGetValue(name, out values))
+            if (_nameToFeatureValues == null || !_nameToFeatureValues.TryGetValue(name, out var values))
             {
-                return Enumerable.Empty<string>();
+                return new List<string>(0);
             }
 
             return values;
@@ -912,16 +912,18 @@ namespace Extract.AttributeFinder
                 }
                 else if (MachineUsage == LearningMachineUsage.Pagination)
                 {
-                    return GetPaginationFeatureVectors(document, protoFeaturesOrGroupsOfProtoFeatures);
+                    return GetPaginationOrDeletionFeatureVectors(document, protoFeaturesOrGroupsOfProtoFeatures, true);
                 }
                 else if (MachineUsage == LearningMachineUsage.Deletion)
                 {
-                    return GetDeletionFeatureVectors(document, protoFeaturesOrGroupsOfProtoFeatures);
+                    return GetPaginationOrDeletionFeatureVectors(document, protoFeaturesOrGroupsOfProtoFeatures, false);
                 }
                 else if (MachineUsage == LearningMachineUsage.AttributeCategorization)
                 {
                     return GetAttributesFeatureVectors(document,
-                        protoFeaturesOrGroupsOfProtoFeatures.ToIEnumerable<ComAttribute>());
+                        protoFeaturesOrGroupsOfProtoFeatures
+                            .ToIEnumerable<ComAttribute>()
+                            .ToList());
                 }
                 else
                 {
@@ -1835,106 +1837,35 @@ namespace Extract.AttributeFinder
             }
         }
 
-        /// <summary>
         /// Gets zero or more feature vectors from a <see cref="ISpatialString"/> and vector of <see cref="ComAttribute"/>s
         /// </summary>
         /// <param name="document">The <see cref="ISpatialString"/> to use for auto-bag-of-words features.</param>
         /// <param name="pagesOfProtoFeatures">The vector of <see cref="ComAttribute"/>s containing Page attributes with
         /// sub-attributes to use for attribute features.</param>
+        /// <param name="pagination">Whether to get feature vectors for pagination or deletion mode</param>
         /// <returns>The feature vectors computed from the input arguments.</returns>
-        private IEnumerable<double[]> GetPaginationFeatureVectors(ISpatialString document, IUnknownVector pagesOfProtoFeatures)
+        private IEnumerable<double[]> GetPaginationOrDeletionFeatureVectors(
+            ISpatialString document,
+            IUnknownVector pagesOfProtoFeatures,
+            bool pagination)
         {
-            var attributeFeatures = Enumerable.Empty<List<double[]>>();
-            List<double[]> shingleFeatures = null;
-            int numberOfExamples = 0;
-
-            if (pagesOfProtoFeatures != null)
-            {
-                // At runtime (e.g., called from LearningMachineOutputHandler) handle empty VOA
-                // by creating empty feature vector for each page pair rather than returning an empty
-                // collection that would cause an exception
-                var protoFeatureGroups = pagesOfProtoFeatures.Size() > 0
-                    ? GetPaginationProtoFeatures(pagesOfProtoFeatures)
-                    : SpatialStringFeatureVectorizer.GetPaginationTexts(document)
-                        .Select(_ => new NameToProtoFeaturesMap());
-
-                numberOfExamples = protoFeatureGroups.Count();
-
-                // NOTE: vectorizers return an empty enumerable if not enabled
-                // TODO: pass along cancelation token!
-                attributeFeatures = AttributeFeatureVectorizers
-                    .Select(vectorizer => vectorizer.GetFeatureVectorsForEachGroup(protoFeatureGroups)
-                    .ToList());
-            }
-            else
-            {
-                var protoFeatureGroups = SpatialStringFeatureVectorizer.GetPaginationTexts(document).Select(_ =>
-                    Enumerable.Empty<NameToProtoFeaturesMap>()
-                );
-            }
-
-            if (AutoBagOfWords == null || !AutoBagOfWords.Enabled)
-            {
-                // Transpose from <# vectorizers> X <# page pairs> to <# page pairs> X <# vectorizers>
-                for (int i = 0; i < numberOfExamples; i++)
-                {
-                    yield return attributeFeatures
-                        .Where(v => v.Any()) // Since vectorizers return an empty enumerable if not enabled
-                        .SelectMany(v => v[i])
-                        .ToArray();
-                }
-            }
-            else
-            {
-                shingleFeatures = AutoBagOfWords.GetPaginationFeatureVectors(document).ToList();
-                numberOfExamples = shingleFeatures.Count;
-                for (int i = 0; i < numberOfExamples; i++)
-                {
-                    yield return shingleFeatures[i].Concat(attributeFeatures
-                        .Where(v => v.Any()) // Since vectorizers return an empty enumerable if not enabled
-                        .SelectMany(v => v[i]))
-                        .ToArray();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets zero or more feature vectors from a <see cref="ISpatialString"/> and vector of <see cref="ComAttribute"/>s
-        /// </summary>
-        /// <param name="document">The <see cref="ISpatialString"/> to use for auto-bag-of-words features.</param>
-        /// <param name="pagesOfProtoFeatures">The vector of <see cref="ComAttribute"/>s containing Page attributes with
-        /// sub-attributes to use for attribute features.</param>
-        /// <returns>The feature vectors computed from the input arguments.</returns>
-        private IEnumerable<double[]> GetDeletionFeatureVectors(ISpatialString document, IUnknownVector pagesOfProtoFeatures)
-        {
-            var attributeFeatures = Enumerable.Empty<List<double[]>>();
-            List<double[]> shingleFeatures = null;
-            int numberOfExamples = 0;
-
-            if (pagesOfProtoFeatures != null)
-            {
-                // At runtime (e.g., called from LearningMachineOutputHandler) handle empty VOA
-                // by creating empty feature vector for each page rather than returning an empty
-                // collection that would cause an exception
-                var protoFeatureGroups = pagesOfProtoFeatures.Size() > 0
-                    ? GetPaginationProtoFeatures(pagesOfProtoFeatures, true)
+            // At runtime (e.g., called from LearningMachineOutputHandler) handle empty VOA
+            // by creating empty feature vector for each page rather than returning an empty
+            // collection that would cause an exception
+            var protoFeatureGroups = (pagesOfProtoFeatures?.Size() > 0
+                    ? GetPaginationProtoFeatures(pagesOfProtoFeatures, !pagination)
                     : SpatialStringFeatureVectorizer.GetPaginationTexts(document, true)
-                        .Select(_ => new NameToProtoFeaturesMap());
+                        .Select(_ => new NameToProtoFeaturesMap()))
+                .ToList();
 
-                numberOfExamples = protoFeatureGroups.Count();
+            var numberOfExamples = protoFeatureGroups.Count();
 
-                // NOTE: vectorizers return an empty enumerable if not enabled
-                // TODO: pass along cancelation token!
-                attributeFeatures = AttributeFeatureVectorizers
-                    .Select(vectorizer => vectorizer.GetFeatureVectorsForEachGroup(protoFeatureGroups)
-                    .ToList());
-            }
-            else
-            {
-                var protoFeatureGroups = SpatialStringFeatureVectorizer.GetPaginationTexts(document, true).Select(_ =>
-                    Enumerable.Empty<NameToProtoFeaturesMap>()
-                );
-            }
+            // NOTE: vectorizers return an empty enumerable if not enabled
+            // TODO: pass along cancellation token!
+            List<List<double[]>> attributeFeatures = AttributeFeatureVectorizers
+                .Select(vectorizer => vectorizer.GetFeatureVectorsForEachGroup(protoFeatureGroups).ToList())
+                .Where(v => v.Any()) // Since vectorizers return an empty enumerable if not enabled
+                .ToList();
 
             if (AutoBagOfWords == null || !AutoBagOfWords.Enabled)
             {
@@ -1942,21 +1873,33 @@ namespace Extract.AttributeFinder
                 for (int i = 0; i < numberOfExamples; i++)
                 {
                     yield return attributeFeatures
-                        .Where(v => v.Any()) // Since vectorizers return an empty enumerable if not enabled
                         .SelectMany(v => v[i])
                         .ToArray();
                 }
             }
             else
             {
-                shingleFeatures = AutoBagOfWords.GetDeletionFeatureVectors(document).ToList();
+                var shingleFeatures = pagination
+                    ?  AutoBagOfWords.GetPaginationFeatureVectors(document).ToList()
+                    : AutoBagOfWords.GetDeletionFeatureVectors(document).ToList();
+
                 numberOfExamples = shingleFeatures.Count;
-                for (int i = 0; i < numberOfExamples; i++)
+
+                if (attributeFeatures.Any())
                 {
-                    yield return shingleFeatures[i].Concat(attributeFeatures
-                        .Where(v => v.Any()) // Since vectorizers return an empty enumerable if not enabled
-                        .SelectMany(v => v[i]))
-                        .ToArray();
+                    for (int i = 0; i < numberOfExamples; i++)
+                    {
+                        yield return shingleFeatures[i].Concat(attributeFeatures
+                                .SelectMany(v => v[i]))
+                                .ToArray();
+                    }
+                }
+                else
+                {
+                    foreach (var v in shingleFeatures)
+                    {
+                        yield return v;
+                    }
                 }
             }
         }
@@ -1965,22 +1908,22 @@ namespace Extract.AttributeFinder
         /// Gets zero or more feature vectors from a <see cref="ISpatialString"/> and vector of <see cref="ComAttribute"/>s
         /// </summary>
         /// <param name="document">The <see cref="ISpatialString"/> to use for auto-bag-of-words features.</param>
-        /// <param name="attributes">The collection of <see cref="ComAttribute"/>s containing attributes to be classified
+        /// <param name="attributes">The collection of <see cref="ComAttribute"/>s containing attributes to be classified</param>
         /// <returns>The feature vectors computed from the input arguments.</returns>
-        private IEnumerable<double[]> GetAttributesFeatureVectors(ISpatialString document, IEnumerable<ComAttribute> attributes)
+        private IEnumerable<double[]> GetAttributesFeatureVectors(ISpatialString document, List<ComAttribute> attributes)
         {
             ExtractException.Assert("ELI41405", "Attributes to be classified cannot be null", attributes != null);
 
-            var attributeFeatures = Enumerable.Empty<List<double[]>>();
-            int numberOfExamples = attributes.Count();
+            int numberOfExamples = attributes.Count;
 
             // Prevent multiple enumerations (else large VOA files take a long time to process)
             // https://extract.atlassian.net/browse/ISSUE-15605
             var protoFeatureGroups = GetAttributesProtoFeatures(attributes).ToList();
 
             // NOTE: vectorizers return an empty enumerable if not enabled
-            attributeFeatures = AttributeFeatureVectorizers
-                .Select(vectorizer => vectorizer.GetFeatureVectorsForEachGroup(protoFeatureGroups).ToList());
+            var attributeFeatures = AttributeFeatureVectorizers
+                .Select(vectorizer => vectorizer.GetFeatureVectorsForEachGroup(protoFeatureGroups).ToList())
+                .ToList();
 
             if (AutoBagOfWords == null || !AutoBagOfWords.Enabled)
             {
@@ -2212,7 +2155,9 @@ namespace Extract.AttributeFinder
                             attributes = inputVOAs[i].Value;
                         }
 
-                        List<double[]> featureVectors = GetPaginationFeatureVectors(spatialString.Value, attributes).ToList();
+                        List<double[]> featureVectors =
+                            GetPaginationOrDeletionFeatureVectors(spatialString.Value, attributes, true)
+                                .ToList();
 
                         // Get page count so that missing page numbers in the answer VOA can be filled in.
                         var answers = GetAttributes(attributeOrAnswerCollection, i);
@@ -2315,7 +2260,9 @@ namespace Extract.AttributeFinder
                             attributes = inputVOAs[i].Value;
                         }
 
-                        List<double[]> featureVectors = GetDeletionFeatureVectors(spatialString.Value, attributes).ToList();
+                        List<double[]> featureVectors =
+                            GetPaginationOrDeletionFeatureVectors(spatialString.Value, attributes, false)
+                                .ToList();
 
                         // Get page count so that missing page numbers in the answer VOA can be filled in.
                         int pageCount = featureVectors.Count + 1;
@@ -2634,7 +2581,7 @@ namespace Extract.AttributeFinder
         /// <param name="updateStatus">Function to use for sending progress updates to caller</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         private void ComputeDeletionEncodings(string[] ussFilePaths, string[] inputVOAFilePaths, string[] answerFiles,
-            Action<StatusArgs> updateStatus, System.Threading.CancellationToken cancellationToken)
+            Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             ExtractException.Assert("ELI46196", "Negative class name must be '" + NotDeletedPageCategory + "'",
                 string.Equals(NegativeClassName, NotDeletedPageCategory, StringComparison.OrdinalIgnoreCase));

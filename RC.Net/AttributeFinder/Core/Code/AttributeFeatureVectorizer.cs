@@ -389,7 +389,9 @@ namespace Extract.AttributeFinder
         /// After this method has been run, this object will be ready to produce feature vectors
         /// </summary>
         /// <param name="protoFeatures">The values to consider when configuring.</param>
-        internal void ComputeEncodingsFromTrainingData(IEnumerable<string> protoFeatures, string category, string docName)
+        /// <param name="category">The class the features belong to</param>
+        /// <param name="docName">The name of the document (uss file) that the features belong to</param>
+        internal void ComputeEncodingsFromTrainingData(List<string> protoFeatures, string category, string docName)
         {
             try
             {
@@ -421,7 +423,7 @@ namespace Extract.AttributeFinder
                         if ((FeatureType == FeatureVectorizerType.Exists || FeatureType == FeatureVectorizerType.Bitmap)
                             && protoFeature.StartsWith("Bitmap", StringComparison.OrdinalIgnoreCase)
                             && XPathContext.TryGetBitmapDataFromString(protoFeature,
-                                out int width, out int height, out double[] data))
+                                out _, out _, out double[] data))
                         {
                             // Validate dimensions
                             int dataSize = data.Length;
@@ -474,8 +476,7 @@ namespace Extract.AttributeFinder
 
                 if (_nonSerializedBagOfWords.IsValueCreated)
                 {
-                    _nonSerializedBagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(() =>
-                        CreateInitialBagOfWords());
+                    _nonSerializedBagOfWords = new Lazy<Accord.MachineLearning.BagOfWords>(CreateInitialBagOfWords);
                 }
             }
             catch (Exception e)
@@ -499,7 +500,7 @@ namespace Extract.AttributeFinder
                     return new double[0];
                 }
 
-                IEnumerable<string> values = protoFeatures.GetProtoFeatureValues(Name);
+                List<string> values = protoFeatures.GetProtoFeatureValues(Name);
 
                 // Each type of feature vectorizer will have an exists component
                 double exists = values.Any() ? 1.0 : 0.0;
@@ -530,7 +531,7 @@ namespace Extract.AttributeFinder
 
                     case FeatureVectorizerType.Bitmap:
                         var firstMatch = values.Select(value =>
-                            XPathContext.TryGetBitmapDataFromString(value, out var _, out var _, out var data)
+                            XPathContext.TryGetBitmapDataFromString(value, out _, out _, out var data)
                             ? data
                             : null)
                             .FirstOrDefault(data => data != null);

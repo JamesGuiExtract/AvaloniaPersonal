@@ -533,7 +533,8 @@ namespace Extract.AttributeFinder
                             .Distinct(StringComparer.OrdinalIgnoreCase);
                         return answers.Select(answer => Tuple.Create(text, answer));
                     })
-                    .SelectMany(answersForFile => answersForFile);
+                    .SelectMany(answersForFile => answersForFile)
+                    .ToList();
 
                 // Skip processing the texts if using feature hashing since there is no need
                 // to build a vocabulary
@@ -911,9 +912,9 @@ namespace Extract.AttributeFinder
         /// Gets the string values of each page in <see paramref="document"/> except for the first.
         /// </summary>
         /// <param name="document">The <see cref="ISpatialString"/> from which to get text.</param>
-        /// <returns>An enumeration of strings containing the text for each candidate first page
+        /// <returns>A list of strings containing the text for each candidate first page
         /// (first page after possible pagination boundary)</returns>
-        internal static IEnumerable<string> GetPaginationTexts(ISpatialString document, bool includeFirstPage = false)
+        internal static List<string> GetPaginationTexts(ISpatialString document, bool includeFirstPage = false)
         {
             var pages = document.GetPages(true, " ")
                 .ToIEnumerable<ISpatialString>()
@@ -921,11 +922,11 @@ namespace Extract.AttributeFinder
 
             if (includeFirstPage)
             {
-                return pages;
+                return pages.ToList();
             }
             else
             {
-                return pages.Skip(1);
+                return pages.Skip(1).ToList();
             }
         }
 
@@ -933,9 +934,9 @@ namespace Extract.AttributeFinder
         /// Gets the string values of each page in <see paramref="ussPath"/> except for the first.
         /// </summary>
         /// <param name="ussPath">The path to the USS file</param>
-        /// <returns>An enumeration of strings containing the text for each candidate first page
+        /// <returns>A list of strings containing the text for each candidate first page
         /// (first page after possible pagination boundary)</returns>
-        private static IEnumerable<string> GetPaginationTexts(string ussPath, bool includeFirstPage = false)
+        private static List<string> GetPaginationTexts(string ussPath, bool includeFirstPage = false)
         {
             try
             {
