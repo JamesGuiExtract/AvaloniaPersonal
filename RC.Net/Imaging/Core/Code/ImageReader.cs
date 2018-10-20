@@ -516,7 +516,7 @@ namespace Extract.Imaging
                         _currentProbe = new Tuple<int, PixelProbe>(pageNumber, probe);
                     }
 
-                    return _currentProbe.Item2.Copy(); ;
+                    return _currentProbe.Item2.Copy();
                 }
             }
             catch (Exception ex)

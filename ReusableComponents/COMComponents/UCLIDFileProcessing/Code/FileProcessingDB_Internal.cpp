@@ -1110,7 +1110,8 @@ long CFileProcessingDB::getActionID(_ConnectionPtr ipConnection, const string& s
 		{
 			if (strWorkflow.empty())
 			{
-				throw UCLIDException("ELI43442", Util::Format("Action \"%s\" does not exist."));
+				throw UCLIDException("ELI43442", Util::Format("Action \"%s\" does not exist.",
+					strActionName.c_str()));
 			}
 			else
 			{
