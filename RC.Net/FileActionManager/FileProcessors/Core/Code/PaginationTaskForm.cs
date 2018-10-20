@@ -1729,16 +1729,16 @@ namespace Extract.FileActionManager.FileProcessors
                     var attributeArray = attributes
                         .ToIEnumerable<IAttribute>()
                         .ToArray();
-                    var rootAttributeNames = attributeArray
-                        .Select(attribute => attribute.Name)
-                        .Distinct();
+                    var rootAttributeNames = new HashSet<string>(
+                        attributeArray.Select(attribute => attribute.Name),
+                        StringComparer.OrdinalIgnoreCase);
 
                     // If only "Document" attributes exist at the root of the VOA file, there is
                     // rules-suggested pagination.
                     // TODO: If there is only a single document, extract the document data and don't
                     // show suggested pagination.
-                    if (rootAttributeNames.Count() == 1 &&
-                        rootAttributeNames.Single().Equals("Document", StringComparison.OrdinalIgnoreCase))
+                    if (rootAttributeNames.Count == 1 &&
+                        rootAttributeNames.Contains("Document"))
                     {
                         int pageCount = 0;
                         using (var codecs = new ImageCodecs())
@@ -1777,9 +1777,8 @@ namespace Extract.FileActionManager.FileProcessors
 
                             var documentDataAttribute = documentAttribute.SubAttributes
                                 .ToIEnumerable<IAttribute>()
-                                .Where(attribute => attribute.Name.Equals(
-                                    "DocumentData", StringComparison.OrdinalIgnoreCase))
-                                .SingleOrDefault();
+                                .SingleOrDefault(attribute => attribute.Name.Equals(
+                                    "DocumentData", StringComparison.OrdinalIgnoreCase));
 
                             PaginationDocumentData documentData =
                                 GetAsPaginationDocumentData(documentDataAttribute, fileName);

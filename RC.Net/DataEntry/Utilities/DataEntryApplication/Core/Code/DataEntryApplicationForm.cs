@@ -4030,9 +4030,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // a comma or semi-colon.
                         IEnumerable<string> tagsToBeSkipped =
                             ActiveDataEntryConfig.Config.Settings.SkipValidationIfDocTaggedAs
-                                .Split(new[] { ',', ';' })
+                                .Split(',', ';')
                                 .Select(tagName => tagName.Trim())
-                                .Where(tagName => !string.IsNullOrWhiteSpace(tagName));
+                                .Where(tagName => !string.IsNullOrWhiteSpace(tagName))
+                                .ToList();
 
                         VariantVector appliedTags = _fileProcessingDb.GetTagsOnFile(_fileId);
                         int tagCount = appliedTags.Size;
@@ -4865,14 +4866,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 var attributeArray = attributes
                     .ToIEnumerable<IAttribute>()
                     .ToArray();
-                var rootAttributeNames = attributeArray
-                    .Select(attribute => attribute.Name)
-                    .Distinct();
+                var rootAttributeNames = new HashSet<string>(
+                    attributeArray.Select(attribute => attribute.Name),
+                    StringComparer.OrdinalIgnoreCase);
 
                 // If only "Document" attributes exist at the root of the VOA file, there is
                 // rules-suggested pagination.
-                if (rootAttributeNames.Count() == 1 &&
-                    rootAttributeNames.Single().Equals("Document", StringComparison.OrdinalIgnoreCase))
+                if (rootAttributeNames.Count == 1 &&
+                    rootAttributeNames.Contains("Document"))
                 {
                     int pageCount = 0;
                     using (var codecs = new ImageCodecs())
