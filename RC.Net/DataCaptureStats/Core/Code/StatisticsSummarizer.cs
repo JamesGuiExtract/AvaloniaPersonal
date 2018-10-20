@@ -205,9 +205,9 @@ namespace Extract.DataCaptureStats
         /// <summary>
         /// Generates a CSV report from summarized accuracy details.
         /// </summary>
-        /// <param name="group">The <see cref="GroupStatistics"/> data to be used to build the report.</param>
+        /// <param name="statisticGroups">The <see cref="GroupStatistics"/> data to be used to build the report.</param>
         /// <returns>A string containing an html document representation of the data</returns>
-        public static string AccuracyDetailsToCsv(this IEnumerable<GroupStatistics> statisticGroups)
+        public static string AccuracyDetailsToCsv(this List<GroupStatistics> statisticGroups)
         {
             try
             {
@@ -330,7 +330,7 @@ namespace Extract.DataCaptureStats
             /// <param name="throwIfConflict">If set to <c>true</c> will throw an exception if
             /// a path appears for an <see cref="AccuracyDetail"/> with a <see cref="AccuracyDetailLabel.ContainerOnly"/> label
             /// as well as for some other <see cref="AccuracyDetailLabel"/>.
-            /// If set to <c>false</c> then conflicting paths will be marked with an asterisk.
+            /// If set to <c>false</c> then conflicting paths will be marked with an asterisk.</param>
             /// <returns>An <see cref="IEnumerable{AccuracyDetail}"/> where any items in the input that were labeled
             /// <see cref="AccuracyDetailLabel.ContainerOnly"/> have been replaced with new <see cref="AccuracyDetail"/>s</returns>
             public IEnumerable<AccuracyDetail> SummarizeStatistics(IEnumerable<AccuracyDetail> statisticsToSummarize, bool throwIfConflict)
@@ -380,7 +380,7 @@ namespace Extract.DataCaptureStats
             /// </summary>
             /// <remarks>Asserts that path/label pairs in <see paramref="statisticsToSummarize"/> are distinct</remarks>
             /// <param name="statisticsToSummarize">The statistics to summarize.</param>
-            private void MakeContainerAndOtherMaps(IEnumerable<AccuracyDetail> statisticsToSummarize)
+            private void MakeContainerAndOtherMaps(List<AccuracyDetail> statisticsToSummarize)
             {
                 ExtractException.Assert("ELI41528", "Path/label pairs in the collection must be distinct",
                     statisticsToSummarize.Select(a => new { a.Label, a.Path }).Distinct().Count() == statisticsToSummarize.Count());
@@ -397,7 +397,7 @@ namespace Extract.DataCaptureStats
                 // Keep track of any container-only paths that were sometimes deemed to be value-holding paths
                 foreach (var p in grouped)
                 {
-                    var container = p.Labels[AccuracyDetailLabel.ContainerOnly];
+                    var container = p.Labels[AccuracyDetailLabel.ContainerOnly].ToList();
                     if (container.Any())
                     {
                         _containerOnlyPaths[p.Path] = container.First();

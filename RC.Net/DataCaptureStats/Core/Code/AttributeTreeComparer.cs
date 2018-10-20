@@ -369,11 +369,6 @@ namespace Extract.DataCaptureStats
             HashSet<IAttribute> containerAttributes,
             bool recurse)
         {
-            if (!attributes.Any())
-            {
-                return;
-            }
-
             foreach (var attribute in attributes)
             {
                 string qualifiedName = GetQualifiedName(attribute, qualifiedAncestorName);

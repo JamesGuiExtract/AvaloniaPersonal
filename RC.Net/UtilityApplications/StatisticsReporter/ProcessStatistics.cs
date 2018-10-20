@@ -387,7 +387,7 @@ namespace StatisticsReporter
         /// Processes the data by retrieving the voa data from the database and creating the results for each file
         /// </summary>
         /// <returns>An <see cref="IEnumerable{GroupStatistics}"/></returns>
-        public IEnumerable<GroupStatistics> ProcessData()
+        public List<GroupStatistics> ProcessData()
         {
             try
             {
@@ -416,9 +416,10 @@ namespace StatisticsReporter
 
                     // Collect the fields that are actually used
                     var referencedDBFields = Settings.GroupByCriteria
-                        .Select(c => c.Match(dbField => (GroupByDBField?)dbField, _ => null, _ => null))
+                        .Select(c => c.Match(dbField => (GroupByDBField?) dbField, _ => null, _ => null))
                         .Where(c => c != null)
-                        .Select(c => c.Value);
+                        .Select(c => c.Value)
+                        .ToList();
 
                     // Create a semaphore to limit the number of threads that get queued (memory may be a problem)
                     Semaphore limitThreads = new Semaphore(100, 100);
