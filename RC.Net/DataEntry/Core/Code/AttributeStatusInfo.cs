@@ -1293,11 +1293,13 @@ namespace Extract.DataEntry
                 // AutoCreate model that does not already have one.
                 if (fieldModels != null)
                 {
+                    var attributeNameSet = new HashSet<string>(attributes
+                        .ToIEnumerable<IAttribute>()
+                        .Select(attribute => attribute.Name));
+
                     foreach (var fieldModel in fieldModels.Where(model => model.AutoCreate))
                     {
-                        if (!attributes
-                                .ToIEnumerable<IAttribute>()
-                                .Any(attribute => attribute.Name == fieldModel.Name))
+                        if (attributeNameSet.Add(fieldModel.Name))
                         {
                             var newAttribute = new UCLID_AFCORELib.Attribute();
                             newAttribute.Name = fieldModel.Name;
