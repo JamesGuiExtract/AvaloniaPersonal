@@ -404,11 +404,7 @@ namespace LearningMachineTrainer
                     && model.FeatureMean != null
                     && model.FeatureScaleFactor != null)
                 {
-                    foreach (var v in inputs)
-                    {
-                        v.Subtract(model.FeatureMean, inPlace: true);
-                    }
-                    inputs.ElementwiseDivide(model.FeatureScaleFactor, inPlace: true);
+                    inputs.Standardize(model.FeatureMean, model.FeatureScaleFactor);
                 }
 
                 switch (model)
@@ -590,12 +586,16 @@ namespace LearningMachineTrainer
         /// <summary>
         /// Standardizes feature values by subtracting the mean and dividing by the standard deviation
         /// </summary>
-        /// <param name="featureVectors">Feature vectors for the training data</param>
+        /// <param name="featureVectors">Feature vectors</param>
         /// <returns>The calculated mean and standard deviation</returns>
         public static (double[] mean, double[] sigma) Standardize(this double[][] featureVectors)
         {
             try
             {
+                if (featureVectors.Skip(1).Any(v => v.Length != featureVectors[0].Length))
+                {
+                    throw new ArgumentException("All feature vectors must be the same length");
+                }
                 var mean = featureVectors.Mean();
                 var sigma = featureVectors.StandardDeviation(mean);
 
@@ -605,18 +605,65 @@ namespace LearningMachineTrainer
                     sigma.ApplyInPlace(factor => factor + 0.0001);
                 }
 
-                // Standardize input
-                foreach (var v in featureVectors)
-                {
-                    v.Subtract(mean, inPlace: true);
-                }
-                featureVectors.ElementwiseDivide(sigma, inPlace: true);
-
+                Standardize(featureVectors, mean, sigma);
                 return (mean, sigma);
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45536");
+            }
+        }
+
+        /// <summary>
+        /// Standardizes feature values by subtracting the mean and dividing by the standard deviation
+        /// </summary>
+        /// <param name="featureVectors">Feature vectors</param>
+        /// <param name="mean">The previously calculated feature means</param>
+        /// <param name="sigma">The previously calculated feature standard deviations</param>
+        public static void Standardize(this double[][] featureVectors, double[] mean, double[] sigma)
+        {
+            try
+            {
+                foreach (var v in featureVectors)
+                {
+                    if (v.Length != mean.Length)
+                    {
+                        throw new ArgumentException(
+                            FormattableString.Invariant(
+                                $"Incorrect feature vector length. Expecting {mean.Length}, given {v.Length}"));
+                    }
+                    v.Subtract(mean, inPlace: true);
+                }
+                featureVectors.ElementwiseDivide(sigma, inPlace: true);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46440");
+            }
+        }
+
+        /// <summary>
+        /// Standardizes feature values by subtracting the mean and dividing by the standard deviation
+        /// </summary>
+        /// <param name="featureVectors">Feature vector</param>
+        /// <param name="mean">The previously calculated feature means</param>
+        /// <param name="sigma">The previously calculated feature standard deviations</param>
+        public static double[] Standardize(this double[] featureVectors, double[] mean, double[] sigma)
+        {
+            try
+            {
+                if (featureVectors.Length != mean.Length)
+                {
+                    throw new ArgumentException(
+                        FormattableString.Invariant(
+                            $"Incorrect feature vector length. Expecting {mean.Length}, given {featureVectors.Length}"));
+                }
+
+                return featureVectors.Subtract(mean).ElementwiseDivide(sigma);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46441");
             }
         }
 
@@ -637,7 +684,7 @@ namespace LearningMachineTrainer
                     && model.FeatureMean != null
                     && model.FeatureScaleFactor != null)
                 {
-                    inputs = inputs.Subtract(model.FeatureMean).ElementwiseDivide(model.FeatureScaleFactor);
+                    inputs = inputs.Standardize(model.FeatureMean, model.FeatureScaleFactor);
                 }
 
                 switch (model)
