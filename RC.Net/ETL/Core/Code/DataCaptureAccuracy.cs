@@ -474,8 +474,8 @@ namespace Extract.ETL
             while (documentIterator.MoveNext())
             {
                 var pagesAttribute = (foundContext.Evaluate(documentIterator, "Pages") as List<object>)
-                    .OfType<IAttribute>()
-                    ?.SingleOrDefault();
+                    ?.OfType<IAttribute>()
+                    .SingleOrDefault();
                 var pagesString = pagesAttribute?.Value.String;
 
                 // If we find a Document node containing the first page, use this as a comparison.
@@ -485,8 +485,8 @@ namespace Extract.ETL
                         .Contains(queryResultRow.FirstPageFromOriginal))
                 {
                     var foundAttributesFromSource = (foundContext.Evaluate(documentIterator, "DocumentData") as List<object>)
-                        .OfType<IAttribute>()
-                        ?.SingleOrDefault()
+                        ?.OfType<IAttribute>()
+                        .SingleOrDefault()
                         ?.SubAttributes;
                     if (foundAttributesFromSource != null)
                     {
