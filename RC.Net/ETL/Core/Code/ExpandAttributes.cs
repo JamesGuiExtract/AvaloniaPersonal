@@ -666,7 +666,6 @@ namespace Extract.ETL
                 {
                     _status.LastIDProcessedForDashboardAttribute.TryAdd(a.ToString(), -1);
                 }
-                List<string> itemsToRemove = new List<string>();
                 foreach (var d in itemsToDelete)
                 {
                     using (var scope = new TransactionScope(TransactionScopeOption.Required,
@@ -677,7 +676,6 @@ namespace Extract.ETL
                         },
                         TransactionScopeAsyncFlowOption.Enabled))
                     {
-                        itemsToRemove.Add(d);
                         using (var connection = NewSqlDBConnection())
                         {
                             connection.Open();
@@ -693,10 +691,7 @@ namespace Extract.ETL
                                 task.Wait(_cancelToken);
                             }
                         }
-                        foreach (var r in itemsToRemove)
-                        {
-                            _status.LastIDProcessedForDashboardAttribute.Remove(r);
-                        }
+                        _status.LastIDProcessedForDashboardAttribute.Remove(d);
                         SaveStatus();
                         scope.Complete();
                     }

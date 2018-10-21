@@ -108,8 +108,12 @@ namespace Extract.ETL
                 var expectedContext = new XPathContext(expected);
 
                 // Get enumerator for expected and found
-                var expectedEnumerator = expectedContext.FindAllOfType<IAttribute>(xPathOfSensitiveAttributes);
-                var foundEnumerator = foundContext.FindAllOfType<IAttribute>(xPathOfSensitiveAttributes);
+                var expectedEnumerator = expectedContext
+                    .FindAllOfType<IAttribute>(xPathOfSensitiveAttributes)
+                    .ToList();
+                var foundEnumerator = foundContext
+                    .FindAllOfType<IAttribute>(xPathOfSensitiveAttributes)
+                    .ToList();
 
                 // Get the count of expected and found
                 int expectedCount = expectedEnumerator.Count();
@@ -257,7 +261,7 @@ namespace Extract.ETL
                 else if (expectedCount == 0 && foundCount == 0)
                 {
                     // Ensure at least one row is created for every comparison of two files. Otherwise these files
-                    // will not be incluced in dashboards.
+                    // will not be included in dashboards.
                     pageAccuracy[1] = new[] { new AccuracyDetail(AccuracyDetailLabel.Expected, "", 0) }.ToList();
                 }
                 else
