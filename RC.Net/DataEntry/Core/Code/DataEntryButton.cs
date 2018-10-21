@@ -843,11 +843,12 @@ namespace Extract.DataEntry
                     // auto-complete list is active.
                     // Also, only allow Text to be blanked out if the button has been explicitly
                     // mapped to an attribute.
-                    string newValue = (_attribute.Value != null) ? _attribute.Value.String : "";
-                    if ((_hasSpecifiedAttributeName.Value || !string.IsNullOrWhiteSpace(newValue)) &&
+                    string newValue = _attribute.Value?.String ?? "";
+                    if (_hasSpecifiedAttributeName != null &&
+                        (_hasSpecifiedAttributeName.Value || !string.IsNullOrWhiteSpace(newValue)) &&
                         (newValue != Text || spatialInfoUpdated))
                     {
-                        Text = (_attribute.Value != null) ? _attribute.Value.String : "";
+                        Text = newValue;
                     }
 
                     // In case the value itself didn't change but the validation list did,
@@ -1214,9 +1215,9 @@ namespace Extract.DataEntry
             // Display the attribute text.
             // Only allow Text to be blanked out if the button has been explicitly mapped to an
             // attribute.
-            if (_attribute != null && _attribute.Value != null &&
-                (_hasSpecifiedAttributeName.Value ||
-                    !string.IsNullOrWhiteSpace(_attribute.Value.String)))
+            if (_attribute?.Value != null &&
+                _hasSpecifiedAttributeName != null &&
+                (_hasSpecifiedAttributeName.Value || !string.IsNullOrWhiteSpace(_attribute.Value.String)))
             {
                 Text = _attribute.Value.String;
             }
