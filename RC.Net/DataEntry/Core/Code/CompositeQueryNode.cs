@@ -832,16 +832,7 @@ namespace Extract.DataEntry
                             SpatialString spatialString = distinctResult.ToSpatialString();
                             IUnknownVector vecRasterZones = spatialString.GetOCRImageRasterZones();
 
-                            if (forcedSpatialResult == null)
-                            {
-                                forcedSpatialResult = spatialString.Clone();
-                            }
-                            else
-                            {
-                                vecRasterZones.Append(forcedSpatialResult.GetOCRImageRasterZones());
-                                forcedSpatialResult.DataEntryMergeAsHybridString(
-                                    distinctResult.FirstSpatialString);
-                            }
+                            forcedSpatialResult = spatialString.Clone();
 
                             // Because the SpatialString class will remove spatial info for
                             // blank strings yet it is important for the attribute value spatial

@@ -1198,7 +1198,7 @@ namespace Extract.DataEntry
         /// <see langword="null"/> if not required).</param>
         /// <param name="fieldModels">The <see cref="BackgroundFieldModel"/>s that represent
         /// the controls in the DEP.</param>
-        /// <param name="tagUtility">The <see cref="IPathTags"/> instance that should be used to
+        /// <param name="pathTags">The <see cref="IPathTags"/> instance that should be used to
         /// expand any path tag expressions in data queries.</param>
         [ComVisible(false)]
         public static void ExecuteNoUILoad(IUnknownVector attributes, string sourceDocName,
@@ -1559,7 +1559,7 @@ namespace Extract.DataEntry
                 // Set/update the propagated status if necessary.
                 if (considerPropagated && !statusInfo._hasBeenPropagated)
                 {
-                    statusInfo._hasBeenPropagated = considerPropagated;
+                    statusInfo._hasBeenPropagated = true;
                 }
 
                 // Set/update the validator if necessary.
@@ -4287,8 +4287,6 @@ namespace Extract.DataEntry
         /// <see langref="false"/>, the flag should be left unchanged.</param>
         public void Save(IStream stream, bool clearDirty)
         {
-            MemoryStream memoryStream = null;
-
             try
             {
                 ExtractException.Assert("ELI24397", "Memory stream is null!", stream != null);
@@ -4313,13 +4311,6 @@ namespace Extract.DataEntry
             {
                 throw ExtractException.CreateComVisible("ELI24398", 
                     "Error saving data entry application settings.", ex);
-            }
-            finally
-            {
-                if (memoryStream != null)
-                {
-                    memoryStream.Dispose();
-                }
             }
         }
 
