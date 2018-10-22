@@ -120,11 +120,12 @@ namespace Extract.Imaging
                     Thread.CurrentThread.GetApartmentState() == ApartmentState.MTA);
 
                 // If all ocrData instance already have stringized data, it will be most
-                // efficient to simply store this data, then use it to construce SpatialStrings when
+                // efficient to simply store this data, then use it to construct SpatialStrings when
                 // needed.
-                if (ocrData.All(data => data._ocrData != null))
+	            var listOfDataObjects = ocrData.ToList();
+                if (listOfDataObjects.All(data => data._ocrData != null))
                 {
-                    _ocrData = ocrData
+                    _ocrData = listOfDataObjects
                         .SelectMany(data => data._ocrData)
                         .ToArray();
                 }
@@ -132,9 +133,9 @@ namespace Extract.Imaging
                 else
                 {
                     SpatialString unifiedSpatialString = new SpatialString();
-                    foreach (SpatialString spatialString in ocrData)
+                    foreach (var spatialString in listOfDataObjects)
                     {
-                        unifiedSpatialString.Append(spatialString);
+                        unifiedSpatialString.Append(spatialString.SpatialString);
                     }
 
                     // Cache the unifiedSpatialString for the appropriate threading model. 
