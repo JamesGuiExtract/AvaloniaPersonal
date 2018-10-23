@@ -114,7 +114,7 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
             // Add record for DatabaseService so that there's a valid ID
             using (var cmd = connection.CreateCommand())
             {
-                cmd.CommandText = "INSERT DatabaseService (Settings) VALUES('')";
+                cmd.CommandText = "INSERT DatabaseService (Description, Settings) VALUES('ML Model Trainer test', '')";
                 cmd.ExecuteNonQuery();
             }
 

@@ -174,7 +174,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
 
                 using (var cmd = connection.CreateCommand())
                 {
-                    cmd.CommandText = "INSERT DatabaseService (Settings) VALUES('')";
+                    cmd.CommandText = "INSERT DatabaseService (Description, Settings) VALUES('Unit tests'' service', '')";
                     cmd.ExecuteNonQuery();
                 }
             }
