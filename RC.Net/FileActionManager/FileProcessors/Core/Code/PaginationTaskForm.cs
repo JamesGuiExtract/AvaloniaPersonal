@@ -441,6 +441,7 @@ namespace Extract.FileActionManager.FileProcessors
                 ExtractException.Assert("ELI44760", "Invalid operation.", FileProcessingDB != null);
 
                 string fileName = FileProcessingDB.GetFileNameFromFileID(fileID);
+                _fileTaskSessionMap[fileID] = StartFileTaskSession(fileID);
                 LoadDocumentForPagination(fileID, fileName, true);
 
                 return true;
