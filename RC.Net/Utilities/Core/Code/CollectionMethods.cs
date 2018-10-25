@@ -404,36 +404,6 @@ namespace Extract.Utilities
 
         /// <summary>
         /// Gets the value associated with the given key. If the key is not already present in the
-        /// dictionary the <see paramref="valueFactory"/> nullary function is used to create the
-        /// value, which is added to the dictionary.
-        /// </summary>
-        /// <typeparam name="TKey">The type for the keys in the dictionary.</typeparam>
-        /// <typeparam name="TValue">The type for the values in the dictionary.</typeparam>
-        /// <param name="dictionary">The dictionary.</param>
-        /// <param name="key">The key.</param>
-        /// <param name="valueFactory">The nullary delegate function used to create the value.</param>
-        /// <returns>The value associated with the given key.</returns>
-        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary,
-            TKey key, Func<TValue> valueFactory)
-        {
-            try
-            {
-                TValue value;
-                if (!dictionary.TryGetValue(key, out value))
-                {
-                    value = valueFactory();
-                    dictionary.Add(key, value);
-                }
-                return value;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI38960");
-            }
-        }
-
-        /// <summary>
-        /// Gets the value associated with the given key. If the key is not already present in the
         /// dictionary the <see paramref="valueFactory"/> unary function is used to create the value,
         /// which is added to the dictionary.
         /// </summary>

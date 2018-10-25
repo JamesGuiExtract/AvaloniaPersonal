@@ -618,7 +618,7 @@ namespace Extract.DataEntry
                             trimmedItem = "";
                         }
 
-                        var akas = _autoCompleteValues.GetOrAdd(trimmedItem, () => new List<string>());
+                        var akas = _autoCompleteValues.GetOrAdd(trimmedItem, _ => new List<string>());
                         akas.AddRange(items.Skip(1));
                     }
                 }

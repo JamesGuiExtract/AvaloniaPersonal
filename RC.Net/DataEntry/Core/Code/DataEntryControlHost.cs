@@ -7400,7 +7400,7 @@ namespace Extract.DataEntry
                 anchorPoints.Add((page, point, orientation));
             }
 
-            var errorIconsForAttribute = _attributeErrorIcons.GetOrAdd(attribute, () =>
+            var errorIconsForAttribute = _attributeErrorIcons.GetOrAdd(attribute, _ =>
                 new List<ImageLayerObject>());
 
             foreach (var (page, point, rotation) in anchorPoints)

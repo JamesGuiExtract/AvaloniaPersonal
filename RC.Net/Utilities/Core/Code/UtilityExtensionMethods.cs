@@ -7,6 +7,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using Extract.Licensing;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Collections.Concurrent;
 
 namespace Extract.Utilities
 {
@@ -94,12 +95,20 @@ namespace Extract.Utilities
         /// <typeparam name="TResult">The return type of the function</typeparam>
         /// <param name="fun">The non-memoized unary function</param>
         /// <returns>A memoized version of the function</returns>
-        public static Func<T1, TResult> Memoize<T1, TResult>(this Func<T1, TResult> fun)
+        public static Func<T1, TResult> Memoize<T1, TResult>(this Func<T1, TResult> fun, bool threadSafe = false)
         {
             try
             {
-                var map = new Dictionary<T1, TResult>();
-                return a => map.GetOrAdd(a, () => fun(a));
+                if (threadSafe)
+                {
+                    var map = new ConcurrentDictionary<T1, TResult>();
+                    return a => map.GetOrAdd(a, fun);
+                }
+                else
+                {
+                    var map = new Dictionary<T1, TResult>();
+                    return a => map.GetOrAdd(a, fun);
+                }
             }
             catch (Exception ex)
             {
@@ -122,7 +131,7 @@ namespace Extract.Utilities
             try
             {
                 var map = new Dictionary<Tuple<T1, T2>, TResult>();
-                return (a, b) => map.GetOrAdd(Tuple.Create(a, b), () => fun(a, b));
+                return (a, b) => map.GetOrAdd(Tuple.Create(a, b), _ => fun(a, b));
             }
             catch (Exception ex)
             {
@@ -146,7 +155,7 @@ namespace Extract.Utilities
             try
             {
                 var map = new Dictionary<Tuple<T1, T2, T3>, TResult>();
-                return (a, b, c) => map.GetOrAdd(Tuple.Create(a, b, c), () => fun(a, b, c));
+                return (a, b, c) => map.GetOrAdd(Tuple.Create(a, b, c), _ => fun(a, b, c));
             }
             catch (Exception ex)
             {

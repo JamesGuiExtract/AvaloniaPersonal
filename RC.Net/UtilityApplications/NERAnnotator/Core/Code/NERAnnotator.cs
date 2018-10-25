@@ -386,7 +386,7 @@ namespace Extract.UtilityApplications.NERAnnotator
         }
 
         /// <summary>
-        // Process each specified page and append the annotated text to the output file
+        /// Process each specified page and append the annotated text to the output file
         /// </summary>
         /// <param name="files">The filename/page number pairs to process</param>
         /// <param name="appendToTrainingSet">Whether to append to the training output file (if true) or the testing output file (if false)</param>
@@ -690,7 +690,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                             {
                                 foreach(var m in matched)
                                 {
-                                    openTags.GetOrAdd(m, () => new List<int>()).Add(i);
+                                    openTags.GetOrAdd(m, _ => new List<int>()).Add(i);
                                 }
                             }
                         }

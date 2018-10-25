@@ -497,10 +497,10 @@ namespace Extract.LabResultsCustomComponents
                 bool fuzzy = false;
 
                 var potentialESTestCodes = _normalizedNameToESTestCodes.GetOrAdd(normalizedName,
-                    () => new HashSet<Tuple<string, int>>());
+                    _ => new HashSet<Tuple<string, int>>());
 
                 var potentialCustomerTestCodes = _normalizedNameToCustomerTestCodes.GetOrAdd(normalizedName,
-                    () => new HashSet<string>());
+                    _ => new HashSet<string>());
 
                 if (potentialCustomerTestCodes.Count == 0 && potentialESTestCodes.Count == 0)
                 {

@@ -400,12 +400,12 @@ namespace Extract.AttributeFinder
                 {
                     _distinctValuesSeen.Add(protoFeature);
 
-                    var tfForCategory = _termFrequency.GetOrAdd(category, () =>
+                    var tfForCategory = _termFrequency.GetOrAdd(category, _ =>
                         new Dictionary<string, int>(StringComparer.Ordinal));
-                    int tf = tfForCategory.GetOrAdd(protoFeature, () => 0);
+                    int tf = tfForCategory.GetOrAdd(protoFeature, _ => 0);
                     tfForCategory[protoFeature] = tf + 1;
 
-                    var documents = _termToDocument.GetOrAdd(protoFeature, () =>
+                    var documents = _termToDocument.GetOrAdd(protoFeature, _ =>
                         new HashSet<string>(StringComparer.Ordinal));
                     documents.Add(docName);
 

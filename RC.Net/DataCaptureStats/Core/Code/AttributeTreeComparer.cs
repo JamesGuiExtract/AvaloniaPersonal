@@ -372,7 +372,7 @@ namespace Extract.DataCaptureStats
             foreach (var attribute in attributes)
             {
                 string qualifiedName = GetQualifiedName(attribute, qualifiedAncestorName);
-                int count = pathsToCounts.GetOrAdd(qualifiedName, () => 0);
+                int count = pathsToCounts.GetOrAdd(qualifiedName, _ => 0);
                 pathsToCounts[qualifiedName] = count + 1;
                 
                 // Update the container-only status. Don't overwrite a false value with a true value

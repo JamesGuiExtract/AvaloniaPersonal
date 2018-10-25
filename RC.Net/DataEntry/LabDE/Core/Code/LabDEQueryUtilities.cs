@@ -429,7 +429,7 @@ namespace Extract.DataEntry.LabDE
                     string aka = row.ItemArray[1] as string;
                     string esComponentCode = row.ItemArray[2] as string;
 
-                    List<string> akas = results.GetOrAdd(officialName, () => new List<string>());
+                    List<string> akas = results.GetOrAdd(officialName, _ => new List<string>());
                     if (aka != null)
                     {
                         akas.Add(aka);
@@ -437,7 +437,7 @@ namespace Extract.DataEntry.LabDE
 
                     if (esComponentCode != null)
                     {
-                        List<string> names = esCodesToNames.GetOrAdd(esComponentCode, () => new List<string>());
+                        List<string> names = esCodesToNames.GetOrAdd(esComponentCode, _ => new List<string>());
                         names.Add(officialName);
                     }
                 }
@@ -475,7 +475,7 @@ namespace Extract.DataEntry.LabDE
 
                         foreach (var officialName in esCodesToNames[code])
                         {
-                            List<string> akas = results.GetOrAdd(officialName, () => new List<string>());
+                            List<string> akas = results.GetOrAdd(officialName, _ => new List<string>());
                             akas.Add(aka);
                         }
                     }

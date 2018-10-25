@@ -768,7 +768,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     _originalDocuments.Add(outputDocument);
                     var setOutputDocs = _sourceToOriginalDocuments.GetOrAdd(
-                        sourceDocument, () => new HashSet<OutputDocument>());
+                        sourceDocument, _ => new HashSet<OutputDocument>());
                     setOutputDocs.Add(outputDocument);
 
                     _primaryPageLayoutControl.GetDocumentPosition(outputDocument);
@@ -1015,7 +1015,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var documentsToSave = new Dictionary<SourceDocument, List<OutputDocument>>();
                 foreach (var entry in sourceToOutputMap.Where(entry => entry.Key.Any()))
                 {
-                    var outputDocs = documentsToSave.GetOrAdd(entry.Key.Single(), () => new List<OutputDocument>());
+                    var outputDocs = documentsToSave.GetOrAdd(entry.Key.Single(), _ => new List<OutputDocument>());
                     outputDocs.Add(entry.Value);
                 }
 

@@ -202,7 +202,7 @@ namespace Extract.AttributeFinder
                     {
                         var text = attribute.Value.String;
                         var values = _nameToFeatureValues.GetOrAdd(attribute.Name,
-                            () => new List<string>());
+                            _ => new List<string>());
                         values.AddRange(tokenizer.GetTerms(text));
                     }
                 }
@@ -227,7 +227,7 @@ namespace Extract.AttributeFinder
                         {
                             var text = attribute.Value.String;
                             var values = _nameToFeatureValues.GetOrAdd(attribute.Name,
-                                () => new List<string>());
+                                _ => new List<string>());
                             values.AddRange(tokenizer.GetTerms(text));
                         }
                     }

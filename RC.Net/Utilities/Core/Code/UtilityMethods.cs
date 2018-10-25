@@ -1053,7 +1053,7 @@ namespace Extract.Utilities
                             var categoryAttributes = type.GetCustomAttributes<ExtractCategoryAttribute>(true);
                             foreach (var a in categoryAttributes)
                             {
-                                categoriesWithTypes.GetOrAdd(a.Name, () => new HashSet<ExtractCategoryType>())
+                                categoriesWithTypes.GetOrAdd(a.Name, _ => new HashSet<ExtractCategoryType>())
                                     .Add( new ExtractCategoryType
                                     {
                                         DescriptionOfType = a.TypeDescription,

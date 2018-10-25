@@ -1904,7 +1904,7 @@ namespace Extract.LabResultsCustomComponents
                 IUnknownVector vectorOfAttributes = vecAttributes as IUnknownVector;
                 int vectorSize = vectorOfAttributes.Size();
                 List<IAttribute> listAttributes = nameToAttributes.GetOrAdd(name.ToUpperInvariant(),
-                    () => new List<IAttribute>(vectorSize));
+                    _ => new List<IAttribute>(vectorSize));
                 for (int j = 0; j < vectorSize; j++)
                 {
                     listAttributes.Add((IAttribute)vectorOfAttributes.At(j));
