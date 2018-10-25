@@ -52,7 +52,7 @@ namespace Extract.Utilities
                     return;
                 }
 
-                string tempDirectoryPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                string tempDirectoryPath = Path.Combine(Path.GetTempPath(), "SuggestionProvider", Path.GetRandomFileName());
                 _tempDirectory = System.IO.Directory.CreateDirectory(tempDirectoryPath);
                 _directory = FSDirectory.Open(_tempDirectory);
                 _analyzer = new LuceneSuggestionAnalyzer();
@@ -292,25 +292,15 @@ namespace Extract.Utilities
         {
             if (!disposedValue)
             {
-                if (disposing)
-                {
-                    _analyzer?.Dispose();
-                    _directory?.Dispose();
-                    _directoryReader?.Dispose();
-                }
+                // Dispose of these even if this is being called from the
+                // destructor, so that they release locks on the index files
+                _analyzer?.Dispose();
+                _directoryReader?.Dispose();
+                _directory?.Dispose();
 
                 // Delete index
                 if (_tempDirectory != null)
                 {
-                    foreach (var file in System.IO.Directory.GetFiles(_tempDirectory.FullName))
-                    {
-                        try
-                        {
-                            File.Delete(file);
-                        }
-                        catch
-                        { }
-                    }
                     try
                     {
                         System.IO.Directory.Delete(_tempDirectory.FullName, true);
@@ -330,5 +320,19 @@ namespace Extract.Utilities
         }
 
         #endregion
+
+        #region Destructors
+
+        /// <summary>
+        /// Deletes temporary directories before the <see cref="LuceneSuggestionProvider{T}"/>
+        /// is reclaimed by garbage collection.
+        /// </summary>
+        ~LuceneSuggestionProvider()
+        {
+            Dispose(false);
+        }
+
+        #endregion Destructors
+
     }
 }

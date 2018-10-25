@@ -55,7 +55,7 @@ namespace Extract.Utilities
                     return;
                 }
 
-                string tempDirectoryPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                string tempDirectoryPath = Path.Combine(Path.GetTempPath(), "BestMatchProvider", Path.GetRandomFileName());
                 _tempDirectory = System.IO.Directory.CreateDirectory(tempDirectoryPath);
                 _directory = FSDirectory.Open(_tempDirectory);
                 var divideHyphenAnalyzer = new LuceneSuggestionAnalyzer { Synonyms = expandingSynonyms };
@@ -107,13 +107,13 @@ namespace Extract.Utilities
         /// <param name="searchPhrase">The substring or related phrase to search with</param>
         /// <param name="maxSuggestions">The maximim number of suggestions to return</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public IEnumerable<Tuple<string, double>> GetSuggestionsAndScores(string searchPhrase, int maxSuggestions = 1)
+        public List<Tuple<string, double>> GetSuggestionsAndScores(string searchPhrase, int maxSuggestions = 1)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(searchPhrase))
                 {
-                    return Enumerable.Empty<Tuple<string, double>>();
+                    return new List<Tuple<string, double>>(0);
                 }
 
                 var query = new BooleanQuery();
@@ -170,7 +170,7 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 ex.ExtractLog("ELI45490");
-                return Enumerable.Empty<Tuple<string, double>>();
+                return new List<Tuple<string, double>>(0);
             }
         }
 
@@ -215,29 +215,19 @@ namespace Extract.Utilities
         {
             if (!disposedValue)
             {
-                if (disposing)
+                // Dispose of these even if this is being called from the
+                // destructor, so that they release locks on the index files
+                foreach(var an in _fieldAn.Values)
                 {
-                    foreach(var an in _fieldAn.Values)
-                    {
-                        an.Dispose();
-                    }
-                    _analyzer?.Dispose();
-                    _directory?.Dispose();
-                    _directoryReader?.Dispose();
+                    an.Dispose();
                 }
+                _analyzer?.Dispose();
+                _directory?.Dispose();
+                _directoryReader?.Dispose();
 
                 // Delete index
                 if (_tempDirectory != null)
                 {
-                    foreach (var file in System.IO.Directory.GetFiles(_tempDirectory.FullName))
-                    {
-                        try
-                        {
-                            File.Delete(file);
-                        }
-                        catch
-                        { }
-                    }
                     try
                     {
                         System.IO.Directory.Delete(_tempDirectory.FullName, true);

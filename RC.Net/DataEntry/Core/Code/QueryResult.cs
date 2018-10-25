@@ -5,8 +5,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Extract.Utilities;
 using UCLID_AFCORELib;
-using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using TextFieldParser = Microsoft.VisualBasic.FileIO.TextFieldParser;
 
@@ -129,9 +129,33 @@ namespace Extract.DataEntry
         /// </summary>
         MultipleQueryResultSelectionMode _selectionMode = MultipleQueryResultSelectionMode.None;
 
+        /// <summary>
+        /// A memoized function to split csv lines returned from data queries
+        /// in order to speed up the creation of auto suggest lists that use lots of data
+        /// https://extract.atlassian.net/browse/ISSUE-15673
+        /// </summary>
+        static Func<string, string[]> SplitCSVLine;
+
         #endregion Fields
        
         #region Constructors
+
+        /// <summary>
+        /// Initialize the static variables
+        /// </summary>
+        static QueryResult()
+        {
+            Func<string, string[]> splitCSVLine = line =>
+            {
+                using (var sr = new StringReader(line))
+                using (var csvReader = new TextFieldParser(sr) {Delimiters = new[] {", "}})
+                {
+                    return csvReader.ReadFields();
+                }
+            };
+
+            SplitCSVLine = splitCSVLine.Memoize(threadSafe: true);
+        }
 
         /// <summary>
         /// Initializes a new, empty <see cref="QueryResult"/> instance.
@@ -819,12 +843,7 @@ namespace Extract.DataEntry
                     {
                         foreach(string line in _stringResults)
                         {
-                            using (var sr = new StringReader(line))
-                            using (var csvReader = new TextFieldParser(sr) { Delimiters = new[] { ", " } })
-                            {
-                                var fields = csvReader.ReadFields();
-                                stringList.Add(fields[0]);
-                            }
+                            stringList.Add(SplitCSVLine(line)[0]);
                         }
                     }
                     else
@@ -880,15 +899,7 @@ namespace Extract.DataEntry
                     }
                     else if (_queryNode.SplitCsv)
                     {
-                        foreach(string line in _stringResults)
-                        {
-                            using (var sr = new StringReader(line))
-                            using (var csvReader = new TextFieldParser(sr) { Delimiters = new[] { ", " } })
-                            {
-                                var fields = csvReader.ReadFields();
-                                stringList.Add(fields);
-                            }
-                        }
+                        stringList.AddRange(_stringResults.Select(SplitCSVLine));
                     }
                     else
                     {

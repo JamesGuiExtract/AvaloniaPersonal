@@ -937,6 +937,10 @@ namespace Extract.DataEntry
                     else
                     {
                         _editingControl.TextChanged -= HandleCellTextChanged;
+
+                        // Dispose the auto-suggest control here to prevent it from popping up
+                        // twice when a new cell is edited
+                        _luceneAutoSuggest?.Dispose();
                     }
                 }
 
@@ -1344,7 +1348,6 @@ namespace Extract.DataEntry
                         if (AutoCompleteMode == DataEntryAutoCompleteMode.SuggestLucene && validator != null)
                         {
                             var autoCompleteValues = validator.AutoCompleteValuesDictionary;
-                            _luceneAutoSuggest?.Dispose();
                             _luceneAutoSuggest = new LuceneAutoSuggest(textEditingControl, this);
                             _luceneAutoSuggest.UpdateAutoCompleteList(autoCompleteValues);
 

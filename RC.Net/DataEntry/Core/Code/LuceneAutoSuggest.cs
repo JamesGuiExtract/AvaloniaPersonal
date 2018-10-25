@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Extract.DataEntry
@@ -17,7 +18,7 @@ namespace Extract.DataEntry
         IDataEntryAutoCompleteControl _dataEntryControl;
         ListBox _listBoxChild;
         bool _msgFilterActive = false;
-        LuceneSuggestionProvider<KeyValuePair<string, List<string>>> _providerSource;
+        Lazy<LuceneSuggestionProvider<KeyValuePair<string, List<string>>>> _providerSource;
         Action _unregister;
         int _ignoreTextChange;
 
@@ -26,7 +27,7 @@ namespace Extract.DataEntry
         #region Properties
 
         // The object that manages the Lucene index
-        LuceneSuggestionProvider<KeyValuePair<string, List<string>>> ProviderSource
+        private Lazy<LuceneSuggestionProvider<KeyValuePair<string, List<string>>>> ProviderSource
         {
             get
             {
@@ -37,10 +38,21 @@ namespace Extract.DataEntry
                 if (_providerSource != value)
                 {
                     var old = _providerSource;
+
                     _providerSource = value;
-                    Provider = s => _providerSource.GetSuggestions(s,
+                    Provider = s => _providerSource.Value.GetSuggestions(s,
                         excludeLowScoring: true);
-                    old?.Dispose();
+
+                    if (old != null && old.IsValueCreated)
+                    {
+                        old.Value.Dispose();
+                    }
+
+                    // Start lazy instantiation to reduce delay when user starts to type
+                    // (Use of lazy objects helps prevent the UI from opening sluggishly
+                    //  https://extract.atlassian.net/browse/ISSUE-15673
+                    // )
+                    Task.Factory.StartNew(() => _providerSource.Value);
                 }
             }
         }
@@ -48,7 +60,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Function that returns suggestions based on a search string
         /// </summary>
-        public Func<string, IEnumerable<object>> Provider { get; set; }
+        private Func<string, IEnumerable<object>> Provider { get; set; }
 
         #endregion Properties
 
@@ -233,6 +245,7 @@ namespace Extract.DataEntry
                     _listBoxChild.Left = putItHere.X;
                     _listBoxChild.Top = putItHere.Y;
                     _listBoxChild.Width = _control.Width;
+                    _ancestorForm.Controls.SetChildIndex(_listBoxChild, 0);
                     _listBoxChild.Show();
 
                     int totalItemHeight = _listBoxChild.ItemHeight * (_listBoxChild.Items.Count + 1);
@@ -310,9 +323,6 @@ namespace Extract.DataEntry
                     };
                     _listBoxChild.Click += HandleListBoxChild_Click;
                     _ancestorForm.Controls.Add(_listBoxChild);
-
-                    // Put it at the front
-                    _ancestorForm.Controls.SetChildIndex(_listBoxChild, 0);
                 }
             }
         }
@@ -450,7 +460,11 @@ namespace Extract.DataEntry
             {
                 if (disposing)
                 {
-                    ProviderSource?.Dispose();
+                    if (ProviderSource != null && ProviderSource.IsValueCreated)
+                    {
+                        ProviderSource.Value?.Dispose();
+                    }
+
                     _unregister?.Invoke();
                 }
 
@@ -467,11 +481,12 @@ namespace Extract.DataEntry
 
         internal void UpdateAutoCompleteList(Dictionary<string, List<string>> autoCompleteValues)
         {
-            ProviderSource = new LuceneSuggestionProvider<KeyValuePair<string, List<string>>>(
-                autoCompleteValues.AsEnumerable(),
-                s => s.Key,
-                s => Enumerable.Repeat(new KeyValuePair<string, string>("Name", s.Key), 1)
-                    .Concat(s.Value.Select(aka => new KeyValuePair<string, string>("AKA", aka))));
+            ProviderSource = new Lazy<LuceneSuggestionProvider<KeyValuePair<string, List<string>>>>(
+                () => new LuceneSuggestionProvider<KeyValuePair<string, List<string>>>(
+                    autoCompleteValues.AsEnumerable(),
+                    s => s.Key,
+                    s => Enumerable.Repeat(new KeyValuePair<string, string>("Name", s.Key), 1)
+                        .Concat(s.Value.Select(aka => new KeyValuePair<string, string>("AKA", aka)))));
         }
         #endregion
     }
