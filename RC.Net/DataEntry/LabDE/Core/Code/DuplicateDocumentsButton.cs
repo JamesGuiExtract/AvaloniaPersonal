@@ -941,10 +941,32 @@ namespace Extract.DataEntry.LabDE
                 // Only attempt to check out files that are currently pending for verification.
                 if (actionStatus == EActionStatus.kActionPending)
                 {
-                    if (DataEntryApplication.FileRequestHandler.CheckoutForProcessing(
-                        fileID, true, out actionStatus))
+                    // Ignore exceptions caused by the file status changing between the above check
+                    // and the attempt to check out the file
+                    // https://extract.atlassian.net/browse/ISSUE-15672
+                    try
                     {
-                        _checkedOutFiles.Add(fileID);
+                        if (DataEntryApplication.FileRequestHandler.CheckoutForProcessing(
+                            fileID, true, out actionStatus))
+                        {
+                            _checkedOutFiles.Add(fileID);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        try
+                        {
+                            actionStatus =
+                                DataEntryApplication.FileProcessingDB.GetFileStatus(
+                                    fileID, DataEntryApplication.DatabaseActionName, false);
+                        }
+                        catch (Exception)
+                        { }
+
+                        if (actionStatus == EActionStatus.kActionPending)
+                        {
+                            throw;
+                        }
                     }
                 }
             }
