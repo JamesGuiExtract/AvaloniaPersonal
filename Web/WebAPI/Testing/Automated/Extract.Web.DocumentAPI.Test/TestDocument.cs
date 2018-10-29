@@ -35,9 +35,12 @@ namespace Extract.Web.WebAPI.Test
 
         const int OutputFileMetadataFieldID = 6;
 
-        static readonly string _VERIFY_ACTION = "A02_Verify";
-        static readonly string _TEST_FILE1 = "Resources.C413.tif";
-        static readonly string _TEST_FILE1_USS = "Resources.C413.tif.uss";
+        static readonly string _IDS_VERIFY_ACTION = "Verify";
+        static readonly string _LABDE_VERIFY_ACTION = "A02_Verify";
+        static readonly string _TEST_FILE_TESTIMAGE001 = "Resources.TestImage001.tif";
+        static readonly string _TEST_FILE_TESTIMAGE001_USS = "Resources.TestImage001.tif.uss";
+        static readonly string _TEST_FILE_C413 = "Resources.C413.tif";
+        static readonly string _TEST_FILE_C413_USS = "Resources.C413.tif.uss";
 
         static readonly string _WBC_ATTRIBUTE_GUID = "7b493421-299a-423c-80b2-b37043597081";
         static readonly string _HEMOGLOBIN_ATTRIBUTE_GUID = "0ec90152-3c89-4d22-84a0-17322b17b888";
@@ -157,7 +160,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 var filename = _testFiles.GetFile("Resources.A418.tif");
                 using (var stream = new FileStream(filename, FileMode.Open))
@@ -207,7 +210,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 var result = controller.PostText("Document 1, SSN: 111-22-3333, DOB: 10-04-1999").Result;
                 var submitResult = result.AssertGoodResult<DocumentIdResult>();
@@ -230,7 +233,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 for (int i = 1; i <= 10; ++i)
                 {
@@ -255,7 +258,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 var workflowId = fileProcessingDb.GetWorkflowID(ApiTestUtils.CurrentApiContext.WorkflowName);
                 var workflow = fileProcessingDb.GetWorkflowDefinition(workflowId);
@@ -296,7 +299,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 var filename = _testFiles.GetFile("Resources.A418.tif");
                 using (var stream = new FileStream(filename, FileMode.Open))
@@ -336,14 +339,14 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
-                var testFilename = _testFiles.GetFile(_TEST_FILE1);
-                var ussFilename = _testFiles.GetFile(_TEST_FILE1_USS);
+                var testFilename = _testFiles.GetFile(_TEST_FILE_C413);
+                var ussFilename = _testFiles.GetFile(_TEST_FILE_C413_USS);
 
                 int fileId = 4; // A 5 page document.
                 string fileName = fileProcessingDb.GetFileNameFromFileID(fileId);
-                var fileRecord = fileProcessingDb.GetFileRecord(fileName, _VERIFY_ACTION);
+                var fileRecord = fileProcessingDb.GetFileRecord(fileName, _LABDE_VERIFY_ACTION);
                 fileProcessingDb.RenameFile(fileRecord, testFilename);
 
                 var ussData = new SpatialString();
@@ -393,8 +396,8 @@ namespace Extract.Web.WebAPI.Test
                 FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
 
-                _testFiles.RemoveFile(_TEST_FILE1);
-                _testFiles.RemoveFile(_TEST_FILE1_USS);
+                _testFiles.RemoveFile(_TEST_FILE_C413);
+                _testFiles.RemoveFile(_TEST_FILE_C413_USS);
             }
         }
 
@@ -406,14 +409,14 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
-                string testFileName = _testFiles.GetFile(_TEST_FILE1);
-                string ussFileName = _testFiles.GetFile(_TEST_FILE1_USS);
+                string testFileName = _testFiles.GetFile(_TEST_FILE_C413);
+                string ussFileName = _testFiles.GetFile(_TEST_FILE_C413_USS);
 
                 int fileId = 4; // A 5 page document.
                 string fileName = fileProcessingDb.GetFileNameFromFileID(fileId);
-                var fileRecord = fileProcessingDb.GetFileRecord(fileName, _VERIFY_ACTION);
+                var fileRecord = fileProcessingDb.GetFileRecord(fileName, _LABDE_VERIFY_ACTION);
                 fileProcessingDb.RenameFile(fileRecord, testFileName);
 
                 var ussData = new SpatialString();
@@ -451,8 +454,8 @@ namespace Extract.Web.WebAPI.Test
                 FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
 
-                _testFiles.RemoveFile(_TEST_FILE1);
-                _testFiles.RemoveFile(_TEST_FILE1_USS);
+                _testFiles.RemoveFile(_TEST_FILE_C413);
+                _testFiles.RemoveFile(_TEST_FILE_C413_USS);
             }
         }
 
@@ -464,7 +467,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {   
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 var filename = _testFiles.GetFile("Resources.ResultText.txt");
                 SetupMetadataFieldValue(1, filename, OutputFileMetadataFieldID, dbName);
@@ -490,7 +493,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
                 {
@@ -531,7 +534,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                    InitializeAndLogin("Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
 
                 foreach (var kvpFileInfo in IDShieldFileIdToFileInfo)
                 {
@@ -562,9 +565,17 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                    InitializeAndLogin("Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
 
-                var data = controller.GetDocumentData(1)
+                var testFilename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001);
+                var ussFilename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001_USS);
+
+                int fileId = 1;
+                string fileName = fileProcessingDb.GetFileNameFromFileID(fileId);
+                var fileRecord = fileProcessingDb.GetFileRecord(fileName, _IDS_VERIFY_ACTION);
+                fileProcessingDb.RenameFile(fileRecord, testFilename);
+
+                var data = controller.GetDocumentData(fileId)
                     .AssertGoodResult<DocumentDataResult>();
 
                 // Delete the first attribute
@@ -630,10 +641,10 @@ namespace Extract.Web.WebAPI.Test
 
                 newData.Attributes.Add(newAttribute);
 
-                controller.PutDocumentData(1, newData)
+                controller.PutDocumentData(fileId, newData)
                     .AssertGoodResult<NoContentResult>();
 
-                data = controller.GetDocumentData(1)
+                data = controller.GetDocumentData(fileId)
                     .AssertGoodResult<DocumentDataResult>();
 
                 Assert.AreEqual(2, data.Attributes.Count,
@@ -685,14 +696,14 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
-                var testFilename = _testFiles.GetFile(_TEST_FILE1);
-                var ussFilename = _testFiles.GetFile(_TEST_FILE1_USS);
+                var testFilename = _testFiles.GetFile(_TEST_FILE_C413);
+                var ussFilename = _testFiles.GetFile(_TEST_FILE_C413_USS);
 
                 int fileId = 4;
                 string fileName = fileProcessingDb.GetFileNameFromFileID(fileId);
-                var fileRecord = fileProcessingDb.GetFileRecord(fileName, _VERIFY_ACTION);
+                var fileRecord = fileProcessingDb.GetFileRecord(fileName, _LABDE_VERIFY_ACTION);
                 fileProcessingDb.RenameFile(fileRecord, testFilename);
 
                 var data = controller.GetDocumentData(fileId)
@@ -797,8 +808,8 @@ namespace Extract.Web.WebAPI.Test
                 FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
 
-                _testFiles.RemoveFile(_TEST_FILE1);
-                _testFiles.RemoveFile(_TEST_FILE1_USS);
+                _testFiles.RemoveFile(_TEST_FILE_C413);
+                _testFiles.RemoveFile(_TEST_FILE_C413_USS);
             }
         }
 
@@ -810,7 +821,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 foreach (var kvpFileInfo in LabDEFileIdToFileInfo)
                 {
@@ -843,7 +854,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_FlexIndex.bak", dbName, "admin", "a");
+                    InitializeAndLogin("Resources.Demo_FlexIndex.bak", dbName, "jon_doe", "123");
 
                 foreach (var kvpFileInfo in FlexIndexFileIdToFileInfo)
                 {

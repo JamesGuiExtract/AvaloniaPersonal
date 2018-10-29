@@ -91,7 +91,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
                     _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -123,7 +123,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
                     _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -154,7 +154,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
                     _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -200,7 +200,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
                     _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -247,7 +247,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user1, AppBackendController controller1) =
                     _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
 
                 var result = controller1.Login(user1);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -324,7 +324,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
                     _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -378,7 +378,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
                     _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -414,7 +414,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
                     _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
 
                 // Login to register an active FAM.
                 var result = controller.Login(user);
@@ -476,7 +476,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
                     _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
 
                 string testFileName = _testFiles.GetFile(_TEST_FILE1);
 
@@ -530,7 +530,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
                     _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
 
                 string testFileName = _testFiles.GetFile(_TEST_FILE1);
                 _testFiles.GetFile(_TEST_FILE1_USS);
@@ -589,7 +589,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
                     _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
 
                 string testFileName = _testFiles.GetFile(_TEST_FILE1);
 
@@ -658,7 +658,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
                     _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -696,7 +696,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
                     _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
 
                 // Since the uss file will need to be used to translate the saved data into a VOA,
                 // we can't use pre-existing files in the database that may or may not actually
@@ -771,7 +771,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                       ("Resources.Demo_IDShield.bak", dbName, "admin", "a");
+                       ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
 
                 string testFileName = _testFiles.GetFile(_TEST_FILE1);
                 string ussFileName = _testFiles.GetFile(_TEST_FILE1_USS);

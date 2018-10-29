@@ -181,7 +181,8 @@ namespace Extract
 				if (postEditActionComboBox->SelectedIndex >= 0)
 				{
 					String^ postEditAction = (String^)postEditActionComboBox->SelectedItem;
-					if (editAction->Equals(postEditAction, StringComparison::OrdinalIgnoreCase))
+					if (editAction->Length > 0 &&
+						editAction->Equals(postEditAction, StringComparison::OrdinalIgnoreCase))
 					{
 						System::Windows::Forms::MessageBox::Show(
 							"Post edit workflow action cannot be same as the edit action");

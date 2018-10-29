@@ -170,6 +170,7 @@
     <EmbeddedResource Include="Resources\Demo_LabDE.bak" />
     <None Include="packages.config" />
     <EmbeddedResource Include="Resources\C413.tif.uss" />
+    <EmbeddedResource Include="Resources\TestImage001.tif.uss" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="ADODB">
@@ -302,6 +303,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\C413.tif" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\TestImage001.tif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

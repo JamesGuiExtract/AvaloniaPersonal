@@ -54,8 +54,7 @@ namespace WebAPI
 
         /// <summary>
         /// Configuration property
-        /// </summary>140
-        /// 
+        /// </summary>
         public IConfigurationRoot Configuration { get; }
 
         /// <summary>
@@ -105,7 +104,7 @@ namespace WebAPI
                         new Info
                         {
                             Title = "Extract Document API",
-                            Description = "Extract Document API documentation",
+                            Description = "API support to enable integration of Extract processing with external workflows.",
                             Contact = new Contact
                             {
                                 Name = "Extract Systems",
@@ -160,6 +159,8 @@ namespace WebAPI
                 app.UseSwagger();
                 app.UseSwaggerUI(config =>
                 {
+                    config.RoutePrefix = "documentation";
+                    config.DocumentTitle = "Extract Document API";
                     config.SwaggerEndpoint("/swagger/DocumentAPI/swagger.json", "DocumentAPI");
                 });
 

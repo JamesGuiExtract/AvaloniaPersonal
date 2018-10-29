@@ -122,8 +122,6 @@ namespace WebAPI
                 docAttr.Type = attr.Type;
 
                 SpatialString spatialString = attr.Value;
-                HTTPError.Assert("ELI46365", spatialString != null,
-                    "spatial string is null", ("Attribute", docAttr.Name, false));
                 docAttr.Value = spatialString.String;
 
                 int minConf = 0;

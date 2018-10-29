@@ -151,10 +151,14 @@ namespace WebAPI
         /// Returns an enumeration of all attributes and their subattributes, recursively.
         /// </summary>
         /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s to enumerate.</param>
+        /// <param name="includeMetadata"><c>true</c> to include metadata attributes; <c>false</c> to
+        /// exlude them.</param>
         /// <returns>An enumeration of the attribute and its subattributes, recursively</returns>
-        public static IEnumerable<(IAttribute attribute, IAttribute parent)> Enumerate(this IUnknownVector attributes)
+        public static IEnumerable<(IAttribute attribute, IAttribute parent)> Enumerate(
+            this IUnknownVector attributes, bool includeMetadata = false)
         {
-            foreach (var attribute in attributes.ToIEnumerable<IAttribute>())
+            foreach (var attribute in attributes.ToIEnumerable<IAttribute>()
+                .Where(a => includeMetadata || !a.Name.StartsWith("_")))
             {
                 yield return (attribute, null);
 

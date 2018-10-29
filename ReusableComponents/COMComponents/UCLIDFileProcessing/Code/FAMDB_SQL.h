@@ -2064,7 +2064,6 @@ static const string gstrGET_WORKFLOW_STATUS =
 "		COALESCE([WorkflowStatus], 'U') AS [Status], \r\n"
 "		COUNT(*) AS [Count] \r\n"
 "	FROM @workflowStatuses \r\n"
-"	WHERE 0 = <ReturnFileStatuses> \r\n"
 "	GROUP BY[WorkflowStatus] \r\n"
 "END \r\n"
 

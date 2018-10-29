@@ -607,8 +607,8 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Regex to remove GUIDs from API submitted filenames.
         /// </summary>
-        static Regex _guidRegex = new Regex(@"_[0-9,A-F]{8}-([0-9,A-F]{4}-){3}[0-9,A-F]{12}\.",
-            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        static Regex _guidRegex = new Regex(@"^[0-9,A-F]{8}-([0-9,A-F]{4}-){3}[0-9,A-F]{12}_",
+            RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
 
         /// <summary>
         /// Removes the guid added to API submitted filenames.
@@ -616,14 +616,7 @@ namespace WebAPI.Controllers
         /// <param name="fileDownloadName">The filename that (may) contain a guid.</param>
         static string RemoveGUIDFromName(string fileDownloadName)
         {
-
-            var match = _guidRegex.Matches(fileDownloadName)
-                .OfType<Match>()
-                .FirstOrDefault();
-            if (match?.Success == true && match.Index > 0)
-            {
-                fileDownloadName = _guidRegex.Replace(fileDownloadName, ".");
-            }
+            fileDownloadName = _guidRegex.Replace(fileDownloadName, replacement: "", count: 1, startat: 0);
 
             return fileDownloadName;
         }

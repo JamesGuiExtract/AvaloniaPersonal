@@ -588,10 +588,9 @@ namespace WebAPI.Models
                             !String.IsNullOrWhiteSpace(filename), 
                             "Either path or filename is empty");
 
-            string nameOnly = Path.GetFileNameWithoutExtension(filename);
-            string extension = Path.GetExtension(filename);
+            string filenameOnly = Path.GetFileName(filename);
             string guid = Guid.NewGuid().ToString();
-            string newName = Inv($"{nameOnly}_{ guid}{ extension}");
+            string newName = Inv($"{guid}_{filenameOnly}");
             string fullfilename = Path.Combine(path, newName);
 
             return fullfilename;

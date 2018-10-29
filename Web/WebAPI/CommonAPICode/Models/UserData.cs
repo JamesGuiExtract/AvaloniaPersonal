@@ -56,6 +56,10 @@ namespace WebAPI.Models
                     "Database connection failure",
                     !string.IsNullOrWhiteSpace(fileProcessingDB.DatabaseID));
 
+                HTTPError.Assert("ELI46442", StatusCodes.Status401Unauthorized,
+                    !user.Username.Equals("Admin", StringComparison.OrdinalIgnoreCase),
+                    "Unknown user or password");
+
                 try
                 {
                     fileProcessingDB.LoginUser(user.Username, user.Password);

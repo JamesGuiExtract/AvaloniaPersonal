@@ -104,7 +104,7 @@ namespace Extract.Web.WebAPI.Test
 
                 (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
                     _testDbManager.InitializeEnvironment<TestWorkflow, UsersController>
-                        ("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+                        ("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 // Should cause file 1 to be counted as incomplete.
                 fileProcessingDb.SetStatusForFile(1, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out EActionStatus oldStatus);
@@ -154,7 +154,7 @@ namespace Extract.Web.WebAPI.Test
 
                 (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
                     _testDbManager.InitializeEnvironment<TestWorkflow, UsersController>
-                        ("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+                        ("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 // Should cause file 1 to be counted as incomplete.
                 fileProcessingDb.SetStatusForFile(1, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out EActionStatus oldStatus);
@@ -210,7 +210,7 @@ namespace Extract.Web.WebAPI.Test
 
                 (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
                     _testDbManager.InitializeEnvironment<TestWorkflow, UsersController>
-                        ("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+                        ("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 var documentController = user.CreateController<DocumentController>();
 

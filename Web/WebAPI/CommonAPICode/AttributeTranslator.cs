@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
+using UCLID_IMAGEUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using WebAPI.Models;
 
@@ -68,13 +69,12 @@ namespace WebAPI
             {
                 InitializeSourceDocument(sourceDocName);
 
+                // Retrieve all non-metadata attributes.
                 var existingAttributes = attributes.Enumerate()
                     .ToDictionary(a => ((IIdentifiableObject)a.attribute).InstanceGUID, a => a);
 
                 foreach (var patchAttribute in documentAttributeSet.Attributes)
                 {
-                    Guid guid = Guid.Empty;
-
                     switch (patchAttribute.Operation)
                     {
                         case PatchOperation.Create:
@@ -85,9 +85,9 @@ namespace WebAPI
                                 }
                                 else
                                 {
-                                    var parent = GetAttribute(patchAttribute.ParentAttributeID, existingAttributes);
+                                    var target = GetAttribute(patchAttribute.ParentAttributeID, existingAttributes);
 
-                                    parent.attribute.SubAttributes.PushBack(ConvertAttribute(patchAttribute));
+                                    target.attribute.SubAttributes.PushBack(ConvertAttribute(patchAttribute));
                                 }
                             }
                             break;
@@ -163,23 +163,19 @@ namespace WebAPI
             _sourceDocName = sourceDocName;
             _sourceDocPageInfo = new LongToObjectMap();
 
-            var sourceDocString = new SpatialString();
-            sourceDocString.LoadFrom(_sourceDocName + ".uss", false);
-            var pageVector = sourceDocString.SpatialPageInfos.GetKeys();
-
-            int length = pageVector.Size;
-            for (int i = 0; i < length; i++)
+            var imageUtils = new ImageUtils();
+            IIUnknownVector spatialPageInfos = imageUtils.GetSpatialPageInfos(_sourceDocName);
+            int count = spatialPageInfos.Size();
+            for (int i = 0; i < count; i++)
             {
-                int page = (int)pageVector[i];
-
-                var oldPageInfo = sourceDocString.GetPageInfo(page);
+                var storedPageInfo = (SpatialPageInfo)spatialPageInfos.At(i);
 
                 // Create the spatial page info for this page
-                SpatialPageInfo pageInfo = new SpatialPageInfo();
-                pageInfo.Initialize(oldPageInfo.Width, oldPageInfo.Height, EOrientation.kRotNone, 0);
+                var pageInfo = new SpatialPageInfo();
+                pageInfo.Initialize(storedPageInfo.Width, storedPageInfo.Height, EOrientation.kRotNone, 0);
 
                 // Add it to the map
-                _sourceDocPageInfo.Set(page, pageInfo);
+                _sourceDocPageInfo.Set(i + 1, pageInfo);
             }
         }
 

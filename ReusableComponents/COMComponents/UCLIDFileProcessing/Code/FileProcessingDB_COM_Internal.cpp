@@ -11110,6 +11110,7 @@ bool CFileProcessingDB::GetWorkflowStatus_Internal(bool bDBLocked, long nFileID,
 		{
 			ASSERT_ARGUMENT("ELI42136", peaStatus != __nullptr);
 
+			// When bReturnFileStatuses = false, return vector lists the file count for each file status.
 			vector<tuple<long, string>> vecStatuses = getWorkflowStatus(nFileID, false);
 			if (vecStatuses.empty())
 			{
@@ -11158,6 +11159,7 @@ bool CFileProcessingDB::GetAggregateWorkflowStatus_Internal(bool bDBLocked, long
 			*pnCompleted = 0;
 			*pnFailed = 0;
 
+			// When bReturnFileStatuses = false, return vector lists the file count for each file status.
 			vector<tuple<long, string>> vecStatuses = getWorkflowStatus(-1, false);
 			for each (tuple<long, string> status in vecStatuses)
 			{
@@ -11194,6 +11196,7 @@ bool CFileProcessingDB::GetWorkflowStatusAllFiles_Internal(bool bDBLocked, BSTR 
 
 			string strStatusListing;
 
+			// When bReturnFileStatuses = true, return vector lists a file ID and associated status
 			vector<tuple<long, string>> vecStatuses = getWorkflowStatus(-1, true);
 
 			for each (tuple<long, string> status in vecStatuses)

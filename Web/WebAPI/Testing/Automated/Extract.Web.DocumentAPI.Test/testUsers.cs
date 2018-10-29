@@ -1,5 +1,6 @@
 ﻿using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
+using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -58,12 +59,24 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                     _testDbManager.InitializeEnvironment<TestUsers, UsersController>
-                        ("Resources.Demo_LabDE.bak", dbName, "admin", "a");
+                        ("Resources.Demo_LabDE.bak", dbName, "Admin", "a");
 
+                // Login should not be allowed for Admin account
                 var result = userController.Login(user);
+                result.AssertResultCode(StatusCodes.Status401Unauthorized);
+
+                user = new User()
+                {
+                    Username = "jon_doe",
+                    Password = "123",
+                    WorkflowName = ApiTestUtils.CurrentApiContext.WorkflowName
+                };
+
+                result = userController.Login(user);
+
                 var token = result.AssertGoodResult<JwtSecurityToken>();
 
-                Assert.AreEqual("admin", token.Subject, "Unexpected token subject");
+                Assert.AreEqual("jon_doe", token.Subject, "Unexpected token subject");
             }
             finally
             {

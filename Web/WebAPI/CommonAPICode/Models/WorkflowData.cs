@@ -45,7 +45,6 @@ namespace WebAPI.Models
                 if (fileApi != null)
                 {
                     fileApi.InUse = false;
-                    fileApi = null;
                 }
             }
         }
@@ -104,7 +103,6 @@ namespace WebAPI.Models
                 if (fileApi != null)
                 {
                     fileApi.InUse = false;
-                    fileApi = null;
                 }
             }
         }

@@ -292,7 +292,7 @@ namespace WebAPI.Models
         public bool? HasPositionInfo { get; set; }
 
         /// <summary>
-        /// The spatial position information of the attribute, inculding the page number,
+        /// The spatial position information of the attribute, including the page number,
         /// bounding rect, and zonal information (bounds plus skew)
         /// </summary>
         public Position SpatialPosition { get; set; }

@@ -26,15 +26,16 @@ namespace WebAPI
                 eliCode, StatusCodes.Status400BadRequest,
                 controller.ModelState.IsValid,
                 "Invalid request format",
-                controller.ModelState.GetModelStateErrorDetails().ToArray());
+                controller.ModelState.GetModelStateErrorDetails());
         }
 
         /// <summary>
         /// Gets an array of error details for model state violations
         /// </summary>
-        /// <param name="modelState"></param>
+        /// <param name="modelState">The <see cref="ModelStateDictionary"/> defining the state of a
+        /// model for which error details are needed.</param>
         /// <returns></returns>
-        public static IEnumerable<(string field, object error, bool visible)> GetModelStateErrorDetails(this ModelStateDictionary modelState)
+        public static (string field, object error, bool visible)[] GetModelStateErrorDetails(this ModelStateDictionary modelState)
         {
             return modelState
                 .Where(item => item.Value.ValidationState == ModelValidationState.Invalid)
@@ -42,7 +43,8 @@ namespace WebAPI
                     (object)string.Join("; ", item.Value.Errors.Select(error => string.IsNullOrWhiteSpace(error.ErrorMessage)
                         ? error.Exception.Message
                         : error.ErrorMessage).Distinct())
-                    , true));
+                    , true))
+                .ToArray();
         }
 
         /// <summary>

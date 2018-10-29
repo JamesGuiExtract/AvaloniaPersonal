@@ -1263,7 +1263,8 @@ private:
 	vector<pair<string, string>> getWorkflowNamesAndIDs(_ConnectionPtr ipConnection);
 
 	// Gets the status of a file in a workflow or all files in a workflow if nFileID = -1.
-	// Return value is a map of ActionStatus codes (R, F, C, U) to their respective counts.
+	// When bReturnFileStatuses = false, return vector lists the file count for each file status.
+	// When bReturnFileStatuses = true, return vector lists a file ID and associated status
 	vector<tuple<long, string>> getWorkflowStatus(long nFileID, bool bReturnFileStatuses = false);
 
 	// Indicates whether any workflows are currently defined in the database.

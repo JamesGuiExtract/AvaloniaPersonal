@@ -11,6 +11,7 @@
     <AssemblyOriginatorKeyFile>ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <AssemblyName>DocumentAPI</AssemblyName>
     <RootNamespace>WebAPI</RootNamespace>
+    <Version>2.0.0</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AssemblyOriginatorKeyFile>ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
