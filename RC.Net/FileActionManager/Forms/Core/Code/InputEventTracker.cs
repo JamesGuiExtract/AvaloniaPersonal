@@ -409,11 +409,11 @@ namespace Extract.FileActionManager.Forms
         /// </summary>
         void UpdateActivityTime()
         {
-            var elapstedSinceLastActivity = _timeSinceLastEvent.Elapsed;
+            var elapsedSinceLastActivity = _timeSinceLastEvent.Elapsed;
             _timeSinceLastEvent.Restart();
-            if (elapstedSinceLastActivity.TotalSeconds > _activityTimeOut)
+            if (elapsedSinceLastActivity.TotalSeconds > _activityTimeOut)
             {
-                _totalActivityTimeSpan = _totalActivityTimeSpan.Subtract(elapstedSinceLastActivity);
+                _totalActivityTimeSpan = _totalActivityTimeSpan.Subtract(elapsedSinceLastActivity);
             }
         }
 
