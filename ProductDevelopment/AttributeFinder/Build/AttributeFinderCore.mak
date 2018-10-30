@@ -55,6 +55,8 @@ InternalUseBuildFilesArchive=M:\ProductDevelopment\AttributeFinder\Archive\Inter
 ClearImage_5_7_BinDir=$(ReusableComponentsRootDirectory)\APIs\Inlite_5_7\bin
 ClearImage_7_0_BinDir=$(ReusableComponentsRootDirectory)\APIs\ClearImage_7_0\bin
 
+WebAPI=$(EngineeringRootDirectory)\Web\WebAPI\DocumentAPI\Core\DocumentAPI\bin\Release\net46\win7-x86
+
 # determine the name of the release output directory based upon the build
 # configuration that is being built
 !IF "$(BuildConfig)" == "Release"
@@ -422,6 +424,14 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.ExceptionUtilities.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.ETL.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V "$(PDUtilsRootDir)\DetectAndReportFailure\Misc\DetectAndReportFailure.ini" "$(AFCoreInstallFilesRootDir)\ProgramDataFiles"
+# Copy Web files
+	@XCOPY "$(WebAPI)\*.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@XCOPY "$(WebAPI)\*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@XCOPY "$(WebAPI)\*.xml" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@XCOPY "$(WebAPI)\*.config" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@XCOPY "$(WebAPI)\*.json" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+# There should be no Interop files in NonSelfRegFiles, they are included elsewhere
+	@DeleteFiles "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\Interop.*"
 	
 	@COPY /V "$(RCNETDir)\APIs\LogicNP\EZShellExtensions.Net\2011\*.*" "$(RequiredInstallsDir)\LogicNP"
 	@COPY /V "$(RCNETDir)\APIs\LogicNP\EZShellExtensions.Net\2011\RegisterExtensionDotNet40_x*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" 
