@@ -24,7 +24,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
         /// This value should be the total of all the file processors when all items are licensed.
         /// This should be updated if new File processors are created
         /// </summary>
-        const int _NUMBER_OF_FILE_PROCESSORS = 38;
+        const int _NUMBER_OF_FILE_PROCESSORS = 39;
 
         /// <summary>
         /// This list contains the text that will only be contained in descriptions of tasks
@@ -70,7 +70,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
             // This is testing that all the file processor tasks we have are licensed, this number will need to be changed if
             // other file processing tasks added
-            Assert.That(fileProcessorsProgIDs.Size == _NUMBER_OF_FILE_PROCESSORS, "Checking that all file processing tasks are registered and licensed");
+            Assert.AreEqual(_NUMBER_OF_FILE_PROCESSORS, fileProcessorsProgIDs.Size, "Checking that all file processing tasks are registered and licensed");
 
             var processorsProgIDs = fileProcessorsProgIDs.ComToDictionary();
 
