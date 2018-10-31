@@ -55,7 +55,7 @@ InternalUseBuildFilesArchive=M:\ProductDevelopment\AttributeFinder\Archive\Inter
 ClearImage_5_7_BinDir=$(ReusableComponentsRootDirectory)\APIs\Inlite_5_7\bin
 ClearImage_7_0_BinDir=$(ReusableComponentsRootDirectory)\APIs\ClearImage_7_0\bin
 
-WebAPI=$(EngineeringRootDirectory)\Web\WebAPI\DocumentAPI\Core\DocumentAPI\bin\Release\net46\win7-x86
+WebAPI=$(EngineeringRootDirectory)\Web\WebAPI\CommonAPICode\bin\Release\net46\win7-x86
 
 # determine the name of the release output directory based upon the build
 # configuration that is being built
