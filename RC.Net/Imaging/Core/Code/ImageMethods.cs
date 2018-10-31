@@ -1452,4 +1452,118 @@ namespace Extract.Imaging
             ImageMethods.ConvertBitsPerPixel(image, bitsPerPixel);
         }
     }
+
+    public static class PaginationMethods
+    {
+        /// <summary>
+        /// Adjusts the spatial page info to reflect rotation that has been applied to the image page
+        /// </summary>
+        /// <param name="newPageNumber">The page number in the destination document</param>
+        /// <param name="rotation">The rotation, in degrees, that has been applied to the image page</param>
+        /// <param name="newPageInfos">the spatial page info map for the new document (spatial string)</param>
+        [CLSCompliant(false)]
+        public static void RotatePage(
+            int newPageNumber,
+            int rotation,
+            LongToObjectMap newPageInfos,
+            SpatialPageInfo oldSpatialPageInfo)
+        {
+            try
+            {
+                int oldRotation = ConvertOrientationToImageRotationDegrees(oldSpatialPageInfo.Orientation);
+                int totalRotation = (oldRotation + rotation + 360) % 360;
+                var orientation = ConvertDegreesToOrientation(totalRotation);
+
+                // If the page has been rotated 90 degrees right or left, then the 
+                // height and width need to be swapped.
+                int height = oldSpatialPageInfo.Height;
+                int width = oldSpatialPageInfo.Width;
+                if (rotation != 0 && rotation != 180)
+                {
+                    height = width;
+                    width = oldSpatialPageInfo.Height;
+                }
+
+                var newSpatialPageInfo = new SpatialPageInfo();
+                newSpatialPageInfo.Initialize(width,
+                                              height,
+                                              orientation,
+                                              oldSpatialPageInfo.Deskew);
+
+                newPageInfos.Set(newPageNumber, newSpatialPageInfo);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI41339");
+            }
+        }
+
+        /// <summary>
+        /// Converts degrees of image rotation to an orientation enumeration value
+        /// expected to be used for SpatialPageInfos.
+        /// </summary>
+        /// <param name="degrees">must be 0, 90, 180, or 270.</param>
+        /// <returns>the appropriate EOrientation value</returns>
+        static EOrientation ConvertDegreesToOrientation(int degrees)
+        {
+            switch (degrees)
+            {
+                case 0:
+                case -360:
+                    return EOrientation.kRotNone;
+
+                case 90:
+                case -270:
+                    return EOrientation.kRotLeft;
+
+                case 180:
+                case -180:
+                    return EOrientation.kRotDown;
+
+                case 270:
+                case -90:
+                    return EOrientation.kRotRight;
+
+                default:
+                    {
+                        ExtractException ee = new ExtractException("ELI41321", "Invalid parameter");
+                        ee.AddDebugData("Orientation degrees", degrees, encrypt: false);
+                        ee.AddDebugData("The problem is", " rotation must be in + or - 90 degree increments", encrypt: false);
+                        throw ee;
+                    }
+            }
+        }
+
+        /// <summary>
+        /// Converts the EOrientation value used by SpatialPageInfos to degrees
+        /// of image rotation.
+        /// </summary>
+        /// <param name="orientation">The orientation value</param>
+        /// <returns>0, 90, 180, or 270</returns>
+        static int ConvertOrientationToImageRotationDegrees(EOrientation orientation)
+        {
+            switch (orientation)
+            {
+                case EOrientation.kRotNone:
+                    return 0;
+
+                case EOrientation.kRotLeft:
+                    return 90;
+
+                case EOrientation.kRotDown:
+                    return 180;
+
+                case EOrientation.kRotRight:
+                    return 270;
+
+                default:
+                    {
+                        ExtractException ee = new ExtractException("ELI41701",
+                            "Cannot convert specified orientation to degrees");
+                        ee.AddDebugData("Orientation", orientation, encrypt: false);
+                        throw ee;
+                    }
+            }
+        }
+    }
 }

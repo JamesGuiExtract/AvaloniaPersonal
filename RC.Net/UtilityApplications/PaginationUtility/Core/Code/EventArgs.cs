@@ -114,38 +114,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
 
     /// <summary>
-    /// A simple carrier class for page and associated rotation arguments; primarily provides easier-to-read
-    /// notation compared to a Tuple of int, int.
-    /// </summary>
-    public class PageAndRotation
-    {
-        public PageAndRotation(string documentName, int page, int rotation)
-        {
-            DocumentName = documentName;
-            Page = page;
-            Rotation = rotation;
-        }
-
-        public int Page
-        {
-            get;
-            private set;
-        }
-
-        public int Rotation
-        {
-            get;
-            private set;
-        }
-
-        public string DocumentName
-        {
-            get;
-            private set;
-        }
-    }
-
-    /// <summary>
     /// Event args for <see cref="PaginationPanel.CreatingOutputDocument"/>
     /// and <see cref="PaginationPanel.OutputDocumentCreated"/> events.
     /// </summary>
@@ -172,7 +140,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// rotation amount in degrees from original orientation.
         public CreatingOutputDocumentEventArgs(IEnumerable<PageInfo> sourcePageInfo,
             int pageCount, long fileSize, bool? suggestedPaginationAccepted, int position,
-            PaginationDocumentData documentData, ReadOnlyCollection<PageAndRotation> rotatedPages,
+            PaginationDocumentData documentData, ReadOnlyCollection<(string documentName, int page, int rotation)> rotatedPages,
             bool pagesEqualButRotated)
             : base()
         {
@@ -260,7 +228,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Contains a read-only collection of pages that have been rotated (ImageOrientation != 0)
         /// </summary>
-        public ReadOnlyCollection<PageAndRotation> RotatedPages
+        public ReadOnlyCollection<(string documentName, int page, int rotation)> RotatedPages
         {
             get;
             private set;

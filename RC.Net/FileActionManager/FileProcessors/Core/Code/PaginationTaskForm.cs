@@ -1203,7 +1203,7 @@ namespace Extract.FileActionManager.FileProcessors
                 if (documentData != null && documentData.Attributes != null && documentData.Attributes.Size() > 0)
                 {
                     AttributeMethods.TranslateAttributesToNewDocument(
-                        documentData.Attributes, e.OutputFileName, pageMap, newSpatialPageInfos);
+                        documentData.Attributes, e.OutputFileName, pageMap, e.RotatedPages, newSpatialPageInfos);
 
                     string dataFileName = e.OutputFileName + ".voa";
                     documentData.Attributes.SaveTo(dataFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);

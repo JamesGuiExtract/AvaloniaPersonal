@@ -3,14 +3,16 @@ using Extract.Interop.Zip;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using Extract.Imaging;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
-using IAttribute = UCLID_AFCORELib.IAttribute;
+using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 
 namespace Extract.AttributeFinder
 {
@@ -157,27 +159,51 @@ namespace Extract.AttributeFinder
         {
             try
             {
+                TranslateAttributesToNewDocument(attributes, newDocumentName, pageMap, null, newSpatialPageInfos);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI39708");
+            }
+        }
+
+        /// <summary>
+        /// Translates all spatial <see cref="IAttribute"/> values in <see paramref="attributes"/>
+        /// to be associated with the <see paramref="newDocumentName"/> where
+        /// <see paramref="pageMap"/> relates each original page to a corresponding page number in
+        /// <see paramref="newDocumentName"/>.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IAttribute"/> hierarchy to update.</param>
+        /// <param name="newDocumentName">The name of the file with which the attribute values
+        /// should now be associated.</param>
+        /// <param name="pageMap">Each key represents a tuple of the old document name and page
+        /// number while the value represents the new page number(s) in 
+        /// <see paramref="newDocumentName"/> associated with that source page.</param>
+        /// <param name="rotatedPages">Information about which pages have been rotated</param>
+        /// <param name="newSpatialPageInfos">The new spatial page infos to be associated with this string.</param>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public static void TranslateAttributesToNewDocument(IIUnknownVector attributes,
+            string newDocumentName, Dictionary<Tuple<string, int>, List<int>> pageMap,
+            ReadOnlyCollection<(string documentName, int page, int rotation)> rotatedPages,
+            LongToObjectMap newSpatialPageInfos)
+        {
+            try
+            {
                 foreach (IAttribute attribute in attributes.ToIEnumerable<IAttribute>())
                 {
                     TranslateAttributesToNewDocument(attribute.SubAttributes,
-                        newDocumentName, pageMap, newSpatialPageInfos);
+                        newDocumentName, pageMap, rotatedPages, newSpatialPageInfos);
 
-                    SpatialString value = attribute.Value;
-                    if (value.GetMode() == ESpatialStringMode.kSpatialMode)
+                    if (attribute.Value.GetMode() != ESpatialStringMode.kNonSpatialMode)
                     {
                         attribute.Value = TranslateSpatialStringToNewDocument(
-                            value, newDocumentName, pageMap, newSpatialPageInfos);
-                    }
-                    else if (value.GetMode() == ESpatialStringMode.kHybridMode)
-                    {
-                        attribute.Value = TranslateHybridStringToNewDocument(
-                            value, newDocumentName, pageMap, newSpatialPageInfos);
+                            attribute.Value, newDocumentName, pageMap, rotatedPages, newSpatialPageInfos);
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI39708");
+                throw ex.AsExtract("ELI46451");
             }
         }
 
@@ -476,24 +502,30 @@ namespace Extract.AttributeFinder
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
         /// number while the value represents the new page number(s) in 
         /// <see paramref="newDocumentName"/> associated with that source page.</param>
+        /// <param name="rotatedPages">Information about which pages have been rotated</param>
         /// <param name="newSpatialPageInfos">The new spatial page infos to be associated with this string.</param>
         /// <returns>The translated spatial string</returns>
         static SpatialString TranslateSpatialStringToNewDocument(SpatialString value,
             string newDocumentName, Dictionary<Tuple<string, int>, List<int>> pageMap,
+            ReadOnlyCollection<(string documentName, int page, int rotation)> rotatedPages,
             LongToObjectMap newSpatialPageInfos)
         {
+            var spatialMode = value.GetMode();
+
             ExtractException.Assert("ELI39709", "Unexpected spatial mode.",
-                value.GetMode() == ESpatialStringMode.kSpatialMode);
+                spatialMode != ESpatialStringMode.kNonSpatialMode);
 
             // https://extract.atlassian.net/browse/ISSUE-13873
             // To avoid issues with pages being output to a new document in a different order than
             // they came in, downgrade any multi-page attributes to hybrid strings so that
             // unexpected page order doesn't cause errors.
-            if (value.GetFirstPageNumber() != value.GetLastPageNumber())
+            if (spatialMode == ESpatialStringMode.kSpatialMode
+                && value.GetFirstPageNumber() != value.GetLastPageNumber())
             {
+                // Copy the value so as not to mutate the input
+                value = (SpatialString)((ICopyableObject) value).Clone();
                 value.DowngradeToHybridMode();
-                return TranslateHybridStringToNewDocument(
-                    value, newDocumentName, pageMap, newSpatialPageInfos);
+                spatialMode = ESpatialStringMode.kHybridMode;
             }
 
             string sourceDocName = GetSourceDocName(value, pageMap);
@@ -504,98 +536,100 @@ namespace Extract.AttributeFinder
             {
                 int oldPageNum = page.GetFirstPageNumber();
 
-                List<int> newPageNums = null;
                 if (pageMap.TryGetValue(new Tuple<string, int>(sourceDocName, oldPageNum),
-                    out newPageNums))
+                    out var newPageNums))
                 {
                     // If for some reason same source page is copied to multiple destination pages,
                     // only copy attribute value to the first of those pages.
                     int newPageNum = newPageNums.Min();
 
-                    // https://extract.atlassian.net/browse/ISSUE-14384
-                    // Before allowing an attribute to be persisted as spatial, ensure we have
-                    // any spatial page infos needed.
-                    if (newSpatialPageInfos.GetKeys().Contains(newPageNum))
+                    bool updated = false;
+                    if (rotatedPages != null)
                     {
-                        page.SpatialPageInfos = newSpatialPageInfos;
-                        page.UpdatePageNumber(newPageNum);
-                        page.SourceDocName = newDocumentName;
-                        updatedPages.Add(page);
+                        var pageInfoCollection = rotatedPages
+                            .Where(info => info.page == oldPageNum
+                                           && info.documentName == sourceDocName);
+                        var (_, _, rotation) = pageInfoCollection.FirstOrDefault();
+
+                        if (rotation != 0)
+                        {
+                            var newPageInfos = new LongToObjectMapClass();
+                            PaginationMethods.RotatePage(newPageNum, rotation, newPageInfos, page.GetPageInfo(oldPageNum));
+                            page.SpatialPageInfos = newPageInfos;
+                            updated = true;
+                        }
                     }
+
+                    // UpdatePageNumber won't change the spatial page infos if there
+                    // are more than one so that call alone is not sufficient to guarantee a
+                    // valid collection
+                    if (!updated)
+                    {
+                        var oldPageInfo = page.GetPageInfo(oldPageNum);
+                        var newPageInfos = new LongToObjectMapClass();
+                        newPageInfos.Set(newPageNum, oldPageInfo);
+                        page.SpatialPageInfos = newPageInfos;
+                    }
+
+                    page.UpdatePageNumber(newPageNum);
+                    page.SourceDocName = newDocumentName;
+
+                    // Set to the shared collection of spatial page infos if the page info is the same
+                    // (this can reduce VOA size)
+                    if (page.SpatialPageInfos.Contains(newPageNum) && newSpatialPageInfos.Contains(newPageNum))
+                    {
+                        var oldInfo = page.GetPageInfo(newPageNum);
+                        var newInfo = (SpatialPageInfo)newSpatialPageInfos.GetValue(newPageNum);
+                        if (oldInfo.Equal(newInfo, false))
+                        {
+                            page.SpatialPageInfos = newSpatialPageInfos;
+                        }
+                    }
+
+                    updatedPages.Add(page);
                 }
             }
 
-            SpatialString updatedValue = new SpatialString();
             if (updatedPages.Count == 0)
             {
+                SpatialString updatedValue = new SpatialString();
                 updatedValue.CreateNonSpatialString(value.String, newDocumentName);
+
+                return updatedValue;
             }
-            else
+
+            if (spatialMode == ESpatialStringMode.kHybridMode)
             {
-                updatedValue.CreateFromSpatialStrings(
-                    updatedPages.ToIUnknownVector<SpatialString>());
-            }
-            return updatedValue;
-        }
-
-        /// <summary>
-        /// Translates a <see cref="SpatialString"/> in <see cref="ESpatialStringMode.kHybridMode"/>
-        /// to be associated with the <see paramref="newDocumentName"/> where
-        /// <see paramref="pageMap"/> relates each original page to a corresponding page number in
-        /// <see paramref="newDocumentName"/>.
-        /// </summary>
-        /// <param name="value">The <see cref="SpatialString"/> value to translate.</param>
-        /// <param name="newDocumentName">The name of the file with which the value should now be
-        /// associated.</param>
-        /// <param name="pageMap">Each key represents a tuple of the old document name and page
-        /// number while the value represents the new page number(s) in 
-        /// <see paramref="newDocumentName"/> associated with that source page.</param>
-        /// <param name="newSpatialPageInfos">The new spatial page infos to be associated with this string.</param>
-        /// <returns>The translated spatial string</returns>
-        static SpatialString TranslateHybridStringToNewDocument(SpatialString value,
-            string newDocumentName, Dictionary<Tuple<string, int>, List<int>> pageMap,
-            LongToObjectMap newSpatialPageInfos)
-        {
-            ExtractException.Assert("ELI39710", "Unexpected spatial mode.",
-                value.GetMode() == ESpatialStringMode.kHybridMode);
-
-            string sourceDocName = GetSourceDocName(value, pageMap);
-
-            var updatedRasterZones = new List<IRasterZone>();
-            foreach (IRasterZone rasterZone in value.GetOCRImageRasterZones()
-                .ToIEnumerable<IRasterZone>())
-            {
-                int oldPageNum = rasterZone.PageNumber;
-                List<int> newPageNums = null;
-                if (pageMap.TryGetValue(new Tuple<string, int>(sourceDocName, oldPageNum),
-                    out newPageNums))
+                // If each page's info was compatible with the shared collection
+                // then use that
+                LongToObjectMap pageInfos;
+                if (updatedPages.All(s => s.SpatialPageInfos == newSpatialPageInfos))
                 {
-                    // If for some reason same source page is copied to multiple destination pages,
-                    // only copy attribute value to the first of those pages.
-                    int newPageNum = newPageNums.Min();
-
-                    // https://extract.atlassian.net/browse/ISSUE-14384
-                    // Before allowing an attribute to be persisted as spatial, ensure we have
-                    // any spatial page infos needed.
-                    if (newSpatialPageInfos.GetKeys().Contains(newPageNum))
+                    pageInfos = newSpatialPageInfos;
+                }
+                // else, build a new map with info that has been adjusted for rotation
+                else
+                {
+                    pageInfos = new LongToObjectMapClass();
+                    foreach (var page in updatedPages)
                     {
-                        rasterZone.PageNumber = newPageNum;
-                        updatedRasterZones.Add(rasterZone);
+                        var pageNum = page.GetFirstPageNumber();
+                        pageInfos.Set(pageNum, page.GetPageInfo(pageNum));
                     }
                 }
+
+                var zones = updatedPages
+                    .SelectMany(s => s.GetOCRImageRasterZones().ToIEnumerable<ComRasterZone>())
+                    .ToIUnknownVector();
+
+                SpatialString updatedValue = new SpatialString();
+                updatedValue.CreateHybridString(zones, value.String, newDocumentName, pageInfos);
+
+                return updatedValue;
             }
 
-            SpatialString updatedValue = new SpatialString();
-            if (updatedRasterZones.Count == 0)
-            {
-                updatedValue.CreateNonSpatialString(value.String, newDocumentName);
-            }
-            else
-            {
-                updatedValue.CreateHybridString(updatedRasterZones.ToIUnknownVector<IRasterZone>(),
-                    value.String, newDocumentName, newSpatialPageInfos);
-            }
-            return updatedValue;
+            // There will only be one page if mode is not hybrid so just return that
+            return updatedPages.Single();
         }
 
         /// <summary>
