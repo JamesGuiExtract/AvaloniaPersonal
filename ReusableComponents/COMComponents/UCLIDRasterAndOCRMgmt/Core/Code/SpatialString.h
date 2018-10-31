@@ -291,7 +291,12 @@ private:
 	// Updates the spatial page info map with the new entries and validates that the
 	// new entries are compatible (i.e. either the entry did not exist in the map
 	// already or if it exists the values are equal)
-	void updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMapPtr ipPageInfoMap);
+	// PROMISE: To throw an exception if the width or height of a page are different
+	//			in the new map than in the old.
+	// RETURNS: Whether the spatial data needs to be translated from the current info to the new info:
+	//			I.e., true if there is at least one page with different orientation or deskew value
+	//			and false if all common pages have the same orientation and deskew values.
+	bool updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMapPtr ipPageInfoMap);
 	//----------------------------------------------------------------------------------------------
 	// PROMISE:	To return a vector of non-spatial letter objects where each
 	//			of the letter objects in sequence represent the sequence of
@@ -414,7 +419,7 @@ private:
 	// NOTE:    In the case where the resultant line is less than three pixels, the line will be 
 	//          extended to at least three pixels. [P16 #2570] This may mean that the angle between
 	//          the points will not be preserved.
-	void fitPointsWithinBounds(double &x1, double &y1, double &x2, double &y2, 
+	static void fitPointsWithinBounds(double &x1, double &y1, double &x2, double &y2, 
 		double dCenterLeft, double dCenterTop);
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: If the specified Cartesian coordinate is not contained inside an image whose center
@@ -428,7 +433,7 @@ private:
 	//          (dCenterLeft, dCenterTop) are the left-top coordinates of center of the image.
 	// PROMISE: If (x, y) is contained inside the image, it will be unchanged. If it is outside it 
 	//			will be adjusted to the closest point where the line intersects the edge of image.
-	void shiftPointInsideBoundsAlongLine(double &x, double &y, double dSlope, double dYIntercept, 
+	static void shiftPointInsideBoundsAlongLine(double &x, double &y, double dSlope, double dYIntercept, 
 		double dCenterLeft, double dCenterTop);
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: Searches m_strString for strSearchString and returns the position of the first 
@@ -462,20 +467,22 @@ private:
 	//			spatial page info. (rather than that of the page or OCR coordinates or that of the
 	//			image itself) If ipNewPageInfoMap is NULL, the coordinates returned will be relative
 	//			to the original image coordinates.
-	UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr translateToNewPageInfo(
+	static UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr translateToNewPageInfo(
 		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone,
-		ILongToObjectMapPtr ipNewPageInfoMap = __nullptr);
+		ILongToObjectMapPtr ipOldPageInfoMap,
+		ILongToObjectMapPtr ipNewPageInfoMap);
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: Adjusts the specified coordinates so they are relative to the specified spatial page
 	//			info. If ipNewPageInfoMap is NULL, the coordinates returned will be relative to the
 	//			original image coordinates.
-	UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr translateToNewPageInfo(long lStartX, long lStartY,
+	static UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr translateToNewPageInfo(long lStartX, long lStartY,
 		long lEndX, long lEndY, long lHeight, int nPage,
-		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo = __nullptr);
+		ILongToObjectMapPtr ipOldPageInfoMap,
+		UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo);
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: Given an image of the specified width and height, returns the center point (with
 	//			x and y coordinates inverted if specified.
-	CPoint getImageCenterPoint(int nImageWidth, int nImageHeight, bool invertCoordinates);
+	static CPoint getImageCenterPoint(int nImageWidth, int nImageHeight, bool invertCoordinates);
 	//----------------------------------------------------------------------------------------------
 	// REQUIRE: HasSpatialInfo() == true
 	// PURPOSE: To return a vector of raster zones in the OCR coordinate system

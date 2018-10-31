@@ -1108,19 +1108,10 @@ STDMETHODIMP CSpatialString::TranslateToNewPageInfo(ILongToObjectMap* pPageInfoM
 			throw ue;
 		}
 
-		// m_ipPageInfoMap will be read-only. Need to create a new copy to make it writable.
-		// Shallow copy because the PageInfo instances themselves are immutable and don't need
-		// to be cloned.
-		IShallowCopyablePtr ipSourcePageInfoMap(getPageInfoMap());
-		ASSERT_RESOURCE_ALLOCATION("ELI36425", ipSourcePageInfoMap != __nullptr);
-		
-		m_ipPageInfoMap = ipSourcePageInfoMap->ShallowCopy();
-		ASSERT_RESOURCE_ALLOCATION("ELI36426", m_ipPageInfoMap != __nullptr);
-
 		if (m_eMode == kHybridMode)
 		{
 			for(size_t i = 0; i < m_vecRasterZones.size(); ++i) {
-				m_vecRasterZones[i] = translateToNewPageInfo(m_vecRasterZones[i], ipPageInfoMap);
+				m_vecRasterZones[i] = translateToNewPageInfo(m_vecRasterZones[i], m_ipPageInfoMap, ipPageInfoMap);
 			}
 		}
 		else

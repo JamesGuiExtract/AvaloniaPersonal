@@ -70,6 +70,13 @@ void CSpatialString::insert(long nPos,
         {
             // At least one of the strings is hybrid, so the result is a hybrid string.
 
+            // If the source string had spatial info, update the page info map
+			bool requiresTranslation = false;
+            if (eSourceMode != kNonSpatialMode)
+            {
+                requiresTranslation = updateAndValidateCompatibleSpatialPageInfo(ipStringToInsert->SpatialPageInfos);
+            }
+
             // get the text associated with the hybrid string
             string strTemp = m_strString;
             string strTextToInsert = asString(ipStringToInsert->String);
@@ -98,7 +105,15 @@ void CSpatialString::insert(long nPos,
 
             if (eSourceMode != kNonSpatialMode)
             {
-                IIUnknownVectorPtr ipZones = ipStringToInsert->GetOCRImageRasterZones();
+				IIUnknownVectorPtr ipZones;
+				if (requiresTranslation)
+				{
+					ipZones = ipStringToInsert->GetTranslatedImageRasterZones(m_ipPageInfoMap);
+				}
+				else
+				{
+					ipZones = ipStringToInsert->GetOCRImageRasterZones();
+				}
                 ASSERT_RESOURCE_ALLOCATION("ELI15309", ipZones != __nullptr);
 
                 long lSize = ipZones->Size();
@@ -118,17 +133,23 @@ void CSpatialString::insert(long nPos,
 
             // call updateHybrid to reset this object as a hybrid string
             updateHybrid(vecCombinedZones, strTemp);
-
-            // If the source string had spatial info, update the page info map
-            if (eSourceMode != kNonSpatialMode)
-            {
-                updateAndValidateCompatibleSpatialPageInfo(ipStringToInsert->SpatialPageInfos);
-            }
         }
         else if (m_eMode == kSpatialMode || eSourceMode == kSpatialMode)
         {
             // At least one string is spatial, the other is either spatial or non-spatial;
             // so the result will be spatial.
+
+            // If the old string was spatial, page info must be properly updated 
+            if (eSourceMode != kNonSpatialMode)
+            {
+                bool requiresTranslation = updateAndValidateCompatibleSpatialPageInfo(ipStringToInsert->SpatialPageInfos);
+				if (requiresTranslation)
+				{
+					ICopyableObjectPtr ipCopyThis(ipStringToInsert);
+					ipStringToInsert = ipCopyThis->Clone();
+					ipStringToInsert->TranslateToNewPageInfo(m_ipPageInfoMap);
+				}
+            }
 
             vector<CPPLetter> vecFinalLetters;
                         
@@ -236,12 +257,6 @@ void CSpatialString::insert(long nPos,
 
             // call updateLetters to recompute this object
             updateLetters(&(vecFinalLetters[0]), nNumLetters);
-
-            // If the old string was spatial, page info must be properly updated 
-            if (eSourceMode != kNonSpatialMode)
-            {
-                updateAndValidateCompatibleSpatialPageInfo(ipStringToInsert->SpatialPageInfos);
-            }
         }
         else
         {
@@ -334,15 +349,20 @@ void CSpatialString::addRasterZones(IIUnknownVectorPtr ipRasterZones,
             downgradeToHybrid();
         }
 
+        bool requiresTranslation = updateAndValidateCompatibleSpatialPageInfo(ipPageInfoMap);
+
         for (long i=0; i < lSize; i++)
         {
             UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipRasterZones->At(i);
             ASSERT_RESOURCE_ALLOCATION("ELI25805", ipZone != __nullptr);
 
+			if (requiresTranslation)
+			{
+				ipZone = translateToNewPageInfo(ipZone, ipPageInfoMap,  getPageInfoMap());
+			}
+
             m_vecRasterZones.push_back(ipZone);
         }
-
-        updateAndValidateCompatibleSpatialPageInfo(ipPageInfoMap);
 
         // Set mode to hybrid
         m_eMode = kHybridMode;
@@ -350,14 +370,16 @@ void CSpatialString::addRasterZones(IIUnknownVectorPtr ipRasterZones,
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25806");
 }
 //-------------------------------------------------------------------------------------------------
-void CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMapPtr ipPageInfoMap)
+bool CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMapPtr ipPageInfoMap)
 {
     try
     {
+		bool requiresTranslation = false;
+
         if (ipPageInfoMap == __nullptr || m_ipPageInfoMap == ipPageInfoMap)
         {
             // Nothing to add, just return
-            return;
+            return requiresTranslation;
         }
 
         // If the current page info map is NULL just replace it
@@ -414,33 +436,39 @@ void CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMap
                         long lSourceWidth, lCurrentWidth, lSourceHeight, lCurrentHeight;
                         UCLID_RASTERANDOCRMGMTLib::EOrientation eSourceOrient, eCurrentOrient;
                         double dSourceDeskew, dCurrentDeskew;
+						ipSourceInfo->GetPageInfo(&lSourceWidth, &lSourceHeight,
+							&eSourceOrient, &dSourceDeskew);
+						ipCurrentInfo->GetPageInfo(&lCurrentWidth, &lCurrentHeight,
+							&eCurrentOrient, &dCurrentDeskew);
 
-                        UCLIDException ue("ELI25810",
-                            "Cannot merge with incompatible spatial page info!");
-                        ue.addDebugInfo("Page Number", lKey);
+						if (lSourceHeight == lCurrentHeight && lSourceWidth == lCurrentWidth)
+						{
+							requiresTranslation = true;
+						}
+						else
+						{
+							UCLIDException ue("ELI25810",
+								"Cannot merge with incompatible spatial page info!");
+							ue.addDebugInfo("Page Number", lKey);
 
-                        // Try to get the page info values and add it as debug info
-                        try
-                        {
-                            ipSourceInfo->GetPageInfo(&lSourceWidth, &lSourceHeight,
-                                &eSourceOrient, &dSourceDeskew);
-                            ipCurrentInfo->GetPageInfo(&lCurrentWidth, &lCurrentHeight,
-                                &eCurrentOrient, &dCurrentDeskew);
+							// Try to get the page info values and add it as debug info
+							try
+							{
+								ue.addDebugInfo("Source Width", lSourceWidth);
+								ue.addDebugInfo("Source Height", lSourceHeight);
+								ue.addDebugInfo("Source Orientation", eSourceOrient);
+								ue.addDebugInfo("Source Deskew", dSourceDeskew);
+								ue.addDebugInfo("Current Width", lCurrentWidth);
+								ue.addDebugInfo("Current Height", lCurrentHeight);
+								ue.addDebugInfo("Current Orientation", eCurrentOrient);
+								ue.addDebugInfo("Current Deskew", dCurrentDeskew);
+							}
+							catch (...)
+							{
+							}
 
-                            ue.addDebugInfo("Source Width", lSourceWidth);
-                            ue.addDebugInfo("Source Height", lSourceHeight);
-                            ue.addDebugInfo("Source Orientation", eSourceOrient);
-                            ue.addDebugInfo("Source Deskew", dSourceDeskew);
-                            ue.addDebugInfo("Current Width", lCurrentWidth);
-                            ue.addDebugInfo("Current Height", lCurrentHeight);
-                            ue.addDebugInfo("Current Orientation", eCurrentOrient);
-                            ue.addDebugInfo("Current Deskew", dCurrentDeskew);
-                        }
-                        catch(...)
-                        {
-                        }
-
-                        throw ue;
+							throw ue;
+						}
                     }
                 }
             }
@@ -450,6 +478,8 @@ void CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMap
 			// After being assigned to a SpatialString, the page info map must not be modifed, otherwise
 			// it may affect other SpatialStrings that share these page infos.
 			m_ipPageInfoMap->SetReadonly();
+
+			return requiresTranslation;
         }
     }
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25811");
@@ -2246,7 +2276,7 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToOriginalIma
 }
 //-------------------------------------------------------------------------------------------------
 void CSpatialString::translateToNewPageInfo(CPPLetter *pLetters, long nNumLetters,
-	ILongToObjectMapPtr ipNewPageInfoMap/* = __nullptr*/)
+	ILongToObjectMapPtr ipNewPageInfoMap)
 {
     try
     {
@@ -2358,17 +2388,18 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToOriginalIma
 {
     try
     {
-        return translateToNewPageInfo(lStartX, lStartY, lEndX, lEndY, lHeight, nPage);
+        return translateToNewPageInfo(lStartX, lStartY, lEndX, lEndY, lHeight, nPage, getPageInfoMap(), __nullptr);
     }
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25823");
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo(
-    UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone, ILongToObjectMapPtr ipNewPageInfoMap/*= NULL*/)
+    UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone,
+	ILongToObjectMapPtr ipOldPageInfoMap,
+	ILongToObjectMapPtr ipNewPageInfoMap)
 {
     try
     {
-        ASSERT_ARGUMENT("ELI28025", m_eMode != kNonSpatialMode);
         ASSERT_ARGUMENT("ELI28026", ipZone != __nullptr);
 
         // Get the data from the raster zone
@@ -2387,6 +2418,7 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo
 
         // Return the a new raster zone containing the translated data
         return translateToNewPageInfo(lStartX, lStartY, lEndX, lEndY, lHeight, lPageNum,
+			ipOldPageInfoMap,
             ipNewPageInfo);
     }
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28178");
@@ -2394,11 +2426,13 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo
 //-------------------------------------------------------------------------------------------------
 UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo(
     long lStartX, long lStartY, long lEndX, long lEndY, long lHeight, int nPage,
+	ILongToObjectMapPtr ipOldPageInfoMap,
     UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipNewPageInfo)
 {
     try
     {
-        ASSERT_ARGUMENT("ELI25704", m_eMode != kNonSpatialMode);
+        ASSERT_ARGUMENT("ELI25704", ipOldPageInfoMap != __nullptr);
+        ASSERT_ARGUMENT("ELI46450", ipOldPageInfoMap->Contains(nPage));
 
         // Now build the raster zone for this page
         UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipNewZone(CLSID_RasterZone);
@@ -2423,7 +2457,7 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo
 
         // Obtain the original page info associated with this spatial string.
         UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipOrigPageInfo =
-            m_ipPageInfoMap->GetValue(nPage);
+            ipOldPageInfoMap->GetValue(nPage);
         ASSERT_RESOURCE_ALLOCATION("ELI28028", ipOrigPageInfo != __nullptr);
 
         // Get the page information
@@ -2529,7 +2563,7 @@ void CSpatialString::downgradeToHybrid()
             // Compute the vector of raster zones
             vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> vecZones = getOCRImageRasterZones();
 
-            // Set the collection of zones
+            // set the collection of zones
             m_vecRasterZones = vecZones;
 
             // Clear the Letters vector
@@ -3221,7 +3255,7 @@ IIUnknownVectorPtr CSpatialString::getTranslatedImageRasterZones(
             ASSERT_RESOURCE_ALLOCATION("ELI28179", ipZone != __nullptr);
 
             UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipNewZone =
-                translateToNewPageInfo(ipZone, ipNewPageInfoMap);
+                translateToNewPageInfo(ipZone, m_ipPageInfoMap, ipNewPageInfoMap);
             ASSERT_RESOURCE_ALLOCATION("ELI28180", ipNewZone != __nullptr);
 
             ipZones->PushBack(ipNewZone);
