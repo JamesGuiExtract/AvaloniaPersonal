@@ -425,11 +425,11 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.ETL.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V "$(PDUtilsRootDir)\DetectAndReportFailure\Misc\DetectAndReportFailure.ini" "$(AFCoreInstallFilesRootDir)\ProgramDataFiles"
 # Copy Web files
-	@XCOPY "$(WebAPI)\*.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@XCOPY "$(WebAPI)\*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@XCOPY "$(WebAPI)\*.xml" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@XCOPY "$(WebAPI)\*.config" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@XCOPY "$(WebAPI)\*.json" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@XCOPY "$(WebAPI)\*.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y
+	@XCOPY "$(WebAPI)\*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y
+	@XCOPY "$(WebAPI)\*.xml" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y
+	@XCOPY "$(WebAPI)\*.config" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y
+	@XCOPY "$(WebAPI)\*.json" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y
 # There should be no Interop files in NonSelfRegFiles, they are included elsewhere
 	@DeleteFiles "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\Interop.*"
 	
