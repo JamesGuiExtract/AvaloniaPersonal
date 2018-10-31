@@ -2290,24 +2290,14 @@ void CSpatialString::translateToNewPageInfo(CPPLetter *pLetters, long nNumLetter
 				// image that has been rotated to the left or right.
 				pointOrigCenter = getImageCenterPoint(nWidth, nHeight, bInvertOrigCoordinates);
 
-				if (ipNewPageInfo == __nullptr)
-				{
-					// If translating to image coordinates and the original orientation was rotated left
-					// or right, width and height need to be swapped before translating the rotated
-					// coordinates back into their final positions.
-					if (bInvertOrigCoordinates)
-					{
-						long nTemp = nWidth;
-						nWidth = nHeight;
-						nHeight = nTemp;
-					}
-				}
-				else
+				bool bInvertFinalCoordinates = false;
+				if (ipNewPageInfo != __nullptr)
 				{
 					ipNewPageInfo->GetPageInfo(&nWidth, &nHeight, &eOrient, &deskew);
+					bInvertFinalCoordinates = (eOrient == kRotLeft || eOrient == kRotRight);
 				}
 
-				pointDestCenter = getImageCenterPoint(nWidth, nHeight, bInvertOrigCoordinates);
+				pointDestCenter = getImageCenterPoint(nWidth, nHeight, bInvertFinalCoordinates);
 
 				// The angle associated with the current coordinate system.
 				double dOrigTheta = ipOrigPageInfo->GetTheta();
@@ -2352,10 +2342,12 @@ void CSpatialString::translateToNewPageInfo(CPPLetter *pLetters, long nNumLetter
 			np2X += pointDestCenter.x;
 			np2Y = pointDestCenter.y - np2Y;
 
-			letter.m_ulLeft = (long)np1X;
-			letter.m_ulTop = (long)np1Y;
-			letter.m_ulRight = (long)np2X;
-			letter.m_ulBottom = (long)np2Y;
+			// Swap points if necessary so that start is less than end
+			// or else highlights may look wrong (too small)
+			letter.m_ulLeft = (long)min(np1X, np2X);
+			letter.m_ulTop = (long)min(np1Y, np2Y);
+			letter.m_ulRight = (long)max(np1X, np2X);
+			letter.m_ulBottom = (long)max(np1Y, np2Y);
 		}
     }
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36401");
