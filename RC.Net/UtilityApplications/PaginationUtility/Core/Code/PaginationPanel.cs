@@ -207,6 +207,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<EventArgs> LoadNextDocument;
 
         /// <summary>
+        /// Occurs when saving data for a file
+        /// </summary>
+        public event EventHandler<SavingDataEventArgs> SavingData;
+
+        /// <summary>
+        /// Occurs when done saving data for all files
+        /// </summary>
+        public event EventHandler<SavingDataEventArgs> DoneSavingData;
+
+        /// <summary>
         /// Raised when a newly paginated document is generated.
         /// </summary>
         public event EventHandler<CreatingOutputDocumentEventArgs> CreatingOutputDocument;
@@ -3104,12 +3114,17 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (documentsToSave.Length > 0)
             {
+                string sourceFileName = null;
                 foreach (var document in documentsToSave)
                 {
+                    sourceFileName = document.PageControls.First().Page.SourceDocument.FileName;
+                    SavingData?.Invoke(this, new SavingDataEventArgs(sourceFileName));
                     _documentDataPanel.UpdateDocumentDataStatus(document.DocumentData, true, validateData);
                 }
 
                 _documentDataPanel.WaitForDocumentStatusUpdates();
+
+                DoneSavingData?.Invoke(this, new SavingDataEventArgs(sourceFileName));
             }
 
             if (validateData)

@@ -486,6 +486,30 @@ namespace Extract.UtilityApplications.PaginationUtility
     }
 
     /// <summary>
+    /// The event arguments for the <see cref="PaginationPanel.SavingData"/>
+    /// event.
+    /// </summary>
+    public class SavingDataEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SavingDataEventArgs"/> class.
+        /// </summary>
+        /// <param name="fileName">The name of the file for which data is being saved.</param>
+        public SavingDataEventArgs(string fileName)
+        {
+            FileName = fileName;
+        }
+
+        /// <summary>
+        /// Gets the name of the file for which data is being saved.
+        /// </summary>
+        public string FileName
+        {
+            get;
+        }
+    }
+
+    /// <summary>
     /// The event arguments for the <see cref="PageLayoutControl.PageDeleted"/> event.
     /// </summary>
     public class PageLoadRequestEventArgs : HandledEventArgs

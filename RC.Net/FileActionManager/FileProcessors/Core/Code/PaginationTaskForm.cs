@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -63,30 +64,43 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         class FileTaskSessionData
         {
-            public FileTaskSessionData(int sessionID)
+            public FileTaskSessionData(int sessionID, string fileName)
             {
                 SessionID = sessionID;
+                FileName = fileName;
+                DurationStopwatch.Start();
             }
 
             /// <summary>
             /// Gets the file task session ID;
             /// </summary>
-            public int SessionID { get; }  = -1;
+            public int SessionID { get; } = -1;
 
             /// <summary>
-            /// Gets the session start time.
+            /// Gets the name of the target file for this session.
             /// </summary>
-            public DateTime StartTime { get; } = DateTime.Now;
+            public string FileName { get; }
 
             /// <summary>
-            /// Gets or sets the time the file associated with this session finished loading into
-            /// the pagination UI.
+            /// Times the total duration this file is in processing.
             /// </summary>
-            public DateTime LoadCompleteTime { get; set; }
+            public Stopwatch DurationStopwatch { get; } = new Stopwatch();
 
             /// <summary>
-            /// Gets or sets the number of seconds a user has been actively working within the
-            /// document.
+            /// Times how long this file is in overhead time (loading/saving). As much as possible,
+            /// this is intended to be time exclusive to this file rather than time shared loading
+            /// and saving other files that are part of a batch. In other words, the aggregated
+            /// overhead time is intended to represent the overhead time of the software as opposed
+            /// to accuratly portraying for any individual file (Duration - [time the file was
+            /// available to be edited])
+            /// </summary>
+            public Stopwatch OverheadStopwatch { get; } = new Stopwatch();
+
+            /// <summary>
+            /// Gets the number of seconds a user has been actively working within the document.
+            /// As with overhead time, the time recorded will be exclusive to the user being active
+            /// within this specific document as opposed to also recording active time while the
+            /// user is working in another document that is loaded at the same time.
             /// </summary>
             public double ActiveSeconds { get; set; }
         }
@@ -211,6 +225,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// being displayed in the image viewer.
         /// </summary>
         int _activeFileID = -1;
+
+        /// <summary>
+        /// FileTaskSessionData for which overhead time is actively being tracked.
+        /// </summary>
+        FileTaskSessionData _fileSessionInOverhead;
 
         #endregion Fields
 
@@ -734,6 +753,9 @@ namespace Extract.FileActionManager.FileProcessors
                     _paginationDocumentDataPanel.RedoAvailabilityChanged += HandlePaginationDocumentDataPanel_RedoAvailabilityChanged;
                 }
 
+                _paginationPanel.SavingData += HandlePaginationPanel_SavingData;
+                _paginationPanel.DoneSavingData += HandlePaginationPanel_DoneSavingData;
+
                 // ComponentData directories referenced by configuration databases will be cached.
                 // Clear any cached ComponentData directory each time the UI is opened.
                 DataEntryConfiguration.ResetComponentDataDir();
@@ -969,6 +991,12 @@ namespace Extract.FileActionManager.FileProcessors
                         FormsMethods.FlashWindow(this, true, true);
                     }
                 }
+
+                // Ensure there is no circumstance where overhead timer continue to run inappropriately.
+                if (_fileSessionInOverhead != null)
+                {
+                    StopTimingOverhead(_fileSessionInOverhead.FileName);
+                }
             }
             catch (Exception ex)
             {
@@ -1168,12 +1196,14 @@ namespace Extract.FileActionManager.FileProcessors
                     })
                     .ToIUnknownVector();
 
-                int firstSourceDocID = e.SourcePageInfo
-                    .Select(pageInfo => GetFileID(pageInfo.DocumentName))
+                var firstSourceFile = e.SourcePageInfo
+                    .Select(pageInfo => pageInfo.DocumentName)
                     .First();
 
+                TimeOverhead(firstSourceFile);
+
                 ExtractException.Assert("ELI40090", "FileTaskSession was not started.",
-                    _fileTaskSessionMap.TryGetValue(firstSourceDocID, out var sessionData));
+                    _fileTaskSessionMap.TryGetValue(GetFileID(firstSourceFile), out var sessionData));
 
                 FileProcessingDB.AddPaginationHistory(
                     e.OutputFileName, sourcePageInfo, deletedSourcePageInfo, sessionData.SessionID);
@@ -1235,6 +1265,8 @@ namespace Extract.FileActionManager.FileProcessors
                     .Where(item => item.Value != null))
                 {
                     string sourceFileName = item.Key;
+                    TimeOverhead(sourceFileName);
+
                     PaginationDocumentData documentData = (PaginationDocumentData)item.Value;
 
                     string dataFileName = sourceFileName + ".voa";
@@ -1478,6 +1510,26 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+        /// <summary>
+        /// Handles the SavingData event of the <see cref="_paginationPanel"/>
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="SavingDataEventArgs"/> instance containing the event data.</param>
+        void HandlePaginationPanel_SavingData(object sender, SavingDataEventArgs e)
+        {
+            TimeOverhead(e.FileName);
+        }
+
+        /// <summary>
+        /// Handles the SavingData event of the <see cref="_paginationPanel"/>
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="SavingDataEventArgs"/> instance containing the event data.</param>
+        void HandlePaginationPanel_DoneSavingData(object sender, SavingDataEventArgs e)
+        {
+            StopTimingOverhead(e.FileName);
+        }
+
         #endregion Event Handlers
 
         #region IVerificationForm Members
@@ -1693,7 +1745,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// Create a new FileTaskSession table row and starts a timer for the session.
         /// </summary>
         /// <param name="fileID">The ID of the file for which a session is to be started.</param>
-        void StartFileTaskSession(int fileID)
+        void StartFileTaskSession(int fileID, string fileName)
         {
             try
             {
@@ -1701,7 +1753,9 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     _fileTaskSessionMap[fileID] = new FileTaskSessionData(
                         FileProcessingDB.StartFileTaskSession(
-                            _PAGINATION_TASK_GUID, fileID, _actionID));
+                            _PAGINATION_TASK_GUID, fileID, _actionID),
+                        fileName);
+                    TimeOverhead(fileName);
                 }
             }
             catch (Exception ex)
@@ -1730,11 +1784,14 @@ namespace Extract.FileActionManager.FileProcessors
                     _inputEventTracker.Active = false;
                 }
 
-                var duration = (DateTime.Now - sessionData.StartTime).TotalSeconds;
-                var overhead =
-                    (sessionData.LoadCompleteTime > sessionData.StartTime)
-                    ? (sessionData.LoadCompleteTime - sessionData.StartTime).TotalSeconds
-                    : 0;
+                if (_fileSessionInOverhead == sessionData)
+                {
+                    _fileSessionInOverhead.OverheadStopwatch.Stop();
+                    _fileSessionInOverhead = null;
+                }
+
+                var duration = sessionData.DurationStopwatch.Elapsed.TotalSeconds;
+                var overhead = sessionData.OverheadStopwatch.Elapsed.TotalSeconds;
 
                 _fileProcessingDB.UpdateFileTaskSession(sessionData.SessionID,
                     duration, overhead, sessionData.ActiveSeconds);
@@ -1779,6 +1836,8 @@ namespace Extract.FileActionManager.FileProcessors
 
             foreach (string sourceFileName in sourceFileNames)
             {
+                TimeOverhead(sourceFileName);
+
                 int sourceFileID = GetFileID(sourceFileName);
                 _fileIDsLoaded.Remove(sourceFileID);
                 _fileIDs.Remove(sourceFileName);
@@ -1808,7 +1867,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                     ReleaseFile(sourceFileID);
                     DelayFile(sourceFileID);
-                    
+
                     if (!string.IsNullOrWhiteSpace(targetAction))
                     {
                         EActionStatus oldStatus;
@@ -1845,7 +1904,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                 _fileIDsLoaded.Add(fileId);
                 _fileIDs[fileName] = fileId;
-                StartFileTaskSession(fileId);
+                StartFileTaskSession(fileId, fileName);
 
                 if (_inputEventTracker == null)
                 {
@@ -1943,7 +2002,6 @@ namespace Extract.FileActionManager.FileProcessors
 
                             _paginationPanel.LoadFile(fileName, fileId, -1, pages, deletedPages,
                                 suggestedPagination.Value, documentData, selectDocument);
-                            _fileTaskSessionMap[fileId].LoadCompleteTime = DateTime.Now;
                             selectDocument = false;
                         }
 
@@ -1954,14 +2012,12 @@ namespace Extract.FileActionManager.FileProcessors
                     PaginationDocumentData rootDocumentData = GetAsPaginationDocumentData(attributes, fileName);
                     _paginationPanel.LoadFile(
                         fileName, fileId, -1, null, null, false, rootDocumentData, selectDocument);
-                    _fileTaskSessionMap[fileId].LoadCompleteTime = DateTime.Now;
                     return;
                 }
 
                 // If there was no rules-suggested pagination, go ahead and load the physical document
                 // into the _paginationPanel
                 _paginationPanel.LoadFile(fileName, fileId, -1, selectDocument);
-                _fileTaskSessionMap[fileId].LoadCompleteTime = DateTime.Now;
             }
             finally
             {
@@ -1983,6 +2039,9 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     _paginationPanel.SuspendUIUpdates = false;
                 }
+
+                // End timing of overhead for this file
+                StopTimingOverhead(fileName);
             }
         }
 
@@ -2204,6 +2263,50 @@ namespace Extract.FileActionManager.FileProcessors
             }
 
             return FileProcessingDB.GetFileID(fileName);
+        }
+
+        /// <summary>
+        /// Starts tracking overhead time for the specified file and stops tracking for any other
+        /// file currently being timed.
+        /// </summary>
+        /// <param name="fileName">Name of the file to start timing overhead for.</param>
+        void TimeOverhead(string fileName)
+        {
+            if (_fileSessionInOverhead != null)
+            {
+                if (fileName == _fileSessionInOverhead.FileName)
+                {
+                    return;
+                }
+
+                _fileSessionInOverhead.OverheadStopwatch.Stop();
+                _fileSessionInOverhead = null;
+            }
+
+            int fileId = GetFileID(fileName);
+
+            ExtractException.Assert("ELI46452", "FileTaskSession was not started.",
+                _fileTaskSessionMap.TryGetValue(fileId, out var sessionData));
+
+            if (!sessionData.OverheadStopwatch.IsRunning)
+            {
+                sessionData.OverheadStopwatch.Start();
+                _fileSessionInOverhead = sessionData;
+            }
+        }
+
+        /// <summary>
+        /// Stops timing overhead for the specified filename.
+        /// </summary>
+        /// <param name="fileName">Name of the file to stop timing.</param>
+        void StopTimingOverhead(string fileName)
+        {
+            if (fileName == _fileSessionInOverhead?.FileName &&
+                _fileSessionInOverhead.OverheadStopwatch.IsRunning)
+            {
+                _fileSessionInOverhead.OverheadStopwatch.Stop();
+                _fileSessionInOverhead = null;
+            }
         }
 
         /// <summary>

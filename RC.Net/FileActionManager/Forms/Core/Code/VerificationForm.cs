@@ -360,7 +360,8 @@ namespace Extract.FileActionManager.Forms
                         _requestedFileID = -1;
                         _waitRequestedFile.Set();
                         _waitingFileIDQueue.Clear();
-                        
+                        _completedFiles.Clear();
+
                         _uiThread = CreateUserInterfaceThread(VerificationApplicationThread,
                             creator, minStackSize);
 
