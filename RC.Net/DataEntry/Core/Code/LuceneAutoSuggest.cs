@@ -420,7 +420,7 @@ namespace Extract.DataEntry
 
                             case Keys.Return:
                                 CopySelection();
-                                return true;
+                                return false;
 
                             case Keys.Tab:
                                 CopySelection();
