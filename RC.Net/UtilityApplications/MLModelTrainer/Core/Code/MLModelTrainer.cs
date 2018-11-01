@@ -656,7 +656,25 @@ namespace Extract.UtilityApplications.MLModelTrainer
         /// <returns><c>true</c> if configured, <c>false</c> if not</returns>
         public bool IsConfigured()
         {
-            return true;
+            try
+            {
+                bool returnVal = !string.IsNullOrWhiteSpace(ModelName);
+                returnVal = returnVal && !string.IsNullOrWhiteSpace(Description);
+                returnVal = returnVal && !string.IsNullOrWhiteSpace(ModelDestination);
+
+                if (ModelType == ModelType.NamedEntityRecognition)
+                {
+                    returnVal = returnVal && !string.IsNullOrWhiteSpace(TrainingCommand);
+                    returnVal = returnVal && !string.IsNullOrWhiteSpace(TestingCommand);
+                }
+
+                return returnVal;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46453");
+                return false;
+            }
         }
 
         #endregion
