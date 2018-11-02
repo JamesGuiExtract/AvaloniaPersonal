@@ -176,17 +176,27 @@ namespace Extract.Dashboard.Forms
         {
             try
             {
-                if (dashboardDataGridView.CurrentCell.Value as string != _originalCellValue)
+                if (dashboardDataGridView.Columns[e.ColumnIndex].Name == "DashboardName")
                 {
-                    using (var connection = NewSqlDBConnection())
+                    if (string.IsNullOrEmpty(dashboardDataGridView.CurrentCell.Value as string))
                     {
-                        connection.Open();
-                        var command = connection.CreateCommand();
-                        command.CommandText =
-                            "UPDATE Dashboard SET DashboardName = @NewDashboardName WHERE DashboardName = @OldDashboardName";
-                        command.Parameters.AddWithValue("@OldDashboardName", _originalCellValue);
-                        command.Parameters.AddWithValue("@NewDashboardName", dashboardDataGridView.CurrentCell.Value as string);
-                        command.ExecuteNonQuery();
+                        ExtractException exName = new ExtractException("ELI46458", "Dashboard name cannot be empty.");
+                        dashboardDataGridView.CurrentCell.Value = _originalCellValue;
+                        throw exName;
+                    }
+
+                    if (dashboardDataGridView.CurrentCell.Value as string != _originalCellValue)
+                    {
+                        using (var connection = NewSqlDBConnection())
+                        {
+                            connection.Open();
+                            var command = connection.CreateCommand();
+                            command.CommandText =
+                                "UPDATE Dashboard SET DashboardName = @NewDashboardName WHERE DashboardName = @OldDashboardName";
+                            command.Parameters.AddWithValue("@OldDashboardName", _originalCellValue);
+                            command.Parameters.AddWithValue("@NewDashboardName", dashboardDataGridView.CurrentCell.Value as string);
+                            command.ExecuteNonQuery();
+                        }
                     }
                 }
             }

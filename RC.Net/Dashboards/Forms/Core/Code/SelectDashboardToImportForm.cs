@@ -60,6 +60,32 @@ namespace Extract.Dashboard.Forms
 
         #region Events
 
+        void HandleOKButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(_dashboardFileTextBox.Text))
+                {
+                    ExtractException exFile = new ExtractException("ELI46456", "Dashboard file must be specified.");
+                    _dashboardFileTextBox.Focus();
+                    DialogResult = DialogResult.None;
+                    throw exFile;
+                }
+                else if (string.IsNullOrEmpty(_dashboardNameTextBox.Text))
+                {
+                    ExtractException exName = new ExtractException("ELI46457", "Dashboard name must be specified.");
+                    _dashboardNameTextBox.Focus();
+                    DialogResult = DialogResult.None;
+                    throw exName;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46454");
+            }
+
+        }
+
         void HandleBrowseButtonClick(object sender, EventArgs e)
         {
             try
