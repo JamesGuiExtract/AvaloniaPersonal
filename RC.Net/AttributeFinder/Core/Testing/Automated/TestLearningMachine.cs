@@ -420,7 +420,7 @@ namespace Extract.AttributeFinder.Test
 
             // Result has poor precision (high false positive rate)
             var (_, testResults) = lm.TestMachine();
-            testResults.Match(gcm => throw new Exception("Not expecting a general confusion matrix!"),
+            testResults.Match(gcm => throw new ArgumentException("Not expecting a general confusion matrix!"),
                 cm =>
                 {
                     Assert.AreEqual(0.54, Math.Round(cm.FScore, 2));
@@ -434,7 +434,7 @@ namespace Extract.AttributeFinder.Test
             lm.TranslateUnknownCategory = true;
             lm.TranslateUnknownCategoryTo = "NotFirstPage";
             (_, testResults) = lm.TestMachine();
-            testResults.Match(gcm => throw new Exception("Not expecting a general confusion matrix!"),
+            testResults.Match(gcm => throw new ArgumentException("Not expecting a general confusion matrix!"),
                 cm =>
                 {
                     Assert.AreEqual(0.75, Math.Round(cm.Precision, 2));
@@ -1955,7 +1955,8 @@ namespace Extract.AttributeFinder.Test
                     int probabilityIndex = Array.IndexOf(fields, "Probability");
                     while (!csvReader.EndOfData && (fields = csvReader.ReadFields()) != null)
                     {
-                        result.Add((fields[ussPathIndex], fields[predictionIndex], double.Parse(fields[probabilityIndex])));
+                        result.Add((fields[ussPathIndex], fields[predictionIndex], double.Parse(fields[probabilityIndex],
+                            CultureInfo.InvariantCulture)));
                     }
                 }
             }

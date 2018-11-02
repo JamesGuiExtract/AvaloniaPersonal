@@ -1225,9 +1225,8 @@ namespace Extract.FileActionManager.FileProcessors
                     destPages.Add(pageCounter++);
                 }
 
-                var newSpatialPageInfos = PaginationPanel.CreateUSSForPaginatedDocument(e.OutputFileName,
-                                                                                        pageMap,
-                                                                                        e.RotatedPages);
+                var newSpatialPageInfos = AttributeMethods.CreateUSSForPaginatedDocument(
+                    e.OutputFileName, pageMap, e.RotatedPages);
 
                 var documentData = e.DocumentData as PaginationDocumentData;
                 if (documentData != null && documentData.Attributes != null && documentData.Attributes.Size() > 0)

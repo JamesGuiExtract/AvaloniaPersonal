@@ -208,7 +208,7 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Converts <see paramref="enumerable" /> into an <see cref="IIUnknownVector" /> and
+        /// Converts <see paramref="enumerable" /> into an <see cref="IUnknownVector" /> and
         /// saves it to <see paramref="fileName" /> using <see cref="AttributeStorageManagerClass" />
         /// </summary>
         /// <param name="enumerable">The <see cref="IEnumerable{ComAttribute}" /> to convert.</param>
@@ -218,11 +218,29 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                enumerable.ToIUnknownVector().SaveTo(fileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                enumerable.ToIUnknownVector().SaveAttributes(fileName);
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI40167", ex);
+            }
+        }
+
+        /// <summary>
+        /// Saves the <see paramref="attributes" /> to <see paramref="fileName" /> using <see cref="AttributeStorageManagerClass" />
+        /// </summary>
+        /// <param name="attributes">The <see cref="IIUnknownVector" /> to save</param>
+        /// <param name="fileName">Full path of the file to be saved</param>
+        [CLSCompliant(false)]
+        public static void SaveAttributes(this IUnknownVector attributes, string fileName)
+        {
+            try
+            {
+                attributes.SaveTo(fileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI46459", ex);
             }
         }
 
@@ -483,6 +501,120 @@ namespace Extract.AttributeFinder
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45748");
+            }
+        }
+
+        /// <summary>
+        /// Creates a new uss file for the specified <see paramref="newDocumentName"/> based upon
+        /// the specified <see paramref="pageMap"/> that relates the source pages to the
+        /// corresponding pages in <see paramref="newDocumentName"/>.
+        /// </summary>
+        /// <param name="newDocumentName">The name of the document for which the uss file is being
+        /// created.</param>
+        /// <param name="pageMap">Each key represents a tuple of the old document name and page
+        /// number while the value represents the new page number(s) in 
+        /// <see paramref="newDocumentName"/> associated with that source page.</param>
+        /// <param name="rotatedPages">collection of PageAndRotation; original page number, and
+        /// rotation in degrees relative to the original page orientation (= 0 degrees,
+        /// so any non-zero amount indicates a rotation)</param>
+        /// <returns>The spatial page info map for the output document</returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "USS")]
+        public static LongToObjectMap CreateUSSForPaginatedDocument(string newDocumentName,
+            Dictionary<Tuple<string, int>, List<int>> pageMap, 
+            ReadOnlyCollection<(string documentName, int page, int rotation)> rotatedPages)
+        {
+            try
+            {
+                var sourceUSSData = pageMap.Keys
+                    .Select(sourcePage => sourcePage.Item1)
+                    .Distinct()
+                    .Where(sourceFileName => File.Exists(sourceFileName + ".uss"))
+                    .ToDictionary(sourceFileName => sourceFileName, sourceFileName =>
+                    {
+                        var ussData = new SpatialString();
+                        ussData.LoadFrom(sourceFileName + ".uss", false);
+                        ussData.ReportMemoryUsage();
+                        return ussData;
+                    });
+                    
+                var newSpatialPageInfos = new LongToObjectMapClass();
+                int destPageCount = pageMap.Values.SelectMany(value => value).Count();
+                var newPageDataArray = new SpatialString[destPageCount];
+                bool ussFileExists = false;
+                foreach (var pageInfo in pageMap)
+                {
+                    string sourceDocName = pageInfo.Key.Item1;
+
+                    SpatialString sourceDocData;
+                    if (sourceUSSData.TryGetValue(sourceDocName, out sourceDocData))
+                    {
+                        ussFileExists = true;
+                        if (sourceDocData.HasSpatialInfo())
+                        {
+                            foreach (int destPage in pageInfo.Value)
+                            {
+                                int sourcePage = pageInfo.Key.Item2;
+                                var pageData = sourceDocData.GetSpecifiedPages(sourcePage, sourcePage);
+
+                                var oldPageInfos = sourceDocData.SpatialPageInfos;
+                                if (oldPageInfos.Contains(sourcePage))
+                                {
+                                    newSpatialPageInfos.Set(destPage, oldPageInfos.GetValue(sourcePage));
+                                }
+
+                                // CreateFromSpatialStrings won't accept non-spatial strings
+                                // UpdatePageNumber is only valid for spatial strings
+                                if (pageData.HasSpatialInfo())
+                                {
+                                    var oldSpatialPageInfo = (SpatialPageInfo)oldPageInfos.GetValue(sourcePage);
+                                    newPageDataArray[destPage - 1] = pageData;
+                                    pageData.UpdatePageNumber(destPage);
+
+                                    if (rotatedPages != null)
+                                    {
+                                        var rotation = rotatedPages
+                                            .Where(info => info.page == sourcePage
+                                                           && info.documentName == pageData.SourceDocName)
+                                            .Select(info => info.rotation)
+                                            .FirstOrDefault();
+
+                                        if (rotation != 0)
+                                        {
+                                            PaginationMethods.RotatePage(destPage, rotation, newSpatialPageInfos, oldSpatialPageInfo);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                var newUSSData = new SpatialString();
+                if (newPageDataArray.Length > 0)
+                {
+                    var newPageData = newPageDataArray
+                        .Where(s => s != null)
+                        .ToIUnknownVector<SpatialString>();
+
+                    if (newPageData.Size() > 0)
+                    {
+                        newUSSData.CreateFromSpatialStrings(newPageData);
+                        newUSSData.SpatialPageInfos = newSpatialPageInfos;
+                    }
+                }
+                if (ussFileExists)
+                {
+                    newUSSData.SourceDocName = newDocumentName;
+                    newUSSData.SaveTo(newDocumentName + ".uss", true, false);
+                }
+                newUSSData.ReportMemoryUsage();
+
+                return newSpatialPageInfos;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40253");
             }
         }
 

@@ -709,7 +709,8 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     { new Tuple<string, int>(sourceDocName, pageNum), new List<int>() { 1 } }
                 };
-                var spatialPageInfoMap = PaginationPanel.CreateUSSForPaginatedDocument(outputFileName, pageMap, null);
+                var spatialPageInfoMap = AttributeMethods.CreateUSSForPaginatedDocument(
+                    outputFileName, pageMap, null);
 
                 // Create voa file
                 if (attributes != null)

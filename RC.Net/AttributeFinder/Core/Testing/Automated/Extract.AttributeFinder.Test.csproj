@@ -89,6 +89,7 @@
     <Compile Include="TestAFUtils.cs" />
     <Compile Include="TestFKB.cs" />
     <Compile Include="TestClassWeights.cs" />
+    <Compile Include="TestSpatialPageInfo.cs" />
     <Compile Include="TestOCRParameters.cs" />
     <Compile Include="TestTranslateToBestMatch.cs" />
     <Compile Include="TestLocateImageRegion.cs" />
@@ -110,6 +111,10 @@
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj">
+      <Project>{b2d07de4-9192-4531-8854-de03ce9b0b57}</Project>
+      <Name>Extract.Imaging</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
@@ -495,6 +500,9 @@
     <EmbeddedResource Include="Resources\CallTestOCRParamsPropagation.rsd" />
     <EmbeddedResource Include="Resources\CallTestOCRParamsPropagationByPage.rsd" />
     <EmbeddedResource Include="Resources\CallTestOCRParamsPropagationByDocument.rsd" />
+    <EmbeddedResource Include="Resources\Example05.tif" />
+    <EmbeddedResource Include="Resources\Example05.tif.uss" />
+    <EmbeddedResource Include="Resources\Example05_WithRotatedPage.tif" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

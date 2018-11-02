@@ -3156,9 +3156,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     destPages.Add(pageCounter++);
                 }
 
-                var newSpatialPageInfos = PaginationPanel.CreateUSSForPaginatedDocument(e.OutputFileName, 
-                                                                                        pageMap,
-                                                                                        e.RotatedPages);
+                var newSpatialPageInfos = AttributeMethods.CreateUSSForPaginatedDocument(
+                    e.OutputFileName, pageMap, e.RotatedPages);
 
                 // Only grab the file back into the current verification session if suggested
                 // pagination boundaries were accepted (meaning the rules should have already found
