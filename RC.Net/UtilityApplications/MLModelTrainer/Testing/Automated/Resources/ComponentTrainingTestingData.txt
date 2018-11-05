@@ -1,0 +1,393 @@
+c/k ) Memorial Hospital 777 American Avenue , Waukesha , WI 53188 ( 262 ) 262-2620 Attending : Doe , Robert Primary : Doe , Steve MRN : 25252525 File : LAB 599 RW Loc : 0 Patient : DOE , Chad DOB : 12/12/1970 Age :39 Sex : M H : 820 820-8208 W: 820 820-8208 Ordering : Doe , Robert Glucose , Blood Collected : 09/09/09 09:00 --- Result Name -- Result -- Abnormal <START:LabTest> Glucose <END> 91 --ID : CHE 1 -- Normal Range -- Units 70-99 MG/DL HGB A1C , Hemoglobin A1C Collected : 09/09/09 09:00 --ID : CHE 2 --- Result Name -- Result -- Abnormal -- Normal Range -- Units <START:LabTest> HGBA1C-OMH <END> 6.5 H 4.8-6.0
+% CBC , Complete Blood Count Collected : 09/09/09 09:00 --ID : HEMA 3 --- Result Name -- Result -- Abnormal -- Normal Range -- Units <START:LabTest> WBC <END> 4.85 4.0-10.8
+K/UL <START:LabTest> RBC <END> 4.36 L 4.5-6.1 M/UL <START:LabTest> Hemoglobin <END> 12.7 L 14.0-17.0
+GM/DL <START:LabTest> Hematocrit <END> 40.5 L 42.0-52.0
+% <START:LabTest> MCV <END> 92.9 81-99 FL <START:LabTest> MCH <END> 29.1 27-33 PG <START:LabTest> MCHC <END> 31.4
+L 32-36 % <START:LabTest> Platelet Count <END> 210 130-400 K/UL <START:LabTest> RDW-SD <END> 60.1 H 37-53 FL <START:LabTest> MPV <END> 10.8 8-14 FL <START:LabTest> Differential Method <END> ** AUTO DIFFERENTIAL <START:LabTest> Segmented Neutrophil <END> 60.7 50-70 % <START:LabTest> Lymphocyte <END> 25.4 20-40 <START:LabTest> Monocyte <END> 11.8 H 0-8 <START:LabTest> Eosinophil <END> 1.9 0-5 % <START:LabTest> Basophil <END> 0.2 0-2 % <START:LabTest> Abs Neutrophil Count <END> 2.95 2.4-7.56
+K/UL <START:LabTest> Abs Lymphocyte Count <END> 1.23 0.96-4.32
+K/UL <START:LabTest> Abs Monocyte <END> 0.57 0.00-0.60
+K/UL <START:LabTest> Abs Eosinophil Count <END> 0.09 0.05-0.40
+K/UL <START:LabTest> Abs Basophil Count <END> 0.01 0.00-0.10
+K/UL Doe , Chad Acct : 25252525 Admitted : 09/09/2009 ( Loc : 0) Lab Results Processed : 09/09/09 00:27 09/09/09 00:01 thru 09/09/09 24 :00 Version : 2.3
+
+Wescan Laboratory PATHOLOGISTS K.K. Doe , M.D. S. S .
+Doe , M.D. M.M. Doe , M.D. 11111 West Court Suite 100 Wauwatosa , WI 53226 Client Services : ( 414 ) 2562560 or 1-800-557-5570 Fax : ( 414 ) 2562560 U.U. Doe , M.D. A.A. Doe , M.D. A.A. C.C. Doe , M.D. Doe , M.D. Name : DOE , GEORGE G MRN : 302302302 DOB/Age/Sex : 11/11/1911 98Y M Pt .
+Location : CCC 222 Requisition No: R8181818181 Ordering Loc : Collection Date : Report Date/Time : Ordering Physician : Ordering Facility : Wescan Laboratory 09/09/2009 09:09 09/09/2009 09:09 DOE , PATRICK , MD MFF CLINICAL LABORATORY REPORT HEMATOLOGY NORMAL ABNORMAL REFERENCE UNITS Hemogram with Differential <START:LabTest> WBC <END> <START:LabTest> RBC <END> <START:LabTest> Hgb <END> 12.2 H 4.0-10.0
+4.00-5.00
+12.0-16.0
+Thou/uL Mill/uL g/dL 4.55 12.3 40.6 89.1 <START:LabTest> Hot <END> 36.0-48.0
+% <START:LabTest> MCV <END> 80.0-99.0
+fL <START:LabTest> MCH <END> 27.0 L 28.0-34.0
+pg <START:LabTest> MCHC <END> 30.4 L 32.0-36.0
+g/dL <START:LabTest> RDW <END> 20.0 H 11.5-14.5 % <START:LabTest> Platelet <END> <START:LabTest> MPV <END> 7.1 487H 150-400 Thou/uL 7.0-11.0
+fL <START:LabTest> Segs <END> 68.3 42.0-70.0
+% <START:LabTest> Lymphs <END> 19.51.. 20.0-45.0 % <START:LabTest> Monos <END> 7.5 4.0-11.0
+<START:LabTest> Eos <END> 4.5 0.0-5.0
+<START:LabTest> Basos <END> 0.2 0.0-2.0
+<START:LabTest> AbsNeutr <END> <START:LabTest> AbsLymph <END> 2.4 <START:LabTest> AbsMono <END> 0.9 <START:LabTest> AbsEos <END> <START:LabTest> AbsBaso <END> <START:LabTest> Morph <END> 8.3 H 1.7-7.0
+0.8-4.5 0.1-1.1 0.0-0.5 0.0-0.2
+Thou/uL Thou/uL Thou/uL Thou/uL Thou/uL 0.6 H 0.0 See Note ' ' Automated differential - smear not reviewed DOE , PATRICK N88 W18989 NOMONEE AVE MENOMONEE FALLS , WI 53051 Original Report Status :Final Page 1 of 1
+
+ST. MARY 'S CAMPUS PT : DOE , SKIP LOC : 1A MR4* : ( 95555)22222222 PT# : 142142142142 .
+12/12/1920 88 YRS SEX : M DOB : AGE : ( 262)262-2622 ADM DR : DOE , WILLIAM W DSCH DATE :08/09/08 HEMATOLOGY PROCEDURE : UNITS : REF.RANGE : 08/08/08 0533 08/09/08 0445 <START:LabTest> WBC <END> K/UL [4.0-10.0]
+<START:LabTest> HGB <END> GM/DL [12.0-16.0]
+<START:LabTest> HCT <END> 96 [36.0-48.0]
+<START:LabTest> PLT <END> K/UL [150-400] <START:LabTest> MPV <END> FL [9.0-13.0]
+<START:LabTest> RBC <END> M/UL [4.00-5.30]
+10.2 H 14.4 43.2 304 11.4 4.91 6.5 12.5 37.7 247 11.0 4.14 INDICES DATA PROCEDURE : UNITS : REF.RANGE : 08/08/08 0533 08/09/08 0445 <START:LabTest> MCV <END> FL [79.0-99.0]
+<START:LabTest> MCH <END> PG [26.0-34.0]
+<START:LabTest> MCHC <END> GM/DL [32.0-36.0]
+<START:LabTest> RDW <END> FL [38.0-50.0]
+88.0 29.3 33.3 44.0 91.1 30.2 33.2 44.4 DIFFERENTIAL ( AUTOMATED ) PROCEDURE : UNITS : REF.RANGE : 08/08/08 0533 08/09/08 0445 <START:LabTest> NEUT <END> [42.0-76.0]
+<START:LabTest> LYMPH <END> <START:LabTest> MONO <END> <START:LabTest> EOS <END> <START:LabTest> BASOS <END> <START:LabTest> ABS# NEUT <END> K/UL [15.0-45.0]
+[4.0-12.0]
+[0.0-6.0]
+[0.0-2.0]
+[1.6-7.6]
+35.2 8.2 3.0 0.2 5.5 53.4 44.3 43.2 8.5 3.7 0.3 2.9 <START:LabTest> ABS# LYMPH <END> K/UL [1.1-4.0]
+PROCEDURE : UNITS : REF.RANGE : 08/08/08 0533 08/09/08 0445 <START:LabTest> ABS# MONO <END> K/UL [0.3-1.0]
+<START:LabTest> ABS# EOS <END> <START:LabTest> ABS# BASO <END> K/UL K/UL [0.0-0.6]
+[0.0-0.2]
+3.6 0.8 0.3 0.0 2.8 0.6 0.2 0.0 COAGULATION PROCEDURE : UNITS : REF.RANGE : 08/08/08 0533 <START:LabTest> D-DIMER QUANT. <END>
+NG/ML [ < 400] 697 Hf Legend : H= HIGH , f =FOOTNOTE D-DIMER QUANT.
+This D-dimer method has a high negative predictive value for the exclusion of both deep vein thrombosis ( DVT ) and pulmonary embolism ( PE ) when used in conjunction with a pre-test probability assessment in low-to-moderate probability outpatients .
+D-dimer testing may also aid in the diagnosis of disseminated intravascular coagulation ( DIC ) .
+DR.
+WILLIAM W. DOE PAGE : 1 222 WASHINGTON PRINTED : 08/09/2008 0216 FINAL REPORT GRAFTON WI 53024-
+ST. MARY 'S CAMPUS PT : DOE , SKIP LOC : 1A MR4* : ( 95555)22222222 PT# : 142142142142 .
+DOB : 12/12/1920 AGE : 88 YRS SEX : M ( 262)262-2622 ADM DR : DOE , WILLIAM W DSCH DATE :08/09/08 CHEMISTRY PROCEDURE : UNITS : REF.RANGE : 08/08/08 0533 08/09/08 0445 <START:LabTest> GLUCOSE <END> MG/DL [70-99] <START:LabTest> BUN <END> MG/DL [8-21] <START:LabTest> CREATININE <END> MG/DL [0.7-1.3]
+134 H 31 H 1.0 100 H 18 1.0 PROCEDURE : UNITS : REF.RANGE : 08/08/08 0533 08/08/08 1152 08/08/08 1825 08/09/08 0445 <START:LabTest> CALCIUM <END> MG/DL [8.4-10.2]
+<START:LabTest> CA IONIZED <END> <START:LabTest> CK <END> <START:LabTest> CKMB <END> CK INDEX MMOL/L U/L NG/ML % [1.15-1.27]
+[24-173] ( < 5.0] 1.19 85 2.2 82 2.2 2.6 f 2.7 f 9.0 PROCEDURE : <START:LabTest> TROPONIN I <END> <START:LabTest> B-NATRIURETIC P <END> POC CKMB UNITS : NG/ML PG/ML NG/ML REF.RANGE : [0.00-0.10]
+[ < 100] [ < 10.0] 08/08/08 0533 33 POC MYOGLOBIN NG/ML [ < 170] 08/08/08 0557 2.0 91 08/08/08 1152 0.17 Hf 08/08/08 1825 0.22 Hf 08/09/08 1450 0.11 Hf Legend : H. HIGH , f =FOOTNOTE TROPONIN I 08/08/081152 REFERENCE RANGE FOR TROPONIN I : 0.00 - 0.10 NG/ML = NEGATIVE > 0.10 NG/ML INDICATES INCREASED RISK OF MORBIDITY AND MORTALITY DIAGNOSTIC CUT-OFF FOR AMI WAS DETERMINED TO BE > 1.50 NG/ML FOOTNOTE ADDED ON 08/08/08 AT 1237 BY LAB TROPONIN I 08/08/08 1825 REFERENCE RANGE FOR TROPONIN I : 0.00 - 0.10 NG/ML = NEGATIVE > 0.10 NG/ML INDICATES INCREASED RISK OF MORBIDITY AND MORTALITY DIAGNOSTIC CUT-OFF FOR AMI WAS DETERMINED TO BE > 1.50 NG/ML FOOTNOTE ADDED ON 08/08/08 AT 1910 BY LAB TROPONIN I 08/08/08 1450 REFERENCE RANGE FOR TROPONIN I : 0.00 - 0.10 NG/ML = NEGATIVE > 0.10 NG/ML INDICATES INCREASED RISK OF MORBIDITY AND MORTALITY DIAGNOSTIC CUT-OFF FOR AMI WAS DETERMINED TO BE > 1.50 NG/ML FOOTNOTE ADDED ON 08/08/08 AT 1543 BY LAB CK INDEX CK INDEX GREATER THAN 3 % WITH ELEVATED TOTAL CK AND RISING OR FALLING CKMB SUPPORTS A DIAGNOSIS OF AN MI .
+DR.
+WILLIAM W. DOE PAGE : 2 222 WASHINGTON PRINTED : 08/09/08 0216 FINAL REPORT CHEMISTRY
+ST. MARY 'S CAMPUS PT : DOE , SKIP LOC : 1A MR4* : ( 95555)22222222 PT# : 142142142142 .
+DOB : 12/12/1920 AGE : 88 YRS SEX : M ( 262)262-2622 ADM DR : DOE , WILLIAM W DSCH DATE :08/09/08 CHEMISTRY PROCEDURE : UNITS : REF.RANGE : 08/08/08 0557 <START:LabTest> POC TROPONIN <END> NG/ML [0.00-0.09 ]
+<0.05 f PROCEDURE : 08/08/08 0533 08/09/08 0445 <START:LabTest> GFR AFRO AMER <END> <START:LabTest> GFR OTHER <END> 67 55 f 55 f 67 LIPID STUDIES PROCEDURE : UNITS : REF.RANGE : 08/09/08 0445 <START:LabTest> CHOLESTEROL <END> MG/DL [ < 200] <START:LabTest> TRIGLYCERIDES <END> MG/DL [ < 150] <START:LabTest> HDL CHOLESTEROL <END> MG/DL [ > 40] <START:LabTest> LDL CHOL,CALC <END> MG/DL [ < 130] 183 163 H 52 98 Legend : H= HIGH , f =FOOTNOTE POC TROPONIN REFERENCE RANGE FOR TROPONIN I : 0.00 - 0.09 NG/ML = NEGATIVE > = 0.10 NG/ML INDICATES INCREASED RISK OF MORBIDITY AND MORTALITY DIAGNOSTIC CUT-OFF FOR AMI WAS DETERMINED TO BE > = 0.40 NG/ML GFR OTHER The estimated GFR is based on a four parameter MDRD equation .
+The MDRD GFR formula is valid only for adults ages 18 years and older .
+Interpret the eGFR with caution on the elderly ( > 70 years ) .
+Estimated GFR units are mL/min/1.73
+sqm .
+Stage 1:GFR : >=90 Stage 2:GFR : 60-89 Stage 3:GFR : 30-59 Stage 4:GFR : 15-29 Stage 5:GFR : <=14 Stage 6:GFR : <=14 Normal kidney function Mildly reduced kidney function Moderately reduced kidney function Severely reduced kidney function Very severe or end stage kidney failure w/o dialysis Very severe or end stage kidney failure with dialysis DR.
+WILLIAM W. DOE 222 WASHINGTON PAGE : 3 PRINTED : 08/09/2008 0216 FINAL REPORT CHEMISTRY CHEMISTRY
+ST. MARY 'S CAMPUS PT : DOE , SKIP LOC : 1A MR4* : ( 95555)22222222 PT# : 142142142142 .
+DOB : 12/12/1920 AGE : 88 YRS SEX : M ( 262)262-2622 ADM DR : DOE , WILLIAM W DSCH DATE :08/09/08 CHEMISTRY LIPID STUDIES <START:LabTest> CHOL/HDL <END> [ < 6.0] PROCEDURE : REF.RANGE : 08/09/08 0445 CHOL/HDL 3.5 f NCEP - ( 2001 ) Borderline 150-199 200-239 GUIDELINES Desirable <150 <200 >60 Higher Risk >=200 >=240 <40 Test Triglyceride Cholesterol HDL-Cholesterol LDL-Cholesterol *<130 130-160 >160 ( *<100 if patient has Coronary Heart Disease ) Chol/HDL Ratio 4.0-6.0
+A ratio of >6.0 has been associated with a greater risk of Coronary Heart Disease .
+ELECTROLYTES - BLOOD GASES PROCEDURE : UNITS : REF.RANGE : 08/08/08 0533 08/08/08 1825 08/09/08 0445 <START:LabTest> SODIUM <END> MMOL/L [136-145] <START:LabTest> POTASSIUM <END> MMOL/L [3.5-5.1]
+<START:LabTest> CHLORIDE <END> MMOL/L [98-107] TOTAL CO2 MMOL/L [23-29 ] 143 3.3 L 3.8 4.1 139 107 24 PROCEDURE : UNITS : REF.RANGE : 08/09/08 0445 <START:LabTest> ANION GAP <END> MMOL/L [4-14] 8 PROCEDURE : UNITS : REF.RANGE : 08/08/08 0533 <START:LabTest> HCO3 VENOUS <END> MMOL/L [24-28 ] 27 Legend : L= LOW , f =FOOTNOTE DR.
+WILLIAM W. DOE PAGE : 4 222 WASHINGTON PRINTED : 08/09/2008 0216 FINAL REPORT CHEMISTRY LYTES/GASES
+ST. MARY 'S CAMPUS PT : DOE , SKIP LOC : 1A MR4* : ( 95555)22222222 PT# : 142142142142 .
+DOB : 12/12/1920 AGE : 88 YRS SEX : M ( 262)262-2622 ADM DR : DOE , WILLIAM W DSCH DATE :08/09/08 ENDOCRINOLOGY THYROID PROCEDURE : <START:LabTest> TSH <END> UNITS : MIU/L REF.RANGE : [0.27-4.20]
+08/08/08 1152 2.86 REFERENCE LABS ST.
+MARY 'S CAMPUS , 2222 PORT AVE , MILWAUKEE , __W I 53211 ' 08/08/08 1152 TSH ( TSH) DR.
+WILLIAM W. DOE PAGE : 5 222 WASHINGTON PRINTED : 08/09/2008 0216 FINAL REPORT GRAFTON WI 53024- END OF CHART
+
+200 West Wisconsin Ave .
+Milwaukee , WI 53226-3596 ( 414 ) 805-8050 (888 ) 611-6118 CLIA # : 52D0303030 Medicare 4 : 999999999 CARE LABORATORIES Affiliated with Medical College Ordering Dr : Doe , Scott Cc Doctor : N/A Requisition # : Pt .
+Info : Pt .
+Phone : 2228858858 Pt : Doe , Jean Pt . # : 747474747 DOB : 02/02/1922 Sex : Female Financial # : 141414145 Location : L441 A Health Care Center-7878 10101 W Blue Rd Wauwatosa , WI 53226 Printed : 10/10/2010 4:10 PM Report Status : Interim-Any Documentation Report Collected Date Collected Time 10/10/2010 06 :06 :00 Units Ref Range Procedure Long Term Care MD Comment See comment .
+f 10/10/2010 06 :35 :00 Long Term Care MD Comment : A copy of these results have also been sent to the ordering physician .
+Hematology - General CBC Collected Date Collected Time 10/10/2010 06 :35 :00 Procedure <START:LabTest> WBC <END> <START:LabTest> RBC <END> <START:LabTest> Hemoglobin <END> <START:LabTest> Hematocrit <END> <START:LabTest> MCV <END> <START:LabTest> MCH <END> <START:LabTest> MCHC <END> <START:LabTest> RDW <END> <START:LabTest> Platelet Count <END> <START:LabTest> Mean Plt Volume <END> <START:LabTest> Neutrophil % <END> <START:LabTest> Lymphocyte % <END> <START:LabTest> Monocyte % <END> <START:LabTest> Eosmnophil % <END> <START:LabTest> Basophil % <END> <START:LabTest> Neutrophil Absolute <END> <START:LabTest> Lymphocyte Absolute <END> <START:LabTest> Monocyte Absolute <END> <START:LabTest> Eosinophil Absolute <END> <START:LabTest> Basophil Absolute <END> Units Ref Range 10.7 H 10e3/uL [4.0-10.0]
+3.9 L 10e6/uL [4.4-5.8]
+11.5 L g/dL [13.0-17.0]
+33 L [42-52] 84 fL [83-99] 30 pg [27-34] 35 g/dL [32-36] 15.6 H [11.5-14.0]
+372 H 10e3/uL [150-350] 6.4 L fL [7.5-9.5]
+76 H [40-70] 13 L [20-45] 7 [2-8] 3 [0-4] 1 [0-2] 8.13 H 10e3/uL [1.30-6.10]
+1.39 10e3/uL [1.00-3.40]
+0.75 H 10e3/uL [0.10-0.60]
+0.32 10e3/uL [0.00-0.45]
+0.11 10e3/uL [0.00-0.20]
+H = High g = Reference Lab e = Edited/Con-ected = Abnormal C = Critical L = Low Legend : i = Intern Data f = Footnotes Page 1 of 1 Pt : Doe , Jean
+
+MC HOSPITAL 4444 Medical Center Drive , McHenry , Illinois 60050 (888 ) 777-7777 INTERIM REPORT 11/11/2011 11:11 DOB : 02/02/1972 AGE : 39Y SEX : F NAME : DOE,ISELDA MR# : IC989898 ACCT# : 20120120 PHYS : M4M4M4 COLL : 11/11/2011 11:11 REC : 11/11/2011 11:11 PHYS : BRAIN,MANDELA MD mg/dL H 63 [8-21] **NOTE NEW REFERENCE RANGE STARTED 08/08/2008 <START:LabTest> BUN <END> CREATININE SERUM <START:LabTest> CREATININE <END> H 3.48 [0.47-1.15 ]
+mg/dL <START:LabTest> GFR CALCULATION <END> L 14 [>60] mL/min/1.73m2
+If the patient is African-American , Please multiply this result by 1.21 .
+This result has been calculated assuming the patient is non - African American .
+<START:LabTest> GLUCOSE <END> 83 [75-99] mg/dL <START:LabTest> POTASSIUM <END> 4.3 [3.5-5.1]
+mmol/L <START:LabTest> HCT <END> L 26.5 [36-46] % <START:LabTest> WBC <END> 4.5 [4.1-11.0]
+10x3/uL TACROLIMUS PENDING DOE,ISELDA END OF REPORT PAGE 1
+
+MC HOSPITAL 4444 Medical Center Drive , McHenry , Illinois 60050 (888 ) 777-7777 INTERIM REPORT 11/11/2011 11:11 DOB : 02/02/1972 AGE : 39Y SEX : F NAME : DOE,ISELDA MR# : IC989898 ACCT# : 20120120 PHYS : M4M4M4 COLL : 11/11/2011 11:11 REC : 11/11/2011 11:11 PHYS : BRAIN,MANDELA MD mg/dL H 63 [8-21] **NOTE NEW REFERENCE RANGE STARTED 08/08/2008 <START:LabTest> BUN <END> CREATININE SERUM <START:LabTest> CREATININE <END> H 3.48 [0.47-1.15 ]
+mg/dL <START:LabTest> GFR CALCULATION <END> L 14 [>60] mL/min/1.73m2
+If the patient is African-American , Please multiply this result by 1.21 .
+This result has been calculated assuming the patient is non - African American .
+<START:LabTest> GLUCOSE <END> 83 [75-99] mg/dL <START:LabTest> POTASSIUM <END> 4.3 [3.5-5.1]
+mmol/L <START:LabTest> HCT <END> L 26.5 [36-46] % <START:LabTest> WBC <END> 4.5 [4.1-11.0]
+10x3/uL TACROLIMUS PENDING DOE,ISELDA END OF REPORT PAGE 1
+MC HOSPITAL 4444 Medical Center Drive , McHenry , Illinois 60050 (888 ) 777-7777 INTERIM REPORT 11/11/2011 11:11 DOB : 02/02/1972 AGE : 39Y SEX : F NAME : DOE,ISELDA MR# : IC989898 ACCT# : 20120120 PHYS : M4M4M4 COLL : 11/11/2011 11:11 REC : 11/11/2011 11:11 PHYS : BRAIN,MANDELA MD mg/dL H 63 [8-21] **NOTE NEW REFERENCE RANGE STARTED 08/28/2014 <START:LabTest> BUN <END> CREATININE SERUM <START:LabTest> CREATININE <END> H 3.48 [0.47-1.15 ]
+mg/dL <START:LabTest> GFR CALCULATION <END> L 14 [>60] mL/min/1.73m2
+If the patient is African-American , Please multiply this result by 1.21 .
+This result has been calculated assuming the patient is non - African American .
+<START:LabTest> GLUCOSE <END> 83 [75-99] mg/dL <START:LabTest> POTASSIUM <END> 4.3 [3.5-5.1]
+mmol/L <START:LabTest> HCT <END> L 26.5 [36-46] % <START:LabTest> WBC <END> 4.5 [4.1-11.0]
+10x3/uL TACROLIMUS <START:LabTest> TACROLIMUS <END> 6.4 [A] Unit : ng/mL ( NOTE ) Therapeutic Range : Kidney transplant : 0-3 months post-transplant : 7.0-20.0
+ng/mL 3 months and older : 5.0-15.0
+ng/mL Liver transplant : 1-12 months post-transplant : 5-20 ng/mL Heart transplant : 0-3 months post-transplant : 10.0-20.0
+ng/mL 3 months and older : 5.0-15.0
+ng/mL Toxic value : Greater than 25 ng/m I Therapeutic range is based on a whole blood specimen drawn 12 hours post-dose or prior to next dose ( the trough ) .
+The optimal therapeutic range for a given patient may differ from this suggested range based on the indication for therapy , treatment phase ( initiation or maintenance ) , use in combination with other drugs , time of specimen collection relative to prior dose , type of transplanted organ , and/or the therapeutic approach of the transplant center .
+CONTINUED PAGE 1 DOE,ISELDA
+
+11/11/11 11:11 AH CST Clinical Labs via V5I-FAX Page 1 of 1 Clinical Laboratories , Inc. 222 Blue Street - Lower Level , Dubuque , Iowa 52001 ( 563)-563-5630 Notice:Thiv report contains legally privileged information .
+If you are not the intended recipient , please notify the laboratory at the number above .
+WBC , Automated : Collected :11/11/11 11:35 Released :11/11/11 08:45 Printed :11/11/14 08:46 Testing Location : Laboratory Hospital 333 Grand Ave Dubuque , IA 52001 ANALYTE RESULT REF RANGE UNITS <START:LabTest> WBC <END> 7.2 4.5 - 11.0 thou/ul Encounter Report Copying and faxing degrades readability of this report .
+LLL cannot be responsible for the quality of 2nd and 3rd generation copies .
+Patient : Patt , Patricia P I.D. No. : X104104104 ROOM : AG E/SEX : 77 yrs /F DOB : 07/07/37 Doctor : Doe , Artie Account : Laboratory
+
+11/11/11 11:11 AH CST Clinical Labs via V5I-FAX Page 1 of 1 Clinical Laboratories , Inc. 222 Blue Street - Lower Level , Dubuque , Iowa 52001 ( 563)-563-5630 Notice:Thiv report contains legally privileged information .
+If you are not the intended recipient , please notify the laboratory at the number above .
+WBC , Automated : Collected :11/11/11 11:35 Released :11/11/11 08:45 Printed :11/11/14 08:46 Testing Location : Laboratory Hospital 333 Grand Ave Dubuque , IA 52001 ANALYTE RESULT REF RANGE UNITS <START:LabTest> WBC <END> 7.2 4.5 - 11.0 thou/ul Encounter Report Copying and faxing degrades readability of this report .
+LLL cannot be responsible for the quality of 2nd and 3rd generation copies .
+Patient : Patt , Patricia P I.D. No. : X104104104 ROOM : AG E/SEX : 77 yrs /F DOB : 07/07/37 Doctor : Doe , Artie Account : Laboratory
+11/11/11 11 : 11 RH CST Clinical Labs via V5I-FAX Page 1 of 1 Clinical Laboratories , Inc. 222 Blue Street - Lower Level , Dubuque , Iowa 52001 ( 563)-563-5630 Notice:Thiv report contains legally privileged information .
+If you are not the intended recipient , please notify the laboratory at the number above .
+Hematocrit : Collected :11/11/11 11:35 Released :11/11/11 08:45 Printed :11/11/14 08:46 Testing Location : Laboratory Hospital 333 Grand Ave Dubuque , IA 52001 ANALYTE RESULT <START:LabTest> HCT <END> 46 . . REF RANGE UNITS 35 - 47 Encounter Report Copying and faxing degrades readability of this report .
+LLL cannot be responsible for the quality of 2nd and 3rd generation copies .
+Patient : Patt , Patricia P I.D. No. : X104104104 ROOM : AG E/SEX : 77 yrs /F DOB : 07/07/37 Doctor : Doe , Artie Account : Laboratory
+11/11/11 11:11 AH CST Clinical Labs via V5I-FAX Page 1 of 1 Clinical Laboratories , Inc. 222 Blue Street - Lower Level , Dubuque , Iowa 52001 ( 563)-563-5630 Notice:Thiv report contains legally privileged information .
+If you are not the intended recipient , please notify the laboratory at the number above .
+Glucose : Collected :11/11/11 11:35 Released :11/11/11 08:45 Printed :11/11/14 08:46 Testing Location : Laboratory Hospital 333 Grand Ave Dubuque , IA 52001 ANALYTE RESULT REF RANGE UNITS 65 - 99 mg/dl <START:LabTest> Glucose <END> NEP Encounter Report Copying and faxing degrades readability of this report .
+LLL cannot be responsible for the quality of 2nd and 3rd generation copies .
+Patient : Patt , Patricia P I.D. No. : X104104104 ROOM : AG E/SEX : 77 yrs /F DOB : 07/07/37 Doctor : Doe , Artie Account : Laboratory
+11/11/11 11:11 AH CST Clinical Labs via V5I-FAX Page 1 of 1 Clinical Laboratories , Inc. 222 Blue Street - Lower Level , Dubuque , Iowa 52001 ( 563)-563-5630 Notice:Thiv report contains legally privileged information .
+If you are not the intended recipient , please notify the laboratory at the number above .
+BUN : Collected :11/11/11 11:35 Released :11/11/11 08:45 Printed :11/11/14 08:46 Testing Location : Laboratory Hospital 333 Grand Ave Dubuque , IA 52001 ANALYTE RESULT REF RANGE UNITS <START:LabTest> BUN <END> 20 10 - 26 mg/dl Encounter Report Copying and faxing degrades readability of this report .
+LLL cannot be responsible for the quality of 2nd and 3rd generation copies .
+Patient : Patt , Patricia P I.D. No. : X104104104 ROOM : AG E/SEX : 77 yrs /F DOB : 07/07/37 Doctor : Doe , Artie Account : Laboratory
+
+11/11/11 11 : 11 RH CST Clinical Labs via V5I-FAX Page 1 of 1 Clinical Laboratories , Inc. 222 Blue Street - Lower Level , Dubuque , Iowa 52001 ( 563)-563-5630 Notice:Thiv report contains legally privileged information .
+If you are not the intended recipient , please notify the laboratory at the number above .
+Hematocrit : Collected :11/11/11 11:35 Released :11/11/11 08:45 Printed :11/11/14 08:46 Testing Location : Laboratory Hospital 333 Grand Ave Dubuque , IA 52001 ANALYTE RESULT <START:LabTest> HCT <END> 46 . . REF RANGE UNITS 35 - 47 Encounter Report Copying and faxing degrades readability of this report .
+LLL cannot be responsible for the quality of 2nd and 3rd generation copies .
+Patient : Patt , Patricia P I.D. No. : X104104104 ROOM : AG E/SEX : 77 yrs /F DOB : 07/07/37 Doctor : Doe , Artie Account : Laboratory
+
+11/11/11 11:11 AH CST Clinical Labs via V5I-FAX Page 1 of 1 Clinical Laboratories , Inc. 222 Blue Street - Lower Level , Dubuque , Iowa 52001 ( 563)-563-5630 Notice:Thiv report contains legally privileged information .
+If you are not the intended recipient , please notify the laboratory at the number above .
+Glucose : Collected :11/11/11 11:35 Released :11/11/11 08:45 Printed :11/11/14 08:46 Testing Location : Laboratory Hospital 333 Grand Ave Dubuque , IA 52001 ANALYTE RESULT REF RANGE UNITS 65 - 99 mg/dl <START:LabTest> Glucose <END> NEP Encounter Report Copying and faxing degrades readability of this report .
+LLL cannot be responsible for the quality of 2nd and 3rd generation copies .
+Patient : Patt , Patricia P I.D. No. : X104104104 ROOM : AG E/SEX : 77 yrs /F DOB : 07/07/37 Doctor : Doe , Artie Account : Laboratory
+
+11/11/11 11:11 AH CST Clinical Labs via V5I-FAX Page 1 of 1 Clinical Laboratories , Inc. 222 Blue Street - Lower Level , Dubuque , Iowa 52001 ( 563)-563-5630 Notice:Thiv report contains legally privileged information .
+If you are not the intended recipient , please notify the laboratory at the number above .
+BUN : Collected :11/11/11 11:35 Released :11/11/11 08:45 Printed :11/11/14 08:46 Testing Location : Laboratory Hospital 333 Grand Ave Dubuque , IA 52001 ANALYTE RESULT REF RANGE UNITS <START:LabTest> BUN <END> 20 10 - 26 mg/dl Encounter Report Copying and faxing degrades readability of this report .
+LLL cannot be responsible for the quality of 2nd and 3rd generation copies .
+Patient : Patt , Patricia P I.D. No. : X104104104 ROOM : AG E/SEX : 77 yrs /F DOB : 07/07/37 Doctor : Doe , Artie Account : Laboratory
+
+11/11/11 01:01 PM Universit via VSI-FAX Page 2 of 4 0= UNIVERSITY HEALTHSYSTEM DEPARTMENT OF PATHOLOGY AND LABORATORY MEDICINE Name : DOE , STEVEN Sex : M DOB : 08/08/1951 Pat 4 : E004004004 Acct 4 : 77777777 Loc : LAB Report to : DOE , JON 600 HIGHLAND AVE MADISON , WI 53792 Order : H53535353 Req Phy : DOE , JON Report Status : **FINAL** Authorization on file .
+NORMAL TEST RESULTS AB RANGE UNITS SITE BIOCHEMISTRY COLLECTED 11/11/2011 10:13 <START:LabTest> GLUCOSE <END> 88 60-99 MG/DL <START:LabTest> POTASSIUM <END> 4.6 3.5-5.3
+MEQ/L <START:LabTest> BUN <END> 23 7-23 MG/DL <START:LabTest> CREATININE <END> 1.4 H 0.6-1.3
+MG/DL COLLECTED 11/11/2011 10:13 28-100 U/L 22-51 U/L <START:LabTest> AMYLASE <END> <START:LabTest> LIPASE <END> TDM/TOXICOLOGY 82 26 COLLECTED 11/11/2011 10:13 <START:LabTest> PROGRAF <END> 12.1 5.0-20.0
+NG/ML 0 HEMATOLOGY COMPLETE BLOOD COUNT COLLECTED 11/11/2011 10:13 <START:LabTest> WBC <END> 9.0 4.0-10.0
+THOU/CU MM <START:LabTest> RBC <END> 4.22 L 4.30-5.90
+M/UL <START:LabTest> HEMOGLOBIN <END> 12.3 L 13.0-17.0
+GM/DL <START:LabTest> HCT <END> 38.9 L 39.0-51.0
+% .
+<START:LabTest> MCV <END> 92.3 81.0-99.0
+CU MICRONS <START:LabTest> MCH <END> 29.2 27.0-33.0
+UUG ( continued on next page ) KEY FOR MICRO RESULTS : - NEW RESULT FOR RESULTS AND INFORMATION CALL 847-847-8470 ** Key Site Codes 0=Evanston 1=Glenbrook 2 or 3=Highland Park 6=Okokie Hospital Hospital Hospital Director : K.Evanston , M.D. Director : R. Glenview , M.D. Director : J. Park , OUTPATIENT LAB REPORT Hospital Director : R. Skokie , M.D. Printed : 11/11/2011 11:11 PAGE : 1
+11/11/11 01:01 PM Universit via VSI-FAX Page 3 of 4 # 4070 1:1 UNIVERSITY HEALTHSYSTEM DEPARTMENT OF PATHOLOGY AND LABORATORY MEDICINE Name : DOE , STEVEN Sex : M DOB : 08/08/1951 Pat 4 : E004004004 Acct 4 : 77777777 Loc : LAB Report to : DOE , JON 600 HIGHLAND AVE MADISON , WI 53792 Order : H53535353 Req Phy : DOE , JON Report Status : **FINAL** Authorization on file .
+NORMAL TEST RESULTS AB RANGE UNITS SITE continued <START:LabTest> MCHC <END> 31.7 L 32.5-36.5 % .
+<START:LabTest> RDW <END> 21.1 H 11.6-14.8
+5'6 <START:LabTest> PLATELET COUNT <END> 486 H 150-400 THOU/CU MM <START:LabTest> LYMPH56 <END> .
+14.0 12.0-40.0
+% .
+<START:LabTest> MON096 <END> .
+0.8 L 4.0-12.0
+5'6 <START:LabTest> NEUT96 <END> .
+83.5 H 40.0-74.0
+5'6 <START:LabTest> EOSIN96 <END> .
+0.3 0.0-8.0
+5'6 <START:LabTest> BAS056 <END> .
+1.4 0.0-2.0
+% .
+<START:LabTest> ABSOLUTE LYMPH <END> 1.3 1.0-4.0
+THOU/CU MM <START:LabTest> ABSOLUTE MONO <END> 0.1 0.1-0.7 THOU/CU MM <START:LabTest> ABSOLUTE NEUT <END> 7.5 1.5-8.0
+THOU/CU MM <START:LabTest> ABSOLUTE EOS <END> 0.0 0.0-0.6
+THOU/CU MM <START:LabTest> ABSOLUTE BASO <END> 0.1 0.0-0.2
+THOU/CU MM MOLECULAR DX REFERRED TESTS COLLECTED 11/11/2011 10:13 CMV DNA DETECTION , QUAN SEE BELOW Test Result Flag Unit RefValue <START:LabTest> CMV DNA Detect/Quant , P <END> .z137
+IU/mL Undetected Result in log IU/mL is <2.14 .
+CMV DNA level detected is <137 IU/mL ( 2.14 log IU/mL ) .
+This assay cannot accurately quantify CMV DNA below this level .
+ADDITIONAL INFORMATION ( continued on next page ) KEY FOR MICRO RESULTS : - NEW RESULT FOR RESULTS AND INFORMATION CALL 847-847-8470 ** Key Site Codes 0=Evanston 1=Glenbrook 2 or 3=Highland Park 6=Okokie Hospital Hospital Hospital Director : K.Evanston , M.D. Director : R. Glenview , M.D. Director : J. Park , OUTPATIENT LAB REPORT Hospital Director : R. Skokie , M.D. Printed : 11/11/2011 11:11 PAGE : 1
+
+11/11/11 01:01 PM Universit via VSI-FAX Page 2 of 4 0= UNIVERSITY HEALTHSYSTEM DEPARTMENT OF PATHOLOGY AND LABORATORY MEDICINE Name : DOE , STEVEN Sex : M DOB : 08/08/1951 Pat 4 : E004004004 Acct 4 : 77777777 Loc : LAB Report to : DOE , JON 600 HIGHLAND AVE MADISON , WI 53792 Order : H53535353 Req Phy : DOE , JON Report Status : **FINAL** Authorization on file .
+NORMAL TEST RESULTS AB RANGE UNITS SITE BIOCHEMISTRY COLLECTED 11/11/2011 10:13 <START:LabTest> GLUCOSE <END> 88 60-99 MG/DL <START:LabTest> POTASSIUM <END> 4.6 3.5-5.3
+MEQ/L <START:LabTest> BUN <END> 23 7-23 MG/DL <START:LabTest> CREATININE <END> 1.4 H 0.6-1.3
+MG/DL COLLECTED 11/11/2011 10:13 28-100 U/L 22-51 U/L <START:LabTest> AMYLASE <END> <START:LabTest> LIPASE <END> TDM/TOXICOLOGY 82 26 COLLECTED 11/11/2011 10:13 <START:LabTest> PROGRAF <END> 12.1 5.0-20.0
+NG/ML 0 HEMATOLOGY COMPLETE BLOOD COUNT COLLECTED 11/11/2011 10:13 <START:LabTest> WBC <END> 9.0 4.0-10.0
+THOU/CU MM <START:LabTest> RBC <END> 4.22 L 4.30-5.90
+M/UL <START:LabTest> HEMOGLOBIN <END> 12.3 L 13.0-17.0
+GM/DL <START:LabTest> HCT <END> 38.9 L 39.0-51.0
+% .
+<START:LabTest> MCV <END> 92.3 81.0-99.0
+CU MICRONS <START:LabTest> MCH <END> 29.2 27.0-33.0
+UUG ( continued on next page ) KEY FOR MICRO RESULTS : - NEW RESULT FOR RESULTS AND INFORMATION CALL 847-847-8470 ** Key Site Codes 0=Evanston 1=Glenbrook 2 or 3=Highland Park 6=Okokie Hospital Hospital Hospital Director : K.Evanston , M.D. Director : R. Glenview , M.D. Director : J. Park , OUTPATIENT LAB REPORT Hospital Director : R. Skokie , M.D. Printed : 11/11/2011 11:11 PAGE : 1
+11/11/11 01:01 PM Universit via VSI-FAX Page 3 of 4 # 4070 1:1 UNIVERSITY HEALTHSYSTEM DEPARTMENT OF PATHOLOGY AND LABORATORY MEDICINE Name : DOE , STEVEN Sex : M DOB : 08/08/1951 Pat 4 : E004004004 Acct 4 : 77777777 Loc : LAB Report to : DOE , JON 600 HIGHLAND AVE MADISON , WI 53792 Order : H53535353 Req Phy : DOE , JON Report Status : **FINAL** Authorization on file .
+NORMAL TEST RESULTS AB RANGE UNITS SITE continued <START:LabTest> MCHC <END> 31.7 L 32.5-36.5 % .
+<START:LabTest> RDW <END> 21.1 H 11.6-14.8
+5'6 <START:LabTest> PLATELET COUNT <END> 486 H 150-400 THOU/CU MM <START:LabTest> LYMPH56 <END> .
+14.0 12.0-40.0
+% .
+<START:LabTest> MON096 <END> .
+0.8 L 4.0-12.0
+5'6 <START:LabTest> NEUT96 <END> .
+83.5 H 40.0-74.0
+5'6 <START:LabTest> EOSIN96 <END> .
+0.3 0.0-8.0
+5'6 <START:LabTest> BAS056 <END> .
+1.4 0.0-2.0
+% .
+<START:LabTest> ABSOLUTE LYMPH <END> 1.3 1.0-4.0
+THOU/CU MM <START:LabTest> ABSOLUTE MONO <END> 0.1 0.1-0.7 THOU/CU MM <START:LabTest> ABSOLUTE NEUT <END> 7.5 1.5-8.0
+THOU/CU MM <START:LabTest> ABSOLUTE EOS <END> 0.0 0.0-0.6
+THOU/CU MM <START:LabTest> ABSOLUTE BASO <END> 0.1 0.0-0.2
+THOU/CU MM MOLECULAR DX REFERRED TESTS COLLECTED 11/11/2011 10:13 CMV DNA DETECTION , QUAN SEE BELOW Test Result Flag Unit RefValue <START:LabTest> CMV DNA Detect/Quant , P <END> .z137
+IU/mL Undetected Result in log IU/mL is <2.14 .
+CMV DNA level detected is <137 IU/mL ( 2.14 log IU/mL ) .
+This assay cannot accurately quantify CMV DNA below this level .
+ADDITIONAL INFORMATION ( continued on next page ) KEY FOR MICRO RESULTS : - NEW RESULT FOR RESULTS AND INFORMATION CALL 847-847-8470 ** Key Site Codes 0=Evanston 1=Glenbrook 2 or 3=Highland Park 6=Okokie Hospital Hospital Hospital Director : K.Evanston , M.D. Director : R. Glenview , M.D. Director : J. Park , OUTPATIENT LAB REPORT Hospital Director : R. Skokie , M.D. Printed : 11/11/2011 11:11 PAGE : 1
+
+Nov 09 09:09:09 2014 Page 2 of 6 PAGE : I CLINICAL LABORATORY REPORT Regist .
+Date : 11/11/2011 PATIENT : DOE,DEAN D MED REC .
+# : 26262626 DOB : 06/06/1950 AGE : 61Y ACCOUNT.
+# : 26262626 SEX : M LOC : OP Doctor : DOE , JANG PHYSICIAN COPY FOR DR : BRAIN , MANDELA ********************* TEST PERFORMED AT CLINIC LABORATORIES ********************* 11/11/11 0846 {MA} Cyclosporine , Blood <START:LabTest> Cyclosporine <END> : L 38 Reference range : 100 to 400 ( Trough ) Unit : ng/mL *************************** ************************** CANCELLED TESTS 11/11/11 0846 CANCELLED : SEND OUT TEST REASON : DUPLICATE ORDER {MA} 1Performed at Clinic , 222 First St . SW , Rochester , MN 55905 M.R. # : 26262626 Print Date-Time : 11/11/2011 -09:55 ** OUTPATIENT NEW ACTIVITY REPORT ** PATIENT : DOE,DEAN D
+Nov 09 09:09:09 2014 Page 3 of 6 PAGE : 1 CLINICAL LABORATORY REPORT Regist .
+Date : 11/11/2011 PATIENT : DOE,ANNE D MED REC .
+# : 26262627 DOB : 06/06/1960 AGE : 51Y ACCOUNT.
+# : 26262627 SEX : F LOC : OP Doctor : DOE , JANG PHYSICIAN COPY FOR DR : BRAIN , MANDELA ********************* TEST PERFORMED AT CLINIC LABORATORIES ********************* 11/11/11 1716 Cyclosporine , Blood <START:LabTest> Cyclosporine <END> : L <25 Reference range : 100 to 400 ( Trough ) Unit : ng/mL {MA} ************************** CANCELLED TESTS *************************** 11/11/11 1716 CANCELLED : SEND OUT TEST REASON : DUPLICATE ORDER NO MAILER {MA} 1Performed at Clinic , 222 First St . SW , Rochester , MN 55905 M.R. # : 26262627 Print Date-Time : 11/11/2011 -09:55 ** OUTPATIENT NEW ACTIVITY REPORT ** PATIENT : DOE,ANNE D
+Nov 09 09:09:09 2014 Page 4 of 6 PAGE : 1 CLINICAL LABORATORY REPORT Regist .
+Date : 11/11/2011 PATIENT : DOE,DEAN D MED REC .
+# : 26262626 DOB : 06/06/1950 AGE : 61Y ACCOUNT.
+# : 26262626 SEX : M LOC : OP Doctor : DOE , JANG PHYSICIAN COPY FOR DR : BRAIN , MANDELA ********************* TEST PERFORMED AT CLINIC LABORATORIES ********************* 11/11/11 0846 Cyclosporine , Blood <START:LabTest> Cyclosporine <END> : L 38 Reference range : 100 to 400 ( Trough ) Unit : ng/mL {MA} ************************** CANCELLED TESTS *************************** 11/11/11 0846 CANCELLED : SEND OUT TEST REASON : DUPLICATE ORDER {MA} 1Performed at Clinic , 222 First St . SW , Rochester , MN 55905 M.R. # : 26262626 Print Date-Time : 11/11/2011 -09:55 ** OUTPATIENT NEW ACTIVITY REPORT ** PATIENT : DOE,DEAN D
+Nov 09 09:09:09 2014 Page 5 of 6 PAGE : 1 CLINICAL LABORATORY REPORT Regist .
+Date : 11/11/2011 PATIENT : DOE,IAN D MED REC .
+# : 26262628 DOB : 06/06/1951 AGE : 60Y ACCOUNT.
+# : 26262628 SEX : M LOC : OP Doctor : DOE , JANG PHYSICIAN COPY FOR DR : BRAIN , MANDELA ********************************* General Laboratory ********************************* DAY : 1 DATE : 11/11/11 TIME : 0848 RANGE UNITS <START:LabTest> Potassium <END> 4.1 3.5-5.1 mmol/L <START:LabTest> BUN <END> 17 7-18 mg/dL <START:LabTest> Creatinine <END> 0.9 0.6-1.0
+mg/dL <START:LabTest> eGFR Non-Afr Amer <END> >60 >60 mls/min <START:LabTest> eGFR Afr Amer <END> >60 >60 mls/min <START:LabTest> Glucose <END> 83 70-99 mg/dL Postprandial 12 <START:LabTest> WBC <END> 6.9 3.8-10.7 k/uL <START:LabTest> HCT <END> 36.5 35.0-46.0
+% <START:LabTest> Amylase <END> 68 25-115 U/L <START:LabTest> Lipase <END> 230 73-393 U/L ************************************* CHEMISTRY ************************************** DAY : 1 DATE : 11/11/11 TIME : 0848 RANGE UNITS mg/dL <START:LabTest> Hgb Alc <END> 5.1 <START:LabTest> Est . <END>
+<START:LabTest> Avg Glucose <END> 100 4.5-6.2
+M.R. # : 26262628 Print Date-Time : 11/11/2011 -09:55 ** OUTPATIENT NEW ACTIVITY REPORT ** PATIENT : DOE,IAN D
+
+MC HOSPITAL 4444 Medical Center Drive , McHenry , Illinois 60050 (888 ) 777-7777 INTERIM REPORT 11/11/2011 11:11 DOB : 02/02/1972 AGE : 39Y SEX : F NAME : DOE,ISELDA MR# : IC989898 ACCT# : 20120120 PHYS : M4M4M4 COLL : 11/11/2011 11:11 REC : 11/11/2011 11:11 PHYS : BRAIN,MANDELA MD mg/dL H 63 [8-21] **NOTE NEW REFERENCE RANGE STARTED 08/28/2014 <START:LabTest> BUN <END> CREATININE SERUM <START:LabTest> CREATININE <END> H 3.48 [0.47-1.15 ]
+mg/dL <START:LabTest> GFR CALCULATION <END> L 14 [>60] mL/min/1.73m2
+If the patient is African-American , Please multiply this result by 1.21 .
+This result has been calculated assuming the patient is non - African American .
+<START:LabTest> GLUCOSE <END> 83 [75-99] mg/dL <START:LabTest> POTASSIUM <END> 4.3 [3.5-5.1]
+mmol/L <START:LabTest> HCT <END> L 26.5 [36-46] % <START:LabTest> WBC <END> 4.5 [4.1-11.0]
+10x3/uL TACROLIMUS <START:LabTest> TACROLIMUS <END> 6.4 [A] Unit : ng/mL ( NOTE ) Therapeutic Range : Kidney transplant : 0-3 months post-transplant : 7.0-20.0
+ng/mL 3 months and older : 5.0-15.0
+ng/mL Liver transplant : 1-12 months post-transplant : 5-20 ng/mL Heart transplant : 0-3 months post-transplant : 10.0-20.0
+ng/mL 3 months and older : 5.0-15.0
+ng/mL Toxic value : Greater than 25 ng/m I Therapeutic range is based on a whole blood specimen drawn 12 hours post-dose or prior to next dose ( the trough ) .
+The optimal therapeutic range for a given patient may differ from this suggested range based on the indication for therapy , treatment phase ( initiation or maintenance ) , use in combination with other drugs , time of specimen collection relative to prior dose , type of transplanted organ , and/or the therapeutic approach of the transplant center .
+CONTINUED PAGE 1 DOE,ISELDA
+
+Community HOSPITAL N44 W1616 Menomonee Ave Menomonee Falls WI 53051 Phone : 255-255-3255 Patient : DOB : Age : Loc : Pt Ph : Jacobi , Job 05/05/1950 50 years Male 70P 1231231131 Healthcare that works Dr : Medman , Gary W. Healthcare N44 W1616 Menomonee Ave Menomonee Falls WI 53051 Adm Dr : Medman , Gary W. Ord Dr : Medman , Gary W. Addl : Chemistry - Blood Collected Date : 10/13/2000 Collected Time : 07 :00:00 Procedure Units Ref Range <START:LabTest> Creatinine <END> 1.04 mg/dL [0.70-1.30]
+<START:LabTest> eGFR for African Americans i <END> >60 mL/min/1.73
+sqm <START:LabTest> eGFR for Non-African Americans <END> >60 mL/min/1.73
+sqm 10/13/2008 07 :54:00 eGFR for African Americans : Persistent reduction for 3 months or more in an eGFR <60 ml/min/1.73
+square meter defines CKD.
+Patients with eGFR values >=60 mL/min/1.73
+square meter may also have CKD if evidence of persistent proteinuria is present .
+The eGFR calculation applies only to patients between 18 and 70 years of age .
+Legend : * = Abnormal C = Critical i = Interp Data e= Edited/Corrected L = Low H = High t = Reference Lab f = Footnotes Patient : Jacobi , Job MR # : (606060)050505 FIN # : 308308308 Page : 1 of 1 Printed : 10/13/2000 9:00 AM Interim-Any
+
+0,Pinpoint 1 ) AGNOSTICS PATIENT INFORMATION DOE,NEAL REPORT STATUS FAX COPY PINPOINT DIAGNOSTICS INCORPORATED CLIENT SERVICE 800.323.3237
+ORDERING PHYSICIAN DOB : 10/10/1935 AGE : 75 DOE,SCOTT GENDER:M SPECIMEN INFORMATION SPECIMEN : WX17171 REQUISITION : 999999 CLIENT INFORMATION C22622622 INTERNISTS OF NEW BERLIN ID : 10001000M PHONE : 571.571.5719
+COLLECTED : 10/10/2010 10:10 CT RECEIVED : 10/10/2010 10:10 CT REPORTED : 10/10/2010 10:10 CT COMMENTS : FASTING Lab CB CB CB CB Test Name In Range Out of Range Reference Range LIPID PANEL <START:LabTest> TRIGLYCERIDES <END> <START:LabTest> CHOLESTEROL , TOTAL <END> <START:LabTest> HDL CHOLESTEROL <END> <START:LabTest> LDL-CHOLESTEROL <END> 97 <150 mg/dL 135 125-200 mg/dL 60 > OR = 46 mg/dL 56 <130 mg/dL ( calc ) DESIRABLE RANGE <100 MG/DL FOR PATIENTS WITH CHD OR DIABETES AND <70 MG/DL FOR DIABETIC PATIENTS WITH MOWN HEART DISEASE.
+< OR = 5.0 ( calc ) <START:LabTest> CHOL/HDLC RATIO <END> 2.3 CB <START:LabTest> AST <END> 33 10-35 U/L CB HARD COPY TO FOLLOW PERFORMING LABORATORY INFORMATION CB PINPOINT DIAGNOSTICS WOOD DALE , 5555 MITTEL BOULEVARD , WOOD DALE , Laboratory Director : ANTHONY A. DOE , M.D. , CLIA : 14D14D14D2 IL 60191 6°A Page 1 - End of Report 10/10/10 05T2 # 700700 1/2
+
+PT : DOE , LYNN PHONE : 474-474-4747 DOB : 12/12/1959 SEX : F MR : ( 75757)57575757 LOC : OZ DEFAULT LOC ADMIT MD : MEDIMAN , MARK M ST.
+MARY 'S CAMPUS 11111 WASHINGTON ROAD MEQUON , WI 53097 REPORT FOR : DOE , NORINE CC : MEDIMAN , MARK M CLIN MR : ABN/CRIT DATE/TIME NORM UNITS REF.
+RANGE HEMATOLOGY 08/08/08 0833 <START:LabTest> HGB <END> <START:LabTest> HCT <END> <START:LabTest> RBC <END> GM/DL 12.0-16.0
+36.0-48.0
+M/UL 4.00-5.30
+246 K/UL 4.0-10.0
+K/UL 150-400 FL 9.0-13.0
+<START:LabTest> WBC <END> <START:LabTest> PLT <END> <START:LabTest> MPV <END> <START:LabTest> MCV <END> <START:LabTest> MCH <END> <START:LabTest> MCHC <END> <START:LabTest> RDW <END> 8.7 los ,p L H H FL 79.0-99.0
+PG 26.0-34.0
+GM/DL 32.0-36.0
+FL 38.0-50.0
+33 4,8 748 17-,9 4 Ir>3 ck 0 DIFFERENTIAL ( AUTOMATED ) <START:LabTest> NEUT <END> <START:LabTest> LYMPH <END> <START:LabTest> MONO <END> <START:LabTest> EOS <END> <START:LabTest> BASOS <END> <START:LabTest> ABS# NEUT <END> <START:LabTest> ABS# LYMPH <END> <START:LabTest> ABS# MONO <END> <START:LabTest> ABS# EOS <END> <START:LabTest> ABS# BASO <END> 42.0-76.0
+15.0-45.0
+4.0-12.0
+0.0-6.0
+0.0-2.0
+K/UL 1.6-7.6
+K/UL 1.1-4.0
+K/UL 0.3-1.0
+K/UL 0.0-0.6
+K/UL 0.0-0.2
+0 L Legend : L=Low , H=High DR NORINE N DOE ADV HEALTHCARE,INC 22222 CORPORATE PKWY MEQUON WI 53092 - CHART COPY INTERIM PRINTED : 08/08/08 0833 PAGE : 1 END OF CHART
+
+LIT 328-328-3280 Oct 08 08 :08 : 03 2008 PRINTED : 07 :13 08/08/2008 REC( .#48484848
+MU.
+CLIENT INFORMATION : ACCESSION # A448448448 PATIENT ID # ROUTE CODE : 9999 ADVANCED HEALTHCARE WALK IN 1070 RIVER LN GERMANTOWN , WI 53022 labora to ries 141300-877-8777 DATE OF BIRTH : 08/08/2000 AG E/SEX : 8 M COMPANY NAME : COLLECTION SITE : SPECIMEN TYPE : COLLECTED : 08/08/2008 9:18 RECEIVED : 08/08/2008 10:38 PHONE : ( 363 )363-3637 PATIENT NAME : DOE , BERT REFERRING CLIENT : ADVANCED HEALTHCARE ORDERING PHY : DOE,RICHARD LAB ID # 244422444 REFERENCE RANGE PERFORMING LAB : I TEST FLAG RESULT H 143 UNITS mg/dL 65-99 <START:LabTest> GLUCOSE <END> C <START:LabTest> HEMOGLOBIN A1C <END> H 7.5 4.5-5.9
+NON DIABETIC <6 % EXCELLENT CONTROL 6-7 % GOOD TO FAIR CONTROL >7-8 % SUBOPTIMAL GLYCEMIC CONTROL >8 % C {C} Test Performed At Laboratory 8901 WEST LINCOLN AVENUE WEST ALLIS , WI 53227 Legend : H=High, L=Low , @=Abnormal , *=Critical Value PAGE : 1 ***COMPREHENSIVE FINAL REPORT*** END OF REPORT
+
+From : Network Administrator MEDICAL HEALTH CENTERS 180 Town Hall Road Menomonee Falls , WI 53051 PH : 262-262-2629 FX : 262-262-2629 :c : DOE , ADELLE Provider : Collection Date : Received Date : Approval Date : DOE , ADELLE 08/08/08 9:00 AM 08/08/08 9:00 AM 08/08/08 9:00 AM Name/DOB : DOE , BLANE ( 12/12/32 ) Sample ID : 525525 Patient ID : 555555 Sex : F Age : 76 Outside Provider Fasting : No Items in this order include : Basic Metabolic Panel , venipuncture-sx [i] RESULT UNITS IN RANGE OUT OF RANGE REFERENCE RANGE TEST NAME Basic Metabolic Panel 135-145 3.5-5.0
+97-110 '22-33 5-14 5.0-20.0
+0.6-1.1 >60 patient eGFR <START:LabTest> Sodium <END> : 140' Petassiwil 4.6 <START:LabTest> Chloride <END> 102 CS.t-15tilDio5d4107.1 30 ' Andorichp .
+<START:LabTest> Blood Urea Nitrogen <END> <START:LabTest> Creatirdne <END> 1.1 <START:LabTest> Glomerular Filtration Rate ( Estimated ) <END> 08/08/08 08:08 AM For patients who have values mmol/L mmol/L mmol/L rarnol/lL ' =ion 27 .
+( H) mg/dL , nig/d1_ , 47 ( L ) mIlmin/1.73m2
+within the normal reference range , the "greater than 60 mL/min/1.73M2" .
+result is reported as eGFR Interpretive Guidelines : 30 - 59 = Stage 3 CKD ( chronic kidney disease ) , or moderate kidney disease .
+15 - 29 = Stage 4 CKD , or severe kidney disease <15 = Stage 5 CKD , or kidney failure NOTE : IF PATIENT IS AFRICAN-AMERICAN FINAL RESULT MUST BE MULTIPLIED BY 1.210 .
+The MDRD equation is used for this estimation .
+The eGFR is invalid if the serum creatinine is changing on a daily basis , as in dialysis patients or patients with acute renal failure , or if the patient is pregnant .
+If the patient is <18 years of age , or age/sex is reported that reads , "eGFR not calculated " .
+of the patient is unknown , a statement <START:LabTest> BUN/Creat Ratio <END> <START:LabTest> Glucose <END> 08/08/08 08:08 AM 25.0( H) RATIO mg/dL 12.0-20.0
+65-99 144 ( H) 2004 ADA GUIDELINES NORMAL FASTING GLUCOSE : < 100 MG/DL IMPAIRED : 100-125 MG/DL DIABETIC : > 126 MG/DL ( CONFIRMATION OF DIAGNOSIS IS REQUIRED ) Sample ID : 525525 This report continues ... ( Final )
+From : Network Administrator MEDICAL HEALTH CENTERS 180 Town Hall Road Menomonee Falls , WI 53051 PH : 262-262-2629 FX : 262-262-2629 :c : DOE , ADELLE Provider : Collection Date : Received Date : Approval Date : DOE , ADELLE 08/08/08 9:00 AM 08/08/08 9:00 AM 08/08/08 9:00 AM Name/DOB : DOE , BLANE ( 12/12/32 ) Sample ID : 525525 Patient ID : 555555 Sex : F Age : 76 TEST NAME RESULT UNITS IN RANGE OUT OF RANGE REFERENCE RANGE Basic Metabolic Panel ( cont 'd ) CORRELATION WITH FASTING STATUS IS ESSENTIAL .
+<START:LabTest> Calcium <END> mg/c1L 9.1 8.5-10.5 Sample ID : 525525 END OF REPORT ( Final ) Page 2
+
+ST. MARY 'S CAMPUS 11111 WASHINGTON ROAD MEQUON , WI 53097 PT : DOE , BEN B PHONE : 555-555-5555 DOB : 12/12/1940 SEX : M MR : ( 55555)55555555 LOC : OP SERVICES-COL ADMIT MD : PETER , PAUL REPORT FOR : DOE , NORINE CC : PETER , PAUL CLIN MR : DATE/TIME NORM ABN/CRIT UNITS REF.
+RANGE MARKER STUDIES 08/08/08 0833 TUMOR MARKER STUDIES <START:LabTest> TOTAL PSA <END> <START:LabTest> FREE PSA <END> % <START:LabTest> FREE PSA <END> TOTAL PSA 6.3 HF NG/ML 0.0-4.0
+1.3 NG/ML 21 LF 25 The Roche Modular E170 PSA method is used .
+Results obtained with different assay methods of kits cannot be used interchangeably .
+In patients with total PSA concentrations of 4-10 ng/mL , the probability of finding prostate cancer on needle biopsy by age in years is : % Free PSA RATIO 50-59 years 60-69 years 70 years and older 0-10 % 49 % 58 % 65 % 11-18 % 27 % 34 % 41 % 19-25 % 18 % 24 % 30 % >25 % 9 % 12 % 16 % Other factors may help determine the actual risk of prostate cancer in individual patients .
+% FREE PSA The Roche Modular E170 Free PSA method is used in conjunction with the Roche Modular E170 PSA method to determine the free PSA percentage .
+Legend : L=Low , H=High , F=Footnote DR NORINE N DOE CHART COPY INTERIM ADV HEALTHCARE,INC PRINTED : 08/08/08 0833 22222 CORPORATE PKWY PAGE : 1 MEQUON WI 53092 - END OF CHART
+
+PT : DOE , ELLEN PHONE : 777-777-7777 DOB : 12/12/1979 SEX : F MR : ( 77777)77777777 LOC : OZ DEFAULT LOC ADMIT MD : MANN , MARY ST.
+MARY 'S CAMPUS 11111 WASHINGTON ROAD MEQUON , WI 53097 REPORT FOR : DOE , NORINE CC : DOE , JENNIFER CLIN MR : DATE/TIME NORM ABN/CRIT UNITS REF.
+RANGE CHEMISTRY 08/08/08 0833 <START:LabTest> CALCIUM <END> 9.5 <START:LabTest> GFR AFRO AMER <END> 122 <START:LabTest> GFR NON AF AM <END> 101 F GFR NON AF AM The estimated GFR is based on a f formula is valid only for adults eGFR with caution on the elderly Estimated GFR units are mL/min/1 .
+MG/DL 8.4-10.2
+our parameter MDRD equation .
+The MDRD GFR ages 18 years and older .
+Interpret the ( > 70 years ) .
+73 sqm .
+Stage 1:GFR : >=90 Stage 2:GFR : 60-89 Stage 3:GFR : 30-59 Stage 4:GFR : 15-29 Stage 5:GFR : <=14 Stage 6:GFR : <=14 Normal kidney function Mildly reduced kidney function Moderately reduced kidney function Severely reduced kidney function Very severe or end stage kidney failure w/o dialysis Very severe or end stage kidney failure with dialysis H MG/DL MG/DL L MG/DL <START:LabTest> GLUCOSE <END> <START:LabTest> BUN <END> <START:LabTest> CREATININE <END> 70-99 8-21 0.7-1.3
+ELECTROLYTES/BLOOD GASES 08/08/08 0833 <START:LabTest> SODIUM <END> <START:LabTest> POTASSIUM <END> <START:LabTest> CHLORIDE <END> <START:LabTest> TOTAL CO2 <END> <START:LabTest> ANION GAP <END> L MMOL/L MMOL/L L MMOL/L MMOL/L MMOL/L 136-145 3.5-5.1 98-107 23-29 4-14 14 Legend : L=Low , H=High , F=Footnote DR NORINE N DOE ADV HEALTHCARE,INC 22222 CORPORATE PKW MEQUON WI 53092 - CHART COPY INTERIM PRINTED : 08/08/08 PAGE : 1 END OF CHART 0833
+
+Oct 08 08 :08 :03 2008 LAB 328-328-3280 PRINTED : 07 :13 07/07/2010 REQg48484848 lp ACCESSION # A448448.448
+PATIENT ID # COMPANY NAME : COLLECTION SITE : SPECIMEN TYPE : CLIENT INFORMATION : ROUTE CODE : 9999 ADVANCED HEALTHCARE WALK IN 1070 RIVER LN GERMANTOWN , WI 53022 I b o ra to ries Chicago , IL Milwaukee , WI 1-800-877-8777 DATE OF BIRTH : 07/07/1948 AG E/SEX : 59 M COLLECTED : 07/07/2010 9:18 RECEIVED : 07/07/2010 10:38 PHONE : ( 363 ) 363-3637 PATIENT NAME : DOE , MIKE REFERRING CLIENT : ADVANCED HEALTHCARE ORDERING PHY : DOE , WALKER LAB ID # 244422444 TEST FLAG RESULT UNITS REFERENCE RANGE PERFORMING LAB : COMP METABOLIC PNL <START:LabTest> SODIUM <END> <START:LabTest> POTASSIUM <END> <START:LabTest> CHLORIDE <END> <START:LabTest> CARBON DIOXIDE <END> <START:LabTest> ANION GAP <END> <START:LabTest> GLUCOSE <END> <START:LabTest> BUN <END> <START:LabTest> CREATININE <END> <START:LabTest> GFR EST.AFRICAN AMER <END> Units = mL/min/1.73m2
+<START:LabTest> GFR EST.NONAFRI AMER <END> Units = mL/min/1.73m2
+<START:LabTest> BUN/CREATININE RATIO <END> <START:LabTest> BILIRUBIN TOTAL <END> <START:LabTest> GOT/AST <END> <START:LabTest> ALK PHOSPHATASE <END> <START:LabTest> ALBUMIN <END> <START:LabTest> PROTEIN , TOTAL <END> <START:LabTest> GLOBULIN <END> <START:LabTest> A/G RATIO <END> <START:LabTest> CALCIUM <END> <START:LabTest> GPT/ALT <END> mmol/L mmol/L mmol/L mmol/L mmol/L mg/dL mg/dL mg/dL 139 4.0 104 28 12 102 14 0.8 >60 135-145 3.5-5.1 98-107 22-30 10-20 65-99 10-20 0.6-1.1 >59 >59 7-25 <1.4 8-39 38-126 3.5-5.0
+6.0-8.2 2.0-4.0 1.0-2.4
+8.4-10.2
+9-52 C C C C C C C C C C C C C C C C C C C C C C H >60 18 0.5 25 82 4.1 7.1 2.9 1.4 9.2 35 mg/dL Units/L Units/L g/dL g/dL g/dL mg/dL Units/L LIPID PANEL TA/REFLEX <START:LabTest> FASTING STATUS <END> 12.0 <START:LabTest> CHOLESTEROL <END> 187 hrs mg/dL 100-200 DESIRABLE BORDERLINE HIGH HIGH <200 200-239 >=240 71 mg/dL >39 LOW HIGH H=High, L=Low , @=Abnormal , *=Critical Value ***COMPREHENSIVE FINAL REPORT*** <START:LabTest> HDL <END> C <40 >=60 Legend : PAGE : 1 REPORT CONTINUED
+1-111,1 OLO-OLO-OLO U UCt 08 08:08:03 2008 CLIENT INFORMATION : r.gX .
+PRINTED : 07 :13 07/07/2010 RB1#48484848 ACCESSION # A448448448 PATIENT ID # ROUTE CODE : 9999 ADVANCED HEALTHCARE WALK IN 1070 RIVER LN GERMANTOWN , WI 53022 I b o ra to ries Chicago , IL Milwaukee , WI 14100-877-8777 DATE OF NUN : 07/07/1948 AGESEK : 59 M COMPANY NAME : COLLECTION SITE : SPECIMEN TYPE : COLLECTED : 07/07/2010 9:18 RECEIVED : 07/07/2010 10:38 PATIENT NAME : PHONE : ( 363 )363-3637 DOE , MIKE REFERRING CLIENT : ADVANCED HEALTHCARE \ORDERING PHY : DOE , WALKER LAB ID # 2444 22444 PERFORMING LAB : TEST FLAG RESULT UNITS REFERENCE RANGE <START:LabTest> TRIGLYCERIDE <END> <START:LabTest> LDL <END> 164 mg/dL <150 83 mg/dL <130 OPTIMAL NEAR OPTIMAL BORDERLINE HIGH HIGH VERY HIGH C C <100 100-129 130-159 160-189 >=190 <START:LabTest> NON-HDL CHOL <END> 116 mg/dL THERAPEUTIC TARGET CHD AND RISK EQUIVALENTS MULTIPLE RISK FACTORS 0-1 RISK FACTORS C <130 <160 <190 <START:LabTest> CHOLESTEROL/HDL <END> 2.6 <4.5 C <START:LabTest> TSII <END> II 6.34 mcUnits/mL 0.35-5.00
+C {C} Test Performed At ACL-WI Central Laboratory 8901 WEST LINCOLN AVENUE WEST ALLIS , WI 53227 REPRINT 10/04/2008 10:06 Legend : H=High, L=Low , @=Abinormal , *=Critioal Value ***COMPREHENSIVE FINAL REPORT*** PAGE : 2 END OF REPORT
+
+CHHS 8/8 /2008 9:42:32 PM Fax Server CHILDREN 'S HOSPITAL 9999 WISCONSIN AVE.
+MILWAUKEE , WI. 53201 414-414-4140 LOC : LAB ROOM : PRINTED : 09/09/2009 21:41 NAME : DOE,TOM SEX : M DOB : 10110/1999 MR : 48484848 VISIT4 : 42424242 ADM : 09/09/2009 MD : LAB PHYSICIAN COPY FOR DR : PHYSICSTEIN,CAROL M99999 COLL : 09/09/2009 16 :00 REC : 08/08/2008 16 :16 PHYS:PHYSICSTEIN,CAROL URINE MACROSCOPIC <START:LabTest> URINE COLOR <END> YELLOW <START:LabTest> URINE CLARITY <END> CLEAR <START:LabTest> URINE GLUCOSE <END> NEG [NEG] mg/dL THIS TEST IS SPECIFIC FOR GLUCOSE.
+SUGGEST REDUCING SUBSTANCE URINE TO DETECT REDUCING SUBSTANCES OTHER THAN GLUCOSE.
+<START:LabTest> URINE BILIRUBIN <END> NEG [NEG] <START:LabTest> URINE KETONES <END> NEG [NEG] <START:LabTest> SPEC GRAVITY URINE <END> 1.010 [1.001-1.035]
+<START:LabTest> URINE PH <END> 8.5 [5.0-9.0]
+<START:LabTest> URINE PROTEIN <END> NEG [NEG] mg/dL <START:LabTest> URINE UROBILINOGEN <END> 0.2 [0.2-1.0]
+EU/dL <START:LabTest> URINE NITRITES <END> NEG [NEG] <START:LabTest> URINE BLOOD <END> NEG [NEG] <START:LabTest> URINE LEUKOCYTES <END> NEG [NEG] DEPARTMENT OF PATHOLOGY AND LABORATORY MEDICINE INTERIM REPORT C.PHYSICSTEIN , M.D. DIRECTOR DOE,TOM
+
+From : Network Administrator MEDICAL HEALTH CENTERS 180 Town Hall Road Menomonee Falls , WI 53051 PH : 262-262-2629 FY : 262-262-2629 cc : DOE , ADELLE Provider : Collection Date : Received Date : Approval Date : DOE , ADELLE 02/02/08 9:00 AM 02/02/08 9:00 AM 02/02/08 9:00 AM Name/DOB : DOE. , ANNA ( 12112/23 ) Sample ID : 525525 Patient ID : SSSSSS Sex : F Age : 85 Outside Provider Fasting : No Items in this order include : Thyroid Stimulating Hormone , Venipuncture-ME [i] , Free T4 Items in this order include : Thyroid Stimulating Hormone , Venipuncture-ME [i] TEST NAME RESULT IN RANGE OUT OF RANGE UNITS REFERENCE RANGE Thyroid Stimulating Hormone <START:LabTest> Thyroid Stimulating Hormone <END> Free T4 <START:LabTest> Free T4 <END> < or = 0.015 ( A ) 0.465-4.680
+2.00 ng/dL 0.78-2.19
+Sample ID : 525525 This report continues .. : ( Final )
+
+09:09 MAY 21 , 2009 FAX NO : 1 0353535 RUN DATE : 08/08/08 RUN TIME : 0848 HealthCare Laboratory PAGE 1 PHYSICIAN Doe,Bharat B MD Name : DOE,SANDI Acct# : G1414111141 Reg : 08/08/08 Home Phone : ( 299)111-1111 DOB/S : 11/11/1925/F Attend Dr : Doe,Bharat B MD Status : REG CLI Location : LAB FMG Unit# : D050505 SPEC # : 2242:R22424R COLL : 08/08/08-1520 STATUS : RECD REQ # : 599599599 RECD : 08/08/08-1522 SUBM DR : Doe,Bharat B MD ENTERED : 08/08/08-1509 OTHR DR : ORDERED : FT3 ( T3FREE ) Test Result Flag Reference Site FT3 ( T3FREE ) 1 PENDING SPEC # : 2242:R224245R COLL : 08/08/08-1520 STATUS : COMP REQ # : 599599599 RECD : 08/08/08-1522 SUBM DR : Doe,Bharat B MD ENTERED : 08/08/08-1509 ORDERED : TSH , FT4 OTHR DR : Test Result Flag Reference Site <START:LabTest> TSH <END> <START:LabTest> FT4 <END> 84.67 0.35-5.50
+uIU/mL 0.89-1.76
+ng/dL H L 0.28 ** END OF REPORT **
+09:09 MAY 21 , 2009 FAX NO : 1 0353535 RUN DATE : 08/08/08 RUN TIME : 0848 HealthCare Laboratory PAGE 1 PHYSICIAN Doe,Bharat B MD Name : DOE,SANDI Acct# : G1414111141 Reg : 08/08/08 Home Phone : ( 299)111-1111 DOB/S : 11/11/1925/F Attend Dr : Doe,Bharat B MD Status : REG CLI Location : LAB FMG Unit# : D050505 SPEC # : 2242:R22424R COLL : 08/08/08-1520 STATUS : RECD REQ # : 599599599 RECD : 08/08/08-1522 SUBM DR : Doe,Bharat B MD ENTERED : 08/08/08-1509 OTHR DR : ORDERED : FT3 ( T3FREE ) Test Result Flag Reference Site L I 2.3-4.2
+pg/mL I LCA <START:LabTest> FREE T3 <END> 1.1 Testing performed at : Laboratories 999 Wisconsin Ave .
+Milwaukee , WI 53222 CARE LABORATORIES 999 Wisconsin Avenue , Milwaukee , WI 53226 ** END OF REPORT **
+

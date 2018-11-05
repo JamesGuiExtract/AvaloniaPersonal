@@ -57,6 +57,9 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
+    <Reference Include="IKVM.OpenJDK.Core, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -100,8 +103,14 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
+    <Reference Include="OpenNLP.IKVM, Version=1.8.1.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\APIs\OpenNLP.IKVM.1.8.1\lib\OpenNLP.IKVM.exe</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
@@ -116,6 +125,10 @@
     <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
       <Project>{6dd0855c-6031-49f4-874c-667f3a576345}</Project>
       <Name>Extract.AttributeFinder</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\AttributeFinder\Rules\Core\Code\Extract.AttributeFinder.Rules.csproj">
+      <Project>{52C53912-5790-4F68-AB57-6CBC3EF45A14}</Project>
+      <Name>Extract.AttributeFinder.Rules</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
@@ -164,6 +177,7 @@
     <EmbeddedResource Include="Resources\MLModelTrainerSettings.txt" />
     <EmbeddedResource Include="Resources\docClassifier.lm" />
     <EmbeddedResource Include="Resources\Example02.tif.uss" />
+    <EmbeddedResource Include="Resources\ComponentTrainingTestingData.txt" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

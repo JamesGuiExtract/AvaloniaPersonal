@@ -1,4 +1,5 @@
 ﻿using Extract.AttributeFinder;
+using Extract.AttributeFinder.Rules;
 using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
@@ -7,12 +8,13 @@ using Extract.UtilityApplications.TrainingDataCollector.Test;
 using LearningMachineTrainer;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using opennlp.tools.namefind;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
@@ -91,7 +93,7 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
 
         // Helper function to put resource test files into a DB
         // These images are from Demo_FlexIndex
-        private static void CreateDatabase()
+        private static void CreateDatabase(IEnumerable<string> data = null)
         {
             // Create DB
             var fileProcessingDB = _testDbManager.GetNewDatabase(_DB_NAME);
@@ -119,7 +121,12 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
             }
 
             var rng = new Random();
-            foreach (int i in Enumerable.Range(0, 100))
+            if (data == null)
+            {
+                data = Enumerable.Range(0, 100).Select(i => UtilityMethods.FormatInvariant($"{i}\r\n"));
+            }
+
+            foreach (string s in data)
             {
                 using (var cmd = connection.CreateCommand())
                 {
@@ -127,7 +134,7 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                     SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
                     FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName";
                     cmd.Parameters.AddWithValue("@IsTrainingData", (rng.Next(2) == 0));
-                    cmd.Parameters.AddWithValue("@Data", UtilityMethods.FormatInvariant($"{i}\r\n"));
+                    cmd.Parameters.AddWithValue("@Data", s);
                     cmd.Parameters.AddWithValue("@ModelName", _MODEL_NAME);
                     cmd.Parameters.AddWithValue("@FileName", "dummy");
 
@@ -217,35 +224,35 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
 
         // Test that both training and testing processes run without error
         [Test, Category("MLModelTrainer")]
-        public static void DummyCommands()
+        public static void NERTrainingAndTesting()
         {
             try
             {
-                CreateDatabase();
+                var dataFile = _testFiles.GetFile("Resources.ComponentTrainingTestingData.txt");
+                var data = File.ReadAllLines(dataFile);
+                CreateDatabase(data);
 
-                var trainingExe = Path.Combine(_inputFolder.Last(), "train.bat");
-                var testingExe = Path.Combine(_inputFolder.Last(), "test2.bat");
-                _testFiles.GetFile("Resources.train.bat", trainingExe);
-                _testFiles.GetFile("Resources.test2.bat", testingExe);
                 using (var dest = new TemporaryFile(false))
                 {
                     var trainer = new MLModelTrainer
                     {
                         ModelName = _MODEL_NAME,
                         ModelDestination = dest.FileName,
-                        TrainingCommand = trainingExe.Quote() + " \"<TempModelPath>\"",
-                        TestingCommand = testingExe.Quote() + " \"<TempModelPath>\"",
                         MaximumTrainingRecords = 10000,
                         MaximumTestingRecords = 10000,
                         DatabaseServer = "(local)",
-                        DatabaseName = _DB_NAME
+                        DatabaseName = _DB_NAME,
+                        MinimumF1Score = 0.5,
+                        LastF1Score = 0
                     };
 
                     trainer.Process(CancellationToken.None);
 
-                    var expected = "Training Result:\r\nTraining\r\n";
-                    var testingOutput = File.ReadAllText(dest.FileName);
-                    Assert.AreEqual(expected, testingOutput);
+                    using (var zipArchive = ZipFile.Open(dest.FileName, ZipArchiveMode.Read))
+                    {
+                        var model = zipArchive.GetEntry("nameFinder.model");
+                        Assert.NotNull(model);
+                    }
                 }
             }
             finally
@@ -366,28 +373,35 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
         {
             try
             {
-                CreateDatabase();
+                var dataFile = _testFiles.GetFile("Resources.ComponentTrainingTestingData.txt");
+                var data = File.ReadAllLines(dataFile);
+                CreateDatabase(data);
 
-                var trainingExe = Path.Combine(_inputFolder.Last(), "train.bat");
-                _testFiles.GetFile("Resources.train.bat", trainingExe);
                 using (var dest = new TemporaryFile(".etf", false))
                 {
                     var trainer = new MLModelTrainer
                     {
                         ModelName = _MODEL_NAME,
                         ModelDestination = dest.FileName,
-                        TrainingCommand = trainingExe.Quote() + " \"<TempModelPath>\"",
-                        TestingCommand = null,
                         MaximumTrainingRecords = 10000,
+                        MaximumTestingRecords = 10000,
                         DatabaseServer = "(local)",
-                        DatabaseName = _DB_NAME
+                        DatabaseName = _DB_NAME,
+                        MinimumF1Score = 0.5,
+                        LastF1Score = 0
                     };
 
                     trainer.Process(CancellationToken.None);
 
-                    var expected = new byte [] { 134, 229, 5, 229, 22, 201, 81, 37, 94, 70, 57, 40, 127, 77, 225, 36 };
-                    var trainingOutput = File.ReadAllBytes(dest.FileName);
-                    CollectionAssert.AreEqual(expected, trainingOutput);
+                    // Confirm that the output is not a model file (is not a valid zip file)
+                    Assert.Throws(typeof(InvalidDataException), delegate
+                    {
+                        using (var zipArchive = ZipFile.Open(dest.FileName, ZipArchiveMode.Read)) { }
+                    });
+
+                    // Confirm that it can be loaded by the NERF (and so does contain an encrypted model)
+                    var model = NERFinder.GetModel(dest.FileName, strm => new TokenNameFinderModel(strm));
+                    Assert.NotNull(model);
                 }
             }
             finally

@@ -639,7 +639,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
         #region IConfigSettings implementation
 
         /// <summary>
-        /// Displays configuration dialog for the NERTrainer
+        /// Displays configuration dialog for the MLModelTrainer
         /// </summary>
         /// <returns><c>true</c> if configuration was accepted, <c>false</c> if it was not</returns>
         public bool Configure()
