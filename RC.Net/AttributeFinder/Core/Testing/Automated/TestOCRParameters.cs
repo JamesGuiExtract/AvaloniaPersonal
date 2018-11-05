@@ -1,14 +1,10 @@
 ﻿using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
-using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using UCLID_AFCORELib;
-using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
-using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 
 
 namespace Extract.AttributeFinder.Test

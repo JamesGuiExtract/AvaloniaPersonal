@@ -131,6 +131,22 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(features.Length, answers.Length);
         }
 
+        // Test using a filter that matches the same attribute by type and by name
+        // https://extract.atlassian.net/browse/ISSUE-14761
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void PaginationWithMultipleMatchFilter()
+        {
+            int expectedFeatureVectorLength = 32;
+            SetPaginationFiles();
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, attributeFilter: "DOBDiff02|*@Feature|*@EnsureAFQuery{*}");
+            encoder.ComputeEncodings(_ussFiles, _voaFiles, _eavFiles);
+            Assert.AreEqual(expectedFeatureVectorLength, encoder.FeatureVectorLength);
+
+            Assert.AreEqual(16, encoder.AttributeFeatureVectorizers.Count());
+            Assert.That(encoder.AttributeFeatureVectorizers.All(fv => fv.FeatureType == FeatureVectorizerType.Numeric));
+            Assert.That(encoder.AttributeFeatureVectorizers.Any(fv => fv.Name == "DOBDiff02"));
+        }
+
         // Test where there is a negated attribute filter used to get the same results as a positive filter
         [Test, Category("LearningMachineDataEncoder")]
         public static void PaginationWithNegatedAttributeFilter()
