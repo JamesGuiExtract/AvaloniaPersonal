@@ -803,8 +803,13 @@ EXPORT_BaseUtils CTime FromDateTimeStringWithTimeZoneAdjustment(string strDate)
 	FILETIME fileTime;
 	SystemTimeToFileTime(&st, &fileTime);
 
+	// Determine if Daylight savings is in effect
+	// https://extract.atlassian.net/browse/ISSUE-15325
+	TIME_ZONE_INFORMATION tzi;
+	DWORD daylight = GetTimeZoneInformation(&tzi);
+
 	// Create the CTime object from the file time
-	CTime timeValue(fileTime);
+	CTime timeValue(fileTime,(daylight == TIME_ZONE_ID_DAYLIGHT) ? 1 : 0);
 	 
 	// Adjust for timezone 
 	CTimeSpan ts(0, abs(nTZHours), nTZMin, 0);

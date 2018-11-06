@@ -46,7 +46,8 @@ void DBCounterChangeValue::LoadFromFields(FieldsPtr ipFields, bool bValidateHash
 		m_nToValue = getLongField(ipFields, "ToValue");
 		rnToValue = m_nToValue; 
 		m_nFromValue = getLongField(ipFields, "FromValue");
-		m_ctUpdatedTime = getTimeDateField(ipFields, "LastUpdatedTime");
+		string tempDate = getStringField(ipFields, "LastUpdatedTime");
+		m_ctUpdatedTime = getTimeDateField(ipFields, "LastUpdatedTime", true);
 
 		// This field could be null 
 		if (isNULL(ipFields, "LastUpdatedByFAMSessionID"))
@@ -71,6 +72,10 @@ void DBCounterChangeValue::LoadFromFields(FieldsPtr ipFields, bool bValidateHash
 			{
 				UCLIDException ue("ELI38929", "Counter Value change Hash value is invalid.");
 				ue.addDebugInfo("SecureCounterValueChangeID", m_nID);
+				ue.addDebugInfo("CalculatedHash", nCalculatedHash, true);
+				ue.addDebugInfo("ExpectedHash", m_llHashValue, true);
+				ue.addDebugInfo("UpdatedTime", m_ctUpdatedTime.FormatGmt("%Y-%m-%d %H:%M:%S %z").operator LPCSTR(), true);
+				ue.addDebugInfo("UpdatedTimeAsStringFromDB", tempDate, true);
 				throw ue;
 			}
 		}

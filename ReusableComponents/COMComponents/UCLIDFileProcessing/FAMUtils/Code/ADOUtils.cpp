@@ -387,7 +387,14 @@ CTime getTimeDateField(const FieldsPtr& ipFields, const string& strFieldName, bo
 				{
 					FILETIME fileTime;
 					SystemTimeToFileTime(&systemTime, &fileTime);
-					CTime checkFromFileTime(fileTime);
+
+					// Determine if Daylight savings is in effect
+					// https://extract.atlassian.net/browse/ISSUE-15325
+					TIME_ZONE_INFORMATION tzi;
+					DWORD daylight = GetTimeZoneInformation(&tzi);
+
+					// Create the CTime object from the file time
+					CTime checkFromFileTime(fileTime, (daylight == TIME_ZONE_ID_DAYLIGHT) ? 1 : 0);
 					return checkFromFileTime;
 				}
 				else

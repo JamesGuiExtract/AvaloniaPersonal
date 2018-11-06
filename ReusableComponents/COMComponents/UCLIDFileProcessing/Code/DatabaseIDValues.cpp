@@ -87,8 +87,12 @@ bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfIn
 	makeLowerCase(tmp.m_strServer);
 	makeLowerCase(tmp.m_strName);
 
+	// Expand the check of the times by making sure they are in a 12 hour window
+	// https://extract.atlassian.net/browse/ISSUE-15325
+	CTimeSpan TwelveHours(0, 12, 0, 0);
 	if (tmp.m_strServer == strServer && tmp.m_strName == strDatabaseName
-		&& m_ctCreated == ctCreationDate && m_ctRestored == ctRestoreDate)
+		&& m_ctCreated >= (ctCreationDate - TwelveHours) && m_ctCreated <= (ctCreationDate + TwelveHours)
+		&& m_ctRestored >=(ctRestoreDate - TwelveHours) && m_ctRestored <= (ctRestoreDate + TwelveHours))
 	{
 		return true;
 	}
