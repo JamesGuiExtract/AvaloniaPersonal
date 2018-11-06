@@ -41,8 +41,6 @@ namespace WebAPI.Filters
                         Type = "file"
                     });
 
-                    operation.Consumes.Add("multipart/form-data");
-
                     // For some unknown reason, it seems to be important to add the auth header back to the list
                     // after the file upload filter. 
                     var index = operationParameters.FindIndex(p => p.Name.IsEquivalent("Authorization"));

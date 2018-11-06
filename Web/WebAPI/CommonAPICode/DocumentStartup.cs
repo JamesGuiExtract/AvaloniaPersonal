@@ -84,12 +84,7 @@ namespace WebAPI
                 manager.ApplicationParts.Add(new AssemblyPart(typeof(Startup).Assembly));
                 services.AddSingleton(manager);
                 services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-                services.AddMvc(options =>
-                {
-                    // Remove the HttpNoContentOutputFormatter, so that null object will be represented
-                    // in JSON (as "null"), instead of returning http error "204 No Content" response
-                    options.OutputFormatters.RemoveType<HttpNoContentOutputFormatter>();
-                });
+                services.AddMvc();
 
                 // Register Swashbuckle/Swagger - auto-generate API documentation
                 var basepath = PlatformServices.Default.Application.ApplicationBasePath;
@@ -127,6 +122,11 @@ namespace WebAPI
 
                     // Register File Upload Operation Filter - this supports upload button in Swagger UI for Document.SubmitFile
                     config.OperationFilter<FileUploadOperation>();
+
+                    // Updates Content-Type list for Consumes and Produces; partially to avoid having to see Consumes/Produces
+                    // attributes for every method and partially because there seems to otherwise be no good way to clear the
+                    // lists via Produces/Consumes attributes when no content is produced or consumed.
+                    config.OperationFilter<ContentTypeSpecifier>();
                 });
 
                 services.Configure<ServerOptions>(Configuration);

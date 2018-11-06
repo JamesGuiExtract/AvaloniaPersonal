@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -25,14 +24,13 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Submit a document for processing
         /// </summary>
-        /// <param name="file">The input file - NOTE: if the argument name is changed here, it MUST 
-        /// also be changed in FileUploadOperation.Apply, NonBodyParameter.Name - if not, then Swagger UI
-        /// for this action will be broken!</param>
+        /// <param name="file">The input file</param>
         /// <returns>A <see cref="DocumentIdResult"/> containing the ID for the submitted document.</returns>
         [HttpPost]
         [ProducesResponseType(201, Type = typeof(DocumentIdResult))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
+        // NOTE: If method name changes, ContentTypeSpecifier and FileUploadOperation should be updated to match.
         public async Task<IActionResult> PostDocument(IFormFile file)
         {
             try
@@ -130,17 +128,17 @@ namespace WebAPI.Controllers
         [ProducesResponseType(201, Type = typeof(DocumentIdResult))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
-        public async Task<IActionResult> PostText([FromBody]TextData textData)
+        // NOTE: If method name changes, ContentTypeSpecifier should be updated to match.
+        public async Task<IActionResult> PostText([FromBody]string textData)
         {
             try
             {
-                this.AssertModel("ELI45195");
-                HTTPError.AssertRequest("ELI45194", !string.IsNullOrEmpty(textData?.Text),
+                HTTPError.AssertRequest("ELI45194", !string.IsNullOrEmpty(textData),
                     "Submitted text is empty");
 
                 using (var data = new DocumentData(User, requireSession: false))
                 {
-                    var result = await data.SubmitText(textData.Text);
+                    var result = await data.SubmitText(textData);
                     string url = Request.Path.HasValue
                         ? Request.GetDisplayUrl()
                         : "https://unknown/api/Document/Text";
@@ -309,6 +307,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404, Type = typeof(ErrorResult))]
+        // NOTE: If method name changes, ContentTypeSpecifier should be updated to match.
         public IActionResult GetDocumentType(int Id)
         {
             try
@@ -499,6 +498,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404, Type = typeof(ErrorResult))]
+        // NOTE: If method name changes, ContentTypeSpecifier should be updated to match.
         public IActionResult GetOutputFile(int Id)
         {
             try

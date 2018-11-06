@@ -1,0 +1,1443 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Extract Document API</title>
+    <style type="text/css">
+      body {
+      	font-family: Trebuchet MS, sans-serif;
+      	font-size: 15px;
+      	color: #444;
+      	margin-right: 24px;
+      }
+      
+      h1	{
+      	font-size: 25px;
+      }
+      h2	{
+      	font-size: 20px;
+      }
+      h3	{
+      	font-size: 16px;
+      	font-weight: bold;
+      }
+      hr	{
+      	height: 1px;
+      	border: 0;
+      	color: #ddd;
+      	background-color: #ddd;
+      }
+      
+      .app-desc {
+        clear: both;
+        margin-left: 20px;
+      }
+      .param-name {
+        width: 100%;
+      }
+      .license-info {
+        margin-left: 20px;
+      }
+      
+      .license-url {
+        margin-left: 20px;
+      }
+      
+      .model {
+        margin: 0 0 0px 20px;
+      }
+      
+      .method {
+        margin-left: 20px;
+      }
+      
+      .method-notes	{
+      	margin: 10px 0 20px 0;
+      	font-size: 90%;
+      	color: #555;
+      }
+      
+      pre {
+        padding: 10px;
+        margin-bottom: 2px;
+      }
+      
+      .http-method {
+       text-transform: uppercase;
+      }
+      
+      pre.get {
+        background-color: #0f6ab4;
+      }
+      
+      pre.post {
+        background-color: #10a54a;
+      }
+      
+      pre.put {
+        background-color: #c5862b;
+      }
+      
+      pre.delete {
+        background-color: #a41e22;
+      }
+      
+      .huge	{
+      	color: #fff;
+      }
+      
+      pre.example {
+        background-color: #f3f3f3;
+        padding: 10px;
+        border: 1px solid #ddd;
+      }
+      
+      code {
+        white-space: pre;
+      }
+      
+      .nickname {
+        font-weight: bold;
+      }
+      
+      .method-path {
+        font-size: 1.5em;
+        background-color: #0f6ab4;
+      }
+      
+      .up {
+        float:right;
+      }
+      
+      .parameter {
+        width: 500px;
+      }
+      
+      .param {
+        width: 500px;
+        padding: 10px 0 0 20px;
+        font-weight: bold;
+      }
+      
+      .param-desc {
+        width: 700px;
+        padding: 0 0 0 20px;
+        color: #777;
+      }
+      
+      .param-type {
+        font-style: italic;
+      }
+      
+      .param-enum-header {
+      width: 700px;
+      padding: 0 0 0 60px;
+      color: #777;
+      font-weight: bold;
+      }
+      
+      .param-enum {
+      width: 700px;
+      padding: 0 0 0 80px;
+      color: #777;
+      font-style: italic;
+      }
+      
+      .field-label {
+        padding: 0;
+        margin: 0;
+        clear: both;
+      }
+      
+      .field-items	{
+      	padding: 0 0 15px 0;
+      	margin-bottom: 15px;
+      }
+      
+      .return-type {
+        clear: both;
+        padding-bottom: 10px;
+      }
+      
+      .param-header {
+        font-weight: bold;
+      }
+      
+      .method-tags {
+        text-align: right;
+      }
+      
+      .method-tag {
+        background: none repeat scroll 0% 0% #24A600;
+        border-radius: 3px;
+        padding: 2px 10px;
+        margin: 2px;
+        color: #FFF;
+        display: inline-block;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+  <h1>Extract Document API</h1>
+    <div class="app-desc">API support to enable integration of Extract processing with external workflows.</div>
+    <div class="app-desc">More information: <a href="http://www.extractsystems.com">http://www.extractsystems.com</a></div>
+    <div class="app-desc">Contact Info: <a href="developers@extractsystems.com">developers@extractsystems.com</a></div>
+    <div class="app-desc">Version: 2.0</div>
+    <div class="license-info">Use under Extract Systems license</div>
+    <div class="license-url">http://extractsystems.com</div>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#Document">Document</a></h4>
+  <ul>
+  <li><a href="#apiDocumentByIdDataGet"><code><span class="http-method">get</span> /api/Document/{Id}/Data</code></a></li>
+  <li><a href="#apiDocumentByIdDataPatch"><code><span class="http-method">patch</span> /api/Document/{Id}/Data</code></a></li>
+  <li><a href="#apiDocumentByIdDataPut"><code><span class="http-method">put</span> /api/Document/{Id}/Data</code></a></li>
+  <li><a href="#apiDocumentByIdDelete"><code><span class="http-method">delete</span> /api/Document/{Id}</code></a></li>
+  <li><a href="#apiDocumentByIdDocumentTypeGet"><code><span class="http-method">get</span> /api/Document/{Id}/DocumentType</code></a></li>
+  <li><a href="#apiDocumentByIdGet"><code><span class="http-method">get</span> /api/Document/{Id}</code></a></li>
+  <li><a href="#apiDocumentByIdOutputFileGet"><code><span class="http-method">get</span> /api/Document/{Id}/OutputFile</code></a></li>
+  <li><a href="#apiDocumentByIdOutputTextGet"><code><span class="http-method">get</span> /api/Document/{Id}/OutputText</code></a></li>
+  <li><a href="#apiDocumentByIdPageByPageTextGet"><code><span class="http-method">get</span> /api/Document/{Id}/Page/{Page}/Text</code></a></li>
+  <li><a href="#apiDocumentByIdPageByPageWordZonesGet"><code><span class="http-method">get</span> /api/Document/{Id}/Page/{Page}/WordZones</code></a></li>
+  <li><a href="#apiDocumentByIdPageInfoGet"><code><span class="http-method">get</span> /api/Document/{Id}/PageInfo</code></a></li>
+  <li><a href="#apiDocumentByIdStatusGet"><code><span class="http-method">get</span> /api/Document/{Id}/Status</code></a></li>
+  <li><a href="#apiDocumentByIdTextGet"><code><span class="http-method">get</span> /api/Document/{Id}/Text</code></a></li>
+  <li><a href="#apiDocumentPost"><code><span class="http-method">post</span> /api/Document</code></a></li>
+  <li><a href="#apiDocumentTextPost"><code><span class="http-method">post</span> /api/Document/Text</code></a></li>
+  </ul>
+  <h4><a href="#Users">Users</a></h4>
+  <ul>
+  <li><a href="#apiUsersLoginPost"><code><span class="http-method">post</span> /api/Users/Login</code></a></li>
+  </ul>
+  <h4><a href="#Workflow">Workflow</a></h4>
+  <ul>
+  <li><a href="#apiWorkflowDocumentStatusesGet"><code><span class="http-method">get</span> /api/Workflow/DocumentStatuses</code></a></li>
+  <li><a href="#apiWorkflowStatusGet"><code><span class="http-method">get</span> /api/Workflow/Status</code></a></li>
+  </ul>
+
+  <h1><a name="Document">Document</a></h1>
+  <div class="method"><a name="apiDocumentByIdDataGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/Document/{Id}/Data</code></pre></div>
+    <div class="method-summary">Gets the found data for a document (<span class="nickname">apiDocumentByIdDataGet</span>)</div>
+    <div class="method-notes"></div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">Id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The document ID format: int32</div>    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#DocumentDataResult">DocumentDataResult</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Success
+        <a href="#DocumentDataResult">DocumentDataResult</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Not Found
+        <a href="#ErrorResult">ErrorResult</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiDocumentByIdDataPatch"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="patch"><code class="huge"><span class="http-method">patch</span> /api/Document/{Id}/Data</code></pre></div>
+    <div class="method-summary">Adds, updates or deletes specified document data attributes. (<span class="nickname">apiDocumentByIdDataPatch</span>)</div>
+    <div class="method-notes"></div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">Id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The document ID format: int32</div>    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#DocumentDataPatch">DocumentDataPatch</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>*/*</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">204</h4>
+    Success
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Not Found
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">423</h4>
+    Client Error
+        <a href="#ErrorResult">ErrorResult</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiDocumentByIdDataPut"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="put"><code class="huge"><span class="http-method">put</span> /api/Document/{Id}/Data</code></pre></div>
+    <div class="method-summary">Replaces the data for the specified document. (<span class="nickname">apiDocumentByIdDataPut</span>)</div>
+    <div class="method-notes"></div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">Id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The document ID format: int32</div>    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#DocumentDataInput">DocumentDataInput</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>*/*</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">204</h4>
+    Success
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Not Found
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">423</h4>
+    Client Error
+        <a href="#ErrorResult">ErrorResult</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiDocumentByIdDelete"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="delete"><code class="huge"><span class="http-method">delete</span> /api/Document/{Id}</code></pre></div>
+    <div class="method-summary">Delete the specified document from the workflow. (<span class="nickname">apiDocumentByIdDelete</span>)</div>
+    <div class="method-notes"></div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">Id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The document ID format: int32</div>    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>*/*</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">204</h4>
+    Success
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Not Found
+        <a href="#ErrorResult">ErrorResult</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiDocumentByIdDocumentTypeGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/Document/{Id}/DocumentType</code></pre></div>
+    <div class="method-summary">Gets the document type (<span class="nickname">apiDocumentByIdDocumentTypeGet</span>)</div>
+    <div class="method-notes"></div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">Id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The document ID format: int32</div>    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#TextData">TextData</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Success
+        <a href="#TextData">TextData</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Not Found
+        <a href="#ErrorResult">ErrorResult</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiDocumentByIdGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/Document/{Id}</code></pre></div>
+    <div class="method-summary">Gets the source document (<span class="nickname">apiDocumentByIdGet</span>)</div>
+    <div class="method-notes"></div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">Id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The document ID format: int32</div>    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#PhysicalFileResult">PhysicalFileResult</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>image/tiff</code></li>
+      <li><code>application/pdf</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Success
+        <a href="#PhysicalFileResult">PhysicalFileResult</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Not Found
+        <a href="#ErrorResult">ErrorResult</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiDocumentByIdOutputFileGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/Document/{Id}/OutputFile</code></pre></div>
+    <div class="method-summary">Gets the output file for the specified input document (e.g., a redacted copy or a searchable PDF) (<span class="nickname">apiDocumentByIdOutputFileGet</span>)</div>
+    <div class="method-notes"></div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">Id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The document ID format: int32</div>    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#PhysicalFileResult">PhysicalFileResult</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>image/tiff</code></li>
+      <li><code>application/pdf</code></li>
+      <li><code>application/xml</code></li>
+      <li><code>application/octet-stream</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Success
+        <a href="#PhysicalFileResult">PhysicalFileResult</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Not Found
+        <a href="#ErrorResult">ErrorResult</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiDocumentByIdOutputTextGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/Document/{Id}/OutputText</code></pre></div>
+    <div class="method-summary">Gets the output text result; valid only for submitted text. (<span class="nickname">apiDocumentByIdOutputTextGet</span>)</div>
+    <div class="method-notes"></div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">Id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The document ID format: int32</div>    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#PageTextResult">PageTextResult</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Success
+        <a href="#PageTextResult">PageTextResult</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Not Found
+        <a href="#ErrorResult">ErrorResult</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiDocumentByIdPageByPageTextGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/Document/{Id}/Page/{Page}/Text</code></pre></div>
+    <div class="method-summary">Gets the text from the specified page of an input document.
+NOTE: Cannot be used to retrieve text for a document submitted as text. (<span class="nickname">apiDocumentByIdPageByPageTextGet</span>)</div>
+    <div class="method-notes"></div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">Id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The document ID format: int32</div>      <div class="param">Page (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The page number for which text should be retrieved. format: int32</div>    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#PageTextResult">PageTextResult</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Success
+        <a href="#PageTextResult">PageTextResult</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Not Found
+        <a href="#ErrorResult">ErrorResult</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiDocumentByIdPageByPageWordZonesGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/Document/{Id}/Page/{Page}/WordZones</code></pre></div>
+    <div class="method-summary">Gets each word from a document page along with its spatial location on the document. (<span class="nickname">apiDocumentByIdPageByPageWordZonesGet</span>)</div>
+    <div class="method-notes"></div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">Id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The document ID format: int32</div>      <div class="param">Page (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The page number format: int32</div>    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#WordZoneDataResult">WordZoneDataResult</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Success
+        <a href="#WordZoneDataResult">WordZoneDataResult</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Not Found
+        <a href="#ErrorResult">ErrorResult</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiDocumentByIdPageInfoGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/Document/{Id}/PageInfo</code></pre></div>
+    <div class="method-summary">Gets the page size and orientation info for a document. (<span class="nickname">apiDocumentByIdPageInfoGet</span>)</div>
+    <div class="method-notes"></div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">Id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The document ID format: int32</div>    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#PagesInfoResult">PagesInfoResult</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Success
+        <a href="#PagesInfoResult">PagesInfoResult</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Not Found
+        <a href="#ErrorResult">ErrorResult</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiDocumentByIdStatusGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/Document/{Id}/Status</code></pre></div>
+    <div class="method-summary">Gets the status of the specified document. (<span class="nickname">apiDocumentByIdStatusGet</span>)</div>
+    <div class="method-notes"></div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">Id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The document ID format: int32</div>    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#ProcessingStatusResult">ProcessingStatusResult</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Success
+        <a href="#ProcessingStatusResult">ProcessingStatusResult</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Not Found
+        <a href="#ErrorResult">ErrorResult</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiDocumentByIdTextGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/Document/{Id}/Text</code></pre></div>
+    <div class="method-summary">Gets the text of a specified document. If the document was submitted as an image file,
+the result will be the OCR text for the document (divided into pages). If the document
+was submitted as text, the result will be the submitted text. (<span class="nickname">apiDocumentByIdTextGet</span>)</div>
+    <div class="method-notes"></div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">Id (required)</div>
+      
+            <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; The document ID format: int32</div>    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#PageTextResult">PageTextResult</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Success
+        <a href="#PageTextResult">PageTextResult</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+    <h4 class="field-label">404</h4>
+    Not Found
+        <a href="#ErrorResult">ErrorResult</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiDocumentPost"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/Document</code></pre></div>
+    <div class="method-summary">Submit a document for processing (<span class="nickname">apiDocumentPost</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>multipart/form-data</code></li>
+    </ul>
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+    <h3 class="field-label">Form parameters</h3>
+    <div class="field-items">
+      <div class="param">file (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Form Parameter</span> &mdash;  format: binary</div>    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#DocumentIdResult">DocumentIdResult</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">201</h4>
+    Success
+        <a href="#DocumentIdResult">DocumentIdResult</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiDocumentTextPost"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/Document/Text</code></pre></div>
+    <div class="method-summary">Submit text for document processing (<span class="nickname">apiDocumentTextPost</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>text/plain</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#string">string</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#DocumentIdResult">DocumentIdResult</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">201</h4>
+    Success
+        <a href="#DocumentIdResult">DocumentIdResult</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <h1><a name="Users">Users</a></h1>
+  <div class="method"><a name="apiUsersLoginPost"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/Users/Login</code></pre></div>
+    <div class="method-summary">Authenticates a user and, if successful, returns a JSON Web Token. (<span class="nickname">apiUsersLoginPost</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#User">User</a> (optional)</div>
+      
+            <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#LoginToken">LoginToken</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Success
+        <a href="#LoginToken">LoginToken</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <h1><a name="Workflow">Workflow</a></h1>
+  <div class="method"><a name="apiWorkflowDocumentStatusesGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/Workflow/DocumentStatuses</code></pre></div>
+    <div class="method-summary">Gets the status of all files in the workflow (<span class="nickname">apiWorkflowDocumentStatusesGet</span>)</div>
+    <div class="method-notes"></div>
+
+
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#FileStatusResult">FileStatusResult</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Success
+        <a href="#FileStatusResult">FileStatusResult</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="apiWorkflowStatusGet"></a>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/Workflow/Status</code></pre></div>
+    <div class="method-summary">Gets the overall status of the workflow (# of files in each state) (<span class="nickname">apiWorkflowStatusGet</span>)</div>
+    <div class="method-notes"></div>
+
+
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#WorkflowStatusResult">WorkflowStatusResult</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Success
+        <a href="#WorkflowStatusResult">WorkflowStatusResult</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#ErrorResult">ErrorResult</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#DocumentAttribute"><code>DocumentAttribute</code></a></li>
+    <li><a href="#DocumentAttributePatch"><code>DocumentAttributePatch</code></a></li>
+    <li><a href="#DocumentDataInput"><code>DocumentDataInput</code></a></li>
+    <li><a href="#DocumentDataPatch"><code>DocumentDataPatch</code></a></li>
+    <li><a href="#DocumentDataResult"><code>DocumentDataResult</code></a></li>
+    <li><a href="#DocumentIdResult"><code>DocumentIdResult</code></a></li>
+    <li><a href="#ErrorInfo"><code>ErrorInfo</code></a></li>
+    <li><a href="#ErrorResult"><code>ErrorResult</code></a></li>
+    <li><a href="#FileStatus"><code>FileStatus</code></a></li>
+    <li><a href="#FileStatusResult"><code>FileStatusResult</code></a></li>
+    <li><a href="#LoginToken"><code>LoginToken</code></a></li>
+    <li><a href="#PageInfo"><code>PageInfo</code></a></li>
+    <li><a href="#PageText"><code>PageText</code></a></li>
+    <li><a href="#PageTextResult"><code>PageTextResult</code></a></li>
+    <li><a href="#PagesInfoResult"><code>PagesInfoResult</code></a></li>
+    <li><a href="#PhysicalFileResult"><code>PhysicalFileResult</code></a></li>
+    <li><a href="#Position"><code>Position</code></a></li>
+    <li><a href="#ProcessingStatusResult"><code>ProcessingStatusResult</code></a></li>
+    <li><a href="#SpatialLine"><code>SpatialLine</code></a></li>
+    <li><a href="#SpatialLineBounds"><code>SpatialLineBounds</code></a></li>
+    <li><a href="#SpatialLineZone"><code>SpatialLineZone</code></a></li>
+    <li><a href="#TextData"><code>TextData</code></a></li>
+    <li><a href="#User"><code>User</code></a></li>
+    <li><a href="#WordZoneDataResult"><code>WordZoneDataResult</code></a></li>
+    <li><a href="#WorkflowStatusResult"><code>WorkflowStatusResult</code></a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="DocumentAttribute"><code>DocumentAttribute</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Represents a single field in a document&#x27;s data.</div>
+    <div class="field-items">
+      <div class="param">childAttributes (optional)</div><div class="param-desc"><span class="param-type"><a href="#DocumentAttribute">array[DocumentAttribute]</a></span> The descendant attribute of this attribute </div>
+<div class="param">averageCharacterConfidence (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The average OCR recognition confidence of each character value in the defined attribute format: int32</div>
+<div class="param">id (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The attribute ID </div>
+<div class="param">name (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Name of the attribute </div>
+<div class="param">value (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Value of the attribute </div>
+<div class="param">type (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The assigned type of the attribute </div>
+<div class="param">confidenceLevel (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The confidence level of the redaction </div>
+<div class="param">hasPositionInfo (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> Some attributes do not have position info - in that case this will be false and the Position
+member will be null. </div>
+<div class="param">spatialPosition (optional)</div><div class="param-desc"><span class="param-type"><a href="#Position">Position</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DocumentAttributePatch"><code>DocumentAttributePatch</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Data needed to add/update/delete an attribute.</div>
+    <div class="field-items">
+      <div class="param">operation (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Whether to create/update/delete an attribute </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">Create</div><div class="param-enum">Update</div><div class="param-enum">Delete</div>
+<div class="param">parentAttributeID (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> In the case of a create operation, ParentAttributeID will specify the parent for the new
+attribute (blank if the attribute is to be created at the root). </div>
+<div class="param">id (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The attribute ID </div>
+<div class="param">name (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Name of the attribute </div>
+<div class="param">value (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Value of the attribute </div>
+<div class="param">type (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The assigned type of the attribute </div>
+<div class="param">confidenceLevel (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The confidence level of the redaction </div>
+<div class="param">hasPositionInfo (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> Some attributes do not have position info - in that case this will be false and the Position
+member will be null. </div>
+<div class="param">spatialPosition (optional)</div><div class="param-desc"><span class="param-type"><a href="#Position">Position</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DocumentDataInput"><code>DocumentDataInput</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Document data representation intended to replace all existing data for a document.</div>
+    <div class="field-items">
+      <div class="param">attributes (optional)</div><div class="param-desc"><span class="param-type"><a href="#DocumentAttribute">array[DocumentAttribute]</a></span> A list of attributes (fields) comprising the document data </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DocumentDataPatch"><code>DocumentDataPatch</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Represents changes to make to existing document data (add/update/delete of specific attributes).
+There is no hierarchy to these attributes; each change is made using attribute a guid; changes
+are made in the order they appear in the Attributes list.</div>
+    <div class="field-items">
+      <div class="param">attributes (optional)</div><div class="param-desc"><span class="param-type"><a href="#DocumentAttributePatch">array[DocumentAttributePatch]</a></span> The attributes to add/change/delete </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DocumentDataResult"><code>DocumentDataResult</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A result containing the data for a document</div>
+    <div class="field-items">
+      <div class="param">attributes (optional)</div><div class="param-desc"><span class="param-type"><a href="#DocumentAttribute">array[DocumentAttribute]</a></span> A list of attributes (fields) comprising the document data </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DocumentIdResult"><code>DocumentIdResult</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A result containing the ID of a document.</div>
+    <div class="field-items">
+      <div class="param">id (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The ID of the document format: int32</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ErrorInfo"><code>ErrorInfo</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Describes the reason for a failed call.</div>
+    <div class="field-items">
+      <div class="param">message (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Description of the error </div>
+<div class="param">code (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Code associated with the error </div>
+<div class="param">additionalCodes (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> Codes providing further context for the error </div>
+<div class="param">errorDetails (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> Parameters pertinent to the error </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ErrorResult"><code>ErrorResult</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A return value with ErrorInfo describing the reason for a failed call.</div>
+    <div class="field-items">
+      <div class="param">error (optional)</div><div class="param-desc"><span class="param-type"><a href="#ErrorInfo">ErrorInfo</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FileStatus"><code>FileStatus</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>The status of a particular file in a workflow</div>
+    <div class="field-items">
+      <div class="param">id (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The document ID format: int32</div>
+<div class="param">status (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The status of the file </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FileStatusResult"><code>FileStatusResult</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A result representing the status of all files in a workflow.</div>
+    <div class="field-items">
+      <div class="param">fileStatuses (optional)</div><div class="param-desc"><span class="param-type"><a href="#FileStatus">array[FileStatus]</a></span> The list of all file statuses </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="LoginToken"><code>LoginToken</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Returned in response to a successful login</div>
+    <div class="field-items">
+      <div class="param">access_token (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The JSON web (bearer) token to identify a caller in subsequent API calls </div>
+<div class="param">expires_in (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The number of seconds before this token expires format: int32</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PageInfo"><code>PageInfo</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Data for a specific document page</div>
+    <div class="field-items">
+      <div class="param">page (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The page format: int32</div>
+<div class="param">displayOrientation (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The orientation (in degrees) the page should display in by default format: int32</div>
+<div class="param">skew (optional)</div><div class="param-desc"><span class="param-type"><a href="#double">Double</a></span> The predominant angle of the text on the page (in degrees) format: double</div>
+<div class="param">width (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The width of the page (in pixels) format: int32</div>
+<div class="param">height (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The height of the page (in pixels) format: int32</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PageText"><code>PageText</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Represents the text of a particular document page.</div>
+    <div class="field-items">
+      <div class="param">page (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The page number format: int32</div>
+<div class="param">text (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The text from the given page number </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PageTextResult"><code>PageTextResult</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A result containing text from document pages.</div>
+    <div class="field-items">
+      <div class="param">pages (optional)</div><div class="param-desc"><span class="param-type"><a href="#PageText">array[PageText]</a></span> Document text separated by page </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PagesInfoResult"><code>PagesInfoResult</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Data model for information on all pages in a document</div>
+    <div class="field-items">
+      <div class="param">pageCount (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The page count format: int32</div>
+<div class="param">pageInfos (optional)</div><div class="param-desc"><span class="param-type"><a href="#PageInfo">array[PageInfo]</a></span> The WebAPI.Models.PageInfos </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PhysicalFileResult"><code>PhysicalFileResult</code></a> <a class="up" href="#__Models">Up</a></h3>
+    
+    <div class="field-items">
+      <div class="param">fileName (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">contentType (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">fileDownloadName (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Position"><code>Position</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>The position information of the attribute, and the associated page number of the document that the attribute is found on</div>
+    <div class="field-items">
+      <div class="param">pages (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">array[Integer]</a></span> A list of the pages that the attribute spans (if any) format: int32</div>
+<div class="param">lineInfo (optional)</div><div class="param-desc"><span class="param-type"><a href="#SpatialLine">array[SpatialLine]</a></span> The list of lines of spatial information for the attribute - may span pages </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ProcessingStatusResult"><code>ProcessingStatusResult</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A result containing the processing status of a document.</div>
+    <div class="field-items">
+      <div class="param">documentStatus (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Status code representing a document status </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">Processing</div><div class="param-enum">Done</div><div class="param-enum">Failed</div><div class="param-enum">Incomplete</div><div class="param-enum">NotApplicable</div>
+<div class="param">statusText (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Textual name of a document status </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SpatialLine"><code>SpatialLine</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Describes the location of a line (or partial line) of text</div>
+    <div class="field-items">
+      <div class="param">spatialLineZone (optional)</div><div class="param-desc"><span class="param-type"><a href="#SpatialLineZone">SpatialLineZone</a></span>  </div>
+<div class="param">spatialLineBounds (optional)</div><div class="param-desc"><span class="param-type"><a href="#SpatialLineBounds">SpatialLineBounds</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SpatialLineBounds"><code>SpatialLineBounds</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>The bounding rectangle that encloses the attribute</div>
+    <div class="field-items">
+      <div class="param">pageNumber (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The start page number where the attribute exists, or -1 when the attribute doesn&#x27;t have spatial info format: int32</div>
+<div class="param">text (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The text value of the zone </div>
+<div class="param">top (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The top of the bounding rectangle format: int32</div>
+<div class="param">left (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The left edge of the bounding rectangle format: int32</div>
+<div class="param">bottom (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The bottom of the bounding rectangle format: int32</div>
+<div class="param">right (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The right edge of the bounding rectangle format: int32</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SpatialLineZone"><code>SpatialLineZone</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A rectangular area defined by a center line between two points
+and a height. The height is the length of the sides perpendicular to the defining line.
+The zone extends half of height in both directions from the center line.</div>
+    <div class="field-items">
+      <div class="param">pageNumber (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The page number where the attribute exists, or -1 when the attribute doesn&#x27;t have spatial info format: int32</div>
+<div class="param">text (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The text value of the zone </div>
+<div class="param">startX (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The x coordinate of the start of the defining line format: int32</div>
+<div class="param">startY (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The y coordinate of the start of the defining line format: int32</div>
+<div class="param">endX (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The x coordinate of the end of the defining line format: int32</div>
+<div class="param">endY (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The y coordinate of the end of the defining line format: int32</div>
+<div class="param">height (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The height of the rectangle (length of the sides perpendicular to the defining line) format: int32</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="TextData"><code>TextData</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Represents text of a request argument or return value.</div>
+    <div class="field-items">
+      <div class="param">text (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The text </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="User"><code>User</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Information needed to authenticate an API user</div>
+    <div class="field-items">
+      <div class="param">username (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> User name </div>
+<div class="param">password (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> User password </div>
+<div class="param">workflowName (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Optional user-specified workflow name that overrides the default workflow </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WordZoneDataResult"><code>WordZoneDataResult</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A result representing the location of words in a document based on OCR results.</div>
+    <div class="field-items">
+      <div class="param">zones (optional)</div><div class="param-desc"><span class="param-type"><a href="#SpatialLineZone">array[SpatialLineZone]</a></span> Gets a list of SpatialLineZones instances, each of which represents one word
+from OCR results. NOTE: Non-spatial text will not be included in these zones. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WorkflowStatusResult"><code>WorkflowStatusResult</code></a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>The overall status information of a workflow</div>
+    <div class="field-items">
+      <div class="param">numberProcessing (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The number of documents processing format: int32</div>
+<div class="param">numberDone (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The number of documents done processing format: int32</div>
+<div class="param">numberFailed (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The number of documents that have failed format: int32</div>
+<div class="param">numberIncomplete (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The number of document submitted but that are no longer progressing through the workflow. format: int32</div>
+    </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>
