@@ -700,6 +700,10 @@ STDMETHODIMP CSpatialString::CreateFromSpatialStrings(IIUnknownVector *pStrings)
 		IIUnknownVectorPtr ipStrings(pStrings);
 		ASSERT_RESOURCE_ALLOCATION("ELI37129", ipStrings != __nullptr);
 
+		// Clear member variables
+		// https://extract.atlassian.net/browse/ISSUE-15691
+		reset(true, true);
+
 		// Need to verify that each SpatialString in the vector
 		// has mode kSpatialMode and calculate the final size of the string
 		long lSize = ipStrings->Size();
