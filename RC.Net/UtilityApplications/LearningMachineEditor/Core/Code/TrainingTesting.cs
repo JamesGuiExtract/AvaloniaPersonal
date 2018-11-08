@@ -502,8 +502,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                 && !string.IsNullOrWhiteSpace(_editor.CurrentLearningMachine.CsvOutputFile);
 
             loadDataFromCsvRadioButton.Enabled =
-                 _editor.CurrentLearningMachine.Encoder.AreEncodingsComputed
-                && !string.IsNullOrWhiteSpace(_editor.CurrentLearningMachine.CsvOutputFile);
+                !string.IsNullOrWhiteSpace(_editor.CurrentLearningMachine.CsvOutputFile);
 
             trainTestButton.Enabled = _editor.CurrentLearningMachine.InputConfig.TrainingSetPercentage > 0
                 || loadDataFromCsvRadioButton.Checked;
