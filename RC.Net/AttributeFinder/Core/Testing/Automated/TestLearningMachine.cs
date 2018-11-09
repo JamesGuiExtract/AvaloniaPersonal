@@ -1811,6 +1811,101 @@ namespace Extract.AttributeFinder.Test
                 testCM.Data.SelectMany(a => a).ToArray());
         }
 
+        // Test that an output document that is a blank page doesn't cause an error
+        // https://extract.atlassian.net/browse/ISSUE-15615
+        [Test, Category("LearningMachine")]
+        public static void PaginationWithBlankPages()
+        {
+            SetPaginationFiles();
+            var lm = new LearningMachine
+            {
+                InputConfig = new InputConfiguration
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = "<SourceDocName>.protofeatures.voa",
+                    AnswerPath = "<SourceDocName>.eav",
+                    TrainingSetPercentage = 50
+                },
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, autoBagOfWords: new SpatialStringFeatureVectorizer("", 5, 2000), attributeFilter: "*@Feature"),
+                Classifier = new NeuralNetworkClassifier { UseCrossValidationSets = true }
+            };
+            lm.TrainMachine();
+
+            lm.InputConfig.GetInputData(out var spatialStringFilePaths, out var attributeFilePaths, out var answerFiles);
+
+            var ss = new SpatialStringClass();
+            var voa = new IUnknownVectorClass();
+            ss.LoadFrom(spatialStringFilePaths[3], false);
+
+            var pages = ss.GetPages(true, "");
+            pages.Remove(0);
+            ss.CreateFromSpatialStrings(pages);
+            voa.LoadFrom(attributeFilePaths[3], false);
+
+            // No exception is thrown
+            lm.ComputeAnswer(ss, voa, true);
+
+            Assert.AreEqual(3, voa.Size());
+            var firstDoc = (IAttribute)voa.At(0);
+
+            // Confirm that the first document is a single, empty page
+            Assert.AreEqual("Document", firstDoc.Name);
+            Assert.AreEqual(ESpatialStringMode.kNonSpatialMode, firstDoc.Value.GetMode());
+            Assert.AreEqual("N/A", firstDoc.Value.String);
+
+            var pagesAttribute = (IAttribute)firstDoc.SubAttributes.At(0);
+            Assert.AreEqual("Pages", pagesAttribute.Name);
+            Assert.AreEqual("1", pagesAttribute.Value.String);
+        }
+
+        // Test that if a doc classifier is conigured to use text of page 1 that a blank page doesn't cause an error
+        // https://extract.atlassian.net/browse/ISSUE-15615
+        [Test, Category("LearningMachine")]
+        public static void DocumentClassificationWithBlankPages()
+        {
+            SetDocumentCategorizationFiles();
+            var inputConfig = new InputConfiguration
+            {
+                InputPath = _inputFolder.Last(),
+                InputPathType = InputType.Folder,
+                AttributesPath = "",
+                AnswerPath = "$FileOf($DirOf(<SourceDocName>))",
+                TrainingSetPercentage = 80
+            };
+            var lm = new LearningMachine
+            {
+                InputConfig = inputConfig,
+                Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, new SpatialStringFeatureVectorizer("1", 5, 2000)),
+                Classifier = new MulticlassSupportVectorMachineClassifier { CalibrateMachineToProduceProbabilities = true },
+                UseUnknownCategory = true,
+                UnknownCategoryCutoff = 0.1,
+                TranslateUnknownCategory = true,
+                TranslateUnknownCategoryTo = "Unknown"
+            };
+            lm.TrainMachine();
+
+            lm.InputConfig.GetInputData(out var spatialStringFilePaths, out var attributeFilePaths, out var answerFiles);
+
+            var ss = new SpatialStringClass();
+            var voa = new IUnknownVectorClass();
+            ss.LoadFrom(spatialStringFilePaths[3], false);
+
+            var pages = ss.GetPages(true, "");
+            pages.Remove(0);
+            ss.CreateFromSpatialStrings(pages);
+
+            // No exception is thrown
+            lm.ComputeAnswer(ss, voa, true);
+
+            Assert.AreEqual(1, voa.Size());
+            var firstAt = (IAttribute)voa.At(0);
+
+            // Confirm that the doc type was not confidently predicted since the feature vector was all 0s
+            Assert.AreEqual("DocumentType", firstAt.Name);
+            Assert.AreEqual("Unknown", firstAt.Value.String);
+        }
+
         #endregion Tests
 
         #region Helper Methods

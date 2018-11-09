@@ -89,6 +89,7 @@
     <Compile Include="TestAFUtils.cs" />
     <Compile Include="TestFKB.cs" />
     <Compile Include="TestClassWeights.cs" />
+    <Compile Include="TestSpatialString.cs" />
     <Compile Include="TestSpatialPageInfo.cs" />
     <Compile Include="TestOCRParameters.cs" />
     <Compile Include="TestTranslateToBestMatch.cs" />
