@@ -46,7 +46,8 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
             @"SELECT Data FROM MLData
             JOIN MLModel ON MLData.MLModelID = MLModel.ID
                 WHERE Name = @Name
-                AND IsTrainingData = @IsTrainingData";
+                AND IsTrainingData = @IsTrainingData
+                AND CanBeDeleted = 'False'";
 
         #endregion Fields
 
@@ -169,13 +170,46 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
                     NetworkLibrary = "dbmssocn"
                 };
 
-                var connection = new SqlConnection(sqlConnectionBuild.ConnectionString);
-                connection.Open();
-
-                using (var cmd = connection.CreateCommand())
+                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
                 {
-                    cmd.CommandText = "INSERT DatabaseService (Description, Settings) VALUES('Unit tests'' service', '')";
-                    cmd.ExecuteNonQuery();
+                    connection.Open();
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = "INSERT DatabaseService (Description, Settings) VALUES('Unit tests'' service', '')";
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45129");
+            }
+        }
+
+        /// <summary>
+        /// Modifies the date stamp of the stored data
+        /// </summary>
+        public static void ModifyDateAttributesStored(DateTime date)
+        {
+            try
+            {
+                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
+                {
+                    DataSource = "(local)",
+                    InitialCatalog = DBName,
+                    IntegratedSecurity = true,
+                    NetworkLibrary = "dbmssocn"
+                };
+
+                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                {
+                    connection.Open();
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = "UPDATE FileTaskSession SET DateTimeStamp = @Date";
+                        cmd.Parameters.AddWithValue("@Date", date.ToString("s", CultureInfo.InvariantCulture));
+                        cmd.ExecuteNonQuery();
+                    }
                 }
             }
             catch (Exception ex)
@@ -510,6 +544,80 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
             Assert.AreEqual(collector.ModelName, updatedCollector.ModelName);
         }
 
+        // Tests MarkAllDataForDeletion() behavior and
+        // tests that attributes stored more than 30 days ago are ignored by default
+        [Test, Category("TrainingDataCollector")]
+        public static void SkipOldFiles()
+        {
+            try
+            {
+                CreateDatabase();
+
+                Process();
+
+                // Verify that there is data
+                string trainingOutput = GetDataFromDB(trainingData: true);
+                Assert.Greater(trainingOutput.Length, 0);
+
+                var testingOutput = GetDataFromDB(trainingData: false);
+                Assert.Greater(testingOutput.Length, 0);
+
+                var collector = new TrainingDataCollector
+                {
+                    DatabaseName = DBName,
+                    DatabaseServer = "(local)",
+                    ModelName = _MODEL_NAME
+                };
+
+                // Mark all the data for this model for deletion
+                collector.MarkAllDataForDeletion();
+
+                // Verify that there is no data
+                trainingOutput = GetDataFromDB(trainingData: true);
+                Assert.AreEqual(0, trainingOutput.Length);
+
+                testingOutput = GetDataFromDB(trainingData: false);
+                Assert.AreEqual(0, testingOutput.Length);
+
+                // Change date data stored so that it will be ignored
+                ModifyDateAttributesStored(DateTime.Now.Subtract(TimeSpan.FromDays(30)));
+
+                Process();
+
+                // Verify that there is no data
+                trainingOutput = GetDataFromDB(trainingData: true);
+                Assert.AreEqual(0, trainingOutput.Length);
+
+                testingOutput = GetDataFromDB(trainingData: false);
+                Assert.AreEqual(0, testingOutput.Length);
+
+                // Change date stored so that it will not be ignored
+                ModifyDateAttributesStored(DateTime.Now.Subtract(TimeSpan.FromDays(29)));
+
+                Process();
+
+                // Verify that there is data
+                trainingOutput = GetDataFromDB(trainingData: true);
+                Assert.Greater(trainingOutput.Length, 0);
+
+                testingOutput = GetDataFromDB(trainingData: false);
+                Assert.Greater(testingOutput.Length, 0);
+
+                // Confirm that marking data for deletion doesn't affect the data if the model name is different
+                collector.ModelName = _MODEL_NAME + "_";
+                collector.MarkAllDataForDeletion();
+                trainingOutput = GetDataFromDB(trainingData: true);
+                Assert.Greater(trainingOutput.Length, 0);
+
+                testingOutput = GetDataFromDB(trainingData: false);
+                Assert.Greater(testingOutput.Length, 0);
+
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(DBName);
+            }
+        }
         #endregion Tests
     }
 }
