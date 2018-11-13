@@ -111,8 +111,3 @@ EXPORT_BaseUtils SYSTEMTIME asLocalSystemTime(const CTime &ct);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: Converts the CTime argument into a SYSTEMTIME representing the UTC time
 EXPORT_BaseUtils SYSTEMTIME asUTCSystemTime(const CTime &ct);
-//-------------------------------------------------------------------------------------------------
-// PROMISE: Converts the string date to a CTime with any timezone data
-//			string date with format YYYY-MM-DD HH:mm:ss.sssssss zzz:zz
-//			if the zzz:zz is not specified the strDate will be assumed to be UTC
-EXPORT_BaseUtils CTime FromDateTimeStringWithTimeZoneAdjustment(string strDate);

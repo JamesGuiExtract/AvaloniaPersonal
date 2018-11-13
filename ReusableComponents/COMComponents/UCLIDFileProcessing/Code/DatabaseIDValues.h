@@ -14,9 +14,9 @@ public:
 	GUID m_GUID;
 	string m_strServer;
 	string m_strName;
-	CTime m_ctCreated;
-	CTime m_ctRestored;
-	CTime m_ctLastUpdated;
+	SYSTEMTIME m_stCreated;
+	SYSTEMTIME m_stRestored;
+	SYSTEMTIME m_stLastUpdated;
 
 	// This will only be filled in when CheckIfValid is called with bGenerateInvalidReason = true
 	string m_strInvalidReason;
@@ -29,8 +29,7 @@ public:
 	// is true
 	// Fills in the m_strInvalidReason if bGenerateInvalidReason is true otherwise m_strInvalidReason will 
 	// be set to ""
-	bool CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfInvalid = false, bool bGenerateInvalidReason = false,
-		bool bNoTZConversion = true);
+	bool CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfInvalid = false, bool bGenerateInvalidReason = false);
 
 	// This will return a string that identifies what parts of the Database id are invalid
 	// if the database id is valid the return string will be ""

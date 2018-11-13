@@ -58,6 +58,7 @@ public:
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, unsigned char ucData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, const string& strData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, const CTime& Time);
+	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, const SYSTEMTIME& Time);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, bool bData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator << (ByteStreamManipulator& byteStreamManipulator, const GUID &guidData);
 
@@ -70,6 +71,7 @@ public:
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, unsigned char& rucData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, string& rstrData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, CTime& rTime);
+	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, SYSTEMTIME& rTime);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, bool& bData);
 	EXPORT_BaseUtils friend ByteStreamManipulator& operator >> (ByteStreamManipulator& byteStreamManipulator, GUID& guidData);
 

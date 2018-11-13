@@ -2564,7 +2564,7 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 	ASSERT_RESOURCE_ALLOCATION("ELI26863", ipFields != __nullptr);
 
 	// Check the last updated time stamp 
-	CTime timeCurrent = getSQLServerDateTimeAsCTime(ipConnection);
+	CTime timeCurrent = getSQLServerDateTimeAsSystemTime(ipConnection);
 	CTime timeLastUpdated = getTimeDateField(ipFields, "LastUpdateTimeStamp");
 	CTimeSpan ts = timeCurrent - timeLastUpdated;
 	if (bForceUpdate || ts.GetTotalSeconds() > m_nActionStatisticsUpdateFreqInSeconds)
@@ -5627,7 +5627,7 @@ bool CFileProcessingDB::isStatisticsUpdateFromDeltaNeeded(const _ConnectionPtr& 
 		ASSERT_RESOURCE_ALLOCATION("ELI35131", ipFields != __nullptr);
 
 		// Check the last updated time stamp 
-		CTime timeCurrent = getSQLServerDateTimeAsCTime(ipConnection);
+		CTime timeCurrent = getSQLServerDateTimeAsSystemTime(ipConnection);
 		CTime timeLastUpdated = getTimeDateField(ipFields, "LastUpdateTimeStamp");
 		CTimeSpan ts = timeCurrent - timeLastUpdated;
 		if (ts.GetTotalSeconds() > m_nActionStatisticsUpdateFreqInSeconds)
@@ -6245,15 +6245,15 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 
 	// Get the new DatabaseID - will be the same as old except for the LastUpdated
 	DatabaseIDValues newDatabaseIDValues = m_DatabaseIDValues;
-	newDatabaseIDValues.m_ctLastUpdated = getSQLServerDateTimeOffsetAsCTime(getDBConnection());
+	newDatabaseIDValues.m_stLastUpdated = getSQLServerDateTimeAsSystemTime(getDBConnection());
 
 	// Get the time since the request was generated
-	CTimeSpan tsDiff = newDatabaseIDValues.m_ctLastUpdated - counterUpdates.m_ctTimeCodeGenerated;
+	CTimeSpan tsDiff = CTime(newDatabaseIDValues.m_stLastUpdated) - CTime(counterUpdates.m_stTimeCodeGenerated);
 	if (tsDiff.GetDays() >= 4 || tsDiff.GetDays() < 0)
 	{
 		// Code has expired
 		UCLIDException ue("ELI38996", "Counter update code has expired.");
-		ue.addDebugInfo("UpdateCodeDate", (LPCSTR) counterUpdates.m_ctTimeCodeGenerated.Format(gstrDATE_TIME_FORMAT.c_str()));
+		ue.addDebugInfo("UpdateCodeDate", (LPCSTR)CTime(counterUpdates.m_stTimeCodeGenerated).Format(gstrDATE_TIME_FORMAT.c_str()));
 		throw ue;
 	}
 
@@ -6304,7 +6304,7 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 		// Create the counter change records
 		DBCounterChangeValue counterChange;
 		counterChange.m_nCounterID = counterOp.m_nCounterID;
-		counterChange.m_ctUpdatedTime = newDatabaseIDValues.m_ctLastUpdated;
+		counterChange.m_stUpdatedTime = newDatabaseIDValues.m_stLastUpdated;
 		counterChange.m_nLastUpdatedByFAMSessionID = m_nFAMSessionID;
 		counterChange.m_llMinFAMFileCount = m_nLastFAMFileID;
 		counterChange.m_strComment = "Update";
@@ -6500,15 +6500,15 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 	DatabaseIDValues &newDatabaseID = counterUpdates.m_DatabaseID;
 	
 	// Update the counterUpdates DatabaseID to have a new last updated time
-	newDatabaseID.m_ctLastUpdated =  getSQLServerDateTimeOffsetAsCTime(getDBConnection());
+	newDatabaseID.m_stLastUpdated = getSQLServerDateTimeAsSystemTime(getDBConnection());
 
 	// Get the time since the request was generated
-	CTimeSpan tsDiff = newDatabaseID.m_ctLastUpdated - counterUpdates.m_ctTimeCodeGenerated;
+	CTimeSpan tsDiff = CTime(newDatabaseID.m_stLastUpdated) - CTime(counterUpdates.m_stTimeCodeGenerated);
 	if (tsDiff.GetDays() >= 4 || tsDiff.GetDays() < 0)
 	{
 		// Code has expired
 		UCLIDException ue("ELI38988", "Unlock code has expired.");
-		ue.addDebugInfo("UnlockCodeDate", (LPCSTR) counterUpdates.m_ctTimeCodeGenerated.Format(gstrDATE_TIME_FORMAT.c_str()));
+		ue.addDebugInfo("UnlockCodeDate", (LPCSTR)CTime(counterUpdates.m_stTimeCodeGenerated).Format(gstrDATE_TIME_FORMAT.c_str()));
 		throw ue;
 	}
 
@@ -6629,47 +6629,46 @@ bool CFileProcessingDB::isFileInPagination(_ConnectionPtr ipConnection, long nFi
 	return bResult;
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::updateDatabaseIDAndSecureCounterTablesSchema142(_ConnectionPtr ipConnection)
+void CFileProcessingDB::updateDatabaseIDAndSecureCounterTablesSchema171(_ConnectionPtr ipConnection)
 {
 	try
 	{
+		// To prevent against this being called outside of a schema udpate that includes version 171.
+		ASSERT_RUNTIME_CONDITION("ELI46481", m_iDBSchemaVersion > 0 && m_iDBSchemaVersion < 171,
+			"Invalid counter operation");
+
 		TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 		m_strEncryptedDatabaseID = "";
-		string strEncryptedDatabaseID = getDBInfoSetting(ipConnection, gstrDATABASEID, false);
-
-		DatabaseIDValues OldDatabaseIDValues(strEncryptedDatabaseID);
-
 		createAndStoreNewDatabaseID(ipConnection);
 
-		// Check if the values are valid with the old way of checking
-		// That could have problems if timezone differences between the current timezone on the 
-		// machine running this and the timezones when the database was created
-		if (OldDatabaseIDValues.CheckIfValid(ipConnection, false, false, false))
-		{
-			// Update the databaseID and secure counter data so that everything is uncorrupted
-			UCLIDException ueLog("ELI41819", "Counters updated for new schema");
-			vector<string> vecUpdateQueries;
-			// Get map with the key as CounterId and the counter as a CounterOperation with operation set to kNone
-			map<long, CounterOperation> mapCounters;
-			// Get the counters from SecureCounter table but don't check the hash (the counterID portion of the hash
-			// will still be checked
-			getCounterInfo(mapCounters, false);
-			auto iter = mapCounters.begin();
-			for (auto iter = mapCounters.begin(); iter != mapCounters.end(); iter++)
-			{
-				CounterOperation &existingCounter = iter->second;
-				vecUpdateQueries.push_back(existingCounter.GetSQLQuery(m_DatabaseIDValues));
-				vecUpdateQueries.push_back(getQueryToResetCounterCorruption(existingCounter, 
-					m_DatabaseIDValues, ueLog, "Schema Update"));
-			}
-			vecUpdateQueries.push_back(getDatabaseIDUpdateQuery(m_DatabaseIDValues));
-			executeVectorOfSQL(ipConnection, vecUpdateQueries);
+		UCLIDException ueLog("ELI39143", "Database counters updated");
+		vector<string> vecQueries;
 
-			ueLog.log();
+		// Get map with the key as CounterId and the counter as a CounterOperation with operation set to kNone
+		map<long, CounterOperation> mapCounters;
+		// Get the counters from SecureCounter table but don't check the hash (the counterID portion of the hash
+		// will still be checked
+		getCounterInfo(mapCounters, false);
+		auto iter = mapCounters.begin();
+		for (auto iter = mapCounters.begin(); iter != mapCounters.end(); iter++)
+		{
+			CounterOperation &existingCounter = iter->second;
+			vecQueries.push_back(existingCounter.GetSQLQuery(m_DatabaseIDValues));
+			vecQueries.push_back(getQueryToResetCounterCorruption(existingCounter,
+				m_DatabaseIDValues, ueLog, "Schema Update"));
 		}
+		vecQueries.push_back(getDatabaseIDUpdateQuery(m_DatabaseIDValues));
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		ueLog.log();
+
+		tg.CommitTrans();
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41818");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46486");
 }
+
+//-------------------------------------------------------------------------------------------------
+
 //-------------------------------------------------------------------------------------------------
 string CFileProcessingDB::getQueryToResetCounterCorruption(CounterOperation counter,
 	DatabaseIDValues databaseID, UCLIDException &ueLog, string strComment)
@@ -6679,7 +6678,7 @@ string CFileProcessingDB::getQueryToResetCounterCorruption(CounterOperation coun
 	// Create the counter change records
 	DBCounterChangeValue counterChange;
 	counterChange.m_nCounterID = counter.m_nCounterID;
-	counterChange.m_ctUpdatedTime = databaseID.m_ctLastUpdated;
+	counterChange.m_stUpdatedTime = databaseID.m_stLastUpdated;
 	counterChange.m_nLastUpdatedByFAMSessionID = m_nFAMSessionID;
 	counterChange.m_llMinFAMFileCount = m_nLastFAMFileID;
 	counterChange.m_strComment = strComment;

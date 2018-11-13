@@ -23,6 +23,7 @@
 #include <EncryptionEngine.h>
 #include <StringTokenizer.h>
 #include <ValueRestorer.h>
+#include <DateUtil.h>
 
 #include <string>
 #include <stack>
@@ -35,11 +36,11 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 170;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 171;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
-const long glSECURE_COUNTER_REQUEST_VERSION = 1;
+const long glSECURE_COUNTER_REQUEST_VERSION = 2;
 
 // Add item to exception log at this counter decrement frequency
 const long gnLOG_FREQUENCY = 1000;
@@ -2435,6 +2436,30 @@ int UpdateToSchemaVersion170(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46287");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion171(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 171;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		vecQueries.push_back("ALTER TABLE [SecureCounterValueChange] ALTER COLUMN [LastUpdatedTime] DATETIME NOT NULL");
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46478");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -7490,7 +7515,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 167:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion168);
 				case 168:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion169);
 				case 169:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion170);
-				case 170:
+				case 170:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion171);
+				case 171:
 					break;
 
 				default:
@@ -7614,10 +7640,11 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 
 			tg.CommitTrans();
 
-			if (nOriginalSchemaVersion < 142)
+			if (nOriginalSchemaVersion < 171)
 			{
-				// Need to update the DatabaseID and Secure Counter tables 
-				updateDatabaseIDAndSecureCounterTablesSchema142(ipConnection);
+				// Changes to how the database ID and counters are persisted mean they will be
+				// corrupted at this point; restore them.
+				updateDatabaseIDAndSecureCounterTablesSchema171(ipConnection);
 			}
 
 			UCLIDException ue("ELI32551", "Application Trace: Database schema updated.");
@@ -10075,7 +10102,7 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 
 						dbCounterChange.m_llMinFAMFileCount = m_nLastFAMFileID;
 										
-						dbCounterChange.m_ctUpdatedTime = getSQLServerDateTimeOffsetAsCTime(getDBConnection());
+						dbCounterChange.m_stUpdatedTime = getSQLServerDateTimeAsSystemTime(getDBConnection());
 
 						dbCounterChange.CalculateHashValue(dbCounterChange.m_llHashValue);
 
@@ -10160,9 +10187,9 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 
 				if (!bValid)
 				{
-					// Modify the DBIdValue to have corrected values (m_GUID and m_ctLastUpdated will be the same)
+					// Modify the DBIdValue to have corrected values (m_GUID and m_stLastUpdated will be the same)
 					getDatabaseInfo(ipConnection, m_strDatabaseName, DBIDValue.m_strServer,
-						DBIDValue.m_ctCreated, DBIDValue.m_ctRestored);
+						DBIDValue.m_stCreated, DBIDValue.m_stRestored);
 					DBIDValue.m_strName = m_strDatabaseName;
 				}
 
@@ -10225,8 +10252,16 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 
 				bsmRequest << DBIDValue;
 
+				// Send the offset from UTC for the current timezone so that the counter manager
+				// can translate times reported here to central time.
+				TIME_ZONE_INFORMATION tzi;
+				bool daylight = (GetTimeZoneInformation(&tzi) == TIME_ZONE_ID_DAYLIGHT);
+				bsmRequest << (daylight
+					? tzi.Bias + tzi.DaylightBias
+					: tzi.Bias + tzi.StandardBias);
+
 				// Add the current time
-				bsmRequest << getSQLServerDateTimeOffsetAsCTime(getDBConnection());
+				bsmRequest << getSQLServerDateTimeAsSystemTime(getDBConnection());
 
 				bsmRequest << (((nNumCounters == 0) || bValid) ? nNumCounters : -nNumCounters);
 

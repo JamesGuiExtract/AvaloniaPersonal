@@ -34,6 +34,7 @@ namespace Extract.FAMDBCounterManager
         public DateTime RestoreTime;
         public DateTime LastCounterUpdateTime;
         public DateTime DateTimeStamp;
+        public int TimeZoneBias;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseInfo"/> struct from the
@@ -41,15 +42,28 @@ namespace Extract.FAMDBCounterManager
         /// </summary>
         /// <param name="licenseData">The <see cref="ByteArrayManipulator"/> containing the data
         /// encoding in a license string.</param>
-        public DatabaseInfo(ByteArrayManipulator licenseData)
+        /// <param name="version">The schema version of the license data.</param>
+        public DatabaseInfo(ByteArrayManipulator licenseData, long version)
         {
             DatabaseID = licenseData.ReadGuid();
             DatabaseServer = licenseData.ReadString();
             DatabaseName = licenseData.ReadString();
-            CreationTime = licenseData.ReadCTimeAsDateTime();
-            RestoreTime = licenseData.ReadCTimeAsDateTime();
-            LastCounterUpdateTime = licenseData.ReadCTimeAsDateTime();
-            DateTimeStamp = licenseData.ReadCTimeAsDateTime();
+            if (version >= 2)
+            {
+                CreationTime = licenseData.ReadFileTimeAsDateTime();
+                RestoreTime = licenseData.ReadFileTimeAsDateTime();
+                LastCounterUpdateTime = licenseData.ReadFileTimeAsDateTime();
+                TimeZoneBias = licenseData.ReadInt32();
+                DateTimeStamp = licenseData.ReadFileTimeAsDateTime();
+            }
+            else
+            {
+                CreationTime = licenseData.ReadCTimeAsDateTime();
+                RestoreTime = licenseData.ReadCTimeAsDateTime();
+                LastCounterUpdateTime = licenseData.ReadCTimeAsDateTime();
+                DateTimeStamp = licenseData.ReadCTimeAsDateTime();
+                TimeZoneBias = 0;
+            }
         }
     }
 
@@ -585,10 +599,22 @@ namespace Extract.FAMDBCounterManager
                     licenseData.Write(_dbInfo.DatabaseID);
                     licenseData.Write(_dbInfo.DatabaseServer);
                     licenseData.Write(_dbInfo.DatabaseName);
-                    licenseData.WriteAsCTime(_dbInfo.CreationTime);
-                    licenseData.WriteAsCTime(_dbInfo.RestoreTime);
-                    licenseData.WriteAsCTime(_dbInfo.LastCounterUpdateTime);
-                    licenseData.WriteAsCTime(DateTime.UtcNow);
+                    if (_licenseCodeVersion >= 2)
+                    {
+                        licenseData.WriteAsFileTime(_dbInfo.CreationTime);
+                        licenseData.WriteAsFileTime(_dbInfo.RestoreTime);
+                        licenseData.WriteAsFileTime(_dbInfo.LastCounterUpdateTime);
+                        // Convert current time to the timezone of the requesting server.
+                        licenseData.WriteAsFileTime(
+                            DateTime.UtcNow - new TimeSpan(0, _dbInfo.TimeZoneBias, 0));
+                    }
+                    else
+                    {
+                        licenseData.WriteAsCTime(_dbInfo.CreationTime);
+                        licenseData.WriteAsCTime(_dbInfo.RestoreTime);
+                        licenseData.WriteAsCTime(_dbInfo.LastCounterUpdateTime);
+                        licenseData.WriteAsCTime(DateTime.UtcNow);
+                    }
                     licenseData.Write(Environment.UserName);
                     licenseData.Write(Environment.MachineName);
 
@@ -782,7 +808,7 @@ namespace Extract.FAMDBCounterManager
 
                 // Make sure the version is one that can be interpreted
 				// Future version will need code to read the different versions if needed
-                if (_licenseCodeVersion > 1)
+                if (_licenseCodeVersion > 2)
                 {
                     Exception ex = new Exception("License code version is not recognized.");
                     ex.Data.Add("LicenseCodeVersion", _licenseCodeVersion.ToString());
@@ -790,14 +816,14 @@ namespace Extract.FAMDBCounterManager
                     throw ex;
                 }
 
-                _dbInfo = new DatabaseInfo(_licenseData);
+                _dbInfo = new DatabaseInfo(_licenseData, _licenseCodeVersion);
                 _databaseIdTextBox.Text = _dbInfo.DatabaseID.ToString().ToUpperInvariant();
                 _databaseServerTextBox.Text = _dbInfo.DatabaseServer;
                 _databaseNameTextBox.Text = _dbInfo.DatabaseName;
-                _databaseCreationTextBox.Text = _dbInfo.CreationTime.DateTimeToString();
-                _databaseRestoreTextBox.Text = _dbInfo.RestoreTime.DateTimeToString();
-                _lastCounterUpdateTextBox.Text = _dbInfo.LastCounterUpdateTime.DateTimeToString();
-                _dateTimeStampTextBox.Text = _dbInfo.DateTimeStamp.DateTimeToString();
+                _databaseCreationTextBox.Text = _dbInfo.CreationTime.DateTimeToString(_dbInfo.TimeZoneBias);
+                _databaseRestoreTextBox.Text = _dbInfo.RestoreTime.DateTimeToString(_dbInfo.TimeZoneBias);
+                _lastCounterUpdateTextBox.Text = _dbInfo.LastCounterUpdateTime.DateTimeToString(_dbInfo.TimeZoneBias);
+                _dateTimeStampTextBox.Text = _dbInfo.DateTimeStamp.DateTimeToString(_dbInfo.TimeZoneBias);
                 _customerNameTextBox.Text = "";
                 _commentsTextBox.Text = "";
                 

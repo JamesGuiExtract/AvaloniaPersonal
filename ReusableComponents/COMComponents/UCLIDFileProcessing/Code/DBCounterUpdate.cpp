@@ -3,6 +3,7 @@
 
 #include <ADOUtils.h>
 #include <UCLIDException.h>
+#include <DateUtil.h>
 
 #include <EncryptionEngine.h>
 
@@ -96,7 +97,7 @@ ByteStreamManipulator& operator >> (ByteStreamManipulator & bsm, CounterOperatio
 ByteStreamManipulator& operator >> (ByteStreamManipulator & bsm, DBCounterUpdate &counterUpdate)
 {
 	bsm >> counterUpdate.m_DatabaseID;
-	bsm >> counterUpdate.m_ctTimeCodeGenerated;
+	bsm >> counterUpdate.m_stTimeCodeGenerated;
 	bsm >> counterUpdate.m_strUserName;
 	bsm >> counterUpdate.m_strMachineName;
 	bsm >> counterUpdate.m_nNumberOfUpdates;

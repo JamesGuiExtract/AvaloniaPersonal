@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "DBCounterChangeValue.h"
 
+#include <DateUtil.h>
 #include <UCLIDException.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -11,11 +12,11 @@ DBCounterChangeValue::DBCounterChangeValue()
 	, m_nCounterID(0)
 	, m_nToValue(0)
 	, m_nFromValue(0)
-	, m_ctUpdatedTime(0)
 	, m_nLastUpdatedByFAMSessionID(0)
 	, m_llMinFAMFileCount(0)
 	, m_llHashValue(0)
 {
+	ZeroMemory(&m_stUpdatedTime, sizeof(SYSTEMTIME));
 }
 //-------------------------------------------------------------------------------------------------
 void DBCounterChangeValue::CalculateHashValue(long long &llHashValue)
@@ -28,7 +29,7 @@ void DBCounterChangeValue::CalculateHashValue(long long &llHashValue)
 	llHashValue ^= hashLong(m_nCounterID) << 1;
 	llHashValue ^= hashLong(m_nToValue) << 2;
 	llHashValue ^= hashLong(m_nFromValue) << 3;
-	llHashValue ^= hashLonglong((long long)m_ctUpdatedTime.GetTime()) << 4;
+	llHashValue ^= hashLonglong(asULongLong(m_stUpdatedTime)) << 4;
 	llHashValue ^= hashLong(m_nLastUpdatedByFAMSessionID) << 5;
 	llHashValue ^= hashLonglong(m_llMinFAMFileCount) << 6;
 	if (!m_strComment.empty())
@@ -46,8 +47,7 @@ void DBCounterChangeValue::LoadFromFields(FieldsPtr ipFields, bool bValidateHash
 		m_nToValue = getLongField(ipFields, "ToValue");
 		rnToValue = m_nToValue; 
 		m_nFromValue = getLongField(ipFields, "FromValue");
-		string tempDate = getStringField(ipFields, "LastUpdatedTime");
-		m_ctUpdatedTime = getTimeDateField(ipFields, "LastUpdatedTime", true);
+		m_stUpdatedTime = getTimeDateField(ipFields, "LastUpdatedTime");
 
 		// This field could be null 
 		if (isNULL(ipFields, "LastUpdatedByFAMSessionID"))
@@ -74,8 +74,7 @@ void DBCounterChangeValue::LoadFromFields(FieldsPtr ipFields, bool bValidateHash
 				ue.addDebugInfo("SecureCounterValueChangeID", m_nID);
 				ue.addDebugInfo("CalculatedHash", nCalculatedHash, true);
 				ue.addDebugInfo("ExpectedHash", m_llHashValue, true);
-				ue.addDebugInfo("UpdatedTime", m_ctUpdatedTime.FormatGmt("%Y-%m-%d %H:%M:%S %z").operator LPCSTR(), true);
-				ue.addDebugInfo("UpdatedTimeAsStringFromDB", tempDate, true);
+				ue.addDebugInfo("UpdatedTime", (LPCTSTR)CTime(m_stUpdatedTime).Format("%Y-%m-%d %H:%M:%S"), true);
 				throw ue;
 			}
 		}
@@ -90,7 +89,7 @@ string DBCounterChangeValue::GetInsertQuery()
 		"VALUES (";
 
 	// Format the time as UTC 
-	string strTime = m_ctUpdatedTime.FormatGmt("%Y-%m-%d %H:%M:%S +00:00");
+	string strTime = CTime(m_stUpdatedTime).Format("%Y-%m-%d %H:%M:%S");
 	
 	strInsertQuery += asString(m_nCounterID) + ", ";
 	strInsertQuery += asString(m_nFromValue) + ", ";

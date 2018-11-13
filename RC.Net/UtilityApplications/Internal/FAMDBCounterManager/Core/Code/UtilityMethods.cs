@@ -89,6 +89,33 @@ namespace Extract.FAMDBCounterManager
         }
 
         /// <summary>
+        /// Returns a <see cref="System.String"/> that represents the <see paramref="dateTime"/>
+        /// </summary>
+        /// <param name="dateTime">The date time.</param>
+        /// <param name="bias">The number of minutes ahead of UTC of the timezone to which
+        /// <paramref name="dateTime"/> belongs.</param>
+        /// A <see cref="System.String"/> that represents this instance or "N/A" if the datetime is
+        /// zero/empty.
+        public static string DateTimeToString(this DateTime dateTime, int bias)
+        {
+            var dateOffset = new TimeSpan(0, bias, 0);
+            var localOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
+
+            dateTime += dateOffset;
+            dateTime += localOffset;
+
+            // There is no standard way to get the time zone abbreviation. Working off the
+            // assumption that Extract Systems will always operate out of the central time zone,
+            // hard-code the time zone abbreviation taking only daylight vs standard into account.
+            return (dateTime.Ticks == 0)
+                ? "N/A"
+                : dateTime.ToString("g", CultureInfo.CurrentCulture)
+                    + (TimeZoneInfo.Local.IsDaylightSavingTime(DateTime.Now)
+                        ? " CDT"
+                        : " CST");
+        }
+
+        /// <summary>
         /// Parses and validates a positive integer from the specified <see paramref="stringValue"/>.
         /// </summary>
         /// <param name="stringValue">The string value to parse</param>

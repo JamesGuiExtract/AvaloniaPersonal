@@ -349,7 +349,7 @@ void setStringField( const FieldsPtr& ipFields, const string& strFieldName, cons
 	}
 }
 //-------------------------------------------------------------------------------------------------
-CTime getTimeDateField(const FieldsPtr& ipFields, const string& strFieldName, bool noTZConversion)
+SYSTEMTIME getTimeDateField(const FieldsPtr& ipFields, const string& strFieldName)
 {
 	// Use double try catch so that the field name can be added to the debug info
 	try
@@ -373,36 +373,12 @@ CTime getTimeDateField(const FieldsPtr& ipFields, const string& strFieldName, bo
 				ue.addDebugInfo("Type", vtItem.vt);
 				throw ue;
 			}
-			if (vtItem.vt == VT_BSTR)
-			{
-				return FromDateTimeStringWithTimeZoneAdjustment(asString(vtItem.bstrVal));
-			}
-			else
-			{
-				// Get the date time as systemTime
-				SYSTEMTIME systemTime;
-				VariantTimeToSystemTime(vtItem, &systemTime);
+			
+			// Get the date time as systemTime
+			SYSTEMTIME systemTime;
+			VariantTimeToSystemTime(vtItem, &systemTime);
 
-				if (noTZConversion)
-				{
-					FILETIME fileTime;
-					SystemTimeToFileTime(&systemTime, &fileTime);
-
-					// Determine if Daylight savings is in effect
-					// https://extract.atlassian.net/browse/ISSUE-15325
-					TIME_ZONE_INFORMATION tzi;
-					DWORD daylight = GetTimeZoneInformation(&tzi);
-
-					// Create the CTime object from the file time
-					CTime checkFromFileTime(fileTime, (daylight == TIME_ZONE_ID_DAYLIGHT) ? 1 : 0);
-					return checkFromFileTime;
-				}
-				else
-				{
-					CTime checkFromSystemTime(systemTime);
-					return checkFromSystemTime;
-				}
-			}
+			return systemTime;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI15410");
 	}
@@ -631,7 +607,7 @@ string getSQLServerDateTime( const _ConnectionPtr& ipDBConnection )
 	return asString(vtTimeStr.bstrVal);;
 }
 //-------------------------------------------------------------------------------------------------
-CTime getSQLServerDateTimeAsCTime(const _ConnectionPtr& ipDBConnection)
+SYSTEMTIME getSQLServerDateTimeAsSystemTime(const _ConnectionPtr& ipDBConnection)
 {
 	ASSERT_ARGUMENT("ELI30822", ipDBConnection != __nullptr);
 
@@ -645,27 +621,6 @@ CTime getSQLServerDateTimeAsCTime(const _ConnectionPtr& ipDBConnection)
 	ASSERT_RESOURCE_ALLOCATION("ELI30824", ipFields != __nullptr );
 
 	return getTimeDateField(ipFields, "CurrDateTime");
-}
-//-------------------------------------------------------------------------------------------------
-CTime getSQLServerDateTimeOffsetAsCTime(const _ConnectionPtr& ipDBConnection)
-{
-	try
-	{
-		ASSERT_ARGUMENT("ELI41808", ipDBConnection != __nullptr);
-
-		// Get the current date time
-		_RecordsetPtr ipRSTime;
-		ipRSTime = ipDBConnection->Execute (gstrGET_SQL_SERVER_DATETIMEOFFSET.c_str(), NULL, adCmdText );
-		ASSERT_RESOURCE_ALLOCATION("ELI41809", ipRSTime != __nullptr );
-	
-		// Get the fields pointer
-		FieldsPtr ipFields = ipRSTime->Fields;
-		ASSERT_RESOURCE_ALLOCATION("ELI41810", ipFields != __nullptr );
-
-		return getTimeDateField(ipFields, "CurrDateTimeOffset");
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41807")
-
 }
 //-------------------------------------------------------------------------------------------------
 string createConnectionString(const string& strServer, const string& strDatabase,
@@ -1275,7 +1230,7 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const st
 }
 //-------------------------------------------------------------------------------------------------
 FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
-	string &strServerName, CTime &ctCreateDate, CTime &ctLastRestoreDate, bool noTZConversion)
+	string &strServerName, SYSTEMTIME &ctCreateDate, SYSTEMTIME &ctLastRestoreDate)
 {
 	try
 	{
@@ -1294,8 +1249,8 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const st
 			FieldsPtr ipFields = result->Fields;
 			ASSERT_RESOURCE_ALLOCATION("ELI38806", ipFields != __nullptr );
 
-			ctCreateDate = getTimeDateField(ipFields, "create_date", noTZConversion);
-			ctLastRestoreDate = getTimeDateField(ipFields, "restore_date", noTZConversion);
+			ctCreateDate = getTimeDateField(ipFields, "create_date");
+			ctLastRestoreDate = getTimeDateField(ipFields, "restore_date");
 			strServerName = getStringField(ipFields, "ServerName");
 		}
 		else
@@ -1312,8 +1267,8 @@ FAMUTILS_API void createDatabaseID(const _ConnectionPtr& ipConnection, ByteStrea
 {
 	try
 	{
-		CTime ctDBCreatedDate;
-		CTime ctDBRestoreDate;
+		SYSTEMTIME stDBCreatedDate;
+		SYSTEMTIME stDBRestoreDate;
 		string strServer;
 
 		string strDBName = ipConnection->DefaultDatabase;
@@ -1323,20 +1278,25 @@ FAMUTILS_API void createDatabaseID(const _ConnectionPtr& ipConnection, ByteStrea
 
 		ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, bsDatabaseID);
 
-		getDatabaseInfo(ipConnection, strDBName, strServer,ctDBCreatedDate,
-			ctDBRestoreDate);
+		getDatabaseInfo(ipConnection, strDBName, strServer, stDBCreatedDate, stDBRestoreDate);
 		
 		GUID guidDatabaseID;
 		CoCreateGuid(&guidDatabaseID);
-		CTime ctLastUpdateTime = getSQLServerDateTimeOffsetAsCTime(ipConnection);
+		SYSTEMTIME stLastUpdateTime = getSQLServerDateTimeAsSystemTime(ipConnection);
+
+		TIME_ZONE_INFORMATION tzi;
+		bool daylight = (GetTimeZoneInformation(&tzi) == TIME_ZONE_ID_DAYLIGHT);
+		long nTimeZoneBias = daylight
+			? tzi.Bias + tzi.DaylightBias
+			: tzi.Bias + tzi.StandardBias;
 
 		// Put the values in the ByteStream;
 		bsm << guidDatabaseID;
 		bsm << strServer;
 		bsm << strDBName;
-		bsm << ctDBCreatedDate;
-		bsm << ctDBRestoreDate;
-		bsm << ctLastUpdateTime;
+		bsm << stDBCreatedDate;
+		bsm << stDBRestoreDate;
+		bsm << stLastUpdateTime;
 		// Flush in multiple of 8 bytes because it will need to be encrypted
 		bsm.flushToByteStream(8);
 	}

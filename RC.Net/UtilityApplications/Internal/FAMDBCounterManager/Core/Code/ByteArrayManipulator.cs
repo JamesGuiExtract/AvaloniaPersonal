@@ -116,6 +116,15 @@ namespace Extract.FAMDBCounterManager
         /// <summary>
         /// Writes the specified <see paramref="value"/> to the stream.
         /// </summary>
+        /// <param name="value">The <see cref="Int64"/> to write to the stream.</param>
+        public void Write(Int64 value)
+        {
+            _bytes.AddRange(BitConverter.GetBytes(value));
+        }
+
+        /// <summary>
+        /// Writes the specified <see paramref="value"/> to the stream.
+        /// </summary>
         /// <param name="value">The <see cref="DateTime"/> to write to the stream.</param>
         public void WriteAsCTime(DateTime value)
         {
@@ -127,6 +136,22 @@ namespace Extract.FAMDBCounterManager
             {
                 TimeSpan span = value - new DateTime(1970, 1, 1);
                 Write((int)(span.Ticks / TimeSpan.TicksPerSecond));
+            }
+        }
+
+        /// <summary>
+        /// Writes the specified <see paramref="value"/> to the stream as a filetime.
+        /// </summary>
+        /// <param name="value">The <see cref="DateTime"/> to write to the stream.</param>
+        public void WriteAsFileTime(DateTime value)
+        {
+            if (value == new DateTime(0))
+            {
+                Write((int)0);
+            }
+            else
+            {
+                Write(value.ToFileTime());
             }
         }
 
@@ -191,6 +216,28 @@ namespace Extract.FAMDBCounterManager
             {
                 return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc) +
                     TimeSpan.FromTicks(seconds * TimeSpan.TicksPerSecond);
+            }
+        }
+
+        /// <summary>
+        /// Reads a filetime from the string into a <see cref="DateTime"/> value.
+        /// <para><b>Note</b></para>
+        /// The filetime is interpreted literally-- it is not converted based on timezone.
+        /// </summary>
+        /// <returns>The <see cref="DateTime"/> value read from the stream.</returns>
+        public DateTime ReadFileTimeAsDateTime()
+        {
+            long fileTime = BitConverter.ToInt64(ReadBytes(sizeof(Int64)), 0);
+
+            if (fileTime == 0)
+            {
+                return new DateTime(0);
+            }
+            else
+            {
+                // Read the filetime as UTC, otherwise it will be adjusted based on the 
+                // current timezone.
+                return DateTime.FromFileTimeUtc(fileTime);
             }
         }
 

@@ -423,6 +423,25 @@ ByteStreamManipulator& operator << (ByteStreamManipulator& rManipulator,
 	return rManipulator;
 }
 //--------------------------------------------------------------------------------------------------
+ByteStreamManipulator& operator << (ByteStreamManipulator& rManipulator,
+	const SYSTEMTIME& SystemTime)
+{
+	// this operator should only work in the kWrite mode
+	if (rManipulator.eMode != ByteStreamManipulator::kWrite)
+	{
+		throw UCLIDException("ELI46477",
+			"ByteStreamManipulator: cannot call << operator on a read-only object!");
+	}
+
+	FILETIME fileTime = { 0 };
+	SystemTimeToFileTime(&SystemTime, &fileTime);
+
+	rManipulator << fileTime.dwLowDateTime;
+	rManipulator << fileTime.dwHighDateTime;
+
+	return rManipulator;
+}
+//--------------------------------------------------------------------------------------------------
 ByteStreamManipulator& operator << (ByteStreamManipulator& rManipulator, bool bData)
 {
 	// this operator should only work in the kWrite mode
@@ -717,6 +736,32 @@ ByteStreamManipulator& operator >> (ByteStreamManipulator& rManipulator,
 	// Convert time_t object to CTime object
 	rTime = CTime(time);
 	
+	return rManipulator;
+}
+//--------------------------------------------------------------------------------------------------
+ByteStreamManipulator& operator >> (ByteStreamManipulator& rManipulator,
+	SYSTEMTIME& rSystemTime)
+{
+	// this operator should only work in the kRead mode
+	if (rManipulator.eMode != ByteStreamManipulator::kRead)
+	{
+		throw UCLIDException("ELI46475",
+			"ByteStreamManipulator: cannot call >> operator on a write-only object!");
+	}
+
+	// ensure that the cursor is not null
+	if (rManipulator.pszByteStreamCursor == NULL)
+	{
+		throw UCLIDException("ELI46476",
+			"Internal error in ByteStreamManipulator >> operator - rSystemTime!");
+	}
+
+	FILETIME fileTime = { 0 };
+	rManipulator >> fileTime.dwLowDateTime;
+	rManipulator >> fileTime.dwHighDateTime;
+
+	FileTimeToSystemTime(&fileTime, &rSystemTime);
+
 	return rManipulator;
 }
 //--------------------------------------------------------------------------------------------------

@@ -42,7 +42,7 @@ class DBCounterUpdate
 {
 public:
 	DatabaseIDValues m_DatabaseID;
-	CTime m_ctTimeCodeGenerated;
+	SYSTEMTIME m_stTimeCodeGenerated;
 	string m_strUserName;
 	string m_strMachineName;
 	long m_nNumberOfUpdates;

@@ -13,7 +13,7 @@ public:
 	long m_nCounterID;
 	long m_nToValue;
 	long m_nFromValue;
-	CTime m_ctUpdatedTime;
+	SYSTEMTIME m_stUpdatedTime;
 	long m_nLastUpdatedByFAMSessionID;
 	long long m_llMinFAMFileCount;
 	long long m_llHashValue;

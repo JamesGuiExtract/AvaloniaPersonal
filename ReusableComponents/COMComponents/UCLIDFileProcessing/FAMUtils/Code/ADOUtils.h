@@ -161,7 +161,7 @@ FAMUTILS_API string getStringField( const FieldsPtr& ipFields, const string& str
 //			if the field is of the wrong type an exception will be thrown
 //			if noTZConversion true then datetime is in the local time zone otherwise there will be no adjustment
 //			made to the time for the timezone
-FAMUTILS_API CTime getTimeDateField(const FieldsPtr& ipFields, const string& strFieldName, bool noTZConversion = false);
+FAMUTILS_API SYSTEMTIME getTimeDateField(const FieldsPtr& ipFields, const string& strFieldName);
 
 // PROMISE: To return the double value of the field named strFieldName in the ipFields collection
 //			if the field does not exist an exception will be thrown
@@ -192,11 +192,8 @@ FAMUTILS_API void setDoubleField( const FieldsPtr& ipFields, const string& strFi
 // PROMISE:	To return datetime as string from the SQL server using the GETDATE() SQL function 
 FAMUTILS_API string getSQLServerDateTime( const _ConnectionPtr& ipDBConnection );
 
-// PROMISE: To return datetime as CTime from the SQL server using the GETDATE() SQL function
-FAMUTILS_API CTime getSQLServerDateTimeAsCTime(const _ConnectionPtr& ipDBConnection);
-
-// PROMISE: To return the datetimeOffset as CTime from the SQL server using the SYSDATETIMEOFFSET() SQL function
-FAMUTILS_API CTime getSQLServerDateTimeOffsetAsCTime(const _ConnectionPtr& ipDBConnection);
+// PROMISE: To return the datetime as SYSTEMTIME from the SQL server using the GETDATE() SQL function
+FAMUTILS_API SYSTEMTIME getSQLServerDateTimeAsSystemTime(const _ConnectionPtr& ipDBConnection);
 
 // Returns the connection string using the given server and database.
 // If strAdditionalConnectionStringComponents is non=empty it will be added to the end of the
@@ -315,7 +312,7 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const st
 //				ctCreateDate
 //				ctLastRestoreDate
 FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
-	string &strServerName, CTime &ctCreateDate, CTime &ctLastRestoreDate, bool noTZConversion = true);
+	string &strServerName, SYSTEMTIME &ctCreateDate, SYSTEMTIME &ctLastRestoreDate);
 
 // PROMISE: To return the bsDatabaseID ByteStream that contains the following:
 //				<DatabaseGUID>,<DatabaseServer>,<DatabaseName>,<DatabaseCreationDate>,<DatabaseRestoreDate><LastUpdateTime>
