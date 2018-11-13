@@ -138,6 +138,8 @@ library UCLID_SSOCR2Lib
 		// PURPOSE: To write OCR parameters to a file in order to verify which settings have been set
 		[id(11), helpstring("method WriteOCRSettingsToFile")] HRESULT WriteOCRSettingsToFile(
 			[in] BSTR bstrFileName, VARIANT_BOOL vbWriteDefaults, VARIANT_BOOL vbWriteExtractImplementedSettings);
+		[id(12), helpstring("method CreateOutputImage")] HRESULT CreateOutputImage([in] BSTR bstrImageFileName, 
+			[in] BSTR bstrFormat, [in] BSTR bstrOutputFileName);
 	};
 
 	//----------------------------------------------------------------------------------------------

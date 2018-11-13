@@ -56,6 +56,8 @@ public:
 		IProgressStatus* pProgressStatus, IOCRParameters* pOCRParameters,
 		ISpatialString* *pstrText);
 	STDMETHOD(raw_WhackOCREngine)();
+	STDMETHOD(raw_CreateOutputImage)(BSTR bstrImageFileName, BSTR bstrFormat, BSTR bstrOutputFileName,
+		IOCRParameters* pOCRParameters);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

@@ -1453,6 +1453,8 @@ library UCLID_RASTERANDOCRMGMTLib
 		// PROMISE: Will kill the OCR engine and prevent it from immediately respawning
 		//			to continue OCR on the current document.
 		[id(8), helpstring("method WhackOCREngine")] HRESULT WhackOCREngine();
+		[id(9), helpstring("method CreateOutputImage")] HRESULT CreateOutputImage([in] BSTR bstrImageFileName, 
+			[in] BSTR bstrFormat, [in] BSTR bstrOutputFileName, [in] IOCRParameters* pOCRParameters);
 	};
 
 	[

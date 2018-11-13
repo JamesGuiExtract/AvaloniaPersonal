@@ -93,7 +93,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>KernelAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>KernelAPI.lib;RecApiPlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\..\..\Binaries\$(Configuration)\$(ProjectName).exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\..\..\..\..\APIs\Nuance_19\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -148,7 +148,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>KernelAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>KernelAPI.lib;RecApiPlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\..\..\Binaries\$(Configuration)\$(ProjectName).exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\..\..\..\..\APIs\Nuance_19\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

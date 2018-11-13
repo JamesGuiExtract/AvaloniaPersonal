@@ -347,6 +347,28 @@ STDMETHODIMP CScansoftOCR::raw_WhackOCREngine()
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI22046");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CScansoftOCR::raw_CreateOutputImage(BSTR bstrImageFileName, BSTR bstrFormat, BSTR bstrOutputFileName,
+	IOCRParameters* pOCRParameters)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+	
+	try
+	{
+
+		IScansoftOCR2Ptr ipOcrEngine = getOCREngine();
+		ASSERT_RESOURCE_ALLOCATION("ELI46464", ipOcrEngine != __nullptr);
+
+		// Set the parameters (either from registry or parameters object)
+		// Re-apply the settings in case they have changed since the engine was created
+		ipOcrEngine->SetOCRParameters(pOCRParameters, VARIANT_TRUE);
+
+		ipOcrEngine->CreateOutputImage(bstrImageFileName, bstrFormat, bstrOutputFileName);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46465");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent

@@ -5,6 +5,11 @@
 #include "resource.h"       // main symbols
 
 #include <KernelAPI.h>	
+
+#ifdef InitializeRecAPIPlusForSSOCR2
+#include <RecAPIPlus.h>	
+#endif
+
 #include <Win32Event.h>
 #include <CPPLetter.h>
 
@@ -65,6 +70,7 @@ END_COM_MAP()
 	STDMETHOD(SetOCRParameters)(IOCRParameters* pOCRParameters, VARIANT_BOOL vbReApply);
 	STDMETHOD(WriteOCRSettingsToFile)(BSTR bstrFileName, VARIANT_BOOL vbWriteDefaults,
 		VARIANT_BOOL vbWriteExtractImplementedSettings);
+	STDMETHOD(CreateOutputImage)(BSTR bstrImageFileName, BSTR bstrFormat, BSTR bstrOutputFileName);
 
 // IPrivateLicensedComponent
 	STDMETHOD(raw_InitPrivateLicense)(/*[in]*/ BSTR strPrivateLicenseKey);

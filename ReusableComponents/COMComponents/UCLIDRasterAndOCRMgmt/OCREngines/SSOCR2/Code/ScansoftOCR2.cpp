@@ -293,6 +293,74 @@ STDMETHODIMP CScansoftOCR2::RecognizeText(BSTR bstrImageFileName, IVariantVector
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CScansoftOCR2::CreateOutputImage(BSTR bstrImageFileName, BSTR bstrFormat, BSTR bstrOutputFileName)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+	
+	try
+	{
+#ifndef InitializeRecAPIPlusForSSOCR2
+		throw UCLIDException("ELI46494", "This method requires RecAPIPlus to be initialized");
+#else
+		// validate the license
+		validateLicense();
+
+		HDOC hDoc;
+		HIMGFILE hFile;
+		HPAGE hPage;
+		int nPageCount;
+
+		THROW_UE_ON_ERROR("ELI46466", "Unable to set output format",
+			RecSetOutputFormat(0, get_bstr_t(bstrFormat)));
+
+		THROW_UE_ON_ERROR("ELI46467", "Unable to create doc",
+			RecCreateDoc(0, "", &hDoc, DOC_NORMAL));
+
+		_bstr_t bstrtImageFileName = get_bstr_t(bstrImageFileName);
+		THROW_UE_ON_ERROR("ELI46468", "Unable to open input file",
+			kRecOpenImgFile(bstrtImageFileName, &hFile, IMGF_READ, FF_SIZE));
+
+		THROW_UE_ON_ERROR("ELI46469", "Unable to get image page count",
+			kRecGetImgFilePageCount(hFile, &nPageCount));
+
+		for (int i = 0; i < nPageCount; ++i)
+		{
+			try
+			{
+				THROW_UE_ON_ERROR("ELI46470", "Unable to load image page",
+					kRecLoadImgF(0, bstrtImageFileName, &hPage, i));
+			}
+			catch (UCLIDException ue)
+			{
+				ue.addDebugInfo("Image", asString(bstrtImageFileName));
+				ue.addDebugInfo("Page", i + 1);
+				throw ue;
+			}
+			try
+			{
+				THROW_UE_ON_ERROR("ELI46471", "Unable to recognize image page",
+					kRecRecognize(0, hPage, NULL));
+			}
+			catch (UCLIDException ue)
+			{
+				ue.addDebugInfo("Image", asString(bstrtImageFileName));
+				ue.addDebugInfo("Page", i + 1);
+				ue.log();
+			}
+
+			THROW_UE_ON_ERROR("ELI46472", "Unable to insert page",
+				RecInsertPage(0, hDoc, hPage, -1));
+
+			THROW_UE_ON_ERROR("ELI46473", "Unable convert document",
+				RecConvert2Doc(0, hDoc, get_bstr_t(bstrOutputFileName)));
+		}
+
+		return S_OK;
+#endif
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46479");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CScansoftOCR2::GetPID(long* pPID)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
@@ -1108,7 +1176,13 @@ void CScansoftOCR2::initEngineAndLicense()
 		}
 
 		// Initialization of OCR engine	
+#ifdef InitializeRecAPIPlusForSSOCR2
+		// Use this to make CreateOutputImage, and thus CreateHtmlFromImage.exe, work:
+		rc = RecInitPlus("Extract Systems", "SSOCR2");
+#else
 		rc = kRecInit("Extract Systems", "SSOCR2");
+#endif
+
 		if (rc != REC_OK && rc != API_INIT_WARN)
 		{
 			// create the exception object to throw to outer scope
