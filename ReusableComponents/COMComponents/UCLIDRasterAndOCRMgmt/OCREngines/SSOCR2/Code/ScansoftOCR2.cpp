@@ -1784,7 +1784,8 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	THROW_UE_ON_ERROR("ELI12723", "Unable to rotate image.",
 		kRecRotateImg(0, m_hPage, imgRotate));
 
-	if (m_eForceDespeckle != kNeverForce)
+	if (m_eForceDespeckle == kAlwaysForce
+		|| m_eForceDespeckle == kForceWhenBitonal && info.BitsPerPixel == 1)
 	{
 		THROW_UE_ON_ERROR("ELI36823", "Unable to despeckle image.",
 			kRecForceDespeckleImg(0, m_hPage, pZone, m_eForceDespeckleMethod, m_nForceDespeckleLevel));
