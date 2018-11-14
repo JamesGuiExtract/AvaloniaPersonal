@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -8,8 +9,49 @@ using System.Windows.Forms;
 
 namespace Extract.Testing.Utilities
 {
+       #region Structures
+
+        [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes")]
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SystemTime
+        {
+            [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
+            public short Year;
+            [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
+            public short Month;
+            [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
+            public short DayOfWeek;
+            [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
+            public short Day;
+            [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
+            public short Hour;
+            [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
+            public short Minute;
+            [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
+            public short Second;
+            [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
+            public short Milliseconds;
+
+            public SystemTime(SystemTime from)
+            {
+                Year = from.Year;
+                Month = from.Month;
+                DayOfWeek = from.DayOfWeek;
+                Day = from.Day;
+                Hour = from.Hour;
+                Minute = from.Minute;
+                Second = from.Second;
+                Milliseconds = from.Milliseconds;
+            }
+
+        }
+
+    #endregion
+
     public static class NativeMethods
     {
+ 
+
         #region Constants
 
         const uint BM_CLICK = 0x00F5;
@@ -35,6 +77,13 @@ namespace Extract.Testing.Utilities
         static extern bool EnumChildWindows(IntPtr hWndParent, EnumWindowsProc enumProc, IntPtr lParam);
 
         delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+        [DllImport("kernel32.dll", EntryPoint = "GetSystemTime", SetLastError = true)]
+        extern static void Win32GetSystemTime(ref SystemTime sysTime);
+
+        [DllImport("kernel32.dll", EntryPoint = "SetSystemTime", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        extern static bool Win32SetSystemTime(ref SystemTime sysTime);
 
         #endregion P/Invokes
 
@@ -138,6 +187,43 @@ namespace Extract.Testing.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI46042");
+            }
+        }
+
+        /// <summary>
+        /// Calls the windows GetSystemTime function to get the SystemTime
+        /// </summary>
+        /// <returns>System time</returns>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public static SystemTime GetWin32SystemTime()
+        {
+            try
+            {
+                SystemTime systemTime = new SystemTime();
+                Win32GetSystemTime(ref systemTime);
+                return systemTime;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46492");
+            }
+        }
+
+        /// <summary>
+        /// Sets the System time to the given time.
+        /// NOTE: Application that calls this method must be running as an admin in order for it to work
+        /// </summary>
+        /// <param name="systemTime">The date and time to set</param>
+        /// <returns><c>true</c> if the time was changed. <c>false</c> f the time was not changed</returns> 
+        public static bool SetWin32SystemTime(SystemTime systemTime)
+        {
+            try
+            {
+                return Win32SetSystemTime(ref systemTime);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46493");
             }
         }
 
