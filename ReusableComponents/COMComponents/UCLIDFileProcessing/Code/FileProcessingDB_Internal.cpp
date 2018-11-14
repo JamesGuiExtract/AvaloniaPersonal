@@ -6302,7 +6302,7 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 		}
 
 		// Create the counter change records
-		DBCounterChangeValue counterChange;
+		DBCounterChangeValue counterChange(m_DatabaseIDValues);
 		counterChange.m_nCounterID = counterOp.m_nCounterID;
 		counterChange.m_stUpdatedTime = newDatabaseIDValues.m_stLastUpdated;
 		counterChange.m_nLastUpdatedByFAMSessionID = m_nFAMSessionID;
@@ -6451,7 +6451,7 @@ void CFileProcessingDB::getCounterInfo(map<long, CounterOperation> &mapOfCounter
 	while (!asCppBool(ipResultSet->adoEOF))
 	{
 		DBCounter dbCounter;
-		DBCounterChangeValue counterChange;
+		DBCounterChangeValue counterChange(m_DatabaseIDValues);
 
 		FieldsPtr fields = ipResultSet->Fields;
 		dbCounter.LoadFromFields(ipResultSet->Fields);
@@ -6460,7 +6460,7 @@ void CFileProcessingDB::getCounterInfo(map<long, CounterOperation> &mapOfCounter
 		{
 			// Check the counter hash and validate counter value against the last ChangeValue for the
 			// counter
-			dbCounter.validate(m_DatabaseIDValues.m_nHashValue);
+			dbCounter.validate(m_DatabaseIDValues);
 		}
 
 		CounterOperation counterOp(dbCounter);
@@ -6676,7 +6676,7 @@ string CFileProcessingDB::getQueryToResetCounterCorruption(CounterOperation coun
 	vector<string> resultQueries;
 	
 	// Create the counter change records
-	DBCounterChangeValue counterChange;
+	DBCounterChangeValue counterChange(m_DatabaseIDValues);
 	counterChange.m_nCounterID = counter.m_nCounterID;
 	counterChange.m_stUpdatedTime = databaseID.m_stLastUpdated;
 	counterChange.m_nLastUpdatedByFAMSessionID = m_nFAMSessionID;

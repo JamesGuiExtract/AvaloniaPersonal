@@ -1,5 +1,7 @@
 #pragma once
 
+#include "DatabaseIDValues.h"
+
 #include <ADOUtils.h>
 
 using namespace ADODB;
@@ -8,7 +10,8 @@ using namespace ADODB;
 class DBCounterChangeValue
 {
 public:
-	DBCounterChangeValue();
+	DBCounterChangeValue(DatabaseIDValues databaseID);
+	DatabaseIDValues m_DatabaseID;
 	long m_nID;
 	long m_nCounterID;
 	long m_nToValue;
@@ -19,8 +22,8 @@ public:
 	long long m_llHashValue;
 	string m_strComment;
 
-	// Calculates a hash value for the recored (does not include m_llHashValue
-	void CalculateHashValue(long long &llHashValue);
+	// Calculates a hash value for the recored (does not include m_llHashValue)
+	void CalculateHashValue(long long &lHashValue);
 
 	// Assumes results in ipFields using gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE
 	// Which has SecureCounter.ID as ID and SecureCounterValueChange.ID as ValueChangedID

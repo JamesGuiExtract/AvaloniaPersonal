@@ -30,7 +30,7 @@ string CounterOperation::GetSQLQuery(const DatabaseIDValues &databaseIDValues)
 	DBCounter dbCounter(m_nCounterID, m_strCounterName, m_nValue);
 
 	// Get the new encrypted counter value
-	string encryptedCounterValue = dbCounter.getEncrypted(databaseIDValues.m_nHashValue);
+	string encryptedCounterValue = dbCounter.getEncrypted(databaseIDValues);
 
 	// Build the Where clause to select the row to update
 	string strWhere = " WHERE ID = " + asString(m_nCounterID);

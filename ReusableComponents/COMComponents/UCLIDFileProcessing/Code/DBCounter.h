@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DatabaseIDValues.h"
 
 #include <ADOUtils.h>
 #include <ByteStreamManipulator.h>
@@ -38,16 +39,16 @@ public:
 	void LoadFromFields(FieldsPtr ipFields);
 
 	// Returns a string of the encrypted m_nValue & CounterIDHash
-	string getEncrypted(const long nDatabaseIDHash);
+	string getEncrypted(const DatabaseIDValues databaseID);
 
 	// Throws an exception if checks of the counter validity fail. If ipFields is specified, the
 	// counter's value with be cross checked with the SecureCounterValueChange table. Use of
 	// ipFields assumes ipFields was generated with gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE.
-	void validate(const long nDatabaseIDHash, FieldsPtr ipFields = nullptr);
+	void validate(const DatabaseIDValues databaseID, FieldsPtr ipFields = nullptr);
 
 	// Returns true if checks of the counter validity succeed.
 	// Assumes ipFields generated with gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE.
-	bool isValid(const long nDatabaseIDHash, FieldsPtr ipFields = nullptr);
+	bool isValid(const DatabaseIDValues databaseID, FieldsPtr ipFields = nullptr);
 
 	// Map that maps the CounterID to Name for the standard counters
 	static map<long, string> ms_mapOfStandardNames;

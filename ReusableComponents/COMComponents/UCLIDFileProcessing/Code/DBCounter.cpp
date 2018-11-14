@@ -98,13 +98,13 @@ void DBCounter::LoadFromFields(FieldsPtr ipFields)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-string DBCounter::getEncrypted(const long nDatabaseIDHash)
+string DBCounter::getEncrypted(const DatabaseIDValues databaseID)
 {
 	ByteStream bsPW;
 	getFAMPassword(bsPW);
 	
 	// Add the counter id to the rightmost 10 bits after shifting the DatabaseIDHash
-	m_nDatabaseIDCounterIDHash = (nDatabaseIDHash << 10) + m_nID;
+	m_nDatabaseIDCounterIDHash = (databaseID.m_nHashValue << 10) + m_nID;
 	
 	ByteStream bsCounter;
 	ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, bsCounter);
@@ -115,7 +115,7 @@ string DBCounter::getEncrypted(const long nDatabaseIDHash)
 	return MapLabel::setMapLabelWithS(bsCounter, bsPW);
 }
 //-------------------------------------------------------------------------------------------------
-void DBCounter::validate(const long nDatabaseIDHash, FieldsPtr ipFields/* = nullptr */)
+void DBCounter::validate(const DatabaseIDValues databaseID, FieldsPtr ipFields/* = nullptr */)
 {
 	if (m_bUnrecoverable)
 	{
@@ -129,7 +129,7 @@ void DBCounter::validate(const long nDatabaseIDHash, FieldsPtr ipFields/* = null
 
 	if (ipFields != nullptr)
 	{
-		DBCounterChangeValue counterChange;
+		DBCounterChangeValue counterChange(databaseID);
 		try
 		{
 			try
@@ -156,7 +156,7 @@ void DBCounter::validate(const long nDatabaseIDHash, FieldsPtr ipFields/* = null
 		}
 	}
 
-	if (m_nDatabaseIDCounterIDHash != ((nDatabaseIDHash << 10) + m_nID))
+	if (m_nDatabaseIDCounterIDHash != ((databaseID.m_nHashValue << 10) + m_nID))
 	{
 		m_strValidationError = "Counter hash is invalid";
 		throw UCLIDException("ELI38927", "Counter has been corrupted.");
@@ -166,11 +166,11 @@ void DBCounter::validate(const long nDatabaseIDHash, FieldsPtr ipFields/* = null
 	m_strValidationError = "";
 }
 //-------------------------------------------------------------------------------------------------
-bool DBCounter::isValid(const long nDatabaseIDHash, FieldsPtr ipFields/* = nullptr */)
+bool DBCounter::isValid(const DatabaseIDValues databaseID, FieldsPtr ipFields/* = nullptr */)
 {
 	try
 	{
-		validate(nDatabaseIDHash, ipFields);
+		validate(databaseID, ipFields);
 		return true;
 	}
 	catch (UCLIDException ue)

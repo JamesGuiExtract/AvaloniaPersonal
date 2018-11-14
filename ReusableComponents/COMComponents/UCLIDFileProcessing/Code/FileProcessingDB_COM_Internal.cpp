@@ -9778,7 +9778,7 @@ bool CFileProcessingDB::GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL 
 					{
 						dbCounter.LoadFromFields(ipResultSet->Fields);
 						bool bValid = bIsDatabaseIDValid &&
-							dbCounter.isValid(m_DatabaseIDValues.m_nHashValue, ipResultSet->Fields);
+							dbCounter.isValid(m_DatabaseIDValues, ipResultSet->Fields);
 
 						ipSecureCounter->Initialize(getThisAsCOMPtr(), dbCounter.m_nID,
 							_bstr_t(dbCounter.m_strName.c_str()), dbCounter.m_nAlertLevel,
@@ -10011,7 +10011,7 @@ bool CFileProcessingDB::GetSecureCounterValue_Internal(bool bDBLocked, long nCou
 					DBCounter dbCounter;
 					
 					dbCounter.LoadFromFields(ipResultSet->Fields);
-					dbCounter.validate(m_DatabaseIDValues.m_nHashValue);
+					dbCounter.validate(m_DatabaseIDValues);
 
 					*pnCounterValue = dbCounter.m_nValue;
 					return true;
@@ -10078,9 +10078,9 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 					FieldsPtr fields = ipResultSet->Fields;
 					DBCounter dbCounter;
 					dbCounter.LoadFromFields(ipResultSet->Fields);
-					dbCounter.validate(m_DatabaseIDValues.m_nHashValue);
+					dbCounter.validate(m_DatabaseIDValues);
 
-					DBCounterChangeValue dbCounterChange;
+					DBCounterChangeValue dbCounterChange(m_DatabaseIDValues);
 					dbCounterChange.m_nCounterID = dbCounter.m_nID;
 					dbCounterChange.m_nFromValue = dbCounter.m_nValue;
 					if (decrementAmount > dbCounter.m_nValue)
@@ -10109,7 +10109,7 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 						// list of queries to run
 						vector<string> vecUpdateQueries;
 						vecUpdateQueries.push_back("UPDATE [dbo].[SecureCounter] SET SecureCounterValue = '" + 
-							dbCounter.getEncrypted(m_DatabaseIDValues.m_nHashValue) + 
+							dbCounter.getEncrypted(m_DatabaseIDValues) + 
 							"' WHERE ID = " + asString(dbCounter.m_nID));
 
 						vecUpdateQueries.push_back(dbCounterChange.GetInsertQuery());
@@ -10212,7 +10212,7 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 					dbCounter.LoadFromFields(ipResultSet->Fields);
 
 					bValid = bValid && dbCounter.isValid(
-						m_DatabaseIDValues.m_nHashValue, ipResultSet->Fields);
+						m_DatabaseIDValues, ipResultSet->Fields);
 
 					vecDBCounters.push_back(dbCounter);
 

@@ -7,7 +7,7 @@
 //-------------------------------------------------------------------------------------------------
 // DBCounterChangeValue 
 //-------------------------------------------------------------------------------------------------
-DBCounterChangeValue::DBCounterChangeValue()
+DBCounterChangeValue::DBCounterChangeValue(DatabaseIDValues databaseID)
 	: m_nID(0)
 	, m_nCounterID(0)
 	, m_nToValue(0)
@@ -17,6 +17,8 @@ DBCounterChangeValue::DBCounterChangeValue()
 	, m_llHashValue(0)
 {
 	ZeroMemory(&m_stUpdatedTime, sizeof(SYSTEMTIME));
+
+	m_DatabaseID = databaseID;
 }
 //-------------------------------------------------------------------------------------------------
 void DBCounterChangeValue::CalculateHashValue(long long &llHashValue)
@@ -25,17 +27,29 @@ void DBCounterChangeValue::CalculateHashValue(long long &llHashValue)
 	hash<long long> hashLonglong;
 	hash<string> hashString;
 
+	long updatedTimeHash = hashLonglong(asULongLong(m_stUpdatedTime));
+
+	// Distribute overlapping hashed values over all 64 bits
+	llHashValue = 0;
 	llHashValue = hashLonglong(m_llMinFAMFileCount);
-	llHashValue ^= hashLong(m_nCounterID) << 1;
-	llHashValue ^= hashLong(m_nToValue) << 2;
-	llHashValue ^= hashLong(m_nFromValue) << 3;
-	llHashValue ^= hashLonglong(asULongLong(m_stUpdatedTime)) << 4;
-	llHashValue ^= hashLong(m_nLastUpdatedByFAMSessionID) << 5;
-	llHashValue ^= hashLonglong(m_llMinFAMFileCount) << 6;
+	llHashValue ^= (long long)hashLong(m_nCounterID) << 4;
+	llHashValue ^= (long long)hashLong(m_nToValue) << 8;
+	llHashValue ^= (long long)hashLong(m_nFromValue) << 12;
+	llHashValue ^= (long long)updatedTimeHash << 16;
+	llHashValue ^= (long long)hashLong(m_nLastUpdatedByFAMSessionID) << 24;
+	llHashValue ^= (long long)hashLonglong(m_llMinFAMFileCount) << 28;
 	if (!m_strComment.empty())
 	{
-		llHashValue ^= hashString(m_strComment);
+		llHashValue ^= (long long)hashString(m_strComment) << 32;
 	}
+
+	// Above hash often leaves many bits unaffected between neighboring rows. Salt the hash using
+	// data-dependent psuedo random shifts of DB guid to improve distribution
+	long long *plGUIDData = (long long *)&m_DatabaseID.m_GUID;
+	llHashValue ^= plGUIDData[0];
+	llHashValue ^= plGUIDData[1] << (m_nToValue % 32);
+	llHashValue ^= plGUIDData[0] >> (m_nFromValue % 32);
+	llHashValue ^= plGUIDData[1] << (updatedTimeHash % 32);
 }
 //-------------------------------------------------------------------------------------------------
 void DBCounterChangeValue::LoadFromFields(FieldsPtr ipFields, bool bValidateHash, long& rnToValue)
@@ -66,7 +80,7 @@ void DBCounterChangeValue::LoadFromFields(FieldsPtr ipFields, bool bValidateHash
 		// Validate the HASH
 		if (bValidateHash)
 		{
-			long long nCalculatedHash;
+			long long nCalculatedHash = 0;
 			CalculateHashValue(nCalculatedHash);
 			if (nCalculatedHash != m_llHashValue)
 			{
