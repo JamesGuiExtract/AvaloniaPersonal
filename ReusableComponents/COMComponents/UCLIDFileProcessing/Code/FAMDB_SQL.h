@@ -377,7 +377,7 @@ static const string gstrCREATE_SECURE_COUNTER_VALUE_CHANGE =
 	"  CounterID int NOT NULL, "
 	"  FromValue int NOT NULL, "
 	"  ToValue int NOT NULL, "
-	"  LastUpdatedTime datetimeoffset NOT NULL, "
+	"  LastUpdatedTime datetime NOT NULL, "
 	"  LastUpdatedByFAMSessionID int NULL, "
 	"  MinFAMFileCount bigint NOT NULL, "
 	"  HashValue bigint NOT NULL, "
