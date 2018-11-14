@@ -214,7 +214,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI45129");
+                throw ex.AsExtract("ELI46490");
             }
         }
 
@@ -618,6 +618,92 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
                 _testDbManager.RemoveDatabase(DBName);
             }
         }
+
+        // Test that the status column is used for LastIDProcessed
+        // https://extract.atlassian.net/browse/ISSUE-15366
+        [Test, Category("TrainingDataCollector")]
+        public static void StatusColumn()
+        {
+            try
+            {
+                CreateDatabase();
+
+                var collector = new TrainingDataCollector
+                {
+                    ModelName = _MODEL_NAME,
+                    LastIDProcessed = 5,
+                };
+
+                int id = collector.AddToDatabase("(local)", DBName);
+
+                string statusJson = collector.Status.ToJson();
+
+                // Disconnect from the DB and change values
+                collector.DatabaseServiceID = 0;
+                collector.LastIDProcessed = 6;
+
+                string modifiedStatusJson = collector.Status.ToJson();
+                Assert.AreNotEqual(statusJson, modifiedStatusJson);
+
+                Assert.AreEqual(6, collector.LastIDProcessed);
+
+                // Reconnect to the DB and confirm values are reset
+                collector.DatabaseServiceID = id;
+                string resetStatusJson = collector.Status.ToJson();
+                Assert.AreEqual(statusJson, resetStatusJson);
+
+                // Clear the status column
+                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
+                {
+                    DataSource = "(local)",
+                    InitialCatalog = DBName,
+                    IntegratedSecurity = true,
+                    NetworkLibrary = "dbmssocn"
+                };
+
+                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                {
+                    connection.Open();
+
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = "UPDATE DatabaseService SET Status = NULL";
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                // Refresh the status and confirm values are defaults
+                collector.RefreshStatus();
+                Assert.AreEqual(0, collector.LastIDProcessed);
+                string clearedStatusJson = collector.Status.ToJson();
+                string defaultStatusJson = new TrainingDataCollector.TrainingDataCollectorStatus().ToJson();
+                Assert.AreEqual(defaultStatusJson, clearedStatusJson);
+
+                // Set back to original values
+                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                {
+                    connection.Open();
+
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = "UPDATE DatabaseService SET Status = @Status";
+                        cmd.Parameters.AddWithValue("@Status", statusJson);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                // Refresh the status and confirm values are back to original values
+                collector.RefreshStatus();
+                Assert.AreEqual(5, collector.LastIDProcessed);
+                string resetToOriginalStatusJson = collector.Status.ToJson();
+                Assert.AreEqual(statusJson, resetToOriginalStatusJson);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(DBName);
+            }
+        }
+
         #endregion Tests
     }
 }

@@ -84,7 +84,7 @@ namespace Extract.FileActionManager.Forms.Test
                 ocrEngine.SetOCRParameters(null, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 
-                string settings = File.ReadAllText(tmpFile.FileName);
+                string settings = ReadSettings(tmpFile.FileName);
                 Assert.AreEqual(expectedSettings, settings, "Can fail because of non-default registry settings");
 
                 // Set to new defaults and then set back from the registry
@@ -95,7 +95,7 @@ namespace Extract.FileActionManager.Forms.Test
                 ocrEngine.SetOCRParameters(_hasParameters.OCRParameters, true);
                 ocrEngine.SetOCRParameters(null, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
-                settings = File.ReadAllText(tmpFile.FileName);
+                settings = ReadSettings(tmpFile.FileName);
                 Assert.AreEqual(expectedSettings, settings);
             }
         }
@@ -145,7 +145,7 @@ namespace Extract.FileActionManager.Forms.Test
                 ocrEngine.SetOCRParameters(_hasParameters.OCRParameters, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 
-                string settings = File.ReadAllText(tmpFile.FileName);
+                string settings = ReadSettings(tmpFile.FileName);
                 Assert.AreEqual(expectedSettings, settings);
             }
         }
@@ -193,7 +193,7 @@ namespace Extract.FileActionManager.Forms.Test
                 ocrEngine.SetOCRParameters(_hasParameters.OCRParameters, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 
-                string settings = File.ReadAllText(tmpFile.FileName);
+                string settings = ReadSettings(tmpFile.FileName);
                 Assert.AreEqual(expectedSettings, settings);
             }
 
@@ -208,7 +208,7 @@ namespace Extract.FileActionManager.Forms.Test
                 ocrEngine.SetOCRParameters(_hasParameters.OCRParameters, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 
-                string settings = File.ReadAllText(tmpFile.FileName);
+                string settings = ReadSettings(tmpFile.FileName);
                 Assert.AreEqual(expectedSettings, settings);
             }
         }
@@ -268,7 +268,7 @@ namespace Extract.FileActionManager.Forms.Test
                 ocrEngine.SetOCRParameters(_hasParameters.OCRParameters, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 
-                string settings = File.ReadAllText(tmpFile.FileName);
+                string settings = ReadSettings(tmpFile.FileName);
                 Assert.AreEqual(expectedSettings, settings);
             }
         }
@@ -362,7 +362,7 @@ namespace Extract.FileActionManager.Forms.Test
                 ocrEngine.SetOCRParameters(_hasParameters.OCRParameters, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 
-                string settings = File.ReadAllText(tmpFile.FileName);
+                string settings = ReadSettings(tmpFile.FileName);
                 Assert.AreEqual(expectedSettings, settings);
             }
         }
@@ -432,7 +432,7 @@ namespace Extract.FileActionManager.Forms.Test
                 ocrEngine.SetOCRParameters(_hasParameters.OCRParameters, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 
-                string settings = File.ReadAllText(tmpFile.FileName);
+                string settings = ReadSettings(tmpFile.FileName);
                 Assert.AreEqual(expectedSettings, settings);
             }
         }
@@ -494,7 +494,7 @@ namespace Extract.FileActionManager.Forms.Test
                 ocrEngine.SetOCRParameters(_hasParameters.OCRParameters, true);
                 ocrEngine.WriteOCRSettingsToFile(tmpFile.FileName, false, true);
 
-                string settings = File.ReadAllText(tmpFile.FileName);
+                string settings = ReadSettings(tmpFile.FileName);
                 Assert.AreEqual(expectedSettings, settings);
             }
         }
@@ -593,6 +593,22 @@ namespace Extract.FileActionManager.Forms.Test
             config.ConfigureOCRParameters(_hasParameters, false, 0);
 
             t.Wait();
+        }
+
+        private static string ReadSettings(string fileName)
+        {
+            string settings = File.ReadAllText(fileName);
+
+            // Remove APIPlus settings (present if InitPlus was called)
+            if (settings.Contains("APIPlus.ProcessPagesEx.PromptPath"))
+            {
+                settings = Regex.Replace(settings,
+                    @"^(APIPlus\.ProcessPagesEx\.PromptPath|Converters\.).*[\r\n]+",
+                    "",
+                    RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture);
+            }
+
+            return settings;
         }
 
         #endregion Helper Methods

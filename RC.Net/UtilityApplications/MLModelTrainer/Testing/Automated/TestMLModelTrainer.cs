@@ -261,6 +261,103 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
             }
         }
 
+        // Test that the status column is used for LastIDProcessed, MaximumTrainingDocuments, etc
+        // https://extract.atlassian.net/browse/ISSUE-15366
+        [Test, Category("MLModelTrainer")]
+        public static void StatusColumn()
+        {
+            try
+            {
+                CreateDatabase();
+
+                var trainer = new MLModelTrainer
+                {
+                    ModelName = _MODEL_NAME,
+                    MaximumTrainingRecords = 1,
+                    MaximumTestingRecords = 2,
+                    MinimumF1Score = 0.3,
+                    LastF1Score = 0.4,
+                    LastIDProcessed = 5
+                };
+
+                int id = trainer.AddToDatabase("(local)", _DB_NAME);
+
+                string statusJson = trainer.Status.ToJson();
+
+                // Disconnect from the DB and change values
+                trainer.DatabaseServiceID = 0;
+                trainer.MaximumTrainingRecords = 10;
+                trainer.MaximumTestingRecords = 20;
+                trainer.MinimumF1Score = 0.4;
+                trainer.LastF1Score = 0.5;
+                trainer.LastIDProcessed = 6;
+
+                string modifiedStatusJson = trainer.Status.ToJson();
+                Assert.AreNotEqual(statusJson, modifiedStatusJson);
+
+                Assert.AreEqual(10, trainer.MaximumTrainingRecords);
+                Assert.AreEqual(20, trainer.MaximumTestingRecords);
+                Assert.AreEqual(0.4, trainer.MinimumF1Score);
+                Assert.AreEqual(0.5, trainer.LastF1Score);
+                Assert.AreEqual(6, trainer.LastIDProcessed);
+
+                // Reconnect to the DB and confirm values are reset
+                trainer.DatabaseServiceID = id;
+                string resetStatusJson = trainer.Status.ToJson();
+                Assert.AreEqual(statusJson, resetStatusJson);
+
+                // Clear the status column
+                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
+                {
+                    DataSource = "(local)",
+                    InitialCatalog = _DB_NAME,
+                    IntegratedSecurity = true,
+                    NetworkLibrary = "dbmssocn"
+                };
+
+                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                {
+                    connection.Open();
+
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = "UPDATE DatabaseService SET Status = NULL";
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                // Refresh the status and confirm values are defaults
+                trainer.RefreshStatus();
+                Assert.AreEqual(0, trainer.LastIDProcessed);
+                string clearedStatusJson = trainer.Status.ToJson();
+                string defaultStatusJson = new MLModelTrainer.MLModelTrainerStatus().ToJson();
+                Assert.AreEqual(defaultStatusJson, clearedStatusJson);
+
+                // Set back to original values
+                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                {
+                    connection.Open();
+
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = "UPDATE DatabaseService SET Status = @Status";
+                        cmd.Parameters.AddWithValue("@Status", statusJson);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                // Refresh the status and confirm values are back to original values
+                trainer.RefreshStatus();
+                Assert.AreEqual(5, trainer.LastIDProcessed);
+                string resetToOriginalStatusJson = trainer.Status.ToJson();
+                Assert.AreEqual(statusJson, resetToOriginalStatusJson);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(_DB_NAME);
+            }
+        }
+
         // Test exit code handling
         [Test, Category("MLModelTrainer")]
         public static void FailedTrainingCommand()

@@ -505,82 +505,20 @@ namespace Extract.ETL.Management
 
                     if (service != null)
                     {
-                        using (var trans = new TransactionScope())
-                        using (var connection = NewSqlDBConnection())
+                        int id = service.AddToDatabase(DatabaseServer, DatabaseName);
+
+                        var newRcd = new DatabaseServiceData
                         {
-                            connection.Open();
-                            var cmd = connection.CreateCommand();
-                            cmd.CommandText = @"
-                                INSERT INTO [dbo].[DatabaseService]
-                                            ([Description]
-                                            ,[Settings]
-                                            ,[Enabled]
-                                            )
-                                OUTPUT inserted.id
-                                VALUES (
-                                    @Description,
-                                    @Settings,
-                                    @Enabled)";
+                            ID = id,
+                            Description = service.Description,
+                            Service = service,
+                            ServiceType = service.ExtractCategoryType,
+                            Enabled = true
+                        };
+                        _listOfDataToDisplay.Add(newRcd);
+                        int rowAdded = _databaseServicesDataGridView.Rows.GetLastRow(DataGridViewElementStates.None);
+                        _databaseServicesDataGridView.CurrentCell = _databaseServicesDataGridView.Rows[rowAdded].Cells["Enabled"];
 
-                            cmd.Parameters.AddWithValue("@Description", service.Description);
-                            cmd.Parameters.AddWithValue("@Settings", service.ToJson());
-                            cmd.Parameters.AddWithValue("@Enabled", true);
-
-                            // Some services allow editing of initial status values so save 
-                            if (service is IHasConfigurableDatabaseServiceStatus hasStatus)
-                            {
-                                cmd.CommandText = @"
-                                    INSERT INTO [dbo].[DatabaseService]
-                                                ([Description]
-                                                ,[Settings]
-                                                ,[Enabled]
-                                                ,[Status]
-                                                ,[LastFileTaskSessionIDProcessed]
-                                                )
-                                    OUTPUT inserted.id
-                                    VALUES (
-                                        @Description,
-                                        @Settings,
-                                        @Enabled,
-                                        @Status,
-                                        @LastFileTaskSession)";
-
-                                string status = hasStatus.Status?.ToJson();
-                                if (status != null)
-                                {
-                                    cmd.Parameters.AddWithValue("@Status", status);
-                                }
-                                else
-                                {
-                                    cmd.Parameters.AddWithValue("@Status", DBNull.Value);
-                                }
-                                var fileTaskSessionStatus = hasStatus.Status as IFileTaskSessionServiceStatus;
-                                int? lastFileTaskSession = fileTaskSessionStatus?.LastFileTaskSessionIDProcessed;
-                                if (lastFileTaskSession is null)
-                                {
-                                    cmd.Parameters.AddWithValue("@LastFileTaskSession", DBNull.Value);
-                                }
-                                else
-                                {
-                                    cmd.Parameters.AddWithValue("@LastFileTaskSession", lastFileTaskSession);
-                                }
-                            }
-
-                            Int32 id = (Int32)cmd.ExecuteScalar();
-                            trans.Complete();
-
-                            var newRcd = new DatabaseServiceData
-                            {
-                                ID = id,
-                                Description = service.Description,
-                                Service = service,
-                                ServiceType = service.ExtractCategoryType,
-                                Enabled = true
-                            };
-                            _listOfDataToDisplay.Add(newRcd);
-                            int rowAdded = _databaseServicesDataGridView.Rows.GetLastRow(DataGridViewElementStates.None);
-                            _databaseServicesDataGridView.CurrentCell = _databaseServicesDataGridView.Rows[rowAdded].Cells["Enabled"];
-                        }
                         EnableButtons();
                     }
                 }

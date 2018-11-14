@@ -481,6 +481,93 @@ namespace Extract.ETL
         }
 
         /// <summary>
+        /// Inserts a record into the DatabaseService table for this service and sets the DatabaseServer,
+        /// DatabaseName and DatabaseServiceID fields of this instance
+        /// </summary>
+        /// <param name="databaseServer">The server to add to</param>
+        /// <param name="databaseName">The database to add to</param>
+        /// <returns>The ID of the new record</returns>
+        public int AddToDatabase(string databaseServer, string databaseName)
+        {
+            try
+            {
+                _databaseServer = databaseServer;
+                _databaseName = databaseName;
+
+                using (var trans = new TransactionScope())
+                using (var connection = NewSqlDBConnection())
+                {
+                    connection.Open();
+                    var cmd = connection.CreateCommand();
+                    cmd.CommandText = @"
+                        INSERT INTO [dbo].[DatabaseService]
+                                    ([Description]
+                                    ,[Settings]
+                                    ,[Enabled]
+                                    )
+                        OUTPUT inserted.id
+                        VALUES (
+                            @Description,
+                            @Settings,
+                            @Enabled)";
+
+                    cmd.Parameters.AddWithValue("@Description", Description);
+                    cmd.Parameters.AddWithValue("@Settings", ToJson());
+                    cmd.Parameters.AddWithValue("@Enabled", true);
+
+                    // Some services allow editing of initial status values so save 
+                    if (this is IHasConfigurableDatabaseServiceStatus hasStatus)
+                    {
+                        cmd.CommandText = @"
+                            INSERT INTO [dbo].[DatabaseService]
+                                        ([Description]
+                                        ,[Settings]
+                                        ,[Enabled]
+                                        ,[Status]
+                                        ,[LastFileTaskSessionIDProcessed]
+                                        )
+                            OUTPUT inserted.id
+                            VALUES (
+                                @Description,
+                                @Settings,
+                                @Enabled,
+                                @Status,
+                                @LastFileTaskSession)";
+
+                        string status = hasStatus.Status?.ToJson();
+                        if (status != null)
+                        {
+                            cmd.Parameters.AddWithValue("@Status", status);
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@Status", DBNull.Value);
+                        }
+                        var fileTaskSessionStatus = hasStatus.Status as IFileTaskSessionServiceStatus;
+                        int? lastFileTaskSession = fileTaskSessionStatus?.LastFileTaskSessionIDProcessed;
+                        if (lastFileTaskSession is null)
+                        {
+                            cmd.Parameters.AddWithValue("@LastFileTaskSession", DBNull.Value);
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@LastFileTaskSession", lastFileTaskSession);
+                        }
+                    }
+
+                    _databaseServiceID = (int)cmd.ExecuteScalar();
+                    trans.Complete();
+
+                    return _databaseServiceID;
+               }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46489");
+            }
+        }
+
+        /// <summary>
         /// Gets the status object for this service from the DB or creates an instance using the supplied function
         /// </summary>
         /// <typeparam name="T">The type of the status object to return/create</typeparam>
