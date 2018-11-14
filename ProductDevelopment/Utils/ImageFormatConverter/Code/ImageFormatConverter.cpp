@@ -527,6 +527,13 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 			// may be copied in a corrupted state.
 			kRecCloseImgFile(*uphOutputImage);
 
+			// Ensure the outut directory exists
+			string strOutDir = getDirectoryFromFullPath(strOutputFileName);
+			if (!isValidFolder(strOutDir))
+			{
+				createDirectory(strOutDir);
+			}
+
 			copyFile(strTempOutputFileName, strOutputFileName);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34281");
