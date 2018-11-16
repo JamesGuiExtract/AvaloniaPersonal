@@ -502,6 +502,258 @@ namespace Extract.AttributeFinder.Test
             Assert.That( ex.Message, Is.EqualTo("Encodings have not been computed") );
         }
 
+        // Use auto-bag-of-words with two pages per case
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void PaginationWithAutoBowTwoPages()
+        {
+            int expectedFeatureVectorLength = 4032;
+            SetPaginationFiles();
+            var autoBoW = new SpatialStringFeatureVectorizer("2", 5, 2000);
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, autoBoW, attributeFilter:"*@Feature");
+            encoder.ComputeEncodings(_ussFiles, _voaFiles, _eavFiles);
+
+            // This number reflects the fact that there will be two pages of features for each case
+            Assert.AreEqual(expectedFeatureVectorLength, encoder.FeatureVectorLength);
+
+            // This is the per-page number, not the actual feature vector length
+            Assert.AreEqual(2000, encoder.AutoBagOfWords.FeatureVectorLength);
+
+            // This is the true number of BoW features
+            Assert.AreEqual(4000, encoder.AutoBagOfWords.FeatureVectorLengthForPagination);
+
+            var t = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles, _eavFiles);
+            var features = t.Item1;
+            var answers = t.Item2;
+            Assert.AreEqual(features.Length, answers.Length);
+
+            var uss = new SpatialStringClass();
+            uss.LoadFrom(_ussFiles[0], false);
+            var voa = new IUnknownVectorClass();
+            voa.LoadFrom(_voaFiles[0], false);
+
+            int pages = uss.GetPages(true, " ").Size();
+            Assert.AreEqual(4, pages);
+            var featureVectorCollection = encoder.GetFeatureVectors(uss, voa).ToArray();
+            Assert.AreEqual(pages-1, featureVectorCollection.Length);
+
+            var case1Features = featureVectorCollection[0];
+            Assert.AreEqual(expectedFeatureVectorLength, case1Features.Length);
+
+            // First 2k features of the second case are the same as second 2k features of first case,
+            // since they are from the same page
+            var case2Features = featureVectorCollection[1];
+            CollectionAssert.AreEqual(
+                case1Features.Skip(2000).Take(2000).ToArray(),
+                case2Features.Take(2000).ToArray());
+        }
+
+        // Use auto-bag-of-words with three pages per case
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void PaginationWithAutoBowThreePages()
+        {
+            // With three pages per case there is the possibility for a page to not be available (last case in a document)
+            // so the feature vector is 6033 instead of 6032 (32 are attribute features)
+            int expectedFeatureVectorLength = 6033;
+            SetPaginationFiles();
+            var autoBoW = new SpatialStringFeatureVectorizer("3", 5, 2000);
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, autoBoW, attributeFilter:"*@Feature");
+            encoder.ComputeEncodings(_ussFiles, _voaFiles, _eavFiles);
+
+            // This number reflects the fact that there will be three pages of features for each case
+            Assert.AreEqual(expectedFeatureVectorLength, encoder.FeatureVectorLength);
+
+            // This is the per-page number, not the actual feature vector length
+            Assert.AreEqual(2000, encoder.AutoBagOfWords.FeatureVectorLength);
+
+            // This is the true number of BoW features
+            Assert.AreEqual(6001, encoder.AutoBagOfWords.FeatureVectorLengthForPagination);
+
+            var t = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles, _eavFiles);
+            var features = t.Item1;
+            var answers = t.Item2;
+            Assert.AreEqual(features.Length, answers.Length);
+
+            var uss = new SpatialStringClass();
+            uss.LoadFrom(_ussFiles[0], false);
+            var voa = new IUnknownVectorClass();
+            voa.LoadFrom(_voaFiles[0], false);
+
+            int pages = uss.GetPages(true, " ").Size();
+            Assert.AreEqual(4, pages);
+            var featureVectorCollection = encoder.GetFeatureVectors(uss, voa).ToArray();
+            Assert.AreEqual(pages-1, featureVectorCollection.Length);
+
+            var case1Features = featureVectorCollection[0];
+            Assert.AreEqual(expectedFeatureVectorLength, case1Features.Length);
+
+            // First 2k features of the second case are the same as second 2k features of first case,
+            // since they are from the same page
+            var case2Features = featureVectorCollection[1];
+            CollectionAssert.AreEqual(
+                case1Features.Skip(2000).Take(2000).ToArray(),
+                case2Features.Take(2000).ToArray());
+
+            // The features from the third page may be all zeros, if the page doesn't exist,
+            // so there is an extra, present/missing flag, feature for that page with value of 1 when
+            // the page is present and zero if missing
+            Assert.AreEqual(1, case1Features[4000]);
+            var case3Features = featureVectorCollection[2];
+            Assert.AreEqual(0, case3Features[4000]);
+            Assert.That(case3Features.Skip(4001).Take(2000).All(f => f == 0));
+
+            // First 2k features of the third case are the same as third 2k features (shifted one place
+            // for the present/missing flag) of first case, since they are from the same page
+            CollectionAssert.AreEqual(
+                case1Features.Skip(4001).Take(2000).ToArray(),
+                case3Features.Take(2000).ToArray());
+        }
+
+        // Use auto-bag-of-words with four pages per case
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void PaginationWithAutoBowFourPages()
+        {
+            // With four pages per case there is the possibility for two pages to not be available
+            // (first case in a document could be missing two and last one) so the feature vector
+            // is 8034 instead of 8032 (32 are attribute features)
+            int expectedFeatureVectorLength = 8034;
+            SetPaginationFiles();
+            var autoBoW = new SpatialStringFeatureVectorizer("4", 5, 2000);
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, autoBoW, attributeFilter:"*@Feature");
+            encoder.ComputeEncodings(_ussFiles, _voaFiles, _eavFiles);
+
+            // This number reflects the fact that there will be three pages of features for each case
+            Assert.AreEqual(expectedFeatureVectorLength, encoder.FeatureVectorLength);
+
+            // This is the per-page number, not the actual feature vector length
+            Assert.AreEqual(2000, encoder.AutoBagOfWords.FeatureVectorLength);
+
+            // This is the true number of BoW features
+            Assert.AreEqual(8002, encoder.AutoBagOfWords.FeatureVectorLengthForPagination);
+
+            var t = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles, _eavFiles);
+            var features = t.Item1;
+            var answers = t.Item2;
+            Assert.AreEqual(features.Length, answers.Length);
+
+            var uss = new SpatialStringClass();
+            uss.LoadFrom(_ussFiles[0], false);
+            var voa = new IUnknownVectorClass();
+            voa.LoadFrom(_voaFiles[0], false);
+
+            int pages = uss.GetPages(true, " ").Size();
+            Assert.AreEqual(4, pages);
+            var featureVectorCollection = encoder.GetFeatureVectors(uss, voa).ToArray();
+            Assert.AreEqual(pages-1, featureVectorCollection.Length);
+
+            var case1Features = featureVectorCollection[0];
+            Assert.AreEqual(expectedFeatureVectorLength, case1Features.Length);
+
+            // First 2k features, shifted one place, of the third case are the same as the
+            // third 2k features, shifted one place, of the first case, since they are from the same page
+            var case3Features = featureVectorCollection[2];
+            CollectionAssert.AreEqual(
+                case1Features.Skip(4001).Take(2000).ToArray(),
+                case3Features.Skip(1).Take(2000).ToArray());
+
+            // Second 2k features, shifted one place, of the third case are the same as the
+            // fourth 2k features, shifted two places, of first case, since they are from the same page
+            CollectionAssert.AreEqual(
+                case1Features.Skip(6002).Take(2000).ToArray(),
+                case3Features.Skip(2001).Take(2000).ToArray());
+
+            // The features from the first page may be all zeros, if the page doesn't exist,
+            // so there is an extra, present/missing flag, feature for that page with value of 1 when
+            // the page is present and zero if missing
+            Assert.That(case1Features.Take(2001).All(f => f == 0));
+            Assert.AreEqual(1, case3Features[0]);
+
+            // Check on two page document (one case with two missing pages)
+            uss.LoadFrom(_ussFiles[6], false);
+            voa.LoadFrom(_voaFiles[6], false);
+
+            pages = uss.GetPages(true, " ").Size();
+            Assert.AreEqual(2, pages);
+            featureVectorCollection = encoder.GetFeatureVectors(uss, voa).ToArray();
+            Assert.AreEqual(pages-1, featureVectorCollection.Length);
+
+            case1Features = featureVectorCollection[0];
+            Assert.That(case1Features.Take(2001).All(f => f == 0));
+            Assert.That(case1Features.Skip(6001).Take(2001).All(f => f == 0));
+        }
+
+        // Use feature-hashing-auto-bag-of-words with four pages per case
+        [Test, Category("LearningMachineDataEncoder")]
+        public static void PaginationWithHashingAutoBowFourPages()
+        {
+            // With four pages per case there is the possibility for two pages to not be available
+            // (first case in a document could be missing two and last one) so the feature vector
+            // is 8034 instead of 8032 (32 are attribute features)
+            int expectedFeatureVectorLength = 8034;
+            SetPaginationFiles();
+            var autoBoW = new SpatialStringFeatureVectorizer("4", 5, 2000) { UseFeatureHashing = true };
+            LearningMachineDataEncoder encoder = new LearningMachineDataEncoder(LearningMachineUsage.Pagination, autoBoW, attributeFilter:"*@Feature");
+            encoder.ComputeEncodings(_ussFiles, _voaFiles, _eavFiles);
+
+            // This number reflects the fact that there will be three pages of features for each case
+            Assert.AreEqual(expectedFeatureVectorLength, encoder.FeatureVectorLength);
+
+            // This is the per-page number, not the actual feature vector length
+            Assert.AreEqual(2000, encoder.AutoBagOfWords.FeatureVectorLength);
+
+            // This is the true number of BoW features
+            Assert.AreEqual(8002, encoder.AutoBagOfWords.FeatureVectorLengthForPagination);
+
+            var t = encoder.GetFeatureVectorAndAnswerCollections(_ussFiles, _voaFiles, _eavFiles);
+            var features = t.Item1;
+            var answers = t.Item2;
+            Assert.AreEqual(features.Length, answers.Length);
+
+            var uss = new SpatialStringClass();
+            uss.LoadFrom(_ussFiles[0], false);
+            var voa = new IUnknownVectorClass();
+            voa.LoadFrom(_voaFiles[0], false);
+
+            int pages = uss.GetPages(true, " ").Size();
+            Assert.AreEqual(4, pages);
+            var featureVectorCollection = encoder.GetFeatureVectors(uss, voa).ToArray();
+            Assert.AreEqual(pages-1, featureVectorCollection.Length);
+
+            var case1Features = featureVectorCollection[0];
+            Assert.AreEqual(expectedFeatureVectorLength, case1Features.Length);
+
+            // First 2k features, shifted one place, of the third case are the same as the
+            // third 2k features, shifted one place, of the first case, since they are from the same page
+            var case3Features = featureVectorCollection[2];
+            CollectionAssert.AreEqual(
+                case1Features.Skip(4001).Take(2000).ToArray(),
+                case3Features.Skip(1).Take(2000).ToArray());
+
+            // Second 2k features, shifted one place, of the third case are the same as the
+            // fourth 2k features, shifted two places, of first case, since they are from the same page
+            CollectionAssert.AreEqual(
+                case1Features.Skip(6002).Take(2000).ToArray(),
+                case3Features.Skip(2001).Take(2000).ToArray());
+
+            // The features from the first page may be all zeros, if the page doesn't exist,
+            // so there is an extra, present/missing flag, feature for that page with value of 1 when
+            // the page is present and zero if missing
+            Assert.That(case1Features.Take(2001).All(f => f == 0));
+            Assert.AreEqual(1, case3Features[0]);
+
+            // Check on two page document (one case with two missing pages)
+            uss.LoadFrom(_ussFiles[6], false);
+            voa.LoadFrom(_voaFiles[6], false);
+
+            pages = uss.GetPages(true, " ").Size();
+            Assert.AreEqual(2, pages);
+            featureVectorCollection = encoder.GetFeatureVectors(uss, voa).ToArray();
+            Assert.AreEqual(pages-1, featureVectorCollection.Length);
+
+            case1Features = featureVectorCollection[0];
+            Assert.That(case1Features.Take(2001).All(f => f == 0));
+            Assert.That(case1Features.Skip(6001).Take(2001).All(f => f == 0));
+        }
+
         // Tests changing feature types
         [Test, Category("LearningMachineDataEncoder")]
         public static void ChangeFeatureVectorizerTypes()
