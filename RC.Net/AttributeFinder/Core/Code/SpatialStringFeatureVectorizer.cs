@@ -650,6 +650,11 @@ namespace Extract.AttributeFinder
                                 featureVector[featureVectorSubsetStart + j] = pageOfinterest[j];
                             }
                         }
+                        // Else page is missing so leave flag at 0
+                        else
+                        {
+                            featureVectorSubsetStart++;
+                        }
                         featureVectorSubsetStart += FeatureVectorLength;
                     }
 
