@@ -92,6 +92,15 @@ namespace Extract.DataEntry.LabDE
 
         #endregion Constructors
 
+        #region Events
+
+        /// <summary>
+        /// Raised when operations are applied via the duplicate document window.
+        /// </summary>
+        public event EventHandler<DuplicateDocumentsAppliedEventArgs> DuplicateDocumentsApplied;
+
+        #endregion Events
+
         #region Properties
 
         /// <summary>
@@ -1236,6 +1245,14 @@ namespace Extract.DataEntry.LabDE
                 CreateStapledOutput(stapledIds, stapledIdsWithoutFirstPage);
                 StandardActionProcessor(stapledIds, EActionStatus.kActionCompleted, TagForStaple,
                     StapledIntoMetadataFieldName, StapledIntoMetadataFieldValue);
+
+                // Translate the actions by ID to a dictionary of actions to the associated set of file IDs.
+                var fileIDsByAction = CurrentValues
+                    .GroupBy(value => value.Value,
+                             (key, result) => (Action: key, FileIDs: result.Select(entry => entry.Key)))
+                    .ToDictionary(key => key.Action, key => key.FileIDs);
+
+                DuplicateDocumentsApplied?.Invoke(this, new DuplicateDocumentsAppliedEventArgs(fileIDsByAction));
             }
             catch (Exception ex)
             {

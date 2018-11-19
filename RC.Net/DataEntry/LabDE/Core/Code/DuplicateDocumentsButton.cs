@@ -206,7 +206,7 @@ namespace Extract.DataEntry.LabDE
         /// An <see cref="IFAMFileInspectorColumn"/> for the FFI that allows for various actions to
         /// be performed on the displayed documents.
         /// </summary>
-        protected virtual DuplicateDocumentsFFIColumn ActionColumn
+        public virtual DuplicateDocumentsFFIColumn ActionColumn
         {
             get
             {
@@ -222,7 +222,7 @@ namespace Extract.DataEntry.LabDE
         /// An <see cref="IFAMFileInspectorColumn"/> that displays the status of the files prior to
         /// being loaded into the FFI.
         /// </summary>
-        protected virtual PreviousStatusFFIColumn StatusColumn
+        public virtual PreviousStatusFFIColumn StatusColumn
         {
             get
             {

@@ -1,5 +1,6 @@
 ﻿using Extract.AttributeFinder;
 using Extract.DataEntry;
+using Extract.DataEntry.LabDE;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
@@ -59,6 +60,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 AttributeStatusInfo.UndoManager.UndoAvailabilityChanged += HandleUndoManager_UndoAvailabilityChanged;
                 AttributeStatusInfo.UndoManager.RedoAvailabilityChanged += HandleUndoManager_RedoAvailabilityChanged;
+
+                ControlRegistered += HandleDataEntryDocumentDataPanel_ControlRegistered;
+                ControlUnregistered += HandelDataEntryDocumentDataPanel_ControlUnregistered;
             }
             catch (Exception ex)
             {
@@ -67,6 +71,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         #endregion Constructors
+
+        #region Events
+
+        /// <summary>
+        /// Raised when operations are applied via the duplicate document window.
+        /// </summary>
+        public event EventHandler<DuplicateDocumentsAppliedEventArgs> DuplicateDocumentsApplied;
+
+        #endregion Events
 
         #region Properties
 
@@ -941,6 +954,64 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41425");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ControlRegistered"/> event of this panel.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DataEntryControlEventArgs"/> instance containing the event data.</param>
+        void HandleDataEntryDocumentDataPanel_ControlRegistered(object sender, DataEntryControlEventArgs e)
+        {
+            try
+            {
+                if (e.DataEntryControl is PaginationDuplicateDocumentsButton dupDocButton)
+                {
+                    dupDocButton.ActionColumn.DuplicateDocumentsApplied += HandleActionColumn_DuplicateDocumentsApplied;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46499");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ControlUnregistered"/> event of this panel.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DataEntryControlEventArgs"/> instance containing the event data.</param>
+        void HandelDataEntryDocumentDataPanel_ControlUnregistered(object sender, DataEntryControlEventArgs e)
+        {
+            try
+            {
+                if (e.DataEntryControl is PaginationDuplicateDocumentsButton dupDocButton)
+                {
+                    dupDocButton.ActionColumn.DuplicateDocumentsApplied -= HandleActionColumn_DuplicateDocumentsApplied;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46500");
+            }
+        }
+
+        /// <summary>
+        /// Handles the DuplicateDocumentsApplied event of any <see cref="PaginationDuplicateDocumentsButton"/>
+        /// in the panel.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DuplicateDocumentsAppliedEventArgs"/> instance containing the event data.</param>
+        void HandleActionColumn_DuplicateDocumentsApplied(object sender, DuplicateDocumentsAppliedEventArgs e)
+        {
+            try
+            {
+                DuplicateDocumentsApplied?.Invoke(sender, e);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46496");
             }
         }
 

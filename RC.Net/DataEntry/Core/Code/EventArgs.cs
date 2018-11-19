@@ -928,4 +928,31 @@ namespace Extract.DataEntry
             private set;
         }
     }
+
+    /// <summary>
+    /// Event arguments for the events that relate to data entry controls.
+    /// </summary>
+    public class DataEntryControlEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new <see cref="DataEntryControlEventArgs"/> instance.
+        /// </summary>
+        /// <param name="dataEntryControl">The <see cref="IDataEntryControl"/> the selection
+        /// pertains to.</param>
+        /// </param>
+        public DataEntryControlEventArgs(IDataEntryControl dataEntryControl)
+            : base()
+        {
+            DataEntryControl = dataEntryControl;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IDataEntryControl"/> the event pertains to.
+        /// </summary>
+        /// <value>The <see cref="IDataEntryControl"/> the event  pertains to.</value>
+        public IDataEntryControl DataEntryControl
+        {
+            get;
+        }
+    }
 }

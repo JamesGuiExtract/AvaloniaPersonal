@@ -282,6 +282,10 @@
       <Project>{55C4FA3A-26C9-4CC0-9F11-A7E607E6ACD2}</Project>
       <Name>Extract.DataEntry</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\DataEntry\LabDE\Core\Code\Extract.DataEntry.LabDE.csproj">
+      <Project>{882fde16-73be-4420-b89f-abe418902983}</Project>
+      <Name>Extract.DataEntry.LabDE</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Drawing\Core\Code\Extract.Drawing.csproj">
       <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
       <Name>Extract.Drawing</Name>

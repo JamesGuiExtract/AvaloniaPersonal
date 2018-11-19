@@ -1,5 +1,6 @@
 using Extract.AttributeFinder;
 using Extract.DataEntry;
+using Extract.DataEntry.LabDE;
 using Extract.FileActionManager.Forms;
 using Extract.Imaging;
 using Extract.Licensing;
@@ -1529,6 +1530,35 @@ namespace Extract.FileActionManager.FileProcessors
             StopTimingOverhead(e.FileName);
         }
 
+        /// <summary>
+        /// Handles the DuplicateDocumentsApplied event of <see cref="_paginationDocumentDataPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DuplicateDocumentsAppliedEventArgs"/> instance containing the event data.</param>
+        void HandlePaginationPanelContainer_DuplicateDocumentsApplied(object sender, DuplicateDocumentsAppliedEventArgs e)
+        {
+            try
+            {
+                // https://extract.atlassian.net/browse/ISSUE-15603
+                // Set any documents discarded in the duplicate documents window to SourceAction so
+                // they can be cleaned up.
+                if (sender is PaginationDuplicateDocumentsFFIColumn duplicateDocActionColumn &&
+                    e.FileActions.TryGetValue(duplicateDocActionColumn.IgnoreOption.Action, out var ignoredFileIDs))
+                {
+                    foreach (var fileID in ignoredFileIDs)
+                    {
+                        EActionStatus oldStatus;
+                        FileProcessingDB.SetStatusForFile(fileID,
+                            _settings.SourceAction, -1, EActionStatus.kActionPending, true, false, out oldStatus);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46498");
+            }
+        }
+
         #endregion Event Handlers
 
         #region IVerificationForm Members
@@ -1711,7 +1741,15 @@ namespace Extract.FileActionManager.FileProcessors
         {
             if (paginationDocumentDataPanelAssembly.EndsWith(".config", StringComparison.OrdinalIgnoreCase))
             {
-                return new DataEntryPanelContainer(paginationDocumentDataPanelAssembly, this, _tagUtility, _imageViewer);
+                var paginationPanelContainer =
+                    new DataEntryPanelContainer(paginationDocumentDataPanelAssembly, this, _tagUtility, _imageViewer);
+                if (!string.IsNullOrWhiteSpace(_settings.SourceAction))
+                {
+                    // https://extract.atlassian.net/browse/ISSUE-15603
+                    // Handler to set discarded documents to pending in SourceAction.
+                    paginationPanelContainer.DuplicateDocumentsApplied += HandlePaginationPanelContainer_DuplicateDocumentsApplied;
+                }
+                return paginationPanelContainer;
             }
             else
             {

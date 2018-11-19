@@ -1,4 +1,5 @@
 ﻿using Extract.DataEntry;
+using Extract.DataEntry.LabDE;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
@@ -340,6 +341,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         #endregion Constructors
+
+        #region Events
+
+        /// <summary>
+        /// Raised when operations are applied via the duplicate document window.
+        /// </summary>
+        public event EventHandler<DuplicateDocumentsAppliedEventArgs> DuplicateDocumentsApplied;
+
+        #endregion Events
 
         #region IPaginationDocumentDataPanel
 
@@ -921,12 +931,30 @@ namespace Extract.UtilityApplications.PaginationUtility
                     newDataEntryControlHost.PageLoadRequest += DataEntryControlHost_PageLoadRequest;
                     newDataEntryControlHost.UndoAvailabilityChanged += DataEntryControlHost_UndoAvailabilityChanged;
                     newDataEntryControlHost.RedoAvailabilityChanged += DataEntryControlHost_RedoAvailabilityChanged;
+                    newDataEntryControlHost.DuplicateDocumentsApplied += HandleDataEntryControlHost_DuplicateDocumentsApplied;
 
                     // Set Active = true for the new DEP so that it tracks image viewer events.
                     newDataEntryControlHost.Active = true;
                 }
 
                 OnDataPanelChanged();
+            }
+        }
+
+        /// <summary>
+        /// Handles the DuplicateDocumentsApplied event of the active <see cref="DataEntryDocumentDataPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DuplicateDocumentsAppliedEventArgs"/> instance containing the event data.</param>
+        void HandleDataEntryControlHost_DuplicateDocumentsApplied(object sender, DuplicateDocumentsAppliedEventArgs e)
+        {
+            try
+            {
+                DuplicateDocumentsApplied?.Invoke(sender, e);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46497");
             }
         }
 

@@ -2904,6 +2904,16 @@ namespace Extract.DataEntry
         /// </summary>
         public event EventHandler<EventArgs> DocumentLoaded;
 
+        /// <summary>
+        /// Raised whenever a <see cref="DataEntryControl"/> is registered in the panel.
+        /// </summary>
+        public event EventHandler<DataEntryControlEventArgs> ControlRegistered;
+
+        /// <summary>
+        /// Raised whenever a <see cref="DataEntryControl"/> is unregistered from the panel.
+        /// </summary>
+        public event EventHandler<DataEntryControlEventArgs> ControlUnregistered;
+
         #endregion Events
 
         #region Overrides
@@ -5628,6 +5638,8 @@ namespace Extract.DataEntry
                     {
                         dataControl.Disabled = true;
                     }
+
+                    ControlRegistered?.Invoke(this, new DataEntryControlEventArgs(dataControl));
                 }
             }
         }
@@ -5642,6 +5654,8 @@ namespace Extract.DataEntry
             {
                 foreach (IDataEntryControl dataControl in _dataControls)
                 {
+                    ControlUnregistered?.Invoke(this, new DataEntryControlEventArgs(dataControl));
+
                     ((Control)dataControl).GotFocus -= HandleControlGotFocus;
                     dataControl.SwipingStateChanged -= HandleSwipingStateChanged;
                     dataControl.AttributesSelected -= HandleAttributesSelected;
@@ -5671,6 +5685,8 @@ namespace Extract.DataEntry
                 dataControl.UpdateStarted += HandleControlUpdateStarted;
                 dataControl.UpdateEnded += HandleControlUpdateEnded;
                 dataControl.DataEntryControlHost = this;
+
+                ControlRegistered?.Invoke(this, new DataEntryControlEventArgs(dataControl));
             }
         }
 
