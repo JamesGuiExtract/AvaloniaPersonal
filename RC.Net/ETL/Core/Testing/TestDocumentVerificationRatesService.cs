@@ -38,7 +38,6 @@ namespace Extract.ETL.Test
         static readonly string _TEST_FILE2 = "Resources.TestImage002.tif";
 
         static readonly string _ACTION_A = "ActionA";
-        static readonly string _REDACTION_VERIFY_GUID = "AD7F3F3F-20EC-4830-B014-EC118F6D4567";
 
         #endregion
 
@@ -107,7 +106,7 @@ namespace Extract.ETL.Test
 
         #region Unit tests
 
-        [Test, Category("Automated")]
+        [Test, Category("Automated"), Category("ETL")]
         static public void TestDocumentVerificationRatesServiceSerialization()
         {
             DocumentVerificationRates verificationRates = new DocumentVerificationRates();
@@ -134,7 +133,7 @@ namespace Extract.ETL.Test
             Assert.AreEqual(verificationRates.Schedule.RecurrenceUnit, Utilities.DateTimeUnit.Minute);
         }
 
-        [Test, Category("Automated")]
+        [Test, Category("Automated"), Category("ETL")]
         static public void TestDocumentVerificationStatusSerialization()
         {
             DocumentVerificationStatus serviceStatus = new DocumentVerificationStatus();
@@ -147,8 +146,12 @@ namespace Extract.ETL.Test
                 "LastFileTaskSessionIDProcessed should be serialized.");
         }
 
-        [Test, Category("Automated")]
-        public static void TestDocumentVerificationRatesServiceProcess()
+        [Test, Category("Automated"), Category("ETL")]
+        [TestCase("DF414AD2-742A-4ED7-AD20-C1A1C4993175", 2, TestName = "Core: Paginate files")]
+        [TestCase("FD7867BD-815B-47B5-BAF4-243B8C44AABB", 4, TestName = "Core: Web verification")]
+        [TestCase("59496DF7-3951-49B7-B063-8C28F4CD843F", 5, TestName = "Data Entry: Verify extracted data")]
+        [TestCase("AD7F3F3F-20EC-4830-B014-EC118F6D4567", 6, TestName = "Redaction: Verify sensitive data")]
+        public static void TestDocumentVerificationRatesServiceProcess(string taskGuid, int taskClassID)
         {
             string testDBName = "TestDocumentVerificationRatesService_Test";
             try
@@ -169,7 +172,7 @@ namespace Extract.ETL.Test
 
                 int actionID1 = fileProcessingDb.GetActionID(_ACTION_A);
 
-                int fileTaskSessionID = fileProcessingDb.StartFileTaskSession(_REDACTION_VERIFY_GUID, fileRecord1.FileID, actionID1);
+                int fileTaskSessionID = fileProcessingDb.StartFileTaskSession(taskGuid, fileRecord1.FileID, actionID1);
 
                 fileProcessingDb.UpdateFileTaskSession(fileTaskSessionID, 10.0, 1.0, 10.0);
                 fileProcessingDb.RecordFAMSessionStop();
@@ -178,7 +181,7 @@ namespace Extract.ETL.Test
                 fileProcessingDb.RecordFAMSessionStart("Test.fps", _ACTION_A, true, true);
                 fileProcessingDb.RegisterActiveFAM();
 
-                fileTaskSessionID = fileProcessingDb.StartFileTaskSession(_REDACTION_VERIFY_GUID, fileRecord2.FileID, actionID1);
+                fileTaskSessionID = fileProcessingDb.StartFileTaskSession(taskGuid, fileRecord2.FileID, actionID1);
                 
                 DocumentVerificationRates rates = new DocumentVerificationRates();
                 rates.DatabaseServer = fileProcessingDb.DatabaseServer;
@@ -187,11 +190,11 @@ namespace Extract.ETL.Test
 
                 // This should not process any results
                 Assert.Throws<ExtractException>(() => rates.Process(_cancel));
-                CheckResults(rates, new VerificationRatesList());
+                CheckResults(rates, taskClassID, new VerificationRatesList());
 
                 rates.Process(_noCancel);
 
-                CheckResults(rates, _PROCESS1_EXPECTED);
+                CheckResults(rates, taskClassID, _PROCESS1_EXPECTED);
 
                 // Check the status
                 var status = rates.Status as DocumentVerificationStatus;
@@ -206,19 +209,19 @@ namespace Extract.ETL.Test
                 Assert.AreEqual(status.LastFileTaskSessionIDProcessed, 2, "LastFileTaskSessionIDProcessed is 2.");
                 Assert.That(status.SetOfActiveFileTaskIds.Count == 0 , "SetOfActiveFileTaskIds is no longer used.");
 
-                CheckResults(rates, _PROCESS2_EXPECTED);
+                CheckResults(rates, taskClassID, _PROCESS2_EXPECTED);
 
                 fileProcessingDb.RecordFAMSessionStop();
                 fileProcessingDb.UnregisterActiveFAM();
 
                 rates.Process(_noCancel);
 
-                CheckResults(rates, _PROCESS2_EXPECTED);
+                CheckResults(rates, taskClassID, _PROCESS2_EXPECTED);
 
                 fileProcessingDb.RecordFAMSessionStart("Test.fps", _ACTION_A, true, true);
                 fileProcessingDb.RegisterActiveFAM();
 
-                fileTaskSessionID = fileProcessingDb.StartFileTaskSession(_REDACTION_VERIFY_GUID, fileRecord2.FileID, actionID1);
+                fileTaskSessionID = fileProcessingDb.StartFileTaskSession(taskGuid, fileRecord2.FileID, actionID1);
 
                 fileProcessingDb.UpdateFileTaskSession(fileTaskSessionID, 30.0, 3.0, 30.0);
                 fileProcessingDb.RecordFAMSessionStop();
@@ -226,7 +229,7 @@ namespace Extract.ETL.Test
 
                 rates.Process(_noCancel);
 
-                CheckResults(rates, _PROCESS4_EXPECTED);
+                CheckResults(rates, taskClassID, _PROCESS4_EXPECTED);
             }
             finally
             {
@@ -285,8 +288,19 @@ namespace Extract.ETL.Test
             return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
-        static void CheckResults(DocumentVerificationRates rates, VerificationRatesList expected)
+        static void CheckResults(DocumentVerificationRates rates, int taskClassID, VerificationRatesList expected)
         {
+            // Put the taskClassID in the expected
+            var adjustedExpected = expected.Select(e => (
+                    DatabaseServiceID: e.DatabaseServiceID,
+                    FileID: e.FileID,
+                    ActionID: e.ActionID,
+                    TaskClassID: taskClassID,
+                    LastFileTaskSessionID: e.LastFileTaskSessionID,
+                    Duration: e.Duration,
+                    OverheadTime: e.OverheadTime,
+                    ActivityTime: e.ActivityTime
+                    )).ToList();
             using (var connection = GetConnection(rates))
             {
                 connection.Open();
@@ -295,7 +309,7 @@ namespace Extract.ETL.Test
 
                 cmd.CommandText = "SELECT COUNT(ID) FROM [dbo].[ReportingVerificationRates]";
 
-                Assert.AreEqual(cmd.ExecuteScalar() as Int32?, expected.Count);
+                Assert.AreEqual(cmd.ExecuteScalar() as Int32?, adjustedExpected.Count);
 
                 cmd.CommandText = "SELECT * FROM [dbo].[ReportingVerificationRates]";
 
@@ -315,13 +329,13 @@ namespace Extract.ETL.Test
                         ActivityTime: r.GetDouble(r.GetOrdinal("ActivityTime"))
                     )).ToList();
 
-                    Assert.AreEqual(resultsInTuples.Count, expected.Count,
+                    Assert.AreEqual(resultsInTuples.Count, adjustedExpected.Count,
                         string.Format(CultureInfo.InvariantCulture, "Found {0} and expected {1}",
-                        resultsInTuples.Count, expected.Count));
+                        resultsInTuples.Count, adjustedExpected.Count));
                     Assert.That(resultsInTuples
                             .OrderBy(a => a.DatabaseServiceID)
                             .ThenBy(a => a.FileID)
-                        .SequenceEqual(expected
+                        .SequenceEqual(adjustedExpected
                             .OrderBy(r => r.DatabaseServiceID)
                             .ThenBy(r => r.FileID)),
                         "Compare the actual data with the expected");
