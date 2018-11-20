@@ -152,8 +152,7 @@ namespace Extract.Dashboard.Forms
         {
             try
             {
-
-                string dashboardName = dashboardDataGridView.CurrentCell?.Value as string;
+                string dashboardName = dashboardDataGridView.CurrentRow?.Cells["DashboardName"].Value as string;
                 if (string.IsNullOrWhiteSpace(dashboardName))
                 {
                     return;
@@ -222,6 +221,11 @@ namespace Extract.Dashboard.Forms
         {
             try
             {
+                if ( dashboardDataGridView.CurrentRow is null)
+                {
+                    return;
+                }
+                dashboardDataGridView.CurrentCell = dashboardDataGridView.CurrentRow.Cells["DashboardName"];
                 dashboardDataGridView.BeginEdit(true);
             }
             catch (Exception ex)
@@ -238,7 +242,7 @@ namespace Extract.Dashboard.Forms
                 {
                     string dashboardName = dashboardDataGridView.CurrentRow.Cells["DashboardName"].Value as string;
                     string message = string.Format(CultureInfo.InstalledUICulture, "Remove the {0} dashboard?", dashboardName);
-                    if (MessageBox.Show(message, "Remove dashboard from database", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
+                    if (MessageBox.Show(message, "Remove dashboard from database", MessageBoxButtons.YesNo) == DialogResult.Yes)
                     {
                         using (var connection = NewSqlDBConnection())
                         {
@@ -322,7 +326,7 @@ namespace Extract.Dashboard.Forms
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandText =
-                        "SELECT DashboardName, FullUserName, LastImportedDate FROM Dashboard " +
+                        "SELECT DashboardName, IsNull(FullUserName, UserName) FullUserName, LastImportedDate FROM Dashboard " +
                             "INNER JOIN FAMUser ON Dashboard.FAMUserID = FAMUser.ID";
 
                     DataTable dataTable = new DataTable();
