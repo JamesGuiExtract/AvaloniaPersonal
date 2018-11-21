@@ -974,7 +974,7 @@ namespace Extract.AttributeFinder
         /// <remarks>The CSV fields are: "answer", features...</remarks>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public (IList<IList<string>> trainingData, IList<IList<string>> testingData)
-            GetDataToWriteDataToDatabase(
+            GetDataToWriteToDatabase(
                 CancellationToken cancelToken,
                 string databaseServer,
                 string databaseName,

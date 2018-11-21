@@ -276,7 +276,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                         ProcessInVariableBatches(availableIDs,
                             executeBeforeTransaction: (lowestIDToProcess, highestIDToProcess) =>
                             {
-                                (trainingData, testingData) = machine.GetDataToWriteDataToDatabase(cancelToken,
+                                (trainingData, testingData) = machine.GetDataToWriteToDatabase(cancelToken,
                                     DatabaseServer, DatabaseName, AttributeSetName,
                                     lowestIDToProcess, highestIDToProcess, UseAttributeSetForExpecteds,
                                     RunRulesetForCandidateOrFeatures, RunRulesetIfVoaIsMissing,

@@ -1,4 +1,7 @@
-﻿using Extract.Testing.Utilities;
+﻿using AttributeDbMgrComponentsLib;
+using Extract.FileActionManager.Database.Test;
+using Extract.FileActionManager.FileProcessors;
+using Extract.Testing.Utilities;
 using Extract.Utilities;
 using LearningMachineTrainer;
 using NUnit.Framework;
@@ -15,11 +18,42 @@ using System.Threading.Tasks;
 using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
+using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.AttributeFinder.Test
 {
+    [Flags]
+    public enum Features
+    {
+        Attribute = 1,
+        SpatialString = 2,
+        Both = Attribute | SpatialString
+    }
+    [Flags]
+    [SuppressMessage("Microsoft.Naming", "CA1714:FlagsEnumsShouldHavePluralNames")]
+    public enum MissingData
+    {
+        None = 0,
+        SomeImages = 1,
+        SomeUSSFiles = 2,
+        SomeVOAFiles = 4,
+        SomeEAVFiles = 8,
+        AllOfSpecified = 16,
+        All = AllOfSpecified | SomeImages | SomeUSSFiles | SomeVOAFiles,
+        AllVOAFiles = AllOfSpecified | SomeVOAFiles,
+        AllEAVFiles = AllOfSpecified | SomeEAVFiles,
+        VOA_EAVFiles = SomeVOAFiles | SomeEAVFiles,
+        AllV_EFiles = AllOfSpecified | VOA_EAVFiles,
+    }
+    public enum FeatureRule
+    {
+        None = 0,
+        IfMissing = 1,
+        Always = 2
+    }
+
     /// <summary>
     /// Unit tests for learning machine data class
     /// </summary>
@@ -29,9 +63,7 @@ namespace Extract.AttributeFinder.Test
     {
         #region Constants
 
-        /// <summary>
-        /// The name of an embedded resource folder
-        /// </summary>
+        static readonly string _STORE_ATTRIBUTE_GUID = typeof(StoreAttributesInDBTask).GUID.ToString();
 
         #endregion Constants
 
@@ -41,6 +73,7 @@ namespace Extract.AttributeFinder.Test
         /// Manages the test images needed for testing.
         /// </summary>
         static TestFileManager<TestLearningMachine> _testFiles;
+        static FAMTestDBManager<TestLearningMachine> _testDbManager;
         static List<string> _inputFolder = new List<string>();
         static string _csvPath = Path.GetTempFileName();
         static string _savedMachinePath = Path.GetTempFileName();
@@ -59,6 +92,7 @@ namespace Extract.AttributeFinder.Test
             GeneralMethods.TestSetup();
 
             _testFiles = new TestFileManager<TestLearningMachine>();
+            _testDbManager = new FAMTestDBManager<TestLearningMachine>();
         }
 
         /// <summary>
@@ -71,6 +105,11 @@ namespace Extract.AttributeFinder.Test
             if (_testFiles != null)
             {
                 _testFiles.Dispose();
+            }
+
+            if (_testDbManager != null)
+            {
+                _testDbManager.Dispose();
             }
 
             // Delete temp dir
@@ -1905,6 +1944,255 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual("Unknown", firstAt.Value.String);
         }
 
+        // Tests using attributes stored in DB and using a feature generator ruleset for pagination classifier training
+        [CLSCompliant(false)]
+        [Test, Category("LearningMachine")]
+        //        usage,                                 useASForExp, featureTypes,           testMissingData,          useFeatureRuleSet,     records, minTrainAcc, minTestAcc
+        [TestCase(LearningMachineUsage.DocumentCategorization,  true, Features.SpatialString, MissingData.None,         FeatureRule.None,      20,       1.0,         1.0, TestName = "DocumentCategorization: Not using feature VOAs")]
+        [TestCase(LearningMachineUsage.DocumentCategorization, false, Features.SpatialString, MissingData.None,         FeatureRule.None,      20,       1.0,         1.0, TestName = "DocumentCategorization: Use folder structure for expected data")]
+        [TestCase(LearningMachineUsage.DocumentCategorization,  true, Features.SpatialString, MissingData.SomeImages,   FeatureRule.None,      14,       1.0,         1.0, TestName = "DocumentCategorization: Missing some images, not using feature VOAs")]
+        [TestCase(LearningMachineUsage.DocumentCategorization,  true, Features.SpatialString, MissingData.SomeUSSFiles, FeatureRule.None,      14,       1.0,         1.0, TestName = "DocumentCategorization: Missing some uss files, not using feature VOAs")]
+        [TestCase(LearningMachineUsage.DocumentCategorization,  true, Features.SpatialString, MissingData.All,          FeatureRule.None,       0,      null,        null, TestName = "DocumentCategorization: Missing all data")]
+        [TestCase(LearningMachineUsage.DocumentCategorization,  true, Features.Attribute,     MissingData.None,         FeatureRule.None,      20,       1.0,         1.0, TestName = "DocumentCategorization: Using only feature VOAs on disk")]
+        [TestCase(LearningMachineUsage.DocumentCategorization,  true, Features.Attribute,     MissingData.SomeVOAFiles, FeatureRule.None,      14,       1.0,         1.0, TestName = "DocumentCategorization: Missing some VOAs, using only feature VOAs on disk")]
+        [TestCase(LearningMachineUsage.DocumentCategorization,  true, Features.Both,          MissingData.SomeVOAFiles, FeatureRule.None,      14,       1.0,         1.0, TestName = "DocumentCategorization: Missing some VOAs, using feature VOAs on disk")]
+        [TestCase(LearningMachineUsage.DocumentCategorization,  true, Features.Both,          MissingData.None,         FeatureRule.None,      20,       1.0,         1.0, TestName = "DocumentCategorization: Using feature VOAs on disk")]
+        [TestCase(LearningMachineUsage.DocumentCategorization,  true, Features.Both,          MissingData.SomeImages,   FeatureRule.None,      14,       1.0,         1.0, TestName = "DocumentCategorization: Missing some images, using feature VOAs on disk")]
+        [TestCase(LearningMachineUsage.DocumentCategorization,  true, Features.Both,          MissingData.SomeUSSFiles, FeatureRule.None,      14,       1.0,         1.0, TestName = "DocumentCategorization: Missing some uss files, using feature VOAs on disk")]
+        [TestCase(LearningMachineUsage.DocumentCategorization,  true, Features.Both,          MissingData.SomeVOAFiles, FeatureRule.IfMissing, 20,       1.0,         1.0, TestName = "DocumentCategorization: Run ruleset if files are missing")]
+        [TestCase(LearningMachineUsage.DocumentCategorization,  true, Features.Both,          MissingData.AllVOAFiles,  FeatureRule.Always,    20,       1.0,         1.0, TestName = "DocumentCategorization: Run ruleset for all files")]
+
+        [TestCase(LearningMachineUsage.Pagination,              true, Features.SpatialString, MissingData.None,         FeatureRule.None,      15,       1.0,         0.0, TestName = "Pagination: Not using feature VOAs")]
+        [TestCase(LearningMachineUsage.Pagination,             false, Features.SpatialString, MissingData.None,         FeatureRule.None,      15,       1.0,         0.0, TestName = "Pagination: Use eav files")]
+        [TestCase(LearningMachineUsage.Pagination,             false, Features.SpatialString, MissingData.SomeEAVFiles, FeatureRule.None,       9,       1.0,         0.0, TestName = "Pagination: Missing some eav files")]
+        [TestCase(LearningMachineUsage.Pagination,             false, Features.SpatialString, MissingData.AllEAVFiles,  FeatureRule.None,       0,      null,        null, TestName = "Pagination: Missing all eav files")]
+        [TestCase(LearningMachineUsage.Pagination,              true, Features.SpatialString, MissingData.SomeImages,   FeatureRule.None,       9,       1.0,         1.0, TestName = "Pagination: Missing some images, not using feature VOAs")]
+        [TestCase(LearningMachineUsage.Pagination,              true, Features.SpatialString, MissingData.SomeUSSFiles, FeatureRule.None,       9,       1.0,         1.0, TestName = "Pagination: Missing uss files, not using feature VOAs")]
+        [TestCase(LearningMachineUsage.Pagination,              true, Features.SpatialString, MissingData.All,          FeatureRule.None,       0,      null,        null, TestName = "Pagination: Missing all data")]
+        [TestCase(LearningMachineUsage.Pagination,              true, Features.Both,          MissingData.None,         FeatureRule.None,      15,      0.90,         0.0, TestName = "Pagination: Using both spatial string and feature VOAs on disk")]
+        [TestCase(LearningMachineUsage.Pagination,              true, Features.Attribute,     MissingData.SomeImages,   FeatureRule.None,       9,       1.0,         1.0, TestName = "Pagination: Missing some images, using feature VOAs on disk")]
+        [TestCase(LearningMachineUsage.Pagination,              true, Features.Attribute,     MissingData.None,         FeatureRule.None,      15,       1.0,         0.0, TestName = "Pagination: Using feature VOAs on disk")]
+        [TestCase(LearningMachineUsage.Pagination,              true, Features.Attribute,     MissingData.SomeVOAFiles, FeatureRule.IfMissing, 15,      0.92,         0.0, TestName = "Pagination: Run ruleset if files are missing")]
+        [TestCase(LearningMachineUsage.Pagination,              true, Features.Attribute,     MissingData.AllVOAFiles,  FeatureRule.Always,    15,      0.85,         0.0, TestName = "Pagination: Run ruleset for all files")]
+
+        [TestCase(LearningMachineUsage.AttributeCategorization, true, Features.SpatialString, MissingData.AllEAVFiles,  FeatureRule.None,      134,      0.0,         0.0, TestName = "AttributeCategorization: Not using attribute features")]
+        [TestCase(LearningMachineUsage.AttributeCategorization, true, Features.Attribute,     MissingData.AllEAVFiles,  FeatureRule.None,      134,      1.0,        0.85, TestName = "AttributeCategorization: Using feature VOAs on disk")]
+        [TestCase(LearningMachineUsage.AttributeCategorization, true, Features.Both,          MissingData.AllEAVFiles,  FeatureRule.None,      134,      1.0,        0.66, TestName = "AttributeCategorization: Using spatial string features and feature VOAs on disk")]
+        [TestCase(LearningMachineUsage.AttributeCategorization, true, Features.Attribute,     MissingData.SomeImages,   FeatureRule.None,       87,      1.0,         1.0, TestName = "AttributeCategorization: Missing some images, using feature VOAs on disk")]
+        [TestCase(LearningMachineUsage.AttributeCategorization, true, Features.Attribute,     MissingData.SomeUSSFiles, FeatureRule.None,       87,      1.0,         1.0, TestName = "AttributeCategorization: Missing some uss files, using feature VOAs on disk")]
+        [TestCase(LearningMachineUsage.AttributeCategorization, true, Features.Attribute,     MissingData.VOA_EAVFiles, FeatureRule.None,       87,      1.0,         1.0, TestName = "AttributeCategorization: Missing some VOA files, using feature VOAs on disk")]
+        [TestCase(LearningMachineUsage.AttributeCategorization, true, Features.Attribute,     MissingData.VOA_EAVFiles, FeatureRule.IfMissing, 134,     0.71,         0.5, TestName = "AttributeCategorization: Run ruleset if files are missing")]
+        [TestCase(LearningMachineUsage.AttributeCategorization, true, Features.Attribute,     MissingData.AllV_EFiles,  FeatureRule.Always,    134,     0.71,        0.66, TestName = "AttributeCategorization: Run ruleset for all files")]
+        [TestCase(LearningMachineUsage.AttributeCategorization, false, Features.Attribute,    MissingData.SomeVOAFiles, FeatureRule.IfMissing, 134,     0.71,         0.5, TestName = "AttributeCategorization: Don't use attribute set for source of labels")]
+        [TestCase(LearningMachineUsage.AttributeCategorization, false, Features.Attribute,    MissingData.VOA_EAVFiles, FeatureRule.IfMissing,  87,      1.0,         1.0, TestName = "AttributeCategorization: Missing some source of labels files")]
+        [TestCase(LearningMachineUsage.AttributeCategorization, false, Features.Attribute,    MissingData.AllV_EFiles,  FeatureRule.IfMissing,   0,     null,        null, TestName = "AttributeCategorization: Missing all source of labels files")]
+        public static void DBAccess(
+            LearningMachineUsage usage,
+            bool useASForExp,
+            Features featureTypes,
+            MissingData testMissingData,
+            FeatureRule useFeatureRuleSet,
+            int records,
+            double? minTrainAcc,
+            double? minTestAcc)
+        {
+            var dbName = "_LMDBAccess_64B05ED2-DD5C-419D-80B0-3BD6E8094F24";
+            try
+            {
+                string featureVoaSuffix = ".voa";
+                string eavSuffix = ".voa";
+                string sourceOfLabelsSuffix = ".voa";
+                string answerPattern = null;
+                string featureFilter = "DocumentType";
+                string pageRange = null;
+                if (usage == LearningMachineUsage.Pagination)
+                {
+                    SetPaginationFiles();
+                    featureVoaSuffix = ".protofeatures.voa";
+                    eavSuffix = ".eav";
+                    answerPattern = "<SourceDocName>.eav";
+                    featureFilter = "*@Feature";
+                    pageRange = "3";
+                }
+                else if (usage == LearningMachineUsage.DocumentCategorization)
+                {
+                    SetDocumentCategorizationFiles();
+                    answerPattern = "$FileOf($DirOf(<SourceDocName>))";
+                }
+                else if (usage == LearningMachineUsage.AttributeCategorization)
+                {
+                    SetPaginationFiles();
+                    featureVoaSuffix = ".labeled.voa";
+                    featureFilter = (featureTypes & Features.Attribute) == Features.Attribute ? "*@Feature" : "*@NO_FEATURES";
+                }
+
+                string rulesFile = useFeatureRuleSet == FeatureRule.None
+                    ? null
+                    : rulesFile = GetTrainingDataRulesFile(usage);
+
+                // Create DB
+                var eavAttributeSetName = "EVOA";
+                CreateDB(dbName, eavAttributeSetName, eavSuffix);
+
+                // Create LM
+                var inputConfig = new InputConfiguration
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = (featureTypes & Features.Attribute) == Features.Attribute || usage == LearningMachineUsage.AttributeCategorization ? ("<SourceDocName>" + featureVoaSuffix) : "",
+                    AnswerPath = answerPattern,
+                    TrainingSetPercentage = 80
+                };
+                var autoBoW = (featureTypes & Features.SpatialString) == Features.SpatialString ? new SpatialStringFeatureVectorizer(pageRange, 5, 10000) { UseFeatureHashing = true } : null;
+                var lm = new LearningMachine
+                {
+                    InputConfig = inputConfig,
+                    Encoder = new LearningMachineDataEncoder(usage, autoBoW, featureFilter),
+                    Classifier = new MulticlassSupportVectorMachineClassifier()
+                };
+                if (usage == LearningMachineUsage.AttributeCategorization)
+                {
+                    lm.Encoder.AttributesToTokenizeFilter = "*@Tokenize";
+                    lm.InputConfig.AnswerPath = "<SourceDocName>.NO_EAV";
+                    lm.LabelAttributesSettings = new LabelAttributes()
+                    {
+                        SourceOfLabelsPath = "<SourceDocName>" + sourceOfLabelsSuffix,
+                        CreateEmptyLabelForNonMatching = true
+                    };
+                    lm.LabelAttributesSettings.CategoryQueryPairs.Add(new CategoryQueryPair
+                    {
+                        Category = "DOB",
+                        CategoryIsXPath = false,
+                        Query = "/*/Document/DocumentData/PatientInfo/DOB"
+                    });
+                }
+                lm.ComputeEncodings();
+
+                var files = Directory.GetFiles(_inputFolder.Last(), "*.tif", SearchOption.AllDirectories);
+
+                if (useASForExp)
+                {
+                    // Delete eav files since encodings are computed, unless they are being used for features
+                    if ((featureTypes & Features.Attribute) == 0
+                        || eavSuffix != featureVoaSuffix
+                        || useFeatureRuleSet == FeatureRule.Always)
+                    {
+                        foreach (var imageName in files)
+                        {
+                            File.Delete(imageName + eavSuffix);
+                        }
+                    }
+                }
+
+                // If testing missing data then delete some uss and feature voa files
+                if (testMissingData != MissingData.None)
+                {
+                    for (int i = 0; i < files.Length; i++)
+                    {
+                        if ((testMissingData & MissingData.AllOfSpecified) == MissingData.AllOfSpecified || i % 4 == 0)
+                        {
+                            var file = files[i];
+                            if ((testMissingData & MissingData.SomeImages) == MissingData.SomeImages)
+                            {
+                                File.Delete(file);
+                            }
+                            if ((testMissingData & MissingData.SomeUSSFiles) == MissingData.SomeUSSFiles)
+                            {
+                                File.Delete(file + ".uss");
+                            }
+                            if ((testMissingData & MissingData.SomeVOAFiles) == MissingData.SomeVOAFiles)
+                            {
+                                File.Delete(file + featureVoaSuffix);
+
+                            }
+                            if ((testMissingData & MissingData.SomeEAVFiles) == MissingData.SomeEAVFiles)
+                            {
+                                // EAV files are ignored by attribute categorization usage so delete source of labels files
+                                if (usage == LearningMachineUsage.AttributeCategorization)
+                                {
+                                    File.Delete(file + sourceOfLabelsSuffix);
+                                }
+                                else
+                                {
+                                    File.Delete(file + eavSuffix);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                var (training, testing) = lm.GetDataToWriteToDatabase(CancellationToken.None,
+                    "(local)", dbName, eavAttributeSetName,
+                    lowestIDToProcess: 0,
+                    highestIDToProcess: files.Length,
+                    useAttributeSetForExpected: useASForExp,
+                    runRuleSetForFeatures: useFeatureRuleSet == FeatureRule.Always,
+                    runRuleSetIfFeaturesAreMissing: useFeatureRuleSet == FeatureRule.IfMissing,
+                    featureRuleSetName: rulesFile);
+
+                Assert.AreEqual(records, training.Count + testing.Count);
+
+                if (records > 0)
+                {
+                    TemporaryFile trainingDataFile = new TemporaryFile(false);
+                    TemporaryFile testingDataFile = new TemporaryFile(false);
+
+                    File.WriteAllLines(trainingDataFile.FileName, training.Select(record =>
+                        string.Join(",", record.Select(s => s.QuoteIfNeeded("\"", ",")))));
+                    File.WriteAllLines(testingDataFile.FileName, testing.Select(record =>
+                        string.Join(",", record.Select(s => s.QuoteIfNeeded("\"", ",")))));
+
+                    var (trainingSet, testingSet) = lm.TrainAndTestWithCsvData(false, trainingDataFile.FileName, testingDataFile.FileName, false,
+                        _ => { }, CancellationToken.None);
+
+                    var trainAcc = trainingSet.Match(gcm => gcm.OverallAgreement, cm => cm.FScore);
+                    var testAcc = testingSet.Match(gcm => gcm.OverallAgreement, cm => cm.FScore);
+
+                    // Treat NaN as zero
+                    testAcc = double.IsNaN(testAcc) ? 0.0 : testAcc;
+
+                    Assert.GreaterOrEqual(trainAcc, minTrainAcc);
+                    Assert.GreaterOrEqual(testAcc, minTestAcc);
+
+                    var classes = lm.Encoder.AnswerCodeToName;
+                    if (usage == LearningMachineUsage.Pagination)
+                    {
+                        CollectionAssert.AreEqual(new[] { "NotFirstPage", "FirstPage" }, classes);
+                    }
+                    else if (usage == LearningMachineUsage.AttributeCategorization)
+                    {
+                        CollectionAssert.AreEqual(new[] { "", "DOB" }, classes);
+                    }
+                    else if (usage == LearningMachineUsage.DocumentCategorization)
+                    {
+                        // If not expecting files to be skipped then check for all classes to exist
+                        var folders = files.Select(p => Path.GetFileName(Path.GetDirectoryName(p))).ToList();
+                        if (testMissingData == MissingData.None
+                            || (testMissingData & MissingData.SomeVOAFiles) == MissingData.SomeVOAFiles
+                                && useFeatureRuleSet != FeatureRule.None)
+                        {
+                            Assert.AreEqual(folders.Count, folders.Intersect(classes).Count());
+                        }
+                        else
+                        {
+                            Assert.Greater(folders.Count, classes.Count());
+                        }
+
+                        // "Unknown" class has no folder
+                        Assert.AreEqual(1, classes.Except(folders).Count());
+                    }
+                }
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(dbName);
+
+                // Reset test files object to avoid complaints about deleted files
+                _testFiles.Dispose();
+                _testFiles = new TestFileManager<TestLearningMachine>();
+            }
+        }
+
         #endregion Tests
 
         #region Helper Methods
@@ -2057,6 +2345,70 @@ namespace Extract.AttributeFinder.Test
 
             return result;
         }
+
+        private static string GetTrainingDataRulesFile(LearningMachineUsage usage)
+        {
+            string rulesFile = null;
+            if (usage == LearningMachineUsage.Pagination)
+            {
+                rulesFile = Path.Combine(_inputFolder.Last(), "createProtofeatures.rsd");
+                _testFiles.GetFile("Resources.LearningMachine.PaginationFeatureGenerator.createProtofeatures.rsd", rulesFile);
+                _testFiles.GetFile("Resources.LearningMachine.PaginationFeatureGenerator.createProtofeatures.rsd.etf", rulesFile + ".etf");
+
+                rulesFile = Path.Combine(_inputFolder.Last(), "getPageNumber.rsd");
+                _testFiles.GetFile("Resources.LearningMachine.PaginationFeatureGenerator.getPageNumber.rsd", rulesFile);
+                _testFiles.GetFile("Resources.LearningMachine.PaginationFeatureGenerator.getPageNumber.rsd.etf", rulesFile + ".etf");
+
+                rulesFile = Path.Combine(_inputFolder.Last(), "CreateTrainingData.rsd");
+                _testFiles.GetFile("Resources.LearningMachine.PaginationFeatureGenerator.CreateTrainingData.rsd", rulesFile);
+            }
+            else if (usage == LearningMachineUsage.DocumentCategorization)
+            {
+                rulesFile = Path.Combine(_inputFolder.Last(), "CreateTrainingData.rsd");
+                _testFiles.GetFile("Resources.LearningMachine.DocClassifierFeatureGenerator.CreateTrainingData.rsd", rulesFile);
+            }
+            else if (usage == LearningMachineUsage.AttributeCategorization)
+            {
+                rulesFile = Path.Combine(_inputFolder.Last(), "date.dat");
+                _testFiles.GetFile("Resources.LearningMachine.CandidateAttributeGenerator.date.dat", rulesFile);
+
+                rulesFile = Path.Combine(_inputFolder.Last(), "CreateTrainingData.rsd");
+                _testFiles.GetFile("Resources.LearningMachine.CandidateAttributeGenerator.CreateTrainingData.rsd", rulesFile);
+            }
+            return rulesFile;
+        }
+
+        private static void CreateDB(string dbName, string eavAttributeSetName, string eavSuffix)
+        {
+            var modelName = "M";
+            var fileProcessingDB = _testDbManager.GetNewDatabase(dbName);
+            fileProcessingDB.DefineNewAction("a");
+            fileProcessingDB.DefineNewMLModel(modelName);
+            var attributeDBMgr = new AttributeDBMgr
+            {
+                FAMDB = fileProcessingDB
+            };
+            attributeDBMgr.CreateNewAttributeSetName(eavAttributeSetName);
+            var afutility = new AFUtility();
+            var files = Directory.GetFiles(_inputFolder.Last(), "*.tif", SearchOption.AllDirectories);
+            fileProcessingDB.RecordFAMSessionStart("DUMMY", "a", true, true);
+            for (int i = 0; i < files.Length; i++)
+            {
+                var file = files[i];
+                var rec = fileProcessingDB.AddFile(file, "a", -1, EFilePriority.kPriorityNormal,
+                    false, false, EActionStatus.kActionPending, false, out _, out _);
+
+                var path = file + eavSuffix;
+                var voaData = afutility.GetAttributesFromFile(path);
+                int fileTaskSessionID = fileProcessingDB.StartFileTaskSession(_STORE_ATTRIBUTE_GUID, rec.FileID, rec.ActionID);
+                attributeDBMgr.CreateNewAttributeSetForFile(fileTaskSessionID, eavAttributeSetName, voaData, false, true, true,
+                    closeConnection: i == (files.Length - 1));
+
+                fileProcessingDB.UpdateFileTaskSession(fileTaskSessionID, 0, 0, 0);
+            }
+            fileProcessingDB.CloseAllDBConnections();
+        }
+
         #endregion Helper Methods
     }
 }

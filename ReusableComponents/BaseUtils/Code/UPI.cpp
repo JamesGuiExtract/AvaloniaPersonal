@@ -119,7 +119,15 @@ const UPI& UPI::getCurrentProcessUPI()
 			string strAppName;
 			try
 			{
-				strAppName = getFileNameWithoutExtension(__argv[0]);
+				// Avoid an exception when running via nunit
+				if (__argv != __nullptr)
+				{
+					strAppName = getFileNameWithoutExtension(__argv[0]);
+				}
+				else
+				{
+					strAppName = getFileNameWithoutExtension(getCurrentProcessEXEFullPath());
+				}
 			}
 			catch (...)
 			{

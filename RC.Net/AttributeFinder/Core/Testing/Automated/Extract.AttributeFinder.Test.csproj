@@ -113,6 +113,14 @@
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj">
+      <Project>{6B284A4D-132C-4FE4-858F-06A9C476B19B}</Project>
+      <Name>Extract.FileActionManager.Database.Test</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\FileActionManager\FileProcessors\Core\Code\Extract.FileActionManager.FileProcessors.csproj">
+      <Project>{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}</Project>
+      <Name>Extract.FileActionManager.FileProcessors</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj">
       <Project>{b2d07de4-9192-4531-8854-de03ce9b0b57}</Project>
       <Name>Extract.Imaging</Name>
@@ -135,6 +143,24 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <COMReference Include="ADODB">
+      <Guid>{2A75196C-D9EB-4129-B803-931327F72D5C}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="AttributeDbMgrComponentsLib">
+      <Guid>{0DF6DB5B-F788-42FC-AE9E-EF19CAA78D38}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="UCLID_AFCORELib">
       <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -164,6 +190,15 @@
     </COMReference>
     <COMReference Include="UCLID_COMUTILSLib">
       <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_FILEPROCESSINGLib">
+      <Guid>{5FBC9199-D162-4F14-BAD9-090F6AB576C5}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
@@ -504,6 +539,14 @@
     <EmbeddedResource Include="Resources\Example05.tif" />
     <EmbeddedResource Include="Resources\Example05.tif.uss" />
     <EmbeddedResource Include="Resources\Example05_WithRotatedPage.tif" />
+    <EmbeddedResource Include="Resources\LearningMachine\DocClassifierFeatureGenerator\CreateTrainingData.rsd" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationFeatureGenerator\createProtofeatures.rsd" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationFeatureGenerator\createProtofeatures.rsd.etf" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationFeatureGenerator\CreateTrainingData.rsd" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationFeatureGenerator\getPageNumber.rsd" />
+    <EmbeddedResource Include="Resources\LearningMachine\PaginationFeatureGenerator\getPageNumber.rsd.etf" />
+    <EmbeddedResource Include="Resources\LearningMachine\CandidateAttributeGenerator\CreateTrainingData.rsd" />
+    <EmbeddedResource Include="Resources\LearningMachine\CandidateAttributeGenerator\date.dat" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
