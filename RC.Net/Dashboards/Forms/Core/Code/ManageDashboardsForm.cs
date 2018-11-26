@@ -90,7 +90,8 @@ namespace Extract.Dashboard.Forms
                     }
 
                     string dashboardDefinition = GetDashboardDefinition(dashboardName);
-                    File.WriteAllText(saveFileDialog.FileName, dashboardDefinition);
+                    XDocument document = XDocument.Parse(dashboardDefinition);
+                    document.Save(saveFileDialog.FileName, SaveOptions.None);
                 }
             }
         }
@@ -104,7 +105,7 @@ namespace Extract.Dashboard.Forms
                     SelectDashboardToImportForm selectForm = new SelectDashboardToImportForm(true, dashboardName);
                     if (selectForm.ShowDialog() == DialogResult.OK)
                     {
-                        var xDoc = XDocument.Load(selectForm.DashboardFile);
+                        var xDoc = XDocument.Load(selectForm.DashboardFile, LoadOptions.PreserveWhitespace);
                         using (var connect = NewSqlDBConnection())
                         {
                             connect.Open();
@@ -119,7 +120,7 @@ namespace Extract.Dashboard.Forms
 
                             command.Parameters.Add("@DashboardName", SqlDbType.NVarChar, 100).Value = dashboardName;
                             command.Parameters.AddWithValue("@FAMUserID", FAMUserID);
-                            command.Parameters.Add("@Definition", SqlDbType.Xml).Value = xDoc.ToString();
+                            command.Parameters.Add("@Definition", SqlDbType.Xml).Value = xDoc.ToString(SaveOptions.None);
                             command.ExecuteScalar();
                         }
                         LoadDashboardGrid();
@@ -272,7 +273,7 @@ namespace Extract.Dashboard.Forms
                 SelectDashboardToImportForm selectForm = new SelectDashboardToImportForm();
                 if (selectForm.ShowDialog() == DialogResult.OK)
                 {
-                    var xDoc = XDocument.Load(selectForm.DashboardFile);
+                    var xDoc = XDocument.Load(selectForm.DashboardFile, LoadOptions.PreserveWhitespace);
                     using (var connect = NewSqlDBConnection())
                     {
                         connect.Open();
@@ -284,7 +285,7 @@ namespace Extract.Dashboard.Forms
 
                         command.Parameters.Add("@DashboardName", SqlDbType.NVarChar, 100).Value = selectForm.DashboardName;
                         command.Parameters.AddWithValue("@FAMUserID", FAMUserID);
-                        command.Parameters.Add("@Definition", SqlDbType.Xml).Value = xDoc.ToString();
+                        command.Parameters.Add("@Definition", SqlDbType.Xml).Value = xDoc.ToString(SaveOptions.None);
 
                         command.ExecuteScalar();
                     }
