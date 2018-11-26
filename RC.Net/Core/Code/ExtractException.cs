@@ -627,7 +627,7 @@ namespace Extract
         /// <see langword="null"/>, no data will be added to the debug data collection.</param>
         /// <param name="debugDataValue">The value to be added to the data collection.</param>
         /// <param name="encrypt">Specifies whether to encrypt the data value or not.</param>
-        public void AddDebugData(string debugDataName, ValueType debugDataValue, bool encrypt)
+        public void AddDebugData(string debugDataName, ValueType debugDataValue, bool encrypt = false)
         {
             try
             {
@@ -647,7 +647,7 @@ namespace Extract
         /// <see langword="null"/>, no data will be added to the debug data collection.</param>
         /// <param name="debugDataValue">The string to be added to the data collection.</param>
         /// <param name="encrypt">Specifies whether to encrypt the data value or not.</param>
-        public void AddDebugData(string debugDataName, string debugDataValue, bool encrypt)
+        public void AddDebugData(string debugDataName, string debugDataValue, bool encrypt = false)
         {
             try
             {
@@ -667,7 +667,7 @@ namespace Extract
         /// <see langword="null"/>, no data will be added to the debug data collection.</param>
         /// <param name="debugDataValue">The string to be added to the data collection.</param>
         /// <param name="encrypt">Specifies whether to encrypt the data value or not.</param>
-        public void AddDebugData(string debugDataName, EventArgs debugDataValue, bool encrypt)
+        public void AddDebugData(string debugDataName, EventArgs debugDataValue, bool encrypt = false)
         {
             try
             {
@@ -728,7 +728,7 @@ namespace Extract
         /// <see langword="null"/>, no data will be added to the debug data collection.</param>
         /// <param name="debugDataValue">The string to be added to the data collection.</param>
         /// <param name="encrypt">Specifies whether to encrypt the data value or not.</param>
-        public void AddDebugData(string debugDataName, Control debugDataValue, bool encrypt)
+        public void AddDebugData(string debugDataName, Control debugDataValue, bool encrypt = false)
         {
             try
             {
