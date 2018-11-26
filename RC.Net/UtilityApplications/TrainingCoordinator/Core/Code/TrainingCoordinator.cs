@@ -343,13 +343,13 @@ namespace Extract.UtilityApplications.TrainingCoordinator
         /// DatabaseServiceID when it was previously edited</remarks>
         public DatabaseServiceStatus Status
         {
-            get => _status ?? new TrainingCoordinatorStatus
+            get => _status = _status ?? GetLastOrCreateStatus(() => new TrainingCoordinatorStatus()
             {
                 Log = Log,
                 ServiceStatuses = Services.ToDictionary(
                     service => service.Guid,
                     service => service.Status)
-            };
+            });
 
             set => _status = value as TrainingCoordinatorStatus;
         }
@@ -526,15 +526,15 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             [OnDeserialized]
             void OnDeserialized(StreamingContext context)
             {
-                if (Version > CURRENT_VERSION)
+                if (Version > _CURRENT_VERSION)
                 {
                     ExtractException ee = new ExtractException("ELI45808", "Settings were saved with a newer version.");
                     ee.AddDebugData("SavedVersion", Version, false);
-                    ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
+                    ee.AddDebugData("CurrentVersion", _CURRENT_VERSION, false);
                     throw ee;
                 }
 
-                Version = CURRENT_VERSION;
+                Version = _CURRENT_VERSION;
             }
 
             [OnSerializing]

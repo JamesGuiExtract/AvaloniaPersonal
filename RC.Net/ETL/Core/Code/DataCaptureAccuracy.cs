@@ -692,10 +692,10 @@ namespace Extract.ETL
         /// </summary>
         public DatabaseServiceStatus Status
         {
-            get => _status ?? new DataCaptureAccuracyStatus
+            get => _status = _status ?? GetLastOrCreateStatus(() => new DataCaptureAccuracyStatus()
             {
                 LastFileTaskSessionIDProcessed = -1
-            };
+            });
 
             set => _status = value as DataCaptureAccuracyStatus;
         }
@@ -794,15 +794,15 @@ namespace Extract.ETL
             [OnDeserialized]
             void OnDeserialized(StreamingContext context)
             {
-                if (Version > CURRENT_VERSION)
+                if (Version > _CURRENT_VERSION)
                 {
                     ExtractException ee = new ExtractException("ELI46064", "Settings were saved with a newer version.");
                     ee.AddDebugData("SavedVersion", Version, false);
-                    ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
+                    ee.AddDebugData("CurrentVersion", _CURRENT_VERSION, false);
                     throw ee;
                 }
 
-                Version = CURRENT_VERSION;
+                Version = _CURRENT_VERSION;
             }
         }
 

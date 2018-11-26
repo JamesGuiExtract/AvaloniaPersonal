@@ -382,10 +382,10 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// </summary>
         public override DatabaseServiceStatus Status
         {
-            get => _status ?? new TrainingDataCollectorStatus
+            get => _status = _status ?? GetLastOrCreateStatus(() => new TrainingDataCollectorStatus()
             {
                 LastIDProcessed = LastIDProcessed
-            };
+            });
 
             set => _status = value as TrainingDataCollectorStatus;
         }
@@ -659,15 +659,15 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             [OnDeserialized]
             void OnDeserialized(StreamingContext context)
             {
-                if (Version > CURRENT_VERSION)
+                if (Version > _CURRENT_VERSION)
                 {
                     ExtractException ee = new ExtractException("ELI45712", "Settings were saved with a newer version.");
                     ee.AddDebugData("SavedVersion", Version, false);
-                    ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
+                    ee.AddDebugData("CurrentVersion", _CURRENT_VERSION, false);
                     throw ee;
                 }
 
-                Version = CURRENT_VERSION;
+                Version = _CURRENT_VERSION;
             } 
 
             #endregion

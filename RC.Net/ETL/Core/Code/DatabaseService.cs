@@ -568,6 +568,61 @@ namespace Extract.ETL
         }
 
         /// <summary>
+        /// Updates the settings stored in the configured database
+        /// </summary>
+        public void UpdateDatabaseServiceSettings()
+        {
+            try
+            {
+                ExtractException.Assert("ELI46505", "Database Server must be set.", !string.IsNullOrWhiteSpace(DatabaseServer));
+                ExtractException.Assert("ELI46506", "Database Name must be set.", !string.IsNullOrWhiteSpace(DatabaseName));
+
+                using (var trans = new TransactionScope())
+                using (var connection = NewSqlDBConnection())
+                {
+                    connection.Open();
+                    var cmd = connection.CreateCommand();
+                    cmd.CommandText = @"
+                                UPDATE DatabaseService 
+                                SET [Description] = @Description,
+                                    [Settings]    = @Settings
+                                WHERE ID = @DatabaseServiceID";
+                    cmd.Parameters.AddWithValue("@Description", Description);
+                    cmd.Parameters.AddWithValue("@Settings", ToJson());
+                    cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+
+                    // Some services allow editing of initial status values so update the status column in that case
+                    if (this is IHasConfigurableDatabaseServiceStatus hasStatus)
+                    {
+                        cmd.CommandText = @"
+                                    UPDATE DatabaseService 
+                                    SET [Description] = @Description,
+                                        [Settings]    = @Settings,
+                                        [Status]      = @Status
+                                    WHERE ID = @DatabaseServiceID";
+
+                        string status = hasStatus.Status?.ToJson();
+                        if (status != null)
+                        {
+                            cmd.Parameters.AddWithValue("@Status", status);
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@Status", DBNull.Value);
+                        }
+                    }
+
+                    cmd.ExecuteNonQuery();
+                    trans.Complete();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46504");
+            }
+        }
+
+        /// <summary>
         /// Gets the status object for this service from the DB or creates an instance using the supplied function
         /// </summary>
         /// <typeparam name="T">The type of the status object to return/create</typeparam>

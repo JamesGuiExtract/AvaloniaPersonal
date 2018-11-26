@@ -607,10 +607,10 @@ namespace Extract.ETL
         /// </summary>
         public DatabaseServiceStatus Status
         {
-            get => _status ?? new ExpandAttributesStatus
+            get => _status = _status ?? GetLastOrCreateStatus(() => new ExpandAttributesStatus()
             {
                 LastFileTaskSessionIDProcessed = -1
-            };
+            });
 
             set => _status = value as ExpandAttributesStatus;
         }
@@ -654,10 +654,10 @@ namespace Extract.ETL
         void UpdateDashboardAttributesStatusItems()
         {
             var itemsToAdd = DashboardAttributes
-                .Where(s => !_status.LastIDProcessedForDashboardAttribute.ContainsKey(s.ToString()));
+                .Where(s => !_status.LastIDProcessedForDashboardAttribute.ContainsKey(s.ToString())).ToList();
 
             var itemsToDelete = _status.LastIDProcessedForDashboardAttribute.Keys
-                .Where(k => !DashboardAttributes.Contains(DashboardAttributeField.FromString(k)));
+                .Where(k => !DashboardAttributes.Contains(DashboardAttributeField.FromString(k))).ToList();
 
             if (itemsToAdd.Count() > 0 || itemsToDelete.Count() > 0)
             {
@@ -894,7 +894,8 @@ namespace Extract.ETL
         [DataContract]
         public class ExpandAttributesStatus : DatabaseServiceStatus, IFileTaskSessionServiceStatus
         {
-            const int _CURRENT_VERSION = 1;
+            // Changed Version to 2 because of bug that caused this to use CURRENT_VERSION from the parent class
+            const int _CURRENT_VERSION = 2;
 
             [DataMember]
             public override int Version { get; protected set; } = _CURRENT_VERSION;
@@ -917,15 +918,15 @@ namespace Extract.ETL
             [OnDeserialized]
             void OnDeserialized(StreamingContext context)
             {
-                if (Version > CURRENT_VERSION)
+                if (Version > _CURRENT_VERSION)
                 {
                     ExtractException ee = new ExtractException("ELI46106", "Settings were saved with a newer version.");
                     ee.AddDebugData("SavedVersion", Version, false);
-                    ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
+                    ee.AddDebugData("CurrentVersion", _CURRENT_VERSION, false);
                     throw ee;
                 }
 
-                Version = CURRENT_VERSION;
+                Version = _CURRENT_VERSION;
             }
 
             /// <summary>

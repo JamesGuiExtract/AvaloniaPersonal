@@ -440,48 +440,16 @@ namespace Extract.ETL.Management
 
                 if (service != null)
                 {
-                    using (var trans = new TransactionScope())
-                    using (var connection = NewSqlDBConnection())
-                    {
-                        connection.Open();
-                        var cmd = connection.CreateCommand();
-                        cmd.CommandText = @"
-                                UPDATE DatabaseService 
-                                SET [Description] = @Description,
-                                    [Settings]    = @Settings
-                                WHERE ID = @DatabaseServiceID";
-                        cmd.Parameters.AddWithValue("@Description", service.Description);
-                        cmd.Parameters.AddWithValue("@Settings", service.ToJson());
-                        cmd.Parameters.AddWithValue("@DatabaseServiceID", currentData.ID);
+                    service.DatabaseServer = DatabaseServer;
+                    service.DatabaseName = DatabaseName;
 
-                        // Some services allow editing of initial status values so update the status column in that case
-                        if (service is IHasConfigurableDatabaseServiceStatus hasStatus)
-                        {
-                            cmd.CommandText = @"
-                                    UPDATE DatabaseService 
-                                    SET [Description] = @Description,
-                                        [Settings]    = @Settings,
-                                        [Status]      = @Status
-                                    WHERE ID = @DatabaseServiceID";
+                    // Update the database service record in the database
+                    service.UpdateDatabaseServiceSettings();
 
-                            string status = hasStatus.Status?.ToJson();
-                            if (status != null)
-                            {
-                                cmd.Parameters.AddWithValue("@Status", status);
-                            }
-                            else
-                            {
-                                cmd.Parameters.AddWithValue("@Status", DBNull.Value);
-                            }
-                        }
+                    // update the data for the row
+                    currentData.Description = service.Description;
+                    currentData.Service = service;
 
-                        cmd.ExecuteNonQuery();
-                        trans.Complete();
-
-                        // update the data for the row
-                        currentData.Description = service.Description;
-                        currentData.Service = service;
-                    }
                     EnableButtons();
                 }
             }

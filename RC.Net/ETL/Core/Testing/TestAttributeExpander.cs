@@ -21,8 +21,8 @@ namespace Extract.ETL.Test
     {
         #region Constants
 
-        static readonly string _ExpectedSaveAll = "Select * FROM TestExpandAttributesResults";
-        static readonly string _ExpectedNoRasterZones = @"
+        const string _ExpectedSaveAll = "Select * FROM TestExpandAttributesResults";
+        const string _ExpectedNoRasterZones = @"
            SELECT  [ID]
               ,[AttributeSetForFileID]
               ,[Name]
@@ -120,8 +120,12 @@ namespace Extract.ETL.Test
         /// Test Expand Attributes with StoreSpatialInfo=true and StoreEmptyAttributes=false
         /// </summary>
         [Test]
-        [Category("Automated")]
-        public static void TestExpandAttributes()
+        [Category("Automated"), Category("ETL")]
+        [TestCase(true, false, _ExpectedSaveAll + " WHERE [Name] != 'Empty'", TestName = "ExpandAttribute store spatial")]
+        [TestCase(false, false, _ExpectedNoRasterZones + " WHERE [Name] != 'Empty'", TestName = "ExpandAttribute no spatial")]
+        [TestCase(true, true, _ExpectedSaveAll, TestName = "ExpandAttribute spatial and empty")]
+        [TestCase(false, true, _ExpectedNoRasterZones,TestName = "ExpandAttribute no spatial with empty")]
+        public static void TestExpandAttributes(bool  storeSpatialInfo, bool storeEmptyAttributes, string expectedQuery)
         {
             string testDBName = "ExpandAttribute_Test";
             string resultDBName = "ExpandAttribute_Results_Test";
@@ -136,106 +140,10 @@ namespace Extract.ETL.Test
                 ExpandAttributes expandAttributes = new ExpandAttributes();
                 expandAttributes.DatabaseName = fileProcessingDb.DatabaseName;
                 expandAttributes.DatabaseServer = fileProcessingDb.DatabaseServer;
-                expandAttributes.StoreSpatialInfo = true;
-                expandAttributes.StoreEmptyAttributes = false;
+                expandAttributes.StoreSpatialInfo = storeSpatialInfo;
+                expandAttributes.StoreEmptyAttributes = storeEmptyAttributes;
 
-                processTest(resultDBName, expandAttributes, _ExpectedSaveAll + " WHERE [Name] != 'Empty'");
-            }
-            finally
-            {
-                _testDbManager.RemoveDatabase(testDBName);
-                removeExpectedResultsDB(resultDBName);
-            }
-        }
-
-        /// <summary>
-        /// Test Expand Attributes with StoreSpatialInfo=false and StoreEmptyAttributes=false
-        /// </summary>
-        [Test]
-        [Category("Automated")]
-        public static void TestExpandAttributesNoSpatial()
-        {
-            string testDBName = "ExpandAttributeNoSpatial_Test";
-            string resultDBName = "ExpandAttribute_Results_Test";
-            try
-            {
-                // This is only used to initialize the database used for calculating the stats
-                var fileProcessingDb = _testDbManager.GetDatabase(_DATABASE, testDBName);
-
-                // add database that has the results
-                addExpectedResultsDB(resultDBName);
-
-                ExpandAttributes expandAttributes = new ExpandAttributes();
-                expandAttributes.DatabaseName = fileProcessingDb.DatabaseName;
-                expandAttributes.DatabaseServer = fileProcessingDb.DatabaseServer;
-                expandAttributes.StoreSpatialInfo = false;
-                expandAttributes.StoreEmptyAttributes = false;
-
-                processTest(resultDBName, expandAttributes, _ExpectedNoRasterZones + " WHERE [Name] != 'Empty'");
-            }
-            finally
-            {
-                _testDbManager.RemoveDatabase(testDBName);
-                removeExpectedResultsDB(resultDBName);
-            }
-        }
-
-        /// <summary>
-        /// Test Expand Attributes with StoreSpatialInfo=true and StoreEmptyAttributes=true
-        /// </summary>
-        [Test]
-        [Category("Automated")]
-        public static void TestExpandAttributesWithEmpty()
-        {
-            string testDBName = "ExpandAttribute_Test";
-            string resultDBName = "ExpandAttribute_Results_Test";
-            try
-            {
-                // This is only used to initialize the database used for calculating the stats
-                var fileProcessingDb = _testDbManager.GetDatabase(_DATABASE, testDBName);
-
-                // add database that has the results
-                addExpectedResultsDB(resultDBName);
-
-                ExpandAttributes expandAttributes = new ExpandAttributes();
-                expandAttributes.DatabaseName = fileProcessingDb.DatabaseName;
-                expandAttributes.DatabaseServer = fileProcessingDb.DatabaseServer;
-                expandAttributes.StoreSpatialInfo = true;
-                expandAttributes.StoreEmptyAttributes = true; ;
-
-                processTest(resultDBName, expandAttributes, _ExpectedSaveAll);
-            }
-            finally
-            {
-                _testDbManager.RemoveDatabase(testDBName);
-                removeExpectedResultsDB(resultDBName);
-            }
-        }
-
-        /// <summary>
-        /// Test Expand Attributes with StoreSpatialInfo=false and StoreEmptyAttributes=true
-        /// </summary>
-        [Test]
-        [Category("Automated")]
-        public static void TestExpandAttributesNoSpatialWithEmpty()
-        {
-            string testDBName = "ExpandAttributeNoSpatial_Test";
-            string resultDBName = "ExpandAttribute_Results_Test";
-            try
-            {
-                // This is only used to initialize the database used for calculating the stats
-                var fileProcessingDb = _testDbManager.GetDatabase(_DATABASE, testDBName);
-
-                // add database that has the results
-                addExpectedResultsDB(resultDBName);
-
-                ExpandAttributes expandAttributes = new ExpandAttributes();
-                expandAttributes.DatabaseName = fileProcessingDb.DatabaseName;
-                expandAttributes.DatabaseServer = fileProcessingDb.DatabaseServer;
-                expandAttributes.StoreSpatialInfo = false;
-                expandAttributes.StoreEmptyAttributes = true;
-
-                processTest(resultDBName, expandAttributes, _ExpectedNoRasterZones);
+                processTest(resultDBName, expandAttributes, expectedQuery);
             }
             finally
             {
@@ -248,7 +156,7 @@ namespace Extract.ETL.Test
         /// Tests the serialization of the ExpandAttribute object
         /// </summary>
         [Test]
-        [Category("Automated")]
+        [Category("Automated"), Category("ETL")]
         public static void TestExpandAttributesSerialization()
         {
             ExpandAttributes expandAttributes = new ExpandAttributes();
@@ -271,6 +179,81 @@ namespace Extract.ETL.Test
             Assert.AreEqual(expandAttributes.StoreSpatialInfo, test.StoreSpatialInfo, "StoreSpatialInfo serialization worked.");
             Assert.That(test.DatabaseServiceID == 0, "Default DatabaseServiceID is zero.");
             Assert.That(test.Enabled == !expandAttributes.Enabled);
+        }
+
+        [Test]
+        [Category("Automated"), Category("ETL")]
+        public static void TestStatus()
+        {
+            string testDBName = "TestStatus_Test";
+            try
+            {
+                // This is only used to initialize the database used for calculating the stats
+                var fileProcessingDb = _testDbManager.GetDatabase(_DATABASE, testDBName);
+
+
+                ExpandAttributes expandAttributes = new ExpandAttributes();
+                expandAttributes.DatabaseName = fileProcessingDb.DatabaseName;
+                expandAttributes.DatabaseServer = fileProcessingDb.DatabaseServer;
+                expandAttributes.StoreSpatialInfo = true;
+                expandAttributes.StoreEmptyAttributes = false;
+
+                expandAttributes.AddToDatabase("(local)", testDBName);
+                var status = expandAttributes.Status as ExpandAttributes.ExpandAttributesStatus;
+                string jsonStatus = status.ToJson();
+
+                expandAttributes.RefreshStatus();
+
+                Assert.AreEqual(jsonStatus, expandAttributes.Status.ToJson(), "Refreshed status should be the same as previous status");
+
+                expandAttributes.DashboardAttributes.Add(new ExpandAttributes.DashboardAttributeField()
+                {
+                    DashboardAttributeName = "DocumentType",
+                    AttributeSetNameID = 1, // DataFoundByRules 
+                    PathForAttributeInAttributeSet = "DocumentType"
+                });
+
+                expandAttributes.UpdateDatabaseServiceSettings();
+
+                expandAttributes.Process(_noCancel);
+
+                status = expandAttributes.Status as ExpandAttributes.ExpandAttributesStatus;
+                Assert.AreEqual(2, status.LastFileTaskSessionIDProcessed, "All File task sessions should be processed");
+
+                var testValue = new ExpandAttributes.DashboardAttributeField()
+                {
+                    DashboardAttributeName = "Test",
+                    AttributeSetNameID = 1, // DataFoundByRules 
+                    PathForAttributeInAttributeSet = "Test"
+                };
+
+                expandAttributes.DashboardAttributes.Add(testValue);
+
+                expandAttributes.UpdateDatabaseServiceSettings();
+
+                expandAttributes.RefreshStatus();
+                expandAttributes.SaveStatus(expandAttributes.Status);
+
+                status = expandAttributes.Status as ExpandAttributes.ExpandAttributesStatus;
+
+                Assert.AreEqual(-1, status.LastIDProcessedForDashboardAttribute[testValue.ToString()], "Status for new attribute should be -1");
+
+                var itemToRemove = expandAttributes.DashboardAttributes.Single(f => f.DashboardAttributeName == "Test");
+
+                expandAttributes.DashboardAttributes.Remove(itemToRemove);
+
+                expandAttributes.UpdateDatabaseServiceSettings();
+
+                expandAttributes.Process(_noCancel);
+
+                Assert.AreEqual(1, expandAttributes.DashboardAttributes.Count, "Number of DashboardAttributes should be 1");
+                status = expandAttributes.Status as ExpandAttributes.ExpandAttributesStatus;
+                Assert.AreEqual(1, status.LastIDProcessedForDashboardAttribute.Count, "Number of LastIDProcessedForDashboardAttribute items should be 1");
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDBName);
+            }
         }
 
         #endregion
@@ -297,6 +280,7 @@ namespace Extract.ETL.Test
                 cmd.CommandText = @"SELECT TOP (1) [ID] FROM [dbo].[DatabaseService]";
 
                 expandAttributes.DatabaseServiceID = (int)cmd.ExecuteScalar();
+                expandAttributes.UpdateDatabaseServiceSettings();
 
                 Assert.Throws<ExtractException>(()=> expandAttributes.Process(_cancel));
                 cmd.CommandText = "SELECT COUNT(ID) FROM Attribute ";
