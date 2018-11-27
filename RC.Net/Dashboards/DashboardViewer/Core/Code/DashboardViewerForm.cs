@@ -62,8 +62,8 @@ namespace DashboardViewer
         /// </summary>
         bool _inDatabase = false;
 
-        // Indicates if there is a filter
-        bool _filtered = false;
+        // Set that contains all of the items that are filtered
+        HashSet<string> _filteredItems = new HashSet<string>();
 
         #endregion
 
@@ -468,7 +468,10 @@ namespace DashboardViewer
         {
             try
             {
-                _filtered = false;
+                if(_filteredItems.Contains(e.DashboardItemName))
+                {
+                    _filteredItems.Remove(e.DashboardItemName);
+                }
                 UpdateMainTitle();
             }
             catch (Exception ex)
@@ -481,7 +484,10 @@ namespace DashboardViewer
         {
             try
             {
-                _filtered = true;
+                if (!_filteredItems.Contains(e.DashboardItemName))
+                {
+                    _filteredItems.Add(e.DashboardItemName);
+                }
                 UpdateMainTitle();
             }
             catch (Exception ex)
@@ -543,6 +549,9 @@ namespace DashboardViewer
         {
             try
             {
+                // Clear the filtered items list since they are no longer filtered
+                _filteredItems.Clear();
+
                 UpdateMainTitle();
                 _dashboardShared.GridConfigurationsFromXML(Dashboard?.UserData);
                 _toolStripTextBoxlastRefresh.Text = DateTime.Now.ToString(CultureInfo.CurrentCulture);
@@ -607,6 +616,9 @@ namespace DashboardViewer
                 return;
             }
 
+            // Clear the filtered items since they will no longer be filtered
+            _filteredItems.Clear();
+
             _dashboardName = dashboardName;
 
             using (var connection = NewSqlDBConnection())
@@ -634,7 +646,8 @@ namespace DashboardViewer
         /// </summary>
         void UpdateMainTitle()
         {
-            toolStripButtonClearMasterFilter.Enabled = _filtered;
+            bool filtered = _filteredItems.Count > 0;
+            toolStripButtonClearMasterFilter.Enabled = filtered;
             if (Dashboard is null)
             {
                 if (!IsDatabaseOverridden)
@@ -655,7 +668,7 @@ namespace DashboardViewer
             else
             {
                 Text = string.Format(CultureInfo.InvariantCulture,
-                    "\"{0}\" - Using {1} on {2}{3}", _dashboardName, DatabaseName, ServerName, (_filtered) ? "-Filtered" : string.Empty);
+                    "\"{0}\" - Using {1} on {2}{3}", _dashboardName, DatabaseName, ServerName, (filtered) ? "-Filtered" : string.Empty);
             }
         }
 
