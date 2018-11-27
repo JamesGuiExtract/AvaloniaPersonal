@@ -336,6 +336,9 @@ namespace Extract.Dashboard.Utilities
                 }
                 link.Visible = true;
             }
+			
+			// Clear the current filtered files
+            _dashboardForm.CurrentFilteredFiles.Clear();
 
             // Get the filenames from the grid control
             var axisPointTuples = _dashboardForm.GetCurrentFilterValues(e.DashboardItemName)

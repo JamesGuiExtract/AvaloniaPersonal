@@ -124,7 +124,7 @@ namespace DashboardCreator
         /// List of files that were selected in the control when the Popup was 
         /// displayed
         /// </summary>
-        public Collection<string> CurrentFilteredFiles { get; } = new Collection<string>();
+        public HashSet<string> CurrentFilteredFiles { get; } = new HashSet<string>();
 
         /// <summary>
         /// Since this instance is not a <see cref="DevExpress.DashboardWin.DashboardViewer"/> it should return null

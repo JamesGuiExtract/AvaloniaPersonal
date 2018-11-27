@@ -187,7 +187,7 @@ namespace DashboardViewer
         /// List of files that were selected in the control when the Popup was 
         /// displayed
         /// </summary>
-        public Collection<string> CurrentFilteredFiles { get; } = new Collection<string>();
+        public HashSet<string> CurrentFilteredFiles { get; } = new HashSet<string>();
 
         /// <summary>
         /// Since this has a <see cref="DevExpress.DashboardWin.DashboardViewer"/> return the instance of the viewer

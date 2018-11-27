@@ -55,7 +55,7 @@ namespace Extract.Dashboard.Utilities
         /// List of files that were selected in the control when the Popup was 
         /// displayed
         /// </summary>
-        Collection<string> CurrentFilteredFiles { get; }
+        HashSet<string> CurrentFilteredFiles { get; }
 
         /// <summary>
         /// If the control that is implementing this interface has a <see cref="DevExpress.DashboardWin.DashboardViewer"/>
