@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this._closeButton = new System.Windows.Forms.Button();
             this._addButton = new System.Windows.Forms.Button();
@@ -37,6 +38,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this._databaseServicesDataGridView = new System.Windows.Forms.DataGridView();
             this._restartETLButton = new System.Windows.Forms.Button();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this._databaseServicesDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -134,9 +136,17 @@
             this._restartETLButton.Name = "_restartETLButton";
             this._restartETLButton.Size = new System.Drawing.Size(75, 23);
             this._restartETLButton.TabIndex = 6;
-            this._restartETLButton.Text = "Restart ETL";
+            this._restartETLButton.Text = "Restart";
             this._restartETLButton.UseVisualStyleBackColor = true;
             this._restartETLButton.Click += new System.EventHandler(this.HandleRestartETLButtonClick);
+            // 
+            // toolTip
+            // 
+            this.toolTip.AutoPopDelay = 5000;
+            this.toolTip.InitialDelay = 500;
+            this.toolTip.IsBalloon = true;
+            this.toolTip.ReshowDelay = 100;
+            this.toolTip.ShowAlways = true;
             // 
             // ManageDatabaseServicesForm
             // 
@@ -160,6 +170,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Manage database services";
+            this.Load += new System.EventHandler(this.HandleManageDatabaseServicesForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this._databaseServicesDataGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -176,5 +187,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.DataGridView _databaseServicesDataGridView;
         private System.Windows.Forms.Button _restartETLButton;
+        private System.Windows.Forms.ToolTip toolTip;
     }
 }

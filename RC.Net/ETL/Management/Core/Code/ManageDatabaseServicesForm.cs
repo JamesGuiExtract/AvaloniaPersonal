@@ -222,17 +222,17 @@ namespace Extract.ETL.Management
                             {
                                 var service = DatabaseService.FromJson(r.Field<string>("Settings"));
 
-                            // An empty settings string results in a null service object
-                            return service == null
-                                ? null
-                                : new DatabaseServiceData
-                                {
-                                    ID = r.Field<Int32>("ID"),
-                                    Description = r.Field<string>("Description"),
-                                    Service = service,
-                                    ServiceType = service.ExtractCategoryType,
-                                    Enabled = r.Field<bool>("Enabled")
-                                };
+                                // An empty settings string results in a null service object
+                                return service == null
+                                    ? null
+                                    : new DatabaseServiceData
+                                    {
+                                        ID = r.Field<Int32>("ID"),
+                                        Description = r.Field<string>("Description"),
+                                        Service = service,
+                                        ServiceType = service.ExtractCategoryType,
+                                        Enabled = r.Field<bool>("Enabled")
+                                    };
                             })
                             .Where(s => s != null)
                             .ToList();
@@ -372,6 +372,18 @@ namespace Extract.ETL.Management
         #endregion
 
         #region Event Handlers
+
+        void HandleManageDatabaseServicesForm_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                toolTip.SetToolTip(_restartETLButton, "Restarts all enabled database services if configured to run.");
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46553");
+            }
+        }
 
         void HandleDatabaseServicesDataGridViewCellContentClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -580,7 +592,7 @@ namespace Extract.ETL.Management
                 famDB.DatabaseName = DatabaseName;
 
                 famDB.SetDBInfoSetting("ETLRestart", _EtlRestartTime.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz"), true, false);
-                
+
                 EnableButtons();
             }
             catch (Exception ex)
