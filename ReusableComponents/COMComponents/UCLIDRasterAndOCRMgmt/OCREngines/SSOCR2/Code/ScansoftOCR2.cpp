@@ -1226,6 +1226,10 @@ void CScansoftOCR2::initEngineAndLicense()
 			{
 				THROW_UE("ELI17016", "Unable to find required DOT module for OCR engine to run.", rc);
 			}
+			if(pModules[INFO_MAT].Version <= 0)
+			{
+				THROW_UE("ELI17016", "Unable to find required MAT module for OCR engine to run.", rc);
+			}
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26101")

@@ -107,8 +107,8 @@ namespace Extract.FileActionManager.FileProcessors
         string _ocrParametersFile;
         IOCRParameters _ocrParameters;
 
-        static bool _recAPILicensed;
-        static readonly object _licenseLock = new object();
+        static bool _recInitialized;
+        static readonly object _initLock = new object();
 
         CancellationTokenSource _cancellationTokenSource;
 
@@ -360,11 +360,11 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                if (!_recAPILicensed)
+                if (!_recInitialized)
                 {
-                    lock(_licenseLock)
+                    lock(_initLock)
                     {
-                        if (!_recAPILicensed)
+                        if (!_recInitialized)
                         {
                             try
                             {
@@ -374,7 +374,19 @@ namespace Extract.FileActionManager.FileProcessors
                                 rc = RecAPIPlus.RecInitPlus("Extract Systems", "RedactWithNERTask");
                                 RecAssert("ELI46525", "Unable to initialize RecAPIPlus", rc);
 
-                                _recAPILicensed = true;
+                                rc = RecAPI.kRecSettingGetHandle("Kernel.OcrMgr.PDF.RecognitionMode", out IntPtr hSetting);
+                                RecAssert("ELI46547", "Unable to get OCR setting", rc);
+                                rc = RecAPI.kRecSettingSetInt(0, hSetting, (int)PDF_REC_MODE.PDF_RM_MOSTLYGETTEXT);
+
+                                rc = RecAPI.kRecSettingGetHandle("Kernel.OcrMgr.PDF.ProcessingMode", out hSetting);
+                                RecAssert("ELI46549", "Unable to get OCR setting", rc);
+                                rc = RecAPI.kRecSettingSetInt(0, hSetting, 3); // PDF_PROC_MODE.PDF_PM_TEXT_ONLY, which isn't part of the c# API
+
+                                //rc = RecAPIPlus.RecSetOutputFormat(0, "PDFImageOnText");
+                                rc = RecAPIPlus.RecSetOutputFormat(0, "PDF");
+                                RecAssert("ELI46540", "Unable to set output format", rc);
+
+                                _recInitialized = true;
                             }
                             catch (Exception ex)
                             {
@@ -651,16 +663,6 @@ namespace Extract.FileActionManager.FileProcessors
             ExtractException.Assert("ELI46539", "Output must be a PDF file", ext == ".PDF");
             try
             {
-                rc = RecAPI.kRecSettingGetHandle(IntPtr.Zero, "Kernel.OcrMgr.PDF.RecognitionMode", out IntPtr hSetting);
-                RecAssert("ELI46547", "Unable to get OCR setting", rc);
-                rc = RecAPI.kRecSettingSetInt(0, hSetting, (int)PDF_REC_MODE.PDF_RM_MOSTLYGETTEXT);
-                RecAssert("ELI46548", "Unable to set OCR setting", rc);
-
-                rc = RecAPI.kRecSettingGetHandle(IntPtr.Zero, "Kernel.OcrMgr.PDF.ProcessingMode", out hSetting);
-                RecAssert("ELI46549", "Unable to get OCR setting", rc);
-                rc = RecAPI.kRecSettingSetInt(0, hSetting, 3); // PDF_PROC_MODE.PDF_PM_TEXT_ONLY, which isn't part of the c# API
-                RecAssert("ELI46550", "Unable to set OCR setting", rc);
-
                 rc = RecAPI.kRecOpenImgFile(inputImagePath, out hFile, FILEOPENMODE.IMGF_READ, IMF_FORMAT.FF_SIZE);
                 RecAssert("ELI46543", "Unable to create OCR document", rc);
 
@@ -672,7 +674,7 @@ namespace Extract.FileActionManager.FileProcessors
                 rc = RecAPIPlus.RecCreateDoc(0, "", out hDoc, DOCOPENMODE.DOC_NORMAL);
                 RecAssert("ELI46523", "Unable to create OCR document", rc);
 
-                var tokenizer = SimpleTokenizer.INSTANCE;
+                var tokenizer = WhitespaceTokenizer.INSTANCE;
                 var model = NERFinder.GetModel(modelPath, strm => new TokenNameFinderModel(strm));
                 var nameFinder = new NameFinderME(model);
 
@@ -684,6 +686,69 @@ namespace Extract.FileActionManager.FileProcessors
 
                     IntPtr hPage = LoadPageFromImageHandle(inputImagePath, hFile, i);
 
+                    RecAPI.kRecGetImgInfo(0, hPage, IMAGEINDEX.II_CURRENT, out IMG_INFO pImg);
+                    var pageInfo = new SpatialPageInfoClass();
+                    pageInfo.Initialize(pImg.Size.cx, pImg.Size.cy, EOrientation.kRotNone, 0);
+                    var pageInfoMap = new LongToObjectMapClass();
+                    pageInfoMap.Set(i + 1, pageInfo);
+
+                    rc = RecAPI.kRecLocateZones(0, hPage);
+                    RecAssert("ELI00000", "Unable to locate zones", rc);
+                    rc = RecAPI.kRecGetOCRZoneCount(hPage, out int zoneCount);
+                    RecAssert("ELI00000", "Unable to get zone count", rc);
+                    var newZones = new List<ZONE>();
+                    bool updated = false;
+
+                    // 'remove' check images
+                    for (int zi = 0; zi < zoneCount; ++zi)
+                    {
+                        rc = RecAPI.kRecGetOCRZoneInfo(hPage, IMAGEINDEX.II_CURRENT, out ZONE pZone, zi);
+                        RecAssert("ELI00000", "Unable to get zone info", rc);
+
+                        if (pZone.type == ZONETYPE.WT_GRAPHIC)
+                        {
+                            var bounds = pZone.rectBBox;
+                            var height = bounds.bottom - bounds.top;
+                            var width = bounds.right - bounds.left;
+                            if (width > height * 2 && width > pImg.Size.cx / 3)
+                            {
+                                //pZone.fm = FILLINGMETHOD.FM_MICR;
+                                //pZone.rm = RECOGNITIONMODULE.RM_MAT;
+                                //pZone.type = ZONETYPE.WT_FORM;;
+                                pZone.type = ZONETYPE.WT_FLOW; ;
+                                updated = true;
+
+                                if (outputAttributes != null)
+                                {
+                                    string attributeName = "MCData";
+                                    string attributeType = "AccountNumber";
+
+                                    rc = RecAPI.kRecGetOCRZoneLayout(hPage, IMAGEINDEX.II_CURRENT, out RECT[] rects, zi);
+                                    RecAssert("ELI00000", "Unable to get zone layout", rc);
+                                    var spatialString = ZoneToSpatialString(rects, " ", inputImagePath, i + 1, pageInfoMap);
+
+                                    var attribute = new AttributeClass
+                                    {
+                                        Name = attributeName,
+                                        Type = attributeType,
+                                        Value = spatialString
+                                    };
+                                    outputAttributes.PushBack(attribute);
+                                }
+                            }
+                        }
+                        newZones.Add(pZone);
+                    }
+                    if (updated)
+                    {
+                        foreach(ZONE zone in newZones)
+                        {
+                            rc = RecAPI.kRecInsertZone(hPage, IMAGEINDEX.II_CURRENT, zone, -1);
+                            RecAssert("ELI00000", "Unable to insert zone", rc);
+                        }
+                        //rc = RecAPI.kRecLocateZones(0, hPage);
+                        //RecAssert("ELI00000", "Unable to locate zones", rc);
+                    }
                     rc = RecAPI.kRecRecognize(0, hPage);
                     if (rc != RECERR.REC_OK)
                     {
@@ -701,12 +766,6 @@ namespace Extract.FileActionManager.FileProcessors
                         ue.Log();
                     }
 
-                    RecAPI.kRecGetImgInfo(0, hPage, IMAGEINDEX.II_CURRENT, out IMG_INFO pImg);
-                    var pageInfo = new SpatialPageInfoClass();
-                    pageInfo.Initialize(pImg.Size.cx, pImg.Size.cy, EOrientation.kRotNone, 0);
-                    var pageInfoMap = new LongToObjectMapClass();
-                    pageInfoMap.Set(i + 1, pageInfo);
-
                     progressStatus?.CompleteCurrentItemGroup();
 
                     _cancellationTokenSource.Token.ThrowIfCancellationRequested();
@@ -719,7 +778,7 @@ namespace Extract.FileActionManager.FileProcessors
                     IntPtr hFt = IntPtr.Zero;
                     try
                     {
-                        rc = RecAPI.kRecGetLetters(hPage, IMAGEINDEX.II_OCR, out ppLetter);
+                        rc = RecAPI.kRecGetLetters(hPage, IMAGEINDEX.II_CURRENT, out ppLetter);
                         RecAssert("ELI46529", "Unable to get page letters", rc, rc == RECERR.REC_OK || rc == RECERR.NO_TXT_WARN);
 
                         if (rc == RECERR.NO_TXT_WARN)
@@ -730,6 +789,7 @@ namespace Extract.FileActionManager.FileProcessors
                         var chars = new char[ppLetter.Length];
                         for (int letteri = 0; letteri < chars.Length; ++letteri)
                         {
+                            //chars[letteri] = ConvertToCodePage(ppLetter[letteri].code);
                             chars[letteri] = ppLetter[letteri].code;
                         }
                         var pageText = new string(chars);
@@ -751,8 +811,27 @@ namespace Extract.FileActionManager.FileProcessors
                         if (termsToNameTypePair.Count > 0)
                         {
                             var searchTerms = termsToNameTypePair.Keys.Concat(new string[] { null }).ToArray();
-                            rc = RecAPIPlus.RecFindTextFirst(hDoc, i, 0, searchTerms, 0, 0, out hFt, out FoundText ft);
-                            RecAssert("ELI46536", "Unable to initialize search", rc, rc == RECERR.REC_OK || rc == RECERR.APIP_NOMORE_WARN);
+                            FoundText ft = null;
+                            for (int tries = 0; tries < 5; ++tries)
+                            {
+                                try
+                                {
+                                    rc = RecAPIPlus.RecFindTextFirst(hDoc, i, 0, searchTerms, FindTextFlags.FT_MATCHCASE | FindTextFlags.FT_WHOLEWORD, 0, out hFt, out ft);
+                                    //rc = RecAPIPlus.RecFindTextFirst(hDoc, i, 0, searchTerms, 0, 0, out hFt, out FoundText ft);
+                                    RecAssert("ELI46536", "Unable to initialize search", rc, rc == RECERR.REC_OK || rc == RECERR.APIP_NOMORE_WARN);
+
+                                    break;
+                                }
+                                catch (ExtractException ex)
+                                {
+                                    if (rc != RECERR.L_ERROR_FILE || tries == 4)
+                                    {
+                                        throw;
+                                    }
+
+                                    new ExtractException("ELI00000", UtilityMethods.FormatCurrent($"Application trace: search failure #{tries + 1}. Retrying..."), ex).Log();
+                                }
+                            }
 
                             while (rc != RECERR.APIP_NOMORE_WARN)
                             {
@@ -763,10 +842,27 @@ namespace Extract.FileActionManager.FileProcessors
                                     {
                                         nameAndType = ("MCData", "");
                                     }
-                                    outputAttributes.PushBack(MakeAttribute(ft, nameAndType.name, nameAndType.type, inputImagePath, pageInfoMap));
+                                    outputAttributes.PushBack(MakeAttribute(ft, nameAndType.name, nameAndType.type, inputImagePath, pageInfoMap, pImg.DPI));
                                 }
-                                rc = RecAPIPlus.RecProcessText(hFt, ft, FindTextAction.FT_MARKFORREDACT, true);
-                                RecAssert("ELI46535", "Unable to mark item for redaction", rc);
+                                for (int tries = 0; tries < 5; ++tries)
+                                {
+                                    try
+                                    {
+                                        rc = RecAPIPlus.RecProcessText(hFt, ft, FindTextAction.FT_MARKFORREDACT, true);
+                                        RecAssert("ELI46535", "Unable to mark item for redaction", rc);
+
+                                        break;
+                                    }
+                                    catch (ExtractException ex)
+                                    {
+                                        if (rc != RECERR.L_ERROR_FILE || tries == 4)
+                                        {
+                                            throw;
+                                        }
+
+                                        new ExtractException("ELI00000", UtilityMethods.FormatCurrent($"Application trace: mark text failure #{tries + 1}. Retrying..."), ex).Log();
+                                    }
+                                }
 
                                 rc = RecAPIPlus.RecFindTextNext(hFt, out ft);
                                 RecAssert("ELI46545", "Unable to find next", rc, rc == RECERR.REC_OK || rc == RECERR.APIP_NOMORE_WARN);
@@ -798,10 +894,6 @@ namespace Extract.FileActionManager.FileProcessors
                 progressStatus?.StartNextItemGroup("Redacting document...", nPageCount);
                 rc = RecAPIPlus.RecExecuteRedaction(hDoc);
                 RecAssert("ELI46537", "Unable to redact document", rc);
-
-                //rc = RecAPIPlus.RecSetOutputFormat(0, "PDFImageOnText");
-                rc = RecAPIPlus.RecSetOutputFormat(0, "PDF");
-                RecAssert("ELI46540", "Unable to set output format", rc);
 
                 rc = RecAPIPlus.RecConvert2Doc(0, hDoc, outputImagePath);
                 RecAssert("ELI46538", "Unable to output redacted document", rc);
@@ -843,12 +935,12 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
-        IAttribute MakeAttribute(FoundText ft, string name, string type, string sourceDocName, LongToObjectMap pageInfoMap)
+        IAttribute MakeAttribute(FoundText ft, string name, string type, string sourceDocName, LongToObjectMap pageInfoMap, SIZE DPI)
         {
             int fromTwip(int x)
             {
                 // TODO: Check assumption that image should be considered to be 300dpi
-                return x * 300 / 1440;
+                return x * DPI.cx / 1440;
             }
             bool between(int x, int min, int max)
             {
@@ -977,6 +1069,62 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 ue.AddDebugData("Extended error description", pszExtendedErrorDescription, false);
                 ue.AddDebugData("Extended error code", lExtendedErrorCode, false);
+            }
+        }
+        static SpatialString ZoneToSpatialString(RECT[] rects, string value, string imagePath, int pageNum, LongToObjectMap pageInfoMap)
+        {
+            var zones = rects.Select(sourceRect =>
+            {
+                var rect = new LongRectangleClass();
+                rect.SetBounds(sourceRect.left, sourceRect.top, sourceRect.right, sourceRect.bottom);
+                var zone = new RasterZoneClass();
+                zone.CreateFromLongRectangle(rect, pageNum);
+                return zone;
+            })
+            .ToIUnknownVector();
+
+            var spatialString = new SpatialStringClass();
+
+            // Template creator/finder needs to handle empty form field names
+            // https://extract.atlassian.net/browse/ISSUE-14918
+            if (string.IsNullOrEmpty(value))
+            {
+                value = " ";
+            }
+
+            if (zones.Size() == 1)
+            {
+                spatialString.CreatePseudoSpatialString((RasterZone)zones.At(0), value, imagePath, pageInfoMap);
+            }
+            else
+            {
+                spatialString.CreateHybridString(zones, value, imagePath, pageInfoMap);
+            }
+
+            return spatialString;
+        }
+        bool IsBasicLatinCharacter(char letterCode)
+        {
+            // NOTE: 176 is the degree symbol.
+            // Don't allow 0 as a letter code
+            return letterCode > 0 && letterCode <= 126 || letterCode == 176;
+        }
+
+        char ConvertToCodePage(char letterCode)
+        {
+            if (IsBasicLatinCharacter(letterCode))
+            {
+                return letterCode;
+            }
+
+            RECERR rc = RecAPI.kRecConvertUnicode2CodePage(0, letterCode, out byte[] pExport);
+            if (rc != RECERR.REC_OK)
+            {
+                return '^';
+            }
+            else
+            {
+                return (char)pExport[0];
             }
         }
         #endregion Private Members
