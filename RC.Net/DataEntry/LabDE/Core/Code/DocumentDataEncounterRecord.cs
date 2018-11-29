@@ -111,15 +111,14 @@ namespace Extract.DataEntry.LabDE
                     "FROM ( \r\n" +
                     // TempID is a special column used to prevent these matching unmapped rows from
                     // being grouped together.
-                    "SELECT [CSN], [EncounterDateTime], NULL AS [TempID] " +
+                    "SELECT [LabDEEncounter].[CSN], [EncounterDateTime], NULL AS [TempID] " +
                     "   FROM [LabDEEncounter] \r\n" +
+                    "   INNER JOIN @CSN ON [LabDEEncounter].[CSN] = [@CSN].[CSN]\r\n" +
                     (unmappedRecords.Any()
                         ? "UNION ALL\r\n" + string.Join("\r\nUNION ALL\r\n", unmappedRecords)
                         : "") +
                     ") AS [CombinedRecords]\r\n" +
-                    "FULL JOIN [LabDEEncounterFile] ON [LabDEEncounterFile].[EncounterID] = [CombinedRecords].[CSN] \r\n" +
-                    "INNER JOIN @CSN ON [CombinedRecords].[CSN] = [@CSN].[CSN] " +
-                        "OR [CombinedRecords].[CSN] = '*'\r\n" +
+                    "LEFT JOIN [LabDEEncounterFile] ON [LabDEEncounterFile].[EncounterID] = [CombinedRecords].[CSN] \r\n" +
                     (FAMData.AlreadyMappedRecordIds.Any()
                         ? "WHERE ([CombinedRecords].[CSN] NOT IN (" + string.Join(",", FAMData.AlreadyMappedRecordIds) + "))\r\n"
                         : "") +

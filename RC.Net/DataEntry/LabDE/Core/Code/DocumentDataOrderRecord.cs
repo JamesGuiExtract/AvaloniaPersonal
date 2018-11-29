@@ -113,15 +113,14 @@ namespace Extract.DataEntry.LabDE
                     "FROM ( \r\n" +
                     // TempID is a special column used to prevent these matching unmapped rows from
                     // being grouped together.
-                    "SELECT [OrderNumber], [ReceivedDateTime], [OrderStatus], [ReferenceDateTime], [ORMMessage], NULL AS [TempID] " +
+                    "SELECT [LabDEOrder].[OrderNumber], [ReceivedDateTime], [OrderStatus], [ReferenceDateTime], [ORMMessage], NULL AS [TempID] " +
                     "   FROM [LabDEOrder] \r\n" +
+                    "   INNER JOIN @OrderNumbers ON [LabDEOrder].[OrderNumber] = [@OrderNumbers].[OrderNumber]\r\n" +
                     (unmappedOrders.Any()
                         ? "UNION ALL\r\n" + string.Join("\r\nUNION ALL\r\n", unmappedOrders)
                         : "") +
                     ") AS [CombinedOrders]\r\n" +
-                    "FULL JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [CombinedOrders].[OrderNumber] \r\n" +
-                    "INNER JOIN @OrderNumbers ON [CombinedOrders].[OrderNumber] = [@OrderNumbers].[OrderNumber] " +
-                        "OR [CombinedOrders].[OrderNumber] = '*'\r\n" +
+                    "LEFT JOIN [LabDEOrderFile] ON [LabDEOrderFile].[OrderNumber] = [CombinedOrders].[OrderNumber] \r\n" +
                     (FAMData.AlreadyMappedRecordIds.Any()
                         ? "WHERE ([CombinedOrders].[OrderNumber] NOT IN (" + string.Join(",", FAMData.AlreadyMappedRecordIds) + "))\r\n"
                         : "") +
