@@ -174,8 +174,8 @@ namespace Extract.AttributeFinder.Rules
         private string _sentenceDetectorPath;
         private OpenNlpTokenizer _tokenizerType = OpenNlpTokenizer.SimpleTokenizer;
         private NamedEntityRecognizer _nameFinderType = NamedEntityRecognizer.OpenNLP;
-        private bool _outputConfidenceSubattribute = true;
-        private bool _applyLogFunctionToConfidence = true;
+        private bool _outputConfidenceSubattribute = false;
+        private bool _applyLogFunctionToConfidence = false;
         private double _logBase = 2;
         private double _logSteepness = 10;
         private bool _convertConfidenceToPercent = true;
