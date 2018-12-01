@@ -14,6 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMLMLib;
@@ -44,6 +45,11 @@ namespace Extract.FileActionManager.FileProcessors
         string NERModelPath { get; set; }
 
         /// <summary>
+        /// Path to a trained page classifier with a class of RemoveImages, (optional, used to predict when images should be removed from a page)
+        /// </summary>
+        string RemoveImagesClassifierPath { get; set; }
+
+        /// <summary>
         /// Path to the redacted image to output, can contain path tags/functions
         /// </summary>
         string OutputImagePath { get; set; }
@@ -52,6 +58,8 @@ namespace Extract.FileActionManager.FileProcessors
         /// Optional path to a VOA file to output, can contain path tags/functions
         /// </summary>
         string OutputVOAPath { get; set; }
+        bool UseMultipleThreads { get; set; }
+        bool SqueezePDF { get; set; }
     }
 
     /// <summary>
@@ -72,13 +80,18 @@ namespace Extract.FileActionManager.FileProcessors
 
         /// <summary>
         /// Current task version.
+        /// Version 2: Add RemoveImagesClassifierPath
+        ///            Add SqueezePDF
+        ///            Add UseMultipleThreads
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         /// <summary>
         /// The license id to validate in licensing calls
         /// </summary>
         const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
+
+        static readonly string _CPDF_PATH = Path.Combine(FileSystemMethods.CommonComponentsPath, "cpdf.exe");
 
         #endregion Constants
 
@@ -95,6 +108,11 @@ namespace Extract.FileActionManager.FileProcessors
         string _nerModelPath;
 
         /// <summary>
+        /// Path to a trained page classifier with a class of RemoveImages, (optional, used to predict when images should be removed from a page)
+        /// </summary>
+        string _removeImagesClassifierPath;
+
+        /// <summary>
         /// Path to the redacted image to output, can contain path tags/functions
         /// </summary>
         string _outputImagePath = "$InsertBeforeExt(<SourceDocName>,.redacted)";
@@ -103,6 +121,9 @@ namespace Extract.FileActionManager.FileProcessors
         /// Optional path to a VOA file to output, can contain path tags/functions
         /// </summary>
         string _outputVOAPath = "$InsertBeforeExt(<SourceDocName>,.redacted).voa";
+
+        bool _squeezePDF;
+        bool _useMultipleThreads;
 
         string _ocrParametersFile;
         IOCRParameters _ocrParameters;
@@ -150,6 +171,11 @@ namespace Extract.FileActionManager.FileProcessors
         public string NERModelPath { get => _nerModelPath; set => _nerModelPath = value; }
 
         /// <summary>
+        /// Path to a trained page classifier with a class of RemoveImages, (optional, used to predict when images should be removed from a page)
+        /// </summary>
+        public string RemoveImagesClassifierPath { get => _removeImagesClassifierPath; set => _removeImagesClassifierPath = value; }
+
+        /// <summary>
         /// Path to the redacted image to output, can contain path tags/functions
         /// </summary>
         public string OutputImagePath { get => _outputImagePath; set => _outputImagePath = value; }
@@ -158,6 +184,10 @@ namespace Extract.FileActionManager.FileProcessors
         /// Optional path to a VOA file to output, can contain path tags/functions
         /// </summary>
         public string OutputVOAPath { get => _outputVOAPath; set => _outputVOAPath = value; }
+
+        public bool SqueezePDF { get => _squeezePDF; set => _squeezePDF = value; }
+
+        public bool UseMultipleThreads { get => _useMultipleThreads; set => _useMultipleThreads = value; }
 
         #endregion IRedactWithNERTask Members
 
@@ -382,7 +412,6 @@ namespace Extract.FileActionManager.FileProcessors
                                 RecAssert("ELI46549", "Unable to get OCR setting", rc);
                                 rc = RecAPI.kRecSettingSetInt(0, hSetting, 3); // PDF_PROC_MODE.PDF_PM_TEXT_ONLY, which isn't part of the c# API
 
-                                //rc = RecAPIPlus.RecSetOutputFormat(0, "PDFImageOnText");
                                 rc = RecAPIPlus.RecSetOutputFormat(0, "PDF");
                                 RecAssert("ELI46540", "Unable to set output format", rc);
 
@@ -430,7 +459,7 @@ namespace Extract.FileActionManager.FileProcessors
                                                   int nActionID,
                                                   FAMTagManager pFAMTM,
                                                   FileProcessingDB pDB,
-                                                  ProgressStatus pProgressStatus,
+                                                  ProgressStatus progressStatus,
                                                   bool bCancelRequested)
         {
             try
@@ -444,12 +473,163 @@ namespace Extract.FileActionManager.FileProcessors
 
                 var inputImagePath = pathTags.Expand(pFileRecord.Name);
                 var modelPath = pathTags.Expand(_nerModelPath);
+                var classifierPath = string.IsNullOrWhiteSpace(_removeImagesClassifierPath) ? null : pathTags.Expand(_removeImagesClassifierPath);
                 var outputImagePath = pathTags.Expand(_outputImagePath);
                 var outputVOAPath = string.IsNullOrWhiteSpace(_outputVOAPath) ? null : pathTags.Expand(_outputVOAPath);
 
-                using (_cancellationTokenSource = new CancellationTokenSource())
+                string singlePageInputDir = null;
+                string singlePageOutputDir = null;
+                string miscTempDir = null;
+                try
                 {
-                    RedactFile(inputImagePath, modelPath, outputImagePath, outputVOAPath, pProgressStatus);
+                    singlePageInputDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                    Directory.CreateDirectory(singlePageInputDir);
+
+                    singlePageOutputDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                    Directory.CreateDirectory(singlePageOutputDir);
+
+                    miscTempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                    Directory.CreateDirectory(miscTempDir);
+
+                    using (_cancellationTokenSource = new CancellationTokenSource())
+                    {
+                        var args = new[] { "-split", inputImagePath, "-o", singlePageInputDir + @"\" + Path.ChangeExtension(Path.GetFileName(inputImagePath), null) + "%%%%.pdf" };
+                        string stderr;
+                        var ret = SystemMethods.RunExecutable(_CPDF_PATH, args, out _, out stderr);
+                        if (ret != 0)
+                        {
+                            var ex = new ExtractException("ELI46562", "Failed to split PDF");
+                            ex.AddDebugData("StdErr", stderr);
+                            throw ex;
+                        }
+                        var singlePageImages = Directory.GetFiles(singlePageInputDir, "*.pdf");
+
+                        progressStatus?.InitProgressStatus("Initializing redact with NER...", 0, singlePageImages.Length * 2, true);
+
+                        List<UCLID_AFCORELib.Attribute>[] redactions = null;
+                        if (outputVOAPath != null)
+                        {
+                            redactions = new List<UCLID_AFCORELib.Attribute>[singlePageImages.Length];
+                            for (int i = 0; i < singlePageImages.Length; i++)
+                            {
+                                redactions[i] = new List<UCLID_AFCORELib.Attribute>();
+                            }
+                        }
+
+                        void RedactPage(int i)
+                        {
+                            progressStatus?.StartNextItemGroup(UtilityMethods.FormatCurrent($"Processing page {i + 1}"), 1);
+
+                            var path = singlePageImages[i];
+                            var outPath = Path.Combine(singlePageOutputDir, Path.GetFileName(path));
+                            var removeImages = RedactFile(path, modelPath, classifierPath, outPath, redactions?[i], inputImagePath, i);
+                            if (removeImages)
+                            {
+                                var path2 = Path.Combine(miscTempDir, Path.GetFileName(path));
+                                File.Move(outPath, path2);
+                                args = new[] { "-draft", path2, "-o", outPath };
+                                ret = SystemMethods.RunExecutable(_CPDF_PATH, args, out _, out string stderr2);
+                                if (ret != 0)
+                                {
+                                    var ex = new ExtractException("ELI46563", "Failed to remove images from PDF");
+                                    ex.AddDebugData("StdErr", stderr2);
+                                    throw ex;
+                                }
+                            }
+                            progressStatus?.CompleteCurrentItemGroup();
+                        }
+
+                        if (_useMultipleThreads)
+                        {
+                            var opts = new ParallelOptions
+                            {
+                                MaxDegreeOfParallelism = Environment.ProcessorCount
+                            };
+                            Parallel.For(0, singlePageImages.Length, opts, i =>
+                            {
+                                RedactPage(i);
+                            });
+                        }
+                        else
+                        {
+                            for (int i = 0; i < singlePageImages.Length; i++)
+                            {
+                                RedactPage(i);
+                            }
+                        }
+
+                        AttributeMethods.SaveToIUnknownVector(redactions.SelectMany(a => a), outputVOAPath);
+
+                        var mergedPath = outputImagePath;
+                        if (_squeezePDF)
+                        {
+                            progressStatus?.StartNextItemGroup("Combining pages...", singlePageImages.Length / 2);
+                            mergedPath = Path.Combine(miscTempDir, "merged.pdf");
+                        }
+                        else
+                        {
+                            progressStatus?.StartNextItemGroup("Combining pages...", singlePageImages.Length);
+                        }
+
+                        args = new[] { singlePageOutputDir + @"\*.pdf", "-merge", "-o", mergedPath };
+                        ret = SystemMethods.RunExecutable(_CPDF_PATH, args, out _, out stderr);
+                        if (ret != 0)
+                        {
+                            var ex = new ExtractException("ELI46564", "Failed to merge PDF");
+                            ex.AddDebugData("StdErr", stderr);
+                            throw ex;
+                        }
+                        progressStatus?.CompleteCurrentItemGroup();
+                        if (_squeezePDF)
+                        {
+                            progressStatus?.StartNextItemGroup("Squeezing document...", singlePageImages.Length / 2);
+
+                            var squeezedPath = Path.Combine(miscTempDir, "squeezed.pdf");
+                            args = new[] { mergedPath, "-squeeze", "-o", squeezedPath };
+                            ret = SystemMethods.RunExecutable(_CPDF_PATH, args, out _, out stderr);
+                            if (ret == 0)
+                            {
+                                File.Copy(squeezedPath, outputImagePath, true);
+                            }
+                            else
+                            {
+                                var ex = new ExtractException("ELI46565", "Application trace: Failed to squeeze PDF");
+                                ex.AddDebugData("StdErr", stderr);
+                                ex.Log();
+
+                                File.Copy(mergedPath, outputImagePath, true);
+                            }
+                        }
+
+                        progressStatus?.CompleteCurrentItemGroup();
+                    }
+                }
+                finally
+                {
+                    try
+                    {
+                        if (singlePageInputDir != null)
+                        {
+                            Directory.Delete(singlePageInputDir, true);
+                        }
+                    }
+                    catch { }
+                    try
+                    {
+                        if (miscTempDir != null)
+                        {
+                            Directory.Delete(miscTempDir, true);
+                        }
+                    }
+                    catch { }
+                    try
+                    {
+                        if (singlePageOutputDir != null)
+                        {
+                            Directory.Delete(singlePageOutputDir, true);
+                        }
+                    }
+                    catch { }
                 }
 
                 return EFileProcessingResult.kProcessingSuccessful;
@@ -546,6 +726,20 @@ namespace Extract.FileActionManager.FileProcessors
                     {
                         _outputVOAPath = null;
                     }
+
+                    if (reader.Version >= 2)
+                    {
+                        if (reader.ReadBoolean())
+                        {
+                            _removeImagesClassifierPath = reader.ReadString();
+                        }
+                        else
+                        {
+                            _removeImagesClassifierPath = null;
+                        }
+                        _squeezePDF = reader.ReadBoolean();
+                        _useMultipleThreads = reader.ReadBoolean();
+                    }
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -582,6 +776,16 @@ namespace Extract.FileActionManager.FileProcessors
                     {
                         writer.Write(_outputVOAPath);
                     }
+
+                    bool hasRemoveImagesClassifier = !string.IsNullOrWhiteSpace(_removeImagesClassifierPath);
+                    writer.Write(hasRemoveImagesClassifier);
+                    if (hasRemoveImagesClassifier)
+                    {
+                        writer.Write(_removeImagesClassifierPath);
+                    }
+
+                    writer.Write(_squeezePDF);
+                    writer.Write(_useMultipleThreads);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -644,6 +848,9 @@ namespace Extract.FileActionManager.FileProcessors
         void CopyFrom(RedactWithNERTask task)
         {
             _nerModelPath = task.NERModelPath;
+            _removeImagesClassifierPath = task.RemoveImagesClassifierPath;
+            _squeezePDF = task.SqueezePDF;
+            _useMultipleThreads = task.UseMultipleThreads;
             _outputImagePath = task.OutputImagePath;
             _outputVOAPath = task.OutputVOAPath;
 
@@ -652,103 +859,46 @@ namespace Extract.FileActionManager.FileProcessors
             _dirty = true;
         }
 
-        void RedactFile(string inputImagePath, string modelPath, string outputImagePath, string outputVOAPath, ProgressStatus progressStatus)
+        bool RedactFile(string inputImagePath, string nerModelPath, string classifierPath, string outputImagePath,
+            List<UCLID_AFCORELib.Attribute> outputAttributes, string sourceDocName, int sourcePageIndex)
         {
+            bool removeImages = false;
             RECERR rc;
             IntPtr hDoc = IntPtr.Zero;
             IntPtr hFile = IntPtr.Zero;
-            IUnknownVectorClass outputAttributes = outputVOAPath == null ? null : new IUnknownVectorClass();
 
             string ext = Path.GetExtension(outputImagePath).ToUpperInvariant();
             ExtractException.Assert("ELI46539", "Output must be a PDF file", ext == ".PDF");
             try
             {
                 rc = RecAPI.kRecOpenImgFile(inputImagePath, out hFile, FILEOPENMODE.IMGF_READ, IMF_FORMAT.FF_SIZE);
-                RecAssert("ELI46543", "Unable to create OCR document", rc);
+                RecAssert("ELI46543", "Unable to create OCR document", rc, sourceDocName);
 
                 rc = RecAPI.kRecGetImgFilePageCount(hFile, out int nPageCount);
-                RecAssert("ELI46527", "Unable to get page count", rc);
+                RecAssert("ELI46527", "Unable to get page count", rc, sourceDocName);
 
-                progressStatus?.InitProgressStatus("Initializing redact with NER...", 0, nPageCount * 3, true);
 
                 rc = RecAPIPlus.RecCreateDoc(0, "", out hDoc, DOCOPENMODE.DOC_NORMAL);
-                RecAssert("ELI46523", "Unable to create OCR document", rc);
+                RecAssert("ELI46523", "Unable to create OCR document", rc, sourceDocName);
 
                 var tokenizer = WhitespaceTokenizer.INSTANCE;
-                var model = NERFinder.GetModel(modelPath, strm => new TokenNameFinderModel(strm));
+                var model = NERFinder.GetModel(nerModelPath, strm => new TokenNameFinderModel(strm));
                 var nameFinder = new NameFinderME(model);
 
-                for (int i = 0; i < nPageCount; ++i)
+                for (int tempImagePageIndex = 0; tempImagePageIndex < nPageCount; tempImagePageIndex++)
                 {
                     _cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
-                    progressStatus?.StartNextItemGroup(UtilityMethods.FormatCurrent($"OCRing page {i + 1}"), 1);
-
-                    IntPtr hPage = LoadPageFromImageHandle(inputImagePath, hFile, i);
+                    IntPtr hPage = LoadPageFromImageHandle(inputImagePath, hFile, tempImagePageIndex);
 
                     RecAPI.kRecGetImgInfo(0, hPage, IMAGEINDEX.II_CURRENT, out IMG_INFO pImg);
+                    RecAssert("ELI46561", "Unable to get image info", rc, sourceDocName, sourcePageIndex);
+
                     var pageInfo = new SpatialPageInfoClass();
                     pageInfo.Initialize(pImg.Size.cx, pImg.Size.cy, EOrientation.kRotNone, 0);
                     var pageInfoMap = new LongToObjectMapClass();
-                    pageInfoMap.Set(i + 1, pageInfo);
+                    pageInfoMap.Set(sourcePageIndex + 1, pageInfo);
 
-                    rc = RecAPI.kRecLocateZones(0, hPage);
-                    RecAssert("ELI00000", "Unable to locate zones", rc);
-                    rc = RecAPI.kRecGetOCRZoneCount(hPage, out int zoneCount);
-                    RecAssert("ELI00000", "Unable to get zone count", rc);
-                    var newZones = new List<ZONE>();
-                    bool updated = false;
-
-                    // 'remove' check images
-                    for (int zi = 0; zi < zoneCount; ++zi)
-                    {
-                        rc = RecAPI.kRecGetOCRZoneInfo(hPage, IMAGEINDEX.II_CURRENT, out ZONE pZone, zi);
-                        RecAssert("ELI00000", "Unable to get zone info", rc);
-
-                        if (pZone.type == ZONETYPE.WT_GRAPHIC)
-                        {
-                            var bounds = pZone.rectBBox;
-                            var height = bounds.bottom - bounds.top;
-                            var width = bounds.right - bounds.left;
-                            if (width > height * 2 && width > pImg.Size.cx / 3)
-                            {
-                                //pZone.fm = FILLINGMETHOD.FM_MICR;
-                                //pZone.rm = RECOGNITIONMODULE.RM_MAT;
-                                //pZone.type = ZONETYPE.WT_FORM;;
-                                pZone.type = ZONETYPE.WT_FLOW; ;
-                                updated = true;
-
-                                if (outputAttributes != null)
-                                {
-                                    string attributeName = "MCData";
-                                    string attributeType = "AccountNumber";
-
-                                    rc = RecAPI.kRecGetOCRZoneLayout(hPage, IMAGEINDEX.II_CURRENT, out RECT[] rects, zi);
-                                    RecAssert("ELI00000", "Unable to get zone layout", rc);
-                                    var spatialString = ZoneToSpatialString(rects, " ", inputImagePath, i + 1, pageInfoMap);
-
-                                    var attribute = new AttributeClass
-                                    {
-                                        Name = attributeName,
-                                        Type = attributeType,
-                                        Value = spatialString
-                                    };
-                                    outputAttributes.PushBack(attribute);
-                                }
-                            }
-                        }
-                        newZones.Add(pZone);
-                    }
-                    if (updated)
-                    {
-                        foreach(ZONE zone in newZones)
-                        {
-                            rc = RecAPI.kRecInsertZone(hPage, IMAGEINDEX.II_CURRENT, zone, -1);
-                            RecAssert("ELI00000", "Unable to insert zone", rc);
-                        }
-                        //rc = RecAPI.kRecLocateZones(0, hPage);
-                        //RecAssert("ELI00000", "Unable to locate zones", rc);
-                    }
                     rc = RecAPI.kRecRecognize(0, hPage);
                     if (rc != RECERR.REC_OK)
                     {
@@ -761,38 +911,45 @@ namespace Extract.FileActionManager.FileProcessors
                         {
                             ue = new ExtractException("ELI46551", "Unable to OCR page");
                         }
-                        ue.AddDebugData("Image File", inputImagePath);
-                        ue.AddDebugData("Image Page", i + 1);
+                        ue.AddDebugData("Image File", sourceDocName);
+                        ue.AddDebugData("Image Page", sourcePageIndex + 1);
                         ue.Log();
                     }
 
-                    progressStatus?.CompleteCurrentItemGroup();
-
                     _cancellationTokenSource.Token.ThrowIfCancellationRequested();
-                    progressStatus?.StartNextItemGroup(UtilityMethods.FormatCurrent($"Searching page {i + 1}"), 1);
 
                     RecAPIPlus.RecInsertPage(0, hDoc, hPage, -1);
-                    RecAssert("ELI46544", "Unable to insert page", rc, rc == RECERR.REC_OK || rc == RECERR.NO_TXT_WARN);
+                    RecAssert("ELI46544", "Unable to insert page", rc, rc == RECERR.REC_OK || rc == RECERR.NO_TXT_WARN, sourceDocName, sourcePageIndex);
 
                     LETTER[] ppLetter = null;
                     IntPtr hFt = IntPtr.Zero;
                     try
                     {
                         rc = RecAPI.kRecGetLetters(hPage, IMAGEINDEX.II_CURRENT, out ppLetter);
-                        RecAssert("ELI46529", "Unable to get page letters", rc, rc == RECERR.REC_OK || rc == RECERR.NO_TXT_WARN);
+                        RecAssert("ELI46529", "Unable to get page letters", rc, rc == RECERR.REC_OK || rc == RECERR.NO_TXT_WARN, sourceDocName, sourcePageIndex);
+
+                        var chars = new char[ppLetter.Length];
+                        for (int letteri = 0; letteri < chars.Length; ++letteri)
+                        {
+                            chars[letteri] = ConvertToCodePage(ppLetter[letteri].code);
+                        }
+                        var pageText = new string(chars);
+                        var attributes = new IUnknownVectorClass();
+                        var ss = new SpatialStringClass();
+                        ss.CreateNonSpatialString(pageText, sourceDocName);
+                        if (classifierPath != null && File.Exists(classifierPath))
+                        {
+                            LearningMachine.ComputeAnswer(classifierPath, ss, attributes, false);
+                            if (attributes.Size() > 0)
+                            {
+                                removeImages = ((IAttribute)attributes.At(0)).Value.String.Equals("RemoveImages", StringComparison.OrdinalIgnoreCase);
+                            }
+                        }
 
                         if (rc == RECERR.NO_TXT_WARN)
                         {
                             continue;
                         }
-
-                        var chars = new char[ppLetter.Length];
-                        for (int letteri = 0; letteri < chars.Length; ++letteri)
-                        {
-                            //chars[letteri] = ConvertToCodePage(ppLetter[letteri].code);
-                            chars[letteri] = ppLetter[letteri].code;
-                        }
-                        var pageText = new string(chars);
 
                         string[] tokens = tokenizer.tokenize(pageText);
                         opennlp.tools.util.Span[] tokenPositions = tokenizer.tokenizePos(pageText);
@@ -816,9 +973,8 @@ namespace Extract.FileActionManager.FileProcessors
                             {
                                 try
                                 {
-                                    rc = RecAPIPlus.RecFindTextFirst(hDoc, i, 0, searchTerms, FindTextFlags.FT_MATCHCASE | FindTextFlags.FT_WHOLEWORD, 0, out hFt, out ft);
-                                    //rc = RecAPIPlus.RecFindTextFirst(hDoc, i, 0, searchTerms, 0, 0, out hFt, out FoundText ft);
-                                    RecAssert("ELI46536", "Unable to initialize search", rc, rc == RECERR.REC_OK || rc == RECERR.APIP_NOMORE_WARN);
+                                    rc = RecAPIPlus.RecFindTextFirst(hDoc, tempImagePageIndex, 0, searchTerms, FindTextFlags.FT_MATCHCASE | FindTextFlags.FT_WHOLEWORD, 0, out hFt, out ft);
+                                    RecAssert("ELI46536", "Unable to initialize search", rc, rc == RECERR.REC_OK || rc == RECERR.APIP_NOMORE_WARN, sourceDocName, sourcePageIndex);
 
                                     break;
                                 }
@@ -829,7 +985,7 @@ namespace Extract.FileActionManager.FileProcessors
                                         throw;
                                     }
 
-                                    new ExtractException("ELI00000", UtilityMethods.FormatCurrent($"Application trace: search failure #{tries + 1}. Retrying..."), ex).Log();
+                                    new ExtractException("ELI46559", UtilityMethods.FormatCurrent($"Application trace: Search failure #{tries + 1}. Retrying..."), ex).Log();
                                 }
                             }
 
@@ -842,14 +998,14 @@ namespace Extract.FileActionManager.FileProcessors
                                     {
                                         nameAndType = ("MCData", "");
                                     }
-                                    outputAttributes.PushBack(MakeAttribute(ft, nameAndType.name, nameAndType.type, inputImagePath, pageInfoMap, pImg.DPI));
+                                    outputAttributes.Add(MakeAttribute(ft, nameAndType.name, nameAndType.type, sourceDocName, sourcePageIndex, pageInfoMap, pImg.DPI));
                                 }
                                 for (int tries = 0; tries < 5; ++tries)
                                 {
                                     try
                                     {
                                         rc = RecAPIPlus.RecProcessText(hFt, ft, FindTextAction.FT_MARKFORREDACT, true);
-                                        RecAssert("ELI46535", "Unable to mark item for redaction", rc);
+                                        RecAssert("ELI46535", "Unable to mark item for redaction", rc, sourceDocName, sourcePageIndex);
 
                                         break;
                                     }
@@ -860,12 +1016,12 @@ namespace Extract.FileActionManager.FileProcessors
                                             throw;
                                         }
 
-                                        new ExtractException("ELI00000", UtilityMethods.FormatCurrent($"Application trace: mark text failure #{tries + 1}. Retrying..."), ex).Log();
+                                        new ExtractException("ELI46560", UtilityMethods.FormatCurrent($"Application trace: Mark text failure #{tries + 1}. Retrying..."), ex).Log();
                                     }
                                 }
 
                                 rc = RecAPIPlus.RecFindTextNext(hFt, out ft);
-                                RecAssert("ELI46545", "Unable to find next", rc, rc == RECERR.REC_OK || rc == RECERR.APIP_NOMORE_WARN);
+                                RecAssert("ELI46545", "Unable to find next", rc, rc == RECERR.REC_OK || rc == RECERR.APIP_NOMORE_WARN, sourceDocName, sourcePageIndex);
                             }
                         }
                     }
@@ -876,70 +1032,81 @@ namespace Extract.FileActionManager.FileProcessors
                             try
                             {
                                 rc = RecAPIPlus.RecFindTextClose(hFt);
-                                RecAssert("ELI46533", "Unable to close find text", rc);
+                                RecAssert("ELI46533", "Unable to close find text", rc, sourceDocName, sourcePageIndex);
                             }
                             catch (Exception ex)
                             {
                                 ex.ExtractLog("ELI46534");
                             }
                         }
-                        progressStatus?.CompleteCurrentItemGroup();
                     }
                 }
 
                 _cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
-                outputAttributes?.SaveAttributes(outputVOAPath);
-
-                progressStatus?.StartNextItemGroup("Redacting document...", nPageCount);
                 rc = RecAPIPlus.RecExecuteRedaction(hDoc);
-                RecAssert("ELI46537", "Unable to redact document", rc);
+                RecAssert("ELI46537", "Unable to redact document", rc, sourceDocName, sourcePageIndex);
 
                 rc = RecAPIPlus.RecConvert2Doc(0, hDoc, outputImagePath);
-                RecAssert("ELI46538", "Unable to output redacted document", rc);
+                RecAssert("ELI46538", "Unable to output redacted document", rc, sourceDocName, sourcePageIndex);
 
-                progressStatus?.CompleteCurrentItemGroup();
+                return removeImages;
             }
             finally
             {
                 if (hDoc != IntPtr.Zero)
                 {
                     rc = RecAPIPlus.RecCloseDoc(0, hDoc);
-                    RecAssert("ELI46526", "Unable to close OCR document", rc);
+                    RecAssert("ELI46526", "Unable to close OCR document", rc, sourceDocName, sourcePageIndex);
                 }
                 if (hFile != IntPtr.Zero)
                 {
                     rc = RecAPI.kRecCloseImgFile(hFile);
-                    RecAssert("ELI46546", "Unable to close image", rc);
+                    RecAssert("ELI46546", "Unable to close image", rc, sourceDocName, sourcePageIndex);
                 }
             }
         }
 
-        private void RecAssert(string eliCode, string message, RECERR rc)
+        private void RecAssert(string eliCode, string message, RECERR rc, string imagePath = null, int pageIndex = -1)
         {
             if (rc != RECERR.REC_OK)
             {
                 var ex = new ExtractException(eliCode, message);
                 LoadScansoftRecErrInfo(ex, rc);
+                if (imagePath != null)
+                {
+                    ex.AddDebugData("Image File", imagePath, false);
+                }
+                if (pageIndex >= 0)
+                {
+                    ex.AddDebugData("Page Number", pageIndex + 1, false);
+                }
                 throw ex;
             }
         }
 
-        private void RecAssert(string eliCode, string message, RECERR rc, bool condition)
+        private void RecAssert(string eliCode, string message, RECERR rc, bool condition, string imagePath = null, int pageIndex = -1)
         {
             if (!condition)
             {
                 var ex = new ExtractException(eliCode, message);
                 LoadScansoftRecErrInfo(ex, rc);
+                if (imagePath != null)
+                {
+                    ex.AddDebugData("Image File", imagePath, false);
+                }
+                if (pageIndex >= 0)
+                {
+                    ex.AddDebugData("Page Number", pageIndex + 1, false);
+                }
                 throw ex;
             }
         }
 
-        IAttribute MakeAttribute(FoundText ft, string name, string type, string sourceDocName, LongToObjectMap pageInfoMap, SIZE DPI)
+        UCLID_AFCORELib.Attribute MakeAttribute(FoundText ft, string name, string type, string sourceDocName, int sourcePageIndex, LongToObjectMap pageInfoMap, SIZE DPI)
         {
             int fromTwip(int x)
             {
-                // TODO: Check assumption that image should be considered to be 300dpi
                 return x * DPI.cx / 1440;
             }
             bool between(int x, int min, int max)
@@ -992,7 +1159,7 @@ namespace Extract.FileActionManager.FileProcessors
                 var rect = new LongRectangleClass();
                 rect.SetBounds(sourceLeft, sourceTop, sourceRight, sourceBottom);
                 var zone = new RasterZoneClass();
-                zone.CreateFromLongRectangle(rect, ft.page + 1);
+                zone.CreateFromLongRectangle(rect, sourcePageIndex + 1);
                 zones.PushBack(zone);
             }
             
@@ -1001,6 +1168,7 @@ namespace Extract.FileActionManager.FileProcessors
             attribute.Type = type;
             return attribute;
         }
+
         IntPtr LoadPageFromImageHandle(string strImage, IntPtr hImage, int iPageIndex)
         {
             IntPtr phPage = IntPtr.Zero;

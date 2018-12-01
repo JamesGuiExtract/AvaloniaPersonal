@@ -77,6 +77,9 @@ namespace Extract.FileActionManager.FileProcessors
                 base.OnLoad(e);
 
                 _nerModelTextBox.Text = Settings.NERModelPath;
+                _removeImagesClassifierTextBox.Text = Settings.RemoveImagesClassifierPath ?? "";
+                _squeezeCheckBox.Checked = Settings.SqueezePDF;
+                _useMultipleThreadsCheckBox.Checked = Settings.UseMultipleThreads;
                 _outputImageTextBox.Text = Settings.OutputImagePath;
                 _outputVOATextBox.Text = Settings.OutputVOAPath ?? "";
             }
@@ -106,6 +109,9 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 Settings.NERModelPath = _nerModelTextBox.Text;
+                Settings.RemoveImagesClassifierPath = _removeImagesClassifierTextBox.Text;
+                Settings.SqueezePDF = _squeezeCheckBox.Checked;
+                Settings.UseMultipleThreads = _useMultipleThreadsCheckBox.Checked;
                 Settings.OutputImagePath = _outputImageTextBox.Text;
                 Settings.OutputVOAPath = _outputVOATextBox.Text;
 

@@ -4556,7 +4556,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (CurrentlyRecordingStatistics)
                 {
                     // Don't count input when a document is not open.
-                    if (_inputEventTracker != null)
+                    // ReorderAccordingToPagination may have triggered an abort of processing of a document
+                    // before a FileTaskSession was started. This form is not registered until StartFileTaskSession()
+                    // is called so don't attempt to unregister it in that case.
+                    // https://extract.atlassian.net/browse/ISSUE-15686
+                    if (_inputEventTracker != null && _fileTaskSessionID != null)
                     {
                         _inputEventTracker.UnregisterControl(this);
                     }
@@ -4566,7 +4570,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     double activityTime = _inputEventTracker?.StopActivityTimer() ?? 0.0;
 
-                    // ReorderAccordingToPagination may triggered an abort of processing of a document
+                    // ReorderAccordingToPagination may have triggered an abort of processing of a document
                     // before a FileTaskSession was started.
                     if (_fileTaskSessionID != null)
                     {
