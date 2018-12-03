@@ -693,6 +693,14 @@ EOrientation CScansoftOCR2::getOrientation(int nRotationInDegrees, IMG_ROTATE &r
 //-------------------------------------------------------------------------------------------------
 bool CScansoftOCR2::isDeskewable(double dDeskewDegrees, IMG_INFO imgInfo)
 {
+	// maximum deskewable angle (kRecDeskewImg will return an error for angles larger than this)
+	// https://extract.atlassian.net/browse/ISSUE-15701
+	const double dMaximumDeskewDegrees = 30;
+	if (dDeskewDegrees > dMaximumDeskewDegrees)
+	{
+		return false;
+	}
+
 	// minimum deskewable angle (kRecDeskewImg will ignore angles lower than this).
 	double dMinimumDeskewDegrees;
 
@@ -1225,10 +1233,6 @@ void CScansoftOCR2::initEngineAndLicense()
 			if(pModules[INFO_DOT].Version <= 0)
 			{
 				THROW_UE("ELI17016", "Unable to find required DOT module for OCR engine to run.", rc);
-			}
-			if(pModules[INFO_MAT].Version <= 0)
-			{
-				THROW_UE("ELI17016", "Unable to find required MAT module for OCR engine to run.", rc);
 			}
 		}
 	}
@@ -1839,7 +1843,7 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	// calculate the deskew in degrees
 	double dDeskew = convertRadiansToDegrees(atan2((double) slope, 1000.0));
 
-	// check if this angle of deskew is large enough to be used by the RecAPI engine
+	// check if this angle of deskew is large/small enough to be used by the RecAPI engine
 	if ( isDeskewable(dDeskew, info) )
 	{
 		// deskew the image
