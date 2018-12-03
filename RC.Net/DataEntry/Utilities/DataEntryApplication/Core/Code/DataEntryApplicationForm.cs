@@ -4553,14 +4553,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                if (CurrentlyRecordingStatistics)
+                // https://extract.atlassian.net/browse/ISSUE-15686
+                // ReorderAccordingToPagination may triggered an abort of processing of a document
+                // before a FileTaskSession was started.
+                if (CurrentlyRecordingStatistics && _fileTaskSessionID != null)
                 {
                     // Don't count input when a document is not open.
-                    // ReorderAccordingToPagination may have triggered an abort of processing of a document
-                    // before a FileTaskSession was started. This form is not registered until StartFileTaskSession()
-                    // is called so don't attempt to unregister it in that case.
-                    // https://extract.atlassian.net/browse/ISSUE-15686
-                    if (_inputEventTracker != null && _fileTaskSessionID != null)
+                    if (_inputEventTracker != null)
                     {
                         _inputEventTracker.UnregisterControl(this);
                     }
@@ -4570,13 +4569,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     double activityTime = _inputEventTracker?.StopActivityTimer() ?? 0.0;
 
-                    // ReorderAccordingToPagination may have triggered an abort of processing of a document
-                    // before a FileTaskSession was started.
-                    if (_fileTaskSessionID != null)
-                    {
-                        _fileProcessingDb.UpdateFileTaskSession(
-                            _fileTaskSessionID.Value, elapsedSeconds, _overheadElapsedTime.Value, activityTime);
-                    }
+                    _fileProcessingDb.UpdateFileTaskSession(
+                        _fileTaskSessionID.Value, elapsedSeconds, _overheadElapsedTime.Value, activityTime);
                 }
             }
             catch (Exception ex)
