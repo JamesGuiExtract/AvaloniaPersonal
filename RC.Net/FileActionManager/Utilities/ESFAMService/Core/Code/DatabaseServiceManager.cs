@@ -258,7 +258,31 @@ namespace Extract.FileActionManager.Utilities
                                 fileProcessingDB.DatabaseName = _fileProcessingDb.DatabaseName;
 
                                 fileProcessingDB.RecordFAMSessionStart("ETL: " + dbService.Description, string.Empty, false, false);
-                                dbService.RecordProcessStart();
+                                try
+                                {
+                                    dbService.RecordProcessStart();
+                                }
+                                catch (Exception startException)
+                                {
+                                    if (_fileProcessingDb.ActiveFAMID == 0)
+                                    {
+
+                                        _fileProcessingDb.RegisterActiveFAM();
+                                        dbService.StartActiveSchedule(_fileProcessingDb.ActiveFAMID);
+                                        dbService.RecordProcessStart();
+
+                                        ExtractException newActiveSessionException = new ExtractException("ELI46567", 
+                                            "Application trace: ETL ActiveFAM registration has been restored.");
+                                        newActiveSessionException.AddDebugData("Active FAM ID", _fileProcessingDb.ActiveFAMID);
+                                        newActiveSessionException.AddDebugData("ETL process", dbService.Description);
+                                        newActiveSessionException.Log();
+                                    }
+                                    else
+                                    {
+                                        throw startException.AsExtract("ELI46566");
+                                    }
+                                }
+                                
 
                                 try
                                 {
@@ -331,6 +355,7 @@ namespace Extract.FileActionManager.Utilities
                     foreach (var dbService in _databaseServices)
                     {
                         dbService.Value.Enabled = false;
+                        dbService.Value.Schedule.EventStarted -= HandleScheduleEvent_EventStarted;
                     }
                 }
 

@@ -3483,6 +3483,12 @@ STDMETHODIMP CFileProcessingDB::get_ActiveFAMID(long *pnActiveFAMID)
 
 		ASSERT_ARGUMENT("ELI38461", pnActiveFAMID != __nullptr);
 
+		// Check if the maintain ping thread is still active
+		if (m_eventPingThreadExited.isSignaled())
+		{
+			// if not active set to 0
+			m_nActiveFAMID = 0;
+		}
 		*pnActiveFAMID = m_nActiveFAMID;
 
 		return S_OK;
