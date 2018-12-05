@@ -125,11 +125,9 @@ namespace Extract.FileActionManager.FileProcessors
         bool _squeezePDF;
         bool _useMultipleThreads;
 
-        string _ocrParametersFile;
-        IOCRParameters _ocrParameters;
-
         static bool _recInitialized;
         static readonly object _initLock = new object();
+        static readonly object _redactionLock = new object();
 
         CancellationTokenSource _cancellationTokenSource;
 
@@ -424,14 +422,6 @@ namespace Extract.FileActionManager.FileProcessors
                         }
                     }
                 }
-
-                // Load the OCR parameters from the file
-                if (!string.IsNullOrEmpty(_ocrParametersFile))
-                {
-                    ILoadOCRParameters loadOCRParameters = new RuleSetClass();
-                    loadOCRParameters.LoadOCRParameters(_ocrParametersFile);
-                    _ocrParameters = ((IHasOCRParameters)loadOCRParameters).OCRParameters;
-                }
             }
             catch (Exception ex)
             {
@@ -495,7 +485,8 @@ namespace Extract.FileActionManager.FileProcessors
                     {
                         var args = new[] { "-split", inputImagePath, "-o", singlePageInputDir + @"\" + Path.ChangeExtension(Path.GetFileName(inputImagePath), null) + "%%%%.pdf" };
                         string stderr;
-                        var ret = SystemMethods.RunExecutable(_CPDF_PATH, args, out _, out stderr);
+                        var ret = SystemMethods.RunExecutable(_CPDF_PATH, args, out _, out stderr, _cancellationTokenSource.Token);
+                        _cancellationTokenSource.Token.ThrowIfCancellationRequested();
                         if (ret != 0)
                         {
                             var ex = new ExtractException("ELI46562", "Failed to split PDF");
@@ -526,8 +517,7 @@ namespace Extract.FileActionManager.FileProcessors
                             if (removeImages)
                             {
                                 var path2 = Path.Combine(miscTempDir, Path.GetFileName(path));
-                                File.Move(outPath, path2);
-                                args = new[] { "-draft", path2, "-o", outPath };
+                                args = new[] { "-draft", outPath, "-o", path2 };
                                 ret = SystemMethods.RunExecutable(_CPDF_PATH, args, out _, out string stderr2);
                                 if (ret != 0)
                                 {
@@ -535,6 +525,7 @@ namespace Extract.FileActionManager.FileProcessors
                                     ex.AddDebugData("StdErr", stderr2);
                                     throw ex;
                                 }
+                                File.Copy(path2, outPath, true);
                             }
                             progressStatus?.CompleteCurrentItemGroup();
                         }
@@ -636,6 +627,20 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (OperationCanceledException)
             {
+                return EFileProcessingResult.kProcessingCancelled;
+            }
+            catch (AggregateException ae)
+            {
+                ae.Handle(ex =>
+                {
+                    if (ex is OperationCanceledException)
+                    {
+                        return true;
+                    }
+
+                    throw ex.CreateComVisible("ELI46568", "Error redacting with NER");
+                });
+
                 return EFileProcessingResult.kProcessingCancelled;
             }
             catch (Exception ex)
@@ -854,8 +859,6 @@ namespace Extract.FileActionManager.FileProcessors
             _outputImagePath = task.OutputImagePath;
             _outputVOAPath = task.OutputVOAPath;
 
-            _ocrParametersFile = null;
-
             _dirty = true;
         }
 
@@ -973,7 +976,10 @@ namespace Extract.FileActionManager.FileProcessors
                             {
                                 try
                                 {
-                                    rc = RecAPIPlus.RecFindTextFirst(hDoc, tempImagePageIndex, 0, searchTerms, FindTextFlags.FT_MATCHCASE | FindTextFlags.FT_WHOLEWORD, 0, out hFt, out ft);
+                                    lock (_redactionLock)
+                                    {
+                                        rc = RecAPIPlus.RecFindTextFirst(hDoc, tempImagePageIndex, 0, searchTerms, FindTextFlags.FT_MATCHCASE | FindTextFlags.FT_WHOLEWORD, 0, out hFt, out ft);
+                                    }
                                     RecAssert("ELI46536", "Unable to initialize search", rc, rc == RECERR.REC_OK || rc == RECERR.APIP_NOMORE_WARN, sourceDocName, sourcePageIndex);
 
                                     break;
@@ -1004,7 +1010,10 @@ namespace Extract.FileActionManager.FileProcessors
                                 {
                                     try
                                     {
-                                        rc = RecAPIPlus.RecProcessText(hFt, ft, FindTextAction.FT_MARKFORREDACT, true);
+                                        lock (_redactionLock)
+                                        {
+                                            rc = RecAPIPlus.RecProcessText(hFt, ft, FindTextAction.FT_MARKFORREDACT, true);
+                                        }
                                         RecAssert("ELI46535", "Unable to mark item for redaction", rc, sourceDocName, sourcePageIndex);
 
                                         break;
@@ -1020,7 +1029,10 @@ namespace Extract.FileActionManager.FileProcessors
                                     }
                                 }
 
-                                rc = RecAPIPlus.RecFindTextNext(hFt, out ft);
+                                lock (_redactionLock)
+                                {
+                                    rc = RecAPIPlus.RecFindTextNext(hFt, out ft);
+                                }
                                 RecAssert("ELI46545", "Unable to find next", rc, rc == RECERR.REC_OK || rc == RECERR.APIP_NOMORE_WARN, sourceDocName, sourcePageIndex);
                             }
                         }
@@ -1044,10 +1056,16 @@ namespace Extract.FileActionManager.FileProcessors
 
                 _cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
-                rc = RecAPIPlus.RecExecuteRedaction(hDoc);
+                lock (_redactionLock)
+                {
+                    rc = RecAPIPlus.RecExecuteRedaction(hDoc);
+                }
                 RecAssert("ELI46537", "Unable to redact document", rc, sourceDocName, sourcePageIndex);
 
-                rc = RecAPIPlus.RecConvert2Doc(0, hDoc, outputImagePath);
+                lock (_redactionLock)
+                {
+                    rc = RecAPIPlus.RecConvert2Doc(0, hDoc, outputImagePath);
+                }
                 RecAssert("ELI46538", "Unable to output redacted document", rc, sourceDocName, sourcePageIndex);
 
                 return removeImages;
