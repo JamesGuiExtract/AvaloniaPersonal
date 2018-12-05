@@ -54,6 +54,7 @@
     <Compile Include="TestDocumentVerificationRatesService.cs" />
     <Compile Include="TestRedactionAccuracyServices.cs" />
     <Compile Include="TestAttributeExpander.cs" />
+    <Compile Include="DatabaseServiceManagerTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
@@ -79,6 +80,10 @@
     <ProjectReference Include="..\..\..\FileActionManager\FileProcessors\Core\Code\Extract.FileActionManager.FileProcessors.csproj">
       <Project>{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}</Project>
       <Name>Extract.FileActionManager.FileProcessors</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\FileActionManager\Utilities\ESFAMService\Core\Code\ESFAMService.csproj">
+      <Project>{2524969c-e82d-49e4-907a-ad6bdf9354dc}</Project>
+      <Name>ESFAMService</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
       <Project>{8267221b-52c3-490b-a98f-7a51ebeb2a2b}</Project>

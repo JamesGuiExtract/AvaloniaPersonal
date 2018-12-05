@@ -14,7 +14,7 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.Utilities
 {
     // Manages the execution of all DatabaseService instances defined in a FAM database.
-    class DatabaseServiceManager : IDisposable
+    public class DatabaseServiceManager : IDisposable
     {
         #region Fields
 
