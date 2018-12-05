@@ -1430,7 +1430,7 @@ void CScansoftOCR2::addRecognizedLettersToVector(vector<CPPLetter>* pvecLetters,
 		// or if it is a positive-width character AND unrecognized characters should be returned.
 		// NOTE: RecAPI v15 uses a width-less dummy space to mark the end of a line.
 		// We don't add these dummy spaces to maintain backwards-compatibility.
-		if(pCurLetter->width > 0 && (bIsRecognized || bReturnUnrecognized) )
+		if(pCurLetter->width > 0 && (bIsRecognized || bReturnUnrecognized))
 		{
 			// check if this character is a space
 			bool bIsSpace = pCurLetter->code == ' ';
@@ -1467,7 +1467,7 @@ void CScansoftOCR2::addRecognizedLettersToVector(vector<CPPLetter>* pvecLetters,
 				if(m_bOutputMultipleSpaceCharacterSequences || !pvecLetters->empty() && !isWhitespaceChar(pvecLetters->back().m_usGuess1))
 				{
 					int nSpaceCount = m_bOutputOneSpaceCharacterPerCount
-						? pCurLetter->spcInfo.spcCount
+						? max(pCurLetter->spcInfo.spcCount, 1)
 						: 1;
 
 					if (m_bAssignSpatialInfoToSpaceCharacters)
