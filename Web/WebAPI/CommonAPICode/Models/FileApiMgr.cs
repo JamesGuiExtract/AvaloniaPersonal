@@ -114,6 +114,7 @@ namespace WebAPI.Models
             if (availableInstance == null)
             {
                 availableInstance = _interfaces.FirstOrDefault(instance =>
+                    !instance.InUse &&
                     string.IsNullOrWhiteSpace(instance.SessionId) &&
                     instance.Workflow.Name.IsEquivalent(apiContext.WorkflowName) &&
                     instance.Workflow.DatabaseServerName.IsEquivalent(apiContext.DatabaseServerName) &&
