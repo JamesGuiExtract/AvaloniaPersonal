@@ -100,6 +100,11 @@ namespace Extract.ETL.Test
                 _testDbManager.Dispose();
                 _testDbManager = null;
             }
+            if (_testFileManager != null)
+            {
+                _testFileManager.Dispose();
+                _testFileManager = null;
+            }
         }
 
         #endregion Overhead
