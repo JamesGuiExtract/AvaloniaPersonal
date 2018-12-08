@@ -1219,6 +1219,9 @@ namespace Extract.AttributeFinder
                     inputVOAFilePaths = null;
                 }
 
+                // Set up lazy array of input data using thread-safe methods so that the calls
+                // to Get_FeatureVectorAndAnswerCollections below can expand the specifications into real
+                // data using parallel processing
                 Lazy<IUnknownVector>[] inputVOAs = null;
                 using (var attributes = new ThreadLocal<IUnknownVectorClass>(() => new IUnknownVectorClass()))
                 using (var spatialString = new ThreadLocal<SpatialStringClass>(() => new SpatialStringClass()))

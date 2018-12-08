@@ -1001,7 +1001,20 @@ namespace Extract.AttributeFinder
                     return (new string[0][], new string[0][]);
                 }
 
-                InputConfig.GetRelatedInputData(imageFiles, answers, runRuleSetForFeatures,
+                // If usage is attribute categorization and we are not using the attribute set for answers, then in order to
+                // label rules-generated candidates the paths to source-of-labels VOAs need to be supplied to the downstream process,
+                // not the answers configured in the input configuration.
+                // (If the attribute set is being used then that is treated as the source of labels to the candidate attributes)
+                // https://extract.atlassian.net/browse/ISSUE-15716
+                string sourceOfLabelsOverrideOfAnswerPath = null;
+                if (Usage == LearningMachineUsage.AttributeCategorization
+                    && !useAttributeSetForExpected
+                    && (runRuleSetForFeatures || runRuleSetIfFeaturesAreMissing))
+                {
+                    sourceOfLabelsOverrideOfAnswerPath = LabelAttributesSettings?.SourceOfLabelsPath;
+                }
+
+                InputConfig.GetRelatedInputData(imageFiles, answers, runRuleSetForFeatures, sourceOfLabelsOverrideOfAnswerPath,
                     out string[] ussFiles, out string[] voaFiles, out AttributeOrAnswerCollection answersOrAnswerFiles,
                     cancelToken);
 
@@ -1323,12 +1336,12 @@ namespace Extract.AttributeFinder
                                 }
                             }
                         }
-                        var AttributeOrAnswerCollection = getDocTypeFromVoa
+                        var attributeOrAnswerCollection = getDocTypeFromVoa
                             ? new AttributeOrAnswerCollection(answers.ToArray())
                             : useAttributeSetForExpected
                                 ? new AttributeOrAnswerCollection(answerVOAs.ToArray())
                                 : null;
-                        return (imagePaths.ToArray(), AttributeOrAnswerCollection);
+                        return (imagePaths.ToArray(), attributeOrAnswerCollection);
                     }
                 }
             }

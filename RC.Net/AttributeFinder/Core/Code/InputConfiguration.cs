@@ -277,15 +277,17 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Builds data arrays from specification using provided uss paths
         /// </summary>
-        /// <param name="imageFiles">The imape paths to get data for</param>
+        /// <param name="imageFiles">The image paths to get data for</param>
         /// <param name="maybeAnswers">Either null or a collection of answers, answer file paths or VOAs encoded as byte[]</param>
         /// <param name="runRuleSetForFeatures">Whether or not a ruleset is to be run to get feature/candidate attributes</param>
-        /// <param name="spatialStringFilePaths">The USS input files that related paths are based on</param>
+        /// <param name="sourceOfLabelsOverrideForAnswerPath">Optional path tag function to use instead of configured answer path</param>
+        /// <param name="spatialStringFilePaths">Computed uss file paths</param>
         /// <param name="attributeFilePaths">Computed paths to feature VOA files</param>
         /// <param name="answers">Computed answer strings, paths to answer files, or the answer VOAs encoded as byte arrays</param>
         /// <param name="cancellationToken">Token indicating that processing should be canceled</param>
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters")]
         public void GetRelatedInputData(string[] imageFiles, AttributeOrAnswerCollection maybeAnswers, bool runRuleSetForFeatures,
+            string sourceOfLabelsOverrideForAnswerPath,
             out string[] spatialStringFilePaths,
             out string[] attributeFilePaths,
             out AttributeOrAnswerCollection answers,
@@ -298,8 +300,9 @@ namespace Extract.AttributeFinder
                 spatialStringFilePaths = new string[0];
                 attributeFilePaths = new string[0];
                 var answersOrAnswerFilePaths = new string[0];
+                var answerPathOrSourceOfLabels = sourceOfLabelsOverrideForAnswerPath ?? AnswerPath;
 
-                bool needAnswers = maybeAnswers == null && AnswerPath != null;
+                bool needAnswers = maybeAnswers == null && answerPathOrSourceOfLabels != null;
                 if (needAnswers)
                 {
                     answersOrAnswerFilePaths = new string[imageFiles.Length];
@@ -336,7 +339,7 @@ namespace Extract.AttributeFinder
                     }
                     if (needAnswers)
                     {
-                        answersOrAnswerFilePaths[i] = pathTags.Expand(AnswerPath);
+                        answersOrAnswerFilePaths[i] = pathTags.Expand(answerPathOrSourceOfLabels);
                     }
                 }
             }
@@ -369,6 +372,7 @@ namespace Extract.AttributeFinder
                 GetRelatedInputData(imagesAndMaybeAnswers.Item1,
                     AttributeOrAnswerCollection.Maybe(imagesAndMaybeAnswers.Item2),
                     runRuleSetForFeatures,
+                    null,
                     out spatialStringFilePaths, out attributeFilePaths, out var answers, cancellationToken);
 
                 answersOrAnswerFilePaths = answers?.Match(a => a, b => null);
