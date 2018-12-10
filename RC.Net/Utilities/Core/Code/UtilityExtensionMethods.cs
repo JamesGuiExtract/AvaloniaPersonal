@@ -199,6 +199,32 @@ namespace Extract.Utilities
             }
         }
 
+        /// <summary>
+        /// Return batches of an enumerable
+        /// https://www.make-awesome.com/2010/08/batch-or-partition-a-collection-with-linq/
+        /// </summary>
+        /// <typeparam name="T">The Type contained in the IEnumerable</typeparam>
+        /// <param name="collection">The collection to return batches from</param>
+        /// <param name="batchSize">The Size of each batch - last batch will just be the remaining</param>
+        /// <returns>The current batch as a List</returns>
+        public static IEnumerable<List<T>> Batch<T>(this IEnumerable<T> collection, int batchSize)
+        {
+            List<T> nextBatch = new List<T>(batchSize);
+            foreach(T item in collection)
+            {
+                nextBatch.Add(item);
+                if (nextBatch.Count == batchSize)
+                {
+                    yield return nextBatch;
+                    nextBatch = new List<T>(batchSize);
+                }
+            }
+            if (nextBatch.Count > 0)
+            {
+                yield return nextBatch;
+            }
+        }
+
 
         #endregion Methods
 

@@ -791,11 +791,13 @@ namespace Extract.ETL
             }
 
             var rasterZones = spatialString.GetOriginalImageRasterZones().ToIEnumerable<RasterZone>();
+            List<string> inserts = new List<string>();
 
-            var valueStrings = rasterZones.Select(rz => getRasterZoneValueClause(rz));
-
-            return string.Format(CultureInfo.InvariantCulture,
-                @"INSERT INTO [dbo].[RasterZone]
+            foreach (var zoneList in rasterZones.Batch(1000))
+            {
+                var valueStrings = zoneList.Select(rz => getRasterZoneValueClause(rz));
+                inserts.Add(string.Format(CultureInfo.InvariantCulture,
+                    @"INSERT INTO [dbo].[RasterZone]
                        ([AttributeID]
                        ,[Top]
                        ,[Left]
@@ -808,7 +810,9 @@ namespace Extract.ETL
                        ,[PageNumber]
                        ,[Height])
                  VALUES
-                    {0};", string.Join(",\r\n", valueStrings));
+                    {0};", string.Join(",\r\n", valueStrings)));
+            }
+            return string.Join(";\r\n", inserts);
         }
 
         /// <summary>

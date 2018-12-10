@@ -43,6 +43,8 @@ namespace Extract.ETL.Test
           FROM [TestExpandAttributesResults] ";
 
         static readonly string _DATABASE = "Resources.ExpandAttributes.bak";
+        static readonly string _1000RASTER_ZONE = "Resources.Test1000.bak";
+
         static readonly string _RESULTS_DATABASE = "Resources.ExpandAttribute_ExpectedResults.bak";
         static readonly string _QUERY_ATTRIBUTE_RESULTS = @"
             SELECT [Attribute].[ID]
@@ -109,6 +111,11 @@ namespace Extract.ETL.Test
             {
                 _testDbManager.Dispose();
                 _testDbManager = null;
+            }
+            if (_testFileManager != null)
+            {
+                _testFileManager.Dispose();
+                _testFileManager = null;
             }
         }
 
@@ -256,22 +263,51 @@ namespace Extract.ETL.Test
             }
         }
 
+        [Test]
+        [Category("Automated"), Category("ETL")]
+        public static void Test1000RasterZones()
+        {
+            string testDBName = "Test1000RasterZones_Test";
+            try
+            {
+                // This is only used to initialize the database used for calculating the stats
+                var fileProcessingDb = _testDbManager.GetDatabase(_1000RASTER_ZONE, testDBName);
+
+                ExpandAttributes expandAttributes = new ExpandAttributes();
+                expandAttributes.DatabaseName = fileProcessingDb.DatabaseName;
+                expandAttributes.DatabaseServer = fileProcessingDb.DatabaseServer;
+                expandAttributes.StoreSpatialInfo = true;
+                expandAttributes.StoreEmptyAttributes = false;
+
+                expandAttributes.AddToDatabase("(local)", testDBName);
+
+                Assert.DoesNotThrow(()=>expandAttributes.Process(_noCancel), "Test that 1000 raster zone spatialString expands");
+
+                // There should 1320 RasterZones added
+                using (var connection = NewSqlConnection(expandAttributes.DatabaseServer, expandAttributes.DatabaseName))
+                {
+                    connection.Open();
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = "SELECT COUNT(ID) NumberOfRasterZones FROM RasterZone";
+                        var result = cmd.ExecuteScalar();
+                        Assert.AreEqual(1320, (int)result, "There should be 1320 raster zones added");
+                    }
+                }
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDBName);
+            }
+        }
+
         #endregion
 
         #region Helper methods
 
         static void processTest(string resultsDbName, ExpandAttributes expandAttributes, string expectedResultsSQL)
         {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = expandAttributes.DatabaseServer;
-            sqlConnectionBuild.InitialCatalog = expandAttributes.DatabaseName;
-
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-
-            using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+            using (var connection = NewSqlConnection(expandAttributes.DatabaseServer, expandAttributes.DatabaseName))
             {
                 connection.Open();
                 SqlCommand cmd = connection.CreateCommand();
@@ -282,7 +318,7 @@ namespace Extract.ETL.Test
                 expandAttributes.DatabaseServiceID = (int)cmd.ExecuteScalar();
                 expandAttributes.UpdateDatabaseServiceSettings();
 
-                Assert.Throws<ExtractException>(()=> expandAttributes.Process(_cancel));
+                Assert.Throws<ExtractException>(() => expandAttributes.Process(_cancel));
                 cmd.CommandText = "SELECT COUNT(ID) FROM Attribute ";
                 Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 0);
 
@@ -293,9 +329,7 @@ namespace Extract.ETL.Test
                 cmd.CommandText = _QUERY_ATTRIBUTE_RESULTS;
                 var results = cmd.ExecuteReader().Cast<IDataRecord>().ToList();
 
-
-                sqlConnectionBuild.InitialCatalog = resultsDbName;
-                using (var expectedResultsConnection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                using (var expectedResultsConnection = NewSqlConnection(expandAttributes.DatabaseServer, resultsDbName))
                 {
                     expectedResultsConnection.Open();
                     var expectedCmd = expectedResultsConnection.CreateCommand();
@@ -368,6 +402,19 @@ namespace Extract.ETL.Test
             {
                 ex.ExtractLog("ELI45443");
             }
+        }
+
+        static SqlConnection NewSqlConnection(string databaseServer, string databaseName)
+        {
+            // Build the connection string from the settings
+            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
+            sqlConnectionBuild.DataSource = databaseServer;
+            sqlConnectionBuild.InitialCatalog = databaseName;
+
+            sqlConnectionBuild.IntegratedSecurity = true;
+            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
+            sqlConnectionBuild.MultipleActiveResultSets = true;
+            return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
         #endregion
