@@ -17,7 +17,8 @@ namespace WebAPI.Controllers
     public class UsersController : Controller
     {
         /// <summary>
-        /// Authenticates a user and, if successful, returns a JSON Web Token.
+        /// Authenticates a user and, if successful, returns a JSON Web Token. Prefix the returned
+        /// access_token with "Bearer " to use for authorization in all other API methods.
         /// </summary>
         /// <param name="user">Login credentials. WorkflowName is optional;
         /// specify only if a special workflow is required.</param>

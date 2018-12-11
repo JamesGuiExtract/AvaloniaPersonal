@@ -20,7 +20,8 @@ namespace WebAPI.Controllers
     public class AppBackendController : Controller
     {
         /// <summary>
-        /// Authenticates a user. The returned JWT token will be used to access session/document state in subsequent calls.
+        /// Authenticates a user. Prefix the returned access_token with "Bearer " to use for authorization
+        /// in subsequent API calls.
         /// </summary>
         /// <param name="user">Login credentials. WorkflowName is optional;
         /// specify only if a special workflow is required.</param>

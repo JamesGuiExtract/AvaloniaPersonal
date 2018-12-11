@@ -535,7 +535,8 @@ namespace Extract.DataEntry
                         validator != null);
 
                     // Initialize the auto-complete list using the query results.
-                    if (dataEntryQuery.ValidationListType != ValidationListType.ValidationListOnly)
+                    if (dataEntryQuery.ValidationListType != ValidationListType.ValidationListOnly &&
+                        dataEntryQuery.ValidValue == null)
                     {
                         string[][] queryResultArray = queryResult.ToArrayOfStringArrays();
                         validator.SetAutoCompleteValues(queryResultArray);
