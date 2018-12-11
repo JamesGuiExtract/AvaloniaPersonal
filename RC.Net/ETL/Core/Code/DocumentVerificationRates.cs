@@ -211,6 +211,7 @@ namespace Extract.ETL
                 _cancelToken = cancelToken;
 
                 RefreshStatus();
+                ExtractException.Assert("ELI46588", "Status cannot be null", _status != null);
 
                 // Reset the Stats on the following conditions
                 if (_status.LastFileTaskSessionIDProcessed <= 0 || _status.SetOfActiveFileTaskIds.Count > 0)

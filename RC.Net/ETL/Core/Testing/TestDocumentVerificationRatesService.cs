@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Extract.FileActionManager.Database.Test;
+using Extract.Testing.Utilities;
+using Extract.Utilities;
+using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using Extract.FileActionManager.Database.Test;
-using Extract.Testing.Utilities;
-using NUnit.Framework;
 using UCLID_FILEPROCESSINGLib;
 using static Extract.ETL.DocumentVerificationRates;
 
@@ -66,7 +67,7 @@ namespace Extract.ETL.Test
             (1, 1, 1, 6, 1, 10.0, 1.0, 10.0),
             (1, 2, 1, 6, 2, 20.0, 2.0, 20.0)
         };
-        
+
         static VerificationRatesList _PROCESS4_EXPECTED = new VerificationRatesList
         {
             (1, 1, 1, 6, 1, 10.0, 1.0, 10.0),
@@ -111,8 +112,22 @@ namespace Extract.ETL.Test
 
         #region Unit tests
 
-        [Test, Category("Automated"), Category("ETL")]
-        static public void TestDocumentVerificationRatesServiceSerialization()
+        /// <summary>
+        /// Test that if no Database configuration is set that the call to Process throws an exception
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("ETL")]
+        public static void TestNoDBProcess()
+        {
+            var documentVerificationRates = new DocumentVerificationRates();
+            Assert.Throws<ExtractException>(() => documentVerificationRates.Process(_noCancel), "Process should throw an exception");
+        }
+
+        [Test]
+        [Category("Automated")]
+        [Category("ETL")]
+        public static void TestDocumentVerificationRatesServiceSerialization()
         {
             DocumentVerificationRates verificationRates = new DocumentVerificationRates();
             verificationRates.DatabaseServer = "TestService";
@@ -120,9 +135,9 @@ namespace Extract.ETL.Test
             verificationRates.DatabaseServiceID = 1;
             verificationRates.Description = "Test description";
             verificationRates.Enabled = !verificationRates.Enabled;
-            verificationRates.Schedule = new Utilities.ScheduledEvent();
-            verificationRates.Schedule.Start = new DateTime(2018,1,1);
-            verificationRates.Schedule.RecurrenceUnit = Utilities.DateTimeUnit.Minute;
+            verificationRates.Schedule = new ScheduledEvent();
+            verificationRates.Schedule.Start = new DateTime(2018, 1, 1);
+            verificationRates.Schedule.RecurrenceUnit = DateTimeUnit.Minute;
 
             string settings = verificationRates.ToJson();
 
@@ -135,23 +150,27 @@ namespace Extract.ETL.Test
             Assert.AreEqual(verificationRates.Description, testRates.Description, "Description serialization worked.");
             Assert.IsNotNull(verificationRates.Schedule, "Schedule was set so should not be null.");
             Assert.AreEqual(verificationRates.Schedule.Start, new DateTime(2018, 1, 1));
-            Assert.AreEqual(verificationRates.Schedule.RecurrenceUnit, Utilities.DateTimeUnit.Minute);
+            Assert.AreEqual(verificationRates.Schedule.RecurrenceUnit, DateTimeUnit.Minute);
         }
 
-        [Test, Category("Automated"), Category("ETL")]
-        static public void TestDocumentVerificationStatusSerialization()
+        [Test]
+        [Category("Automated")]
+        [Category("ETL")]
+        public static void TestDocumentVerificationStatusSerialization()
         {
             DocumentVerificationStatus serviceStatus = new DocumentVerificationStatus();
-            
+
             string settings = serviceStatus.ToJson();
 
-            DocumentVerificationStatus testStatus = (DocumentVerificationStatus) DocumentVerificationStatus.FromJson(settings);
+            DocumentVerificationStatus testStatus = (DocumentVerificationStatus)DocumentVerificationStatus.FromJson(settings);
 
-            Assert.AreEqual(serviceStatus.LastFileTaskSessionIDProcessed, testStatus.LastFileTaskSessionIDProcessed, 
+            Assert.AreEqual(serviceStatus.LastFileTaskSessionIDProcessed, testStatus.LastFileTaskSessionIDProcessed,
                 "LastFileTaskSessionIDProcessed should be serialized.");
         }
 
-        [Test, Category("Automated"), Category("ETL")]
+        [Test]
+        [Category("Automated")]
+        [Category("ETL")]
         [TestCase("DF414AD2-742A-4ED7-AD20-C1A1C4993175", 2, TestName = "Core: Paginate files")]
         [TestCase("FD7867BD-815B-47B5-BAF4-243B8C44AABB", 4, TestName = "Core: Web verification")]
         [TestCase("59496DF7-3951-49B7-B063-8C28F4CD843F", 5, TestName = "Data Entry: Verify extracted data")]
@@ -165,7 +184,7 @@ namespace Extract.ETL.Test
 
                 fileProcessingDb.RecordFAMSessionStart("Test.fps", _ACTION_A, true, true);
                 fileProcessingDb.RegisterActiveFAM();
-                
+
                 string testfileName1 = _testFileManager.GetFile(_TEST_FILE1);
                 string testfileName2 = _testFileManager.GetFile(_TEST_FILE2);
                 bool alreadyExists = false;
@@ -187,7 +206,7 @@ namespace Extract.ETL.Test
                 fileProcessingDb.RegisterActiveFAM();
 
                 fileTaskSessionID = fileProcessingDb.StartFileTaskSession(taskGuid, fileRecord2.FileID, actionID1);
-                
+
                 DocumentVerificationRates rates = new DocumentVerificationRates();
                 rates.DatabaseServer = fileProcessingDb.DatabaseServer;
                 rates.DatabaseName = fileProcessingDb.DatabaseName;
@@ -212,7 +231,7 @@ namespace Extract.ETL.Test
 
                 status = rates.Status as DocumentVerificationStatus;
                 Assert.AreEqual(status.LastFileTaskSessionIDProcessed, 2, "LastFileTaskSessionIDProcessed is 2.");
-                Assert.That(status.SetOfActiveFileTaskIds.Count == 0 , "SetOfActiveFileTaskIds is no longer used.");
+                Assert.That(status.SetOfActiveFileTaskIds.Count == 0, "SetOfActiveFileTaskIds is no longer used.");
 
                 CheckResults(rates, taskClassID, _PROCESS2_EXPECTED);
 
@@ -235,6 +254,28 @@ namespace Extract.ETL.Test
                 rates.Process(_noCancel);
 
                 CheckResults(rates, taskClassID, _PROCESS4_EXPECTED);
+
+                // Test that the status gets reset if the database is cleared with retain settings
+                fileProcessingDb.Clear(true);
+
+                using (var connection = GetConnection(rates))
+                {
+                    connection.Open();
+                    using (var statusCmd = connection.CreateCommand())
+                    {
+                        statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
+                        statusCmd.Parameters.AddWithValue("@DatabaseServiceID", rates.DatabaseServiceID);
+                        var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
+                        Assert.AreNotEqual(null, result, "A single record was returned");
+                        Assert.AreEqual(DBNull.Value, result["Status"], "Status is null");
+                        Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed is null");
+                    }
+                }
+
+                rates.RefreshStatus();
+                status = rates.Status as DocumentVerificationStatus;
+
+                Assert.AreEqual(0, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 0");
             }
             finally
             {

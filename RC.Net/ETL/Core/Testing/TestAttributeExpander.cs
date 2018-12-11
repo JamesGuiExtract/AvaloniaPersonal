@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Extract.Database;
+using Extract.FileActionManager.Database.Test;
+using Extract.Testing.Utilities;
+using NUnit.Framework;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Threading;
-using Extract.Database;
-using Extract.FileActionManager.Database.Test;
-using Extract.Testing.Utilities;
-using NUnit.Framework;
 
 namespace Extract.ETL.Test
 {
@@ -124,15 +124,28 @@ namespace Extract.ETL.Test
         #region Unit Tests
 
         /// <summary>
+        /// Test that if no Database configuration is set that the call to Process throws an exception
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("ETL")]
+        public static void TestNoDBProcess()
+        {
+            var expandAttributes = new ExpandAttributes();
+            Assert.Throws<ExtractException>(() => expandAttributes.Process(_noCancel), "Process should throw an exception");
+        }
+
+        /// <summary>
         /// Test Expand Attributes with StoreSpatialInfo=true and StoreEmptyAttributes=false
         /// </summary>
         [Test]
-        [Category("Automated"), Category("ETL")]
+        [Category("Automated")]
+        [Category("ETL")]
         [TestCase(true, false, _ExpectedSaveAll + " WHERE [Name] != 'Empty'", TestName = "ExpandAttribute store spatial")]
         [TestCase(false, false, _ExpectedNoRasterZones + " WHERE [Name] != 'Empty'", TestName = "ExpandAttribute no spatial")]
         [TestCase(true, true, _ExpectedSaveAll, TestName = "ExpandAttribute spatial and empty")]
-        [TestCase(false, true, _ExpectedNoRasterZones,TestName = "ExpandAttribute no spatial with empty")]
-        public static void TestExpandAttributes(bool  storeSpatialInfo, bool storeEmptyAttributes, string expectedQuery)
+        [TestCase(false, true, _ExpectedNoRasterZones, TestName = "ExpandAttribute no spatial with empty")]
+        public static void TestExpandAttributes(bool storeSpatialInfo, bool storeEmptyAttributes, string expectedQuery)
         {
             string testDBName = "ExpandAttribute_Test";
             string resultDBName = "ExpandAttribute_Results_Test";
@@ -163,7 +176,8 @@ namespace Extract.ETL.Test
         /// Tests the serialization of the ExpandAttribute object
         /// </summary>
         [Test]
-        [Category("Automated"), Category("ETL")]
+        [Category("Automated")]
+        [Category("ETL")]
         public static void TestExpandAttributesSerialization()
         {
             ExpandAttributes expandAttributes = new ExpandAttributes();
@@ -188,8 +202,12 @@ namespace Extract.ETL.Test
             Assert.That(test.Enabled == !expandAttributes.Enabled);
         }
 
+        /// <summary>
+        /// Test that the status is updated correctly
+        /// </summary>
         [Test]
-        [Category("Automated"), Category("ETL")]
+        [Category("Automated")]
+        [Category("ETL")]
         public static void TestStatus()
         {
             string testDBName = "TestStatus_Test";
@@ -197,7 +215,6 @@ namespace Extract.ETL.Test
             {
                 // This is only used to initialize the database used for calculating the stats
                 var fileProcessingDb = _testDbManager.GetDatabase(_DATABASE, testDBName);
-
 
                 ExpandAttributes expandAttributes = new ExpandAttributes();
                 expandAttributes.DatabaseName = fileProcessingDb.DatabaseName;
@@ -213,7 +230,7 @@ namespace Extract.ETL.Test
 
                 Assert.AreEqual(jsonStatus, expandAttributes.Status.ToJson(), "Refreshed status should be the same as previous status");
 
-                expandAttributes.DashboardAttributes.Add(new ExpandAttributes.DashboardAttributeField()
+                expandAttributes.DashboardAttributes.Add(new ExpandAttributes.DashboardAttributeField
                 {
                     DashboardAttributeName = "DocumentType",
                     AttributeSetNameID = 1, // DataFoundByRules 
@@ -227,7 +244,7 @@ namespace Extract.ETL.Test
                 status = expandAttributes.Status as ExpandAttributes.ExpandAttributesStatus;
                 Assert.AreEqual(2, status.LastFileTaskSessionIDProcessed, "All File task sessions should be processed");
 
-                var testValue = new ExpandAttributes.DashboardAttributeField()
+                var testValue = new ExpandAttributes.DashboardAttributeField
                 {
                     DashboardAttributeName = "Test",
                     AttributeSetNameID = 1, // DataFoundByRules 
@@ -256,6 +273,36 @@ namespace Extract.ETL.Test
                 Assert.AreEqual(1, expandAttributes.DashboardAttributes.Count, "Number of DashboardAttributes should be 1");
                 status = expandAttributes.Status as ExpandAttributes.ExpandAttributesStatus;
                 Assert.AreEqual(1, status.LastIDProcessedForDashboardAttribute.Count, "Number of LastIDProcessedForDashboardAttribute items should be 1");
+                Assert.AreEqual(2, status.LastIDProcessedForDashboardAttribute.Single().Value, "The LastIDProcessedForDashboardAttribute for the only record should be 2");
+                Assert.AreEqual(status.LastFileTaskSessionIDProcessed,
+                    status.LastIDProcessedForDashboardAttribute.Single().Value,
+                    "The LastIDProcessedForDashboardAttribute should match to Expand Attribute objects");
+
+                // Test that the status is cleared for the database service is the database is cleared with retain settings
+                fileProcessingDb.Clear(true);
+
+                using (var connection = NewSqlConnection(expandAttributes.DatabaseServer, expandAttributes.DatabaseName))
+                {
+                    connection.Open();
+                    using (var statusCmd = connection.CreateCommand())
+                    {
+                        statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
+                        statusCmd.Parameters.AddWithValue("@DatabaseServiceID", expandAttributes.DatabaseServiceID);
+                        var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
+                        Assert.AreNotEqual(null, result, "A single record should be returned");
+                        Assert.AreEqual(DBNull.Value, result["Status"], "Status should be null");
+                        Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should be null");
+                    }
+                }
+
+                expandAttributes.RefreshStatus();
+
+                status = expandAttributes.Status as ExpandAttributes.ExpandAttributesStatus;
+
+                Assert.AreEqual(0, status.LastFileTaskSessionIDProcessed, "Default LastFileTaskSessionIDProcessed after database cleared should be 0");
+
+                Assert.AreEqual(1, status.LastIDProcessedForDashboardAttribute.Count, "There should be one record in the LastIDProcessedForDashboardAttribute");
+                Assert.AreEqual(-1, status.LastIDProcessedForDashboardAttribute.Single().Value, "The LastIDProcessedForDashboardAttribute for the only record should be -1");
             }
             finally
             {
@@ -264,7 +311,8 @@ namespace Extract.ETL.Test
         }
 
         [Test]
-        [Category("Automated"), Category("ETL")]
+        [Category("Automated")]
+        [Category("ETL")]
         public static void Test1000RasterZones()
         {
             string testDBName = "Test1000RasterZones_Test";
@@ -281,7 +329,7 @@ namespace Extract.ETL.Test
 
                 expandAttributes.AddToDatabase("(local)", testDBName);
 
-                Assert.DoesNotThrow(()=>expandAttributes.Process(_noCancel), "Test that 1000 raster zone spatialString expands");
+                Assert.DoesNotThrow(() => expandAttributes.Process(_noCancel), "Test that 1000 raster zone spatialString expands");
 
                 // There should 1320 RasterZones added
                 using (var connection = NewSqlConnection(expandAttributes.DatabaseServer, expandAttributes.DatabaseName))

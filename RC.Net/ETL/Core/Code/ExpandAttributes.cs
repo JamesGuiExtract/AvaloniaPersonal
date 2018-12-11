@@ -372,6 +372,7 @@ namespace Extract.ETL
                 _cancelToken = cancelToken;
 
                 RefreshStatus();
+                ExtractException.Assert("ELI46585", "Status cannot be null", _status != null);
 
                 int maxFileTaskSession = MaxReportableFileTaskSessionId(true);
                 int currentLastProcessed = _status.StartingFileTaskSessionId();

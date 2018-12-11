@@ -26,7 +26,7 @@ namespace Extract.ETL
     [KnownType(typeof(ScheduledEvent))]
     [SuppressMessage("Microsoft.Naming", "CA1709: CorrectCasingInTypeName")]
     [ExtractCategory("DatabaseService", "Redaction accuracy")]
-    public class RedactionAccuracy : DatabaseService, IConfigSettings
+    public class RedactionAccuracy : DatabaseService, IConfigSettings, IHasConfigurableDatabaseServiceStatus
     {
         #region Internal classes
 
@@ -198,6 +198,12 @@ namespace Extract.ETL
         /// </summary>
         bool _processing;
 
+
+        /// <summary>
+        /// The current status info for this service.
+        /// </summary>
+        RedactionAccuracyStatus _status;
+
         #endregion Fields
 
         #region Constructors
@@ -244,8 +250,8 @@ namespace Extract.ETL
             {
                 _processing = true;
 
-                // Get the status
-                var status = GetLastOrCreateStatus(() => new RedactionAccuracyStatus());
+                RefreshStatus();
+                ExtractException.Assert("ELI46587", "Status cannot be null", _status != null);
 
                 using (var connection = NewSqlDBConnection())
                 {
@@ -253,7 +259,7 @@ namespace Extract.ETL
                     connection.Open();
 
                     // Clear the ReportingRedactionAccuracy table if the LastFileTaskSessionIDProcessed is 0
-                    if (status.LastFileTaskSessionIDProcessed == 0)
+                    if (_status.LastFileTaskSessionIDProcessed == 0)
                     {
                         using (var deleteCmd = connection.CreateCommand())
                         {
@@ -270,13 +276,13 @@ namespace Extract.ETL
                 Int32 maxFileTaskSession = MaxReportableFileTaskSessionId(true);
 
                 // Process the entries in chunks of 100 file task session
-                while (status.LastFileTaskSessionIDProcessed < maxFileTaskSession)
+                while (_status.LastFileTaskSessionIDProcessed < maxFileTaskSession)
                 {
                     ConcurrentQueue<string> queriesToRunInBatch = new ConcurrentQueue<string>(); 
 
                     cancelToken.ThrowIfCancellationRequested();
 
-                    int lastInBatchToProcess = Math.Min(status.LastFileTaskSessionIDProcessed + _PROCESS_BATCH_SIZE, maxFileTaskSession);
+                    int lastInBatchToProcess = Math.Min(_status.LastFileTaskSessionIDProcessed + _PROCESS_BATCH_SIZE, maxFileTaskSession);
 
                     using (var connection = NewSqlDBConnection())
                     using (SqlCommand cmd = connection.CreateCommand())
@@ -290,7 +296,7 @@ namespace Extract.ETL
                         cmd.Parameters.AddWithValue("@FoundSetName", FoundAttributeSetName);
                         cmd.Parameters.AddWithValue("@ExpectedSetName", ExpectedAttributeSetName);
                         cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
-                        cmd.Parameters.AddWithValue("@LastProcessedID", status.LastFileTaskSessionIDProcessed);
+                        cmd.Parameters.AddWithValue("@LastProcessedID", _status.LastFileTaskSessionIDProcessed);
                         cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
 
                         queriesToRunInBatch.Enqueue(DELETE_OLD_DATA);
@@ -321,7 +327,7 @@ namespace Extract.ETL
                                     cmd.Parameters.AddWithValue("@FoundSetName", FoundAttributeSetName);
                                     cmd.Parameters.AddWithValue("@ExpectedSetName", ExpectedAttributeSetName);
                                     cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
-                                    cmd.Parameters.AddWithValue("@LastProcessedID", status.LastFileTaskSessionIDProcessed);
+                                    cmd.Parameters.AddWithValue("@LastProcessedID", _status.LastFileTaskSessionIDProcessed);
                                     cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
                                     var saveTask = cmd.ExecuteNonQueryAsync();
                                     saveTask.Wait(cancelToken);
@@ -329,9 +335,9 @@ namespace Extract.ETL
 
                             }
 
-                            status.LastFileTaskSessionIDProcessed = lastInBatchToProcess;
+                            _status.LastFileTaskSessionIDProcessed = lastInBatchToProcess;
 
-                            status.SaveStatus(saveConnection, DatabaseServiceID);
+                            _status.SaveStatus(saveConnection, DatabaseServiceID);
                         }
                         scope.Complete();
                     }
@@ -408,6 +414,48 @@ namespace Extract.ETL
 
         [DataMember]
         public override int Version { get; protected set; } = CURRENT_VERSION;
+        #endregion
+
+        #region IHasConfigurableDatabaseServiceStatus
+
+        /// <summary>
+        /// The <see cref="DatabaseServiceStatus"/> for this instance
+        /// </summary>
+        public DatabaseServiceStatus Status
+        {
+            get => _status = _status ?? GetLastOrCreateStatus(() => new RedactionAccuracyStatus()
+            {
+                LastFileTaskSessionIDProcessed = -1
+            });
+
+            set => _status = value as RedactionAccuracyStatus;
+        }
+
+        /// <summary>
+        /// Refreshes the <see cref="DatabaseServiceStatus"/> by loading from the database, creating a new instance,
+        /// or setting it to null (if <see cref="DatabaseServiceID"/>, <see cref="DatabaseServer"/> and
+        /// <see cref="DatabaseName"/> are not configured)
+        /// </summary>
+        public void RefreshStatus()
+        {
+            try
+            {
+                if (DatabaseServiceID > 0
+                    && !string.IsNullOrEmpty(DatabaseServer)
+                    && !string.IsNullOrEmpty(DatabaseName))
+                {
+                    _status = GetLastOrCreateStatus(() => new RedactionAccuracyStatus());
+                }
+                else
+                {
+                    _status = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46583");
+            }
+        }
 
         #endregion
 

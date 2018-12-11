@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Extract.FileActionManager.Database.Test;
+using Extract.Testing.Utilities;
+using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using Extract.FileActionManager.Database.Test;
-using Extract.Testing.Utilities;
-using NUnit.Framework;
 
 namespace Extract.ETL.Test
 {
@@ -16,7 +16,7 @@ namespace Extract.ETL.Test
     using RedactionAccuracyList = List<RedactionAccuracyItem>;
     using I = RedactionAccuracyItem;
 
-    internal struct RedactionAccuracyItem
+    struct RedactionAccuracyItem
     {
         public RedactionAccuracyItem(long foundAttributeSetForFileID,
             long expectedAttributeSetForFileID,
@@ -124,7 +124,7 @@ namespace Extract.ETL.Test
 
         static readonly string _DATABASE = "Resources.RedactionDemo_IDShield_first.bak";
         static readonly string _RERUN_DATABASE = "Resources.RedactionDemo_IDShield_second.bak";
- 
+
         #endregion
 
         #region Fields
@@ -152,7 +152,7 @@ namespace Extract.ETL.Test
             new I(8 ,  18,  8 ,  1,   "SSN", 1,   1,   1,   0,   0,   0,   0, "1/8/2018 3:14:02 PM", 1, 1, "1/8/2018 3:21:52 PM", 1, 3),
             new I(9 ,  19,  9 ,  1,   "SSN", 2,   3,   1,   0,   0,   2,   1, "1/8/2018 3:14:55 PM", 1, 1, "1/8/2018 3:22:02 PM", 1, 3),
             new I(10,  20,  10,  1,   "SSN", 2,   2,   2,   0,   0,   0,   0, "1/8/2018 3:15:26 PM", 1, 1, "1/8/2018 3:22:05 PM", 1, 3)
-        };                                                             
+        };
 
         /// <summary>
         /// List of the expected contents of the ReportingRedactionAccuracy table after a rerun of the file from the first run
@@ -204,9 +204,98 @@ namespace Extract.ETL.Test
         #region Unit Tests
 
         /// <summary>
+        /// Test that if no Database configuration is set that the call to Process throws an exception
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("ETL")]
+        public static void TestNoDBProcess()
+        {
+            var redactionAccuracy = new RedactionAccuracy();
+            Assert.Throws<ExtractException>(() => redactionAccuracy.Process(_noCancel), "Process should throw an exception");
+        }
+
+        /// <summary>
         /// Test the use of the IDatabase.Process command for RedactionAccuracy Service
         /// </summary>
-        [Test, Category("Automated")]
+        [Test]
+        [Category("Automated")]
+        [Category("ETL")]
+        public static void TestRedactionAccuracyServiceStatus()
+        {
+            string testDBName = "RedactionAccuracyServiceStatus_Test";
+            try
+            {
+                // This is only used to initialize the database used for calculating the stats
+                var fileProcessingDb = _testDbManager.GetDatabase(_DATABASE, testDBName);
+
+                // Create DataCaptureAccuracy object using the initialized database
+                RedactionAccuracy redactionAccuracy = CreateTestRedactionAccuracy(fileProcessingDb.DatabaseServer,
+                    fileProcessingDb.DatabaseName);
+
+                using (var connection = NewSqlConnection(redactionAccuracy.DatabaseServer, redactionAccuracy.DatabaseName))
+                {
+                    connection.Open();
+
+                    redactionAccuracy.RefreshStatus();
+                    var status = redactionAccuracy.Status as RedactionAccuracy.RedactionAccuracyStatus;
+
+                    Assert.AreEqual(0, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed is 0");
+
+                    // Process using the settings
+                    redactionAccuracy.Process(_noCancel);
+
+                    // Status should have been updated by the process
+                    status = redactionAccuracy.Status as RedactionAccuracy.RedactionAccuracyStatus;
+
+                    Assert.AreEqual(60, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed is 60");
+
+                    // Refresh from the Database to make sure the database was updated properly
+                    redactionAccuracy.RefreshStatus();
+                    status = redactionAccuracy.Status as RedactionAccuracy.RedactionAccuracyStatus;
+
+                    Assert.AreEqual(60, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed is 60");
+
+                    using (var statusCmd = connection.CreateCommand())
+                    {
+                        statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
+                        statusCmd.Parameters.AddWithValue("@DatabaseServiceID", redactionAccuracy.DatabaseServiceID);
+                        var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
+                        Assert.AreNotEqual(null, result, "A single record was returned");
+                        Assert.AreNotEqual(DBNull.Value, result["Status"], "Status is not null");
+                        Assert.AreNotEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed is not null");
+                    }
+
+                    fileProcessingDb.Clear(true);
+
+                    using (var statusCmd = connection.CreateCommand())
+                    {
+                        statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
+                        statusCmd.Parameters.AddWithValue("@DatabaseServiceID", redactionAccuracy.DatabaseServiceID);
+                        var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
+                        Assert.AreNotEqual(null, result, "A single record was returned");
+                        Assert.AreEqual(DBNull.Value, result["Status"], "Status is null");
+                        Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed is null");
+                    }
+
+                    redactionAccuracy.RefreshStatus();
+                    status = redactionAccuracy.Status as RedactionAccuracy.RedactionAccuracyStatus;
+
+                    Assert.AreEqual(0, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed is 0");
+                }
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDBName);
+            }
+        }
+
+        /// <summary>
+        /// Test the use of the IDatabase.Process command for RedactionAccuracy Service
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("ETL")]
         public static void TestRedactionAccuracyServiceProcessNoExistingData()
         {
             string testDBName = "RedactionAccuracyService_Test";
@@ -216,33 +305,13 @@ namespace Extract.ETL.Test
                 var fileProcessingDb = _testDbManager.GetDatabase(_DATABASE, testDBName);
 
                 // Create DataCaptureAccuracy object using the initialized database
-                RedactionAccuracy redactionAccuracy = new RedactionAccuracy();
-                redactionAccuracy.DatabaseName = fileProcessingDb.DatabaseName;
-                redactionAccuracy.DatabaseServer = fileProcessingDb.DatabaseServer;
+                RedactionAccuracy redactionAccuracy = CreateTestRedactionAccuracy(fileProcessingDb.DatabaseServer,
+                    fileProcessingDb.DatabaseName);
 
-                redactionAccuracy.ExpectedAttributeSetName = "DataSavedByOperator";
-                redactionAccuracy.FoundAttributeSetName = "DataFoundByRules";
-
-                // Save the record in the DatabaseService table 
-                // Build the connection string from the settings
-                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-                sqlConnectionBuild.DataSource = redactionAccuracy.DatabaseServer;
-                sqlConnectionBuild.InitialCatalog = redactionAccuracy.DatabaseName;
-
-                sqlConnectionBuild.IntegratedSecurity = true;
-                sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-                sqlConnectionBuild.MultipleActiveResultSets = true;
-
-                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                using (var connection = NewSqlConnection(redactionAccuracy.DatabaseServer, redactionAccuracy.DatabaseName))
                 {
                     connection.Open();
                     SqlCommand cmd = connection.CreateCommand();
-
-                    // Database should have one record in the DatabaseService table - not using the settings in the table
-                    cmd.CommandText = @"SELECT TOP (1) [ID] FROM [dbo].[DatabaseService]";
-        
-                    redactionAccuracy.DatabaseServiceID = (int)cmd.ExecuteScalar();
-                    //redactionAccuracy.XPathOfSensitiveAttributes = "";
 
                     // with the _cancel token there should be no results
                     Assert.Throws<ExtractException>(() => redactionAccuracy.Process(_cancel));
@@ -276,7 +345,9 @@ namespace Extract.ETL.Test
         /// <summary>
         /// Test the use of the IDatabase.Process command for DataCaptureAccuracy Service with newer data that previous run
         /// </summary>
-        [Test, Category("Automated")]
+        [Test]
+        [Category("Automated")]
+        [Category("ETL")]
         public static void TestRedactionAccuracyServiceProcessExistingData()
         {
             string testDBName = "RedactionAccuracyService_Test";
@@ -286,31 +357,13 @@ namespace Extract.ETL.Test
                 var fileProcessingDb = _testDbManager.GetDatabase(_RERUN_DATABASE, testDBName);
 
                 // Create DataCaptureAccuracy object using the initialized database
-                RedactionAccuracy redactionAccuracy = new RedactionAccuracy();
-                redactionAccuracy.DatabaseName = fileProcessingDb.DatabaseName;
-                redactionAccuracy.DatabaseServer = fileProcessingDb.DatabaseServer;
+                RedactionAccuracy redactionAccuracy = CreateTestRedactionAccuracy(fileProcessingDb.DatabaseServer, 
+                    fileProcessingDb.DatabaseName);
 
-                redactionAccuracy.FoundAttributeSetName = "DataFoundByRules";
-                redactionAccuracy.ExpectedAttributeSetName = "DataSavedByOperator";
-
-                // Build the connection string from the settings
-                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-                sqlConnectionBuild.DataSource = redactionAccuracy.DatabaseServer;
-                sqlConnectionBuild.InitialCatalog = redactionAccuracy.DatabaseName;
-
-                sqlConnectionBuild.IntegratedSecurity = true;
-                sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-                sqlConnectionBuild.MultipleActiveResultSets = true;
-
-                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                using (var connection = NewSqlConnection(redactionAccuracy.DatabaseServer, redactionAccuracy.DatabaseName))
                 {
                     connection.Open();
                     SqlCommand cmd = connection.CreateCommand();
-
-                    // Database should have one record in the DatabaseService table - not using the settings in the table
-                    cmd.CommandText = @"SELECT TOP (1) [ID] FROM [dbo].[DatabaseService]";
-
-                    redactionAccuracy.DatabaseServiceID = (int)cmd.ExecuteScalar();
 
                     // Process using the settings
                     redactionAccuracy.Process(_noCancel);
@@ -338,7 +391,9 @@ namespace Extract.ETL.Test
         /// Tests that the DataCaptureAccuracy object can save settings to a string and then 
         /// be created with that string
         /// </summary>
-        [Test, Category("Automated")]
+        [Test]
+        [Category("Automated")]
+        [Category("ETL")]
         public static void TestRedactionAccuracyGetSettingsAndLoad()
         {
             RedactionAccuracy redactionAccuracy = new RedactionAccuracy();
@@ -347,7 +402,7 @@ namespace Extract.ETL.Test
             redactionAccuracy.FoundAttributeSetName = "DataFoundByRules";
             redactionAccuracy.ExpectedAttributeSetName = "DataSavedByOperator";
             redactionAccuracy.XPathOfSensitiveAttributes = "XPath to ignore test";
-            
+
             redactionAccuracy.Description = "Test Description";
 
             string settings = redactionAccuracy.ToJson();
@@ -366,11 +421,11 @@ namespace Extract.ETL.Test
             Assert.AreEqual(redactionAccuracy.ExpectedAttributeSetName, ra.ExpectedAttributeSetName);
             Assert.AreEqual(redactionAccuracy.XPathOfSensitiveAttributes, ra.XPathOfSensitiveAttributes);
         }
-        
+
         #endregion
 
         #region Helper Methods
-        
+
         /// <summary>
         /// Compares what is in the foundResults with expected
         /// </summary>
@@ -403,8 +458,8 @@ namespace Extract.ETL.Test
                    expectedActionID: r.GetInt32(r.GetOrdinal("ExpectedActionID")))).ToList();
 
 
-            Assert.That(formattedResults.Count() == expected.Count, 
-                string.Format(CultureInfo.InvariantCulture, "Found {0} and expected {1} ", 
+            Assert.That(formattedResults.Count() == expected.Count,
+                string.Format(CultureInfo.InvariantCulture, "Found {0} and expected {1} ",
                 formattedResults.Count(), expected.Count));
 
             Assert.That(formattedResults
@@ -416,6 +471,47 @@ namespace Extract.ETL.Test
                 "Compare the actual data with the expected");
 
             foundResults.Close();
+        }
+
+        /// <summary>
+        /// Creates a RedactionAccuracy service object for use in testing, the settings are set to the DatabaseServiceID = 1
+        /// and the database gets updated to contain the objects settings in the DatabaseService table
+        /// </summary>
+        /// <param name="databaseServer">Database server to use</param>
+        /// <param name="databaseName">Database name to use</param>
+        /// <returns>A new <see cref="RedactionAccuracy"/> object that is associated with DatabaseServiceID 1 in the database</returns>
+        static RedactionAccuracy CreateTestRedactionAccuracy(string databaseServer, string databaseName)
+        {
+            RedactionAccuracy accuracy = new RedactionAccuracy
+            {
+                DatabaseServiceID = 1,
+                DatabaseName = databaseName,
+                DatabaseServer = databaseServer,
+                FoundAttributeSetName = "DataFoundByRules",
+                ExpectedAttributeSetName = "DataSavedByOperator",
+            };
+            accuracy.UpdateDatabaseServiceSettings();
+            return accuracy;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="SqlConnection"/> with the given database server and database name
+        /// </summary>
+        /// <param name="databaseServer">Database server to use</param>
+        /// <param name="databaseName">Database name to use</param>
+        /// <returns>A new <see cref="SqlConnection"/></returns>
+        static SqlConnection NewSqlConnection(string databaseServer, string databaseName)
+        {
+            // Build the connection string from the settings
+            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
+            sqlConnectionBuild.DataSource = databaseServer;
+            sqlConnectionBuild.InitialCatalog = databaseName;
+
+            sqlConnectionBuild.IntegratedSecurity = true;
+            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
+            sqlConnectionBuild.MultipleActiveResultSets = true;
+
+            return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
         #endregion
