@@ -19,6 +19,8 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
         public string RootDir { get; set; }
 
+        public int NumberOfBackupModelsToKeep { get => 0; set => throw new NotImplementedException(); }
+
         [STAThread]
         static int Main(string[] args)
         {

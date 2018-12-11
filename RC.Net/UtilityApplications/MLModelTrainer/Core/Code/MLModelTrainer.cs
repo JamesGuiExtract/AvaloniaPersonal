@@ -326,6 +326,15 @@ namespace Extract.UtilityApplications.MLModelTrainer
         /// </summary>
         public override bool Processing => _processing;
 
+        /// <summary>
+        /// The number of backups to keep for each model
+        /// </summary>
+        /// <remarks>
+        /// When this limit has been reached, the oldest backup will be deleted each time
+        /// a new version is saved
+        /// </remarks>
+        public int NumberOfBackupsToKeep => Container?.NumberOfBackupModelsToKeep ?? 0;
+
         #endregion Properties
 
         #region Constructors
@@ -418,6 +427,16 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
                     if (copyToDestination && !string.IsNullOrWhiteSpace(QualifiedModelDestination))
                     {
+                        try
+                        {
+                            BackupPreviousModel();
+                        }
+                        catch (Exception ex)
+                        {
+                            var ue = new ExtractException("ELI46572", "Error encountered backing up previous model", ex);
+                            ue.AddDebugData("Model path", QualifiedModelDestination);
+                        }
+
                         var dest = QualifiedModelDestination;
                         if (dest.EndsWith(".etf", StringComparison.OrdinalIgnoreCase))
                         {
@@ -1143,6 +1162,50 @@ namespace Extract.UtilityApplications.MLModelTrainer
                 else
                 {
                     SaveStatus(_status);
+                }
+            }
+        }
+
+        void BackupPreviousModel()
+        {
+            int maxBackups = NumberOfBackupsToKeep;
+            if (maxBackups > 0 && File.Exists(QualifiedModelDestination))
+            {
+                string nextBackupDir = DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd.HH.mm") + "UTC";
+                string path = Path.GetDirectoryName(QualifiedModelDestination);
+                string fileName = Path.GetFileName(QualifiedModelDestination);
+                string backupRoot = Path.Combine(path, "__ml_model_backups__");
+                string backupDir = Path.Combine(backupRoot, nextBackupDir);
+
+                // Backup the file
+                Directory.CreateDirectory(backupDir);
+                File.Copy(QualifiedModelDestination, Path.Combine(backupDir, fileName), true);
+
+                // Remove extra backups
+                var backups = Directory.GetDirectories(backupRoot, "*-*-*.*.*UTC")
+                    .SelectMany(dir => Directory.GetFiles(dir, fileName))
+                    .ToList();
+
+                int extraBackups = backups.Count - maxBackups;
+                if (extraBackups > 0)
+                {
+                    backups.Sort();
+                    var backupsToDelete = backups.Take(extraBackups);
+
+                    // Delete the files
+                    foreach (var file in backupsToDelete)
+                    {
+                        FileSystemMethods.DeleteFile(file);
+                    }
+
+                    // Delete any newly empty dirs
+                    foreach (var dir in backupsToDelete.Select(file => Path.GetDirectoryName(file)))
+                    {
+                        if (Directory.GetFiles(dir).Length == 0)
+                        {
+                            Directory.Delete(dir);
+                        }
+                    }
                 }
             }
         }

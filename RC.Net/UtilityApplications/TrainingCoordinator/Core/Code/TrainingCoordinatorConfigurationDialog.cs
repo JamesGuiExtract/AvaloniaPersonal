@@ -974,6 +974,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                 _minimumRecordsRequiredNumericUpDown.Value = settings.MinimumNewRecordsRequiredForTraining;
                 _deleteDataCheckBox.Checked = settings.DeleteMarkedMLData;
                 _logTextBox.Text = settings.Log;
+                _maxModelBackupsNumericUpDown.Value = Math.Max(settings.NumberOfBackupModelsToKeep, 0);
 
                 // Scroll to end of log
                 _logTextBox.SelectionStart = _logTextBox.TextLength;
@@ -1004,6 +1005,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             _settings.MinimumNewRecordsRequiredForTraining = (int)_minimumRecordsRequiredNumericUpDown.Value;
             _settings.DeleteMarkedMLData = _deleteDataCheckBox.Checked;
             _settings.Log = _logTextBox.Text;
+            _settings.NumberOfBackupModelsToKeep = (int)_maxModelBackupsNumericUpDown.Value;
         }
 
         /// <summary>
