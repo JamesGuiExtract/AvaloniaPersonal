@@ -382,7 +382,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// </summary>
         public override DatabaseServiceStatus Status
         {
-            get => _status = _status ?? GetLastOrCreateStatus(() => new TrainingDataCollectorStatus()
+            get => _status ?? GetLastOrCreateStatus(() => new TrainingDataCollectorStatus()
             {
                 LastIDProcessed = LastIDProcessed
             });

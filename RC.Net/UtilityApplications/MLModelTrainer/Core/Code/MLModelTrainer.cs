@@ -616,7 +616,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
         /// </summary>
         public override DatabaseServiceStatus Status
         {
-            get => _status = _status ?? GetLastOrCreateStatus(() => new MLModelTrainerStatus()
+            get => _status ?? GetLastOrCreateStatus(() => new MLModelTrainerStatus()
             {
                 LastIDProcessed = LastIDProcessed,
                 LastF1Score = LastF1Score,

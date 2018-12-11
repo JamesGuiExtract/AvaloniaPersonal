@@ -353,7 +353,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
         /// DatabaseServiceID when it was previously edited</remarks>
         public DatabaseServiceStatus Status
         {
-            get => _status = _status ?? GetLastOrCreateStatus(() => new TrainingCoordinatorStatus()
+            get => _status ?? GetLastOrCreateStatus(() => new TrainingCoordinatorStatus()
             {
                 Log = Log,
                 ServiceStatuses = Services.ToDictionary(
