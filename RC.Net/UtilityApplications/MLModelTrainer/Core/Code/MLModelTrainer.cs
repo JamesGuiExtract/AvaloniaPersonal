@@ -121,11 +121,6 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
         bool _processing;
         TemporaryFile _tempModelFile;
-        long _lastIDProcessed;
-        double _lastF1Score;
-        int _maximumTrainingRecords = 10000;
-        int _maximumTestingRecords = 10000;
-        MLModelTrainerStatus _status;
 
         #endregion Fields
 
@@ -162,61 +157,13 @@ namespace Extract.UtilityApplications.MLModelTrainer
         /// The ID of the last MLData record processed
         /// </summary>
         [DataMember]
-        public override long LastIDProcessed
-        {
-            get
-            {
-                if (_status != null)
-                {
-                    return _status.LastIDProcessed;
-                }
-                else
-                {
-                    return _lastIDProcessed;
-                }
-            }
-            set
-            {
-                if (_status != null)
-                {
-                    _status.LastIDProcessed = value;
-                }
-                else
-                {
-                    _lastIDProcessed = value;
-                }
-            }
-        }
+        public override long LastIDProcessed { get; set; }
 
         /// <summary>
         /// The average F1Score from the last time the testing command was successfully executed
         /// </summary>
         [DataMember]
-        public double LastF1Score
-        {
-            get
-            {
-                if (_status != null)
-                {
-                    return _status.LastF1Score;
-                }
-                else
-                {
-                    return _lastF1Score;
-                }
-            }
-            set
-            {
-                if (_status != null)
-                {
-                    _status.LastF1Score = value;
-                }
-                else
-                {
-                    _lastF1Score = value;
-                }
-            }
-        }
+        public double LastF1Score { get; set; }
 
         /// <summary>
         /// The lowest acceptable average F1 score
@@ -234,61 +181,13 @@ namespace Extract.UtilityApplications.MLModelTrainer
         /// The maximum number of MLData records that will be used for training
         /// </summary>
         [DataMember]
-        public int MaximumTrainingRecords
-        {
-            get
-            {
-                if (_status != null)
-                {
-                    return _status.MaximumTrainingRecords;
-                }
-                else
-                {
-                    return _maximumTrainingRecords;
-                }
-            }
-            set
-            {
-                if (_status != null)
-                {
-                    _status.MaximumTrainingRecords = value;
-                }
-                else
-                {
-                    _maximumTrainingRecords = value;
-                }
-            }
-        }
+        public int MaximumTrainingRecords { get; set; } = 10000;
 
         /// <summary>
         /// The maximum number of MLData records that will be used for testing
         /// </summary>
         [DataMember]
-        public int MaximumTestingRecords
-        {
-            get
-            {
-                if (_status != null)
-                {
-                    return _status.MaximumTestingRecords;
-                }
-                else
-                {
-                    return _maximumTestingRecords;
-                }
-            }
-            set
-            {
-                if (_status != null)
-                {
-                    _status.MaximumTestingRecords = value;
-                }
-                else
-                {
-                    _maximumTestingRecords = value;
-                }
-            }
-        }
+        public int MaximumTestingRecords { get; set; } = 10000;
 
         /// <summary>
         /// A comma-separated list of email addresses to notify in the event of failure/unacceptable testing result
@@ -607,6 +506,28 @@ namespace Extract.UtilityApplications.MLModelTrainer
             return ChangeAnswer(oldAnswer, newAnswer, QualifiedModelDestination, silent);
         }
 
+        /// <summary>
+        /// Updates the properties of this object using the provided <see cref="MLModelTrainerStatus"/>
+        /// </summary>
+        public override void UpdateFromStatus(DatabaseServiceStatus status)
+        {
+            try
+            {
+                if (status is MLModelTrainerStatus correctStatus)
+                {
+                    correctStatus.UpdateMLModelTrainer(this);
+                }
+                else
+                {
+                    throw new ArgumentException("MLModelTrainer.UpdateFromStatus requires a MLModelTrainerStatus");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46576");
+            }
+        }
+
         #endregion Public Methods
 
         #region IHasConfigurableDatabaseServiceStatus
@@ -616,15 +537,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
         /// </summary>
         public override DatabaseServiceStatus Status
         {
-            get => _status ?? GetLastOrCreateStatus(() => new MLModelTrainerStatus()
-            {
-                LastIDProcessed = LastIDProcessed,
-                LastF1Score = LastF1Score,
-                MaximumTrainingRecords = MaximumTrainingRecords,
-                MaximumTestingRecords = MaximumTestingRecords
-            });
-
-            set => _status = value as MLModelTrainerStatus;
+            get => new MLModelTrainerStatus(this);
         }
 
         /// <summary>
@@ -640,11 +553,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
                     && !string.IsNullOrEmpty(DatabaseServer)
                     && !string.IsNullOrEmpty(DatabaseName))
                 {
-                    _status = GetLastOrCreateStatus(() => new MLModelTrainerStatus());
-                }
-                else
-                {
-                    _status = null;
+                    UpdateFromStatus(GetLastOrCreateStatus(() => new MLModelTrainerStatus()));
                 }
             }
             catch (Exception ex)
@@ -1161,7 +1070,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
                 }
                 else
                 {
-                    SaveStatus(_status);
+                    SaveStatus(new MLModelTrainerStatus(this));
                 }
             }
         }
@@ -1254,6 +1163,55 @@ namespace Extract.UtilityApplications.MLModelTrainer
             /// </summary>
             [DataMember]
             public int MaximumTestingRecords { get; set; } = 10000;
+
+            #endregion
+
+            #region MLModelTrainerStatus Constructors
+
+            /// <summary>
+            /// Creates a new status object with default values
+            /// </summary>
+            public MLModelTrainerStatus()
+            {
+            }
+
+            /// <summary>
+            /// Creates a new status object using the values of a <see cref="MLModelTrainer"/>
+            /// </summary>
+            /// <param name="mlModelTrainer">The <see cref="MLModelTrainer"/> to copy the settings from</param>
+            public MLModelTrainerStatus(MLModelTrainer mlModelTrainer)
+            {
+                try
+                {
+                    LastIDProcessed = mlModelTrainer.LastIDProcessed;
+                    LastF1Score = mlModelTrainer.LastF1Score;
+                    MaximumTrainingRecords = mlModelTrainer.MaximumTrainingRecords;
+                    MaximumTestingRecords = mlModelTrainer.MaximumTestingRecords;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI46577");
+                }
+            }
+
+            /// <summary>
+            /// Updates a <see cref="MLModelTrainer"/> with settings from this status object
+            /// </summary>
+            /// <param name="mlModelTrainer">The <see cref="MLModelTrainer"/> to update</param>
+            public void UpdateMLModelTrainer(MLModelTrainer mlModelTrainer)
+            {
+                try
+                {
+                    mlModelTrainer.LastIDProcessed = LastIDProcessed;
+                    mlModelTrainer.LastF1Score = LastF1Score;
+                    mlModelTrainer.MaximumTrainingRecords = MaximumTrainingRecords;
+                    mlModelTrainer.MaximumTestingRecords = MaximumTestingRecords;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI46578");
+                }
+            }
 
             #endregion
 

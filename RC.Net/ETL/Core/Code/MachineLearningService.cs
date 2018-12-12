@@ -245,7 +245,7 @@ namespace Extract.ETL
         /// <summary>
         /// When overridden by a derived class, will return the current status
         /// </summary>
-        public abstract DatabaseServiceStatus Status { get; set; }
+        public abstract DatabaseServiceStatus Status { get; }
 
         /// <summary>
         /// When overridden by a derived class, will return the count of new MLData records
@@ -262,6 +262,11 @@ namespace Extract.ETL
         /// <param name="newAnswer">The new answer to change to (must not exist in the LearningMachine)</param>
         /// <param name="silent">Whether to display exceptions and messages</param>
         public abstract bool ChangeAnswer(string oldAnswer, string newAnswer, bool silent);
+
+        /// <summary>
+        /// When overridden by a derived class, will update the properties of this object using the provided <see cref="DatabaseServiceStatus"/>
+        /// </summary>
+        public abstract void UpdateFromStatus(DatabaseServiceStatus status);
 
         #endregion Abstract Methods
 

@@ -56,8 +56,6 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         #region Fields
 
         bool _processing;
-        long _lastIDProcessed;
-        TrainingDataCollectorStatus _status;
 
         #endregion Fields
 
@@ -88,31 +86,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// The last AttributeSetForFile.ID that was processed by this application
         /// </summary>
         [DataMember]
-        public override long LastIDProcessed
-        {
-            get
-            {
-                if (_status != null)
-                {
-                    return _status.LastIDProcessed;
-                }
-                else
-                {
-                    return _lastIDProcessed;
-                }
-            }
-            set
-            {
-                if (_status != null)
-                {
-                    _status.LastIDProcessed = value;
-                }
-                else
-                {
-                    _lastIDProcessed = value;
-                }
-            }
-        }
+        public override long LastIDProcessed { get; set; }
 
         /// <summary>
         /// Whether processing
@@ -373,6 +347,28 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             return ChangeAnswer(oldAnswer, newAnswer, QualifiedDataGeneratorPath, silent);
         }
 
+        /// <summary>
+        /// Updates the properties of this object using the provided <see cref="TrainingDataCollectorStatus"/>
+        /// </summary>
+        public override void UpdateFromStatus(DatabaseServiceStatus status)
+        {
+            try
+            {
+                if (status is TrainingDataCollectorStatus correctStatus)
+                {
+                    correctStatus.UpdateTrainingDataCollector(this);
+                }
+                else
+                {
+                    throw new ArgumentException("TrainingDataCollector.UpdateFromStatus requires a TrainingDataCollectorStatus");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46582");
+            }
+        }
+
         #endregion Public Methods
 
         #region IHasConfigurableDatabaseServiceStatus
@@ -380,15 +376,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// <summary>
         /// The <see cref="DatabaseServiceStatus"/> for this instance
         /// </summary>
-        public override DatabaseServiceStatus Status
-        {
-            get => _status ?? GetLastOrCreateStatus(() => new TrainingDataCollectorStatus()
-            {
-                LastIDProcessed = LastIDProcessed
-            });
-
-            set => _status = value as TrainingDataCollectorStatus;
-        }
+        public override DatabaseServiceStatus Status => new TrainingDataCollectorStatus(this);
 
         /// <summary>
         /// Refreshes <see cref="_status"/> by loading from the database, creating a new instance,
@@ -402,11 +390,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                     && !string.IsNullOrEmpty(DatabaseServer)
                     && !string.IsNullOrEmpty(DatabaseName))
                 {
-                    _status = GetLastOrCreateStatus(() => new TrainingDataCollectorStatus());
-                }
-                else
-                {
-                    _status = null;
+                    UpdateFromStatus(GetLastOrCreateStatus(() => new TrainingDataCollectorStatus()));
                 }
             }
             catch (Exception ex)
@@ -505,7 +489,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             }
             else
             {
-                SaveStatus(_status);
+                SaveStatus(new TrainingDataCollectorStatus(this));
             }
         }
 
@@ -632,13 +616,13 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         [DataContract]
         public class TrainingDataCollectorStatus : DatabaseServiceStatus
         {
-            #region MLModelTrainerStatus Constants
+            #region TrainingDataCollectorStatus Constants
 
             const int _CURRENT_VERSION = 1;
 
             #endregion
 
-            #region MLModelTrainerStatus Properties
+            #region TrainingDataCollectorStatus Properties
 
             [DataMember]
             public override int Version { get; protected set; } = _CURRENT_VERSION;
@@ -651,7 +635,50 @@ namespace Extract.UtilityApplications.TrainingDataCollector
 
             #endregion
 
-            #region MLModelTrainerStatus Serialization
+            #region TrainingDataCollectorStatus Constructors
+
+            /// <summary>
+            /// Creates a new status object with default values
+            /// </summary>
+            public TrainingDataCollectorStatus()
+            {
+            }
+
+            /// <summary>
+            /// Creates a new status object using the values of a <see cref="TrainingDataCollector"/>
+            /// </summary>
+            /// <param name="dataCollector">The <see cref="TrainingDataCollector"/> to copy the settings from</param>
+            public TrainingDataCollectorStatus(TrainingDataCollector dataCollector)
+            {
+                try
+                {
+                    LastIDProcessed = dataCollector.LastIDProcessed;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI46580");
+                }
+            }
+
+            /// <summary>
+            /// Updates a <see cref="TrainingDataCollector"/> with settings from this status object
+            /// </summary>
+            /// <param name="dataCollector">The <see cref="TrainingDataCollector"/> to update</param>
+            public void UpdateTrainingDataCollector(TrainingDataCollector dataCollector)
+            {
+                try
+                {
+                    dataCollector.LastIDProcessed = LastIDProcessed;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI46581");
+                }
+            }
+
+            #endregion
+
+            #region TrainingDataCollectorStatus Serialization
 
             /// <summary>
             /// Called after this instance is deserialized.

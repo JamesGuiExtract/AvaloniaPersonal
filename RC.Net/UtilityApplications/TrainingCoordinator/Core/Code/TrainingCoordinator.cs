@@ -24,9 +24,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
         #region Fields
 
         bool _processing;
-        TrainingCoordinatorStatus _status;
         string _log;
-        Dictionary<Guid, DatabaseServiceStatus> _serviceStatuses;
 
         #endregion Fields
 
@@ -94,25 +92,11 @@ namespace Extract.UtilityApplications.TrainingCoordinator
         {
             get
             {
-                if (_status != null)
-                {
-                    return _status.Log;
-                }
-                else
-                {
-                    return _log;
-                }
+                return _log;
             }
             set
             {
-                if (_status != null)
-                {
-                    _status.Log = value;
-                }
-                else
-                {
-                    _log = value;
-                }
+                _log = value;
                 NotifyPropertyChanged();
             }
         }
@@ -132,31 +116,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
         /// (since these do not have their own records in the DB)
         /// </summary>
         [DataMember]
-        public Dictionary<Guid,DatabaseServiceStatus> ServiceStatuses
-        {
-            get
-            {
-                if (_status != null)
-                {
-                    return _status.ServiceStatuses;
-                }
-                else
-                {
-                    return _serviceStatuses;
-                }
-            }
-            set
-            {
-                if (_status != null)
-                {
-                    _status.ServiceStatuses = value;
-                }
-                else
-                {
-                    _serviceStatuses = value;
-                }
-            }
-        }
+        public Dictionary<Guid, DatabaseServiceStatus> ServiceStatuses { get; set; }
 
         #endregion Properties
 
@@ -351,22 +311,17 @@ namespace Extract.UtilityApplications.TrainingCoordinator
         /// <remarks>This will either be the status retrieved from the database, and possibly updated,
         /// or it will be newly created using serialized properties, if this object didn't have a valid
         /// DatabaseServiceID when it was previously edited</remarks>
-        public DatabaseServiceStatus Status
-        {
-            get => _status ?? GetLastOrCreateStatus(() => new TrainingCoordinatorStatus()
+        public DatabaseServiceStatus Status =>
+            new TrainingCoordinatorStatus()
             {
                 Log = Log,
                 ServiceStatuses = Services.ToDictionary(
                     service => service.Guid,
                     service => service.Status)
-            });
-
-            set => _status = value as TrainingCoordinatorStatus;
-        }
+            };
 
         /// <summary>
-        /// Refreshes <see cref="_status"/> by loading from the database, creating a new instance,
-        /// or setting it to null (if <see cref="DatabaseServiceID"/> is less than or equal to zero)
+        /// Refreshes this instance by loading the status from the database or creating a new instance
         /// </summary>
         public void RefreshStatus()
         {
@@ -377,32 +332,23 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                     && !string.IsNullOrEmpty(DatabaseName))
                 {
                     // Get status from DB or initialize an empty object
-                    _status = GetLastOrCreateStatus(() => new TrainingCoordinatorStatus());
+                    var coordinatorStatus = GetLastOrCreateStatus(() => new TrainingCoordinatorStatus());
 
-                    // Refresh each service's status
+                    ServiceStatuses = coordinatorStatus.ServiceStatuses;
+
+                    // Refresh each service from the status object
                     if (ServiceStatuses != null)
                     {
                         foreach (var service in Services)
                         {
                             if (ServiceStatuses.TryGetValue(service.Guid, out var status))
                             {
-                                service.Status = status;
-                            }
-                            else
-                            {
-                                service.Status = null;
+                                service.UpdateFromStatus(status);
                             }
                         }
                     }
 
-                    // Set the status to be null so that it gets rebuilt out of the individual
-                    // service statuses on save. Otherwise UI edits may not be persisted
-                    _log = _status.Log;
-                    _status = null;
-                }
-                else
-                {
-                    _status = null;
+                    _log = coordinatorStatus.Log;
                 }
             }
             catch (Exception ex)
