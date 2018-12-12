@@ -105,7 +105,11 @@ namespace Extract.UtilityApplications.TrainingCoordinator.Test
             {
                 CreateDatabase();
 
-                var coordinator = new TrainingCoordinator();
+                var coordinator = new TrainingCoordinator()
+                {
+                    Log = "Hello world!"
+                };
+
                 coordinator.DataCollectors = new List<ETL.MachineLearningService>
                 {
                     new TrainingDataCollector.TrainingDataCollector
@@ -117,6 +121,15 @@ namespace Extract.UtilityApplications.TrainingCoordinator.Test
                 int id = coordinator.AddToDatabase("(local)", DBName);
 
                 string statusJson = coordinator.Status.ToJson();
+
+                // Confirm status doesn't become stale
+                // https://extract.atlassian.net/browse/ISSUE-15721
+                coordinator.DataCollectors[0].LastIDProcessed = 11;
+                var updatedStatus = coordinator.Status;
+                var updatedStatusJson = updatedStatus.ToJson();
+                Assert.AreNotEqual(statusJson, updatedStatusJson, "Status is stale!");
+
+                coordinator.SaveStatus(updatedStatus);
 
                 // Disconnect from the DB and change values
                 coordinator.DatabaseServiceID = 0;
@@ -130,7 +143,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator.Test
                 // Reconnect to the DB and confirm values are reset
                 coordinator.DatabaseServiceID = id;
                 string resetStatusJson = coordinator.Status.ToJson();
-                Assert.AreEqual(statusJson, resetStatusJson);
+                Assert.AreEqual(updatedStatusJson, resetStatusJson);
 
                 // Clear the status column
                 SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
@@ -152,11 +165,14 @@ namespace Extract.UtilityApplications.TrainingCoordinator.Test
                     }
                 }
 
-                // Refresh the status and confirm values are set back to the original values
+                // Refresh the status and confirm that the log is cleared
+                coordinator.RefreshStatus();
+                Assert.That(string.IsNullOrEmpty(coordinator.Log), "Log should be cleared when status is set to null!");
+
+                // Also confirm current behavior that the contained data collector status items are reset to previous values
                 // (This is inconsistent and called as a bug in https://extract.atlassian.net/browse/ISSUE-15505
                 // but it is arguably more useful than if the default values were used...)
-                coordinator.RefreshStatus();
-                Assert.AreEqual(5, coordinator.DataCollectors[0].LastIDProcessed);
+                Assert.AreEqual(11, coordinator.DataCollectors[0].LastIDProcessed);
 
                 // Set back to original values
                 using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
@@ -173,6 +189,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator.Test
 
                 // Refresh the status and confirm values are back to original values
                 coordinator.RefreshStatus();
+                Assert.AreEqual("Hello world!", coordinator.Log);
                 Assert.AreEqual(5, coordinator.DataCollectors[0].LastIDProcessed);
                 string resetToOriginalStatusJson = coordinator.Status.ToJson();
                 Assert.AreEqual(statusJson, resetToOriginalStatusJson);
