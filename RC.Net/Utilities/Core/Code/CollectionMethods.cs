@@ -648,6 +648,56 @@ namespace Extract.Utilities
             }
         }
 
+        /// <summary>
+        /// Converts <see paramref="ocrParameters"/> into an <see cref="IEnumerable"/>.
+        /// </summary>
+        /// <param name="ocrParameters">The <see cref="IOCRParameters"/> to convert.</param>
+        /// <returns>An <see cref="IEnumerable"/> of type <see cref="OCRParam"/>.</returns>
+        [CLSCompliant(false)]
+        public static IOCRParameters ToOCRParameters(this IEnumerable<OCRParam> ocrParameters)
+        {
+            try
+            {
+                var variantVector = new VariantVectorClass();
+                foreach (var ocrParam in ocrParameters)
+                {
+                    VariantPair keyValue = new VariantPairClass();
+                    ocrParam.Match(
+                        pair =>
+                        {
+                            keyValue.VariantKey = pair.key;
+                            keyValue.VariantValue = pair.value;
+                        },
+                        pair =>
+                        {
+                            keyValue.VariantKey = pair.key;
+                            keyValue.VariantValue = pair.value;
+                        },
+                        pair =>
+                        {
+                            keyValue.VariantKey = pair.key;
+                            keyValue.VariantValue = pair.value;
+                        },
+                        pair =>
+                        {
+                            keyValue.VariantKey = pair.key;
+                            keyValue.VariantValue = pair.value;
+                        },
+                        pair =>
+                        {
+                            keyValue.VariantKey = pair.key;
+                            keyValue.VariantValue = pair.value;
+                        });
+                    variantVector.PushBack(keyValue);
+                }
+                return variantVector;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46584");
+            }
+        }
+
         #endregion Public Methods
     }
 }

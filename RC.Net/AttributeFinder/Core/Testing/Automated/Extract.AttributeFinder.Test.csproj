@@ -246,6 +246,7 @@
     <EmbeddedResource Include="Resources\RunModeLoadTestFromOld.rsd" />
     <EmbeddedResource Include="Resources\TwoLayers.rsd" />
     <EmbeddedResource Include="Resources\insertUnderParent.rsd" />
+    <EmbeddedResource Include="Resources\GrayAreas.tif" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\A418_xpath_3_subattrs_added.voa" />

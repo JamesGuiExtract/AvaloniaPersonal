@@ -1,10 +1,12 @@
 ﻿using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_RASTERANDOCRMGMTLib;
+using OCRParam = Extract.Utilities.Union<(int key, int value), (int key, double value), (string key, int value), (string key, double value), (string key, string value)>;
 
 
 namespace Extract.AttributeFinder.Test
@@ -23,6 +25,7 @@ namespace Extract.AttributeFinder.Test
         static TestFileManager<TestOCRParameters> _testFiles;
 
         const string _A418_TIF_FILE = "Resources.A418.tif";
+        const string _GRAY_AREAS_TIF_FILE = "Resources.GrayAreas.tif";
         const string _DEFAULT_PARAMS_FILE = "Resources.defaultOCRParams.rsd";
         const string _TEST_PROPAGATION_RULESET = "Resources.TestOCRParamsPropagation.rsd";
         const string _CALL_TEST_PROPAGATION_RULESET = "Resources.CallTestOCRParamsPropagation.rsd";
@@ -357,6 +360,87 @@ namespace Extract.AttributeFinder.Test
             }
         }
 
+        /// <summary>
+        /// Test force despeckle variations on grayscale image
+        /// https://extract.atlassian.net/browse/ISSUE-15692
+        /// </summary>
+        [Test, Category("OCRParameters")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Despeckle")]
+        public static void ForceDespeckleGrayscaleImage()
+        {
+            string ussPath = null;
+            try
+            {
+                string imagePath = _testFiles.GetFile(_GRAY_AREAS_TIF_FILE);
+                string paramsPath = _testFiles.GetFile(_DEFAULT_PARAMS_FILE);
+                ussPath = imagePath + ".uss";
+                Assert.That(!File.Exists(ussPath));
+
+                int exitCode = SystemMethods.RunExecutable(
+                    _OCR_SINGLE_DOCUMENT_APPLICATION,
+                    new[] { imagePath, "/params", paramsPath },
+                    createNoWindow: true);
+
+                Assert.AreEqual(0, exitCode);
+                Assert.That(File.Exists(ussPath));
+
+                var uss = new SpatialStringClass();
+                uss.LoadFrom(ussPath, false);
+                var defaultString = uss.String;
+
+                var rsd = new RuleSetClass();
+                rsd.LoadFrom(paramsPath, false);
+                var hasParams = (IHasOCRParameters)rsd;
+                var ocrParams = hasParams.OCRParameters.ToIEnumerable().ToList();
+
+                // Set force mode to force-when-bitonal
+                ocrParams.RemoveAll(u => u.Match(kv => (EOCRParameter)kv.key == EOCRParameter.kForceDespeckleMode, _ => false, _ => false, _ => false, _ => false));
+                var forceDespeckleWhenBitonal = new OCRParam(((int)EOCRParameter.kForceDespeckleMode, (int)EForceDespeckleMode.kForceWhenBitonal));
+                ocrParams.Add(forceDespeckleWhenBitonal);
+                hasParams.OCRParameters = ocrParams.ToOCRParameters();
+                rsd.SaveTo(paramsPath, true);
+
+                exitCode = SystemMethods.RunExecutable(
+                    _OCR_SINGLE_DOCUMENT_APPLICATION,
+                    new[] { imagePath, "/params", paramsPath },
+                    createNoWindow: true);
+                Assert.AreEqual(0, exitCode);
+
+                uss.LoadFrom(ussPath, false);
+                var forceWhenBitonalString = uss.String;
+
+                Assert.AreEqual(defaultString, forceWhenBitonalString);
+
+                // Set force mode to always-force
+                ocrParams.RemoveAll(u => u.Match(kv => (EOCRParameter)kv.key == EOCRParameter.kForceDespeckleMode, _ => false, _ => false, _ => false, _ => false));
+                var alwaysDespeckle = new OCRParam(((int)EOCRParameter.kForceDespeckleMode, (int)EForceDespeckleMode.kAlwaysForce));
+                ocrParams.Add(alwaysDespeckle);
+                hasParams.OCRParameters = ocrParams.ToOCRParameters();
+                rsd.SaveTo(paramsPath, true);
+
+                exitCode = SystemMethods.RunExecutable(
+                    _OCR_SINGLE_DOCUMENT_APPLICATION,
+                    new[] { imagePath, "/params", paramsPath },
+                    createNoWindow: true);
+                Assert.AreEqual(0, exitCode);
+
+                uss.LoadFrom(ussPath, false);
+                var alwaysDespeckleString = uss.String;
+                Assert.AreNotEqual(defaultString, alwaysDespeckleString);
+                Assert.That(!string.IsNullOrWhiteSpace(alwaysDespeckleString), "USS was empty!");
+            }
+            finally
+            {
+                if (ussPath != null && File.Exists(ussPath))
+                {
+                    File.Delete(ussPath);
+                }
+
+                // Reset test file manager so that modified rsd file isn't used by other tests
+                _testFiles.Dispose();
+                _testFiles = new TestFileManager<TestOCRParameters>();
+            }
+        }
         #endregion Public Test Functions
     }
 }
