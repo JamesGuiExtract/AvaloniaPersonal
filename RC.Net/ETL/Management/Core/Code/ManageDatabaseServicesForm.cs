@@ -593,6 +593,8 @@ namespace Extract.ETL.Management
 
                 famDB.SetDBInfoSetting("ETLRestart", _EtlRestartTime.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz"), true, false);
 
+                MessageBox.Show("The enabled database services will be restarted within 30 seconds if Extract FAM Service is running.", "Restart database services", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
                 EnableButtons();
             }
             catch (Exception ex)
