@@ -1986,8 +1986,7 @@ namespace Extract.AttributeFinder.Test
         [TestCase(LearningMachineUsage.AttributeCategorization, false, Features.Attribute,    MissingData.SomeVOAFiles, FeatureRule.IfMissing, 134,     0.71,         0.5, TestName = "AttributeCategorization: Don't use attribute set for source of labels")]
         [TestCase(LearningMachineUsage.AttributeCategorization, false, Features.Attribute,    MissingData.VOA_EAVFiles, FeatureRule.IfMissing,  87,      1.0,         1.0, TestName = "AttributeCategorization: Missing some source of labels files")]
         [TestCase(LearningMachineUsage.AttributeCategorization, false, Features.Attribute,    MissingData.AllV_EFiles,  FeatureRule.IfMissing,   0,     null,        null, TestName = "AttributeCategorization: Missing all source of labels files")]
-        public static void DBAccess(
-            LearningMachineUsage usage,
+        public static void DBAccess( LearningMachineUsage usage,
             bool useASForExp,
             Features featureTypes,
             MissingData testMissingData,
@@ -2188,6 +2187,96 @@ namespace Extract.AttributeFinder.Test
                 _testDbManager.RemoveDatabase(dbName);
 
                 // Reset test files object to avoid complaints about deleted files
+                _testFiles.Dispose();
+                _testFiles = new TestFileManager<TestLearningMachine>();
+            }
+        }
+
+        [Test, Category("LearningMachine")]
+        public static void AttributeSetForFileMissingDocType()
+        {
+            var dbName = "_LMDBAccess_86102C61-BA91-476D-BD18-DFC8FC974F76";
+            try
+            {
+                string eavSuffix = ".voa";
+                string pageRange = null;
+                SetDocumentCategorizationFiles();
+                string answerPattern = "$FileOf($DirOf(<SourceDocName>))";
+
+                // Create LM
+                var inputConfig = new InputConfiguration
+                {
+                    InputPath = _inputFolder.Last(),
+                    InputPathType = InputType.Folder,
+                    AttributesPath = "",
+                    AnswerPath = answerPattern,
+                    TrainingSetPercentage = 80
+                };
+                var autoBoW = new SpatialStringFeatureVectorizer(pageRange, 5, 10000) { UseFeatureHashing = true };
+                var lm = new LearningMachine
+                {
+                    InputConfig = inputConfig,
+                    Encoder = new LearningMachineDataEncoder(LearningMachineUsage.DocumentCategorization, autoBoW),
+                    Classifier = new MulticlassSupportVectorMachineClassifier()
+                };
+                lm.ComputeEncodings();
+
+                // Remove the document type from a few of the files before adding them to the DB
+                var files = Directory.GetFiles(_inputFolder.Last(), "*.tif", SearchOption.AllDirectories);
+                var numberOfRecordsExpected = files.Length * 2; // each file gets added to training and testing data since there is only one example of each doc type
+                var afutil = new AFUtility();
+                for (int i = 0; i < files.Length; i++)
+                {
+                    if (i % 4 == 0)
+                    {
+                        numberOfRecordsExpected-=2;
+                        var eavFile = files[i] + eavSuffix;
+                        var attributes = afutil.GetAttributesFromFile(eavFile);
+                        afutil.QueryAttributes(attributes, "DocumentType", true);
+                        attributes.SaveAttributes(eavFile);
+                    }
+                }
+
+                // Create DB
+                var eavAttributeSetName = "EVOA";
+                CreateDB(dbName, eavAttributeSetName, eavSuffix);
+
+                var (training, testing) = lm.GetDataToWriteToDatabase(CancellationToken.None,
+                    "(local)", dbName, eavAttributeSetName,
+                    lowestIDToProcess: 0,
+                    highestIDToProcess: files.Length,
+                    useAttributeSetForExpected: true,
+                    runRuleSetForFeatures: false,
+                    runRuleSetIfFeaturesAreMissing: false,
+                    featureRuleSetName: null);
+
+                Assert.AreEqual(numberOfRecordsExpected, training.Count + testing.Count);
+
+                TemporaryFile trainingDataFile = new TemporaryFile(false);
+                TemporaryFile testingDataFile = new TemporaryFile(false);
+
+                File.WriteAllLines(trainingDataFile.FileName, training.Select(record =>
+                    string.Join(",", record.Select(s => s.QuoteIfNeeded("\"", ",")))));
+                File.WriteAllLines(testingDataFile.FileName, testing.Select(record =>
+                    string.Join(",", record.Select(s => s.QuoteIfNeeded("\"", ",")))));
+
+                var (trainingSet, testingSet) = lm.TrainAndTestWithCsvData(false, trainingDataFile.FileName, testingDataFile.FileName, false,
+                    _ => { }, CancellationToken.None);
+
+                var trainAcc = trainingSet.Match(gcm => gcm.OverallAgreement, cm => cm.FScore);
+                var testAcc = testingSet.Match(gcm => gcm.OverallAgreement, cm => cm.FScore);
+
+                Assert.AreEqual(1.0, trainAcc);
+                Assert.AreEqual(1.0, testAcc);
+
+                var classes = lm.Encoder.AnswerCodeToName;
+                Assert.AreEqual(0, classes.Count(name => string.IsNullOrWhiteSpace(name)));
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(dbName);
+
+                // Reset test files object to avoid issues with modified files
                 _testFiles.Dispose();
                 _testFiles = new TestFileManager<TestLearningMachine>();
             }

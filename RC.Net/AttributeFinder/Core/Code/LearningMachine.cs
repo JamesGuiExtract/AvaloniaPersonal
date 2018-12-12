@@ -1298,12 +1298,22 @@ namespace Extract.AttributeFinder
                             // so that this process doesn't log a ton of errors and/or fail at some later point
                             var imagePath = record.GetString(0);
                             var ussPath = imagePath + ".uss";
-                            if (!File.Exists(imagePath) || !File.Exists(ussPath))
+                            var imageExists = File.Exists(imagePath);
+                            var ussExists = File.Exists(ussPath);
+                            if (!imageExists || !ussExists)
                             {
+                                var ue = new ExtractException("ELI46574", "Missing ML data source file");
+                                if (!imageExists)
+                                {
+                                    ue.AddDebugData("Missing image file", imagePath);
+                                }
+                                if (!ussExists)
+                                {
+                                    ue.AddDebugData("Missing uss file", ussPath);
+                                }
+                                ue.Log();
                                 continue;
                             }
-
-                            imagePaths.Add(record.GetString(0));
 
                             if (useAttributeSetForExpected)
                             {
@@ -1319,6 +1329,17 @@ namespace Extract.AttributeFinder
                                             answer = afutil.QueryAttributes(voa, "DocumentType", false)
                                                 .ToIEnumerable<ComAttribute>()
                                                 .FirstOrDefault()?.Value.String;
+
+                                            // Skip file if no document type exists
+                                            // https://extract.atlassian.net/browse/ISSUE-15724
+                                            if (answer == null)
+                                            {
+                                                var ue = new ExtractException("ELI46575", "Missing DocumentType for ML training (file will be skipped)");
+                                                ue.AddDebugData("Image file", imagePath);
+                                                ue.AddDebugData("Attribute set name", attributeSetName);
+                                                ue.Log();
+                                                continue;
+                                            }
                                         }
                                         else
                                         {
@@ -1335,6 +1356,8 @@ namespace Extract.AttributeFinder
                                     answerVOAs.Add((byte[])answer);
                                 }
                             }
+
+                            imagePaths.Add(record.GetString(0));
                         }
                         var attributeOrAnswerCollection = getDocTypeFromVoa
                             ? new AttributeOrAnswerCollection(answers.ToArray())
