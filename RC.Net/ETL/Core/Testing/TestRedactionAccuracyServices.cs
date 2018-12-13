@@ -261,9 +261,9 @@ namespace Extract.ETL.Test
                         statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
                         statusCmd.Parameters.AddWithValue("@DatabaseServiceID", redactionAccuracy.DatabaseServiceID);
                         var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
-                        Assert.AreNotEqual(null, result, "A single record was returned");
-                        Assert.AreNotEqual(DBNull.Value, result["Status"], "Status is not null");
-                        Assert.AreNotEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed is not null");
+                        Assert.AreNotEqual(null, result, "A single record should be returned");
+                        Assert.AreNotEqual(DBNull.Value, result["Status"], "Status should not be null");
+                        Assert.AreNotEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should not be null");
                     }
 
                     fileProcessingDb.Clear(true);
@@ -273,15 +273,15 @@ namespace Extract.ETL.Test
                         statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
                         statusCmd.Parameters.AddWithValue("@DatabaseServiceID", redactionAccuracy.DatabaseServiceID);
                         var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
-                        Assert.AreNotEqual(null, result, "A single record was returned");
-                        Assert.AreEqual(DBNull.Value, result["Status"], "Status is null");
-                        Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed is null");
+                        Assert.AreNotEqual(null, result, "A single should be returned");
+                        Assert.AreEqual(DBNull.Value, result["Status"], "Status should be null");
+                        Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should be null");
                     }
 
                     redactionAccuracy.RefreshStatus();
                     status = redactionAccuracy.Status as RedactionAccuracy.RedactionAccuracyStatus;
 
-                    Assert.AreEqual(0, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed is 0");
+                    Assert.AreEqual(0, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 0");
                 }
             }
             finally
