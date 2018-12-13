@@ -273,7 +273,14 @@ namespace Extract.ETL
                         cmd.Parameters.Add("@MachineName", SqlDbType.NVarChar, 50).Value = Environment.MachineName;
                         cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
                         cmd.Parameters.AddWithValue("@ActiveFAMID", _activeFAMID);
-                        cmd.Parameters.AddWithValue("@NextScheduledRunTime", Schedule?.GetNextOccurrence());
+                        if (Schedule?.GetNextOccurrence() is DateTime nextOccurrence)
+                        {
+                            cmd.Parameters.AddWithValue("@NextScheduledRunTime", nextOccurrence);
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@NextScheduledRunTime", DBNull.Value);
+                        }
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected < 1)
                         {
@@ -325,8 +332,14 @@ namespace Extract.ETL
                         }
                         cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
                         cmd.Parameters.AddWithValue("@ActiveFAMID", _activeFAMID);
-                        cmd.Parameters.AddWithValue("@NextScheduledRunTime", Schedule?.GetNextOccurrence());
-
+                        if (Schedule?.GetNextOccurrence() is DateTime nextOccurrence)
+                        {
+                            cmd.Parameters.AddWithValue("@NextScheduledRunTime", nextOccurrence);
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@NextScheduledRunTime", DBNull.Value);
+                        }
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected < 1)
                         {
@@ -390,7 +403,14 @@ namespace Extract.ETL
                         cmd.Parameters.AddWithValue("@ActiveFAMID", activeFamID);
                         cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
                         cmd.Parameters.Add("@MachineName", SqlDbType.NVarChar, 50).Value = Environment.MachineName;
-                        cmd.Parameters.AddWithValue("@NextScheduledRunTime", Schedule?.GetNextOccurrence());
+                        if (Schedule?.GetNextOccurrence() is DateTime nextOccurrence)
+                        {
+                            cmd.Parameters.AddWithValue("@NextScheduledRunTime", nextOccurrence);
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@NextScheduledRunTime", DBNull.Value);
+                        }
                         cmd.ExecuteNonQuery();
                         _activeFAMID = activeFamID;
                     }
