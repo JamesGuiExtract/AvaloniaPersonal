@@ -177,7 +177,7 @@ namespace Extract.ETL.Test
         [TestCase("AD7F3F3F-20EC-4830-B014-EC118F6D4567", 6, TestName = "Redaction: Verify sensitive data")]
         public static void TestDocumentVerificationRatesServiceProcess(string taskGuid, int taskClassID)
         {
-            string testDBName = "TestDocumentVerificationRatesService_Test";
+            string testDBName = taskGuid + "_Test";
             try
             {
                 var fileProcessingDb = CreateTestDatabase(testDBName);

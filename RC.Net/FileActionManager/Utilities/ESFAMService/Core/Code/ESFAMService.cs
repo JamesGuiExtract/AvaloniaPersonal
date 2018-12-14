@@ -980,8 +980,12 @@ namespace Extract.FileActionManager.Utilities
 
                         foreach (var etl in etlArguments)
                         {
-                            _databaseServiceManagers.Add(
-                                new DatabaseServiceManager(etl.FileName, _etlDatabaseServer, _etlDatabaseName, etlProcesses, etl.NumberOfInstances));
+                            string etlName = etl.FileName.Replace("ETL:", "").Trim();
+                            if (etl.FileName == "ETL" || _listOfEnabledServices.Contains(etlName, StringComparer.CurrentCultureIgnoreCase))
+                            {
+                                _databaseServiceManagers.Add(
+                                    new DatabaseServiceManager(etl.FileName, _etlDatabaseServer, _etlDatabaseName, etlProcesses, etl.NumberOfInstances));
+                            }
                         }
                     }
                     catch (ThreadAbortException)
@@ -1001,49 +1005,65 @@ namespace Extract.FileActionManager.Utilities
             // if the etlDatabaseServer and etlDatabaseName is not configured there is no way to poll for ETL changes
             if (!string.IsNullOrEmpty(_etlDatabaseServer) && !string.IsNullOrEmpty(_etlDatabaseName))
             {
-                if (_etlFAMDB is null || _etlFAMDB.DatabaseServer != _etlDatabaseServer || _etlFAMDB.DatabaseName != _etlDatabaseName)
+                new Thread(() =>
                 {
-                    _etlFAMDB = new FileProcessingDB();
-                    _etlFAMDB.DatabaseName = _etlDatabaseName;
-                    _etlFAMDB.DatabaseServer = _etlDatabaseServer;
-                }
-                
-                _checkForETLChangesTimer?.Dispose();
-                _checkForETLChangesTimer = null;
-
-                _checkForETLChangesTimer = new System.Timers.Timer(30000);
-                _checkForETLChangesTimer.Elapsed += (o, e) =>
-                {
-                    try
+                    // if _stopProcessing is set return without starting the DatabaseServiceManagers
+                    if (WaitHandle.WaitAny(new WaitHandle[] { _startThreads, _stopProcessing }) == 1)
                     {
-                        _checkForETLChangesTimer.Stop();
-
-                        string restartSetting = _etlFAMDB.GetDBInfoSetting("ETLRestart", false);
-                        DateTime restartTime;
-                        if (!DateTime.TryParse(restartSetting, out restartTime))
-                        {
-                            ExtractException restartInvalid = new ExtractException("ELI46424", 
-                                "ETLRestart value in DBInfo should be a date time string");
-                            restartInvalid.AddDebugData("ETLRestart", restartSetting, false);
-                            throw restartInvalid;
-                        }
-                        
-                        if (restartTime <= _lastETLStart)
-                        {
-                            _checkForETLChangesTimer.Start();
-                            return;
-                        }
-
-                        StopAndRestartETL();
+                        return;
                     }
-                    catch (Exception ex)
+
+                    if (_etlFAMDB is null || _etlFAMDB.DatabaseServer != _etlDatabaseServer || _etlFAMDB.DatabaseName != _etlDatabaseName)
                     {
-                        ex.ExtractLog("ELI46302");
+                        if (_etlFAMDB != null)
+                        {
+                            _etlFAMDB.RecordFAMSessionStop();
+                            _etlFAMDB.UnregisterActiveFAM();
+                            _etlFAMDB.CloseAllDBConnections();
+                            _etlFAMDB = null;
+                        }
+                        _etlFAMDB = new FileProcessingDB();
+                        _etlFAMDB.DatabaseName = _etlDatabaseName;
+                        _etlFAMDB.DatabaseServer = _etlDatabaseServer;
                     }
-                };
-                _checkForETLChangesTimer.Start();
-                _etlFAMDB.RecordFAMSessionStart("ETL Polling", string.Empty, false, false);
-                _etlFAMDB.RegisterActiveFAM();
+
+                    _checkForETLChangesTimer?.Dispose();
+                    _checkForETLChangesTimer = null;
+
+                    _checkForETLChangesTimer = new System.Timers.Timer(30000);
+                    _checkForETLChangesTimer.Elapsed += (o, e) =>
+                    {
+                        try
+                        {
+                            _checkForETLChangesTimer.Stop();
+
+                            string restartSetting = _etlFAMDB.GetDBInfoSetting("ETLRestart", false);
+                            DateTime restartTime;
+                            if (!DateTime.TryParse(restartSetting, out restartTime))
+                            {
+                                ExtractException restartInvalid = new ExtractException("ELI46424",
+                                    "ETLRestart value in DBInfo should be a date time string");
+                                restartInvalid.AddDebugData("ETLRestart", restartSetting, false);
+                                throw restartInvalid;
+                            }
+
+                            if (restartTime <= _lastETLStart)
+                            {
+                                _checkForETLChangesTimer.Start();
+                                return;
+                            }
+
+                            StopAndRestartETL();
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractLog("ELI46302");
+                        }
+                    };
+                    _checkForETLChangesTimer.Start();
+                    _etlFAMDB.RecordFAMSessionStart("ETL Polling", string.Empty, false, false);
+                    _etlFAMDB.RegisterActiveFAM();
+                }).Start();
             }
         }
 
