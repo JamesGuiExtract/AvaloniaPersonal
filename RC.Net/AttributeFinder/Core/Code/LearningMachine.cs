@@ -950,13 +950,13 @@ namespace Extract.AttributeFinder
 
                 var (trainingData, testingData) = CombineFeatureVectorsAndAnswers(featureVectors, answerCodes, ussPathsPerExample, updateStatus, cancellationToken);
 
-                if (trainingData.Any())
+                if (trainingData != null)
                 {
                     var trainingCsv = CsvOutputFile + ".train.csv";
                     File.WriteAllLines(trainingCsv, trainingData.Select(l => string.Join(",", l.Select(f => f.QuoteIfNeeded("\"", ",")))));
                 }
 
-                if (testingData.Any())
+                if (testingData != null)
                 {
                     var testingCsv = CsvOutputFile + ".test.csv";
                     File.WriteAllLines(testingCsv, testingData.Select(l => string.Join(",", l.Select(f => f.QuoteIfNeeded("\"", ",")))));
@@ -1044,7 +1044,7 @@ namespace Extract.AttributeFinder
                 }
 
                 var (trainingData, testingData) = CombineFeatureVectorsAndAnswers(featureVectors, answerCodes, ussPathsPerExample, _ => { }, cancelToken);
-                return (trainingData.ToArray(), testingData.ToArray());
+                return (trainingData?.ToArray() ?? new IList<string>[0], testingData?.ToArray() ?? new IList<string>[0]);
             }
             catch (Exception ex)
             {
@@ -1458,8 +1458,11 @@ namespace Extract.AttributeFinder
 
             var trainingData = trainInputs != null && trainInputs.Any()
                 ? zip(trainFiles, trainFileIndices, trainInputs, trainOutputs, "training")
-                : new List<List<string>>(0);
-            var testingData = zip(testFiles, testFileIndices, testInputs, testOutputs, "testing");
+                : null;
+
+            var testingData = testInputs != null && testInputs.Any()
+                ? zip(testFiles, testFileIndices, testInputs, testOutputs, "testing")
+                : null;
 
             return (trainingData, testingData);
         }
