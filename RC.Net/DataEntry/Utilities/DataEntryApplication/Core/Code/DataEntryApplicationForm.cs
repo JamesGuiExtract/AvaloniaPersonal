@@ -4118,7 +4118,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _imageViewer.CloseImage();
 
                 // Record statistics to database that need to happen when a file is closed.
-                RecordCounts(onLoad: false, attributes: null);
+                // Null check because ReorderAccordingToPagination may triggered an abort of processing of a document
+                // before a FileTaskSession was started.
+                if (_fileTaskSessionID != null)
+                {
+                    RecordCounts(onLoad: false, attributes: null);
+                }
                 EndFileTaskSession();
 
                 OnFileComplete(_fileId, processingResult);
@@ -4596,7 +4601,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         "database manager has not been initialized!", _dataEntryDatabaseManager != null);
 
                     ExtractException.Assert("ELI39701",
-                        "Cannot record counts; there is not active FileTaskSession.",
+                        "Cannot record counts; there is not an active FileTaskSession.",
                         _fileTaskSessionID != null);
 
                     if (onLoad)
