@@ -971,6 +971,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 RaiseVerificationException("ELI23871", ex, true);
+
+                // https://extract.atlassian.net/browse/ISSUE-15728
+                // Ensure the file task session for this file is ended if it was started.
+                if (_fileTaskSessionID != null)
+                {
+                    EndFileTaskSession();
+                }
             }
             finally
             {
