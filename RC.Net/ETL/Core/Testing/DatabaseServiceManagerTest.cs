@@ -266,10 +266,10 @@ namespace Extract.ETL.Test
         public static void DatabaseServiceTestNonRecurringSchedule(int minutes, bool completeWithException)
         {
             string testDBName = "DatabaseServiceTestFutureSchedule_test";
+            UCLID_FILEPROCESSINGLib.FileProcessingDB fileProcessingDb = null;
             try
             {
-                // This is only used to initialize the database used for calculating the stats
-                var fileProcessingDb = _testDbManager.GetDatabase("Resources.ExpandAttributes.bak", testDBName);
+                fileProcessingDb = _testDbManager.GetDatabase("Resources.ExpandAttributes.bak", testDBName);
 
                 TestDatabaseService testDatabaseService = new TestDatabaseService();
                 testDatabaseService.DatabaseName = fileProcessingDb.DatabaseName;
@@ -412,6 +412,7 @@ namespace Extract.ETL.Test
             }
             finally
             {
+                fileProcessingDb.UnregisterActiveFAM();
                 _testDbManager.RemoveDatabase(testDBName);
             }
         }
