@@ -3178,7 +3178,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         }
 
                         AttributeMethods.TranslateAttributesToNewDocument(
-                            attributesCopy, e.OutputFileName, pageMap, newSpatialPageInfos);
+                            attributesCopy, e.OutputFileName, pageMap, e.RotatedPages, newSpatialPageInfos);
 
                         attributesCopy.SaveTo(e.OutputFileName + ".voa", false,
                             _ATTRIBUTE_STORAGE_MANAGER_GUID);
@@ -5126,7 +5126,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     attributesCopy.ReportMemoryUsage();
 
                     AttributeMethods.TranslateAttributesToNewDocument(
-                        attributesCopy, e.OutputFileName, pageMap, newSpatialPageInfos);
+                        attributesCopy, e.OutputFileName, pageMap, e.RotatedPages, newSpatialPageInfos);
 
                     attributesCopy.SaveTo(e.OutputFileName + ".voa", false,
                         _ATTRIBUTE_STORAGE_MANAGER_GUID);
