@@ -385,7 +385,9 @@ namespace Extract.DataEntry
                 // Register to be notified when the user selects a new document type.
                 if (_documentTypeConfigurations != null)
                 {
-                    _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeSelectedIndexChanged;
+                    _documentTypeComboBox.DropDownClosed += HandleDocumentTypeDropDownClosed;
+                    _documentTypeComboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
+                    _documentTypeComboBox.AutoCompleteMode = AutoCompleteMode.Suggest;
                 }
             }
             catch (Exception ex)
@@ -979,12 +981,12 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the <see cref="ComboBox.SelectedIndexChanged"/> event for the
+        /// Handles the <see cref="ComboBox.DropDownClosed"/> event for the
         /// _documentTypeComboBox.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        void HandleDocumentTypeSelectedIndexChanged(object sender, EventArgs e)
+        void HandleDocumentTypeDropDownClosed(object sender, EventArgs e)
         {
             try
             {
