@@ -107,7 +107,8 @@ namespace WebAPI.Models
         {
             // Try first to look up an instance that was specificially associated with apiContext.
             FileApi availableInstance =
-                _interfaces.FirstOrDefault(instance => apiContext.SessionId.Equals(instance.SessionId));
+                _interfaces.FirstOrDefault(instance =>
+                    !instance.InUse && apiContext.SessionId.Equals(instance.SessionId));
 
             // If that fails, look for an instance set up for apiContext's DB and workflow that has not
             // been tied to a different context.
