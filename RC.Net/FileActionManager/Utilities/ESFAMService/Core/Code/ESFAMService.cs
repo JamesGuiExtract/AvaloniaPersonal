@@ -1,3 +1,4 @@
+using Extract.ETL;
 using Extract.FileActionManager.Database;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -980,8 +981,10 @@ namespace Extract.FileActionManager.Utilities
 
                         foreach (var etl in etlArguments)
                         {
-                            string etlName = etl.FileName.Replace("ETL:", "").Trim();
-                            if (etl.FileName == "ETL" || _listOfEnabledServices.Contains(etlName, StringComparer.CurrentCultureIgnoreCase))
+                            string etlName = etl.FileName.Replace("ETL:", string.Empty).Trim();
+                            if (etl.FileName == "ETL" || _listOfEnabledServices
+                                .Select(s => DatabaseService.FromJson(s).Description)
+                                .Contains(etlName, StringComparer.CurrentCultureIgnoreCase))
                             {
                                 _databaseServiceManagers.Add(
                                     new DatabaseServiceManager(etl.FileName, _etlDatabaseServer, _etlDatabaseName, etlProcesses, etl.NumberOfInstances));
