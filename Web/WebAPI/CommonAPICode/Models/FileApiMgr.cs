@@ -26,14 +26,15 @@ namespace WebAPI.Models
         /// <returns>a FileApi instance</returns>
         static public FileApi GetInterface(ApiContext apiContext, ClaimsPrincipal sessionOwner = null)
         {
-            FileApi fileApi = null;
-
-            try
+            // Lock around whole method to prevent modifying a fileApi object, via AbortSession(), that has been claimed by another thread
+            lock (_lock)
             {
-                HTTPError.Assert("ELI46389", apiContext != null, "empty API context used");
+                FileApi fileApi = null;
 
-                lock (_lock)
+                try
                 {
+                    HTTPError.Assert("ELI46389", apiContext != null, "empty API context used");
+
                     Int32.TryParse(sessionOwner?.GetClaim("FAMSessionId"), out int requestedFAMSessionId);
 
                     fileApi = FindAvailable(apiContext);
@@ -58,7 +59,7 @@ namespace WebAPI.Models
                     else
                     {
                         fileApi = new FileApi(apiContext, setInUse: true);
-                        
+
                         // If a FAM session was requested but a new instance had to be created, abort the old session.
                         if (requestedFAMSessionId > 0)
                         {
@@ -72,29 +73,30 @@ namespace WebAPI.Models
                     }
 
                     return fileApi;
+
                 }
-            }
-            catch (HTTPError re)
-            {
-                // fileApi session is already aborted.
-                throw re;
-            }
-            catch (ExtractException ee)
-            {
-                fileApi?.AbortSession();
+                catch (HTTPError re)
+                {
+                    // fileApi session is already aborted.
+                    throw re;
+                }
+                catch (ExtractException ee)
+                {
+                    fileApi?.AbortSession();
 
-                throw new ExtractException("ELI43343", ee.Message, ee);
-            }
-            catch (Exception ex)
-            {
-                fileApi?.AbortSession();
+                    throw new ExtractException("ELI43343", ee.Message, ee);
+                }
+                catch (Exception ex)
+                {
+                    fileApi?.AbortSession();
 
-                var ee = ex.AsExtract("ELI42160");
-                ee.AddDebugData("FileAPI factory failed for workflow:", apiContext.WorkflowName, encrypt: false);
-                ee.AddDebugData("database server name", apiContext.DatabaseServerName, encrypt: false);
-                ee.AddDebugData("database name", apiContext.DatabaseName, encrypt: false);
+                    var ee = ex.AsExtract("ELI42160");
+                    ee.AddDebugData("FileAPI factory failed for workflow:", apiContext.WorkflowName, encrypt: false);
+                    ee.AddDebugData("database server name", apiContext.DatabaseServerName, encrypt: false);
+                    ee.AddDebugData("database name", apiContext.DatabaseName, encrypt: false);
 
-                throw ee;
+                    throw ee;
+                }
             }
         }
 

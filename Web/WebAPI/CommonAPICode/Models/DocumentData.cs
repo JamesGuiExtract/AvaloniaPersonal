@@ -96,15 +96,12 @@ namespace WebAPI.Models
             // Allow the fileApi object to be reused by clearing the InUse flag.
             if (_fileApi != null)
             {
+
+                // Since the previous test seemed backwards but maybe was intentional,
+                // I'm removing the test altogether and just calling EndSession() - Nat
+                _fileApi.EndSession();
+
                 _fileApi.InUse = false;
-
-                // If a FAMSession was not started, end the session so this instance
-                // can be used by others.
-                if (_fileApi.FAMSessionId == 0)
-                {
-                    _fileApi.EndSession();
-                }
-
                 _fileApi = null;
             }
         }
@@ -131,6 +128,7 @@ namespace WebAPI.Models
             catch (Exception ex)
             {
                 FileApi.AbortSession();
+                _fileApi = null;
 
                 throw ex.AsExtract("ELI45225");
             }
@@ -391,11 +389,6 @@ namespace WebAPI.Models
             {
                 AssertRequestFileId("ELI46349", fileId);
 
-                var results = GetAttributeSetForFile(fileId);
-                var attribute = new AttributeClass() { Name = "Update"};
-                attribute.Value.ReplaceAndDowngradeToNonSpatial(inputData.ToString());
-                results.PushBack(attribute);
-
                 string fileName = AttributeDbMgr.FAMDB.GetFileNameFromFileID(fileId);
                 var translator = new AttributeTranslator(fileName, inputData);
 
@@ -417,11 +410,6 @@ namespace WebAPI.Models
             try
             {
                 AssertRequestFileId("ELI46350", fileId);
-
-                var results = GetAttributeSetForFile(fileId);
-                var attribute = new AttributeClass() { Name = "Update" };
-                attribute.Value.ReplaceAndDowngradeToNonSpatial(patchData.ToString());
-                results.PushBack(attribute);
 
                 var existingData = GetAttributeSetForFile(fileId);
                 string fileName = AttributeDbMgr.FAMDB.GetFileNameFromFileID(fileId);

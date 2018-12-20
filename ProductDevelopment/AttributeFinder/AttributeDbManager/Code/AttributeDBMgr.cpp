@@ -1535,7 +1535,11 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 			// Get the connection for the thread and save it locally.
 			ipConnection = getDBConnection();
 
+			TransactionGuard tg( ipConnection, adXactReadCommitted, __nullptr );
+
 			auto strQuery( GetQueryForAttributeSetForFile( fileID, attributeSetName, relativeIndex ) );
+
+			tg.CommitTrans();
 
 #ifdef UNCOMPRESSED_STREAM
 			FieldsPtr ipFields = GetFieldsForQuery( strQuery, ipConnection );
@@ -1547,15 +1551,29 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 
 #ifdef COMPRESSED_STREAM
 			FieldsPtr ipFields = GetFieldsForQuery( strQuery, ipConnection );
+			ASSERT_RESOURCE_ALLOCATION("ELI46595", ipFields != __nullptr);
 
-			CComSafeArray<BYTE> saData;
-			saData.Attach(ipFields->GetItem("VOA")->GetValue().parray);
+			FieldPtr ipVOAPtr = ipFields->GetItem("VOA");
+			ASSERT_RESOURCE_ALLOCATION("ELI46596", ipVOAPtr != __nullptr);
 
-			CComSafeArray<BYTE> saData2;
-			saData2.Attach(ZipUtil::DecompressAttributes(saData));
+			variant_t vtValue = ipVOAPtr->GetValue();
+			IIUnknownVectorPtr ipAttributes;
+			if (vtValue.vt == VT_NULL)
+			{
+				ipAttributes.CreateInstance(CLSID_IUnknownVector);
+				ASSERT_RESOURCE_ALLOCATION("ELI46597", ipAttributes != __nullptr);
+			}
+			else
+			{
+				CComSafeArray<BYTE> saData;
+				saData.Attach(vtValue.Detach().parray);
 
-			IIUnknownVectorPtr ipAttributes = readObjFromSAFEARRAY(saData2);
-			ASSERT_RESOURCE_ALLOCATION("ELI39172", ipAttributes != __nullptr);
+				CComSafeArray<BYTE> saData2;
+				saData2.Attach(ZipUtil::DecompressAttributes(saData));
+
+				ipAttributes = readObjFromSAFEARRAY(saData2);
+				ASSERT_RESOURCE_ALLOCATION("ELI39172", ipAttributes != __nullptr);
+			}
 
 			*ppAttributes = ipAttributes.Detach();
 #endif
@@ -1729,7 +1747,7 @@ ADODB::_ConnectionPtr CAttributeDBMgr::getDBConnection(bool bReset)
 	}
 
 	// Check if the connection should be reset
-	if (bReset)
+	if (bReset && m_ipDBConnection != __nullptr)
 	{
 		// if the database is not closed close it
 		if (m_ipDBConnection->State != adStateClosed)

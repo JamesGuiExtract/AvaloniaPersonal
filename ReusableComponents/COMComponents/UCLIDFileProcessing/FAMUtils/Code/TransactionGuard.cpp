@@ -98,8 +98,8 @@ TransactionGuard::~TransactionGuard()
 
 	try
 	{
-		// Restore the connection isolation level to the ADO default of adXactChaos.
-		m_ipConnection->IsolationLevel = adXactChaos;
+		// Restore the connection isolation level to the ADO default of adXactReadCommitted.
+		m_ipConnection->IsolationLevel = adXactReadCommitted;
 		
 		m_ipConnection = __nullptr;
 	}

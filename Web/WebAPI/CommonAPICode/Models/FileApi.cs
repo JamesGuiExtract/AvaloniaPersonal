@@ -246,7 +246,6 @@ namespace WebAPI.Models
             {
                 _sessionId = null;
                 _apiContext.FAMSessionId = 0;
-                InUse = false;
 
                 try
                 {
@@ -267,6 +266,11 @@ namespace WebAPI.Models
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI46253");
+            }
+            finally
+            {
+                // Unset InUse last so this can't be claimed by another thread before we are done aborting the session
+                InUse = false;
             }
         }
 
