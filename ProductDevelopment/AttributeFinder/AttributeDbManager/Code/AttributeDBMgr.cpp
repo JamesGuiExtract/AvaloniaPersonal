@@ -37,7 +37,7 @@ namespace
 	// WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
 	const string gstrSCHEMA_VERSION_NAME = "AttributeCollectionSchemaVersion";
 	const string gstrDESCRIPTION = "Attribute database manager";
-	const long glSCHEMA_VERSION = 7;
+	const long glSCHEMA_VERSION = 8;
 	const long dbSchemaVersionWhenAttributeCollectionWasIntroduced = 129;
 
 
@@ -216,9 +216,17 @@ namespace
 		return queries;
 	}
 
+	VectorOfString GetSchema_v8(bool bAddUserTables)
+	{
+		VectorOfString queries = GetSchema_v7(bAddUserTables);
+		queries.push_back(gstrCREATE_DESTFILE_WITH_INCLUDES_INDEX);
+
+		return queries;
+	}
+
 	VectorOfString GetCurrentSchema(bool bAddUserTables = true)
 	{
-		return GetSchema_v7(bAddUserTables);
+		return GetSchema_v8(bAddUserTables);
 	}
 
 
@@ -457,7 +465,7 @@ namespace
 			}
 
 			vector<string> queries;
-			queries.push_back(gstrCREATE_REPORTING_HIM_STATS);
+			queries.push_back(gstrCREATE_REPORTING_HIM_STATS_V7);
 			queries.push_back(gstrCREATE_FAMUSERID_WITH_INCLUDES_INDEX);
 
 			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
@@ -470,6 +478,36 @@ namespace
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46055");
 
+	}
+	//-------------------------------------------------------------------------------------------------
+	int UpdateToSchemaVersion8(_ConnectionPtr ipConnection, long* pnNumSteps)
+	{
+		try
+		{
+			const int nNewSchemaVersion = 8;
+
+			if (pnNumSteps != __nullptr)
+			{
+				*pnNumSteps += 1;
+				return nNewSchemaVersion;
+			}
+
+			vector<string> queries;
+			queries.push_back("ALTER TABLE [dbo].[ReportingHIMStats] ADD [ID][int] IDENTITY(1,1) NOT NULL");
+			queries.push_back("ALTER TABLE [dbo].[ReportingHIMStats] DROP CONSTRAINT [PK_ReportingHIMStats]");
+			queries.push_back("ALTER TABLE [dbo].[ReportingHIMStats] ALTER COLUMN [PaginationID] [int] NULL");
+			queries.push_back("ALTER TABLE [dbo].[ReportingHIMStats] ADD CONSTRAINT [PK_ReportingHIMStats] PRIMARY KEY CLUSTERED(ID)");
+			queries.push_back(gstrCREATE_DESTFILE_WITH_INCLUDES_INDEX);
+
+			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
+			long saveCommandTimeout = ipConnection->CommandTimeout;
+			ipConnection->CommandTimeout = 0;
+			executeVectorOfSQL(ipConnection, queries);
+			ipConnection->CommandTimeout = saveCommandTimeout;
+
+			return nNewSchemaVersion;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46594");
 	}
 }
 
@@ -841,6 +879,13 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 				break;
 
 			case 7:
+				if (nFAMDBSchemaVersion == 171)
+				{
+					*pnProdSchemaVersion = UpdateToSchemaVersion8(ipConnection, pnNumSteps);
+				}
+				break;
+
+			case 8:
 				break;
 
 			default:

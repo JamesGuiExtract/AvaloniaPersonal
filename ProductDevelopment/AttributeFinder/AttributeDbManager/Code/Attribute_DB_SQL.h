@@ -335,9 +335,23 @@ static const std::string gstrCREATE_REPORTING_REDACTION_ACCURACY_FOUND_FAMUSERID
 
 static const std::string gstrREPORTING_HIM_STATS_TABLE = "ReportingHIMStats";
 
-static const std::string gstrCREATE_REPORTING_HIM_STATS =
+static const std::string gstrCREATE_REPORTING_HIM_STATS_V7 =
 "CREATE TABLE[dbo].[ReportingHIMStats]( "
 "	[PaginationID][int] NOT NULL CONSTRAINT [PK_ReportingHIMStats] PRIMARY KEY CLUSTERED, "
+"	[FAMUserID][int] NOT NULL, "
+"	[SourceFileID][int] NOT NULL, "
+"	[DestFileID][int] NULL, "
+"	[OriginalFileID][int] NOT NULL, "
+"	[DateProcessed][date] NULL, "
+"	[ActionID][int] NULL, "
+"	[FileTaskSessionID][int] NOT NULL, "
+"	[ActionName][nvarchar](50) NOT NULL "
+"	)";
+
+static const std::string gstrCREATE_REPORTING_HIM_STATS =
+"CREATE TABLE[dbo].[ReportingHIMStats]( "
+"	[ID][int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_ReportingHIMStats] PRIMARY KEY CLUSTERED, "
+"	[PaginationID][int] NULL , "
 "	[FAMUserID][int] NOT NULL, "
 "	[SourceFileID][int] NOT NULL, "
 "	[DestFileID][int] NULL, "
@@ -352,4 +366,8 @@ static const std::string gstrCREATE_FAMUSERID_WITH_INCLUDES_INDEX =
 "CREATE NONCLUSTERED INDEX [IX_ReportingHIMStats_FAMUserID_With_Includes] "
 "ON[dbo].[ReportingHIMStats]([FAMUserID], [DateProcessed]) "
 "INCLUDE([SourceFileID], [DestFileID], [OriginalFileID], [ActionName]) ";
+
+static const std::string gstrCREATE_DESTFILE_WITH_INCLUDES_INDEX =
+"CREATE NONCLUSTERED INDEX[IX_ReportingHIMStats_DestFileID] ON[dbo].[ReportingHIMStats] "
+"([DestFileID]	) INCLUDE([FAMUserID], [SourceFileID], [OriginalFileID], [DateProcessed], [ActionID], [ActionName])";
 

@@ -63,15 +63,15 @@ namespace Extract.ETL
             [OnDeserialized]
             void OnDeserialized(StreamingContext context)
             {
-                if (Version > CURRENT_VERSION)
+                if (Version > _CURRENT_VERSION)
                 {
                     ExtractException ee = new ExtractException("ELI46063", "Settings were saved with a newer version.");
                     ee.AddDebugData("SavedVersion", Version, false);
-                    ee.AddDebugData("CurrentVersion", CURRENT_VERSION, false);
+                    ee.AddDebugData("CurrentVersion", _CURRENT_VERSION, false);
                     throw ee;
                 }
 
-                Version = CURRENT_VERSION;
+                Version = _CURRENT_VERSION;
             }
 
             #endregion
@@ -262,12 +262,20 @@ namespace Extract.ETL
                     if (_status.LastFileTaskSessionIDProcessed == 0)
                     {
                         using (var deleteCmd = connection.CreateCommand())
+                        using (var scope = new TransactionScope(TransactionScopeOption.Required,
+                            new TransactionOptions()
+                            {
+                                IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
+                                Timeout = TransactionManager.MaximumTimeout
+                            },
+                            TransactionScopeAsyncFlowOption.Enabled))
                         {
                             deleteCmd.CommandTimeout = 0;
                             deleteCmd.CommandText = "DELETE FROM ReportingRedactionAccuracy WHERE DatabaseServiceID = @DatabaseServiceID";
                             deleteCmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
                             var task = deleteCmd.ExecuteNonQueryAsync();
                             task.Wait(cancelToken);
+                            scope.Complete();
                         }
                     }
                 }

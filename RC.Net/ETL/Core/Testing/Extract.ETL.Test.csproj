@@ -55,6 +55,7 @@
     <Compile Include="TestRedactionAccuracyServices.cs" />
     <Compile Include="TestAttributeExpander.cs" />
     <Compile Include="DatabaseServiceManagerTest.cs" />
+    <Compile Include="TestHIMStatsService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
@@ -171,6 +172,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Test1000.bak" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\HIMStatsDB.bak" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
