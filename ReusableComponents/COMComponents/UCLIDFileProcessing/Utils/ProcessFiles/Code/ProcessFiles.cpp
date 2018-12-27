@@ -69,7 +69,7 @@ const string gstrCUSTOMTAGS_DB_FILE = "CustomTags.sdf";
 //-------------------------------------------------------------------------------------------------
 void usage()
 {
-	string strUsage =	"Usage: ProcessFiles.exe [OPTIONS]\n"
+	string strUsage =	"Usage: ProcessFiles.exe [FPSFile] [OPTIONS]\n"
 						"OPTIONS:\n"
 						"/r - register .fps files to open by default with ProcessFiles.exe then exit\n"
 						"/u - unregister .fps files to not open with ProcessFiles.exe then exit\n"

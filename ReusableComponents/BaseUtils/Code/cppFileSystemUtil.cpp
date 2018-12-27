@@ -1132,26 +1132,16 @@ string getRelativeFileName(const string& strParentFile, const string& strAbsolut
 //--------------------------------------------------------------------------------------------------
 string buildAbsolutePath(const string& strFileOrDirPath)
 {
-	// check to see if this is an absolute path or relative path
-	if (!isAbsolutePath(strFileOrDirPath))
-	{
-		// relative path, build absolute path relative to current directory
-		string strNewPath = getCurrentDirectory();
-		strNewPath += "\\" + strFileOrDirPath;
-		simplifyPathName(strNewPath);
+	char full[_MAX_PATH];
 
-		return strNewPath;
-	}
-    else if (strFileOrDirPath.find_first_of("..") != string::npos)
-    {
-        string strSimple = strFileOrDirPath;
-        simplifyPathName(strSimple);
-        return strSimple;
-    }
-	else
+	if (_fullpath(full, strFileOrDirPath.c_str(), _MAX_PATH) == NULL)
 	{
-		return strFileOrDirPath;
+		UCLIDException ue("ELI46599", "Invalid path.");
+		ue.addDebugInfo("Input path", strFileOrDirPath);
+		throw ue;
 	}
+
+	return full;
 }
 //--------------------------------------------------------------------------------------------------
 string getTextFileContentsAsString(const string& strTextFileName)
@@ -1626,8 +1616,8 @@ int getLongPathName(const string& strShortPath, string& strLongPath)
 //--------------------------------------------------------------------------------------------------
 bool isAbsolutePath(const string& strFileOrFolderName)
 {
-	return (strFileOrFolderName.find(":") == 1 ||
-		strFileOrFolderName.find("\\\\") == 0);
+	return (strFileOrFolderName.find(":\\") == 1
+		|| strFileOrFolderName.find("\\\\") == 0);
 }
 //--------------------------------------------------------------------------------------------------
 string getCurrentDirectory()
