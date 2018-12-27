@@ -292,7 +292,7 @@ STDMETHODIMP CIDShieldTester::get_OutputFileDirectory(BSTR *pVal)
 		// Check license
 		validateLicense();
 
-		*pVal = _bstr_t(m_strOutputFileDirectory.c_str());
+		*pVal = _bstr_t(m_strOutputFileDirectory.c_str()).Detach();
 
 		return S_OK;
 	}

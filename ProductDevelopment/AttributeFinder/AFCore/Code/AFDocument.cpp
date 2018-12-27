@@ -483,7 +483,7 @@ STDMETHODIMP CAFDocument::GetCurrentRSDFileDir(BSTR *pstrRSDFileDir)
 	{
 		if (m_ipRSDFileStack == __nullptr || m_ipRSDFileStack->Size == 0)
 		{
-			*pstrRSDFileDir = _bstr_t("");
+			*pstrRSDFileDir = _bstr_t("").Detach();
 
 			return S_OK;
 		}

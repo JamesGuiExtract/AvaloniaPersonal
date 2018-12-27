@@ -348,7 +348,7 @@ STDMETHODIMP CSpotRecognitionWindow::raw_GetText(BSTR strID, BSTR *pstrText)
 			stdstrText += "\r\n" + getSpotRecognitionDlg()->getZoneEntityText(ids[i]);
 		}
 
-		*pstrText = _bstr_t(stdstrText.c_str());
+		*pstrText = _bstr_t(stdstrText.c_str()).Detach();
 
 		return S_OK;
 	}

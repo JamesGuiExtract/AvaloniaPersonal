@@ -11240,7 +11240,7 @@ bool CFileProcessingDB::GetWorkflowStatusAllFiles_Internal(bool bDBLocked, BSTR 
 				strStatusListing += strStatusString;
 			}
 
-			*pbstrStatusListing = get_bstr_t(strStatusListing.c_str());
+			*pbstrStatusListing = get_bstr_t(strStatusListing.c_str()).Detach();
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46410");
 	}
