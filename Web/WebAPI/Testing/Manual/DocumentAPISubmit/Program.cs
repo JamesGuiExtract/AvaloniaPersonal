@@ -23,6 +23,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
             string userName = null;
             string pwd = null;
             int pollingInterval = 10000;
+            TimeSpan minTimeToRun = TimeSpan.FromMinutes(15);
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -65,6 +66,10 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                         case "POLLINT":
                             pollingInterval = int.Parse(args[++i]);
                             continue;
+
+                        case "MINTIME":
+                            minTimeToRun = TimeSpan.Parse(args[++i]);
+                            continue;
                     }
                 }
 
@@ -99,29 +104,50 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
             var t = new Stopwatch();
             t.Start();
 
-            var files = Directory.EnumerateFiles(root, "*.*", SearchOption.AllDirectories)
-                .Where(f =>
-                {
-                    var ext = Path.GetExtension(f).ToUpperInvariant();
-                    return ext == ".PDF" || ext == ".TIF";
-                });
-
-            // Process files with only one task working on any particular file
-            int tasksStarted2 = 0;
-            int tasksCompleted2 = 0;
-            for (int i = 0; i < 50; i++)
+            IEnumerable<string> GetFiles(params string[] extensions)
             {
-                var (tasksStarted, tasksCompleted) = ProcessAll(docClient, workflowClient, files, batchSize, pollingInterval, false, RunTests).GetAwaiter().GetResult();
-                tasksStarted2 += tasksStarted;
-                tasksCompleted2 += tasksCompleted;
+                var extSet = new HashSet<string>(extensions, StringComparer.OrdinalIgnoreCase);
+                var files = Directory.EnumerateFiles(root, "*.*", SearchOption.AllDirectories);
+                foreach (var file in files)
+                {
+                    var ext = Path.GetExtension(file);
+                    if (extSet.Contains(ext))
+                    {
+                        yield return file;
+                    }
+                }
             }
 
-            // Process files where random files in the valid range are processed (so that it is possible that the same
-            // file is processed by multiple threads at a time)
-           // var (tasksStarted2, tasksCompleted2) = ProcessAll(docClient, workflowClient, files, batchSize, pollingInterval, true, RunTests).GetAwaiter().GetResult();
+            int totalTasksStarted = 0;
+            int totalTasksCompleted = 0;
 
-            Log(FormattableString.Invariant($"Total tasks started: {tasksStarted2}"));
-            Log(FormattableString.Invariant($"Total tasks completed: {tasksCompleted2}"));
+            // Cache text file enumeration because otherwise the list grow exponentially
+            string[] textFiles = null;
+            while(t.Elapsed < minTimeToRun)
+            {
+                // Process files with only one task working on any particular file
+                var (tasksStarted, tasksCompleted) = ProcessAll(docClient, workflowClient, GetFiles(".tif", ".pdf"), batchSize, pollingInterval, false, RunTests).GetAwaiter().GetResult();
+                totalTasksStarted += tasksStarted;
+                totalTasksCompleted += tasksCompleted;
+
+                textFiles = textFiles ?? GetFiles(".txt").ToArray();
+                (tasksStarted, tasksCompleted) = ProcessAll(docClient, workflowClient, textFiles, batchSize, pollingInterval, false, RunTests).GetAwaiter().GetResult();
+                totalTasksStarted += tasksStarted;
+                totalTasksCompleted += tasksCompleted;
+
+                // Process files where random files in the valid range are processed (so that it is possible that the same
+                // file is processed by multiple threads at a time)
+                (tasksStarted, tasksCompleted) = ProcessAll(docClient, workflowClient, GetFiles(".tif", ".pdf"), batchSize, pollingInterval, true, RunTests).GetAwaiter().GetResult();
+                totalTasksStarted += tasksStarted;
+                totalTasksCompleted += tasksCompleted;
+
+                (tasksStarted, tasksCompleted) = ProcessAll(docClient, workflowClient, textFiles, batchSize, pollingInterval, true, RunTests).GetAwaiter().GetResult();
+                totalTasksStarted += tasksStarted;
+                totalTasksCompleted += tasksCompleted;
+            }
+
+            Log(FormattableString.Invariant($"Total tasks started: {totalTasksStarted}"));
+            Log(FormattableString.Invariant($"Total tasks completed: {totalTasksCompleted}"));
 
             Log("Time elapsed: " + t.Elapsed);
         }
@@ -168,14 +194,14 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                     if (processRandomFileIDs
                         && finished.Exception.InnerExceptions
                             .OfType<SwaggerException>()
-                            .Any(ex => ex.Response.Contains("File not in the workflow")))
+                            .Any(ex => ex.Response.Contains("File not in the workflow") || ex.Response.Contains("Attribute not found")))
                     {
                         Log("Exception about deleted file caught while processing random IDs");
                         tasksCompleted++;
                     }
                     else
                     {
-                        Log(FormattableString.Invariant($"FAILURE {finished.Exception}"), true);
+                        Log(FormattableString.Invariant($"FAILURE at {DateTime.Now} {finished.Exception}"), true);
                     }
                 }
                 else
@@ -195,28 +221,36 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
 
         static async Task RunTests(int id, string fileName, DocumentClient docClient, WorkflowClient workflowClient, int pollingInterval)
         {
+            bool fileIsText = Path.GetExtension(fileName).Equals(".txt", StringComparison.OrdinalIgnoreCase);
             DocumentDataResult origData = null;
+            bool docDataExists = false;
+            string text = " ";
+
+            void ResetStateVars()
+            {
+                docDataExists = false;
+            }
 
             async Task GetDataTest()
             {
-                origData = null;
+                DocumentDataResult data = null;
                 int attempts = 0;
 
                 Naive:
                 Log(FormattableString.Invariant($"Naive attempt {++attempts} for {fileName}"));
                 try
                 {
-                    origData = await docClient.GetDocumentDataAsync(id);
+                    data = await docClient.GetDocumentDataAsync(id);
                 }
                 catch (Exception)
                 {
                     Log(FormattableString.Invariant($"Naive attempt {attempts} failed with exception"));
-                    origData = null;
+                    data = null;
                     if (attempts < 10)
                         goto Naive;
                 }
 
-                if (origData != null)
+                if (data != null)
                 {
                     Log("Successful naive get-data for " + fileName);
                 }
@@ -225,9 +259,11 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                     await Log("Waiting for " + fileName, async () =>
                         await PollForCompletion(docClient, id, pollingInterval));
 
-                    origData = await Log("Getting data " + fileName, async () =>
+                    data = await Log("Getting data " + fileName, async () =>
                         await docClient.GetDocumentDataAsync(id));
                 }
+
+                origData = data;
 
                 Log("Writing " + fileName + ".json", () =>
                     File.WriteAllText(fileName + ".json", origData.ToJson()));
@@ -235,48 +271,57 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
 
             async Task PatchDataTest()
             {
-                var attr = origData.Attributes.FirstOrDefault();
-                if (attr != null)
+                try
                 {
-                    var attrPatch = new DocumentAttributePatch(attr) { Operation = PatchOperation.Update };
-                    attrPatch.Name = "Blah";
-                    var patch = new DocumentDataPatch
+                    var attr = origData.Attributes.FirstOrDefault();
+                    if (attr != null)
                     {
-                        Attributes = new[] { attrPatch }
-                    };
+                        var attrPatch = new DocumentAttributePatch(attr) { Operation = PatchOperation.Update };
+                        attrPatch.Name = "Blah";
+                        var patch = new DocumentDataPatch
+                        {
+                            Attributes = new[] { attrPatch }
+                        };
 
-                    await Log("Patching " + fileName, async () =>
-                        await docClient.PatchDocumentDataAsync(id, patch));
+                        await Log("Patching " + fileName, async () =>
+                            await docClient.PatchDocumentDataAsync(id, patch));
 
-                    var patchedData = await Log("Getting patched data for " + fileName, async () =>
-                        await docClient.GetDocumentDataAsync(id));
+                        var patchedData = await Log("Getting patched data for " + fileName, async () =>
+                            await docClient.GetDocumentDataAsync(id));
 
-                    var newName = fileName + ".patched.json";
-                    Log("Writing " + newName, () =>
-                        File.WriteAllText(newName, patchedData.ToJson()));
+                        var newName = fileName + ".patched.json";
+                        Log("Writing " + newName, () =>
+                            File.WriteAllText(newName, patchedData.ToJson()));
+                    }
+                    else
+                    {
+                        Log(FormattableString.Invariant($"WWWWWHHHHHHATTTT! WHY NO ATTR? File: {fileName}"), true);
+                    }
                 }
-                else
+                catch (SwaggerException ex) when (!docDataExists && ex.Response.Contains("Attribute not found"))
                 {
-                    Log(FormattableString.Invariant($"WWWWWHHHHHHATTTT! WHY NO ATTR? File: {fileName}"), true);
+                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
                 }
             }
 
-            async Task WipeDataTest()
+            async Task ClearDataTest()
             {
                 var input = new DocumentDataInput
                 {
                     Attributes = new DocumentAttribute[0]
                 };
 
-                await Log("Wiping out data for " + fileName, async () =>
+                await Log("Clearing out data for " + fileName, async () =>
                     await docClient.PutDocumentDataAsync(id, input));
 
-                var wipedData = await Log("Getting wiped data for " + fileName, async () =>
+                var clearedData = await Log("Getting cleared data for " + fileName, async () =>
                     await docClient.GetDocumentDataAsync(id));
 
-                var newName = fileName + ".wiped.json";
+                var newName = fileName + ".cleared.json";
                 Log("Writing " + newName, () =>
-                    File.WriteAllText(newName, wipedData.ToJson()));
+                    File.WriteAllText(newName, clearedData.ToJson()));
+
+                docDataExists = false;
             }
 
             async Task RestoreDataTest()
@@ -295,6 +340,8 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                 var newName = fileName + ".restored.json";
                 Log("Writing " + newName, () =>
                     File.WriteAllText(newName, restoredData.ToJson()));
+
+                docDataExists = true;
             }
 
             async Task DeleteDocumentTest()
@@ -303,56 +350,232 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                     await docClient.DeleteDocumentAsync(id));
             }
 
-            await GetDataTest();
-            await PatchDataTest();
-            await WipeDataTest();
-            await RestoreDataTest();
+            async Task GetDocumentTest()
+            {
+                var file = await Log("Getting document from " + fileName, async () =>
+                    await docClient.GetDocumentAsync(id));
+
+                using (var ms = new MemoryStream())
+                {
+                    file.Stream.CopyTo(ms);
+
+                    var origInfo = new FileInfo(fileName);
+                    if (origInfo.Length != ms.Length)
+                    {
+                        throw new Exception("Retrieved file size differs from original file size!");
+                    }
+                }
+            }
+
+            async Task GetDocumentTypeTest()
+            {
+                var docType = await Log("Getting document type from " + fileName, async () =>
+                    await docClient.GetDocumentTypeAsync(id));
+            }
+
+            async Task GetOutputFileTest()
+            {
+                var file = await Log("Getting output file for " + fileName, async () =>
+                    await docClient.GetOutputFileAsync(id));
+            }
+
+            int pageCount = 0;
+            async Task GetPageInfoTest()
+            {
+                var info = await Log("Getting page info for " + fileName, async () =>
+                    await docClient.GetPageInfoAsync(id));
+
+                if (info.PageCount == 0 || info.PageCount != info.PageInfos.Count)
+                {
+                    throw new Exception("Unexpected discrepency in page info counts");
+                }
+
+                pageCount = info.PageCount;
+            }
+
+            async Task GetPageZonesTest()
+            {
+                var pageNum = Math.Max(pageCount, 1);
+                var zones = await Log(FormattableString.Invariant($"Getting page text from page {pageCount} of {fileName}"), async () =>
+                    await docClient.GetPageWordZonesAsync(id, pageNum));
+            }
+
+            async Task GetOutputTextTest()
+            {
+                var textResult = await Log("Getting output text from " + fileName, async () =>
+                    await docClient.GetOutputTextAsync(id));
+
+                text = string.Join("\r\n\r\n", textResult.Pages.Select(p => p.Text));
+                Log("Writing output text from " + fileName, () =>
+                    File.WriteAllText(fileName + ".output.txt", text));
+            }
+
+            async Task GetPageTextTest()
+            {
+                // Use either first or last page, depending on whether GetPageInfoTest has been run already
+                var pageNum = Math.Max(pageCount, 1);
+
+                var textResult = await Log(FormattableString.Invariant($"Getting page text from page {pageNum} of {fileName}"), async () =>
+                    await docClient.GetPageTextAsync(id, pageNum));
+
+                text = textResult.Pages.Single().Text;
+                Log(FormattableString.Invariant($"Writing page {pageNum} text from {fileName}"), () =>
+                    File.WriteAllText(FormattableString.Invariant($"{fileName}.page{pageNum}.txt"), text));
+            }
+
+            async Task GetTextTest()
+            {
+                var textResult = await Log(FormattableString.Invariant($"Getting text from {fileName}"), async () =>
+                    await docClient.GetTextAsync(id));
+
+                text = string.Join("\r\n\r\n", textResult.Pages.Select(p => p.Text));
+                Log("Writing text from " + fileName, () =>
+                    File.WriteAllText(fileName + ".document.txt", text));
+            }
+
+            async Task PostTextTest()
+            {
+                // Currently posting an empty string is an error so ensure there is at least one character
+                var textSubmittedIDResult = await Log(FormattableString.Invariant($"Posting text from {fileName}"), async () =>
+                    await docClient.PostTextAsync(text ?? " "));
+            }
+
+            async Task GetDocumentStatusesTest()
+            {
+                var docStatuses = await Log("Getting workflow document statuses", workflowClient.GetDocumentStatusesAsync);
+            }
+
+            async Task GetWorkflowStatusTest()
+            {
+                var status = await Log("Getting workflow status", workflowClient.GetWorkflowStatusAsync);
+            }
+
+
+            var generalTests = new List<(Func<Task> test, string description)>
+            {
+                (GetDataTest, "getting data from"),
+                (GetDocumentTest, "getting document from"),
+                (GetDocumentTypeTest, "getting document type from"),
+                (GetOutputFileTest, "getting output file for"),
+                (GetPageTextTest, "getting page text from"),
+                (GetPageZonesTest, "getting page zones from"),
+                (GetTextTest, "getting text from"),
+                (GetOutputTextTest, "getting output text from"),
+            };
+
+            var imageOnlyTests = new List<(Func<Task> test, string description)>
+            {
+                (GetPageInfoTest, "getting page info for"),
+                (PatchDataTest, "patching data to"), // TODO: This should work for text
+                (RestoreDataTest, "restoring data to"), // TODO: This should work for text
+                (ClearDataTest, "clearing data from"), // TODO: This should work for text
+            };
+
+            var testsNotRequiringDocument = new List<(Func<Task> test, string description)>
+            {
+                (PostTextTest, "posting text from"),
+                (GetDocumentStatusesTest, "getting document statuses for "),
+                (GetWorkflowStatusTest, "getting workflow status for "),
+            };
+
+            var allButDelete = generalTests.Concat(imageOnlyTests).Concat(testsNotRequiringDocument).ToList();
+
+            // Randomly sort but make sure GetDataTest comes first so that origData has a value
+            Random rng = new Random();
+            allButDelete.Sort((x, y) =>
+            {
+                if (x.test == GetDataTest)
+                {
+                    return -1;
+                }
+                else if (y.test == GetDataTest)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return rng.Next(-1, 2);
+                }
+            });
+
+            Log(FormattableString.Invariant($"{DateTime.Now}: file: {fileName}, ID: {id}, test order: {string.Join("|", allButDelete.Select(t => SimpleName(t.test)))}"));
+
+            foreach (var pair in allButDelete)
+            {
+                bool failBecauseText = fileIsText && imageOnlyTests.Contains(pair);
+                try
+                {
+                    await pair.test();
+                    if (failBecauseText)
+                    {
+                        throw new Exception(FormattableString.Invariant($"Lack of exception {pair.description} posted text! File: {fileName}"));
+                    }
+                }
+                catch (SwaggerException) when (failBecauseText)
+                {
+                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(FormattableString.Invariant($"Unexpected exception caught running {SimpleName(pair.test)} on {fileName}"), ex);
+                }
+            }
+
+            ResetStateVars();
 
             await DeleteDocumentTest();
-            try
-            {
-                await RestoreDataTest();
-                throw new Exception("Expected an exception restoring data to deleted file!");
-            }
-            catch (SwaggerException ex) when (ex.Response.Contains("File not in the workflow"))
-            {
-                Log("Expected exception caught");
-            }
 
-            try
+            allButDelete.Sort((x, y) => rng.Next(-1, 2));
+            Log(FormattableString.Invariant($"After deleting: file: {fileName}, ID: {id}, test order: {string.Join("+", allButDelete.Select(t => SimpleName(t.test)))}"));
+            foreach (var pair in allButDelete)
             {
-                await PatchDataTest();
-                throw new Exception("Expected an exception patching data to deleted file!");
-            }
-            catch (SwaggerException ex) when (ex.Response.Contains("File not in the workflow"))
-            {
-                Log("Expected exception caught");
-            }
+                bool failWhenDeleted = !testsNotRequiringDocument.Contains(pair);
+                bool failBecauseText = fileIsText && imageOnlyTests.Contains(pair);
+                try
+                {
+                    await pair.test();
 
-            try
-            {
-                await GetDataTest();
-                throw new Exception("Expected an exception getting data from a deleted file!");
-            }
-            catch (SwaggerException ex) when (ex.Response.Contains("File not in the workflow"))
-            {
-                Log("Expected exception caught");
+                    if (failWhenDeleted)
+                    {
+                        throw new Exception(FormattableString.Invariant($"Lack of exception {pair.description} deleted file! File: {fileName}"));
+                    }
+                    if (failBecauseText)
+                    {
+                        throw new Exception(FormattableString.Invariant($"Lack of exception {pair.description} posted text! File: {fileName}"));
+                    }
+                }
+                catch (SwaggerException ex) when (failBecauseText || failWhenDeleted && ex.Response.Contains("File not in the workflow"))
+                {
+                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
+                }
+                catch (SwaggerException ex)
+                {
+                    throw new Exception(FormattableString.Invariant($"Unexpected post-deletion exception caught running {SimpleName(pair.test)} on {fileName}"), ex);
+                }
             }
         }
 
-
-        static async Task<(string fileName, int id)> PostAsync(DocumentClient client, string filename)
+        static async Task<(string fileName, int id)> PostAsync(DocumentClient client, string fileName)
         {
-            using (var stream = File.OpenRead(filename))
+            DocumentIdResult result;
+
+            if (Path.GetExtension(fileName).Equals(".txt", StringComparison.OrdinalIgnoreCase))
             {
-                var file = new FileParameter(stream, filename);
-                var result = await client.PostDocumentAsync(file);
-                var output = DateTime.Now.ToLongTimeString() + " Created: " + result.Id;
-
-                Log(output);
-
-                return (filename, result.Id);
+                var text = File.ReadAllText(fileName);
+                result = await client.PostTextAsync(text ?? " ");
             }
+            else
+            {
+                using (var stream = File.OpenRead(fileName))
+                {
+                    var file = new FileParameter(stream, fileName);
+                    result = await client.PostDocumentAsync(file);
+                }
+            }
+
+            Log(DateTime.Now.ToLongTimeString() + " Created: " + result.Id);
+
+            return (fileName, result.Id);
         }
 
         static async Task PollForCompletion(DocumentClient client, int id, int pollingInterval = 10000)
@@ -423,6 +646,11 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
             Trace.WriteLine("Done " + message.Substring(0, 1).ToLower() + message.Substring(1));
 
             return ret;
+        }
+
+        public static string SimpleName<T>(Func<T> func)
+        {
+            return func.Method.Name.Split(new[] { '_', '|' })[2];
         }
     }
 
