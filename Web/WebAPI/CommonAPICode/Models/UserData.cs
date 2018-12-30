@@ -76,10 +76,6 @@ namespace WebAPI.Models
             {
                 throw ex.AsExtract("ELI43409");
             }
-            finally
-            {
-                _fileApi.InUse = false;
-            }
         }
     }
 }
