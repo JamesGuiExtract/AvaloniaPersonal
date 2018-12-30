@@ -12,6 +12,8 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
 {
     class Program
     {
+        static Func<Task> _login;
+
         static void Main(string[] args)
         {
             string root = ".";
@@ -24,6 +26,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
             string pwd = null;
             int pollingInterval = 10000;
             TimeSpan minTimeToRun = TimeSpan.FromMinutes(15);
+            string workflow = null;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -70,13 +73,21 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                         case "MINTIME":
                             minTimeToRun = TimeSpan.Parse(args[++i]);
                             continue;
+
+                        case "WORKFLOW":
+                            workflow = args[++i];
+                            continue;
                     }
                 }
 
                 root = arg;
             }
 
-            HttpClient client = new HttpClient();
+            HttpClient client = new HttpClient
+            {
+                // Set timeout to be higher than default to avoid the occasional TaskCanceledExceptions
+                Timeout = TimeSpan.FromMinutes(5)
+            };
             url = url ?? File.ReadAllText(urlFile).Trim();
             client.BaseAddress = new Uri(url);
 
@@ -92,14 +103,24 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                 var user = new User()
                 {
                     Username = userName,
-                    Password = pwd
+                    Password = pwd,
+                    WorkflowName = workflow
                 };
-                var tokenResult = userClient.LoginAsync(user).GetAwaiter().GetResult();
-                token = tokenResult.Access_token;
-            }
 
-            token = token ?? File.ReadAllText(tokenFile).Trim();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                _login = async () =>
+                {
+                    var tokenResult = await userClient.LoginAsync(user);
+                    token = tokenResult.Access_token;
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                };
+
+                _login().GetAwaiter().GetResult();
+            }
+            else
+            {
+                token = token ?? File.ReadAllText(tokenFile).Trim();
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
 
             var t = new Stopwatch();
             t.Start();
@@ -223,12 +244,14 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
         {
             bool fileIsText = Path.GetExtension(fileName).Equals(".txt", StringComparison.OrdinalIgnoreCase);
             DocumentDataResult origData = null;
-            bool docDataExists = false;
+            bool docDataAllExist = false;
             string text = " ";
+            int docDataCount = 0;
 
             void ResetStateVars()
             {
-                docDataExists = false;
+                docDataAllExist = false;
+                docDataCount = 0;
             }
 
             async Task GetDataTest()
@@ -264,12 +287,13 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                 }
 
                 origData = data;
+                docDataCount = origData.Attributes.Count;
 
                 Log("Writing " + fileName + ".json", () =>
                     File.WriteAllText(fileName + ".json", origData.ToJson()));
             }
 
-            async Task PatchDataTest()
+            async Task PatchDataUpdateTest()
             {
                 try
                 {
@@ -298,7 +322,117 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                         Log(FormattableString.Invariant($"WWWWWHHHHHHATTTT! WHY NO ATTR? File: {fileName}"), true);
                     }
                 }
-                catch (SwaggerException ex) when (!docDataExists && ex.Response.Contains("Attribute not found"))
+                catch (SwaggerException ex) when (!docDataAllExist && ex.Response.Contains("Attribute not found"))
+                {
+                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
+                }
+            }
+
+            async Task PatchDataDeleteTest()
+            {
+                try
+                {
+                    var attr = origData.Attributes.FirstOrDefault();
+                    if (attr != null)
+                    {
+                        var attrPatch = new DocumentAttributePatch
+                        {
+                            ID = attr.ID,
+                            Operation = PatchOperation.Delete
+                        };
+
+                        var patch = new DocumentDataPatch
+                        {
+                            Attributes = new[] { attrPatch }
+                        };
+
+                        await Log("Delete-patching " + fileName, async () =>
+                            await docClient.PatchDocumentDataAsync(id, patch));
+
+                        var patchedData = await Log("Getting patched data for " + fileName, async () =>
+                            await docClient.GetDocumentDataAsync(id));
+
+                        docDataAllExist = false;
+                        docDataCount--;
+
+                        if (patchedData.Attributes.Count != docDataCount)
+                        {
+                            throw new Exception("Delete patch had no effect!");
+                        }
+                    }
+                }
+                catch (SwaggerException ex) when (!docDataAllExist && ex.Response.Contains("Attribute not found"))
+                {
+                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
+                }
+            }
+
+            async Task PatchDataCreateTest()
+            {
+                try
+                {
+                    var attrPatch = new DocumentAttributePatch
+                    {
+                        ConfidenceLevel = "High",
+                        HasPositionInfo = false,
+                        ID = Guid.NewGuid().ToString(),
+                        Name = "MyName",
+                        Type = "SSN",
+                        Value = "123-12-1234",
+                        Operation = PatchOperation.Create
+                    };
+
+                    var patch = new DocumentDataPatch
+                    {
+                        Attributes = new[] { attrPatch }
+                    };
+
+                    await Log("Create-patching " + fileName, async () =>
+                        await docClient.PatchDocumentDataAsync(id, patch));
+
+                    var patchedData = await Log("Getting patched data for " + fileName, async () =>
+                        await docClient.GetDocumentDataAsync(id));
+
+                    docDataCount++;
+
+                    if (patchedData.Attributes.Count != docDataCount)
+                    {
+                        throw new Exception(FormattableString.Invariant(
+                            $"Create patch had no effect! Expecting {docDataCount} attributes but got {patchedData.Attributes.Count}"));
+                    }
+                }
+                catch (SwaggerException ex) when (!docDataAllExist && ex.Response.Contains("Attribute not found"))
+                {
+                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
+                }
+            }
+
+            async Task PatchBadDataTest()
+            {
+                try
+                {
+                    var attrPatch = new DocumentAttributePatch
+                    {
+                        ConfidenceLevel = "High",
+                        HasPositionInfo = false,
+                        ID = Guid.NewGuid().ToString(),
+                        Name = "MyName",
+                        Type = "SSN",
+                        Value = "123-12-1234",
+                        Operation = PatchOperation.Update
+                    };
+
+                    var patch = new DocumentDataPatch
+                    {
+                        Attributes = new[] { attrPatch }
+                    };
+
+                    await Log("Patching " + fileName, async () =>
+                        await docClient.PatchDocumentDataAsync(id, patch));
+
+                    throw new Exception("Lack of exception patch-updating non-existent attribute");
+                }
+                catch (SwaggerException ex) when (ex.Response.Contains("Attribute not found"))
                 {
                     Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
                 }
@@ -311,17 +445,20 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                     Attributes = new DocumentAttribute[0]
                 };
 
-                await Log("Clearing out data for " + fileName, async () =>
+                await Log("Clearing data for " + fileName, async () =>
                     await docClient.PutDocumentDataAsync(id, input));
 
                 var clearedData = await Log("Getting cleared data for " + fileName, async () =>
                     await docClient.GetDocumentDataAsync(id));
 
-                var newName = fileName + ".cleared.json";
-                Log("Writing " + newName, () =>
-                    File.WriteAllText(newName, clearedData.ToJson()));
+                docDataCount = 0;
+                if (clearedData.Attributes.Count != docDataCount)
+                {
+                    throw new Exception(FormattableString.Invariant(
+                        $"Clear data had no effect! Expecting 0 attributes but got {clearedData.Attributes.Count}"));
+                }
 
-                docDataExists = false;
+                docDataAllExist = false;
             }
 
             async Task RestoreDataTest()
@@ -337,11 +474,14 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                 var restoredData = await Log("Getting restored data for " + fileName, async () =>
                     await docClient.GetDocumentDataAsync(id));
 
-                var newName = fileName + ".restored.json";
-                Log("Writing " + newName, () =>
-                    File.WriteAllText(newName, restoredData.ToJson()));
+                docDataCount = origData.Attributes.Count;
+                docDataAllExist = true;
 
-                docDataExists = true;
+                if (restoredData.Attributes.Count != docDataCount)
+                {
+                    throw new Exception(FormattableString.Invariant(
+                        $"Restore data failed! Expecting {docDataCount} attributes but got {restoredData.Attributes.Count}"));
+                }
             }
 
             async Task DeleteDocumentTest()
@@ -450,6 +590,10 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                 var status = await Log("Getting workflow status", workflowClient.GetWorkflowStatusAsync);
             }
 
+            async Task LoginTest()
+            {
+                await Log("Logging in user", _login);
+            }
 
             var generalTests = new List<(Func<Task> test, string description)>
             {
@@ -466,7 +610,10 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
             var imageOnlyTests = new List<(Func<Task> test, string description)>
             {
                 (GetPageInfoTest, "getting page info for"),
-                (PatchDataTest, "patching data to"), // TODO: This should work for text
+                (PatchDataUpdateTest, "update-patching data to"), // TODO: This should work for text
+                (PatchDataDeleteTest, "delete-patching data to"), // TODO: This should work for text
+                (PatchDataCreateTest, "create-patching data to"), // TODO: This should work for text
+                (PatchBadDataTest, "bad-patching data to"), // TODO: This should work for text
                 (RestoreDataTest, "restoring data to"), // TODO: This should work for text
                 (ClearDataTest, "clearing data from"), // TODO: This should work for text
             };
@@ -477,6 +624,11 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                 (GetDocumentStatusesTest, "getting document statuses for "),
                 (GetWorkflowStatusTest, "getting workflow status for "),
             };
+
+            if (_login != null)
+            {
+                testsNotRequiringDocument.Add((LoginTest, "re-logging in for"));
+            }
 
             var allButDelete = generalTests.Concat(imageOnlyTests).Concat(testsNotRequiringDocument).ToList();
 
@@ -650,12 +802,21 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
 
         public static string SimpleName<T>(Func<T> func)
         {
-            return func.Method.Name.Split(new[] { '_', '|' })[2];
+            try
+            {
+                return func.Method.Name.Split(new[] { '_', '|' })[2];
+            }
+            catch (NullReferenceException)
+            {
+                return "UnknownMethodName:" + (func?.Method?.Name ?? "");
+            }
         }
     }
 
     public partial class DocumentAttributePatch : DocumentAttributeCore
     {
+        public DocumentAttributePatch() { }
+
         public DocumentAttributePatch(DocumentAttribute attribute)
         {
             ConfidenceLevel = attribute.ConfidenceLevel;
