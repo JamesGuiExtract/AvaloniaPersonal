@@ -3521,7 +3521,7 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 		m_bAllowRestartableProcessing = false;
 
 		// Only load the settings if the table exists
-		if (doesTableExist(getDBConnection(), "DBInfo"))
+		if (doesTableExist(ipConnection, "DBInfo"))
 		{
 			// Create a pointer to a recordset
 			_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
