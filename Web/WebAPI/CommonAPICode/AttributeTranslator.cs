@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -38,7 +39,12 @@ namespace WebAPI
         {
             try
             {
-                InitializeSourceDocument(sourceDocName);
+                bool spatialInfoRequired = inputDocumentData
+                    .Attributes
+                    .Enumerate()
+                    .Any(a => a.HasPositionInfo ?? false);
+
+                InitializeSourceDocument(sourceDocName, spatialInfoRequired);
 
                 _attributes = new IUnknownVector();
 
@@ -67,13 +73,18 @@ namespace WebAPI
         {
             try
             {
-                InitializeSourceDocument(sourceDocName);
+                bool spatialInfoRequired = documentAttributeSet
+                    .Attributes
+                    .Any(a => (a.HasPositionInfo ?? false)
+                        && (a.Operation == PatchOperation.Create || a.Operation == PatchOperation.Update));
+
+                InitializeSourceDocument(sourceDocName, spatialInfoRequired);
 
                 // Retrieve all non-metadata attributes.
                 var existingAttributes = attributes.Enumerate()
                     .ToDictionary(a => ((IIdentifiableObject)a.attribute).InstanceGUID, a => a);
 
-                foreach (var patchAttribute in documentAttributeSet.Attributes)
+                foreach (DocumentAttributePatch patchAttribute in documentAttributeSet.Attributes)
                 {
                     switch (patchAttribute.Operation)
                     {
@@ -158,24 +169,56 @@ namespace WebAPI
         /// can be properly created.
         /// </summary>
         /// <param name="sourceDocName">Name of the source document.</param>
-        void InitializeSourceDocument(string sourceDocName)
+        /// <param name="spatialInfoRequired">Whether it is necessary to create a page info map</param>
+        void InitializeSourceDocument(string sourceDocName, bool spatialInfoRequired)
         {
             _sourceDocName = sourceDocName;
-            _sourceDocPageInfo = new LongToObjectMap();
+            _sourceDocPageInfo = null;
 
-            var imageUtils = new ImageUtils();
-            IIUnknownVector spatialPageInfos = imageUtils.GetSpatialPageInfos(_sourceDocName);
-            int count = spatialPageInfos.Size();
-            for (int i = 0; i < count; i++)
+            if (spatialInfoRequired)
             {
-                var storedPageInfo = (SpatialPageInfo)spatialPageInfos.At(i);
+                bool sourceIsText = sourceDocName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase);
 
-                // Create the spatial page info for this page
-                var pageInfo = new SpatialPageInfo();
-                pageInfo.Initialize(storedPageInfo.Width, storedPageInfo.Height, EOrientation.kRotNone, 0);
+                ExtractException.Assert("ELI46600", "Can't get image info from text file",
+                    !sourceIsText || File.Exists(sourceDocName + ".uss"));
 
-                // Add it to the map
-                _sourceDocPageInfo.Set(i + 1, pageInfo);
+                _sourceDocPageInfo = new LongToObjectMap();
+
+                if (sourceIsText)
+                {
+                    var ss = new SpatialStringClass();
+                    ss.LoadFrom(sourceDocName + ".uss", false);
+                    LongToObjectMap spatialPageInfos = ss.SpatialPageInfos;
+                    int count = spatialPageInfos.Size;
+                    for (int i = 0; i < count; i++)
+                    {
+                        spatialPageInfos.GetKeyValue(i, out int pageNum, out object pageInfoObj);
+                        var storedPageInfo = (SpatialPageInfo)pageInfoObj;
+
+                        // Create the spatial page info for this page
+                        var pageInfo = new SpatialPageInfo();
+                        pageInfo.Initialize(storedPageInfo.Width, storedPageInfo.Height, EOrientation.kRotNone, 0);
+
+                        _sourceDocPageInfo.Set(pageNum, pageInfo);
+                    }
+                }
+                else
+                {
+                    var imageUtils = new ImageUtils();
+                    IIUnknownVector spatialPageInfos = imageUtils.GetSpatialPageInfos(_sourceDocName);
+                    int count = spatialPageInfos.Size();
+                    for (int i = 0; i < count; i++)
+                    {
+                        var storedPageInfo = (SpatialPageInfo)spatialPageInfos.At(i);
+
+                        // Create the spatial page info for this page
+                        var pageInfo = new SpatialPageInfo();
+                        pageInfo.Initialize(storedPageInfo.Width, storedPageInfo.Height, EOrientation.kRotNone, 0);
+
+                        // Add it to the map
+                        _sourceDocPageInfo.Set(i + 1, pageInfo);
+                    }
+                }
             }
         }
 
@@ -238,8 +281,7 @@ namespace WebAPI
             string value = attributeModel.Value ?? targetComAttribute.Value.String;
             targetComAttribute.Value = new SpatialString();
 
-            bool hasPositionInfo = 
-                attributeModel.HasPositionInfo ?? targetComAttribute.Value.HasSpatialInfo();
+            bool hasPositionInfo = attributeModel.HasPositionInfo ?? false;
             if (hasPositionInfo)
             {
                 HTTPError.AssertRequest("ELI46400", attributeModel.SpatialPosition?.LineInfo.Count > 0,
@@ -311,7 +353,6 @@ namespace WebAPI
 
             if (attribute.ChildAttributes != null)
             {
-                comAttribute.SubAttributes = new IUnknownVector();
                 foreach (var subAttribute in attribute.ChildAttributes)
                 {
                     comAttribute.SubAttributes.PushBack(ConvertAttribute(subAttribute));

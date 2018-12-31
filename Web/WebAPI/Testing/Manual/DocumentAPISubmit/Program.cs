@@ -605,17 +605,17 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                 (GetPageZonesTest, "getting page zones from"),
                 (GetTextTest, "getting text from"),
                 (GetOutputTextTest, "getting output text from"),
+                (PatchDataUpdateTest, "update-patching data to"),
+                (PatchDataDeleteTest, "delete-patching data to"),
+                (PatchDataCreateTest, "create-patching data to"),
+                (PatchBadDataTest, "bad-patching data to"),
+                (RestoreDataTest, "restoring data to"),
+                (ClearDataTest, "clearing data from"),
             };
 
             var imageOnlyTests = new List<(Func<Task> test, string description)>
             {
                 (GetPageInfoTest, "getting page info for"),
-                (PatchDataUpdateTest, "update-patching data to"), // TODO: This should work for text
-                (PatchDataDeleteTest, "delete-patching data to"), // TODO: This should work for text
-                (PatchDataCreateTest, "create-patching data to"), // TODO: This should work for text
-                (PatchBadDataTest, "bad-patching data to"), // TODO: This should work for text
-                (RestoreDataTest, "restoring data to"), // TODO: This should work for text
-                (ClearDataTest, "clearing data from"), // TODO: This should work for text
             };
 
             var testsNotRequiringDocument = new List<(Func<Task> test, string description)>
@@ -634,21 +634,17 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
 
             // Randomly sort but make sure GetDataTest comes first so that origData has a value
             Random rng = new Random();
-            allButDelete.Sort((x, y) =>
+            allButDelete = allButDelete.OrderBy(pair =>
             {
-                if (x.test == GetDataTest)
+                if (pair.test == GetDataTest)
                 {
                     return -1;
                 }
-                else if (y.test == GetDataTest)
-                {
-                    return 1;
-                }
                 else
                 {
-                    return rng.Next(-1, 2);
+                    return rng.Next();
                 }
-            });
+            }).ToList();
 
             Log(FormattableString.Invariant($"{DateTime.Now}: file: {fileName}, ID: {id}, test order: {string.Join("|", allButDelete.Select(t => SimpleName(t.test)))}"));
 
@@ -677,7 +673,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
 
             await DeleteDocumentTest();
 
-            allButDelete.Sort((x, y) => rng.Next(-1, 2));
+            allButDelete = allButDelete.OrderBy(_ => rng.Next()).ToList();
             Log(FormattableString.Invariant($"After deleting: file: {fileName}, ID: {id}, test order: {string.Join("+", allButDelete.Select(t => SimpleName(t.test)))}"));
             foreach (var pair in allButDelete)
             {
