@@ -18,6 +18,13 @@ namespace WebAPI
     /// </summary>
     public class AttributeTranslator
     {
+        #region Constants
+
+        static readonly HashSet<string> _ocrableTextExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".txt", ".csv", ".xml" };
+
+        #endregion Constants
+
+
         #region Fields
 
         IUnknownVector _attributes;
@@ -177,7 +184,7 @@ namespace WebAPI
 
             if (spatialInfoRequired)
             {
-                bool sourceIsText = sourceDocName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase);
+                bool sourceIsText = _ocrableTextExtensions.Contains(Path.GetExtension(sourceDocName));
 
                 ExtractException.Assert("ELI46600", "Can't get image info from text file",
                     !sourceIsText || File.Exists(sourceDocName + ".uss"));
