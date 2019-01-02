@@ -147,7 +147,7 @@ namespace WebAPI.Models
                 {
                     if (FileApi.DocumentSession.IsOpen)
                     {
-                        CloseDocument(false);
+                        CloseDocument(EActionStatus.kActionPending);
                     }
                 }
                 finally
@@ -281,9 +281,10 @@ namespace WebAPI.Models
         /// <summary>
         /// Releases the document.
         /// </summary>
-        /// <param name="commit"><c>true</c> to commit the document so that it advances in the
-        /// workflow; <c>false</c> to save the document without advancing in the workflow.</param>
-        public void CloseDocument(bool commit)
+        /// <param name="setStatusTo"><see cref="EActionStatus.kActionCompleted"/> to commit the document so that it advances in the
+        /// workflow; other values to save the document but set the file's status in the EditAction to a non-completed value.</param>
+        /// <param name="exception">Optional exception for logging if <see paramref="setStatusTo"/> is <see cref="EActionStatus.kActionFailed"/></param>
+        public void CloseDocument(EActionStatus setStatusTo, Exception exception = null)
         {
             try
             {
@@ -296,19 +297,36 @@ namespace WebAPI.Models
                     duration, 0, 0);
 
                 int fileId = FileApi.DocumentSession.FileId;
-                if (commit)
+                if (setStatusTo == EActionStatus.kActionCompleted)
                 {
                     FileApi.FileProcessingDB.NotifyFileProcessed(fileId, FileApi.Workflow.EditAction, -1, true);
+                }
+                else if (setStatusTo == EActionStatus.kActionSkipped)
+                {
+                    FileApi.FileProcessingDB.NotifyFileSkipped(fileId, FileApi.Workflow.EditAction, -1, true);
+                }
+                else if (setStatusTo == EActionStatus.kActionFailed)
+                {
+                    string exceptionString = null;
+                    if (exception != null)
+                    {
+                        try
+                        {
+                            exceptionString = exception.AsExtract("ELI46612").AsStringizedByteStream();
+                        }
+                        catch { }
+                    }
+                    FileApi.FileProcessingDB.NotifyFileFailed(fileId, FileApi.Workflow.EditAction, -1, exceptionString, true);
                 }
                 else
                 {
                     FileApi.FileProcessingDB.SetStatusForFile(fileId, FileApi.Workflow.EditAction, -1,
-                        EActionStatus.kActionPending, false, true, out EActionStatus oldStatus);
+                        setStatusTo, false, true, out EActionStatus oldStatus);
                 }
 
                 try
                 {
-                    if (commit && !string.IsNullOrWhiteSpace(FileApi.Workflow.PostEditAction))
+                    if (setStatusTo == EActionStatus.kActionCompleted && !string.IsNullOrWhiteSpace(FileApi.Workflow.PostEditAction))
                     {
                         FileApi.FileProcessingDB.SetFileStatusToPending(fileId,
                             FileApi.Workflow.PostEditAction, true);

@@ -9,6 +9,7 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using UCLID_FILEPROCESSINGLib;
 using WebAPI.Models;
 
 namespace WebAPI.Controllers
@@ -392,7 +393,7 @@ namespace WebAPI.Controllers
                     try
                     {
                         data.PutDocumentResultSet(data.DocumentSessionFileId, documentData);
-                        data.CloseDocument(commit: true);
+                        data.CloseDocument(setStatusTo: EActionStatus.kActionCompleted);
                         data.CloseSession();
                     }
                     catch (Exception ex)
@@ -401,7 +402,7 @@ namespace WebAPI.Controllers
                         // upon an error.
                         try
                         {
-                            data.CloseDocument(commit: false);
+                            data.CloseDocument(setStatusTo: EActionStatus.kActionFailed, exception: ex);
                         }
                         catch { }
 
@@ -459,14 +460,14 @@ namespace WebAPI.Controllers
                     try
                     {
                         data.PatchDocumentData(data.DocumentSessionFileId, documentData);
-                        data.CloseDocument(commit: true);
+                        data.CloseDocument(setStatusTo: EActionStatus.kActionCompleted);
                         data.CloseSession();
                     }
                     catch (Exception ex)
                     {
                         try
                         {
-                            data.CloseDocument(commit: false);
+                            data.CloseDocument(setStatusTo: EActionStatus.kActionFailed, exception: ex);
                         }
                         catch { }
 

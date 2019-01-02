@@ -1,4 +1,5 @@
 ﻿using Extract;
+using UCLID_FILEPROCESSINGLib;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -184,7 +185,7 @@ namespace WebAPI.Controllers
             {
                 using (var data = new DocumentData(User, requireSession: true))
                 {
-                    data.CloseDocument(commit);
+                    data.CloseDocument(commit ? EActionStatus.kActionCompleted : EActionStatus.kActionPending);
 
                     return NoContent();
                 }
