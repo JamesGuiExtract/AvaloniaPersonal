@@ -37,7 +37,7 @@ namespace
 	// WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
 	const string gstrSCHEMA_VERSION_NAME = "AttributeCollectionSchemaVersion";
 	const string gstrDESCRIPTION = "Attribute database manager";
-	const long glSCHEMA_VERSION = 8;
+	const long glSCHEMA_VERSION = 9;
 	const long dbSchemaVersionWhenAttributeCollectionWasIntroduced = 129;
 
 
@@ -224,9 +224,15 @@ namespace
 		return queries;
 	}
 
-	VectorOfString GetCurrentSchema(bool bAddUserTables = true)
+	// Change is to FK that is part of v3 so nothing to do here
+	VectorOfString GetSchema_v9(bool bAddUserTables)
 	{
 		return GetSchema_v8(bAddUserTables);
+	}
+
+	VectorOfString GetCurrentSchema(bool bAddUserTables = true)
+	{
+		return GetSchema_v9(bAddUserTables);
 	}
 
 
@@ -289,7 +295,7 @@ namespace
 			}
 
 			vector<string> queries;
-			queries.push_back(gstrADD_WORKFLOW_OUTPUTATTRIBUTESET_FK);
+			queries.push_back(gstrADD_WORKFLOW_OUTPUTATTRIBUTESET_FK_V3);
 			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
 			executeVectorOfSQL(ipConnection, queries);
 
@@ -508,6 +514,33 @@ namespace
 			return nNewSchemaVersion;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46594");
+	}
+	//-------------------------------------------------------------------------------------------------
+	int UpdateToSchemaVersion9(_ConnectionPtr ipConnection, long* pnNumSteps)
+	{
+		try
+		{
+			const int nNewSchemaVersion = 9;
+
+			if (pnNumSteps != __nullptr)
+			{
+				*pnNumSteps += 1;
+				return nNewSchemaVersion;
+			}
+
+			vector<string> queries;
+			queries.push_back("ALTER TABLE [dbo].[Workflow] DROP CONSTRAINT [FK_Workflow_OutputAttributeSet]");
+			queries.push_back(gstrADD_WORKFLOW_OUTPUTATTRIBUTESET_FK);
+
+			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
+			long saveCommandTimeout = ipConnection->CommandTimeout;
+			ipConnection->CommandTimeout = 0;
+			executeVectorOfSQL(ipConnection, queries);
+			ipConnection->CommandTimeout = saveCommandTimeout;
+
+			return nNewSchemaVersion;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46601");
 	}
 }
 
@@ -883,9 +916,16 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 				{
 					*pnProdSchemaVersion = UpdateToSchemaVersion8(ipConnection, pnNumSteps);
 				}
-				break;
+				// Fall through to next case
 
 			case 8:
+				if (nFAMDBSchemaVersion == 171)
+				{
+					*pnProdSchemaVersion = UpdateToSchemaVersion9(ipConnection, pnNumSteps);
+				}
+				break;
+
+			case 9:
 				break;
 
 			default:
