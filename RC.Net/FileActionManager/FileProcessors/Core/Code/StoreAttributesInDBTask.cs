@@ -23,13 +23,13 @@ namespace Extract.FileActionManager.FileProcessors
     [ComVisible(true)]
     [Guid("31FE0077-EF9C-4F69-8BBD-D7344A3855B7")]
     [CLSCompliant(false)]
-    public interface IStoreAttributesInDBTask : 
-        ICategorizedComponent, 
+    public interface IStoreAttributesInDBTask :
+        ICategorizedComponent,
         IConfigurableObject,
-        IMustBeConfiguredObject, 
-        ICopyableObject, 
+        IMustBeConfiguredObject,
+        ICopyableObject,
         IFileProcessingTask,
-        ILicensedComponent, 
+        ILicensedComponent,
         IPersistStream
     {
         /// <summary>
@@ -66,6 +66,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// Gets or set flag that determines mode - either Save or Retrieve
         /// </summary>
         bool StoreModeIsSet { get; set; }
+
+        /// <summary>
+        /// Gets or sets flag that determines whether to save empty attributes
+        /// </summary>
+        bool StoreEmptyAttributes { get; set; }
     }
 
     /// <summary>
