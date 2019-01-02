@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -317,9 +316,9 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                         Log("Writing " + newName, () =>
                             File.WriteAllText(newName, patchedData.ToJson()));
                     }
-                    else
+                    else if (docDataCount == 0)
                     {
-                        Log(FormattableString.Invariant($"WWWWWHHHHHHATTTT! WHY NO ATTR? File: {fileName}"), true);
+                        throw new Exception("No attributes to patch");
                     }
                 }
                 catch (SwaggerException ex) when (!docDataAllExist && ex.Response.Contains("Attribute not found"))
@@ -359,6 +358,10 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                         {
                             throw new Exception("Delete patch had no effect!");
                         }
+                    }
+                    else if (docDataCount == 0)
+                    {
+                        throw new Exception("No attributes to patch");
                     }
                 }
                 catch (SwaggerException ex) when (!docDataAllExist && ex.Response.Contains("Attribute not found"))
@@ -502,7 +505,14 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                     var origInfo = new FileInfo(fileName);
                     if (origInfo.Length != ms.Length)
                     {
-                        throw new Exception("Retrieved file size differs from original file size!");
+                        using (var fs = new FileStream(fileName + ".wrongSize" + Path.GetExtension(fileName), FileMode.Create))
+                        {
+                            ms.Position = 0;
+                            ms.CopyTo(fs);
+                        }
+
+                        throw new Exception(FormattableString.Invariant(
+                            $"Retrieved file size differs from original file size! (expected: {origInfo.Length} retrieved: {ms.Length})"));
                     }
                 }
             }
@@ -663,6 +673,10 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                 {
                     Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
                 }
+                catch (Exception ex) when (ex.Message.Contains("No attributes to patch"))
+                {
+                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
+                }
                 catch (Exception ex)
                 {
                     throw new Exception(FormattableString.Invariant($"Unexpected exception caught running {SimpleName(pair.test)} on {fileName}"), ex);
@@ -696,9 +710,17 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                 {
                     Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
                 }
+                catch (SwaggerException ex) when (failWhenDeleted && string.IsNullOrWhiteSpace(ex.Response))
+                {
+                    throw new Exception(FormattableString.Invariant($"Generic (empty response) exception instead of the expected \"file not in the workflow\" exception"));
+                }
                 catch (SwaggerException ex)
                 {
                     throw new Exception(FormattableString.Invariant($"Unexpected post-deletion exception caught running {SimpleName(pair.test)} on {fileName}"), ex);
+                }
+                catch (Exception ex) when (ex.Message.Contains("No attributes to patch"))
+                {
+                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
                 }
             }
         }
