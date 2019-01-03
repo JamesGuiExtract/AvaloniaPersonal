@@ -1516,7 +1516,10 @@ void CScansoftOCR2::addRecognizedLettersToVector(vector<CPPLetter>* pvecLetters,
 				{
 					// Scansoft uses 0 as highest confidence 100 as lowest so we need to reverse that.
 					// Ignore the bit that ScanSoft uses to denote suspect words.
-					letter.m_ucCharConfidence = 100 - (pCurLetter->err & RE_ERROR_LEVEL_MASK);
+					// Use a maximum on 99 so that the lowest possible confidence for non-space letters is 1
+					// (see else clause below)
+					// https://extract.atlassian.net/browse/ISSUE-15752
+					letter.m_ucCharConfidence = 100 - min(99, (pCurLetter->err & RE_ERROR_LEVEL_MASK));
 
 					// set font attributes
 					letter.m_ucFont = 0;
