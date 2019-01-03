@@ -184,7 +184,9 @@ namespace WebAPI
             var dbConnectionRetries = Configuration["DbNumberOfConnectionRetries"];
             var dbConnectionTimeout = Configuration["DbConnectionRetryTimeout"];
 
-            Utils.SetCurrentApiContext(databaseServer, databaseName, workflowName, dbConnectionRetries, dbConnectionTimeout);
+            var exceptionLogFilter = Configuration["ExceptionLogFilter"];
+
+            Utils.SetCurrentApiContext(databaseServer, databaseName, workflowName, dbConnectionRetries, dbConnectionTimeout, exceptionLogFilter);
 
             Utils.ValidateCurrentApiContext();
 

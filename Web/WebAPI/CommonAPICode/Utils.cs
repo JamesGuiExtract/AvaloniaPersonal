@@ -108,11 +108,15 @@ namespace WebAPI
         /// <param name="workflowName">workflow name</param>
         /// <param name="dbNumberOfConnectionRetries">number of times to retry DB connection on failure</param>
         /// <param name="dbConnectionRetryTimeout">timeout value in seconds</param>
+        /// <param name="exceptionLogFilter">Specifies the HTTP result codes that should not be logged
+        /// to the main Extract exception log. Specify <c>null</c> to use the default value or empty
+        /// string to log all error codes.</param>
         public static void SetCurrentApiContext(string databaseServerName, 
                                                 string databaseName, 
                                                 string workflowName,
                                                 string dbNumberOfConnectionRetries = "",
-                                                string dbConnectionRetryTimeout = "")
+                                                string dbConnectionRetryTimeout = "",
+                                                string exceptionLogFilter = null)
         {
             try
             {
@@ -122,7 +126,8 @@ namespace WebAPI
                                                         databaseName, 
                                                         workflowName,
                                                         dbNumberOfConnectionRetries,
-                                                        dbConnectionRetryTimeout);
+                                                        dbConnectionRetryTimeout,
+                                                        exceptionLogFilter);
                 }
             }
             catch (Exception ex)

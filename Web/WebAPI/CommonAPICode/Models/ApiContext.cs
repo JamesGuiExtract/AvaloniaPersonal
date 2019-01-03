@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Extract;
+using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace WebAPI.Models
 {
@@ -27,11 +27,15 @@ namespace WebAPI.Models
         /// <param name="workflowName">workflow name</param>
         /// <param name="numberOfConnectionRetries">number of retries on DB connection, on failure</param>
         /// <param name="connectionRetryTimeout">timout interval for DB connection</param>
+        /// <param name="exceptionLogFilter">Specifies the HTTP result codes that should not be logged
+        /// to the main Extract exception log. Specify <c>null</c> to use the default value or empty
+        /// string to log all error codes.</param>
         public ApiContext(string databaseServerName,
                           string databaseName,
                           string workflowName,
                           string numberOfConnectionRetries = "",
-                          string connectionRetryTimeout = "")
+                          string connectionRetryTimeout = "",
+                          string exceptionLogFilter = null)
         {
             HTTPError.Assert("ELI46375", !String.IsNullOrWhiteSpace(databaseServerName),
                 "Database server name is empty");
@@ -67,27 +71,50 @@ namespace WebAPI.Models
             {
                 ConnectionRetryTimeout = timeout;
             }
+
+            if (exceptionLogFilter != null)
+            {
+                try
+                {
+                    ExceptionLogFilter = NumericRange.Parse(exceptionLogFilter);
+                }
+                catch (Exception ex)
+                {
+                    ExceptionLogFilter = null;
+
+                    var error = new HTTPError("ELI46604", StatusCodes.Status500InternalServerError,
+                        "Failed to parse ExceptionLogFilter", ex);
+                    error.AddDebugData("Filter", exceptionLogFilter, false);
+                    throw error;
+                }
+            }
         }
 
         /// <summary>
         /// The number of times to retry DB connection on failure
         /// </summary>
-        public int NumberOfConnectionRetries { get; private set; }
+        public int NumberOfConnectionRetries { get; }
 
         /// <summary>
         /// The retry interval in seconds
         /// </summary>
-        public int ConnectionRetryTimeout { get; private set; }
+        public int ConnectionRetryTimeout { get; }
+
+        /// <summary>
+        /// Specifies the HTTP result codes that should not be logged to the main Extract exception log.
+        /// Only needed for codes that pertain to an error or some sort (>= 400).
+        /// </summary>
+        public IEnumerable<NumericRange> ExceptionLogFilter { get; } = new[] { new NumericRange(404) };
 
         /// <summary>
         /// The database server name
         /// </summary>
-        public string DatabaseServerName { get; private set; }
+        public string DatabaseServerName { get; }
 
         /// <summary>
         /// The database name
         /// </summary>
-        public string DatabaseName { get; private set; }
+        public string DatabaseName { get; }
 
         /// <summary>
         /// The workflow name

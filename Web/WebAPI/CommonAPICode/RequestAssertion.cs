@@ -55,10 +55,11 @@ namespace WebAPI
         /// <param name="eliCode">The eli code to assign to the error.</param>
         public static IActionResult GetAsHttpError(this ControllerBase controller, Exception ex, string eliCode)
         {
+            int statusCode = StatusCodes.Status500InternalServerError;
+            ErrorResult errorObject = null;
+
             try
             {
-
-                ex.ExtractLog(eliCode);
                 var ee = ex as ExtractException;
 
                 var errorDetails = ee?.Data
@@ -76,7 +77,7 @@ namespace WebAPI
                         .Select(dataItem => dataItem.Value.ToString())
                         .ToList();
 
-                var errorObject = new ErrorResult();
+                errorObject = new ErrorResult();
                 errorObject.Error = new ErrorInfo()
                 {
                     Message = ex.Message,
@@ -96,26 +97,31 @@ namespace WebAPI
                 }
 
                 // Otherwise the error will be 500 (server error) or a manually specified error code.
-                if (requestException != null)
+                if (requestException != null && requestException.StatusCode != 0)
                 {
-                    if (requestException.StatusCode == 0)
-                    {
-                        return controller.StatusCode(StatusCodes.Status500InternalServerError, errorObject);
-                    }
-                    else
-                    {
-                        return controller.StatusCode(requestException.StatusCode, errorObject);
-                    }
+                    statusCode = requestException.StatusCode;
                 }
                 else
                 {
-                    return controller.StatusCode(StatusCodes.Status500InternalServerError, errorObject);
+                    statusCode = StatusCodes.Status500InternalServerError;
+                    // Add new top-level interal server error exception.
+                    ex = new HTTPError(eliCode, statusCode, "Internal Server Error", ex);
                 }
             }
             catch
             {
-                return controller.StatusCode(StatusCodes.Status500InternalServerError);
+                statusCode = StatusCodes.Status500InternalServerError;
+                // Add new top-level interal server error exception.
+                ex = new HTTPError(eliCode, statusCode, "Internal Server Error", ex);
             }
+
+            if (true != Utils.CurrentApiContext?.ExceptionLogFilter
+                .Any(range => range.Contains(statusCode)))
+            {
+                ex.ExtractLog(eliCode);
+            }
+
+            return controller.StatusCode(statusCode, errorObject);
         }
     }
 }
