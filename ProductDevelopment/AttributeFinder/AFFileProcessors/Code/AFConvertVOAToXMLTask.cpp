@@ -119,12 +119,16 @@ STDMETHODIMP CAFConvertVOAToXMLTask::raw_ProcessFile(IFileRecord* pFileRecord, l
 		ASSERT_RESOURCE_ALLOCATION("ELI26315", ipAFDoc != __nullptr);
 		ipAFDoc->Text = ipString;
 
-		// Get the XML Output handler as an output handler
-		IOutputHandlerPtr ipOutput = getXMLOutputHandler();
+		// Get the XML Output handler as a FAM-aware rule object
+		IFAMAwareRuleObjectPtr ipOutput = getXMLOutputHandler();
 		ASSERT_RESOURCE_ALLOCATION("ELI26296", ipOutput != __nullptr);
 
+		// Cast the tag manager to the AF-compatible interface
+		ITagUtilityPtr ipTagUtility(ipTagManager);
+		ASSERT_RESOURCE_ALLOCATION("ELI46615", ipTagUtility != __nullptr);
+
 		// Write the XML file
-		ipOutput->ProcessOutput(ipAttributes, ipAFDoc, pProgressStatus);
+		ipOutput->ProcessAttributes(ipAttributes, ipAFDoc, ipTagUtility, pProgressStatus);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26259")
 

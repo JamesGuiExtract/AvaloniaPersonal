@@ -20,6 +20,7 @@ class ATL_NO_VTABLE COutputToXML :
 	public IPersistStream,
 	public IDispatchImpl<IOutputToXML, &IID_IOutputToXML, &LIBID_UCLID_AFOUTPUTHANDLERSLib>,
 	public IDispatchImpl<IOutputHandler, &IID_IOutputHandler, &LIBID_UCLID_AFCORELib>,
+	public IDispatchImpl<IFAMAwareRuleObject, &IID_IFAMAwareRuleObject, &LIBID_UCLID_AFCORELib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<ICategorizedComponent, &IID_ICategorizedComponent, &LIBID_UCLID_COMUTILSLib>,
@@ -41,6 +42,7 @@ BEGIN_COM_MAP(COutputToXML)
 	COM_INTERFACE_ENTRY2(IDispatch, IOutputToXML)
 	COM_INTERFACE_ENTRY(IPersistStream)
 	COM_INTERFACE_ENTRY(IOutputHandler)
+	COM_INTERFACE_ENTRY(IFAMAwareRuleObject)
 	COM_INTERFACE_ENTRY(ILicensedComponent)
 	COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 	COM_INTERFACE_ENTRY(ICategorizedComponent)
@@ -84,6 +86,10 @@ public:
 // IOutputHandler
 	STDMETHOD(raw_ProcessOutput)(IIUnknownVector *pAttributes, IAFDocument *pAFDoc,
 		IProgressStatus *pProgressStatus);
+
+// IFAMAwareRuleObject
+	STDMETHOD(raw_ProcessAttributes)(IIUnknownVector *pAttributes, IAFDocument *pAFDoc,
+		ITagUtility *pTagUtility, IProgressStatus *pProgressStatus);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -143,10 +149,12 @@ private:
 	void validateLicense();
 
 	// Expands the file name based on the doc tags
-	string expandFileName(IAFDocumentPtr ipDoc);
+	string expandFileName(IAFDocumentPtr ipDoc, ITagUtility *pTagUtility);
 
 	// Checks if the the file name contains tags and whether those tags are valid
 	// pair.first holds the contains tags value
 	// pair.second holds the valid tags value
 	pair<bool, bool> getContainsTagsAndTagsAreValid(const string& strFileName);
+
+	void processAttributes(IIUnknownVector *pAttributes, IAFDocument *pAFDoc, ITagUtility *pTagUtility, IProgressStatus *pProgressStatus);
 };

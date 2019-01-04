@@ -62,7 +62,8 @@ STDMETHODIMP COutputToXML::InterfaceSupportsErrorInfo(REFIID riid)
 		&IID_ICopyableObject,
 		&IID_IMustBeConfiguredObject,
 		&IID_ILicensedComponent,
-		&IID_IIdentifiableObject
+		&IID_IIdentifiableObject,
+		&IID_IFAMAwareRuleObject
 	};
 	for (int i=0; i < sizeof(arr) / sizeof(arr[0]); i++)
 	{
@@ -460,52 +461,30 @@ STDMETHODIMP COutputToXML::raw_ProcessOutput(IIUnknownVector *pAttributes,
 	{
 		validateLicense();
 
-		IAFDocumentPtr ipAFDoc(pAFDoc);
-		ASSERT_ARGUMENT("ELI26298", ipAFDoc != __nullptr);
+		processAttributes(pAttributes, pAFDoc, __nullptr, pProgressStatus);
 
-		// ensure  valid parameters
-		ASSERT_ARGUMENT("ELI10489", pAttributes != __nullptr);
-
-		// Expand the file name based on the Doc tags
-		string strFileName = expandFileName(ipAFDoc);
-
-		// Pass Attributes to appropriate XMLWriter object
-		if (m_eOutputFormat == kXMLOriginal)
-		{
-			XMLVersion1Writer	xml1(m_bRemoveSpatialInfo);
-			xml1.WriteFile( strFileName.c_str(), pAttributes );
-		}
-		else if (m_eOutputFormat == kXMLSchema)
-		{
-			XMLVersion2Writer	xml2(m_bRemoveSpatialInfo);
-
-			// Provide UseNamedAttributes value
-			xml2.UseNamedAttributes( m_bUseNamedAttributes );
-
-			// Provide Schema Name
-			if (m_bSchemaName)
-			{
-				xml2.UseSchemaName( m_strSchemaName.c_str() );
-			}
-
-			// Set flag for full text value
-			xml2.ValueAsFullText(m_bValueAsFullText);
-
-			// Set flag for remove empty nodes
-			xml2.RemoveEmptyNodes(m_bRemoveEmptyNodes);
-
-			// Write the XML file
-			xml2.WriteFile( strFileName.c_str(), pAttributes );
-		}
-		else
-		{
-			// Unsupported output format
-			THROW_LOGIC_ERROR_EXCEPTION("ELI12898")
-		}
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07852")
-		
-	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IFAMAwareRuleObject
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COutputToXML::raw_ProcessAttributes(IIUnknownVector *pAttributes, IAFDocument *pAFDoc,
+	ITagUtility *pTagUtility, IProgressStatus *pProgressStatus)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		processAttributes(pAttributes, pAFDoc, pTagUtility, pProgressStatus);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46616")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -864,15 +843,27 @@ void COutputToXML::validateLicense()
 	VALIDATE_LICENSE( gnRULE_WRITING_CORE_OBJECTS, "ELI07892", "OutputToXML Output Handler" );
 }
 //-------------------------------------------------------------------------------------------------
-string COutputToXML::expandFileName(IAFDocumentPtr ipDoc)
+string COutputToXML::expandFileName(IAFDocumentPtr ipDoc, ITagUtility *pTagUtility)
 {
 	try
 	{
 		ASSERT_ARGUMENT("ELI26300", ipDoc != __nullptr);
 
 		string strFileName;
+		if (pTagUtility != __nullptr)
+		{
+			ITagUtilityPtr ipTagUtility(pTagUtility);
+			ASSERT_RESOURCE_ALLOCATION("ELI46613", ipTagUtility != __nullptr);
 
-		if (m_bFAMTags)
+			// Get the source doc name from the AF doc object
+			ISpatialStringPtr ipString = ipDoc->Text;
+			ASSERT_RESOURCE_ALLOCATION("ELI46614", ipString != __nullptr);
+			_bstr_t bstrSourceDoc = ipString->SourceDocName;
+			
+			strFileName = asString(ipTagUtility->ExpandTagsAndFunctions(
+				m_strFileName.c_str(), bstrSourceDoc, ipDoc));
+		}
+		else if (m_bFAMTags)
 		{
 			ITagUtilityPtr ipTagUtility(CLSID_FAMTagManager);
 			ASSERT_RESOURCE_ALLOCATION("ELI26301", ipTagUtility != __nullptr);
@@ -937,5 +928,52 @@ pair<bool, bool> COutputToXML::getContainsTagsAndTagsAreValid(const string &strF
 		return prResult;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26313");
+}
+//-------------------------------------------------------------------------------------------------
+void COutputToXML::processAttributes(IIUnknownVector *pAttributes, IAFDocument *pAFDoc,
+	ITagUtility *pTagUtility, IProgressStatus *pProgressStatus)
+{
+	IAFDocumentPtr ipAFDoc(pAFDoc);
+	ASSERT_ARGUMENT("ELI26298", ipAFDoc != __nullptr);
+
+	// ensure  valid parameters
+	ASSERT_ARGUMENT("ELI10489", pAttributes != __nullptr);
+
+	// Expand the file name based on the Doc tags
+	string strFileName = expandFileName(ipAFDoc, pTagUtility);
+
+	// Pass Attributes to appropriate XMLWriter object
+	if (m_eOutputFormat == kXMLOriginal)
+	{
+		XMLVersion1Writer xml1(m_bRemoveSpatialInfo);
+		xml1.WriteFile(strFileName.c_str(), pAttributes );
+	}
+	else if (m_eOutputFormat == kXMLSchema)
+	{
+		XMLVersion2Writer xml2(m_bRemoveSpatialInfo);
+
+		// Provide UseNamedAttributes value
+		xml2.UseNamedAttributes(m_bUseNamedAttributes );
+
+		// Provide Schema Name
+		if (m_bSchemaName)
+		{
+			xml2.UseSchemaName(m_strSchemaName.c_str() );
+		}
+
+		// Set flag for full text value
+		xml2.ValueAsFullText(m_bValueAsFullText);
+
+		// Set flag for remove empty nodes
+		xml2.RemoveEmptyNodes(m_bRemoveEmptyNodes);
+
+		// Write the XML file
+		xml2.WriteFile(strFileName.c_str(), pAttributes );
+	}
+	else
+	{
+		// Unsupported output format
+		THROW_LOGIC_ERROR_EXCEPTION("ELI12898")
+	}
 }
 //-------------------------------------------------------------------------------------------------

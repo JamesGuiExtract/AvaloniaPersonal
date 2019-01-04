@@ -609,6 +609,23 @@ library UCLID_AFCORELib
 
 	[
 		object,
+		uuid(AC7D6CAB-8EC2-43E3-B562-DC03C9FFBBF7),
+		dual,
+		helpstring("IFAMAwareRuleObject Interface"),
+		pointer_default(unique)
+	]
+	interface IFAMAwareRuleObject : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To modify a IIUnknownVector of IAttribute objects in some way, using the supplied
+		//			tag manager to resolve tags.
+		[id(1), helpstring("method ProcessAttributes")] HRESULT ProcessAttributes([in] IIUnknownVector* pAttributes, 
+			[in] IAFDocument *pDoc, [in] ITagUtility *pTagUtil, [in] IProgressStatus *pProgressStatus);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
 		uuid(FDC8A439-7ABB-421F-AD66-7D9085C6BBF4),
 		dual,
 		helpstring("IAttributeFinderEngine Interface"),
