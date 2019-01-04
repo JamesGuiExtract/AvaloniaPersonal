@@ -8053,7 +8053,6 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 							ipResultSet->Open(gstrFAST_TOTAL_FAMFILE_QUERY.c_str(),
 								_variant_t((IDispatch *)ipConnection, true), adOpenStatic,
 								adLockReadOnly, adCmdText);
-							ASSERT_RESOURCE_ALLOCATION("ELI35762", ipResultSet != __nullptr);
 
 							bGotFastCount = true;
 						}
@@ -8072,8 +8071,16 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 					}
 				}
 
-				if (m_bDeniedFastCountPermission)
+				if (nWorkflowID <= 0 && m_bDeniedFastCountPermission)
 				{
+					// It is possible the result set is open from a previous attempt to open
+					// but it threw an exception due to a permissions problem 
+					// so check if the result set is open and close it if it is
+					// https://extract.atlassian.net/browse/ISSUE-15680
+					if (ipResultSet->State == adStateOpen)
+					{
+						ipResultSet->Close();
+					}
 					// If the user had insufficient permission for the fast query, use the standard
 					// query that will work for all db readers/writers.
 					ipResultSet->Open(gstrSTANDARD_TOTAL_FAMFILE_QUERY.c_str(),
