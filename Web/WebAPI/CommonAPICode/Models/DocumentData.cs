@@ -96,7 +96,6 @@ namespace WebAPI.Models
             // Allow the fileApi object to be reused by clearing the InUse flag.
             if (_fileApi != null)
             {
-
                 // Since the previous test seemed backwards but maybe was intentional,
                 // I'm removing the test altogether and just calling EndSession() - Nat
                 _fileApi.EndSession();
@@ -104,6 +103,22 @@ namespace WebAPI.Models
                 _fileApi.InUse = false;
                 _fileApi = null;
             }
+        }
+
+        /// <summary>
+        /// Opens a session for the specified ClaimsPrincipal.
+        /// </summary>
+        /// <param name="claimsPrincipal">The <see cref="ClaimsPrincipal"/> this instance is specific to.</param>
+        /// <param name="remoteIpAddress">The IP address of the web application user.s</param>
+        public void OpenSession(ClaimsPrincipal claimsPrincipal, string remoteIpAddress)
+        {
+            var user = new User()
+            {
+                Username = claimsPrincipal.GetUsername(),
+                WorkflowName = claimsPrincipal.GetClaim(Utils._WORKFLOW_NAME)
+            };
+
+            OpenSession(user, remoteIpAddress);
         }
 
         /// <summary>
@@ -613,30 +628,26 @@ namespace WebAPI.Models
         {
             try
             {
+                HTTPError.Assert("ELI46619", "Session closed", FileApi.FAMSessionId != 0);
+
                 // Now add the file to the FAM queue
                 var fileProcessingDB = FileApi.FileProcessingDB;
                 var workflow = FileApi.Workflow;
                 HTTPError.Assert("ELI46338", !String.IsNullOrWhiteSpace(workflow.StartAction),
                     "Workfow must have a start action", ("Workflow", FileApi.WorkflowName, true));
 
-                // Start a FAM session so that the active action is set. This in turn enables the output result file to be
-                // added to the FileMetadataFieldValue, for later retrieval by Get[File|Text]Result.
-                // ISSUE-14777 Submitting a file via the API, FileMetaDataFieldValue table does not get populated
-                fileProcessingDB.RecordFAMSessionStart(caller, workflow.StartAction, vbQueuing: true, vbProcessing: false);
-
                 var fileRecord =
-                    fileProcessingDB.AddFile(fullPath,                                                 // full path to file
-                                             workflow.StartAction,                                     // action name
-                                             workflow.Id,                                              // workflow ID
-                                             EFilePriority.kPriorityNormal,                            // file priority
-                                             false,                                                    // force status change
-                                             false,                                                    // file modified
-                                             UCLID_FILEPROCESSINGLib.EActionStatus.kActionPending,     // action status
-                                             false,                                                    // skip page count
-                                             out bool bAlreadyExists,                                  // returns whether file already existed
-                                             out EActionStatus previousActionStatus);                  // returns the previous action status (if file already existed)
-
-                fileProcessingDB.RecordFAMSessionStop();
+                    FileApi.FileProcessingDB.AddFile(
+                        fullPath,                                                 // full path to file
+                        workflow.StartAction,                                     // action name
+                        workflow.Id,                                              // workflow ID
+                        EFilePriority.kPriorityNormal,                            // file priority
+                        false,                                                    // force status change
+                        false,                                                    // file modified
+                        UCLID_FILEPROCESSINGLib.EActionStatus.kActionPending,     // action status
+                        false,                                                    // skip page count
+                        out bool bAlreadyExists,                                  // returns whether file already existed
+                        out EActionStatus previousActionStatus);                  // returns the previous action status (if file already existed)
 
                 DocumentIdResult result = new DocumentIdResult()
                 {

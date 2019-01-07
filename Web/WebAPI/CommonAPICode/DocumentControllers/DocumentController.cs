@@ -43,13 +43,26 @@ namespace WebAPI.Controllers
                 var fileStream = file.OpenReadStream();
                 HTTPError.Assert("ELI46331", fileStream != null, "Null filestream");
 
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: true))
                 {
-                    var result = await data.SubmitFile(file.FileName, fileStream);
-                    string url = Request.Path.HasValue
-                        ? Request.GetDisplayUrl()
-                        : "https://unknown/api/Document";
-                    return Created(new Uri($"{url}/{result.Id}"), result);
+                    // IPAddress is used to identify the caller via the "Machine" column in FAMSession. If no RemoteIpAddress
+                    // exists, this is likely a unit test; assume 127.0.0.1.
+                    string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
+
+                    data.OpenSession(User, ipAddress);
+
+                    try
+                    {
+                        var result = await data.SubmitFile(file.FileName, fileStream);
+                        string url = Request.Path.HasValue
+                            ? Request.GetDisplayUrl()
+                            : "https://unknown/api/Document";
+                        return Created(new Uri($"{url}/{result.Id}"), result);
+                    }
+                    finally
+                    {
+                        data.CloseSession();
+                    }
                 }
             }
             catch (Exception ex)
@@ -137,14 +150,27 @@ namespace WebAPI.Controllers
                 HTTPError.AssertRequest("ELI45194", !string.IsNullOrEmpty(textData),
                     "Submitted text is empty");
 
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: true))
                 {
-                    var result = await data.SubmitText(textData);
-                    string url = Request.Path.HasValue
-                        ? Request.GetDisplayUrl()
-                        : "https://unknown/api/Document/Text";
-                    url = url.Replace("/Text", $"/{result.Id}/Text");
-                    return Created(new Uri(url), result);
+                    // IPAddress is used to identify the caller via the "Machine" column in FAMSession. If no RemoteIpAddress
+                    // exists, this is likely a unit test; assume 127.0.0.1.
+                    string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
+
+                    data.OpenSession(User, ipAddress);
+
+                    try
+                    {
+                        var result = await data.SubmitText(textData);
+                        string url = Request.Path.HasValue
+                            ? Request.GetDisplayUrl()
+                            : "https://unknown/api/Document/Text";
+                        url = url.Replace("/Text", $"/{result.Id}/Text");
+                        return Created(new Uri(url), result);
+                    }
+                    finally
+                    {
+                        data.CloseSession();
+                    }
                 }
             }
             catch (Exception ex)
@@ -380,14 +406,8 @@ namespace WebAPI.Controllers
                     // IPAddress is used to identify the caller via the "Machine" column in FAMSession. If no RemoteIpAddress
                     // exists, this is likely a unit test; assume 127.0.0.1.
                     string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
-
-                    var user = new User()
-                    {
-                        Username = User.GetUsername(),
-                        WorkflowName = User.GetClaim(Utils._WORKFLOW_NAME)
-                    };
                     
-                    data.OpenSession(user, ipAddress);
+                    data.OpenSession(User, ipAddress);
                     data.OpenDocument(Id);
 
                     try
@@ -448,13 +468,7 @@ namespace WebAPI.Controllers
                     // exists, this is likely a unit test; assume 127.0.0.1.
                     string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
 
-                    var user = new User()
-                    {
-                        Username = User.GetUsername(),
-                        WorkflowName = User.GetClaim(Utils._WORKFLOW_NAME)
-                    };
-
-                    data.OpenSession(user, ipAddress);
+                    data.OpenSession(User, ipAddress);
                     data.OpenDocument(Id);
 
                     try
