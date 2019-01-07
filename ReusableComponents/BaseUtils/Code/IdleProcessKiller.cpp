@@ -67,7 +67,15 @@ IdleProcessKiller::IdleProcessKiller(unsigned long ulProcessId,
 		// Create a thread to monitor the process
 		if( !AfxBeginThread(monitorProcessLoop, this) )
 		{
-			throw UCLIDException("ELI25208", "Unable to initialize idle process monitoring thread.");
+			UCLIDException ue("ELI25208", "Unable to initialize idle process monitoring thread.");
+
+			// Add error info to the exception
+			char errmsg[80]; 
+			strerror_s(errmsg, 80, errno);
+			ue.addDebugInfo("ErrorCode", errno);
+			ue.addDebugInfo("Error", errmsg);
+
+			throw ue;
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25215")
