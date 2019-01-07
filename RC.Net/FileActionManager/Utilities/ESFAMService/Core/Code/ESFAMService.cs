@@ -1369,6 +1369,11 @@ namespace Extract.FileActionManager.Utilities
                 // Signal the threads to stop
                 _stopProcessing.Set();
 
+                // Stop the Check for ETL changes timer
+                _checkForETLChangesTimer?.Stop();
+                _checkForETLChangesTimer?.Dispose();
+                _checkForETLChangesTimer = null;
+
                 foreach (var dbServiceManager in _databaseServiceManagers)
                 {
                     dbServiceManager.Stop();
