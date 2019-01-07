@@ -1620,11 +1620,7 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 			// Get the connection for the thread and save it locally.
 			ipConnection = getDBConnection();
 
-			TransactionGuard tg( ipConnection, adXactReadCommitted, __nullptr );
-
-			auto strQuery( GetQueryForAttributeSetForFile( fileID, attributeSetName, relativeIndex ) );
-
-			tg.CommitTrans();
+			string strQuery = GetQueryForAttributeSetForFile(fileID, attributeSetName, relativeIndex);
 
 #ifdef UNCOMPRESSED_STREAM
 			FieldsPtr ipFields = GetFieldsForQuery( strQuery, ipConnection );
@@ -1635,6 +1631,9 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 #endif
 
 #ifdef COMPRESSED_STREAM
+
+			TransactionGuard tg( ipConnection, adXactReadCommitted, __nullptr );
+
 			FieldsPtr ipFields = GetFieldsForQuery( strQuery, ipConnection );
 			ASSERT_RESOURCE_ALLOCATION("ELI46595", ipFields != __nullptr);
 
@@ -1642,11 +1641,30 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 			ASSERT_RESOURCE_ALLOCATION("ELI46596", ipVOAPtr != __nullptr);
 
 			variant_t vtValue = ipVOAPtr->GetValue();
+
+			tg.CommitTrans();
+			if (vtValue.vt == VT_NULL)
+			{
+				// Try again in case this is just a temporary condition (e.g., record is being added)
+				Sleep(500);
+
+				ipFields = GetFieldsForQuery( strQuery, ipConnection );
+				ASSERT_RESOURCE_ALLOCATION("ELI46617", ipFields != __nullptr);
+
+				ipVOAPtr = ipFields->GetItem("VOA");
+				ASSERT_RESOURCE_ALLOCATION("ELI46618", ipVOAPtr != __nullptr);
+
+				vtValue = ipVOAPtr->GetValue();
+			}
+
 			IIUnknownVectorPtr ipAttributes;
 			if (vtValue.vt == VT_NULL)
 			{
-				ipAttributes.CreateInstance(CLSID_IUnknownVector);
-				ASSERT_RESOURCE_ALLOCATION("ELI46597", ipAttributes != __nullptr);
+				UCLIDException ue("ELI46597", "VOA field is null");
+				ue.addDebugInfo("File ID", fileID);
+				ue.addDebugInfo("Attribute set name", attributeSetName);
+				ue.addDebugInfo("Relative index", relativeIndex);
+				throw ue;
 			}
 			else
 			{
