@@ -306,7 +306,7 @@ STDMETHODIMP CImageUtils::GetSpatialPageInfos(BSTR bstrFileName, IIUnknownVector
 			ISpatialPageInfoPtr ipSpatialPageInfo = __nullptr;
 
 			// Get page info from uss file if possible
-			if (ipPageInfos != __nullptr)
+			if (ipPageInfos != __nullptr && ipPageInfos->Contains(nPage))
 			{
 				ipSpatialPageInfo = ipPageInfos->GetValue(nPage);
 			}

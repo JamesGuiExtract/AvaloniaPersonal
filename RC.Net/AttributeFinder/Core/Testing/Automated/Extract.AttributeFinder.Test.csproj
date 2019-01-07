@@ -206,6 +206,15 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
+    <COMReference Include="UCLID_IMAGEUTILSLib">
+      <Guid>{D46831E6-669C-423F-8209-D6A7A80C2ADD}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="UCLID_INPUTFUNNELLib">
       <Guid>{775ACC91-32AC-11D6-8259-0050DAD4FF55}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -548,6 +557,8 @@
     <EmbeddedResource Include="Resources\LearningMachine\PaginationFeatureGenerator\getPageNumber.rsd.etf" />
     <EmbeddedResource Include="Resources\LearningMachine\CandidateAttributeGenerator\CreateTrainingData.rsd" />
     <EmbeddedResource Include="Resources\LearningMachine\CandidateAttributeGenerator\date.dat" />
+    <EmbeddedResource Include="Resources\BlankPage.tif" />
+    <EmbeddedResource Include="Resources\BlankPage.tif.uss" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UCLID_AFCORELib;
+using UCLID_IMAGEUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 
 
@@ -30,6 +31,8 @@ namespace Extract.AttributeFinder.Test
         const string _EXAMPLE05_USS_FILE = "Resources.Example05.tif.uss";
         const string _EXAMPLE05_WITH_ROTATED_PAGE_TIF_FILE = "Resources.Example05_WithRotatedPage.tif";
         const string _EXAMPLE05_WITH_ROTATED_PAGE_USS_FILE = "Resources.Example05_WithRotatedPage.tif.uss";
+        const string _BLANKPAGE_TIF_FILE = "Resources.BlankPage.tif";
+        const string _BLANKPAGE_USS_FILE = "Resources.BlankPage.tif.uss";
 
         #endregion Fields
 
@@ -309,6 +312,25 @@ namespace Extract.AttributeFinder.Test
             var overlap = translatedZone.GetAreaOverlappingWith(zone);
             Assert.AreEqual(minArea, overlap, delta: 40);
             Assert.Greater(100.0 * overlap / minArea, 99);
+        }
+
+        /// <summary>
+        /// Checks that ImageUtils.GetSpatialPageInfos works correctly on an image with a blank page (page missing from USS file) 
+        /// </summary>
+        [Test, Category("SpatialPageInfo")]
+        public static void GetPageInfoBlankPage()
+        {
+            string imagePath = _testFiles.GetFile(_BLANKPAGE_TIF_FILE);
+            string ussPath = _testFiles.GetFile(_BLANKPAGE_USS_FILE);
+
+            // USS file only has two pages in it
+            var infosFromImageMethods = ImageMethods.GetSpatialPageInfos(imagePath);
+            Assert.AreEqual(2, infosFromImageMethods.Size);
+
+            // ImageUtils::GetSpatialPageInfos() returns info for all pages
+            var imageUtils = new ImageUtilsClass();
+            var infosFromImageUtils = imageUtils.GetSpatialPageInfos(imagePath);
+            Assert.AreEqual(3, infosFromImageUtils.Size());
         }
 
         #endregion Public Test Functions
