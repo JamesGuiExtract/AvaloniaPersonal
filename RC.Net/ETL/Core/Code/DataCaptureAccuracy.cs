@@ -56,10 +56,10 @@ namespace Extract.ETL
 				SELECT DISTINCT FileID
 					FROM AttributeSetForFile
 					INNER JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
-					INNER JOIN FileTaskSession ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID
+					INNER JOIN FileTaskSession ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID 
+                        AND FileTaskSession.ID >= @StartFileTaskSessionSetID AND FileTaskSession.ID <= @EndFileTaskSessionSetID
 					WHERE AttributeSetName.Description IN (@FoundSetName, @ExpectedSetName)
                     AND FileTaskSession.DateTimeStamp IS NOT NULL
-					AND FileTaskSession.ID >= @StartFileTaskSessionSetID AND FileTaskSession.ID <= @EndFileTaskSessionSetID
             ";
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Extract.ETL
 					AND Pagination.DestPage IS NOT NULL)
 				LEFT JOIN FileTaskSession ON
 					(FileTaskSession.FileID = ExpectedFTS.FileID OR FileTaskSession.FileID = Pagination.OriginalFileID)
-                     AND FileTaskSession.ActionID IS NOT NULL
+                    AND FileTaskSession.ID <= @EndFileTaskSessionSetID AND FileTaskSession.ActionID IS NOT NULL
 				INNER JOIN AttributeSetForFile ON FileTaskSession.ID = AttributeSetForFile.FileTaskSessionID
 				INNER JOIN AttributeSetName ON AttributeSetNameID = AttributeSetName.ID
 				LEFT JOIN FAMFile ON FileTaskSession.FileID = FAMFile.ID
@@ -133,6 +133,7 @@ namespace Extract.ETL
 					LEFT JOIN Pagination ON Pagination.ID = FoundAndExpectedFTS.PaginationID
 					INNER JOIN FAMFile ON foundFTS.FileID = FAMFile.ID
 					WHERE RANK = 1
+                OPTION(MAXDOP 1)
             ";
 
         /// <summary>
