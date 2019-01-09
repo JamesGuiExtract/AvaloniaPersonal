@@ -133,6 +133,9 @@ namespace Extract.ETL
 					LEFT JOIN Pagination ON Pagination.ID = FoundAndExpectedFTS.PaginationID
 					INNER JOIN FAMFile ON foundFTS.FileID = FAMFile.ID
 					WHERE RANK = 1
+
+                -- Added to reduce deadlocks on communication buffers
+                -- https://extract.atlassian.net/browse/ISSUE-15756
                 OPTION(MAXDOP 1)
             ";
 
