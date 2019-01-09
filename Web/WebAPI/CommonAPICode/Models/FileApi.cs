@@ -1,6 +1,7 @@
 ﻿using Extract;
 using System;
 using System.Security.Claims;
+using System.Threading;
 using UCLID_FILEPROCESSINGLib;
 using static WebAPI.Utils;
 
@@ -13,9 +14,12 @@ namespace WebAPI.Models
     /// </summary>
     public class FileApi
     {
+        static AutoResetEvent _instanceReleased = new AutoResetEvent(false);
+
         private ApiContext _apiContext;
         private Workflow _workflow;
         private string _sessionId = "";
+        private bool _inUse;
 
         private FileProcessingDB _fileProcessingDB = null;
 
@@ -167,7 +171,26 @@ namespace WebAPI.Models
         /// <summary>
         /// Is this FileApi instance currently being used?
         /// </summary>
-        public bool InUse { get; set; }
+        public bool InUse
+        {
+            get
+            {
+                return _inUse;
+            }
+
+            set
+            {
+                if (value != _inUse)
+                {
+                    _inUse = value;
+
+                    if (!value)
+                    {
+                        _instanceReleased.Set();
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// The open state, ID, file ID and start time of a document session
@@ -181,6 +204,24 @@ namespace WebAPI.Models
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Waits until an instance is no longer in use.
+        /// </summary>
+        /// <param name="millisecondsTimeout">The milliseconds timeout.</param>
+        /// <returns><c>true</c> if the an instance was released; <c>false</c> if a timeout was
+        /// reached before an instance was released.</returns>
+        public static bool WaitForInstanceNoLongerInUse(int millisecondsTimeout)
+        {
+            try
+            {
+                return _instanceReleased.WaitOne(millisecondsTimeout);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46624");
+            }
         }
 
         /// <summary>

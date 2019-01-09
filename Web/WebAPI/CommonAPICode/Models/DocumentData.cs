@@ -98,7 +98,11 @@ namespace WebAPI.Models
             {
                 // Since the previous test seemed backwards but maybe was intentional,
                 // I'm removing the test altogether and just calling EndSession() - Nat
-                _fileApi.EndSession();
+                try
+                {
+                    _fileApi.EndSession();
+                }
+                catch { }
 
                 _fileApi.InUse = false;
                 _fileApi = null;
@@ -564,7 +568,7 @@ namespace WebAPI.Models
         /// <param name="fileName">file name</param>
         /// <param name="fileStream">filestream object</param>
         /// <returns>DocumentSubmitResult instance that contains error info iff an error occurs</returns>
-        public async Task<DocumentIdResult> SubmitFile(string fileName, Stream fileStream)
+        public DocumentIdResult SubmitFile(string fileName, Stream fileStream)
         {
             try
             {
@@ -583,7 +587,7 @@ namespace WebAPI.Models
 
                 using (var fs = new FileStream(fullPath, FileMode.Create))
                 {
-                    await fileStream.CopyToAsync(fs);
+                    fileStream.CopyTo(fs);
                     fs.Close();
                 }
 
@@ -594,8 +598,6 @@ namespace WebAPI.Models
                 throw ex.AsExtract("ELI43242");
             }
         }
-
-
 
         /// <summary>
         /// get a "safe" filename - appends a GUID so there is never a file name collision issue
@@ -623,7 +625,7 @@ namespace WebAPI.Models
         /// <param name="fullPath">path + filename - path is expected to exist at this point</param>
         /// <param name="caller">caller of this method - DO NOT SET, specified by compiler</param>
         /// <returns>DocumentSubmitresult instance that contains error info iff an error has occurred</returns>
-        public DocumentIdResult AddFile(string fullPath, 
+        public DocumentIdResult AddFile(string fullPath,
                                             [CallerMemberName] string caller = "")
         {
             try
@@ -687,7 +689,7 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="submittedText">text to submit</param>
         /// <returns>DocumentSubmitResult instance that contains error info iff an error occurs</returns>
-        public async Task<DocumentIdResult> SubmitText(string submittedText)
+        public DocumentIdResult SubmitText(string submittedText)
         {
             try
             {
@@ -708,7 +710,7 @@ namespace WebAPI.Models
                 using (var fs = new FileStream(fullPath, FileMode.Create))
                 {
                     byte[] text = Encoding.ASCII.GetBytes(submittedText);
-                    await fs.WriteAsync(text, 0, submittedText.Length);
+                    fs.Write(text, 0, submittedText.Length);
                     fs.Close();
                 }
 

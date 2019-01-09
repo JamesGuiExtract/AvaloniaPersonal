@@ -167,12 +167,12 @@ namespace Extract.Web.WebAPI.Test
                 {
                     var formFile = new FormFile(stream, 0, stream.Length, filename, filename);
 
-                    var result = controller.PostDocument(formFile).Result;
+                    var result = controller.PostDocument(formFile);
                     var submitResult1 = result.AssertGoodResult<DocumentIdResult>();
 
                     // It is OK to re-submit - the web service writes a unique filename, based on the 
                     // submitted filename, so test this as well.
-                    result = controller.PostDocument(formFile).Result;
+                    result = controller.PostDocument(formFile);
                     var submitResult2 = result.AssertGoodResult<DocumentIdResult>();
 
                     var fileName1 = fileProcessingDb.GetFileNameFromFileID(submitResult1.Id);
@@ -212,7 +212,7 @@ namespace Extract.Web.WebAPI.Test
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
                     InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
-                var result = controller.PostText("Document 1, SSN: 111-22-3333, DOB: 10-04-1999").Result;
+                var result = controller.PostText("Document 1, SSN: 111-22-3333, DOB: 10-04-1999");
                 var submitResult = result.AssertGoodResult<DocumentIdResult>();
 
                 var sourceFilename = fileProcessingDb.GetFileNameFromFileID(submitResult.Id);
@@ -306,7 +306,7 @@ namespace Extract.Web.WebAPI.Test
                 {
                     var formFile = new FormFile(stream, 0, stream.Length, filename, filename);
 
-                    var submitResult = controller.PostDocument(formFile).Result
+                    var submitResult = controller.PostDocument(formFile)
                         .AssertGoodResult<DocumentIdResult>();
 
                     var documentResult = controller.GetDocument(submitResult.Id)

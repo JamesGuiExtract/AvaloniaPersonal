@@ -11,6 +11,7 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI;
 using WebAPI.Models;
@@ -180,6 +181,16 @@ namespace Extract.Web.WebAPI.Test
         /// be interpreted as type <typeparam name="T"/>.
         /// </summary>
         /// <returns>If validated, the result interpreted as type <typeparam name="T"/></returns>.
+        public static T AssertGoodResult<T>(this Task<IActionResult> resultTask) where T : class
+        {
+            return AssertGoodResult<T>(resultTask.Result);
+        }
+
+        /// <summary>
+        /// Validates a good <see cref="IActionResult"/> from a call to a controller and that can
+        /// be interpreted as type <typeparam name="T"/>.
+        /// </summary>
+        /// <returns>If validated, the result interpreted as type <typeparam name="T"/></returns>.
         public static T AssertGoodResult<T>(this IActionResult result) where T : class
         {
             try
@@ -229,6 +240,14 @@ namespace Extract.Web.WebAPI.Test
             {
                 throw ex.AsExtract("ELI45300");
             }
+        }
+
+        /// <summary>
+        /// Validates a the <see cref="IActionResult"/> has the specified HTTP status code.
+        /// </summary>
+        public static void AssertResultCode(this Task<IActionResult> resultTask, int expectedCode)
+        {
+            AssertResultCode(resultTask.Result, expectedCode);
         }
 
         /// <summary>

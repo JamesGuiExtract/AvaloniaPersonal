@@ -27,6 +27,10 @@ namespace WebAPI.Models
         /// <param name="workflowName">workflow name</param>
         /// <param name="numberOfConnectionRetries">number of retries on DB connection, on failure</param>
         /// <param name="connectionRetryTimeout">timout interval for DB connection</param>
+        /// <param name="maxInterfaces">Specifies the maximum number of concurrent COM API interfaces for
+        /// a specific database workflow.</param>
+        /// <param name="requestWaitTimeout">The number of seconds a call may wait for an available COM API
+        /// instance.</param>
         /// <param name="exceptionLogFilter">Specifies the HTTP result codes that should not be logged
         /// to the main Extract exception log. Specify <c>null</c> to use the default value or empty
         /// string to log all error codes.</param>
@@ -35,6 +39,8 @@ namespace WebAPI.Models
                           string workflowName,
                           string numberOfConnectionRetries = "",
                           string connectionRetryTimeout = "",
+                          string maxInterfaces = "",
+                          string requestWaitTimeout = "",
                           string exceptionLogFilter = null)
         {
             HTTPError.Assert("ELI46375", !String.IsNullOrWhiteSpace(databaseServerName),
@@ -54,8 +60,7 @@ namespace WebAPI.Models
                 numberOfConnectionRetries :
                 _defaultRetryCount;
 
-            bool parsed = Int32.TryParse(numberOfRetries, out int retries);
-            if (parsed)
+            if (Int32.TryParse(numberOfRetries, out int retries))
             {
                 HTTPError.Assert("ELI46378", retries > 0, "Number of DB connection retries must be > 0");
                 NumberOfConnectionRetries = retries;
@@ -66,10 +71,19 @@ namespace WebAPI.Models
                 connectionRetryTimeout :
                 _defaultRetryTimeout;
 
-            parsed = Int32.TryParse(timeoutInterval, out int timeout);
-            if (parsed)
+            if (Int32.TryParse(timeoutInterval, out int timeout))
             {
                 ConnectionRetryTimeout = timeout;
+            }
+
+            if (Int32.TryParse(maxInterfaces, out int maxInterfacesValue))
+            {
+                MaxInterfaces = maxInterfacesValue;
+            }
+
+            if (Int32.TryParse(requestWaitTimeout, out int requestWaitTimeoutValue))
+            {
+                RequestWaitTimeout = requestWaitTimeoutValue;
             }
 
             if (exceptionLogFilter != null)
@@ -99,6 +113,18 @@ namespace WebAPI.Models
         /// The retry interval in seconds
         /// </summary>
         public int ConnectionRetryTimeout { get; }
+
+        /// <summary>
+        /// Specifies the maximum number of concurrent COM API interfaces for a specific database workflow.
+        /// Beyond this number, requests will block until an interface becomes available.
+        /// </summary>
+        public int MaxInterfaces { get; } = 15;
+
+        /// <summary>
+        /// The number of seconds a call may wait for an available COM API instance. If more than
+        /// this amount of time passes before one is available, an 500 error will be thrown.
+        /// </summary>
+        public int RequestWaitTimeout { get; } = 60;
 
         /// <summary>
         /// Specifies the HTTP result codes that should not be logged to the main Extract exception log.

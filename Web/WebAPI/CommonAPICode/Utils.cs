@@ -108,14 +108,20 @@ namespace WebAPI
         /// <param name="workflowName">workflow name</param>
         /// <param name="dbNumberOfConnectionRetries">number of times to retry DB connection on failure</param>
         /// <param name="dbConnectionRetryTimeout">timeout value in seconds</param>
+        /// <param name="maxInterfaces">Specifies the maximum number of concurrent COM API interfaces for
+        /// a specific database workflow.</param>
+        /// <param name="requestWaitTimeout">The number of seconds a call may wait for an available COM API
+        /// instance.</param>
         /// <param name="exceptionLogFilter">Specifies the HTTP result codes that should not be logged
         /// to the main Extract exception log. Specify <c>null</c> to use the default value or empty
         /// string to log all error codes.</param>
-        public static void SetCurrentApiContext(string databaseServerName, 
-                                                string databaseName, 
+        public static void SetCurrentApiContext(string databaseServerName,
+                                                string databaseName,
                                                 string workflowName,
                                                 string dbNumberOfConnectionRetries = "",
                                                 string dbConnectionRetryTimeout = "",
+                                                string maxInterfaces = null,
+                                                string requestWaitTimeout = null,
                                                 string exceptionLogFilter = null)
         {
             try
@@ -127,6 +133,8 @@ namespace WebAPI
                                                         workflowName,
                                                         dbNumberOfConnectionRetries,
                                                         dbConnectionRetryTimeout,
+                                                        maxInterfaces,
+                                                        requestWaitTimeout,
                                                         exceptionLogFilter);
                 }
             }

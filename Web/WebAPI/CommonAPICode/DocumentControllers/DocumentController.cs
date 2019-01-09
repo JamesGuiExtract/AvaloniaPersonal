@@ -8,7 +8,6 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI.Models;
 
@@ -32,7 +31,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         // NOTE: If method name changes, ContentTypeSpecifier and FileUploadOperation should be updated to match.
-        public async Task<IActionResult> PostDocument(IFormFile file)
+        public IActionResult PostDocument(IFormFile file)
         {
             try
             {
@@ -53,10 +52,11 @@ namespace WebAPI.Controllers
 
                     try
                     {
-                        var result = await data.SubmitFile(file.FileName, fileStream);
+                        var result = data.SubmitFile(file.FileName, fileStream);
                         string url = Request.Path.HasValue
                             ? Request.GetDisplayUrl()
                             : "https://unknown/api/Document";
+
                         return Created(new Uri($"{url}/{result.Id}"), result);
                     }
                     finally
@@ -143,7 +143,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         // NOTE: If method name changes, ContentTypeSpecifier should be updated to match.
-        public async Task<IActionResult> PostText([FromBody]string textData)
+        public IActionResult PostText([FromBody]string textData)
         {
             try
             {
@@ -160,7 +160,7 @@ namespace WebAPI.Controllers
 
                     try
                     {
-                        var result = await data.SubmitText(textData);
+                        var result = data.SubmitText(textData);
                         string url = Request.Path.HasValue
                             ? Request.GetDisplayUrl()
                             : "https://unknown/api/Document/Text";

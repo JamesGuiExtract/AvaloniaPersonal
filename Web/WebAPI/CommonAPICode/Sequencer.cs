@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Extract;
+using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
-namespace Extract.Utilities
+namespace WebAPI
 {
     /// <summary>
     /// A class that blocks threads then releases the blocks in a pre-determined order and interval
@@ -32,6 +33,11 @@ namespace Extract.Utilities
         int _separationTime;
 
         /// <summary>
+        /// Indicates whether items will be removed from the queue via the WaitForTurn call.
+        /// </summary>
+        bool _requireExplicitRemoval;
+
+        /// <summary>
         /// Indicates if currently in the midst of a call to <see cref="Clear"/>.
         /// </summary>
         bool _clearing;
@@ -44,10 +50,14 @@ namespace Extract.Utilities
         /// Initializes a new instance of the <see cref="Sequencer&lt;T&gt;"/> class.
         /// </summary>
         /// <param name="separationTime">The minimum amount of time in milliseconds that should
-        /// elapse between successive items being released.</param>
-        public Sequencer(int separationTime)
+        /// elapse between successive items being released. </param>
+        /// <param name="requireExplicitRemoval">If <c>true</c> items will not be removed from the
+        /// queue via a WaitForTurn call; if <c>false</c> WaitForTurn will remove items from the queue.
+        /// </param>
+        public Sequencer(int separationTime, bool requireExplicitRemoval)
         {
             _separationTime = separationTime;
+            _requireExplicitRemoval = requireExplicitRemoval;
         }
 
         #endregion Constructors
@@ -203,10 +213,10 @@ namespace Extract.Utilities
                     }
                 }
 
-                if (!_clearing)
+                if (!_clearing && !_requireExplicitRemoval)
                 {
                     // Remove the item from the queue immediately if no _separationTime is specified.
-                    if (_separationTime == 0)
+                    if (_separationTime <= 0)
                     {
                         lock (_lock)
                         {
