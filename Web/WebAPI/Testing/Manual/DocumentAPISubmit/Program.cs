@@ -12,6 +12,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
     class Program
     {
         static Func<Task> _login;
+        static string _textFilePrefix;
 
         static void Main(string[] args)
         {
@@ -141,6 +142,8 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
             int totalTasksStarted = 0;
             int totalTasksCompleted = 0;
 
+            _textFilePrefix = Guid.NewGuid().ToString("N");
+
             // Cache text file enumeration because otherwise the list grow exponentially
             string[] textFiles = null;
             while(t.Elapsed < minTimeToRun)
@@ -150,7 +153,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                 totalTasksStarted += tasksStarted;
                 totalTasksCompleted += tasksCompleted;
 
-                textFiles = textFiles ?? GetFiles(".txt").ToArray();
+                textFiles = textFiles ?? GetFiles(".txt").Where(f => f.StartsWith(_textFilePrefix)).ToArray();
                 (tasksStarted, tasksCompleted) = ProcessAll(docClient, workflowClient, textFiles, batchSize, pollingInterval, false, RunTests).GetAwaiter().GetResult();
                 totalTasksStarted += tasksStarted;
                 totalTasksCompleted += tasksCompleted;
@@ -287,9 +290,6 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
 
                 origData = data;
                 docDataCount = origData.Attributes.Count;
-
-                Log("Writing " + fileName + ".json", () =>
-                    File.WriteAllText(fileName + ".json", origData.ToJson()));
             }
 
             async Task PatchDataUpdateTest()
@@ -311,10 +311,6 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
 
                         var patchedData = await Log("Getting patched data for " + fileName, async () =>
                             await docClient.GetDocumentDataAsync(id));
-
-                        var newName = fileName + ".patched.json";
-                        Log("Writing " + newName, () =>
-                            File.WriteAllText(newName, patchedData.ToJson()));
                     }
                     else if (docDataCount == 0)
                     {
@@ -556,8 +552,6 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                     await docClient.GetOutputTextAsync(id));
 
                 text = string.Join("\r\n\r\n", textResult.Pages.Select(p => p.Text));
-                Log("Writing output text from " + fileName, () =>
-                    File.WriteAllText(fileName + ".output.txt", text));
             }
 
             async Task GetPageTextTest()
@@ -569,8 +563,6 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                     await docClient.GetPageTextAsync(id, pageNum));
 
                 text = textResult.Pages.Single().Text;
-                Log(FormattableString.Invariant($"Writing page {pageNum} text from {fileName}"), () =>
-                    File.WriteAllText(FormattableString.Invariant($"{fileName}.page{pageNum}.txt"), text));
             }
 
             async Task GetTextTest()
@@ -579,8 +571,11 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                     await docClient.GetTextAsync(id));
 
                 text = string.Join("\r\n\r\n", textResult.Pages.Select(p => p.Text));
-                Log("Writing text from " + fileName, () =>
-                    File.WriteAllText(fileName + ".document.txt", text));
+                if (!fileIsText)
+                {
+                    Log("Writing text from " + fileName, () =>
+                        File.WriteAllText(Path.Combine(Path.GetDirectoryName(fileName), _textFilePrefix + Guid.NewGuid().ToString("N") + ".txt"), text));
+                }
             }
 
             async Task PostTextTest()
