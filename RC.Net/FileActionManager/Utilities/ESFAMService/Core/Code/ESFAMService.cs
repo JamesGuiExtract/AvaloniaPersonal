@@ -1050,9 +1050,9 @@ namespace Extract.FileActionManager.Utilities
                                 throw restartInvalid;
                             }
 
-                            if (restartTime <= _lastETLStart)
+                            if (_checkForETLChangesTimer is null || restartTime <= _lastETLStart)
                             {
-                                _checkForETLChangesTimer.Start();
+                                _checkForETLChangesTimer?.Start();
                                 return;
                             }
 
@@ -1063,7 +1063,11 @@ namespace Extract.FileActionManager.Utilities
                             ex.ExtractLog("ELI46302");
                         }
                     };
-                    _checkForETLChangesTimer.Start();
+                    _checkForETLChangesTimer?.Start();
+                    if (_checkForETLChangesTimer is null)
+                    {
+                        return;
+                    }
                     _etlFAMDB.RecordFAMSessionStart("ETL Polling", string.Empty, false, false);
                     _etlFAMDB.RegisterActiveFAM();
                 }).Start();
