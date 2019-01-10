@@ -738,15 +738,26 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 		ISpatialStringPtr ipDocText(ipAFDoc->Text);
 		ASSERT_RESOURCE_ALLOCATION("ELI20224", ipDocText != __nullptr);
 
+		// Create an attribute vector to store the results
+		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI19223", ipAttributes != __nullptr );
+
+		// Don't attempt line finding on text files
+		// https://extract.atlassian.net/browse/ISSUE-15767
+		EFileType eFileType = getFileType(asString(ipDocText->SourceDocName));
+		if (eFileType != kImageFile && eFileType != kUnknown)
+		{
+			// return the empty vector
+			*ppAttributes = ipAttributes.Detach();
+
+			return S_OK;
+		}
+
 		// The search should stop when this flag gets set to true
 		bool bEndSearch = false;
 
 		// Expand clue list to replace any file names with the clues from the specified file
 		IVariantVectorPtr ipExpandedClues = getExpandedClueList(ipAFDoc);
-
-		// Create an attribute vector to store the results
-		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI19223", ipAttributes != __nullptr );
 
 		// Get a regular expression parser
 		IRegularExprParserPtr ipParser = m_ipAFUtility->GetNewRegExpParser(ipAFDoc);
@@ -933,10 +944,10 @@ STDMETHODIMP CBoxFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 
 		// return the vector
 		*ppAttributes = ipAttributes.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19224");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------

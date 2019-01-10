@@ -1660,9 +1660,6 @@ bool isImageFileExtension(string strExt)
 	// make the extension into lowercase
 	makeLowerCase(strExt);
 
-	// initialize the vector of valid image file extensions 
-	vector<string> vecExtensions;
-
 	// Check extensions
 	// This was changed from a static vector due to P13 4434  
 	if (strExt == "tif" || strExt == "tiff" ||			// TIF extensions
