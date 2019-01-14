@@ -166,6 +166,7 @@ namespace WebAPI
             try
             {
                 bool foundItem = false;
+                bool exited = false;
 
                 var waitTime = new Stopwatch();
                 waitTime.Start();
@@ -176,7 +177,8 @@ namespace WebAPI
                     // objectToWaitFor is next up.
                     NotifyCollectionChangedEventHandler collectionChangedHandler = (s, e) =>
                         {
-                            if (e.Action == NotifyCollectionChangedAction.Remove)
+                            // Ensure this handler is still active before trying to access recheckEvent.
+                            if (!exited && e.Action == NotifyCollectionChangedAction.Remove)
                             {
                                 recheckEvent.Set();
                             }
@@ -184,7 +186,10 @@ namespace WebAPI
 
                     try
                     {
-                        _queue.CollectionChanged += collectionChangedHandler;
+                        lock (_lock)
+                        {
+                            _queue.CollectionChanged += collectionChangedHandler; 
+                        }
 
                         // Block until the objectToWaitFor is up or the _queue is cleared.
                         while (!_clearing)
@@ -225,7 +230,12 @@ namespace WebAPI
                     }
                     finally
                     {
-                        _queue.CollectionChanged -= collectionChangedHandler;
+                        exited = true;
+
+                        lock (_lock)
+                        {
+                            _queue.CollectionChanged -= collectionChangedHandler; 
+                        }
                     }
                 }
 
