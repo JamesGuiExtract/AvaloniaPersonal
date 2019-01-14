@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
         static Func<Task> _login;
         static string _textFilePrefix;
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             string root = ".";
             string urlFile = "url.txt";
@@ -88,6 +89,9 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                 // Set timeout to be higher than default to avoid the occasional TaskCanceledExceptions
                 Timeout = TimeSpan.FromMinutes(5)
             };
+			// This seems to make connections against a remote address behave like connections to localhost
+            ServicePointManager.DefaultConnectionLimit = int.MaxValue;
+
             url = url ?? File.ReadAllText(urlFile).Trim();
             client.BaseAddress = new Uri(url);
 
@@ -149,22 +153,22 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
             while(t.Elapsed < minTimeToRun)
             {
                 // Process files with only one task working on any particular file
-                var (tasksStarted, tasksCompleted) = ProcessAll(docClient, workflowClient, GetFiles(".tif", ".pdf"), batchSize, pollingInterval, false, RunTests).GetAwaiter().GetResult();
+                var (tasksStarted, tasksCompleted) = await ProcessAll(docClient, workflowClient, GetFiles(".tif", ".pdf"), batchSize, pollingInterval, false, RunTests);
                 totalTasksStarted += tasksStarted;
                 totalTasksCompleted += tasksCompleted;
 
                 textFiles = textFiles ?? GetFiles(".txt").Where(f => f.StartsWith(_textFilePrefix)).ToArray();
-                (tasksStarted, tasksCompleted) = ProcessAll(docClient, workflowClient, textFiles, batchSize, pollingInterval, false, RunTests).GetAwaiter().GetResult();
+                (tasksStarted, tasksCompleted) = await ProcessAll(docClient, workflowClient, textFiles, batchSize, pollingInterval, false, RunTests);
                 totalTasksStarted += tasksStarted;
                 totalTasksCompleted += tasksCompleted;
 
                 // Process files where random files in the valid range are processed (so that it is possible that the same
                 // file is processed by multiple threads at a time)
-                (tasksStarted, tasksCompleted) = ProcessAll(docClient, workflowClient, GetFiles(".tif", ".pdf"), batchSize, pollingInterval, true, RunTests).GetAwaiter().GetResult();
+                (tasksStarted, tasksCompleted) = await ProcessAll(docClient, workflowClient, GetFiles(".tif", ".pdf"), batchSize, pollingInterval, true, RunTests);
                 totalTasksStarted += tasksStarted;
                 totalTasksCompleted += tasksCompleted;
 
-                (tasksStarted, tasksCompleted) = ProcessAll(docClient, workflowClient, textFiles, batchSize, pollingInterval, true, RunTests).GetAwaiter().GetResult();
+                (tasksStarted, tasksCompleted) = await ProcessAll(docClient, workflowClient, textFiles, batchSize, pollingInterval, true, RunTests);
                 totalTasksStarted += tasksStarted;
                 totalTasksCompleted += tasksCompleted;
             }
@@ -226,6 +230,10 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                     {
                         Log(FormattableString.Invariant($"FAILURE at {DateTime.Now} {finished.Exception}"), true);
                     }
+                }
+                else if (finished.IsCanceled)
+                {
+                    Log(FormattableString.Invariant($"FAILURE, CANCELLED at {DateTime.Now}"), true);
                 }
                 else
                 {
