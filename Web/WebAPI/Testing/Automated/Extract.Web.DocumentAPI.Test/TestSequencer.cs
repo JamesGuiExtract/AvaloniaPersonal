@@ -1,5 +1,4 @@
-﻿using Extract.Utilities;
-using Extract.Testing.Utilities;
+﻿using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,8 +6,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using WebAPI;
 
-namespace Extract.Utilities.Test
+namespace Extract.Web.WebAPI.Test
 {
     /// <summary>
     /// Tests the Sequencer class.
@@ -48,7 +48,7 @@ namespace Extract.Utilities.Test
         public static void Test01()
         {
             // 500ms spacing after each item is allowed its turn.
-            var sequencer = new Sequencer<int>(500);
+            var sequencer = new Sequencer<int>(500, false);
 
             // Queue 4 integers out of order
             sequencer.AddToQueue(2);

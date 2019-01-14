@@ -97,6 +97,22 @@ namespace WebAPI
             }
             catch (Exception ex)
             {
+                try
+                {
+                    // There was an situation that occurred in DocumentAPI testing where a null
+                    // reference error was thrown from the CollectionChanged after objectToQueue was
+                    // already in _queue. This caused everything thing else to pile up on the item
+                    // the caller assumed wasn't queued.
+                    lock (_lock)
+                    {
+                        _queue.Remove(objectToQueue);
+                    }
+                }
+                catch (Exception ex2)
+                {
+                    ex2.ExtractLog("ELI46636");
+                }
+
                 throw ex.AsExtract("ELI39517");
             }
         }

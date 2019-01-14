@@ -46,17 +46,17 @@ namespace WebAPI.Models
 
             try
             {
-                // Will throw exception if timeout expires
-                _sequencer.WaitForTurn(requestId, apiContext.RequestWaitTimeout * 1000);
-            }
-            catch (Exception ex)
-            {
-                throw new HTTPError("ELI46633", StatusCodes.Status500InternalServerError,
-                    "Timeout waiting to process request", ex);
-            }
+                try
+                {
+                    // Will throw exception if timeout expires
+                    _sequencer.WaitForTurn(requestId, apiContext.RequestWaitTimeout * 1000);
+                }
+                catch (Exception ex)
+                {
+                    throw new HTTPError("ELI46633", StatusCodes.Status500InternalServerError,
+                        "Timeout waiting to process request", ex);
+                }
 
-            try
-            {
                 while (fileApi == null)
                 {
                     if (waiting)

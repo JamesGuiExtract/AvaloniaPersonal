@@ -159,6 +159,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestDocument.cs" />
+    <Compile Include="TestSequencer.cs" />
     <Compile Include="testUsers.cs" />
     <Compile Include="TestWorkflow.cs" />
   </ItemGroup>
