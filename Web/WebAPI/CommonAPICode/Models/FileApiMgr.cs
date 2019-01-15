@@ -53,7 +53,7 @@ namespace WebAPI.Models
                 }
                 catch (Exception ex)
                 {
-                    throw new HTTPError("ELI46633", StatusCodes.Status500InternalServerError,
+                    throw new HTTPError("ELI46633", StatusCodes.Status503ServiceUnavailable,
                         "Timeout waiting to process request", ex);
                 }
 
@@ -63,7 +63,7 @@ namespace WebAPI.Models
                     {
                         remainingTimeout = Math.Max(0, 
                             (apiContext.RequestWaitTimeout * 1000) - (int)waitTime.ElapsedMilliseconds);
-                        HTTPError.Assert("ELI46635", StatusCodes.Status500InternalServerError,
+                        HTTPError.Assert("ELI46635", StatusCodes.Status503ServiceUnavailable,
                             FileApi.WaitForInstanceNoLongerInUse(remainingTimeout), "Timeout waiting to process request");
                     }
 
