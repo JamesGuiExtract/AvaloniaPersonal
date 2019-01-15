@@ -190,11 +190,12 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                 .Select(async file =>
                 {
                     tasksStarted++;
-                    var (fileName, id) = await PostAsync(docClient, Path.GetFullPath(file));
+                    var fileName = Path.GetFullPath(file);
+                    var id = await KeepTrying(() => PostAsync(docClient, fileName), fileName, pollingInterval);
                     var fileID = processRandomFileIDs
                     ? rng.Next(1, tasksStarted + 1)
                     : id;
-                    await operation(id, fileName, docClient, workflowClient, pollingInterval);
+                    await KeepTrying(() => operation(id, fileName, docClient, workflowClient, pollingInterval), fileName, pollingInterval);
                 });
 
             var waitingTasksEnum = tasks.GetEnumerator();
@@ -666,7 +667,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                 bool failBecauseText = fileIsText && imageOnlyTests.Contains(pair);
                 try
                 {
-                    await pair.test();
+                    await KeepTrying(pair.test, fileName, pollingInterval);
                     if (failBecauseText)
                     {
                         throw new Exception(FormattableString.Invariant($"Lack of exception {pair.description} posted text! File: {fileName}"));
@@ -688,7 +689,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
 
             ResetStateVars();
 
-            await DeleteDocumentTest();
+            await KeepTrying(DeleteDocumentTest, fileName, pollingInterval);
 
             allButDelete = allButDelete.OrderBy(_ => rng.Next()).ToList();
             Log(FormattableString.Invariant($"After deleting: file: {fileName}, ID: {id}, test order: {string.Join("+", allButDelete.Select(t => SimpleName(t.test)))}"));
@@ -698,7 +699,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                 bool failBecauseText = fileIsText && imageOnlyTests.Contains(pair);
                 try
                 {
-                    await pair.test();
+                    await KeepTrying(pair.test, fileName, pollingInterval);
 
                     if (failWhenDeleted)
                     {
@@ -728,7 +729,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
             }
         }
 
-        static async Task<(string fileName, int id)> PostAsync(DocumentClient client, string fileName)
+        static async Task<int> PostAsync(DocumentClient client, string fileName)
         {
             DocumentIdResult result;
 
@@ -748,7 +749,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
 
             Log(DateTime.Now.ToLongTimeString() + " Created: " + result.Id);
 
-            return (fileName, result.Id);
+            return result.Id;
         }
 
         static async Task PollForCompletion(DocumentClient client, int id, int pollingInterval = 10000)
@@ -831,6 +832,80 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
             {
                 return "UnknownMethodName:" + (func?.Method?.Name ?? "");
             }
+        }
+
+        static async Task KeepTrying(Func<Task> action, string fileName, int pollingInterval)
+        {
+            bool success = false;
+            while (!success)
+            {
+                try
+                {
+                    await action();
+                    success = true;
+                    break;
+                }
+                catch (SwaggerException ex) when (ex.StatusCode == 500 && ex.Message.Contains("Timeout waiting to process request"))
+                {
+                    Log(FormattableString.Invariant($"Handled 500, 'timeout...' exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
+                }
+                catch (SwaggerException ex) when (ex.StatusCode == 500)
+                {
+                    Log(FormattableString.Invariant($"Handled 500 exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
+                }
+                catch (SwaggerException ex) when (ex.StatusCode == 502)
+                {
+                    Log(FormattableString.Invariant($"Handled 502 exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
+                }
+                catch (SwaggerException ex) when (ex.StatusCode == 503)
+                {
+                    Log(FormattableString.Invariant($"Handled 503 exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
+                }
+                catch (OperationCanceledException)
+                {
+                    Log(FormattableString.Invariant($"Handled OperationCanceledException at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
+                }
+
+                await Task.Delay(pollingInterval);
+            }
+        }
+
+        static async Task<T> KeepTrying<T>(Func<Task<T>> func, string fileName, int pollingInterval)
+        {
+            T result = default;
+            bool success = false;
+            while (!success)
+            {
+                try
+                {
+                    result = await func();
+                    success = true;
+                    break;
+                }
+                catch (SwaggerException ex) when (ex.StatusCode == 500 && ex.Message.Contains("Timeout waiting to process request"))
+                {
+                    Log(FormattableString.Invariant($"Handled 500, 'timeout...' exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
+                }
+                catch (SwaggerException ex) when (ex.StatusCode == 500)
+                {
+                    Log(FormattableString.Invariant($"Handled 500 exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
+                }
+                catch (SwaggerException ex) when (ex.StatusCode == 502)
+                {
+                    Log(FormattableString.Invariant($"Handled 502 exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
+                }
+                catch (SwaggerException ex) when (ex.StatusCode == 503)
+                {
+                    Log(FormattableString.Invariant($"Handled 503 exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
+                }
+                catch (OperationCanceledException)
+                {
+                    Log(FormattableString.Invariant($"Handled OperationCanceledException at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
+                }
+
+                await Task.Delay(pollingInterval);
+            }
+            return result;
         }
     }
 
