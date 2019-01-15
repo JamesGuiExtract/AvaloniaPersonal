@@ -354,7 +354,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                             await docClient.PatchDocumentDataAsync(id, patch));
 
                         var patchedData = await Log("Getting patched data for " + fileName, async () =>
-                            await docClient.GetDocumentDataAsync(id));
+                            await KeepTrying(() => docClient.GetDocumentDataAsync(id), fileName, pollingInterval));
 
                         docDataAllExist = false;
                         docDataCount--;
@@ -399,7 +399,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                         await docClient.PatchDocumentDataAsync(id, patch));
 
                     var patchedData = await Log("Getting patched data for " + fileName, async () =>
-                        await docClient.GetDocumentDataAsync(id));
+                        await KeepTrying(() => docClient.GetDocumentDataAsync(id), fileName, pollingInterval));
 
                     docDataCount++;
 
@@ -457,7 +457,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                     await docClient.PutDocumentDataAsync(id, input));
 
                 var clearedData = await Log("Getting cleared data for " + fileName, async () =>
-                    await docClient.GetDocumentDataAsync(id));
+                    await KeepTrying(() => docClient.GetDocumentDataAsync(id), fileName, pollingInterval));
 
                 docDataCount = 0;
                 if (clearedData.Attributes.Count != docDataCount)
@@ -480,7 +480,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                     await docClient.PutDocumentDataAsync(id, input));
 
                 var restoredData = await Log("Getting restored data for " + fileName, async () =>
-                    await docClient.GetDocumentDataAsync(id));
+                    await KeepTrying(() => docClient.GetDocumentDataAsync(id), fileName, pollingInterval));
 
                 docDataCount = origData.Attributes.Count;
                 docDataAllExist = true;
