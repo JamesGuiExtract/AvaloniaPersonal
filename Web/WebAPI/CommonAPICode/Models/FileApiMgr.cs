@@ -113,6 +113,7 @@ namespace WebAPI.Models
                             if (instanceCount < apiContext.MaxInterfaces)
                             {
                                 fileApi = new FileApi(apiContext, setInUse: true);
+                                fileApi.Released += HandleFileApi_Released;
                                 _interfaces.Add(fileApi);
                                 Log.WriteLine(Inv($"Number of file API interfaces is now: {_interfaces.Count}"), "ELI43251");
                             }
@@ -155,6 +156,27 @@ namespace WebAPI.Models
         }
 
         /// <summary>
+        /// Handles the Released event of the HandleFileApi control.
+        /// </summary>
+        static void HandleFileApi_Released(object sender, EventArgs e)
+        {
+            try
+            {
+                var fileApi = (FileApi)sender;
+
+                if (_sequencer.Count == 0 || fileApi.UsesSinceClose > 100)
+                {
+                    fileApi.FileProcessingDB.CloseAllDBConnections();
+                    fileApi.UsesSinceClose = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI46638");
+            }
+        }
+
+        /// <summary>
         /// Finds an available <see cref="FileApi"/> instance for the specified
         /// apiContext and sessionOwner.
         /// </summary>
@@ -189,6 +211,7 @@ namespace WebAPI.Models
             foreach (var inf in _interfaces)
             {
                 inf.FileProcessingDB.CloseAllDBConnections();
+                inf.UsesSinceClose = 0;
             }
             _interfaces.Clear();
         }

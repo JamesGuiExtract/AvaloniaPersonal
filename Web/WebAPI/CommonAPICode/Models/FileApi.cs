@@ -92,6 +92,12 @@ namespace WebAPI.Models
         }
 
         /// <summary>
+        /// Raised when this instance's <see cref="InUse"/> flag is set to <c>false</c> to indicate
+        /// it is now available to be used by another request.
+        /// </summary>
+        public event EventHandler<EventArgs> Released;
+
+        /// <summary>
         /// Gets the fileProcessingDB instance
         /// </summary>
         public FileProcessingDB FileProcessingDB
@@ -184,12 +190,25 @@ namespace WebAPI.Models
                 {
                     _inUse = value;
 
-                    if (!value)
+                    if (value)
+                    {
+                        UsesSinceClose++;
+                    }
+                    else
                     {
                         _instanceReleased.Set();
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the number of requests this instance was used for since the last time it was closed.
+        /// </summary>
+        public int UsesSinceClose
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -263,10 +282,6 @@ namespace WebAPI.Models
                 {
                     throw ex.AsExtract("ELI46259");
                 }
-                finally
-                {
-                    FileProcessingDB.CloseAllDBConnections();
-                }
             }
             catch (Exception ex)
             {
@@ -302,6 +317,7 @@ namespace WebAPI.Models
                 finally
                 {
                     FileProcessingDB.CloseAllDBConnections();
+                    UsesSinceClose = 0;
                 }
             }
             catch (Exception ex)
