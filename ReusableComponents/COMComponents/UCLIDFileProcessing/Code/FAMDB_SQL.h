@@ -2306,7 +2306,7 @@ static const std::string gstrCREATE_PAGINATION_DATA_WITH_RANK_VIEW =
 	"				AND FileTaskSession.DateTimeStamp IS NOT NULL') \r\n";
 
 static const std::string gstrCREATE_PROCESSING_DATA_VIEW =
-	"IF OBJECT_ID('[dbo].[vPaginationDataWithRank]', 'V') IS NULL \r\n"
+	"IF OBJECT_ID('[dbo].[vProcessingData]', 'V') IS NULL \r\n"
 	"		EXECUTE(' \r\n"
 	"			CREATE VIEW[dbo].[vProcessingData] \r\n"
 	"			AS \r\n"
