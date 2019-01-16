@@ -27,6 +27,7 @@ namespace Extract.ETL.Test
 
         Dictionary<int, Dictionary<string, object>> expectedData = new Dictionary<int, Dictionary<string, object>>()
         {
+            // This record is for the file completed outside of pagination
             {
                 0,
                 new Dictionary<string, object>()
@@ -44,6 +45,7 @@ namespace Extract.ETL.Test
                 }
             },
 
+            // This record was processed through pagination
             {
                 1,
                 new Dictionary<string, object>()
@@ -61,6 +63,7 @@ namespace Extract.ETL.Test
                 }
             },
 
+            // This record was processed through pagination
             {
                 2,
                 new Dictionary<string, object>()
@@ -175,7 +178,7 @@ namespace Extract.ETL.Test
                             Assert.AreEqual(status.LastFileTaskSessionIDProcessed, record["LastFileTaskSessionIDProcessed"],
                                 "LastFileTaskSessionIDProcessed from database should be same as that in status");
 
-                            Assert.AreEqual(5, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 5");
+                            Assert.AreEqual(6, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 6");
 
                             reader.Close();
 

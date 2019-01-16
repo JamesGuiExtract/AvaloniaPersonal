@@ -144,12 +144,16 @@ namespace Extract.ETL
                             FileTaskSession.ActionID, 
                             ACTION.ASCName, 
                             MAX(FileTaskSession.ID) [FileTaskSessionID]
-                     FROM FileTaskSession
-                          INNER JOIN FAMSession ON FAMSession.ID = FileTaskSession.
-                          FAMSessionID
-                          INNER JOIN ACTION ON FileTaskSession.ActionID = ACTION.ID
-                          INNER JOIN TaskClass ON FileTaskSession.TaskClassID =
-                          TaskClass.ID
+                      FROM FileTaskSession
+                          INNER JOIN FAMSession ON
+                          FAMSession.ID = FileTaskSession.FAMSessionID
+                          INNER JOIN ACTION ON
+                          FileTaskSession.ActionID = ACTION.ID
+                          INNER JOIN TaskClass ON
+                          FileTaskSession.TaskClassID = TaskClass.ID
+                       INNER JOIN FileActionStatus ON FileActionStatus.FileID = FileTaskSession.FileID 
+                       AND FileActionStatus.ActionID =  FileTaskSession.ActionID 
+                       AND FileActionStatus.ActionStatus = 'C'
                      WHERE FileTaskSession.ID > @LastProcessedID
                            AND FileTaskSession.ID <= @LastInBatchID
                            AND [TaskClass].GUID IN(
