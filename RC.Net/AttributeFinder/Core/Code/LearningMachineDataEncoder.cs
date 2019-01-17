@@ -1204,13 +1204,6 @@ namespace Extract.AttributeFinder
             {
                 updateStatus(new StatusArgs { StatusMessage = "Building feature vector and answer collections:" });
 
-                // Indent sub-status messages
-                Action<StatusArgs> updateStatus2 = args =>
-                    {
-                        args.Indent++;
-                        updateStatus(args);
-                    };
-
                 ExtractException.Assert("ELI40261", "Encodings have not been computed", AreEncodingsComputed);
 
                 // Null or empty VOA collection is OK. Set to null to simplify code
@@ -1218,6 +1211,21 @@ namespace Extract.AttributeFinder
                 {
                     inputVOAFilePaths = null;
                 }
+
+                int answerLength = answersOrAnswerFiles?.Match(a => a.Length, a => a.Length) ?? 0;
+
+                if (inputVOAFilePaths != null && inputVOAFilePaths.Length != ussFilePaths.Length
+                    || answersOrAnswerFiles != null && answerLength != ussFilePaths.Length)
+                {
+                    throw new ExtractException("ELI39700", "Arguments are of different lengths");
+                }
+
+                // Indent sub-status messages
+                Action<StatusArgs> updateStatus2 = args =>
+                    {
+                        args.Indent++;
+                        updateStatus(args);
+                    };
 
                 // Set up lazy array of input data using thread-safe methods so that the calls
                 // to Get_FeatureVectorAndAnswerCollections below can expand the specifications into real
@@ -1235,20 +1243,29 @@ namespace Extract.AttributeFinder
 
                     IUnknownVector runRules(string ussPath, Lazy<IUnknownVector> answerVoa)
                     {
-                        spatialString.Value.LoadFrom(ussPath, false);
-                        spatialString.Value.ReportMemoryUsage();
-                        var doc = new AFDocument { Text = spatialString.Value };
-                        var voa = ruleset.Value.ExecuteRulesOnText(doc, null, alternateComponentDataDir, null);
-                        voa.ReportMemoryUsage();
-
-                        // Need to label attributes for attribute categorization
-                        if (MachineUsage == LearningMachineUsage.AttributeCategorization)
+                        try
                         {
-                            labelAttributesSettings.LabelAttributesVector(Path.ChangeExtension(ussPath, null),
-                                voa, answerVoa.Value, cancellationToken);
-                        }
+                            spatialString.Value.LoadFrom(ussPath, false);
+                            spatialString.Value.ReportMemoryUsage();
+                            var doc = new AFDocument { Text = spatialString.Value };
+                            var voa = ruleset.Value.ExecuteRulesOnText(doc, null, alternateComponentDataDir, null);
+                            voa.ReportMemoryUsage();
 
-                        return voa;
+                            // Need to label attributes for attribute categorization
+                            if (MachineUsage == LearningMachineUsage.AttributeCategorization)
+                            {
+                                labelAttributesSettings.LabelAttributesVector(Path.ChangeExtension(ussPath, null),
+                                    voa, answerVoa.Value, cancellationToken);
+                            }
+
+                            return voa;
+                        }
+                        catch (Exception ex)
+                        {
+                            var uex = ex.AsExtract("ELI46640");
+                            uex.AddDebugData("USS File", ussPath);
+                            throw uex;
+                        }
                     }
 
                     if (inputVOAFilePaths != null)
@@ -1288,14 +1305,6 @@ namespace Extract.AttributeFinder
                             inputVOAs[i] = new Lazy<IUnknownVector>(() =>
                                 runRules(ussFilePaths[safeIdx], GetLazyAttributes(answersOrAnswerFiles, safeIdx)));
                         }
-                    }
-
-                    int answerLength = answersOrAnswerFiles?.Match(a => a.Length, a => a.Length) ?? 0;
-
-                    if (inputVOAFilePaths != null && inputVOAFilePaths.Length != ussFilePaths.Length
-                        || answersOrAnswerFiles != null && answerLength != ussFilePaths.Length)
-                    {
-                        throw new ExtractException("ELI39700", "Arguments are of different lengths");
                     }
 
                     if (MachineUsage == LearningMachineUsage.DocumentCategorization)
