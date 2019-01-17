@@ -92,10 +92,10 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Raised when this instance's <see cref="InUse"/> flag is set to <c>false</c> to indicate
-        /// it is now available to be used by another request.
+        /// Raised when this instance's <see cref="InUse"/> flag is being set to <c>false</c> to
+        /// indicate it is now available to be used by another request.
         /// </summary>
-        public event EventHandler<EventArgs> Released;
+        public event EventHandler<EventArgs> Releasing;
 
         /// <summary>
         /// Gets the fileProcessingDB instance
@@ -188,6 +188,11 @@ namespace WebAPI.Models
             {
                 if (value != _inUse)
                 {
+                    if (!value)
+                    {
+                        Releasing?.Invoke(this, new EventArgs());
+                    }
+
                     _inUse = value;
 
                     if (value)
@@ -197,7 +202,6 @@ namespace WebAPI.Models
                     else
                     {
                         _instanceReleased.Set();
-                        Released?.Invoke(this, new EventArgs());
                     }
                 }
             }

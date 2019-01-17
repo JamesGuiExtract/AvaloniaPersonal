@@ -113,7 +113,7 @@ namespace WebAPI.Models
                             if (instanceCount < apiContext.MaxInterfaces)
                             {
                                 fileApi = new FileApi(apiContext, setInUse: true);
-                                fileApi.Released += HandleFileApi_Released;
+                                fileApi.Releasing += HandleFileApi_Releasing;
                                 _interfaces.Add(fileApi);
                                 Log.WriteLine(Inv($"Number of file API interfaces is now: {_interfaces.Count}"), "ELI43251");
                             }
@@ -156,9 +156,9 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Handles the Released event of the HandleFileApi control.
+        /// Handles the Releasing event of a FileApi instance.
         /// </summary>
-        static void HandleFileApi_Released(object sender, EventArgs e)
+        static void HandleFileApi_Releasing(object sender, EventArgs e)
         {
             try
             {
