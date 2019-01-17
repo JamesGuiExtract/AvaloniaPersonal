@@ -197,6 +197,7 @@ namespace WebAPI.Models
                     else
                     {
                         _instanceReleased.Set();
+                        Released?.Invoke(this, new EventArgs());
                     }
                 }
             }
