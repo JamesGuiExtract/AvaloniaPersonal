@@ -1198,7 +1198,7 @@ namespace Extract.DataEntry.LabDE
                         GetFileIdsForAction(StapleWithoutFirstPageOption.Action).Count() == 1)
                 {
                     UtilityMethods.ShowMessageBox("At least 2 documents must be set to " + 
-                        StapleOption + "' in order create a stapled document.", "Staple error", true);
+                        StapleOption.Action + "' in order create a stapled document.", "Staple error", true);
                     return false;
                 }
 
