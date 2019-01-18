@@ -5,6 +5,7 @@ using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -428,6 +429,17 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                 }
                 else
                 {
+                    // https://extract.atlassian.net/browse/ISSUE-15775
+                    if (Process.GetCurrentProcess().MainModule.FileName.EndsWith("FAMDBAdmin.exe", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var result = MessageBox.Show("There are known issues with running rules from the DB Admin. Are you sure?",
+                            "Confirm bad decision", MessageBoxButtons.YesNo);
+                        if (result == DialogResult.No)
+                        {
+                            return;
+                        }
+                    }
+
                     _globalSettingsGroupBox.Enabled =
                         _mlServicesTabPage.Enabled =
                         _okButton.Enabled =

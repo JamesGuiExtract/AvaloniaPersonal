@@ -379,11 +379,9 @@ bool CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMap
         if (ipPageInfoMap == __nullptr || m_ipPageInfoMap == ipPageInfoMap)
         {
             // Nothing to add, just return
-            return requiresTranslation;
         }
-
         // If the current page info map is NULL just replace it
-        if (m_ipPageInfoMap == __nullptr)
+        else if (m_ipPageInfoMap == __nullptr)
         {
             m_ipPageInfoMap = ipPageInfoMap;
 
@@ -478,9 +476,9 @@ bool CSpatialString::updateAndValidateCompatibleSpatialPageInfo(ILongToObjectMap
 			// After being assigned to a SpatialString, the page info map must not be modifed, otherwise
 			// it may affect other SpatialStrings that share these page infos.
 			m_ipPageInfoMap->SetReadonly();
-
-			return requiresTranslation;
         }
+
+		return requiresTranslation;
     }
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25811");
 }
