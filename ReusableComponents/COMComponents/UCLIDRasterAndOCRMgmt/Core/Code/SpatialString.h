@@ -343,7 +343,7 @@ private:
 	//----------------------------------------------------------------------------------------------
 	// Loads specified text file as "indexed" text by loading it as a spatial string where the X
 	// coordinate of each letter is the position of the character in the text file.
-	void loadTextWithPositionalData(const string& strFileName);
+	void loadTextWithPositionalData(const string& strFileName, bool hasExplicitPositionalData);
 	//----------------------------------------------------------------------------------------------
 	// according to pass in start/end page number and total page number,
 	// find out the actual start/end page number 

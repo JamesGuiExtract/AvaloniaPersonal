@@ -1477,6 +1477,13 @@ int getNumberOfPagesInImage( const string& strImageFileName )
 	try
 	{
 		int pageCount = 0;
+
+		EFileType fileTypeFromExtension = getFileType(strImageFileName);
+		if (fileTypeFromExtension == kRichTextFile || fileTypeFromExtension == kTXTFile)
+		{
+			return 1;
+		}
+
 		try
 		{
 			pageCount = getNumberOfPagesInImageNuance(strImageFileName);

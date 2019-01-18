@@ -1719,6 +1719,14 @@ EFileType getFileType(const string& strFileName)
 	{
 		return kTXTFile;
 	}
+	else if (strExt == ".rtf")
+	{
+		return kRichTextFile;
+	}
+	else if (strExt == ".itxt")
+	{
+		return kIndexedTXTFile;
+	}
 	else if (strExt == ".uss")
 	{
 		return kUSSFile;

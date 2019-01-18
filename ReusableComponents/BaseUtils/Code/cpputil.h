@@ -52,7 +52,9 @@ enum EFileType
     kVOAFile,
     kEAVFile,
     kXMLFile,
-    kCSVFile
+    kCSVFile,
+	kRichTextFile,
+	kIndexedTXTFile
 };
 
 //--------------------------------------------------------------------------------------------------

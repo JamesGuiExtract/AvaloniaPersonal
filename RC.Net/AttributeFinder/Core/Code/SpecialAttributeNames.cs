@@ -1,6 +1,6 @@
 ﻿namespace Extract.AttributeFinder
 {
-    public class SpecialAttributeNames
+    public static class SpecialAttributeNames
     {
         #region Pagination
 

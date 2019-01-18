@@ -229,13 +229,24 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 		bool bHasNoSpatialPages = false;
 		
 		EFileType eFileType = getFileType(strInputFileName);
-		if (eFileType == kTXTFile || eFileType == kXMLFile || eFileType == kCSVFile)
+		if (eFileType == kTXTFile || eFileType == kXMLFile || eFileType == kCSVFile
+			|| eFileType == kRichTextFile || eFileType == kIndexedTXTFile)
 		{
 			// If a text file, load as "indexed" text.
 			ipSS.CreateInstance(CLSID_SpatialString);
 			ASSERT_RESOURCE_ALLOCATION("ELI31683", ipSS != __nullptr);
 
-			ipSS->LoadFrom(strInputFileName.c_str(), VARIANT_FALSE);
+			// If there is a file with index info stored with the characters use that
+			string strITextName = strInputFileName + ".itxt";
+			if (isValidFile(strITextName))
+			{
+				ipSS->LoadFrom(strITextName.c_str(), VARIANT_FALSE);
+				ipSS->SourceDocName = strInputFileName.c_str();
+			}
+			else
+			{
+				ipSS->LoadFrom(strInputFileName.c_str(), VARIANT_FALSE);
+			}
 
 			if (ipSS != __nullptr && ipSS->Size == 0)
 			{
@@ -356,9 +367,10 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 				ipProgressStatus->CompleteCurrentItemGroup();
 			}
 		}
+
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11047")
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11047");
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP COCRFileProcessor::raw_Cancel()

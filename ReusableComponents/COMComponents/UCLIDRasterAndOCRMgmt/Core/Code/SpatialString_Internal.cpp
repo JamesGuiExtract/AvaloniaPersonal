@@ -1105,11 +1105,18 @@ void CSpatialString::saveToTXTFile(const string& strFileName)
     waitForFileToBeReadable(strFileName);
 }
 //-------------------------------------------------------------------------------------------------
-void CSpatialString::loadTextWithPositionalData(const string& strFileName)
+void CSpatialString::loadTextWithPositionalData(const string& strFileName, bool hasExplicitPositionalData)
 {
 	// Load the file as text.
 	string text = getTextFileContentsAsString(strFileName);
-	size_t length = text.length();
+	size_t inputLength = text.length();
+	size_t length = inputLength;
+	
+	if (hasExplicitPositionalData)
+	{
+		length = inputLength / 10;
+		ASSERT_RUNTIME_CONDITION("ELI46643", length * 10 == inputLength, "Invalid file length for indexed text!")
+	}
 
 	// Check for an empty string
 	if (text.empty())
@@ -1123,12 +1130,32 @@ void CSpatialString::loadTextWithPositionalData(const string& strFileName)
 
 	// Initialize a letter array that will be used to create the spatial string.
 	vector<CPPLetter> vecLetters(length);
-	CPPLetter *plastSpatialLetter = NULL;
+	CPPLetter *pLastNonWhitespaceLetter = NULL;
 
-	// Loop through each charater of the file.
+	int nCharSize = hasExplicitPositionalData ? 10 : 1;
+	size_t nMaxPos = 0;
+
+	// Loop through each character of the file.
 	for (size_t i = 0; i < length; i++)
 	{
-		unsigned char c = text[i];
+		size_t nInputIdx = i * nCharSize;
+		unsigned char c = text[nInputIdx];
+		size_t nPos = i;
+		size_t nLen = 1;
+
+		if (hasExplicitPositionalData)
+		{
+			string strPos = text.substr(nInputIdx + 1, 8);
+			string strLen = text.substr(nInputIdx + 9, 1);
+			try
+			{
+				nPos = std::stoul(strPos, __nullptr, 16);
+				nLen = std::stoul(strLen, __nullptr, 16);
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46644")
+		}
+		nMaxPos = max(nPos + nLen, nMaxPos);
+
 		CPPLetter& letter = vecLetters[i];
 
 		// Specify the character.
@@ -1136,54 +1163,51 @@ void CSpatialString::loadTextWithPositionalData(const string& strFileName)
 		letter.m_usGuess2 = c;
 		letter.m_usGuess3 = c;
 
-		// If the character is whitespace, don't specify spatial info, but check if this makes the
-		// last non-spatial character the end of a zone or the end of a paragraph.
+		// Assign spatial info using index or explicit position
+		letter.m_bIsSpatial = true;
+		letter.m_usPageNumber = 1;
+		letter.m_ulLeft = nPos;
+		letter.m_ulRight = nPos + nLen;
+		letter.m_ulTop = 0;
+		letter.m_ulBottom = 1;
+
+		if (c == '\r' || c == '\n')
+		{
+			letter.m_bIsSpatial = false;
+		}
+
+		// If the character is whitespace, check if this makes the
+		// last non-whitespace character the end of a zone or the end of a paragraph.
 		if (isWhitespaceChar(c))
 		{
-			if (plastSpatialLetter != __nullptr)
+			if (pLastNonWhitespaceLetter != NULL)
 			{
-				// If there is more than one consecutive non-spatial char, ensure the last spatial
+				if (c == '\r' || c == '\n')
+				{
+					pLastNonWhitespaceLetter->m_bIsEndOfZone = true;
+					pLastNonWhitespaceLetter->m_bIsEndOfParagraph = true;
+					pLastNonWhitespaceLetter = NULL;
+				}
+				// If there is more than one consecutive whitespace char, ensure the last spatial
 				// char is treated as end-of-zone.
-				if (!vecLetters[i - 1].m_bIsSpatial)
+				else if (isWhitespaceChar(vecLetters[i - 1].m_usGuess1))
 				{
-					c = '\t';
+					pLastNonWhitespaceLetter->m_bIsEndOfZone = true;
 				}
 
-				switch (c)
-				{
-					case '\r':
-					case '\n': 
-						plastSpatialLetter->m_bIsEndOfZone = true;
-						plastSpatialLetter->m_bIsEndOfParagraph = true;
-						plastSpatialLetter = NULL;
-						break;
-
-					case '\t': 
-						if (!plastSpatialLetter->m_bIsEndOfZone)
-						{
-							plastSpatialLetter->m_bIsEndOfZone = true;
-						}
-				}
 			}
 		}
-		// This is a spatial character, assign an "index" for the character in the text file.
 		else
 		{
-			letter.m_bIsSpatial = true;
-			letter.m_usPageNumber = 1;
-			letter.m_ulLeft = i;
-			letter.m_ulRight = i;
-			letter.m_ulTop = 0;
-			letter.m_ulBottom = 1;
-			plastSpatialLetter = &letter;
+			pLastNonWhitespaceLetter = &letter;
 		}
 	}
 
-	// The page info should be as many pixels wide as there are characters in the file and 1 pixel
+	// The page info should be as many pixels wide as the max position and 1 pixel
 	// high.
 	UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipPageInfo(CLSID_SpatialPageInfo);
 	ASSERT_RESOURCE_ALLOCATION("ELI31685", ipPageInfo != __nullptr);
-	ipPageInfo->Initialize(length, 1, UCLID_RASTERANDOCRMGMTLib::kRotNone, 0.0);
+	ipPageInfo->Initialize(nMaxPos, 1, UCLID_RASTERANDOCRMGMTLib::kRotNone, 0.0);
 
 	// Create a spatial page info map
 	ILongToObjectMapPtr ipPageInfoMap(CLSID_LongToObjectMap);
@@ -2501,6 +2525,24 @@ UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr CSpatialString::translateToNewPageInfo
         UCLID_RASTERANDOCRMGMTLib::EOrientation eOrient;
         double deskew;
         ipOrigPageInfo->GetPageInfo(&lOriginalWidth, &lOriginalHeight, &eOrient, &deskew);
+
+		// Short-circuit if original info is not rotated and new info is null (translating to image coordinates)
+		// I added this to prevent issues with 1-char-wide zones being interpreted as vertical lines but this is a decent optimisation in any case
+		if (eOrient == 0 && deskew == 0 && ipNewPageInfo == __nullptr)
+		{
+			ipNewZone->CreateFromData(lStartX, lStartY, lEndX, lEndY, lHeight, nPage);
+			return ipNewZone;
+		}
+
+        // Ensure same height conditions as above are met for page dimensions (else x coordinates will become -inf)
+        if (lOriginalHeight < 5)
+        {
+            lOriginalHeight = 5;
+        }
+        else if ((lOriginalHeight % 2) == 0)
+        {
+            lOriginalHeight++;
+        }
 
         // Define the center of the image relative to the 
         // top-left coordinate system of the rotated image.

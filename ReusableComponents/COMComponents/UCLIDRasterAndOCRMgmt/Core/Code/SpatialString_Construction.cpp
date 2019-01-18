@@ -510,7 +510,11 @@ STDMETHODIMP CSpatialString::LoadFrom(BSTR strFullFileName,
 		EFileType eFileType = getFileType(strInputFile);
 		if (eFileType == kTXTFile || eFileType == kXMLFile || eFileType == kCSVFile)
 		{
-			loadTextWithPositionalData(strInputFile);
+			loadTextWithPositionalData(strInputFile, false);
+		}
+		else if (eFileType == kIndexedTXTFile)
+		{
+			loadTextWithPositionalData(strInputFile, true);
 		}
 		else if (eFileType == kUSSFile)
 		{
@@ -559,10 +563,10 @@ STDMETHODIMP CSpatialString::LoadFrom(BSTR strFullFileName,
 
 		// mark this object as dirty depending upon bSetDirtyFlagToTrue
 		m_bDirty = asCppBool(bSetDirtyFlagToTrue);
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06689");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::LoadPageFromFile(BSTR bstrInputFile, long nPage)

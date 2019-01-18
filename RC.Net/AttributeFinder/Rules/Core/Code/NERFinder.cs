@@ -885,8 +885,11 @@ namespace Extract.AttributeFinder.Rules
 
                 foreach (var (offset, sentence) in sentences)
                 {
-                    string[] tokens = tokenizer.tokenize(sentence);
                     opennlp.tools.util.Span[] tokenPositions = tokenizer.tokenizePos(sentence);
+
+                    // The implementation of AbstractTokenizer.tokenize repeats the above call and then calls spansToStrings
+                    // so call that directly to avoid repeating the work
+                    string[] tokens = opennlp.tools.util.Span.spansToStrings(tokenPositions, sentence);
 
                     opennlp.tools.util.Span[] nameSpans = nameFinder.find(tokens);
 
