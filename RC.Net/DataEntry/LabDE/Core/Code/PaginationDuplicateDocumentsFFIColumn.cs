@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using UCLID_COMUTILSLib;
-
+using UCLID_FILEPROCESSINGLib;
 using static System.FormattableString;
 
 namespace Extract.DataEntry.LabDE
@@ -275,6 +275,64 @@ namespace Extract.DataEntry.LabDE
                 }
 
                 return message.ToString().TrimEnd(null);
+            }
+        }
+
+        /// <summary>
+        /// Applies all uncommitted values specified via SetValue.
+        /// </summary>
+        /// <returns><see langword="true"/> if the changes were successfully applied; otherwise,
+        /// <see langword="false"/>.</returns>
+        public override bool Apply()
+        {
+            try
+            {
+                // Prevent new files from being popped off the FPRecordManager's queue while
+                // applying the selected actions. Otherwise, for instance, we might be trying to
+                // move a file to complete at the same time the FPRecordManager is popping it off
+                // the queue.
+                DataEntryApplication.FileRequestHandler.PauseProcessingQueue();
+
+                var filesToDelay = new List<int>();
+
+                if (!PromptForActions())
+                {
+                    return false;
+                }
+
+                // https://extract.atlassian.net/browse/ISSUE-15690
+                // For pagination, there is no ability to remove a file that is displayed via the
+                // duplicate document button; so there is no need to delay/release checked out files.
+
+                // If a new current file has been specified, it should be officially moved into
+                // the queue (via fallback status) if it is not already and it should be
+                // requested to be the next file displayed.
+                foreach (int newId in CurrentFileIds.Except(OriginalFileIds))
+                {
+                    DataEntryApplication.FileRequestHandler.SetFallbackStatus(
+                        newId, EActionStatus.kActionPending);
+
+                    if (!DataEntryApplication.RequestFile(newId))
+                    {
+                        new ExtractException("ELI37565",
+                            "Specified current file is not available for processing.").Display();
+                    }
+                }
+
+                PerformActions();
+
+                ClearData();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI46645", "Failed to apply document actions.");
+            }
+            finally
+            {
+                // Allow the FPRecordManager queue to resume distribution of files.
+                DataEntryApplication.FileRequestHandler.ResumeProcessingQueue();
             }
         }
 
