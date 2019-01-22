@@ -12,6 +12,7 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Represents a <see cref="LayerObject"/> that anchors off a particular point.
     /// </summary>
+    [CLSCompliant(false)]
     public abstract class AnchoredObject : LayerObject
     {
         #region Fields
@@ -51,7 +52,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Initializes a new instance of the <see cref="AnchoredObject"/> class.
         /// </summary>
-        /// <param name="imageViewer">The <see cref="ImageViewer"/> with which the 
+        /// <param name="imageViewer">The <see cref="IDocumentViewer"/> with which the 
         /// <see cref="AnchoredObject"/> is associated.</param>
         /// <param name="pageNumber">The page on which the <see cref="AnchoredObject"/> appears.
         /// </param>
@@ -61,7 +62,8 @@ namespace Extract.Imaging.Forms
         /// logical (image) coordinates.</param>
         /// <param name="anchorAlignment">The alignment of <paramref name="anchorPoint"/> relative 
         /// to the <see cref="AnchoredObject"/>.</param>
-        protected AnchoredObject(ImageViewer imageViewer, int pageNumber, string comment, 
+        [CLSCompliant(false)]
+        protected AnchoredObject(IDocumentViewer imageViewer, int pageNumber, string comment, 
             Point anchorPoint, AnchorAlignment anchorAlignment)
             : base(imageViewer, pageNumber, comment)
         {

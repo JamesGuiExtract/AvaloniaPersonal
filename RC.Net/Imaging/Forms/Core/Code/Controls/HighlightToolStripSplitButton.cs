@@ -61,7 +61,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Image viewer with which this button connects.
         /// </summary>
-        private ImageViewer _imageViewer;
+        private IDocumentViewer _imageViewer;
 
         /// <summary>
         /// Stores the currently selected highlight tool for this button so that the highlight tool
@@ -282,12 +282,12 @@ namespace Extract.Imaging.Forms
         #region HighlightToolStripSplitButton Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.</param>
         /// <param name="e">The event data associated with the
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.</param>
         private void HandleImageChanged(object sender, ImageFileChangedEventArgs e)
         {
             // Set the enabled state
@@ -316,12 +316,12 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.CursorToolChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.CursorToolChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.CursorToolChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.CursorToolChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.CursorToolChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.CursorToolChanged"/> event.</param>
         private void HandleCursorToolChanged(object sender, CursorToolChangedEventArgs e)
         {
             try
@@ -359,7 +359,7 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.AllowHighlightStatusChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.AllowHighlightStatusChanged"/> event.
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
@@ -387,7 +387,8 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer with which a connection is established. 
         /// <see langword="null"/> if no image viewer is connected.</returns>
         /// <seealso cref="IImageViewerControl"/>
-        public ImageViewer ImageViewer
+        [CLSCompliant(false)]
+        public IDocumentViewer ImageViewer
         {
             get
             {
@@ -429,7 +430,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI21379",
                         "Unable to establish connection to image viewer.", e);
-                    ee.AddDebugData("Image viewer", value, false);
+                    ee.AddDebugData("Image viewer", value.ToString(), false);
                     throw ee;
                 }
             }

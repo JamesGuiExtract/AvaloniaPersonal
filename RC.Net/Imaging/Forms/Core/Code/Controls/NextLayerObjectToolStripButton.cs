@@ -78,12 +78,12 @@ namespace Extract.Imaging.Forms
         #region NextLayerObjectToolStripButton Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.</param>
         private void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             try
@@ -98,12 +98,12 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.PageChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.PageChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.PageChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.PageChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.PageChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.PageChanged"/> event.</param>
         private void HandlePageChanged(object sender, PageChangedEventArgs e)
         {
             try
@@ -118,12 +118,12 @@ namespace Extract.Imaging.Forms
         }
         
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ZoomChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.ZoomChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.ZoomChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ZoomChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.ZoomChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ZoomChanged"/> event.</param>
         private void HandleZoomChanged(object sender, ZoomChangedEventArgs e)
         {
             try
@@ -266,7 +266,8 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer to which the <see cref="NextLayerObjectToolStripButton"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        public override ImageViewer ImageViewer
+        [CLSCompliant(false)]
+        public override IDocumentViewer ImageViewer
         {
             get
             {
@@ -313,7 +314,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI22418",
                         "Unable to establish connection to image viewer.", ex);
-                    ee.AddDebugData("Image viewer", value, false);
+                    ee.AddDebugData("Image viewer", value.ToString(), false);
                     throw ee;
                 }
             }

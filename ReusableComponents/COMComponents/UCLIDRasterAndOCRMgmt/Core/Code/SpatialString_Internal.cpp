@@ -2983,7 +2983,7 @@ void CSpatialString::getLines(vector<pair<long, long>>& rvecLines)
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25832");
 }
 //-------------------------------------------------------------------------------------------------
-void CSpatialString::getLinesOrZones(vector<pair<long, long>>& rvecLines)
+void CSpatialString::getLinesAndZones(vector<pair<long, long>>& rvecLines)
 {
     try
     {
@@ -3289,7 +3289,7 @@ vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> CSpatialString::getOCRImageRas
         {
             // Handle kSpatialMode objects. Create a raster zone for each line.
             vector<pair<long, long>> vecLines;
-            getLinesOrZones(vecLines);
+            getLinesAndZones(vecLines);
 
             long lLettersSize = m_vecLetters.size();
             for (vector<pair<long, long>>::iterator it = vecLines.begin();

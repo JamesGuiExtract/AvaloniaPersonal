@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Windows.Forms;
 using UCLID_AFCORELib;
 
 namespace Extract.DataEntry
@@ -711,7 +712,7 @@ namespace Extract.DataEntry
             {
                 if (_normalizedBounds.Width > _normalizedImageBounds.Width)
                 {
-                    using (Graphics graphics = _host.ImageViewer.CreateGraphics())
+                    using (Graphics graphics = ((Control)_host.ImageViewer).CreateGraphics())
                     {
                         SizeF imageSizeF = new SizeF(_normalizedImageBounds.Size.Width,
                             _normalizedImageBounds.Size.Height);

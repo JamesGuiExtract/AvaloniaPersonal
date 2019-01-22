@@ -103,27 +103,32 @@ namespace Extract.Utilities.Parsers.Test
             // I think this is to avoid multi-byte 'display characters.'
             // E.g., if \par means '\r\n' then there would be many of these two-byte chars.
             // Maybe that wouldn't a problem but '\n' is a nicer system anyway.
-            string exp =
-                "\n\nSTATE OF TENNESSEE, COUNTY OF DAVIDSON\n" +
-                "AFFIDAVIT\n" +
-                " FORGERY\n" +
-                "T.C.A. 39-14-114\n" +
-                "\n" +
-                "Personally appeared before me, the undersigned, [Select one] x__ Commissioner ___ Metropolitan General Sessions Judge, the prosecutor named above and made oath in due form of law that\n" +
-                "[Select one] ___x he ___ she [Select one] __x_ personally observed ___ has probable cause to believe the defendant named above on  in Davidson County did unlawfully forge a certain writing of the value of:  [Select one]  __x_ $500 or less ___ more than $500 but less than $1,000 ___ $1,000 or more but less than $10,000 ___ $10,000 or more but less than $60,000 ___ $60,000 or more with the intent to defraud or harm the victim named above and that the probable cause is as follows:      \n" +
-                "\n" +
-                "	 The defendant went to Sun Trust Bank at 123 North Creek Blvd. /Davidson County at approx. 1100 Hrs. and presented  a false Tenn. Drivers License with the name of John D Doe Tn. DL number 123456789 and attempted to cash his payroll check  from  Whatchamacallit  Staffing . Bank Personnel  Jane  Roe noticed the defendant s I.D. as being false.\n" +
-                "\n\n\n" +
-                "________________________________________\n" +
-                "Prosecutor:      \n" +
-                "                     \n" +
-                "                    \n" +
-                "                    ,     \n" +
-                "                      \n\n" +
-                "Sworn to and subscribed before me on  .\n" +
-                "\n" +
-                "________________________________________\n" +
-                "   \n";
+            string exp = @"
+
+STATE OF TENNESSEE, COUNTY OF DAVIDSON
+AFFIDAVIT
+ FORGERY
+T.C.A. 39-14-114
+
+Personally appeared before me, the undersigned, [Select one] x__ Commissioner ___ Metropolitan General Sessions Judge, the prosecutor named above and made oath in due form of law that
+[Select one] ___x he ___ she [Select one] __x_ personally observed ___ has probable cause to believe the defendant named above on 02/10/2006 in Davidson County did unlawfully forge a certain writing of the value of:  [Select one]  __x_ $500 or less ___ more than $500 but less than $1,000 ___ $1,000 or more but less than $10,000 ___ $10,000 or more but less than $60,000 ___ $60,000 or more with the intent to defraud or harm the victim named above and that the probable cause is as follows:      
+
+	 The defendant went to Sun Trust Bank at 123 North Creek Blvd. /Davidson County at approx. 1100 Hrs. and presented  a false Tenn. Drivers License with the name of John D Doe Tn. DL number 123456789 and attempted to cash his payroll check  from  Whatchamacallit  Staffing . Bank Personnel  Jane  Roe noticed the defendant s I.D. as being false.
+
+
+
+________________________________________
+Prosecutor:  Michael  Dorris  0000003097
+                    Goodlettsville Police Dept. 
+                    105 South Main St.
+                    Goodettsville,  Tennessee  37072 
+                    615 742-4248 
+
+Sworn to and subscribed before me on  .
+
+________________________________________
+   
+".Replace("\r\n", "\n");
 
             var (_, plainText) = RichTextExtractor.GetTextPositions(inp, "Unknown", true);
 

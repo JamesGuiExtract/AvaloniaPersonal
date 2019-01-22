@@ -66,7 +66,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The image viewer
         /// </summary>
-        ImageViewer _imageViewer;
+        DocumentViewer _imageViewer;
 
         /// <summary>
         /// The current document type
@@ -121,7 +121,7 @@ namespace Extract.DataEntry
         /// <param name="documentTypeComboBox">The <see cref="ComboBox"/> that offers the user the
         /// ability to see and change the current doc type.</param>
         public DataEntryConfigurationManager(IDataEntryApplication dataEntryApp, ITagUtility tagUtility,
-            ConfigSettings<T> applicationConfig, ImageViewer imageViewer, ComboBox documentTypeComboBox)
+            ConfigSettings<T> applicationConfig, DocumentViewer imageViewer, ComboBox documentTypeComboBox)
         {
             try
             {

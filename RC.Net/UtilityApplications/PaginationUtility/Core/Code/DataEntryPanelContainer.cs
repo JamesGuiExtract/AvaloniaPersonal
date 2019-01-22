@@ -141,9 +141,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         IDataEntryApplication _dataEntryApp;
 
         /// <summary>
-        /// The <see cref="ImageViewer"/> to use.
+        /// The <see cref="DocumentViewer"/> to use.
         /// </summary>
-        ImageViewer _imageViewer;
+        DocumentViewer _imageViewer;
 
         /// <summary>
         /// Indicates whether the PageLayoutControl's PrimarySelection corresponds with the output
@@ -181,9 +181,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// instance is being used.</param>
         /// <param name="tagUtility">The <see cref="ITagUtility"/> to expand path tags/functions.
         /// </param>
-        /// <param name="imageViewer">The <see cref="ImageViewer"/> to use.</param>
+        /// <param name="imageViewer">The <see cref="DocumentViewer"/> to use.</param>
         public DataEntryPanelContainer(string configFileName, IDataEntryApplication dataEntryApp,
-        ITagUtility tagUtility, ImageViewer imageViewer)
+        ITagUtility tagUtility, DocumentViewer imageViewer)
         {
             try
             {
@@ -236,11 +236,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// instance is being used.</param>
         /// <param name="tagUtility">The <see cref="ITagUtility"/> to expand path tags/functions.
         /// </param>
-        /// <param name="imageViewer">The <see cref="ImageViewer"/> to use.</param>
+        /// <param name="imageViewer">The <see cref="DocumentViewer"/> to use.</param>
         /// <param name="threadManager">The <see cref="ThreadManager"/> to use to manage
         /// <see cref="StartUpdateDocumentStatus"/> threads.</param>
         DataEntryPanelContainer(DataEntryConfigurationManager<Properties.Settings> configManager,
-            IDataEntryApplication dataEntryApp, ITagUtility tagUtility, ImageViewer imageViewer,
+            IDataEntryApplication dataEntryApp, ITagUtility tagUtility, DocumentViewer imageViewer,
             ThreadManager threadManager)
         {
             try
@@ -572,7 +572,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <returns>
         /// The <see cref="PaginationDocumentData" /> instance.
         /// </returns>
-        public PaginationDocumentData GetDocumentData(IUnknownVector attributes, string sourceDocName, FileProcessingDB fileProcessingDB, ImageViewer imageViewer)
+        public PaginationDocumentData GetDocumentData(IUnknownVector attributes, string sourceDocName, FileProcessingDB fileProcessingDB, DocumentViewer imageViewer)
         {
             try
             {
@@ -602,7 +602,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// The <see cref="PaginationDocumentData" /> instance.
         /// </returns>
         public PaginationDocumentData GetDocumentData(IAttribute documentDataAttribute, string sourceDocName,
-            FileProcessingDB fileProcessingDB, ImageViewer imageViewer)
+            FileProcessingDB fileProcessingDB, DocumentViewer imageViewer)
         {
             try
             {
@@ -1605,7 +1605,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             var documentStatus = new DocumentStatus();
 
             using (var form = new InvisibleForm())
-            using (var imageViewer = new ImageViewer())
+            using (var imageViewer = new DocumentViewer())
             using (var tempPanel = new DataEntryPanelContainer(
                 configManager, _dataEntryApp, _tagUtility, imageViewer, StatusUpdateThreadManager))
             {

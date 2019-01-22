@@ -86,12 +86,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Specifies how the <see cref="ImageViewer"/> zoom/view is adjusted when new fields are
+        /// Specifies how the <see cref="DocumentViewer"/> zoom/view is adjusted when new fields are
         /// selected.
         /// </summary>
-        /// <value>An <see cref="AutoZoomMode"/> value specifying how the <see cref="ImageViewer"/>
+        /// <value>An <see cref="AutoZoomMode"/> value specifying how the <see cref="DocumentViewer"/>
         /// zoom/view should be adjusted when new fields are selected.</value>
-        /// <returns>An <see cref="AutoZoomMode"/> value specifying how the <see cref="ImageViewer"/>
+        /// <returns>An <see cref="AutoZoomMode"/> value specifying how the <see cref="DocumentViewer"/>
         /// zoom/view is adjusted when new fields are selected.</returns>
         public AutoZoomMode AutoZoomMode
         {

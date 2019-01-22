@@ -25,6 +25,7 @@ namespace Extract.Redaction.Verification
     /// <summary>
     /// Represents a <see cref="DataGridView"/> that displays information about redactions.
     /// </summary>
+    [CLSCompliant(false)]
     public sealed partial class RedactionGridView : UserControl, IImageViewerControl
     {
         #region Enums
@@ -95,7 +96,7 @@ namespace Extract.Redaction.Verification
         /// The <see cref="ImageViewer"/> with which the <see cref="RedactionGridView"/> is 
         /// associated.
         /// </summary>
-        ImageViewer _imageViewer;
+        IDocumentViewer _imageViewer;
 
         /// <summary>
         /// Each row of the <see cref="RedactionGridView"/> which represents a redaction.
@@ -148,7 +149,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The zoom setting when <see cref="_autoZoom"/> is <see langword="true"/>.
         /// </summary>
-        int _autoZoomScale = ImageViewer.DefaultAutoZoomScale;
+        int _autoZoomScale = Imaging.Forms.ImageViewer.DefaultAutoZoomScale;
 
         /// <summary>
         /// The confidence level associated with redactions and clues.
@@ -532,7 +533,7 @@ namespace Extract.Redaction.Verification
         /// <see langword="false"/> if the property should not be serialized.</returns>
         bool ShouldSerializeAutoZoomScale()
         {
-            return _autoZoom && _autoZoomScale != ImageViewer.DefaultAutoZoomScale;
+            return _autoZoom && _autoZoomScale != Imaging.Forms.ImageViewer.DefaultAutoZoomScale;
         }
 
         /// <summary>
@@ -540,7 +541,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void ResetAutoZoomScale()
         {
-            _autoZoomScale = ImageViewer.DefaultAutoZoomScale;
+            _autoZoomScale = Imaging.Forms.ImageViewer.DefaultAutoZoomScale;
         }
 
         /// <summary>
@@ -2329,12 +2330,12 @@ namespace Extract.Redaction.Verification
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.IDocumentViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.IDocumentViewer.ImageFileChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.IDocumentViewer.ImageFileChanged"/> event.</param>
         void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             try
@@ -2358,12 +2359,12 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Handles the <see cref="Imaging.Forms.ImageViewer.ImageFileClosing"/> event.
+        /// Handles the <see cref="Imaging.Forms.IDocumentViewer.ImageFileClosing"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Imaging.Forms.ImageViewer.ImageFileClosing"/> event.</param>
+        /// <see cref="Imaging.Forms.IDocumentViewer.ImageFileClosing"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Imaging.Forms.ImageViewer.ImageFileClosing"/> event.</param>
+        /// <see cref="Imaging.Forms.IDocumentViewer.ImageFileClosing"/> event.</param>
         void HandleImageFileClosing(object sender, ImageFileClosingEventArgs e)
         {
             try
@@ -2837,7 +2838,7 @@ namespace Extract.Redaction.Verification
         /// <returns>The image viewer to which the <see cref="RedactionGridView"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        public ImageViewer ImageViewer
+        public IDocumentViewer ImageViewer
         {
             get
             {
@@ -2963,6 +2964,7 @@ namespace Extract.Redaction.Verification
     /// <summary>
     /// Provides data for the <see cref="RedactionGridView.ExemptionsApplied"/> event.
     /// </summary>
+    [CLSCompliant(false)]
     public class ExemptionsAppliedEventArgs : EventArgs
     {
         /// <summary>

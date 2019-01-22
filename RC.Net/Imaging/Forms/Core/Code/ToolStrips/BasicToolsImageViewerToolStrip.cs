@@ -11,7 +11,7 @@ namespace Extract.Imaging.Forms
 {
     /// <summary>
     /// Represents a prepopulated <see cref="ToolStrip"/> containing the
-    /// Extract <see cref="ImageViewer"/> basic tools commands.
+    /// Extract <see cref="DocumentViewer"/> basic tools commands.
     /// </summary>
     [ToolboxBitmap(typeof(BasicToolsImageViewerToolStrip),
         ToolStripButtonConstants._BASIC_TOOLS_TOOLSTRIP_IMAGE)]

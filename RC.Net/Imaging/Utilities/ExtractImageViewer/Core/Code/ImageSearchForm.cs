@@ -19,9 +19,9 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         #region Fields
 
         /// <summary>
-        /// The <see cref="ImageViewer"/> that will be used to display the found image.
+        /// The <see cref="DocumentViewer"/> that will be used to display the found image.
         /// </summary>
-        ImageViewer _imageViewer;
+        DocumentViewer _imageViewer;
 
         #endregion Fields
 
@@ -30,12 +30,12 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageSearchForm"/> class.
         /// </summary>
-        /// <param name="imageViewer">The <see cref="ImageViewer"/> that this
+        /// <param name="imageViewer">The <see cref="DocumentViewer"/> that this
         /// form should use to display the found image. May not be
         /// <see langword="null"/>.</param>
         /// <exception cref="ExtractException">If <paramref name="imageViewer"/>
         /// is <see langword="null"/>.</exception>
-        public ImageSearchForm(ImageViewer imageViewer)
+        public ImageSearchForm(DocumentViewer imageViewer)
         {
             try
             {

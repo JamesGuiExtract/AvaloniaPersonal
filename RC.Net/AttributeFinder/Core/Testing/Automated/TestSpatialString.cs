@@ -92,6 +92,29 @@ namespace Extract.AttributeFinder.Test
 
         /// <summary>
         /// Test that loading pages from file works the same as loading whole file and then getting pages
+        /// TODO: Decide whether this should pass. See below LoadPagesFromFile test.
+        /// </summary>
+        [Test, Category("SpatialString")]        
+        public static void LoadPagesFromFileEmptyPageIncluded()
+        {
+            string ussPath = _testFiles.GetFile(_BLANK_PAGE_GCV_FILE);
+            var ss = new SpatialStringClass();
+
+            ss.LoadFrom(ussPath, false);
+            var pagesFromMem = ss.GetPages(true, "").ToIEnumerable<IComparableObject>().ToList();
+            var pagesFromFile = ss.LoadPagesFromFile(ussPath).ToIEnumerable<IComparableObject>().ToList();
+
+            Assert.AreEqual(3, pagesFromMem.Count);
+            Assert.AreEqual(3, pagesFromFile.Count);
+            for (int i = 0; i < 3; i++)
+            {
+                Assert.That(pagesFromMem[i].IsEqualTo(pagesFromFile[i]));
+            }
+        }
+
+        /// <summary>
+        /// Test that loading pages from file works the same as loading whole file and then getting pages
+        /// TODO: Make this pass. How should this work, given that there is a page 2 file in the archive...
         /// </summary>
         [Test, Category("SpatialString")]        
         public static void LoadPagesFromFile()
@@ -104,7 +127,7 @@ namespace Extract.AttributeFinder.Test
             var pagesFromFile = ss.LoadPagesFromFile(ussPath).ToIEnumerable<IComparableObject>().ToList();
 
             Assert.AreEqual(2, pagesFromMem.Count);
-            Assert.AreEqual(2, pagesFromFile.Count);
+            Assert.AreEqual(2, pagesFromFile.Count, "This currently fails. Should it be considered a problem?");
             for (int i = 0; i < 2; i++)
             {
                 Assert.That(pagesFromMem[i].IsEqualTo(pagesFromFile[i]));

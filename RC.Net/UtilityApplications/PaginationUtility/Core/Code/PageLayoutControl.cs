@@ -571,7 +571,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// The <see cref="ImageViewer"/> that is to display the images from selected
         /// <see cref="PageThumbnailControl"/>s.
         /// </value>
-        public ImageViewer ImageViewer
+        public IDocumentViewer ImageViewer
         {
             get;
             set;

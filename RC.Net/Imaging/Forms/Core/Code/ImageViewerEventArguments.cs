@@ -7,7 +7,7 @@ using UCLID_RASTERANDOCRMGMTLib;
 namespace Extract.Imaging.Forms
 {
     /// <summary>
-    /// Provides data for the <see cref="ImageViewer.ImageFileChanged"/> event.
+    /// Provides data for the <see cref="DocumentViewer.ImageFileChanged"/> event.
     /// </summary>
     public class ImageFileChangedEventArgs : EventArgs
     {
@@ -39,7 +39,7 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for the <see cref="ImageViewer.ImageFileClosing"/> event.
+    /// Provides data for the <see cref="DocumentViewer.ImageFileClosing"/> event.
     /// </summary>
     public class ImageFileClosingEventArgs : CancelEventArgs
     {
@@ -71,7 +71,7 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for the <see cref="ImageViewer.ZoomChanged"/> event.
+    /// Provides data for the <see cref="DocumentViewer.ZoomChanged"/> event.
     /// </summary>
     public class ZoomChangedEventArgs : EventArgs
     {
@@ -103,7 +103,7 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for the <see cref="ImageViewer.OrientationChanged"/> event.
+    /// Provides data for the <see cref="DocumentViewer.OrientationChanged"/> event.
     /// </summary>
     public class OrientationChangedEventArgs : EventArgs
     {
@@ -153,7 +153,7 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for the <see cref="ImageViewer.CursorToolChanged"/> event.
+    /// Provides data for the <see cref="DocumentViewer.CursorToolChanged"/> event.
     /// </summary>
     public class CursorToolChangedEventArgs : EventArgs
     {
@@ -185,7 +185,7 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for the <see cref="ImageViewer.FitModeChanged"/> event.
+    /// Provides data for the <see cref="DocumentViewer.FitModeChanged"/> event.
     /// </summary>
     public class FitModeChangedEventArgs : EventArgs
     {
@@ -217,7 +217,7 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for the <see cref="ImageViewer.PageChanged"/> event.
+    /// Provides data for the <see cref="DocumentViewer.PageChanged"/> event.
     /// </summary>
     public class PageChangedEventArgs : EventArgs
     {
@@ -249,7 +249,7 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for the <see cref="ImageViewer.OpeningImage"/> event.
+    /// Provides data for the <see cref="DocumentViewer.OpeningImage"/> event.
     /// </summary>
     public class OpeningImageEventArgs : CancelEventArgs
     {
@@ -300,7 +300,7 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for the <see cref="ImageViewer.LoadingNewImage"/> event.
+    /// Provides data for the <see cref="DocumentViewer.LoadingNewImage"/> event.
     /// </summary>
     public class LoadingNewImageEventArgs : EventArgs
     {
@@ -313,7 +313,7 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for the <see cref="ImageViewer.DisplayingPrintDialog"/> event.
+    /// Provides data for the <see cref="DocumentViewer.DisplayingPrintDialog"/> event.
     /// </summary>
     public class DisplayingPrintDialogEventArgs : CancelEventArgs
     {
@@ -326,7 +326,7 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for the <see cref="ImageViewer.FileOpenError"/> event.
+    /// Provides data for the <see cref="DocumentViewer.FileOpenError"/> event.
     /// </summary>
     public class FileOpenErrorEventArgs : CancelEventArgs
     {
@@ -378,9 +378,10 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for an <see cref="ImageViewer"/> event dealing with a particular
+    /// Provides data for an <see cref="DocumentViewer"/> event dealing with a particular
     /// <see cref="LayerObject"/>.
     /// </summary>
+    [CLSCompliant(false)]
     public class LayerObjectEventArgs : EventArgs
     {
         /// <summary>
@@ -411,7 +412,7 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for an <see cref="ImageViewer.ImageExtracted"/> event.
+    /// Provides data for an <see cref="DocumentViewer.ImageExtracted"/> event.
     /// </summary>
     public class ImageExtractedEventArgs : EventArgs
     {
@@ -466,7 +467,7 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for the <see cref="ImageViewer.ExtendedNavigationCheck"/> event.
+    /// Provides data for the <see cref="DocumentViewer.ExtendedNavigationCheck"/> event.
     /// </summary>
     public class ExtendedNavigationCheckEventArgs : EventArgs
     {
@@ -532,7 +533,7 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for the <see cref="ImageViewer.ExtendedNavigation"/> event.
+    /// Provides data for the <see cref="DocumentViewer.ExtendedNavigation"/> event.
     /// </summary>
     public class ExtendedNavigationEventArgs : EventArgs
     {
@@ -594,7 +595,7 @@ namespace Extract.Imaging.Forms
     }
 
     /// <summary>
-    /// Provides data for the <see cref="ImageViewer.BackgroundProcessStatusUpdate"/> event.
+    /// Provides data for the <see cref="DocumentViewer.BackgroundProcessStatusUpdate"/> event.
     /// </summary>
     public class BackgroundProcessStatusUpdateEventArgs : EventArgs
     {

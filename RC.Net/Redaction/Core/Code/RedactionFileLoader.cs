@@ -457,6 +457,7 @@ namespace Extract.Redaction
                     attributes.LoadFrom(fileName, false);
 
                     LoadData(attributes);
+                    attributes.ReportMemoryUsage();
                 }
             }
             catch (Exception ex)

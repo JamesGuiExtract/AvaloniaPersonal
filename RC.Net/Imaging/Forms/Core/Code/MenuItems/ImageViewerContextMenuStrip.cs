@@ -14,7 +14,7 @@ namespace Extract.Imaging.Forms
 {
     /// <summary>
     /// Represents a pre-populated <see cref="ContextMenuStrip"/> that interacts
-    /// with the <see cref="ImageViewer"/>.
+    /// with the <see cref="DocumentViewer"/>.
     /// </summary>
     [ToolboxBitmap(typeof(ToolStripDropDown))]
     public partial class ImageViewerContextMenuStrip : ContextMenuStrip

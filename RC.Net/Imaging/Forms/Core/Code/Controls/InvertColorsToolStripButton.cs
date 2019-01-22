@@ -43,7 +43,8 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer to which the <see cref="InvertColorsToolStripButton"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        public override ImageViewer ImageViewer
+        [CLSCompliant(false)]
+        public override IDocumentViewer ImageViewer
         {
             get
             {
@@ -75,7 +76,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI36801",
                         "Unable to establish connection to image viewer.", ex);
-                    ee.AddDebugData("Image viewer", value, false);
+                    ee.AddDebugData("Image viewer", value.ToString(), false);
                     throw ee;
                 }
             }

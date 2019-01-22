@@ -3583,12 +3583,12 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Handles the <see cref="ImageViewer.ImageFileChanged"/> event.
+        /// Handles the <see cref="DocumentViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="ImageViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="DocumentViewer.ImageFileChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="ImageViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="DocumentViewer.ImageFileChanged"/> event.</param>
         void HandleImageViewerImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             try
@@ -4080,7 +4080,7 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Handles the <see cref="ImageViewer.PageChanged"/> event in order to reset the slideshow
+        /// Handles the <see cref="DocumentViewer.PageChanged"/> event in order to reset the slideshow
         /// timer.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -4109,7 +4109,7 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Handles the <see cref="ImageViewer.OpeningImage"/> event. Processing that would normally
+        /// Handles the <see cref="DocumentViewer.OpeningImage"/> event. Processing that would normally
         /// happen in the <see cref="AdvanceToNextDocument()"/> and <see cref="Open"/> method in FAM
         /// mode will happen in this method in stand-alone mode.
         /// </summary>
@@ -4151,7 +4151,7 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Handles the<see cref="ImageViewer.ImageFileClosing"/> event to ensure the previously
+        /// Handles the<see cref="DocumentViewer.ImageFileClosing"/> event to ensure the previously
         /// loaded image is unloaded from the image reader cache in stand-alone mode.
         /// </summary>
         /// <param name="sender">The sender.</param>
@@ -4483,7 +4483,7 @@ namespace Extract.Redaction.Verification
                                         DateTime.Now < _timeLastKey.AddMilliseconds(500))
                                     {
                                         StartSlideshow();
-                                        return true;
+                                        //return true;
                                     }
                                 }  
                             }

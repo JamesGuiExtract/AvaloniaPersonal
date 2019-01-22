@@ -10,6 +10,7 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Represents a clue that may span multiple lines.
     /// </summary>
+    [CLSCompliant(false)]
     public class Clue : CompositeHighlightLayerObject, IComparable<Clue>
     {
         #region Constants
@@ -60,7 +61,7 @@ namespace Extract.Imaging.Forms
         /// must be on the same page as <paramref name="pageNumber"/>.</param>
         /// <exception cref="ExtractException">If any <see cref="RasterZone.PageNumber"/>
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
-        public Clue(ImageViewer imageViewer, int pageNumber, string comment,
+        public Clue(IDocumentViewer imageViewer, int pageNumber, string comment,
             IEnumerable<RasterZone> rasterZones)
             : this(imageViewer, pageNumber, null, comment, rasterZones)
         {
@@ -79,7 +80,7 @@ namespace Extract.Imaging.Forms
         /// must be on the same page as <paramref name="pageNumber"/>.</param>
         /// <exception cref="ExtractException">If any <see cref="RasterZone.PageNumber"/>
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
-        public Clue(ImageViewer imageViewer, int pageNumber, IEnumerable<string> tags,
+        public Clue(IDocumentViewer imageViewer, int pageNumber, IEnumerable<string> tags,
             IEnumerable<RasterZone> rasterZones)
             : this(imageViewer, pageNumber, tags, "", rasterZones)
         {
@@ -100,7 +101,7 @@ namespace Extract.Imaging.Forms
         /// must be on the same page as <paramref name="pageNumber"/>.</param>
         /// <exception cref="ExtractException">If any <see cref="RasterZone.PageNumber"/>
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
-        public Clue(ImageViewer imageViewer, int pageNumber, IEnumerable<string> tags,
+        public Clue(IDocumentViewer imageViewer, int pageNumber, IEnumerable<string> tags,
             string comment, IEnumerable<RasterZone> rasterZones)
             : base(imageViewer, pageNumber, tags, comment, rasterZones, _CLUE_COLOR)
         {
@@ -213,7 +214,7 @@ namespace Extract.Imaging.Forms
         /// <returns>A new <see cref="Clue"/> object which represents the sum of the
         /// specified clues.</returns>
         /// <exception cref="ExtractException">If objects are connected to different
-        /// <see cref="ImageViewer"/>.</exception>
+        /// <see cref="IDocumentViewer"/>.</exception>
         /// <exception cref="ExtractException">If objects are on different pages.</exception>
         public static Clue operator +(Clue clue1, Clue clue2)
         {

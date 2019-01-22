@@ -43,9 +43,8 @@ namespace Extract.Imaging.Forms
         /// May be <see langword="null"/> if no keys are associated with the menu item.</returns>
         protected override Keys[] GetKeys()
         {
-            ImageViewer imageViewer = base.ImageViewer;
-            return imageViewer == null ? null :
-                imageViewer.Shortcuts.GetKeys(imageViewer.SelectRemoveSelectedLayerObjects);
+            var imageViewer = base.ImageViewer;
+            return imageViewer?.Shortcuts.GetKeys(imageViewer.SelectRemoveSelectedLayerObjects);
         }
 
         /// <summary>
@@ -73,7 +72,7 @@ namespace Extract.Imaging.Forms
 
             try
             {
-                ImageViewer imageViewer = base.ImageViewer;
+                var imageViewer = base.ImageViewer;
                 if (imageViewer != null && imageViewer.IsImageAvailable)
                 {
                     imageViewer.SelectRemoveSelectedLayerObjects();
@@ -146,7 +145,8 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer to which the <see cref="DeleteSelectionToolStripMenuItem"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        public override ImageViewer ImageViewer
+        [CLSCompliant(false)]
+        public override IDocumentViewer ImageViewer
         {
             get
             {
@@ -179,7 +179,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI23247",
                         "Unable to establish connection to image viewer.", ex);
-                    ee.AddDebugData("Image viewer", value, false);
+                    ee.AddDebugData("Image viewer", value.ToString(), false);
                     throw ee;
                 }
             }

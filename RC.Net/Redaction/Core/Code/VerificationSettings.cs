@@ -273,7 +273,6 @@ namespace Extract.Redaction
                 bool useBackdropImage = false;
                 string backdropImage = null;
                 SetFileActionStatusSettings actionStatusSettings = null;
-                bool enableInputTracking = false;
                 bool launchInFullScreenMode = false;
                 SlideshowSettings slideshowSettings = null;
                 bool allowTags = true;
@@ -289,7 +288,8 @@ namespace Extract.Redaction
                 }
                 if (reader.Version >= 3 && reader.Version <= 10)
                 {
-                    enableInputTracking = reader.ReadBoolean();
+                    // Ignore enableInputTracking
+                    reader.ReadBoolean();
                 }
                 if (reader.Version >= 4)
                 {

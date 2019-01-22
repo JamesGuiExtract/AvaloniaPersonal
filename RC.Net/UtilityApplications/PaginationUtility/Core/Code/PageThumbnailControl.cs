@@ -54,7 +54,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Indicates whether the page associated with this control is currently displayed in the
-        /// <see cref="ImageViewer"/>.
+        /// <see cref="IDocumentViewer"/>.
         /// </summary>
         bool _pageIsDisplayed;
 
@@ -251,7 +251,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Gets a value indicating whether this page is currently being displayed in an
-        /// <see cref="ImageViewer"/>.
+        /// <see cref="IDocumentViewer"/>.
         /// </summary>
         /// <value><see langword="true"/> if page is currently being displayed; otherwise,
         /// <see langword="false"/>.</value>
@@ -376,11 +376,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Displays or closed the <see cref="Page"/> in the specified <see paramref="ImageViewer"/>.
         /// </summary>
-        /// <param name="imageViewer">The <see cref="ImageViewer"/> that should display or close the
+        /// <param name="imageViewer">The <see cref="IDocumentViewer"/> that should display or close the
         /// page.</param>
         /// <param name="display"><see langword="true"/> to display the image;
         /// <see langword="false"/> to close it.</param>
-        public void DisplayPage(ImageViewer imageViewer, bool display)
+        public void DisplayPage(IDocumentViewer imageViewer, bool display)
         {
             try
             {

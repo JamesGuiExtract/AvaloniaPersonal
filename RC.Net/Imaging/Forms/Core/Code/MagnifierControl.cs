@@ -26,7 +26,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The image viewer associated with the <see cref="MagnifierControl"/>.
         /// </summary>
-        ImageViewer _imageViewer;
+        IDocumentViewer _imageViewer;
 
         /// <summary>
         /// Indicates whether the magnifier is currently magnifying.
@@ -85,7 +85,8 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer to which the <see cref="MagnifierControl"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        public ImageViewer ImageViewer
+        [CLSCompliant(false)]
+        public IDocumentViewer ImageViewer
         {
             get
             {
@@ -101,8 +102,8 @@ namespace Extract.Imaging.Forms
                         if (_imageViewer != null)
                         {
                             _imageViewer.PostImagePaint -= HandleImageViewerPostImagePaint;
-                            _imageViewer.MouseMove -= HandleImageViewerMouseMove;
-                            _imageViewer.MouseLeave -= HandleImageViewerMouseLeave;
+                            ((Control)_imageViewer).MouseMove -= HandleImageViewerMouseMove;
+                            ((Control)_imageViewer).MouseLeave -= HandleImageViewerMouseLeave;
                             _imageViewer.ImageFileClosing -= HandleImageFileClosing;
                             _imageViewer.ImageFileChanged -= HandleImageFileChanged;
                         }
@@ -111,8 +112,8 @@ namespace Extract.Imaging.Forms
                         _active = _imageViewer.IsImageAvailable;
 
                         _imageViewer.PostImagePaint += HandleImageViewerPostImagePaint;
-                        _imageViewer.MouseMove += HandleImageViewerMouseMove;
-                        _imageViewer.MouseLeave += HandleImageViewerMouseLeave;
+                        ((Control)_imageViewer).MouseMove += HandleImageViewerMouseMove;
+                        ((Control)_imageViewer).MouseLeave += HandleImageViewerMouseLeave;
                         _imageViewer.ImageFileClosing += HandleImageFileClosing;
                         _imageViewer.ImageFileChanged += HandleImageFileChanged;
                     }
@@ -145,7 +146,7 @@ namespace Extract.Imaging.Forms
                 {
                     // Have the image viewer draw the area centered around the mouse zoomed in such
                     // that 1 image pixel = 1 screen pixel.
-                    Point imageCenterPoint = _imageViewer.PointToClient(Control.MousePosition);
+                    Point imageCenterPoint = ((Control)_imageViewer).PointToClient(Control.MousePosition);
                     _imageViewer.PaintToGraphics(e.Graphics, ClientRectangle, imageCenterPoint, 1F);
 
                     // Draw the imageviewer cursor with the hotspot in the center (which corresponds
@@ -164,9 +165,9 @@ namespace Extract.Imaging.Forms
                     // LockControlUpdate is preventing the main image viewer from updating.
                     // There may be a more correct fix for this issue, but the simplest fix for now
                     // seems to be to force an image viewer refresh here if undocked.
-                    if (this.TopLevelControl != _imageViewer.TopLevelControl)
+                    if (TopLevelControl != ((Control)_imageViewer).TopLevelControl)
                     {
-                        _imageViewer.Refresh();
+                        ((Control)_imageViewer).Refresh();
                     }
                 }
             }

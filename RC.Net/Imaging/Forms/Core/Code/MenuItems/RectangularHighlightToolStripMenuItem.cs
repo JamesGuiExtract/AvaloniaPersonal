@@ -65,7 +65,7 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.AllowHighlightStatusChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.AllowHighlightStatusChanged"/> event.
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
@@ -124,7 +124,8 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer with which a connection is established. 
         /// <see langword="null"/> if no image viewer is connected.</returns>
         /// <seealso cref="IImageViewerControl"/>
-        public override ImageViewer ImageViewer
+        [CLSCompliant(false)]
+        public override IDocumentViewer ImageViewer
         {
             get
             {

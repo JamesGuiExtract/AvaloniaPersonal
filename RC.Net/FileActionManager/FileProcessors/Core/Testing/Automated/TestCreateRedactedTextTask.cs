@@ -268,7 +268,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
                 @"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX}{\par}\pard\qj\li720\fi0\ri1784{\b\f0\fs24\cf0\up0\dn0 \loch\af0 XXXXXXXXXXXX}{\" +
                 @"f0\fs24\cf0\up0\dn0 \loch\af0 XXXXXXXXXXXXXXXXX}{\b\f0\fs24\cf0\up0\dn0 \loch\af0 XXXXXXXXXXXXX}{\f0\fs24\cf0\up0\dn0 \l" +
                 @"och\af0 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX}\qj{\f0\fs24\cf0\up0\dn0 \loch\af0 XXXXXXXXXXXXXXXXXXXXXXXXX" +
-                @"XXXXXXXXXXXX}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn0 OFFENSE_DT_FRM}}{\fldrslt{\f0\fs20\cf0\up0\dn0 02/10/2006}}}{\f0\fs" +
+                @"XXXXXXXXXXXX}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn0 OFFENSE_DT_FRM}}{\fldrslt{\f0\fs20\cf0\up0\dn0 XXXXXXXXXX}}}{\f0\fs" +
                 @"24\cf0\up0\dn0 \loch\af0 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX}\qj{\f0\fs24\cf0\up0\dn0 \loch\af0 XXXXXXXX" +
                 @"XXXXXXXXXXXXXXXXXX}{\b\f0\fs24\cf0\up0\dn0 \loch\af0 XXXXXXXXXXXXXX}{\f0\fs24\cf0\up0\dn0 \loch\af0 XXXXXXXXXXXXXXXXXXXX" +
                 @"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX}\qj{\f0\fs24\cf0\up0\dn0 \loch\af0 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" +
@@ -283,23 +283,23 @@ namespace Extract.FileActionManager.FileProcessors.Test
                 @"pard\qj\li720\fi0\ri1784{\f0\fs24\cf0\up0\dn0\par}\pard\qj\li720\fi0\ri1784{\f0\fs24\cf0\up0\dn0\par}\pard\qj\li720\fi0\" +
                 @"ri1784{\f0\fs24\cf0\up0\dn0 \loch\af0 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX}{\par}\pard\qj\li720\fi0\ri1784{\f0\fs24\" +
                 @"cf0\up0\dn0 \loch\af0 XXXXXXXXXXXXX}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn0 PROSECUTOR_FIRST_NAME}}{\fldrslt{\f0\fs20\cf" +
-                @"0\up0\dn0 Michael}}}{\f0\fs24\cf0\up0\dn0 \loch\af0 X}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn0 PROSECUTOR_MIDDLE_NAME}}{\" +
+                @"0\up0\dn0 XXXXXXX}}}{\f0\fs24\cf0\up0\dn0 \loch\af0 X}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn0 PROSECUTOR_MIDDLE_NAME}}{\" +
                 @"fldrslt{\f0\fs20\cf0\up0\dn0 }}}{\f0\fs24\cf0\up0\dn0 \loch\af0 X}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn0 PROSECUTOR_LAS" +
-                @"T_NAME}}{\fldrslt{\f0\fs20\cf0\up0\dn0 Dorris}}}{\f0\fs24\cf0\up0\dn0 \loch\af0 X}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn" +
+                @"T_NAME}}{\fldrslt{\f0\fs20\cf0\up0\dn0 XXXXXX}}}{\f0\fs24\cf0\up0\dn0 \loch\af0 X}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn" +
                 @"0 PROSECUTOR_SUFFIX}}{\fldrslt{\f0\fs20\cf0\up0\dn0 }}}{\f0\fs20\cf0\up0\dn0 \loch\af0 X}{\field{\*\fldinst{\f0\fs20\cf0" +
-                @"\up0\dn0 ENF_OFCR_EMPLOYEE_NUM}}{\fldrslt{\f0\fs20\cf0\up0\dn0 0000003097}}}{\par}\pard\qj\li720\fi0\ri1784{\f0\fs24\cf0" +
+                @"\up0\dn0 ENF_OFCR_EMPLOYEE_NUM}}{\fldrslt{\f0\fs20\cf0\up0\dn0 XXXXXXXXXX}}}{\par}\pard\qj\li720\fi0\ri1784{\f0\fs24\cf0" +
                 @"\up0\dn0 \loch\af0 XXXXXXXXXXXXXXXXXXXX}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn0 PROS_ADDRESS_LINE1_TXT}}{\fldrslt{\f0\fs" +
-                @"20\cf0\up0\dn0 Goodlettsville Police Dept.}}}{\f0\fs20\cf0\up0\dn0 \loch\af0 X}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn0 S" +
+                @"20\cf0\up0\dn0 XXXXXXXXXXXXXXXXXXXXXXXXXXX}}}{\f0\fs20\cf0\up0\dn0 \loch\af0 X}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn0 S" +
                 @"TATION_ASSIGNED}}{\fldrslt{\f0\fs20\cf0\up0\dn0 }}}{\par}\pard\qj\li720\fi0\ri1784{\f0\fs24\cf0\up0\dn0 \loch\af0 XXXXXX" +
-                @"XXXXXXXXXXXXXX}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn0 PROS_ADDRESS_LINE2_TXT}}{\fldrslt{\f0\fs20\cf0\up0\dn0 105 South " +
-                @"Main St.}}}{\par}\pard\qj\li720\fi0\ri1784{\f0\fs24\cf0\up0\dn0 \loch\af0 XXXXXXXXXXXXXXXXXXXX}{\field{\*\fldinst{\f0\fs" +
-                @"20\cf0\up0\dn0 PROS_CITY_NAME}}{\fldrslt{\f0\fs20\cf0\up0\dn0 Goodettsville}}}{\f0\fs24\cf0\up0\dn0 \loch\af0 XXX}{\fiel" +
-                @"d{\*\fldinst{\f0\fs20\cf0\up0\dn0 PROS_STATE_NAME}}{\fldrslt{\f0\fs20\cf0\up0\dn0 Tennessee}}}{\f0\fs24\cf0\up0\dn0 \loc" +
-                @"h\af0 XX}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn0 PROS_POSTAL_CD}}{\fldrslt{\f0\fs20\cf0\up0\dn0 37072}}}{\f0\fs24\cf0\up" +
+                @"XXXXXXXXXXXXXX}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn0 PROS_ADDRESS_LINE2_TXT}}{\fldrslt{\f0\fs20\cf0\up0\dn0 XXXXXXXXXX" +
+                @"XXXXXXXX}}}{\par}\pard\qj\li720\fi0\ri1784{\f0\fs24\cf0\up0\dn0 \loch\af0 XXXXXXXXXXXXXXXXXXXX}{\field{\*\fldinst{\f0\fs" +
+                @"20\cf0\up0\dn0 PROS_CITY_NAME}}{\fldrslt{\f0\fs20\cf0\up0\dn0 XXXXXXXXXXXXX}}}{\f0\fs24\cf0\up0\dn0 \loch\af0 XXX}{\fiel" +
+                @"d{\*\fldinst{\f0\fs20\cf0\up0\dn0 PROS_STATE_NAME}}{\fldrslt{\f0\fs20\cf0\up0\dn0 XXXXXXXXX}}}{\f0\fs24\cf0\up0\dn0 \loc" +
+                @"h\af0 XX}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn0 PROS_POSTAL_CD}}{\fldrslt{\f0\fs20\cf0\up0\dn0 XXXXX}}}{\f0\fs24\cf0\up" +
                 @"0\dn0 \loch\af0 X}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn0 PROS_POSTAL_CD_EXT}}{\fldrslt{\f0\fs20\cf0\up0\dn0 }}}{\par}\p" +
                 @"ard\qj\li720\fi0\ri1784{\f0\fs24\cf0\up0\dn0 \loch\af0 XXXXXXXXXXXXXXXXXXXX}{\field{\*\fldinst{\f0\fs20\cf0\up0\dn0 PROS" +
-                @"_PHONE_PREFIX_NUM}}{\fldrslt{\f0\fs20\cf0\up0\dn0 615}}}{\f0\fs24\cf0\up0\dn0 \loch\af0 X}{\field{\*\fldinst{\f0\fs20\cf" +
-                @"0\up0\dn0 PROS_BASE_PHONE_NUM}}{\fldrslt{\f0\fs20\cf0\up0\dn0 742-4248}}}{\f0\fs24\cf0\up0\dn0 \loch\af0 X}{\field{\*\fl" +
+                @"_PHONE_PREFIX_NUM}}{\fldrslt{\f0\fs20\cf0\up0\dn0 XXX}}}{\f0\fs24\cf0\up0\dn0 \loch\af0 X}{\field{\*\fldinst{\f0\fs20\cf" +
+                @"0\up0\dn0 PROS_BASE_PHONE_NUM}}{\fldrslt{\f0\fs20\cf0\up0\dn0 XXXXXXXX}}}{\f0\fs24\cf0\up0\dn0 \loch\af0 X}{\field{\*\fl" +
                 @"dinst{\f0\fs20\cf0\up0\dn0 PROS_EXTENSION_NUM}}{\fldrslt{\f0\fs20\cf0\up0\dn0 }}}{\par}\pard\qj\li720\fi0\ri1784{\f0\fs2" +
                 @"4\cf0\up0\dn0\par}\pard\qj\li720\fi0\ri1784{\f0\fs24\cf0\up0\dn0 \loch\af0 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX}{\field" +
                 @"{\*\fldinst{\f0\fs20\cf0\up0\dn0 DATE_SWORN}}{\fldrslt{\f0\fs20\cf0\up0\dn0 }}}{\f0\fs24\cf0\up0\dn0 \loch\af0 X}{\field" +

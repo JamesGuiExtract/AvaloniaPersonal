@@ -15,6 +15,7 @@ namespace Extract.Redaction.Verification
     /// <summary>
     /// Represents a set of commands that assist a rule form in the verification user interface.
     /// </summary>
+    [CLSCompliant(false)]
     public class VerificationRuleFormHelper : IRuleFormHelper
     {
         #region Constants
@@ -28,7 +29,7 @@ namespace Extract.Redaction.Verification
 
         #region Fields
 
-        readonly ImageViewer _imageViewer;
+        readonly DocumentViewer _imageViewer;
 
         RedactionGridView _redactionGridView;
 
@@ -44,7 +45,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Initializes a new instance of the <see cref="VerificationRuleFormHelper"/> class.
         /// </summary>
-        public VerificationRuleFormHelper(ImageViewer imageViewer, RedactionGridView redactionGridView)
+        public VerificationRuleFormHelper(DocumentViewer imageViewer, RedactionGridView redactionGridView)
         {
             _imageViewer = imageViewer;
             _redactionGridView = redactionGridView;

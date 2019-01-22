@@ -79,6 +79,7 @@ namespace Extract.Utilities.Parsers
         /// <param name="input">The rich text code to parse</param>
         /// <param name="sourceDocName">The name to use as debug data for any exceptions</param>
         /// <param name="throwParseExceptions">Whether to throw or only log parse exceptions</param>
+        /// <param name="destinationsToOutput">The set of 'RTF destination' names for which text will be output. Null for default collection.</param>
         public static ((int index, int length)[], string) GetTextPositions(string input, string sourceDocName, bool throwParseExceptions, HashSet<string> destinationsToOutput = null)
         {
             if (destinationsToOutput == null)

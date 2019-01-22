@@ -7,6 +7,7 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Provides data for the <see cref="LayerObjectsCollection.LayerObjectAdded"/> event.
     /// </summary>
+    [CLSCompliant(false)]
     public class LayerObjectAddedEventArgs : EventArgs
     {
         /// <summary>
@@ -39,6 +40,7 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Provides data for the <see cref="LayerObjectsCollection.LayerObjectChanged"/> event.
     /// </summary>
+    [CLSCompliant(false)]
     public class LayerObjectChangedEventArgs : EventArgs
     {
         /// <summary>
@@ -71,6 +73,7 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Provides data for the <see cref="LayerObjectsCollection.DeletingLayerObjects"/> event.
     /// </summary>
+    [CLSCompliant(false)]
     public class DeletingLayerObjectsEventArgs : CancelEventArgs
     {
         /// <summary>
@@ -104,6 +107,7 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Provides data for the <see cref="LayerObjectsCollection.LayerObjectDeleted"/> event.
     /// </summary>
+    [CLSCompliant(false)]
     public class LayerObjectDeletedEventArgs : EventArgs
     {
         /// <summary>
@@ -136,6 +140,7 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Provides data for the LayerObjectVisibilityChanged event.
     /// </summary>
+    [CLSCompliant(false)]
     public class LayerObjectVisibilityChangedEventArgs : EventArgs
     {
         /// <summary>

@@ -24,7 +24,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// The <see cref="ImageViewer"/> to be used.
         /// </summary>
-        ImageViewer _imageViewer;
+        DocumentViewer _imageViewer;
 
         /// <summary>
         /// The currently loaded <see cref="DataEntryPaginationDocumentData"/>.
@@ -401,7 +401,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Sets the <see cref="ImageViewer"/> to use.
         /// </summary>
         /// <param name="_imageViewer">The <see cref="ImageViewer"/> to use.</param>
-        internal void SetImageViewer(ImageViewer imageViewer)
+        internal void SetImageViewer(DocumentViewer imageViewer)
         {
             try
             {
@@ -788,7 +788,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// to disconnect the <see cref="T:Extract.DataEntry.DataEntryControlHost" /> from the image viewer.
         /// </value>
         /// <seealso cref="T:Extract.Imaging.Forms.IImageViewerControl" />
-        public override ImageViewer ImageViewer
+        public override IDocumentViewer ImageViewer
         {
             get
             {
@@ -881,7 +881,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="ImageViewer.ImageFileChanged"/> event.
+        /// Handles the <see cref="DocumentViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The <see cref="ImageFileChangedEventArgs"/> that contains the event data.</param>
@@ -908,7 +908,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="ImageViewer.ImageFileClosing"/> event.
+        /// Handles the <see cref="DocumentViewer.ImageFileClosing"/> event.
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The <see cref="ImageFileClosingEventArgs"/> that contains the event data.</param>

@@ -207,6 +207,10 @@
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj">
+      <Project>{DC72C952-D6ED-42F6-893D-8262BC9D183E}</Project>
+      <Name>Extract.Utilities.Parsers</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="ADODB">

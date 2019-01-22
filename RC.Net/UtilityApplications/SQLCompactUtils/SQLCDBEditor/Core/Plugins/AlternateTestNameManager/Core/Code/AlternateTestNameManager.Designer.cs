@@ -15,7 +15,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
+            this._imageViewer = new Extract.Imaging.Forms.DocumentViewer();
             this._toolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this._basicDataGridToolStrip = new System.Windows.Forms.ToolStrip();
             this._previousAKAToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -363,7 +363,7 @@
 
         #endregion
 
-        private Extract.Imaging.Forms.ImageViewer _imageViewer;
+        private Extract.Imaging.Forms.DocumentViewer _imageViewer;
         private System.Windows.Forms.ToolStripContainer _toolStripContainer;
         private System.Windows.Forms.ToolStrip _viewCommands;
         private Imaging.Forms.ZoomInToolStripButton _zoomInToolStripButton;

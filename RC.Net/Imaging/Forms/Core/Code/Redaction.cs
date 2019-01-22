@@ -28,6 +28,7 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Represents a redaction that may span multiple lines.
     /// </summary>
+    [CLSCompliant(false)]
     public class Redaction : CompositeHighlightLayerObject, IComparable<Redaction>
     {
         #region Constants
@@ -90,7 +91,7 @@ namespace Extract.Imaging.Forms
         /// zone collection.</param>
         /// <exception cref="ExtractException">If any <see cref="RasterZone.PageNumber"/>
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
-        public Redaction(ImageViewer imageViewer, int pageNumber, IEnumerable<string> tags,
+        public Redaction(IDocumentViewer imageViewer, int pageNumber, IEnumerable<string> tags,
             IEnumerable<RasterZone> rasterZones)
             : this(imageViewer, pageNumber, tags, rasterZones,
             imageViewer.DefaultRedactionFillColor)
@@ -115,7 +116,7 @@ namespace Extract.Imaging.Forms
         /// zone collection.</param>
         /// <exception cref="ExtractException">If any <see cref="RasterZone.PageNumber"/>
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
-        public Redaction(ImageViewer imageViewer, int pageNumber,IEnumerable<string> tags,
+        public Redaction(IDocumentViewer imageViewer, int pageNumber,IEnumerable<string> tags,
             string comment, IEnumerable<RasterZone> rasterZones)
             : this(imageViewer, pageNumber, tags, comment, rasterZones,
             imageViewer.DefaultRedactionFillColor)
@@ -144,7 +145,7 @@ namespace Extract.Imaging.Forms
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
         /// <exception cref="ExtractException">If <paramref name="fillColor"/> is
         /// not either <see cref="Color.Black"/> or <see cref="Color.White"/>.</exception>
-        public Redaction(ImageViewer imageViewer, int pageNumber, string comment,
+        public Redaction(IDocumentViewer imageViewer, int pageNumber, string comment,
             IEnumerable<RasterZone> rasterZones, RedactionColor fillColor)
             : base(imageViewer, pageNumber, comment, rasterZones,
             fillColor == RedactionColor.Black ? BlackPaint : WhitePaint)
@@ -180,7 +181,7 @@ namespace Extract.Imaging.Forms
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
         /// <exception cref="ExtractException">If <paramref name="fillColor"/> is
         /// not either <see cref="Color.Black"/> or <see cref="Color.White"/>.</exception>
-        public Redaction(ImageViewer imageViewer, int pageNumber, IEnumerable<string> tags,
+        public Redaction(IDocumentViewer imageViewer, int pageNumber, IEnumerable<string> tags,
             IEnumerable<RasterZone> rasterZones, RedactionColor fillColor)
             : base(imageViewer, pageNumber, tags, rasterZones,
             fillColor == RedactionColor.Black ? BlackPaint : WhitePaint)
@@ -218,7 +219,7 @@ namespace Extract.Imaging.Forms
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
         /// <exception cref="ExtractException">If <paramref name="fillColor"/> is
         /// not either <see cref="Color.Black"/> or <see cref="Color.White"/>.</exception>
-        public Redaction(ImageViewer imageViewer, int pageNumber, IEnumerable<string> tags,
+        public Redaction(IDocumentViewer imageViewer, int pageNumber, IEnumerable<string> tags,
             string comment, IEnumerable<RasterZone> rasterZones, RedactionColor fillColor)
             : base(imageViewer, pageNumber, tags, comment, rasterZones,
             fillColor == RedactionColor.Black ? BlackPaint : WhitePaint)

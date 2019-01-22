@@ -13,6 +13,7 @@ namespace Extract.Imaging.Forms
     /// Represents a <see cref="LayerObject"/> which is made up of multiple <see cref="Highlight"/>
     /// objects.
     /// </summary>
+    [CLSCompliant(false)]
     public class CompositeHighlightLayerObject : CompositeLayerObject<Highlight>,
         IComparable<CompositeHighlightLayerObject>
     {
@@ -57,7 +58,7 @@ namespace Extract.Imaging.Forms
         /// must be on the same page as <paramref name="pageNumber"/>.</param>
         /// <exception cref="ExtractException">If any <see cref="LayerObject.PageNumber"/>
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
-        public CompositeHighlightLayerObject(ImageViewer imageViewer, int pageNumber,
+        public CompositeHighlightLayerObject(IDocumentViewer imageViewer, int pageNumber,
             string comment, IEnumerable<Highlight> highlights)
             : base(imageViewer, pageNumber, comment, highlights)
         {
@@ -76,7 +77,7 @@ namespace Extract.Imaging.Forms
         /// must be on the same page as <paramref name="pageNumber"/>.</param>
         /// <exception cref="ExtractException">If any <see cref="LayerObject.PageNumber"/>
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
-        public CompositeHighlightLayerObject(ImageViewer imageViewer, int pageNumber,
+        public CompositeHighlightLayerObject(IDocumentViewer imageViewer, int pageNumber,
             IEnumerable<string> tags, IEnumerable<Highlight> highlights)
             : base(imageViewer, pageNumber, tags, highlights)
         {
@@ -97,7 +98,7 @@ namespace Extract.Imaging.Forms
         /// must be on the same page as <paramref name="pageNumber"/>.</param>
         /// <exception cref="ExtractException">If any <see cref="LayerObject.PageNumber"/>
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
-        public CompositeHighlightLayerObject(ImageViewer imageViewer, int pageNumber,
+        public CompositeHighlightLayerObject(IDocumentViewer imageViewer, int pageNumber,
             IEnumerable<string> tags, string comment, IEnumerable<Highlight> highlights)
             : base(imageViewer, pageNumber, tags, comment, highlights)
         {
@@ -120,7 +121,7 @@ namespace Extract.Imaging.Forms
         /// <see cref="RasterZone"/>.</param>
         /// <exception cref="ExtractException">If any <see cref="RasterZone.PageNumber"/>
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
-        public CompositeHighlightLayerObject(ImageViewer imageViewer, int pageNumber,
+        public CompositeHighlightLayerObject(IDocumentViewer imageViewer, int pageNumber,
             string comment, IEnumerable<RasterZone> rasterZones, Color highlightColor)
             : base(imageViewer, pageNumber, comment, null)
         {
@@ -147,7 +148,7 @@ namespace Extract.Imaging.Forms
         /// <see cref="RasterZone"/>.</param>
         /// <exception cref="ExtractException">If any <see cref="RasterZone.PageNumber"/>
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
-        public CompositeHighlightLayerObject(ImageViewer imageViewer, int pageNumber,
+        public CompositeHighlightLayerObject(IDocumentViewer imageViewer, int pageNumber,
             IEnumerable<string> tags, string comment, IEnumerable<RasterZone> rasterZones,
             Color highlightColor)
             : base(imageViewer, pageNumber, tags, comment, null)
@@ -173,7 +174,7 @@ namespace Extract.Imaging.Forms
         /// <see cref="RasterZone"/>.</param>
         /// <exception cref="ExtractException">If any <see cref="RasterZone.PageNumber"/>
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
-        public CompositeHighlightLayerObject(ImageViewer imageViewer, int pageNumber,
+        public CompositeHighlightLayerObject(IDocumentViewer imageViewer, int pageNumber,
             IEnumerable<string> tags, IEnumerable<RasterZone> rasterZones, Color highlightColor)
             : this(imageViewer, pageNumber, tags, "", rasterZones, highlightColor)
         {

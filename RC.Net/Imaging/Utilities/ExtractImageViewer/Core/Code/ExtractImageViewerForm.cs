@@ -625,7 +625,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         }
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
@@ -700,7 +700,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         }
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageExtracted"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.ImageExtracted"/> event.
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
@@ -736,7 +736,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         /// </summary>
         /// <returns>The <see cref="ImageViewer"/> <see cref="Control"/> from the
         /// <see cref="Form"/>.</returns>
-        internal ImageViewer ImageViewer
+        internal DocumentViewer ImageViewer
         {
             get
             {

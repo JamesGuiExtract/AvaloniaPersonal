@@ -326,15 +326,7 @@ namespace Extract.Redaction
                 }
                 displayString.ReportMemoryUsage();
 
-                // [FlexIDSCore:4598]
-                // Throw an exception if the OCR data isn't text index data.
-                LongRectangle bounds = displayString.GetOCRImageBounds();
-                if (bounds.Top != 0 ||
-                    bounds.Bottom != 2)
-                {
-                    throw new ExtractException("ELI32207",
-                        "\"" + _COMPONENT_DESCRIPTION + "\" task can be used only on text files.");
-                }
+                LongRectangle bounds = GetPageBounds(displayString);
 
                 // https://extract.atlassian.net/browse/ISSUE-12345
                 // In order to avoid problems with assumptions about character encoding leading to
@@ -391,11 +383,7 @@ namespace Extract.Redaction
                 LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI48344",
                     _COMPONENT_DESCRIPTION);
 
-                // [FlexIDSCore:4598]
-                // Throw an exception if the OCR data isn't text index data.
-                LongRectangle pageBounds = displayString.GetOCRImageBounds();
-                ExtractException.Assert("ELI48345", "Unexpected page bounds for text-based SpatialString",
-                    pageBounds.Top == 0 && pageBounds.Bottom == 2);
+                LongRectangle pageBounds = GetPageBounds(displayString);
 
                 return GetRedactedBytes(sourceText, displayString, redactionZones, pageBounds, sourceIsRichText);
             }
@@ -1038,6 +1026,21 @@ namespace Extract.Redaction
 
             return (redactableIndexes, rightIndexIsExclusive);
         }
+
+        /// <summary>
+        /// Gets the page bounds and asserts that it looks like it comes from a text-based USS file
+        /// </summary>
+        static LongRectangle GetPageBounds(SpatialString displayString)
+        {
+            // [FlexIDSCore:4598]
+            // Throw an exception if the OCR data isn't text index data.
+            LongRectangle pageBounds = displayString.GetOCRImageBounds();
+            ExtractException.Assert("ELI48345", "Unexpected page bounds for text-based SpatialString",
+                pageBounds.Top == -1 && pageBounds.Bottom == 3);
+
+            return pageBounds;
+        }
+
 
         #endregion Private Members
     }

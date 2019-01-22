@@ -11,9 +11,10 @@ namespace Extract.Imaging.Forms
     /// the image viewer control may implement this interface to establish a connection with the
     /// image viewer control. The image viewer control passes itself to controls implementing this
     /// interface when the image viewer's 
-    /// <see cref="Extract.Imaging.Forms.ImageViewer.EstablishConnections(System.Windows.Forms.Control)"/> 
+    /// <see cref="Extract.Imaging.Forms.DocumentViewer.EstablishConnections(System.Windows.Forms.Control)"/> 
     /// method is called.
     /// </remarks>
+    [CLSCompliant(false)]
     public interface IImageViewerControl
     {
         /// <summary>
@@ -26,7 +27,7 @@ namespace Extract.Imaging.Forms
         /// <remarks>
         /// <para>The image viewer control passes itself to controls implementing this method when 
         /// the image viewer's 
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.EstablishConnections(System.Windows.Forms.Control)"/> 
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.EstablishConnections(System.Windows.Forms.Control)"/> 
         /// method is called.
         /// </para>
         /// <note type="implementnotes"><para>Classes implementing this method should:
@@ -39,8 +40,8 @@ namespace Extract.Imaging.Forms
         /// <item>disconnect from the image viewer when <see langword="null"/> is set.</item>
         /// </list></para></note>
         /// </remarks>
-        /// <seealso cref="Extract.Imaging.Forms.ImageViewer.EstablishConnections(System.Windows.Forms.Control)"/>
-        ImageViewer ImageViewer
+        /// <seealso cref="Extract.Imaging.Forms.DocumentViewer.EstablishConnections(System.Windows.Forms.Control)"/>
+        IDocumentViewer ImageViewer
         {
             get;
             set;

@@ -42,7 +42,7 @@ namespace Extract.Imaging.Forms
         /// The image viewer to which the <see cref="OpenImageToolStripSplitButton"/> is 
         /// connected.
         /// </summary>
-        ImageViewer _imageViewer;
+        IDocumentViewer _imageViewer;
 
         #endregion
 
@@ -300,7 +300,8 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer to which the <see cref="OpenImageToolStripSplitButton"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        public ImageViewer ImageViewer
+        [CLSCompliant(false)]
+        public IDocumentViewer ImageViewer
         {
             get
             {
@@ -335,7 +336,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI21223",
                         "Unable to establish connection to image viewer.", e);
-                    ee.AddDebugData("Image viewer", value, false);
+                    ee.AddDebugData("Image viewer", value.ToString(), false);
                     throw ee;
                 }
             }

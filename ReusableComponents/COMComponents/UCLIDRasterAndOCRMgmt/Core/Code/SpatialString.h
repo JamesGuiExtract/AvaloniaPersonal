@@ -598,8 +598,8 @@ private:
 	void getLines(vector<pair<long, long>>& rvecLines);
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: To return a vector of pairs containing the begin and end characters for the string
-	//			divided at line and zone boundaries
-	void getLinesOrZones(vector<pair<long, long>>& rvecLines);
+	//			divided at line and, if this is a text-based spatial string, zone boundaries
+	void getLinesAndZones(vector<pair<long, long>>& rvecLines);
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: To return an IUnknownVector of spatial strings containing the current spatial
 	//			string divided by lines.

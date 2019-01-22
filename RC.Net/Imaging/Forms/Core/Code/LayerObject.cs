@@ -17,6 +17,7 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Represents an object in a particular layer of an <see cref="ImageViewer"/>.
     /// </summary>
+    [CLSCompliant(false)]
     public abstract class LayerObject : IDisposable, IComparable<LayerObject>, IXmlSerializable
     {
         #region Constants
@@ -160,7 +161,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The image viewer on which the layer object appears.
         /// </summary>
-        ImageViewer _imageViewer;
+        IDocumentViewer _imageViewer;
 
         /// <summary>
         /// A <see cref="TrackingData"/> object associated with the interactive event currently in 
@@ -211,7 +212,7 @@ namespace Extract.Imaging.Forms
         /// <see cref="LayerObject"/> is associated with.</param>
         /// <param name="pageNumber">The page that this <see cref="LayerObject"/> is on.</param>
         /// <param name="comment">The comment associated with the <see cref="LayerObject"/>.</param>
-        protected LayerObject(ImageViewer imageViewer, int pageNumber, string comment)
+        protected LayerObject(IDocumentViewer imageViewer, int pageNumber, string comment)
         {
             try
             {
@@ -250,7 +251,7 @@ namespace Extract.Imaging.Forms
         /// <param name="tags">A <see cref="IEnumerable{T}"/> of tags associated with this
         /// <see cref="LayerObject"/>.</param>
         /// <param name="comment">The comment associated with the <see cref="LayerObject"/>.</param>
-        protected LayerObject(ImageViewer imageViewer, int pageNumber, IEnumerable<string> tags,
+        protected LayerObject(IDocumentViewer imageViewer, int pageNumber, IEnumerable<string> tags,
             string comment) : this(imageViewer, pageNumber, comment)
         {
             try
@@ -623,7 +624,7 @@ namespace Extract.Imaging.Forms
         /// <value>The image viewer associated with the layer object.</value>
         /// <returns>The image viewer associated with the layer object.</returns>
         [Browsable(false)]
-        public virtual ImageViewer ImageViewer
+        public virtual IDocumentViewer ImageViewer
         {
             get
             {
@@ -664,13 +665,9 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <returns>The minimum height and width of a layer object in logical (image) coordinates.
         /// </returns>
-        public static Size MinSize
-        {
-            get
-            {
-                return _MIN_SIZE;
-            }
-        }
+        public static Size MinSize { get; set; } = _MIN_SIZE;
+
+        public static Size DefaultMinSize => _MIN_SIZE;
 
         /// <summary>
         /// Gets the collection of tags for this <see cref="LayerObject"/>.
@@ -1083,7 +1080,7 @@ namespace Extract.Imaging.Forms
                         new Point(mouseX, mouseY));
 
                     // Start the tracking event
-                    TrackingData = new TrackingData(_imageViewer, mouse.X, mouse.Y,
+                    TrackingData = new TrackingData((Control)_imageViewer, mouse.X, mouse.Y,
                         _imageViewer.GetTransformedRectangle(_imageViewer.GetVisibleImageArea(), true));
 
                     // Store the spatial data associated with the layer object

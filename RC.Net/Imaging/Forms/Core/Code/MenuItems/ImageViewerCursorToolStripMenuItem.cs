@@ -38,7 +38,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Image viewer with which this menu item connects.
         /// </summary>
-        private ImageViewer _imageViewer;
+        private IDocumentViewer _imageViewer;
 
         #endregion
 
@@ -216,12 +216,12 @@ namespace Extract.Imaging.Forms
         #region ImageViewerCursorToolStripMenuItem Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.</param>
         /// <param name="e">The event data associated with the
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.</param>
         private void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             try
@@ -260,12 +260,12 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.CursorToolChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.CursorToolChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.CursorToolChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.CursorToolChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.CursorToolChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.CursorToolChanged"/> event.</param>
         private void HandleCursorToolChanged(object sender, CursorToolChangedEventArgs e)
         {
             try
@@ -288,7 +288,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Gets or sets the image viewer with which to establish a connection.
         /// If you need to handle more events than just the 
-        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event then
+        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event then
         /// you will need to override this method in your derived class.
         /// <para><b>NOTE:</b></para>
         /// The set will also call <see cref="SetMenuItemState"/>.
@@ -338,7 +338,8 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer with which a connection is established. 
         /// <see langword="null"/> if no image viewer is connected.</returns>
         /// <seealso cref="IImageViewerControl"/>
-        public virtual ImageViewer ImageViewer
+        [CLSCompliant(false)]
+        public virtual IDocumentViewer ImageViewer
         {
             get
             {
@@ -377,7 +378,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI21425",
                         "Unable to establish connection to image viewer.", e);
-                    ee.AddDebugData("Image viewer", value, false);
+                    ee.AddDebugData("Image viewer", value.ToString(), false);
                     throw ee;
                 }
             }

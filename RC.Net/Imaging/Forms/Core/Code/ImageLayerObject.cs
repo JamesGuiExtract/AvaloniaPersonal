@@ -10,6 +10,7 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Represents an <see cref="AnchoredObject"/> that contains an image.
     /// </summary>
+    [CLSCompliant(false)]
     public class ImageLayerObject : AnchoredObject
     {
         #region Fields
@@ -68,7 +69,8 @@ namespace Extract.Imaging.Forms
         /// <param name="size">The size of the displayed image in page pixel coordinates.</param>
         /// <param name="orientation">The angle (in degrees) the image layer object should be drawn
         /// at in respect to the image coordinates.</param>
-        public ImageLayerObject(ImageViewer imageViewer, int pageNumber, string comment,
+        [CLSCompliant(false)]
+        public ImageLayerObject(IDocumentViewer imageViewer, int pageNumber, string comment,
             Point anchorPoint, AnchorAlignment anchorAlignment, Image image, Size size, 
             float orientation)
             : base(imageViewer, pageNumber, comment, anchorPoint, anchorAlignment)
@@ -212,7 +214,8 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <value>The image viewer associated with the <see cref="ImageLayerObject"/>.</value>
         /// <returns>The image viewer associated with the <see cref="ImageLayerObject"/>.</returns>
-        public override ImageViewer ImageViewer
+        [CLSCompliant(false)]
+        public override IDocumentViewer ImageViewer
         {
             get
             {
@@ -384,7 +387,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Ensure the image layer is on the active page            
-                ImageViewer imageViewer = base.ImageViewer;
+                var imageViewer = base.ImageViewer;
                 return imageViewer != null && imageViewer.PageNumber == PageNumber &&
                     GetBounds().Contains(point);
             }

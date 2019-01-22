@@ -35,7 +35,7 @@ namespace Extract.Imaging.Forms
         /// The image viewer with which the <see cref="ZoomLevelToolStripStatusLabel"/> is 
         /// associated.
         /// </summary>
-        ImageViewer _imageViewer;
+        IDocumentViewer _imageViewer;
 
         #endregion ZoomLevelToolStripStatusLabel Fields
 
@@ -203,7 +203,8 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer to which the <see cref="ZoomLevelToolStripStatusLabel"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        public ImageViewer ImageViewer
+        [CLSCompliant(false)]
+        public IDocumentViewer ImageViewer
         {
             get
             {
@@ -243,7 +244,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI36796",
                         "Unable to establish connection to image viewer.", ex);
-                    ee.AddDebugData("Image viewer", value, false);
+                    ee.AddDebugData("Image viewer", value.ToString(), false);
                     throw ee;
                 }
             }

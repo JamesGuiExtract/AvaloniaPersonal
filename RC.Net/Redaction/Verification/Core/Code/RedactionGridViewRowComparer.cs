@@ -1,4 +1,5 @@
 using Extract.AttributeFinder;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -8,6 +9,7 @@ namespace Extract.Redaction.Verification
     /// <summary>
     /// Represents a comparison operation between two <see cref="RedactionGridViewRow"/>s.
     /// </summary>
+    [CLSCompliant(false)]
     public class RedactionGridViewRowComparer : IComparer, IComparer<RedactionGridViewRow>
     {
         #region RedactionGridViewComparer Fields
