@@ -596,11 +596,9 @@ STDMETHODIMP CSpatialString::SaveTo(BSTR strFullFileName, VARIANT_BOOL bCompress
 			// save as the specified filename
 			if (bCompress == VARIANT_TRUE)
 			{
-				string strOutputFile = asString(strFullFileName);
-
 				// Compress the file (compress file includes a call to waitForFileToBeReadable
 				// no need to include one here)
-				CompressionEngine::compressFile(tmpFile.getName(), strOutputFile);
+				CompressionEngine::compressFile(tmpFile.getName(), stdstrFullFileName);
 			}
 		}
 		else

@@ -82,10 +82,10 @@ void CompressionEngine::compressFile(const std::string& strInputFile,
 			{
 				UCLIDException ue("ELI06750", "Unable to close compressed file!");
 				throw ue;
-
-				// Wait for the output file to be readable
-				waitForFileToBeReadable(strOutputFile);
 			}
+
+			// Wait for the output file to be readable
+			waitForFileToBeReadable(strOutputFile);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI28329");
 	}
