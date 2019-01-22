@@ -590,7 +590,7 @@ STDMETHODIMP CSpatialString::SaveTo(BSTR strFullFileName, VARIANT_BOOL bCompress
 			m_strSourceDocName = strSourceDocName;
 
 			// Wait until the file is readable
-			waitForStgFileAccess(_bstr_t(strOutputFileName.c_str()));
+			waitForFileToBeReadable(strOutputFileName);
 
 			// if requested, compress the above created temporary file and 
 			// save as the specified filename

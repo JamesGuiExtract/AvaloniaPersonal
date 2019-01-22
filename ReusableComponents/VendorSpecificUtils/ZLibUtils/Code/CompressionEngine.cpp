@@ -45,7 +45,7 @@ void CompressionEngine::compressFile(const std::string& strInputFile,
 
 			if (!infile.read(pszData.get(), endPos))
 			{
-				UCLIDException ue("ELI06755", "Unable to read compressed data from file!");
+				UCLIDException ue("ELI06755", "Unable to read to-be-compressed data from file!");
 				throw ue;
 			}
 			else
