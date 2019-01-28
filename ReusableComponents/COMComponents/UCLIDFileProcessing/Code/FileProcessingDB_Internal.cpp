@@ -2752,7 +2752,7 @@ bool CFileProcessingDB::unaffiliatedWorkflowFilesExist()
 			Sleep(500);
 
 			strQuery =
-				"	SELECT COALESCE(MAX([ID]), -1) FROM [FAMFile] \r\n"
+				"	SELECT COALESCE(MAX([ID]), -1) AS [ID] FROM [FAMFile] \r\n"
 				"	LEFT JOIN [WorkflowFile] ON [FAMFile].[ID] = [FileID] \r\n"
 				"	WHERE [ID] = " + asString(nUnaffiliatedFileId) + " \r\n"
 				"	AND [WorkflowID] IS NULL";
