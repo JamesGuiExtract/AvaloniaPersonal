@@ -278,8 +278,8 @@
         v3AAAAAASUVORK5CYII=
 </value>
   </data>
-  <assembly alias="DevExpress.Data.v18.1" name="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-  <data name="resource.SvgImage" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <assembly alias="DevExpress.Data.v18.2" name="DevExpress.Data.v18.2, Version=18.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+  <data name="resource.SvgImage" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -302,7 +302,7 @@
         IiAvPg0KICA8L2c+DQogIDxnIGlkPSJJY29ucyIgLz4NCjwvc3ZnPgs=
 </value>
   </data>
-  <data name="resource.SvgImage1" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage1" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -325,7 +325,7 @@
         ayIgLz4NCiAgPC9nPg0KICA8ZyBpZD0iSWNvbnMiIC8+DQo8L3N2Zz4L
 </value>
   </data>
-  <data name="resource.SvgImage2" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage2" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -353,7 +353,7 @@
         bG93IiAvPg0KICAgIDwvZz4NCiAgPC9nPg0KICA8ZyBpZD0iSWNvbnMiIC8+DQo8L3N2Zz4L
 </value>
   </data>
-  <data name="resource.SvgImage3" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage3" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -382,7 +382,7 @@
         IlllbGxvdyIgLz4NCiAgICA8L2c+DQogIDwvZz4NCiAgPGcgaWQ9Ikljb25zIiAvPg0KPC9zdmc+Cw==
 </value>
   </data>
-  <data name="resource.SvgImage4" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage4" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -410,7 +410,7 @@
         bGxvdyIgLz4NCiAgICA8L2c+DQogIDwvZz4NCiAgPGcgaWQ9Ikljb25zIiAvPg0KPC9zdmc+Cw==
 </value>
   </data>
-  <data name="resource.SvgImage5" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage5" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -433,7 +433,7 @@
         MUMxQyIgY2xhc3M9IlJlZCIgLz4NCiAgPC9nPg0KICA8ZyBpZD0iSWNvbnMiIC8+DQo8L3N2Zz4L
 </value>
   </data>
-  <data name="resource.SvgImage6" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage6" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -451,7 +451,7 @@
         Pgs=
 </value>
   </data>
-  <data name="resource.SvgImage7" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage7" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -466,7 +466,7 @@
         Pg0KICA8ZyBpZD0iSWNvbnMiIC8+DQo8L3N2Zz4L
 </value>
   </data>
-  <data name="resource.SvgImage8" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage8" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -481,7 +481,7 @@
         L2c+DQogIDxnIGlkPSJJY29ucyIgLz4NCjwvc3ZnPgs=
 </value>
   </data>
-  <data name="resource.SvgImage9" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage9" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -519,7 +519,7 @@
         IC8+DQo8L3N2Zz4L
 </value>
   </data>
-  <data name="resource.SvgImage10" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage10" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -557,7 +557,7 @@
         IiAvPg0KPC9zdmc+Cw==
 </value>
   </data>
-  <data name="resource.SvgImage11" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage11" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -596,7 +596,7 @@
         IDxnIGlkPSJJY29ucyIgLz4NCjwvc3ZnPgs=
 </value>
   </data>
-  <data name="resource.SvgImage12" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage12" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -611,7 +611,7 @@
         Lz4NCiAgPC9nPg0KICA8ZyBpZD0iSWNvbnMiIC8+DQo8L3N2Zz4L
 </value>
   </data>
-  <data name="resource.SvgImage13" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage13" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -626,7 +626,7 @@
         IC8+DQogIDwvZz4NCiAgPGcgaWQ9Ikljb25zIiAvPg0KPC9zdmc+Cw==
 </value>
   </data>
-  <data name="resource.SvgImage14" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage14" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -645,7 +645,7 @@
         Pg0KICA8ZyBpZD0iSWNvbnMiIC8+DQo8L3N2Zz4L
 </value>
   </data>
-  <data name="resource.SvgImage15" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage15" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -665,7 +665,7 @@
         DQogIDxnIGlkPSJJY29ucyIgLz4NCjwvc3ZnPgs=
 </value>
   </data>
-  <data name="resource.SvgImage16" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="resource.SvgImage16" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
@@ -798,7 +798,7 @@
         vJdzX+J/8Hjkkf8FRnwlASy8cJEAAAAASUVORK5CYII=
 </value>
   </data>
-  <data name="dashboardSkinsBarItem1.ImageOptions.SvgImage" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.1" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="dashboardSkinsBarItem1.ImageOptions.SvgImage" type="DevExpress.Utils.Svg.SvgImage, DevExpress.Data.v18.2" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAFlEZXZFeHByZXNzLkRhdGEudjE4LjEsIFZlcnNpb249MTguMS41
         LjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjg4ZDE3NTRkNzAwZTQ5YQUBAAAAHURl
