@@ -109,7 +109,7 @@ BEGIN
             VALUE "FileDescription", "ImageFormatConverter"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "ImageFormatConverter.exe"
-            VALUE "LegalCopyright", "(c) 2018 Extract Systems, LLC.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2019 Extract Systems, LLC.  All rights reserved."
             VALUE "OriginalFilename", "ImageFormatConverter.exe"
             VALUE "ProductName", "ImageFormatConverter"
             VALUE "ProductVersion", "1.0.0.1"

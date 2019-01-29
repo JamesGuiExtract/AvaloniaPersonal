@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "COMLM Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "COMLM"
-            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2018"
+            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2019"
             VALUE "OriginalFilename", "COMLM.DLL"
             VALUE "ProductName", "COMLM Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

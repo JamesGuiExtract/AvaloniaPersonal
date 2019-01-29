@@ -77,7 +77,7 @@ BEGIN
     ICON            IDI_ICON_FAMDBADMIN,IDC_STATIC,11,17,21,20
     DEFPUSHBUTTON   "OK",IDOK,183,7,50,16,WS_GROUP
     EDITTEXT        IDC_EDIT_VERSION,40,11,115,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
-    LTEXT           "Copyright (C) 2018\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,41,28,119,25
+    LTEXT           "Copyright (C) 2019\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,41,28,119,25
 END
 
 IDD_FAMDBADMIN_DIALOG DIALOGEX 0, 0, 395, 189
@@ -365,7 +365,7 @@ BEGIN
             VALUE "FileDescription", "FAMDBAdmin"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "FAMDBAdmin.exe"
-            VALUE "LegalCopyright", "(c) 2018 Extract Systems.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2019 Extract Systems.  All rights reserved."
             VALUE "OriginalFilename", "FAMDBAdmin.exe"
             VALUE "ProductName", "FAMDBAdmin"
             VALUE "ProductVersion", "1, 0, 0, 1"

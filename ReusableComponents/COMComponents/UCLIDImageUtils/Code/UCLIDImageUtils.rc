@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "UCLIDImageUtils Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "UCLIDImageUtils"
-            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2018"
+            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2019"
             VALUE "OriginalFilename", "UCLIDImageUtils.DLL"
             VALUE "ProductName", "UCLIDImageUtils Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

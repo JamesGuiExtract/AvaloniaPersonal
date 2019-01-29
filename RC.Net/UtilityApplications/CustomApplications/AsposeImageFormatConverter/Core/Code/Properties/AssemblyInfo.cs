@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("AsposeImageFormatConverter")]
-[assembly: AssemblyCopyright("(c) 2018 Extract Systems, LLC.")]
+[assembly: AssemblyCopyright("(c) 2019 Extract Systems, LLC.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

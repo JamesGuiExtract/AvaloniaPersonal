@@ -69,7 +69,7 @@ BEGIN
             VALUE "FileDescription", "UCLIDCurveParameter Module\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "UCLIDCurveParameter\0"
-            VALUE "LegalCopyright", "Copyright 2018\0"
+            VALUE "LegalCopyright", "Copyright 2019\0"
             VALUE "OriginalFilename", "UCLIDCurveParameter.DLL\0"
             VALUE "ProductName", "UCLIDCurveParameter Module\0"
             VALUE "ProductVersion", "1, 0, 0, 1\0"

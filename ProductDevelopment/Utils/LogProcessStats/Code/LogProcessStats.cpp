@@ -64,7 +64,7 @@ void displayUsage(const string& rstrError)
 	string strMessage = "";
 	if (rstrError == "")
 	{
-		strMessage += "LogProcessStats (c) 2018 Extract Systems, LLC.  All Rights Reserved\n";
+		strMessage += "LogProcessStats (c) 2019 Extract Systems, LLC.  All Rights Reserved\n";
 		strMessage += "LogProcessStats allows a user to specify a list of Process Names\n";
 		strMessage += "and/or Process IDs that they would like performance data recorded for.\n";
 		strMessage += "This data will be recorded in a collection of csv files with names\n";

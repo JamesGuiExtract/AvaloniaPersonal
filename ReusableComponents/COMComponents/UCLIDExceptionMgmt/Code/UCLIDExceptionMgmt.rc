@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "UCLIDExceptionMgmt Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "UCLIDExceptionMgmt"
-            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2018"
+            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2019"
             VALUE "OriginalFilename", "UCLIDExceptionMgmt.DLL"
             VALUE "ProductName", "UCLIDExceptionMgmt Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

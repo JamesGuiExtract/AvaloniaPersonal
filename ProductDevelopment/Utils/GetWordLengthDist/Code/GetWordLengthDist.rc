@@ -67,7 +67,7 @@ BEGIN
             VALUE "FileDescription", "GetWordLengthDist.exe"
             VALUE "FileVersion", "1,0,0,1"
             VALUE "InternalName", "GetWordLengthDist.exe"
-            VALUE "LegalCopyright", "(c) 2018 Extract Systems, LLC.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2019 Extract Systems, LLC.  All rights reserved."
             VALUE "OriginalFilename", "GetWordLengthDist.exe"
             VALUE "ProductName", "Get Word Length Distribution Utility"
             VALUE "ProductVersion", "1,0,0,1"

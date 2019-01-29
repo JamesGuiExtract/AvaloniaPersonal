@@ -70,7 +70,7 @@ BEGIN
             VALUE "FileDescription", "Utilities that use SafeNet"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "SafeNetUtils.dll"
-            VALUE "LegalCopyright", "Copyright (C) 2018"
+            VALUE "LegalCopyright", "Copyright (C) 2019"
             VALUE "OriginalFilename", "SafeNetUtils.dll"
             VALUE "ProductName", "SafeNetUtils.dll"
             VALUE "ProductVersion", "1.0.0.1"

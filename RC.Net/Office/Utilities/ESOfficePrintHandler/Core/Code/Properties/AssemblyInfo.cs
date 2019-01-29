@@ -11,7 +11,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("ESOfficePrintHandler")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2018")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

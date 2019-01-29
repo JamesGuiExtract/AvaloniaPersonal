@@ -11,7 +11,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.Rules")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2018")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

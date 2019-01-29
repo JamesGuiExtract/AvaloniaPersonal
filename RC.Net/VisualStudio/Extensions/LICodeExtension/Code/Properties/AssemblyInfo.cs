@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("LICodeExtension")]
-[assembly: AssemblyCopyright("2018")]
+[assembly: AssemblyCopyright("2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

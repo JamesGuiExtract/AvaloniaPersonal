@@ -73,7 +73,7 @@ BEGIN
             VALUE "FileDescription", "AFPreProcessors Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFPreProcessors"
-            VALUE "LegalCopyright", "Copyright 2018"
+            VALUE "LegalCopyright", "Copyright 2019"
             VALUE "OriginalFilename", "AFPreProcessors.DLL"
             VALUE "ProductName", "AFPreProcessors Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

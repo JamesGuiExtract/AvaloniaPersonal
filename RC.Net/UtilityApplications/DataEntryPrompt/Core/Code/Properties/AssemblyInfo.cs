@@ -12,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("DataEntryPrompt")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2018")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

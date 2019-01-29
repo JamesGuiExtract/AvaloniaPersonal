@@ -74,7 +74,7 @@ BEGIN
             VALUE "FileDescription", "AFUtilsTest Module\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "AFUtilsTest\0"
-            VALUE "LegalCopyright", "Copyright 2018\0"
+            VALUE "LegalCopyright", "Copyright 2019\0"
             VALUE "OriginalFilename", "AFSplittersTest.DLL\0"
             VALUE "ProductName", "AFSplittersTest Module\0"
             VALUE "ProductVersion", "1, 0, 0, 1\0"

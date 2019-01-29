@@ -74,7 +74,7 @@ BEGIN
             VALUE "FileDescription", "StringPatternMatcherAutoTest Module\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "StringPatternMatcherAutoTest\0"
-            VALUE "LegalCopyright", "Copyright 2018\0"
+            VALUE "LegalCopyright", "Copyright 2019\0"
             VALUE "OriginalFilename", "StringPatternMatcherAutoTest.DLL\0"
             VALUE "ProductName", "StringPatternMatcherAutoTest Module\0"
             VALUE "ProductVersion", "1, 0, 0, 1\0"

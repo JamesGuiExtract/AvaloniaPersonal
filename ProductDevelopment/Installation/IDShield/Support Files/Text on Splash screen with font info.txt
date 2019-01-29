@@ -8,7 +8,7 @@ ID Shield product and can also be found in the README.TXT file.
 
 
 Font: Calibri 9
-© Copyright 2003-2018
+© Copyright 2003-2019
 Extract Systems, LLC
 Madison WI 53717
 All rights reserved.

@@ -16,7 +16,7 @@ using namespace System::Security::Permissions;
 [assembly: AssemblyConfigurationAttribute("")];
 [assembly: AssemblyCompanyAttribute("Extract Systems")];
 [assembly: AssemblyProductAttribute("ExtractEncryption")];
-[assembly: AssemblyCopyrightAttribute("Copyright (c) Extract Systems 2018")];
+[assembly: AssemblyCopyrightAttribute("Copyright (c) Extract Systems 2019")];
 [assembly: AssemblyTrademarkAttribute("")];
 [assembly: AssemblyCultureAttribute("")];
 

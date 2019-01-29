@@ -113,7 +113,7 @@ BEGIN
             VALUE "FileDescription", "ConvertFPSFile"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "ConvertFPSFile.exe"
-            VALUE "LegalCopyright", "(c) 2018 Extract Systems.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2019 Extract Systems.  All rights reserved."
             VALUE "OriginalFilename", "ConvertFPSFile.exe"
             VALUE "ProductName", "ConvertFPSFile"
             VALUE "ProductVersion", "1.0.0.1"

@@ -80,7 +80,7 @@ BEGIN
             VALUE "FileDescription", "Managed licensing components"
             VALUE "FileVersion",     "1.0.0.1"
             VALUE "InternalName",    "Extract.Licensing.dll"
-            VALUE "LegalCopyright", "(c) 2018 Extract Systems, LLC.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2019 Extract Systems, LLC.  All rights reserved."
             VALUE "OriginalFilename","Extract.Licensing.dll"
             VALUE "ProductName", "Extract.Licensing"
             VALUE "ProductVersion",  "1.0.0.1"
