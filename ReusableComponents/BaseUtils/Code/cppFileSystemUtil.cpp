@@ -51,13 +51,19 @@ const string gstrDEFAULT_SECURE_DELETER = "Extract.Utilities.SecureFileDeleters.
 const string gstrSECURE_DELETE_ALL = "SecureDeleteAllSensitiveFiles";
 const string gstrSECURE_DELETER = "SecureDeleter";
 
+// Substitute for broken function scope static in MSVC 2010
+namespace
+{
+	CCriticalSection gGetSecureFileDeleterMutex;
+	CCriticalSection gGetFileAccessRetryCountAndTimeoutMutex;
+}
+
 //--------------------------------------------------------------------------------------------------
 // This helper method retrieves the configured ISecureFileDeleter if either bForceUseSecureDeleter is
 // true or the SecureDeleteAllSensitiveFiles registry value is true. The ISecureFileDeleter is
 // cached on the first call and will be re-used for all subsequent calls.
 ISecureFileDeleterPtr getSecureFileDeleter(bool bForceUseSecureDeleter)
 {
-	static CMutex sMutex;
 	static string sstrRegPath = gstrRC_REG_PATH + "\\Extract.Utilities";
 	static bool sbInitialized = false;
 	static bool sbAlwaysUseSecureDeleter = false;
@@ -67,7 +73,7 @@ ISecureFileDeleterPtr getSecureFileDeleter(bool bForceUseSecureDeleter)
 	static bool sbSecureFileDeleterAuthenticationFailed = false;
 
 	// Lock mutex 
-	CSingleLock lg(&sMutex, TRUE);
+	CSingleLock lg(&gGetSecureFileDeleterMutex, TRUE);
 
 	// Initialize the settings for secure deletion once (the first time they are needed), then use
 	// the cached settings from that point forward.
@@ -144,7 +150,6 @@ ISecureFileDeleterPtr getSecureFileDeleter(bool bForceUseSecureDeleter)
 //-------------------------------------------------------------------------------------------------
 void getFileAccessRetryCountAndTimeout(int& riRetryCount, int& riRetryTimeout)
 {
-	static CMutex sMutex;
 	static int siTimeout = -1;
 	static int siRetries = -1;
 
@@ -152,7 +157,7 @@ void getFileAccessRetryCountAndTimeout(int& riRetryCount, int& riRetryTimeout)
 	if (siTimeout < 0 || siRetries < 0 )
 	{
 		// Lock mutex 
-		CSingleLock lg(&sMutex, TRUE);
+		CSingleLock lg(&gGetFileAccessRetryCountAndTimeoutMutex, TRUE);
 
 		// Check registry for file access timeout
 		RegistryPersistenceMgr machineCfgMgr = RegistryPersistenceMgr( HKEY_LOCAL_MACHINE, "" );

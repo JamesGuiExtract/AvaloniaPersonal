@@ -19,6 +19,13 @@
 #include <set>
 #include <string>
 
+// Substitute for broken function scope static in MSVC 2010
+namespace
+{
+	static CCriticalSection gAutoEncryptFileRegistryManagerMutex;
+	static MapLabelManager encryptedFileManager;
+}
+
 //-------------------------------------------------------------------------------------------------
 // Private Functions
 //-------------------------------------------------------------------------------------------------
@@ -264,12 +271,14 @@ void autoEncryptFile(const string& strFile, const string& strRegistryKey)
 
 			// Protect access to the IConfigurationSettingsPersistenceMgr
 			{
-				static CMutex mutex;
-				CSingleLock lg(&mutex, TRUE );
+				CSingleLock lg(&gAutoEncryptFileRegistryManagerMutex, TRUE );
 
 				static unique_ptr<IConfigurationSettingsPersistenceMgr> pSettings(__nullptr);
 				if (pSettings.get() == __nullptr)
 				{
+					// ...which can cause creation of multiple instances of the RegistryPersistenceMgr,
+					// which because of the unique ptr, can be destructed while still in use below,
+					// which leads to the "invalid call to pure virtual function" exception that I observed
 					pSettings = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 						new RegistryPersistenceMgr(HKEY_CURRENT_USER, ""));
 					ASSERT_RESOURCE_ALLOCATION("ELI08827", pSettings.get() != __nullptr);
@@ -368,13 +377,12 @@ void autoEncryptFile(const string& strFile, const string& strRegistryKey)
 				}
 
 				// Encrypt the base file to the temporary filename
-				static MapLabelManager encryptedFileManager;
 				encryptedFileManager.setMapLabel(strBaseFile, strTempEncryptionFile);
 
 				// Once the encryption process is complete, copy it into the real destination.
 				copyFile(strTempEncryptionFile, strFile);
 
-				// strTempEncryptionFile goes out of scope here, allowing auto-encryption from other threads
+				// upTempFile goes out of scope here, allowing auto-encryption from other threads
 				// and processes access here.
 			}
 		}

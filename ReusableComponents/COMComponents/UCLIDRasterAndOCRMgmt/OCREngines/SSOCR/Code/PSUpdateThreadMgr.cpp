@@ -7,6 +7,7 @@
 
 // Static and global variables
 vector<string> PSUpdateThreadManager::ms_vecstrProcessName;
+CCriticalSection PSUpdateThreadManager::ms_PSUpdateThreadManagerMutex;
 
 //-------------------------------------------------------------------------------------------------
 PSUpdateThreadManager::PSUpdateThreadManager(IProgressStatus* pProgressStatus, IScansoftOCR2* pOCREngine, 
@@ -53,8 +54,7 @@ PSUpdateThreadManager::PSUpdateThreadManager(IProgressStatus* pProgressStatus, I
 		static bool sbInitialized = false;
 		if (!sbInitialized)
 		{
-			static CMutex localMutex;
-			CSingleLock lock(&localMutex, TRUE);
+			CSingleLock lock(&ms_PSUpdateThreadManagerMutex, TRUE);
 
 			if (!sbInitialized)
 			{

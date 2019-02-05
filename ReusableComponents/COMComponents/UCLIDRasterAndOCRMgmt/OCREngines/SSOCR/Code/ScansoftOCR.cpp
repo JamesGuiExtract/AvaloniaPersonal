@@ -63,6 +63,12 @@ const unsigned long gulSSOCR2_ERROR_CLOSE_WAIT = 2000;
 // Global mutex to ensure only one instance of 
 const string gstr_NUANCE_LICENSE_RESET_MUTEX_NAME = "Global\\64EAE541-363A-481B-B51D-B1DDAB52AEB8";
 
+// Substitute for broken function scope static in MSVC 2010
+namespace
+{
+	static CCriticalSection gGetMaxRecognitionsPerOCREngineInstanceMutex;
+}
+
 //-------------------------------------------------------------------------------------------------
 // CScansoftOCR
 //-------------------------------------------------------------------------------------------------
@@ -577,8 +583,7 @@ IScansoftOCR2Ptr CScansoftOCR::getOCREngine()
 unsigned long CScansoftOCR::getMaxRecognitionsPerOCREngineInstance()
 {
 	// only one thread may enter this function at any given time
-	static CMutex ls_lock;
-	CSingleLock guard(&ls_lock, TRUE);
+	CSingleLock guard(&gGetMaxRecognitionsPerOCREngineInstanceMutex, TRUE);
 
 	static unsigned long ls_ulMaxImageRecognitions = 0;
 	static bool ls_bInitialized = false;

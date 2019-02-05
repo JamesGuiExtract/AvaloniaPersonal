@@ -17,6 +17,42 @@ using namespace std;
 // The default file priority (Normal)
 const long glDEFAULT_FILE_PRIORITY = (long) kPriorityNormal;
 
+
+// Namespace-scope statics as substitute for broken function scope static in MSVC 2010
+
+// Function getPriorityString
+namespace nsGetPriorityString
+{
+	// Static collection to hold the priority strings
+	static map<long, string> smapPriorityToString;
+
+	// Mutex and initialized flag to ensure thread safety over collection
+	static CCriticalSection mutex;
+	static bool bInitialized = false;
+}
+
+// Function getPriorityFromString
+namespace nsGetPriorityFromString
+{
+	// Static collection to hold the priority strings
+	static map<string, UCLID_FILEPROCESSINGLib::EFilePriority> smapStringToPriority;
+
+	// Mutex and initialized flag to ensure thread safety over collection
+	static CCriticalSection mutex;
+	static bool bInitialized = false;
+}
+
+// Function getPrioritiesVector
+namespace nsGetPrioritiesVector
+{
+	// Static collection to hold the priority strings
+	static vector<string> svecPriorities;
+
+	// Mutex and initialized flag to ensure thread safety over collection
+	static CCriticalSection mutex;
+	static bool bInitialized = false;
+}
+
 //--------------------------------------------------------------------------------------------------
 // Helper methods
 //--------------------------------------------------------------------------------------------------
@@ -25,21 +61,15 @@ static string getPriorityString(UCLID_FILEPROCESSINGLib::EFilePriority ePriority
 {
 	try
 	{
-		// Static collection to hold the priority strings
-		static map<long, string> smapPriorityToString;
-
-		// Mutex and initialized flag to ensure thread safety over collection
-		static CMutex mutex;
-		static bool bInitialized = false;
-		if (!bInitialized)
+		if (!nsGetPriorityString::bInitialized)
 		{
-			CSingleLock lg(&mutex, TRUE);
+			CSingleLock lg(&nsGetPriorityString::mutex, TRUE);
 
 			// Check initialization again (in case blocked while another thread initialized)
-			if (!bInitialized)
+			if (!nsGetPriorityString::bInitialized)
 			{
 				// Ensure the collection is empty
-				smapPriorityToString.clear();
+				nsGetPriorityString::smapPriorityToString.clear();
 
 				// Get a DB pointer
 				UCLID_FILEPROCESSINGLib::IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);	
@@ -57,19 +87,19 @@ static string getPriorityString(UCLID_FILEPROCESSINGLib::EFilePriority ePriority
 				for (long i=0; i < lSize; i++)
 				{
 					string strTemp = asString(ipVecPriorities->Item[i].bstrVal);
-					smapPriorityToString[i+1] = strTemp;
+					nsGetPriorityString::smapPriorityToString[i+1] = strTemp;
 				}
 
 				// Map has been initialized, set initialized to true
-				bInitialized = true;
+				nsGetPriorityString::bInitialized = true;
 			}
 		}
 
 		// Get the priority value
 		long lPriority = (ePriority == kPriorityDefault ? glDEFAULT_FILE_PRIORITY : (long) ePriority);
 
-		map<long, string>::iterator it = smapPriorityToString.find(lPriority);
-		if (it == smapPriorityToString.end())
+		map<long, string>::iterator it = nsGetPriorityString::smapPriorityToString.find(lPriority);
+		if (it == nsGetPriorityString::smapPriorityToString.end())
 		{
 			UCLIDException uex("ELI27635", "Invalid priority.");
 			uex.addDebugInfo("Priority", lPriority);
@@ -86,21 +116,15 @@ static UCLID_FILEPROCESSINGLib::EFilePriority getPriorityFromString(const string
 {
 	try
 	{
-		// Static collection to hold the priority strings
-		static map<string, UCLID_FILEPROCESSINGLib::EFilePriority> smapStringToPriority;
-
-		// Mutex and initialized flag to ensure thread safety over collection
-		static CMutex mutex;
-		static bool bInitialized = false;
-		if (!bInitialized)
+		if (!nsGetPriorityFromString::bInitialized)
 		{
-			CSingleLock lg(&mutex, TRUE);
+			CSingleLock lg(&nsGetPriorityFromString::mutex, TRUE);
 
 			// Check initialization again (in case blocked while another thread initialized)
-			if (!bInitialized)
+			if (!nsGetPriorityFromString::bInitialized)
 			{
 				// Ensure the collection is empty
-				smapStringToPriority.clear();
+				nsGetPriorityFromString::smapStringToPriority.clear();
 
 				// Get a DB pointer
 				UCLID_FILEPROCESSINGLib::IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
@@ -124,11 +148,11 @@ static UCLID_FILEPROCESSINGLib::EFilePriority getPriorityFromString(const string
 					makeUpperCase(strTemp);
 
 					// Add the priority to the map
-					smapStringToPriority[strTemp] = (UCLID_FILEPROCESSINGLib::EFilePriority)(i+1);
+					nsGetPriorityFromString::smapStringToPriority[strTemp] = (UCLID_FILEPROCESSINGLib::EFilePriority)(i+1);
 				}
 
 				// Map has been initialized, set initialized to true
-				bInitialized = true;
+				nsGetPriorityFromString::bInitialized = true;
 			}
 		}
 
@@ -136,8 +160,8 @@ static UCLID_FILEPROCESSINGLib::EFilePriority getPriorityFromString(const string
 		string strTemp = strPriority;
 		makeUpperCase(strTemp);
 		map<string, UCLID_FILEPROCESSINGLib::EFilePriority>::iterator it =
-			smapStringToPriority.find(strTemp);
-		if (it == smapStringToPriority.end())
+			nsGetPriorityFromString::smapStringToPriority.find(strTemp);
+		if (it == nsGetPriorityFromString::smapStringToPriority.end())
 		{
 			UCLIDException uex("ELI27662", "Invalid priority string.");
 			uex.addDebugInfo("Priority String", strPriority);
@@ -154,21 +178,15 @@ static void getPrioritiesVector(vector<string>& rvecPriorities)
 {
 	try
 	{
-		// Static collection to hold the priority strings
-		static vector<string> svecPriorities;
-
-		// Mutex and initialized flag to ensure thread safety over collection
-		static CMutex mutex;
-		static bool bInitialized = false;
-		if (!bInitialized)
+		if (!nsGetPrioritiesVector::bInitialized)
 		{
-			CSingleLock lg(&mutex, TRUE);
+			CSingleLock lg(&nsGetPrioritiesVector::mutex, TRUE);
 
 			// Check initialization again (in case blocked while another thread initialized)
-			if (!bInitialized)
+			if (!nsGetPrioritiesVector::bInitialized)
 			{
 				// Ensure the collection is empty
-				svecPriorities.clear();
+				nsGetPrioritiesVector::svecPriorities.clear();
 
 				// Get a DB pointer
 				UCLID_FILEPROCESSINGLib::IFAMDBUtilsPtr ipFAMDBUtils(CLSID_FAMDBUtils);
@@ -186,16 +204,16 @@ static void getPrioritiesVector(vector<string>& rvecPriorities)
 				for (long i=0; i < lSize; i++)
 				{
 					// Add the string to the vector
-					svecPriorities.push_back(asString(ipVecPriorities->Item[i].bstrVal));
+					nsGetPrioritiesVector::svecPriorities.push_back(asString(ipVecPriorities->Item[i].bstrVal));
 				}
 
 				// Map has been initialized, set initialized to true
-				bInitialized = true;
+				nsGetPrioritiesVector::bInitialized = true;
 			}
 		}
 
 		// Copy the values to the return vector
-		rvecPriorities = svecPriorities;
+		rvecPriorities = nsGetPrioritiesVector::svecPriorities;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27667");
 }

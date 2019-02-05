@@ -97,6 +97,7 @@ private:
 
 	// an array of strings of OCR process names indexed by RecAPI process ID
 	static vector<string> ms_vecstrProcessName;
+	static CCriticalSection ms_PSUpdateThreadManagerMutex;
 
 	// constants for determining number of progress items per OCR process
 	// NOTE: these values are simply weights which were chosen based on trial and observation
