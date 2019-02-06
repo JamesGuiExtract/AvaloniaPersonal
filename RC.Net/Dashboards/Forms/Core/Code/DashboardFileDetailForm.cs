@@ -311,7 +311,7 @@ namespace Extract.Dashboard.Forms
             }
         }
 
-        private void SetColumnColors(string containsString, Color color)
+        void SetColumnColors(string containsString, Color color)
         {
             var columnsToChange = dataGridView.Columns.Cast<DataGridViewColumn>()
                 .Where(d => d.Name.Contains(containsString));
@@ -440,6 +440,18 @@ namespace Extract.Dashboard.Forms
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI46127");
+            }
+        }
+
+        void HandleExitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Close();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46655");
             }
         }
 
