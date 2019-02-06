@@ -109,6 +109,7 @@
             // 
             // _viewButton
             // 
+            this._viewButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._viewButton.Location = new System.Drawing.Point(453, 13);
             this._viewButton.Name = "_viewButton";
             this._viewButton.Size = new System.Drawing.Size(75, 23);
@@ -156,6 +157,7 @@
             this.Controls.Add(this.dashboardDataGridView);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(555, 489);
             this.Name = "ManageDashboardsForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
