@@ -309,6 +309,10 @@ namespace Extract.DataEntry.LabDE
                 // requested to be the next file displayed.
                 foreach (int newId in CurrentFileIds.Except(OriginalFileIds))
                 {
+                    // https://extract.atlassian.net/browse/ISSUE-15690
+                    // A new current file should not be "released" to its previous status.
+                    CheckedOutFileIds.Remove(newId);
+
                     DataEntryApplication.FileRequestHandler.SetFallbackStatus(
                         newId, EActionStatus.kActionPending);
 
@@ -320,6 +324,10 @@ namespace Extract.DataEntry.LabDE
                 }
 
                 PerformActions();
+
+                // Any remaining files ("Do nothing") that were checked-out for the purpose of being
+                // locked from other users should be released back to their previous status.
+                ReleaseCheckedOutFiles();
 
                 ClearData();
 
