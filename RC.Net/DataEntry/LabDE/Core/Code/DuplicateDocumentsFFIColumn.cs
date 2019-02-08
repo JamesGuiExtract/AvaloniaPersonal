@@ -195,6 +195,14 @@ namespace Extract.DataEntry.LabDE
         } = new Dictionary<int, string>();
 
         /// <summary>
+        /// Stores the action that was selected by default when the FFI was opened.
+        /// </summary>
+        protected Dictionary<int, string> InitialValues
+        {
+            get;
+        } = new Dictionary<int, string>();
+
+        /// <summary>
         /// The files that are currently checked out for processing in different processes.
         /// </summary>
         protected HashSet<int> InUseFiles
@@ -437,22 +445,10 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                if (InUseFiles.Contains(fileID))
-                {
-                    return false;
-                }
-                else if (OriginalFileIds.Contains(fileID) != CurrentFileIds.Contains(fileID))
-                {
-                    return true;
-                }
-                else if (CurrentFileIds.Contains(fileID) || CurrentValues[fileID] == DoNothingOption.Action)
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
+                return
+                    CurrentValues.TryGetValue(fileID, out string currentValue) &&
+                    InitialValues.TryGetValue(fileID, out string initialValue) &&
+                    currentValue != initialValue;
             }
             catch (Exception ex)
             {
@@ -692,6 +688,7 @@ namespace Extract.DataEntry.LabDE
                         PreviousStatuses[fileID] = EActionStatus.kActionProcessing;
                     }
 
+                    InitialValues[fileID] = value;
                     CurrentValues[fileID] = value;
                 }
 

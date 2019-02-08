@@ -192,7 +192,8 @@ namespace Extract.DataEntry.LabDE
                 {
                     return new[] { GetInUseValue(fileId) };
                 }
-                else if (CurrentValues.TryGetValue(fileId, out string option) && option == CurrentOption.Action)
+                // In the pagination UI, if a document is already showing no other option can be available.
+                else if (InitialValues.TryGetValue(fileId, out string option) && option == CurrentOption.Action)
                 {
                     return new[] { CurrentOption.Action };
                 }
