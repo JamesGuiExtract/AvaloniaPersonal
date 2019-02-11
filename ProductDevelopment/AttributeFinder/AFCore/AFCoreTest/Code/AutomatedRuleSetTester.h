@@ -77,6 +77,9 @@ private:
 
 	// To Allow only processing files with existing eav file
 	bool m_bEAVMustExist;
+
+	bool m_bIgnoreTextFiles;
+
 	//////////
 	// Methods
 	//////////

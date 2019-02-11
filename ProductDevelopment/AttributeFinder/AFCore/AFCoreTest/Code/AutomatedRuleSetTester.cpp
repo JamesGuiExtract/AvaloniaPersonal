@@ -165,7 +165,8 @@ CAutomatedRuleSetTester::CAutomatedRuleSetTester()
   m_bCaseSensitive(true),
   m_bEAVMustExist(false),
   m_ipFAMTagManager(CLSID_FAMTagManager),
-  m_ipAFUtility(CLSID_AFUtility)
+  m_ipAFUtility(CLSID_AFUtility),
+  m_bIgnoreTextFiles(false)
 {
 	try
 	{
@@ -1076,6 +1077,26 @@ void CAutomatedRuleSetTester::interpretLine(const string& strLineText,
 					throw ue;
 				}
 			}
+			else if (strSetting == "IGNORE_TEXT_FILES")
+			{
+				string strValue = vecSubTokens[1];
+				
+				if (strValue == "TRUE")
+				{
+					m_bIgnoreTextFiles = true;
+				}
+				else if (strValue == "FALSE")
+				{
+					m_bIgnoreTextFiles = false;
+				}
+				else
+				{
+					UCLIDException ue("ELI46656",
+						"Invalid Value for IGNORE_TEXT_FILES setting.");
+					ue.addDebugInfo("Value", strValue);
+					throw ue;
+				}
+			}
 			else
 			{
 				UCLIDException ue("ELI09729", "Invalid Setting.");
@@ -1370,7 +1391,11 @@ void CAutomatedRuleSetTester::processTestFolder(const string& strRSDFile,
 {
 	// Get all .txt and .uss files from the folder
 	vector<string> vecSourceFiles;
-	::getFilesInDir(vecSourceFiles, strTestFolder, "*.txt", true);
+	if (!m_bIgnoreTextFiles)
+	{
+		::getFilesInDir(vecSourceFiles, strTestFolder, "*.txt", true);
+	}
+
 	::getFilesInDir(vecSourceFiles, strTestFolder, "*.uss", true);
 
 	// Compile a map of unique image file names (given the files in vecSourceFiles) to their
