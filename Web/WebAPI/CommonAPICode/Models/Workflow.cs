@@ -64,7 +64,7 @@ namespace WebAPI.Models
         public string StartAction { get; set; }
 
         /// <summary>
-        /// The post verify action
+        /// The verify action
         /// </summary>
         public string EditAction { get; set; }
 

@@ -33,7 +33,7 @@ namespace WebAPI.Models
         ImageUtils _imageUtils;
         ImageConverter _imageConverter;
         ClaimsPrincipal _user;
-        SpatialString _cachedUssData;
+        bool _endSessionOnDispose;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DocumentData"/> class.
@@ -96,13 +96,14 @@ namespace WebAPI.Models
             // Allow the fileApi object to be reused by clearing the InUse flag.
             if (_fileApi != null)
             {
-                // Since the previous test seemed backwards but maybe was intentional,
-                // I'm removing the test altogether and just calling EndSession() - Nat
-                try
+                if (_endSessionOnDispose)
                 {
-                    _fileApi.EndSession();
+                    try
+                    {
+                        _fileApi.EndSession();
+                    }
+                    catch { }
                 }
-                catch { }
 
                 _fileApi.InUse = false;
                 _fileApi = null;
@@ -114,7 +115,8 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="claimsPrincipal">The <see cref="ClaimsPrincipal"/> this instance is specific to.</param>
         /// <param name="remoteIpAddress">The IP address of the web application user.s</param>
-        public void OpenSession(ClaimsPrincipal claimsPrincipal, string remoteIpAddress)
+        /// <param name="endSessionOnDispose">Whether to call EndSession() when this instance is disposed</param>
+        public void OpenSession(ClaimsPrincipal claimsPrincipal, string remoteIpAddress, bool endSessionOnDispose)
         {
             var user = new User()
             {
@@ -122,7 +124,7 @@ namespace WebAPI.Models
                 WorkflowName = claimsPrincipal.GetClaim(Utils._WORKFLOW_NAME)
             };
 
-            OpenSession(user, remoteIpAddress);
+            OpenSession(user, remoteIpAddress, endSessionOnDispose);
         }
 
         /// <summary>
@@ -130,10 +132,12 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="user">The <see cref="User"/> this instance is specific to.</param>
         /// <param name="remoteIpAddress">The IP address of the web application user.s</param>
-        public void OpenSession(User user, string remoteIpAddress)
+        /// <param name="endSessionOnDispose">Whether to call EndSession() when this instance is disposed</param>
+        public void OpenSession(User user, string remoteIpAddress, bool endSessionOnDispose)
         {
             try
             {
+                _endSessionOnDispose = endSessionOnDispose;
                 FileApi.FileProcessingDB.RecordWebSessionStart(
                     "WebRedactionVerification", _apiContext.SessionId,
                     remoteIpAddress, user.Username);
@@ -214,7 +218,7 @@ namespace WebAPI.Models
             try
             {
                 int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.EditAction);
-                var stats = FileApi.FileProcessingDB.GetStats(actionId, false);
+                var stats = FileApi.FileProcessingDB.GetStats(actionId, false, true);
                 var users = FileApi.FileProcessingDB.GetActiveUsers(FileApi.Workflow.EditAction);
 
                 var result = new QueueStatusResult();
@@ -245,7 +249,8 @@ namespace WebAPI.Models
                 // Per GGK request, if a document is already open, return the already open ID
                 // without error
                 // https://extract.atlassian.net/browse/WEB-55
-                if (FileApi.DocumentSession.IsOpen)
+                // Modified to only return open document if there is no file ID specified so that you can open a specific file with, e.g., http://localhost:4205/?docid=11
+                if (FileApi.DocumentSession.IsOpen && id < 0)
                 {
                     return new DocumentIdResult()
                     {
@@ -302,18 +307,20 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="setStatusTo"><see cref="EActionStatus.kActionCompleted"/> to commit the document so that it advances in the
         /// workflow; other values to save the document but set the file's status in the EditAction to a non-completed value.</param>
+        /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
         /// <param name="exception">Optional exception for logging if <see paramref="setStatusTo"/> is <see cref="EActionStatus.kActionFailed"/></param>
-        public void CloseDocument(EActionStatus setStatusTo, Exception exception = null)
+        public void CloseDocument(EActionStatus setStatusTo, int duration = -1, Exception exception = null)
         {
             try
             {
                 ExtractException.Assert("ELI45238", "No active user", _user != null);
 
-                _cachedUssData = null;
+                double durationInSeconds = duration > 0
+                    ? duration / 1000.0
+                    : (DateTime.Now - FileApi.DocumentSession.StartTime).TotalSeconds;
 
-                double duration = (DateTime.Now - FileApi.DocumentSession.StartTime).TotalSeconds;
                 FileApi.FileProcessingDB.UpdateFileTaskSession(FileApi.DocumentSession.Id,
-                    duration, 0, 0);
+                    durationInSeconds, 0, 0);
 
                 int fileId = FileApi.DocumentSession.FileId;
                 if (setStatusTo == EActionStatus.kActionCompleted)
@@ -1265,47 +1272,13 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// The <see cref="SpatialString"/> from the uss file representing the currently open
-        /// document's OCR results
-        /// </summary>
-        SpatialString DocumentSessionUssData
-        {
-            get
-            {
-                if (_cachedUssData == null)
-                {
-                    var ussFileName = GetSourceFileName(FileApi.DocumentSession.FileId) + ".uss";
-                    _cachedUssData = new SpatialString();
-                    _cachedUssData.LoadFrom(ussFileName, false);
-                }
-
-                return _cachedUssData;
-            }
-        }
-
-        /// <summary>
         /// Gets the USS file data as a <see cref="SpatialString"/> for the specified file.
-        /// NOTE: Cached DocumentSessionUssData will be used if a document session is currently open.
         /// </summary>
         /// <param name="fileId">The ID for which the data is needed.</param>
         /// <returns>A <see cref="SpatialString"/> representing the OCR data.</returns>
         SpatialString GetUssData(int fileId)
         {
-            SpatialString ussData;
-            if (FileApi.DocumentSession.IsOpen)
-            {
-                ExtractException.Assert("ELI46313", "Request for unexpected file",
-                    fileId < 1 || fileId == FileApi.DocumentSession.FileId);
-
-                return DocumentSessionUssData;
-            }
-            else
-            {
-                var fileName = GetSourceFileName(fileId);
-                ussData = GetUssData(fileName);
-            }
-
-            return ussData;
+            return GetUssData(GetSourceFileName(fileId));
         }
 
         /// <summary>

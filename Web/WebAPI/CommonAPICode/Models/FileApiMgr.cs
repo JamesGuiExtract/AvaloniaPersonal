@@ -21,7 +21,7 @@ namespace WebAPI.Models
         // -1 indicates that items should not be removed from the queue via a WaitForTurn call;
         // items will need to be explicitly removed.
         static Sequencer<long> _sequencer = new Sequencer<long>(0, requireExplicitRemoval: true);
-        static long _waitinInstanceId = 0;
+        static long _waitingInstanceId = 0;
 
         /// <summary>
         /// get (an existing unused interface) or make a FAM file processing DB interface
@@ -40,8 +40,17 @@ namespace WebAPI.Models
             var waitTime = new Stopwatch();
             waitTime.Start();
 
-            Int32.TryParse(sessionOwner?.GetClaim("FAMSessionId"), out int requestedFAMSessionId);
-            long requestId = Interlocked.Increment(ref _waitinInstanceId);
+            int requestedFAMSessionID = 0;
+            string requestedSessionID = "";
+            if (sessionOwner != null)
+            {
+                Int32.TryParse(sessionOwner.GetClaim("FAMSessionId"), out requestedFAMSessionID);
+                requestedSessionID = sessionOwner.GetClaim(JwtRegisteredClaimNames.Jti);
+
+                ExtractException.Assert("ELI46662", "Logic error", !string.IsNullOrWhiteSpace(requestedSessionID));
+            }
+
+            long requestId = Interlocked.Increment(ref _waitingInstanceId);
             _sequencer.AddToQueue(requestId);
 
             try
@@ -78,32 +87,15 @@ namespace WebAPI.Models
 
                         if (fileApi != null)
                         {
-                            var requestedSessionId = sessionOwner?.GetClaim(JwtRegisteredClaimNames.Jti);
-                            if (fileApi.Expired ||
-                                (!string.IsNullOrWhiteSpace(requestedSessionId) &&
-                                    (requestedFAMSessionId != 0 &&
-                                     (fileApi.SessionId != apiContext.SessionId || requestedFAMSessionId != fileApi.FAMSessionId))))
+                            if (requestedFAMSessionID > 0)
                             {
-                                // If a FAM session was requested the returned instance is expired or is not for that session,
-                                // abort the old session.
-                                fileApi?.AbortSession(requestedFAMSessionId);
-
-                                throw new HTTPError("ELI45230", StatusCodes.Status401Unauthorized, "Session expired");
+                                fileApi.ResumeSession(requestedFAMSessionID);
                             }
 
                             fileApi.InUse = true;
                         }
                         else if (!waiting)
                         {
-                            // If a FAM session was requested but a new instance had to be created, abort the old session.
-                            if (requestedFAMSessionId > 0)
-                            {
-                                var tempFileApi = new FileApi(apiContext, setInUse: false);
-                                tempFileApi.AbortSession(requestedFAMSessionId);
-
-                                throw new HTTPError("ELI46255", StatusCodes.Status401Unauthorized, "Session expired");
-                            }
-
                             // The number of instances being used for this context.
                             int instanceCount = _interfaces.Count(instance =>
                                 instance.Workflow.Name.IsEquivalent(apiContext.WorkflowName) &&
@@ -116,6 +108,11 @@ namespace WebAPI.Models
                                 fileApi.Releasing += HandleFileApi_Releasing;
                                 _interfaces.Add(fileApi);
                                 Log.WriteLine(Inv($"Number of file API interfaces is now: {_interfaces.Count}"), "ELI43251");
+
+                                if (requestedFAMSessionID > 0)
+                                {
+                                    fileApi.ResumeSession(requestedFAMSessionID);
+                                }
                             }
                             else
                             {

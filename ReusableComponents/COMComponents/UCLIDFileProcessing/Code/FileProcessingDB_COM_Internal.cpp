@@ -3535,7 +3535,7 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 			string strActionName = asString(strAction);
 
 			// If the FAM has lost its registration, re-register before continuing with processing.
-			ensureFAMRegistration(strActionName);
+			ensureFAMRegistration();
 
 			static const string strActionIDPlaceHolder = "<ActionIDPlaceHolder>";
 
@@ -3666,7 +3666,7 @@ bool CFileProcessingDB::GetFileToProcess_Internal(bool bDBLocked, long nFileID, 
 			string strActionName = asString(strAction);
 
 			// If the FAM has lost its registration, re-register before continuing with processing.
-			ensureFAMRegistration(strActionName);
+			ensureFAMRegistration();
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -3917,7 +3917,7 @@ bool CFileProcessingDB::GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrA
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
-	VARIANT_BOOL vbForceUpdate, IActionStatistics* *pStats)
+	VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs, IActionStatistics* *pStats)
 {
 	try
 	{
@@ -3933,6 +3933,16 @@ bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
+
+				if (asCppBool(vbRevertTimedOutFAMs))
+				{
+					// Begin a transaction
+					TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+					revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+
+					tg.CommitTrans();
+				}
 				
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
@@ -5786,17 +5796,20 @@ bool CFileProcessingDB::UnregisterActiveFAM_Internal(bool bDBLocked)
 	{
 		try
 		{
-			// Stop thread here
-			m_eventStopMaintainenceThreads.signal();
-
-			// Wait for the ping and statistics maintenance threads to exit.
-			HANDLE handles[2];
-			handles[0] = m_eventPingThreadExited.getHandle();
-			handles[1] = m_eventStatsThreadExited.getHandle();
-			if (WaitForMultipleObjects(2, (HANDLE *)&handles, TRUE, gnPING_TIMEOUT) != WAIT_OBJECT_0)
+			if (!m_bCurrentSessionIsWebSession)
 			{
-				UCLIDException ue("ELI27857", "Application Trace: Timed out waiting for thread to exit.");
-				ue.log();
+				// Stop thread here
+				m_eventStopMaintenanceThreads.signal();
+
+				// Wait for the ping and statistics maintenance threads to exit.
+				HANDLE handles[2];
+				handles[0] = m_eventPingThreadExited.getHandle();
+				handles[1] = m_eventStatsThreadExited.getHandle();
+				if (WaitForMultipleObjects(2, (HANDLE *)&handles, TRUE, gnPING_TIMEOUT) != WAIT_OBJECT_0)
+				{
+					UCLIDException ue("ELI27857", "Application Trace: Timed out waiting for thread to exit.");
+					ue.log();
+				}
 			}
 			
 			// set FAMRegistered flag to false since thread has exited
@@ -5806,7 +5819,7 @@ bool CFileProcessingDB::UnregisterActiveFAM_Internal(bool bDBLocked)
 			TransactionGuard tg(getDBConnection(), adXactRepeatableRead, &m_criticalSection);
 
 			// Make sure there are no linked records in the LockedFile table 
-			// and if there are records reset there status to StatusBeforeLock if there current
+			// and if there are records reset their status to StatusBeforeLock if their current
 			// state for the action is processing.
 			UCLIDException uex("ELI30304", "Application Trace: Files were reverted to original status.");
 			revertLockedFilesToPreviousState(getDBConnection(), m_nActiveFAMID,
@@ -6557,6 +6570,9 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 	{
 		try
 		{
+			// Set session type so that maintenance threads will be started
+			m_bCurrentSessionIsWebSession = false;
+
 			// Get the FPS File name
 			m_strFPSFileName = asString(bstrFPSFileName);
 
@@ -6642,6 +6658,23 @@ bool CFileProcessingDB::RecordWebSessionStart_Internal(bool bDBLocked)
 	{
 		try
 		{
+			// Set session type so that maintenance threads will not be started
+			m_bCurrentSessionIsWebSession = true;
+
+			// Make sure the threads are not running
+			m_eventStopMaintenanceThreads.signal();
+
+			// Wait for the ping and statistics maintenance threads to exit.
+			HANDLE handles[2];
+			handles[0] = m_eventPingThreadExited.getHandle();
+			handles[1] = m_eventStatsThreadExited.getHandle();
+			if (WaitForMultipleObjects(2, (HANDLE *)&handles, TRUE, gnPING_TIMEOUT) != WAIT_OBJECT_0)
+			{
+				UCLIDException ue("ELI46664", "Application Trace: Timed out waiting for thread to exit.");
+				ue.log();
+			}
+
+
 			string strFAMSessionQuery = "INSERT INTO [" + gstrFAM_SESSION + "] ";
 			strFAMSessionQuery += "([MachineID], [FAMUserID], [UPI], [FPSFileID], [ActionID], "
 				"[Queuing], [Processing]) ";

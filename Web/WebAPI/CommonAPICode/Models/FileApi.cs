@@ -130,6 +130,24 @@ namespace WebAPI.Models
             }
         }
 
+        internal void ResumeSession(int requestedFAMSessionId)
+        {
+            if (_fileProcessingDB.ResumeWebSession(requestedFAMSessionId, out int fileTaskSessionID, out int fileID))
+            {
+                DocumentSession =
+                (
+                    true,
+                    fileTaskSessionID,
+                    fileID,
+                    DateTime.Now
+                );
+            }
+            else
+            {
+                DocumentSession = (false, 0, 0, new DateTime());
+            }
+        }
+
         /// <summary>
         /// get/set the workflow name configured for this instance
         /// </summary>
@@ -201,6 +219,7 @@ namespace WebAPI.Models
                     }
                     else
                     {
+                        DocumentSession = (false, 0, 0, new DateTime());
                         _instanceReleased.Set();
                     }
                 }
@@ -220,15 +239,6 @@ namespace WebAPI.Models
         /// The open state, ID, file ID and start time of a document session
         /// </summary>
         public (bool IsOpen, int Id, int FileId, DateTime StartTime) DocumentSession { get; set; }
-
-        /// <summary>
-        /// A value indicating whether the session is expired.
-        /// </summary>
-        public bool Expired
-        {
-            get;
-            set;
-        }
 
         /// <summary>
         /// Waits until an instance is no longer in use.

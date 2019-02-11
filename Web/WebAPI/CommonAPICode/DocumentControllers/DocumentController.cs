@@ -48,7 +48,7 @@ namespace WebAPI.Controllers
                     // exists, this is likely a unit test; assume 127.0.0.1.
                     string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
 
-                    data.OpenSession(User, ipAddress);
+                    data.OpenSession(User, ipAddress, true);
 
                     try
                     {
@@ -156,7 +156,7 @@ namespace WebAPI.Controllers
                     // exists, this is likely a unit test; assume 127.0.0.1.
                     string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
 
-                    data.OpenSession(User, ipAddress);
+                    data.OpenSession(User, ipAddress, true);
 
                     try
                     {
@@ -407,7 +407,7 @@ namespace WebAPI.Controllers
                     // exists, this is likely a unit test; assume 127.0.0.1.
                     string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
                     
-                    data.OpenSession(User, ipAddress);
+                    data.OpenSession(User, ipAddress, true);
                     data.OpenDocument(Id);
 
                     try
@@ -468,7 +468,7 @@ namespace WebAPI.Controllers
                     // exists, this is likely a unit test; assume 127.0.0.1.
                     string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
 
-                    data.OpenSession(User, ipAddress);
+                    data.OpenSession(User, ipAddress, true);
                     data.OpenDocument(Id);
 
                     try

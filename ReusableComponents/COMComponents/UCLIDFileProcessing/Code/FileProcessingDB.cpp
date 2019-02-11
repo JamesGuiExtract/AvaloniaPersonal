@@ -88,7 +88,8 @@ m_bUsingWorkflowsForCurrentAction(false),
 m_bRunningAllWorkflows(false),
 m_nLastFAMFileID(0),
 m_bDeniedFastCountPermission(false),
-m_ipFAMTagManager(__nullptr)
+m_ipFAMTagManager(__nullptr),
+m_bCurrentSessionIsWebSession(false)
 {
 	try
 	{
@@ -519,7 +520,7 @@ STDMETHODIMP CFileProcessingDB::RemoveFolder(BSTR strFolder, BSTR strAction)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13611");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetStats(long nActionID, VARIANT_BOOL vbForceUpdate,
+STDMETHODIMP CFileProcessingDB::GetStats(long nActionID, VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs,
 	IActionStatistics* *pStats)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -528,12 +529,12 @@ STDMETHODIMP CFileProcessingDB::GetStats(long nActionID, VARIANT_BOOL vbForceUpd
 	{
 		validateLicense();
 
-		if (!GetStats_Internal(false, nActionID, vbForceUpdate, pStats))
+		if (!GetStats_Internal(false, nActionID, vbForceUpdate, vbRevertTimedOutFAMs, pStats))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			GetStats_Internal(true, nActionID, vbForceUpdate, pStats);
+			GetStats_Internal(true, nActionID, vbForceUpdate, vbRevertTimedOutFAMs, pStats);
 		}
 		return S_OK;
 	}
@@ -1918,17 +1919,20 @@ STDMETHODIMP CFileProcessingDB::RegisterActiveFAM()
 				+ "VALUES ('" + asString(m_nFAMSessionID) + "')",
 			false, (long*)&m_nActiveFAMID);
 
-		m_eventStopMaintainenceThreads.reset();
-		m_eventPingThreadExited.reset();
-		m_eventStatsThreadExited.reset();
-
 		// set FAM registered flag
 		m_bFAMRegistered = true;
 		m_dwLastPingTime = 0;
 
-		// Start thread here
-		AfxBeginThread(maintainLastPingTimeForRevert, this);
-		AfxBeginThread(maintainActionStatistics, this);
+		if (!m_bCurrentSessionIsWebSession)
+		{
+			m_eventStopMaintenanceThreads.reset();
+			m_eventPingThreadExited.reset();
+			m_eventStatsThreadExited.reset();
+
+			// Start thread here
+			AfxBeginThread(maintainLastPingTimeForRevert, this);
+			AfxBeginThread(maintainActionStatistics, this);
+		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27726");
 }
@@ -4637,6 +4641,85 @@ STDMETHODIMP CFileProcessingDB::RecordWebSessionStart(BSTR bstrType, BSTR bstrLo
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45220");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::ResumeWebSession(long nFAMSessionID, long* pnFileTaskSessionID, long* pnOpenFileID, VARIANT_BOOL* pbIsFileOpen)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_nFAMSessionID = nFAMSessionID;
+		string strFAMSessionID = asString(nFAMSessionID);
+		m_bCurrentSessionIsWebSession = true;
+
+		string strSessionQuery =
+			"SELECT [MachineName], [UPI], [FPSFileName], [UserName]"
+			" FROM dbo.[FAMSession]"
+			" JOIN dbo.[FAMUser] ON [FAMUserID] = [FAMUser].[ID]"
+			" JOIN dbo.[FPSFile] ON [FPSFileID] = [FPSFile].[ID]"
+			" JOIN dbo.[Machine] ON [MachineID] = [Machine].[ID]"
+			" WHERE [StopTime] IS NULL"
+			" AND [FAMSession].[ID] = " + strFAMSessionID;
+
+		_RecordsetPtr ipRecords = getThisAsCOMPtr()->GetResultsForQuery(strSessionQuery.c_str());
+		ASSERT_RUNTIME_CONDITION("ELI46659", ipRecords->adoEOF == VARIANT_FALSE,
+			"Can't resume session that isn't open");
+
+		FieldsPtr ipFields = ipRecords->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI46660", ipFields != nullptr);
+
+		m_strMachineName = getStringField(ipFields, "MachineName");
+		m_strUPI = getStringField(ipFields, "UPI");
+		m_strFPSFileName = getStringField(ipFields, "FPSFileName");
+		m_strFAMUserName = getStringField(ipFields, "UserName");
+
+		string strActiveFAMQuery = "SELECT [ActiveFAM].[ID] FROM dbo.[ActiveFAM] WHERE [FAMSessionID] = " + asString(nFAMSessionID);
+
+		// Set active FAM, if there was one for this session
+		m_bFAMRegistered = false;
+		ipRecords = getThisAsCOMPtr()->GetResultsForQuery(strActiveFAMQuery.c_str());
+		if (ipRecords->adoEOF == VARIANT_FALSE)
+		{
+			FieldsPtr ipFields = ipRecords->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI46658", ipFields != nullptr);
+
+			long nActiveFAMID = getLongField(ipFields, "ID");
+			if (nActiveFAMID > 0)
+			{
+				m_nActiveFAMID = nActiveFAMID;
+				m_bFAMRegistered = true;
+			}
+		}
+
+		// Get open FileID if there is one
+		string strGetOpenFileFromFAMSession =
+			"SELECT TOP(1) [FileTaskSession].[ID] AS [FileTaskSessionID], [FileTaskSession].[FileID]"
+			"	FROM [dbo].[FileTaskSession]"
+			"	JOIN [dbo].[FileActionStatus] ON [FileTaskSession].[FileID] = [FileActionStatus].FileID"
+			"		AND [FileTaskSession].[ActionID] = [FileActionStatus].[ActionID]"
+			"	WHERE [FAMSessionID] = " + strFAMSessionID +
+			"		AND [ActionStatus] = 'R'"
+			"	ORDER BY [FileTaskSession].[ID] DESC";
+
+		ipRecords = getThisAsCOMPtr()->GetResultsForQuery(strGetOpenFileFromFAMSession.c_str());
+		if (ipRecords->adoEOF == VARIANT_FALSE)
+		{
+			FieldsPtr ipFields = ipRecords->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI46663", ipFields != nullptr);
+
+			*pnFileTaskSessionID = getLongField(ipFields, "FileTaskSessionID");
+			*pnOpenFileID = getLongField(ipFields, "FileID");
+			*pbIsFileOpen = VARIANT_TRUE;
+		}
+		else
+		{
+			*pbIsFileOpen = VARIANT_FALSE;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46657");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::GetActiveUsers(BSTR bstrAction, IVariantVector** ppvecUserNames)

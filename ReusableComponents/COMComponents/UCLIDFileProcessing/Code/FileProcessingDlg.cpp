@@ -3063,7 +3063,7 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 					{
 						_lastCodePos = "66";
 						// Get the stats from the db in a temp object so that the UI will not be blocked
-						ipNewActionStats = ipFPMDB->GetStats(nActionID, VARIANT_FALSE);
+						ipNewActionStats = ipFPMDB->GetStats(nActionID, VARIANT_FALSE, VARIANT_FALSE);
 						ASSERT_RESOURCE_ALLOCATION("ELI20383", ipNewActionStats != __nullptr);
 					}
 				
@@ -3095,7 +3095,7 @@ UINT __cdecl FileProcessingDlg::StatisticsMgrThreadFunct( LPVOID pParam )
 			{
 				_lastCodePos = "100";
 				// Get the stats from the db in a temp object so that the UI will not be blocked
-				ipNewActionStats = ipFPMDB->GetStats(nActionID, VARIANT_TRUE);
+				ipNewActionStats = ipFPMDB->GetStats(nActionID, VARIANT_TRUE, VARIANT_FALSE);
 				ASSERT_RESOURCE_ALLOCATION("ELI43482", ipNewActionStats != __nullptr);
 			}
 			
@@ -3173,7 +3173,7 @@ void FileProcessingDlg::updateUIForCurrentDBStatus()
 				else
 				{
 					ipActionStats =
-						getDBPointer()->GetStats(m_nCurrActionID, VARIANT_FALSE);
+						getDBPointer()->GetStats(m_nCurrActionID, VARIANT_FALSE, VARIANT_FALSE);
 					ASSERT_RESOURCE_ALLOCATION("ELI38476", ipActionStats != __nullptr);
 				}
 				updateStats(ipActionStats);

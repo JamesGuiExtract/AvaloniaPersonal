@@ -422,7 +422,7 @@ void CFAMDBAdminSummaryDlg::OnContextViewFailed()
 		else
 		{
 			long nActionID = m_ipFAMDB->GetActionID(m_strContextMenuAction.c_str());
-			ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE);
+			ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE, VARIANT_FALSE);
 		}
 
 		long nFailedCount = ipActionStats->GetNumDocumentsFailed();
@@ -687,7 +687,7 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 			}
 			else
 			{
-				ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE);
+				ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE, VARIANT_FALSE);
 			}
 
 			long lPending, lCompleted, lSkipped, lFailed, lTotal;

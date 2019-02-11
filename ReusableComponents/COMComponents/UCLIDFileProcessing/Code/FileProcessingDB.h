@@ -159,7 +159,7 @@ public:
 		EActionStatus* poldStatus);
 	STDMETHOD(GetFilesToProcess)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, IIUnknownVector** pvecFileRecords);
-	STDMETHOD(GetStats)(long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
+	STDMETHOD(GetStats)(long nActionID, VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs, IActionStatistics** pStats);
 	STDMETHOD(Clear)(VARIANT_BOOL vbRetainUserValues);
 	STDMETHOD(CopyActionStatusFromAction)(long  nFromAction, long nToAction);
 	STDMETHOD(RenameAction)(BSTR bstrOldActionName, BSTR bstrNewActionNam);
@@ -362,6 +362,7 @@ public:
 	STDMETHOD(GetActiveUsers)(BSTR bstrAction, IVariantVector** ppvecUserNames);
 	STDMETHOD(AbortFAMSession)(long nFAMSessionID);
 	STDMETHOD(MarkFileDeleted)(long nFileID, long nWorkflowID);
+	STDMETHOD(ResumeWebSession)(long nFAMSessionID, long* pnFileTaskSessionID, long* pnOpenFileID, VARIANT_BOOL* pbIsFileOpen);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -586,7 +587,7 @@ private:
 	IMiscUtilsPtr m_ipMiscUtils;
 
 	// Events used for the ping and statistics maintenance threads.
-	Win32Event m_eventStopMaintainenceThreads;
+	Win32Event m_eventStopMaintenanceThreads;
 	Win32Event m_eventPingThreadExited;
 	Win32Event m_eventStatsThreadExited;
 
@@ -645,6 +646,9 @@ private:
 	// Used to expand path tags in a workflow's OutputFilePathInitializationFunction
 	// Used in initOutputFileMetadataFieldValue()
 	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr m_ipFAMTagManager;
+
+	// Wether current session is a web session. If true, no maintenance threads will be started
+	bool m_bCurrentSessionIsWebSession;
 
 	//-------------------------------------------------------------------------------------------------
 	// Methods
@@ -1104,7 +1108,7 @@ private:
 
 	// Verifies that the current instance is registered via RegisterActiveFAM and registers it if it
 	// is not.
-	void ensureFAMRegistration(string strActionName);
+	void ensureFAMRegistration();
 
 	// Thread function that maintains the LastPingtime in the ActiveFAM table in
 	// the database pData should be a pointer to the database object
@@ -1332,7 +1336,7 @@ private:
 		BSTR bstrSkippedForUserName, IIUnknownVector * * pvecFileRecords);
 	bool GetFileToProcess_Internal(bool bDBLocked, long nFileID, BSTR strAction, IFileRecord** ppFileRecord);
 	bool RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BSTR strAction);
-	bool GetStats_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics* *pStats);
+	bool GetStats_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs, IActionStatistics* *pStats);
 	bool CopyActionStatusFromAction_Internal(bool bDBLocked, long  nFromAction, long nToAction);
 	bool RenameAction_Internal(bool bDBLocked, BSTR bstrOldActionName, BSTR bstrNewActionNam);
 	bool Clear_Internal(bool bDBLocked, VARIANT_BOOL vbRetainUserValues);

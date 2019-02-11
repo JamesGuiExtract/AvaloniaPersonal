@@ -50,7 +50,7 @@ namespace WebAPI.Controllers
                     string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
 
                     // Starts an active FAM session via FileProcessingDB and ties the active context to the session
-                    data.OpenSession(user, ipAddress);
+                    data.OpenSession(user, ipAddress, false);
 
                     // Token is specific to user and FAMSessionId
                     var token = AuthUtils.GenerateToken(user, context);
@@ -174,18 +174,19 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <param name="commit"><c>true</c> if the document is to be committed as complete in
         /// verification; <c>false</c> to keep the specified document in verification.</param>
+        /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
         [HttpPost("CloseDocument")]
         [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
-        public IActionResult CloseDocument(bool commit)
+        public IActionResult CloseDocument(bool commit, int duration = -1)
         {
             try
             {
                 using (var data = new DocumentData(User, requireSession: true))
                 {
-                    data.CloseDocument(commit ? EActionStatus.kActionCompleted : EActionStatus.kActionPending);
+                    data.CloseDocument(commit ? EActionStatus.kActionCompleted : EActionStatus.kActionPending, duration);
 
                     return NoContent();
                 }

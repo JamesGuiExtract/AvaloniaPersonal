@@ -4643,7 +4643,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 		}
 
 		// Delete the record from the ActiveFAM table
-		string strQuery = "DELETE FROM [ActiveFAM] WHERE [ID] = " + asString(nActiveFAMID); 
+		string strQuery = "DELETE FROM [ActiveFAM] WHERE [ID] = " + asString(nActiveFAMID);
 		executeCmdQuery(ipConnection, strQuery);
 
 		// Set up the logged exception if it is not null
@@ -4756,7 +4756,7 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 		{
 			try
 			{
-				while (pDB->m_eventStopMaintainenceThreads.wait(gnPING_TIMEOUT) == WAIT_TIMEOUT)
+				while (pDB->m_eventStopMaintenanceThreads.wait(gnPING_TIMEOUT) == WAIT_TIMEOUT)
 				{
 					// Surround call to PingDB with code from the BEGIN_CONNECTION_RETRY macro to
 					// ensure the ping thread has an opportunity to reconnect just as the processing
@@ -4797,7 +4797,7 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 						}
 						catch (UCLIDException &ue)
 						{
-							if (pDB->m_eventStopMaintainenceThreads.wait(0) != WAIT_TIMEOUT)
+							if (pDB->m_eventStopMaintenanceThreads.wait(0) != WAIT_TIMEOUT)
 							{
 								break;
 							}
@@ -4869,12 +4869,12 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 		rand_s(&nTimeToSleep);
 		// Somewhere between 1/4 and 3/4 of gnSTATS_MAINT_TIMEOUT.
 		nTimeToSleep = (nTimeToSleep % (gnSTATS_MAINT_TIMEOUT / 2)) + (gnSTATS_MAINT_TIMEOUT / 4);
-		pDB->m_eventStopMaintainenceThreads.wait(nTimeToSleep);
+		pDB->m_eventStopMaintenanceThreads.wait(nTimeToSleep);
 
 		// Enclose so that the exited event can always be signaled if it can be.
 		try
 		{
-			while (pDB->m_eventStopMaintainenceThreads.wait(gnSTATS_MAINT_TIMEOUT) == WAIT_TIMEOUT)
+			while (pDB->m_eventStopMaintenanceThreads.wait(gnSTATS_MAINT_TIMEOUT) == WAIT_TIMEOUT)
 			{
 				// Surround call to update stats with code from the BEGIN_CONNECTION_RETRY macro to
 				// ensure this thread has an opportunity to reconnect just as the processing does.
@@ -4932,7 +4932,7 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 					{
 						ue.addDebugInfo("ActionID", nActionID);
 
-						if (pDB->m_eventStopMaintainenceThreads.wait(0) != WAIT_TIMEOUT)
+						if (pDB->m_eventStopMaintenanceThreads.wait(0) != WAIT_TIMEOUT)
 						{
 							break;
 						}
@@ -4984,7 +4984,7 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 		// Set the revert in progress flag so only one thread executes this per process
 		m_bRevertInProgress = true;
 
-		// Make sure the LastPingTime is up to date to keep before reverting so that the
+		// Make sure the LastPingTime is up to date before reverting so that the
 		// current session doesn't get auto reverted
 		// pingDB can be expensive under heavy workloads as it is called by every get files to process
 		// call and can cause SQL locks to build up on the ActiveFAM table. Call only the first time or
@@ -5047,7 +5047,7 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 	}
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::ensureFAMRegistration(string strActionName)
+void CFileProcessingDB::ensureFAMRegistration()
 {
 	if (!m_bFAMRegistered)
 	{
