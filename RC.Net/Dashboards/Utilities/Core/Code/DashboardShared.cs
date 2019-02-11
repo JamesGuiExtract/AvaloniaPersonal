@@ -1,4 +1,5 @@
 ﻿using DevExpress.DashboardCommon;
+using DevExpress.DashboardCommon.ViewerData;
 using DevExpress.DashboardWin;
 using DevExpress.DashboardWin.Native;
 using DevExpress.DataAccess.ConnectionParameters;
@@ -339,56 +340,13 @@ namespace Extract.Dashboard.Utilities
 			
 			// Clear the current filtered files
             _dashboardForm.CurrentFilteredFiles.Clear();
-
+            var allaxis = _dashboardForm.GetCurrentFilterValues(e.DashboardItemName);
             // Get the filenames from the grid control
-            var axisPointTuples = _dashboardForm.GetCurrentFilterValues(e.DashboardItemName)
-                .Where(ap => ap.GetAxisPoint().Dimension.DataMember == "FileName");
+            var axisPointTuples = allaxis.Where(ap => ap.GetAxisPoint().Dimension.DataMember == "FileName");
 
-            // Check if the AxisPoint of the mouse click is in the selection
-            var clickAccessPoint = e.GetAxisPoint();
             List<string> files = new List<string>();
-            if (axisPointTuples.FirstOrDefault(ap => ap.GetAxisPoint().Value == clickAccessPoint?.Value) != null)
-            {
-                files = axisPointTuples.Select(a => (string)a.GetAxisPoint().Value).ToList();
-            }
-            else if (grid.InteractivityOptions.MasterFilterMode != DashboardItemMasterFilterMode.None &&
-                clickAccessPoint?.Dimension.DataMember == "FileName")
-            {
-                files = new List<string> { clickAccessPoint.Value as string };
+            files = axisPointTuples.Select(a => (string)a.GetAxisPoint().Value).ToList();
 
-                _dashboardForm?.Viewer?.SetMasterFilter(e.DashboardItemName, e.Data.CreateTuple(clickAccessPoint));
-                _dashboardForm?.Designer?.SetMasterFilter(e.DashboardItemName, e.Data.CreateTuple(clickAccessPoint));
-            }
-            else if (clickAccessPoint != null)
-            {
-                GridControl gridcontrol;
-                if (_dashboardForm.Viewer != null)
-                {
-                    gridcontrol = (GridControl)((IUnderlyingControlProvider)_dashboardForm?.Viewer).GetUnderlyingControl(e.DashboardItemName);
-                }
-                else
-                {
-                    gridcontrol = (GridControl)((IUnderlyingControlProvider)_dashboardForm?.Designer).GetUnderlyingControl(e.DashboardItemName);
-                }
-                GridView view = (GridView)gridcontrol.MainView;
-                view.OptionsBehavior.AllowIncrementalSearch = true;
-                var fileNameColumn = view.Columns.FirstOrDefault(c => c.Caption == "FileName");
-                if (fileNameColumn != null)
-                {
-
-                    view.FocusedColumn = fileNameColumn;
-
-                    view.FocusedRowHandle = 0;
-                    // Added as part of the fix for https://extract.atlassian.net/browse/ISSUE-15625
-                    // StartIncrementalSearch starts an interactive search in the grid (user types and the grid is 
-                    // searched incrementally. There may be a better way to focus the item clicked and if found can 
-                    // be used here
-                    view.StartIncrementalSearch(clickAccessPoint.Value as string);
-                    // StopIncrementalSearch is called so that if a user does type on the keyboard the search will not change
-                    view.StopIncrementalSearch();
-                    files = new List<string> { clickAccessPoint.Value as string };
-                }
-            }
 
             int numberOfFiles = files.Count();
             if (numberOfFiles > 0)
@@ -434,7 +392,7 @@ namespace Extract.Dashboard.Utilities
             }
             catch (Exception ex)
             {
-                ex.AsExtract("ELI46177");
+                throw ex.AsExtract("ELI46177");
             }
         }
 
@@ -786,6 +744,7 @@ namespace Extract.Dashboard.Utilities
                     return;
                 }
 
+                Clipboard.Clear();
                 if (_dashboardForm.CurrentFilteredFiles.Count() > 0)
                 {
 
@@ -799,10 +758,6 @@ namespace Extract.Dashboard.Utilities
                                     dataFileName.StartsWith(fileName + ".", StringComparison.OrdinalIgnoreCase))))
                         .ToArray());
                     Clipboard.SetFileDropList(fileCollection);
-                }
-                else
-                {
-                    Clipboard.Clear();
                 }
             }
             catch (Exception ex)
@@ -878,13 +833,10 @@ namespace Extract.Dashboard.Utilities
                     return;
                 }
 
+                Clipboard.Clear();
                 if (_dashboardForm.CurrentFilteredFiles.Count() > 0)
                 {
                     Clipboard.SetText(string.Join("\r\n", _dashboardForm.CurrentFilteredFiles));
-                }
-                else
-                {
-                    Clipboard.Clear();
                 }
             }
             catch (Exception ex)
@@ -905,15 +857,12 @@ namespace Extract.Dashboard.Utilities
                     return;
                 }
 
+                Clipboard.Clear();
                 if (_dashboardForm.CurrentFilteredFiles.Count() > 0)
                 {
                     StringCollection fileCollection = new StringCollection();
                     fileCollection.AddRange(_dashboardForm.CurrentFilteredFiles.ToArray());
                     Clipboard.SetFileDropList(fileCollection);
-                }
-                else
-                {
-                    Clipboard.Clear();
                 }
             }
             catch (Exception ex)
