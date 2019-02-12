@@ -959,6 +959,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// be used or <see landword="null"/> to us all pages.</param>
         /// <param name="deletedPages">The page numbers from <see paramref="fileName"/> to be
         /// loaded but shown as deleted.</param>
+        /// <param name="viewedPages">The page numbers from <see paramref="fileName"/> to be
+        /// loaded but shown as viewed.</param>
         /// <param name="position">The position at which a document should be loaded. 0 = Load at
         /// the front (top), -1 = load at the end (bottom). Any other value should be a value
         /// passed via <see cref="CreatingOutputDocumentEventArgs"/> and not a value the caller
@@ -970,8 +972,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// before creating the new; otherwise, <see langword="false"/>.</param>
         /// <returns>The <see cref="OutputDocument"/> that was created.</returns>
         public OutputDocument CreateOutputDocument(SourceDocument sourceDocument,
-            IEnumerable<int> pages, IEnumerable<int> deletedPages, int position,
-            bool insertSeparator)
+            IEnumerable<int> pages, IEnumerable<int> deletedPages, IEnumerable<int> viewedPages,
+             int position, bool insertSeparator)
         {
             bool removedLoadNextDocumentButton = false;
 
@@ -1078,6 +1080,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         pageControl.Deleted = true;
                     }
 
+                    if (viewedPages != null && viewedPages.Contains(page.OriginalPageNumber))
+                    {
+                        pageControl.Viewed = true;
+                    }
+
                     InsertPaginationControl(pageControl, pageIndex);
 
                     if (pageIndex != -1)
@@ -1138,7 +1145,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="autoRotatePages">Indicates whether pages should automatically be oriented
         /// to match the orientation of the text (per OCR).</param>
         public void LoadOutputDocument(OutputDocument outputDocument, IEnumerable<Page> pages,
-             IEnumerable<Page> deletedPages, bool autoRotatePages)
+             IEnumerable<Page> deletedPages, IEnumerable<Page> viewedPages, bool autoRotatePages)
         {
             bool removedLoadNextDocumentButton = false;
 
@@ -1172,6 +1179,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (deletedPages != null && deletedPages.Contains(page))
                         {
                             pageControl.Deleted = true;
+                        }
+
+                        if (viewedPages != null && viewedPages.Contains(page))
+                        {
+                            pageControl.Viewed = true;
                         }
 
                         if (autoRotatePages && page.ProposedOrientation != 0)

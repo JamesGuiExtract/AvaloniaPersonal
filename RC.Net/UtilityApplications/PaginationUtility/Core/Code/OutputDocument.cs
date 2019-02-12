@@ -36,6 +36,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         HashSet<Page> _originalDeletedPages = null;
 
         /// <summary>
+        /// The <see cref="Page"/>s from <see cref="_originalPages"/> that were originally in a
+        /// viewed state.
+        /// </summary>
+        HashSet<Page> _originalViewedPages = null;
+
+        /// <summary>
         /// The document data that is associated with this instance (VOA file data, for instance).
         /// </summary>
         PaginationDocumentData _documentData;
@@ -377,6 +383,29 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets the <see cref="Page"/>s that were in a viewed state when
+        /// <see cref="SetOriginalForm"/> was called.
+        /// </summary>
+        public ReadOnlyCollection<Page> OriginalViewedPages
+        {
+            get
+            {
+                try
+                {
+                    if (_originalViewedPages == null)
+                    {
+                        return new ReadOnlyCollection<Page>(new Page[0]);
+                    }
+                    return _originalViewedPages.ToList().AsReadOnly();
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI46671");
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets document data that is associated with this instance (VOA file data,
         /// for instance).
         /// </summary>
@@ -539,6 +568,10 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _originalDeletedPages = new HashSet<Page>(_pageControls
                     .Where(c => c.Deleted)
+                    .Select(c => c.Page));
+
+                _originalViewedPages = new HashSet<Page>(_pageControls
+                    .Where(c => c.Viewed)
                     .Select(c => c.Page));
             }
             catch (Exception ex)

@@ -2016,6 +2016,15 @@ namespace Extract.FileActionManager.FileProcessors
                                     .Select(attribute => attribute.Value.String)
                                     .SingleOrDefault() ?? "", pageCount, true);
 
+                            var viewedPages =
+                                UtilityMethods.GetPageNumbersFromString(
+                                    documentAttribute.SubAttributes
+                                    .ToIEnumerable<IAttribute>()
+                                    .Where(attribute => attribute.Name.Equals(
+                                        "ViewedPages", StringComparison.OrdinalIgnoreCase))
+                                    .Select(attribute => attribute.Value.String)
+                                    .SingleOrDefault() ?? "", pageCount, true);
+
                             var documentDataAttribute = documentAttribute.SubAttributes
                                 .ToIEnumerable<IAttribute>()
                                 .SingleOrDefault(attribute => attribute.Name.Equals(
@@ -2038,7 +2047,7 @@ namespace Extract.FileActionManager.FileProcessors
                             }
 
                             _paginationPanel.LoadFile(fileName, fileId, -1, pages, deletedPages,
-                                suggestedPagination.Value, documentData, selectDocument);
+                                viewedPages, suggestedPagination.Value, documentData, selectDocument);
                             selectDocument = false;
                         }
 
@@ -2048,7 +2057,7 @@ namespace Extract.FileActionManager.FileProcessors
                     // There was a VOA file, just not with suggested pagination. Pass on the VOA data.
                     PaginationDocumentData rootDocumentData = GetAsPaginationDocumentData(attributes, fileName);
                     _paginationPanel.LoadFile(
-                        fileName, fileId, -1, null, null, false, rootDocumentData, selectDocument);
+                        fileName, fileId, -1, null, null, null, false, rootDocumentData, selectDocument);
                     return;
                 }
 

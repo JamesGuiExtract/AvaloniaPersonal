@@ -263,6 +263,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets a value indicating whether this page has been displayed in the ImageViewer (via the
+        /// pagination tab)
+        public bool Viewed
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this instance is highlighted.
         /// </summary>
         /// <value><see langword="true"/> if this instance is highlighted; otherwise,
@@ -380,6 +389,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 _pageIsDisplayed = display;
+
+                if (display && !Viewed)
+                {
+                    Viewed = true;
+                    OnPageStateChanged();
+                }
 
                 if (_contentsPanel == null)
                 {

@@ -265,7 +265,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         _documentDataHasBeenViewed = value;
                         _summaryLabel.Font = new Font(_summaryLabel.Font, value ? FontStyle.Regular : FontStyle.Bold);
-                        _pagesLabel.Font = new Font(_pagesLabel.Font, value ? FontStyle.Regular : FontStyle.Bold);
 
                         if (_outputDocument?.DocumentData != null)
                         {
@@ -362,6 +361,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 var statusInfo = AttributeStatusInfo.GetStatusInfo(Document.DocumentData.DocumentDataAttribute);
                                 DocumentDataHasBeenViewed = statusInfo.HasBeenViewed;
                             }
+
+                            UpdatePagesLabelFont();
                         }
                         else
                         {
@@ -960,6 +961,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // https://extract.atlassian.net/browse/ISSUE-15320
                     this.SafeBeginInvoke("ELI45648", () => UpdateControls(), false);
                 }
+
+                UpdatePagesLabelFont();
             }
             catch (Exception ex)
             {
@@ -1079,6 +1082,22 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Updates the font of the pages label so that it is in sync with whether all pages in a
+        /// document have been viewed.
+        /// </summary>
+        void UpdatePagesLabelFont()
+        {
+            bool allPagesHaveBeenDisplayed =
+                _outputDocument.PageControls.All(pageControl => pageControl.Viewed);
+
+            if (_pagesLabel.Font.Bold == allPagesHaveBeenDisplayed)
+            {
+                _pagesLabel.Font = new Font(_pagesLabel.Font,
+                    allPagesHaveBeenDisplayed ? FontStyle.Regular : FontStyle.Bold);
             }
         }
 

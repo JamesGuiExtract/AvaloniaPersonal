@@ -48,6 +48,7 @@
             this._outputPathPathTags = new Extract.Utilities.Forms.PathTagsButton();
             this._outputPathTextBox = new Extract.Utilities.Forms.BetterTextBox();
             this._outputPathBrowseButton = new Extract.Utilities.Forms.BrowseButton();
+            this._requireAllPagesToBeViewedCheckBox = new System.Windows.Forms.CheckBox();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -185,7 +186,7 @@
             this._expectedPaginationAttributesPathTagButton.Name = "_expectedPaginationAttributesPathTagButton";
             this._expectedPaginationAttributesPathTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this._expectedPaginationAttributesPathTagButton.Size = new System.Drawing.Size(18, 21);
-            this._expectedPaginationAttributesPathTagButton.TabIndex = 8;
+            this._expectedPaginationAttributesPathTagButton.TabIndex = 7;
             this._expectedPaginationAttributesPathTagButton.TextControl = this._expectedPaginationAttributesTextBox;
             this._expectedPaginationAttributesPathTagButton.UseVisualStyleBackColor = true;
             // 
@@ -197,7 +198,7 @@
             this._expectedPaginationAttributesTextBox.Name = "_expectedPaginationAttributesTextBox";
             this._expectedPaginationAttributesTextBox.Required = true;
             this._expectedPaginationAttributesTextBox.Size = new System.Drawing.Size(470, 20);
-            this._expectedPaginationAttributesTextBox.TabIndex = 7;
+            this._expectedPaginationAttributesTextBox.TabIndex = 6;
             // 
             // _expectedPaginationAttributesBrowseButton
             // 
@@ -205,7 +206,7 @@
             this._expectedPaginationAttributesBrowseButton.Location = new System.Drawing.Point(516, 235);
             this._expectedPaginationAttributesBrowseButton.Name = "_expectedPaginationAttributesBrowseButton";
             this._expectedPaginationAttributesBrowseButton.Size = new System.Drawing.Size(27, 21);
-            this._expectedPaginationAttributesBrowseButton.TabIndex = 9;
+            this._expectedPaginationAttributesBrowseButton.TabIndex = 8;
             this._expectedPaginationAttributesBrowseButton.Text = "...";
             this._expectedPaginationAttributesBrowseButton.TextControl = this._expectedPaginationAttributesTextBox;
             this._expectedPaginationAttributesBrowseButton.UseVisualStyleBackColor = true;
@@ -243,12 +244,23 @@
             this._outputPathBrowseButton.TextControl = this._outputPathTextBox;
             this._outputPathBrowseButton.UseVisualStyleBackColor = true;
             // 
+            // _requireAllPagesToBeViewedCheckBox
+            // 
+            this._requireAllPagesToBeViewedCheckBox.AutoSize = true;
+            this._requireAllPagesToBeViewedCheckBox.Location = new System.Drawing.Point(16, 266);
+            this._requireAllPagesToBeViewedCheckBox.Name = "_requireAllPagesToBeViewedCheckBox";
+            this._requireAllPagesToBeViewedCheckBox.Size = new System.Drawing.Size(172, 17);
+            this._requireAllPagesToBeViewedCheckBox.TabIndex = 9;
+            this._requireAllPagesToBeViewedCheckBox.Text = "Require all pages to be viewed";
+            this._requireAllPagesToBeViewedCheckBox.UseVisualStyleBackColor = true;
+            // 
             // PaginationSettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
             this.ClientSize = new System.Drawing.Size(555, 349);
+            this.Controls.Add(this._requireAllPagesToBeViewedCheckBox);
             this.Controls.Add(this._expectedPaginationAttributesCheckBox);
             this.Controls.Add(infoTip5);
             this.Controls.Add(this._expectedPaginationAttributesPathTagButton);
@@ -294,5 +306,6 @@
         private Utilities.Forms.BetterTextBox _expectedPaginationAttributesTextBox;
         private Utilities.Forms.BrowseButton _expectedPaginationAttributesBrowseButton;
         private System.Windows.Forms.CheckBox _expectedPaginationAttributesCheckBox;
+        private System.Windows.Forms.CheckBox _requireAllPagesToBeViewedCheckBox;
     }
 }

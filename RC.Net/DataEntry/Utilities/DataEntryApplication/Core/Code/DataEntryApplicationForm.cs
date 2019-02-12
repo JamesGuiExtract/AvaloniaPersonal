@@ -950,6 +950,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // document to be sent back to the rules.
                         return;
                     }
+                    // https://extract.atlassian.net/browse/ISSUE-15805
+                    // In the case that we are configured to require viewing all pages for pagination,
+                    // anytime there is more than one page, go straight to the pagination tab.
+                    else if (_paginationPanel.RequireAllPagesToBeViewed && _paginationPanel.PageCount > 1)
+                    {
+                        _tabControl.SelectedTab = _paginationTab;
+                        return;
+                    }
                     else
                     {
                         _tabControl.SelectedTab = _dataTab;
@@ -1340,6 +1348,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _settings.PaginationSettings.ExpectedPaginationAttributesOutputPath;
                     _paginationPanel.OutputExpectedPaginationAttributesFile =
                         _settings.PaginationSettings.OutputExpectedPaginationAttributesFiles;
+                    _paginationPanel.RequireAllPagesToBeViewed =
+                        _settings.PaginationSettings.RequireAllPagesToBeViewed;
                     _paginationPanel.FileProcessingDB = FileProcessingDB;
                     _paginationPanel.SaveButtonVisible = false;
 
@@ -2894,6 +2904,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             "Uncommitted pagination", false);
                         e.Cancel = true;
                     }
+                    // Parked check is to see if the tab change is a result of verification closing
+                    // (in which case the pagination tab will already be parked)
+                    else if (e.TabPage != _paginationTab && !_paginationPanel.Parked &&
+                        _paginationPanel.RequireAllPagesToBeViewed && !_paginationPanel.AllPagesViewed)
+                    {
+                        if (MessageBox.Show(null, 
+                            "There are pages that have not been viewed; proceed anyway?",
+                            "Unviewed pages", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, 
+                            MessageBoxDefaultButton.Button2, 0) == DialogResult.No)
+                        {
+                            e.Cancel = true;
+                        }
+                    }
                     // Though not easily reproducible, switching to the pagination tab before a
                     // document is fully loaded can cause exceptions for a null _imageViewer in
                     // FinalizeDocumentLoad. Prevent tab changes until a document fully loaded,
@@ -2932,8 +2955,18 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // while the data tab has focus.
                     _paginationPanel.Park();
 
+                    // https://extract.atlassian.net/browse/ISSUE-15805
+                    // In order to force a load of a document that has not yet been loaded due to the pagination
+                    // tab being defaulted for a document we need to call OpenImage after registering for
+                    // the events below. But to prevent the ImageClose that ImageOpen may trigger from
+                    // triggering verification to close, close the image before registering for the
+                    // events.
+                    if (!_imageOpened && !_paginating)
+                    {
+                        _imageViewer.CloseImage();
+                    }
                     // The pagination control may have closed the document; re-open it if necessary.
-                    if (!string.IsNullOrWhiteSpace(_fileName) &&
+                    else if (!string.IsNullOrWhiteSpace(_fileName) &&
                         _imageViewer.ImageFile != _fileName)
                     {
                         _imageViewer.OpenImage(_fileName, false);
@@ -2945,6 +2978,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _imageViewer.ImageFileChanged += HandleImageFileChanged;
                     _imageViewer.ImageFileClosing += HandleImageFileClosing;
                     _imageViewer.LoadingNewImage += HandleLoadingNewImage;
+
+                    // https://extract.atlassian.net/browse/ISSUE-15805
+                    // Force a load of a document that has not yet been loaded due to the pagination
+                    // tab being defaulted for a document.
+                    if (!_imageOpened && !_paginating)
+                    {
+                        _imageViewer.OpenImage(_fileName, false);
+                    }
 
                     _saveAndCommitFileCommand.Enabled = _imageViewer.IsImageAvailable;
                     _saveMenuItem.Enabled = _imageViewer.IsImageAvailable;
@@ -4017,6 +4058,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _paginationPanel.Park();
                     _paginationPanel.PendingChanges = false;
                 }
+
                 _tabControl.SelectedTab = _dataTab;
             }
 
@@ -4892,7 +4934,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
 
                     bool? suggestedPagination = null;
-                    
+
                     // Iterate each virtual document suggested by the rules and add as a separate
                     // document as far as the _paginationPanel is concerned.
                     foreach (var documentAttribute in attributeArray)
@@ -4917,6 +4959,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                                 .ToIEnumerable<IAttribute>()
                                 .Where(attribute => attribute.Name.Equals(
                                     "DeletedPages", StringComparison.OrdinalIgnoreCase))
+                                .Select(attribute => attribute.Value.String)
+                                .SingleOrDefault() ?? "", pageCount, true);
+
+                        var viewedPages =
+                            UtilityMethods.GetPageNumbersFromString(
+                                documentAttribute.SubAttributes
+                                .ToIEnumerable<IAttribute>()
+                                .Where(attribute => attribute.Name.Equals(
+                                    "ViewedPages", StringComparison.OrdinalIgnoreCase))
                                 .Select(attribute => attribute.Value.String)
                                 .SingleOrDefault() ?? "", pageCount, true);
 
@@ -4950,14 +5001,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         }
 
                         _paginationPanel.LoadFile(
-                            fileName, fileID, -1, pages, deletedPages, suggestedPagination.Value, documentData, false);
+                            fileName, fileID, -1, pages, deletedPages, viewedPages,
+                            suggestedPagination.Value, documentData, false);
                     }
 
                     return;
                 }
 
                 // There was a VOA file, just not with suggested pagination. Pass on the VOA data.
-                _paginationPanel.LoadFile(fileName, fileID, - 1, null, null, false, documentData, false);
+                _paginationPanel.LoadFile(fileName, fileID, -1, null, null, null, false, documentData, false);
                 return;
             }
 

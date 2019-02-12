@@ -95,6 +95,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _pageNumberLabel.Text = string.Format(CultureInfo.CurrentCulture, "Page {0:D}",
                     _page.OriginalPageNumber);
 
+                if (_pageControl.Viewed && _fileNameLabel.Font.Bold)
+                {
+                    _fileNameLabel.Font = new Font(_fileNameLabel.Font, FontStyle.Regular);
+                    _pageNumberLabel.Font = new Font(_pageNumberLabel.Font, FontStyle.Regular);
+                }
+
                 _page.ThumbnailChanged += HandlePage_ThumbnailChanged;
                 _page.OrientationChanged += HandlePage_OrientationChanged;
             }
@@ -187,6 +193,12 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                                 _activeImageViewer = imageViewer;
                             }
+                        }
+
+                        if (_pageControl.Viewed && _fileNameLabel.Font.Bold)
+                        {
+                            _fileNameLabel.Font = new Font(_fileNameLabel.Font, FontStyle.Regular);
+                            _pageNumberLabel.Font = new Font(_pageNumberLabel.Font, FontStyle.Regular);
                         }
                     }
                     finally

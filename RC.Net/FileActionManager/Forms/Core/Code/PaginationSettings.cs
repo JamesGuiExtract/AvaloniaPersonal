@@ -17,8 +17,9 @@ namespace Extract.FileActionManager.Forms
         /// Versions:
         /// 1. Initial version
         /// 2. Added OutputExpectedPaginationAttributesFiles and ExpectedPaginationAttributesOutputPath
+        /// 3. Added RequireAllPagesToBeViewed.
         /// </summary>
-        const int _CURRENT_VERSION = 2;
+        const int _CURRENT_VERSION = 3;
 
         /// <summary>
         /// The default path for expected pagination attributes file
@@ -58,7 +59,8 @@ namespace Extract.FileActionManager.Forms
             paginationOutputAction: null,
             paginatedOutputPriority: EFilePriority.kPriorityAboveNormal,
             outputExpectedPaginationAttributesFiles: false,
-            expectedPaginationAttributesOutputPath: _DEFAULT_EXPECTED_OUTPUT_PATH)
+            expectedPaginationAttributesOutputPath: _DEFAULT_EXPECTED_OUTPUT_PATH,
+            requireAllPagesToBeViewed: false)
         {
         }
 
@@ -74,7 +76,8 @@ namespace Extract.FileActionManager.Forms
             paginationOutputAction: source.PaginationOutputAction,
             paginatedOutputPriority: source.PaginatedOutputPriority,
             outputExpectedPaginationAttributesFiles: source.OutputExpectedPaginationAttributesFiles,
-            expectedPaginationAttributesOutputPath: source.ExpectedPaginationAttributesOutputPath)
+            expectedPaginationAttributesOutputPath: source.ExpectedPaginationAttributesOutputPath,
+            requireAllPagesToBeViewed: source.RequireAllPagesToBeViewed)
         {
         }
 
@@ -94,10 +97,12 @@ namespace Extract.FileActionManager.Forms
         /// pagination attributes.</param>
         /// <param name="expectedPaginationAttributesOutputPath">The expected pagination attributes
         /// path.</param>
+        /// <param name="requireAllPagesToBeViewed">Whether the user should have to view all pages
+        /// for pagination.</param>
         public PaginationSettings(string paginationSourceAction,
             string paginationOutputPath, string paginationOutputAction,
             EFilePriority paginatedOutputPriority, bool outputExpectedPaginationAttributesFiles,
-            string expectedPaginationAttributesOutputPath)
+            string expectedPaginationAttributesOutputPath, bool requireAllPagesToBeViewed)
         {
             PaginationSourceAction = paginationSourceAction;
             PaginationOutputPath = paginationOutputPath;
@@ -105,6 +110,7 @@ namespace Extract.FileActionManager.Forms
             PaginatedOutputPriority = paginatedOutputPriority;
             OutputExpectedPaginationAttributesFiles = outputExpectedPaginationAttributesFiles;
             ExpectedPaginationAttributesOutputPath = expectedPaginationAttributesOutputPath;
+            RequireAllPagesToBeViewed = requireAllPagesToBeViewed;
         }
 
         #endregion Constructors
@@ -167,6 +173,15 @@ namespace Extract.FileActionManager.Forms
             private set;
         }
 
+        /// <summary>
+        /// Gets or sets whether the user should have to view all pages for pagination.
+        /// </summary>
+        public bool RequireAllPagesToBeViewed
+        {
+            get;
+            set;
+        }
+
         #endregion Properties
 
         #region Methods
@@ -207,9 +222,17 @@ namespace Extract.FileActionManager.Forms
                     expectedPaginationAttributesOutputPath = reader.ReadString();
                 }
 
+                bool requireAllPagesToBeViewed = false;
+
+                if (version >= 3)
+                {
+                    requireAllPagesToBeViewed = reader.ReadBoolean();
+                }
+
                 return new PaginationSettings(paginationSourceAction,
                     paginationOutputPath, paginationOutputAction, paginatedOutputPriority,
-                    outputExpectedPaginationAttributesFiles, expectedPaginationAttributesOutputPath);
+                    outputExpectedPaginationAttributesFiles, expectedPaginationAttributesOutputPath,
+                    requireAllPagesToBeViewed);
             }
             catch (Exception ex)
             {
@@ -234,6 +257,7 @@ namespace Extract.FileActionManager.Forms
                 writer.Write((int)PaginatedOutputPriority);
                 writer.Write(OutputExpectedPaginationAttributesFiles);
                 writer.Write(ExpectedPaginationAttributesOutputPath);
+                writer.Write(RequireAllPagesToBeViewed);
             }
             catch (Exception ex)
             {

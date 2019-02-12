@@ -393,6 +393,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             set;
         }
 
+        /// <summary>
+        /// Gets or sets whether the user should view all pages before applying/accepting pagination.
+        /// </summary>
+        public bool RequireAllPagesToBeViewed
+        {
+            get;
+            set;
+        }
+
         #endregion Configuration Properties
 
         #region Runtime Properties
@@ -692,6 +701,39 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Gets the current number of pages contained in this panel (across all documents).
+        /// </summary>
+        public int PageCount
+        {
+            get
+            {
+                return _primaryPageLayoutControl.PageCount;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether all pages (in all documents) in this panel have been viewed.
+        /// </summary>
+        public bool AllPagesViewed
+        {
+            get
+            {
+                return _primaryPageLayoutControl
+                    .PageControls
+                    .All(pageControl => pageControl.Viewed);
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="PaginationPanel"/> is parked.
+        /// </summary>
+        public bool Parked
+        {
+            get;
+            private set;
+        }
+
         #endregion Runtime Properties
 
         #region Internal Properties
@@ -712,7 +754,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see langword="false"/>.</param>
         public void LoadFile(string fileName, int fileID, int position, bool selectDocument)
         {
-            LoadFile(fileName, fileID, position, null, null, false, null, selectDocument);
+            LoadFile(fileName, fileID, position, null, null, null, false, null, selectDocument);
         }
 
         /// <summary>
@@ -728,6 +770,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see langword="null"/> to load all pages.</param>
         /// <param name="deletedPages">The page numbers from <see paramref="fileName"/> to be
         /// loaded but shown as deleted.</param>
+        /// <param name="viewedPages">The page numbers from <see paramref="fileName"/> to be
+        /// loaded but shown as viewed.</param>
         /// <param name="paginationSuggested"><see langword="true"/> if pagination has been
         /// suggested for this document; <see langword="false"/> if it has not been.</param>
         /// <param name="documentData">The VOA file data associated with <see paramref="fileName"/>.
@@ -735,7 +779,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="selectDocument"><see langword="true"/> to select the document; otherwise,
         /// <see langword="false"/>.</param>
         public void LoadFile(string fileName, int fileID, int position, IEnumerable<int> pages,
-            IEnumerable<int> deletedPages, bool paginationSuggested,
+            IEnumerable<int> deletedPages, IEnumerable<int> viewedPages, bool paginationSuggested,
             PaginationDocumentData documentData, bool selectDocument)
         {
             try
@@ -743,7 +787,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (InvokeRequired)
                 {
                     this.Invoke((MethodInvoker)(() => LoadFile(
-                        fileName, fileID, position, pages, deletedPages, paginationSuggested, documentData, selectDocument)));
+                        fileName, fileID, position, pages, deletedPages, viewedPages, 
+                        paginationSuggested, documentData, selectDocument)));
                     return;
                 }
 
@@ -774,7 +819,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // keep the UI responsive as pages are loaded. This allows an opportunity
                     // for there to be multiple calls into LoadNextDocument at the same time.
                     var outputDocument = _primaryPageLayoutControl.CreateOutputDocument(
-                        sourceDocument, pages, deletedPages, position, true);
+                        sourceDocument, pages, deletedPages, viewedPages, position, true);
 
                     _originalDocuments.Add(outputDocument);
                     var setOutputDocs = _sourceToOriginalDocuments.GetOrAdd(
@@ -1057,6 +1102,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             documentAttribute.AddSubAttribute("DeletedPages",
                                 UtilityMethods.GetPageNumbersAsString(deletedPages),
+                                sourceDocName);
+                        }
+
+                        var viewedPages = outputDoc.PageControls
+                            .Where(pageControl => pageControl.Viewed)
+                            .Select(pageControl => pageControl.Page.OriginalPageNumber);
+                        if (viewedPages.Any())
+                        {
+                            documentAttribute.AddSubAttribute("ViewedPages",
+                                UtilityMethods.GetPageNumbersAsString(viewedPages),
                                 sourceDocName);
                         }
 
@@ -1365,6 +1420,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </returns>
         bool CanSelectedDocumentsBeCommitted()
         {
+            if (RequireAllPagesToBeViewed && !AllPagesViewed)
+            {
+                if (MessageBox.Show(null,
+                    "There are pages that have not been viewed; proceed anyway?",
+                    "Unviewed pages", MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
+                    MessageBoxDefaultButton.Button2, 0) == DialogResult.No)
+                {
+                    return false;
+                }
+            }
+
             var affectedSourceDocuments = new HashSet<string>(
                 _pendingDocuments
                     .Where(doc => doc.Selected)
@@ -1461,7 +1527,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             outputDocument.Collapsed = false;
                             outputDocument.Selected = false;
                             _primaryPageLayoutControl.LoadOutputDocument(
-                                outputDocument, outputDocument.OriginalPages, null, false);
+                                outputDocument, outputDocument.OriginalPages, null, null, false);
                             if (outputDocument.DocumentData != null)
                             {
                                 outputDocument.DocumentData.Revert();
@@ -1490,7 +1556,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             outputDocument.DocumentData = args.DocumentData;
 
                             _primaryPageLayoutControl.LoadOutputDocument(
-                                outputDocument, sourceDocument.Pages, null, false);
+                                outputDocument, sourceDocument.Pages, null, null, false);
                         }
                     }
                 }
@@ -1505,7 +1571,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         outputDocument.Selected = false;
 
                         _primaryPageLayoutControl.LoadOutputDocument(outputDocument,
-                            outputDocument.OriginalPages, outputDocument.OriginalDeletedPages, true);
+                            outputDocument.OriginalPages, outputDocument.OriginalDeletedPages,
+                            outputDocument.OriginalViewedPages, true);
                         if (!_pendingDocuments.Contains(outputDocument))
                         {
                             _pendingDocuments.Add(outputDocument);
@@ -1752,6 +1819,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 EnablePageDisplay = false;
                 ImageViewerPageNavigationEnabled = true;
                 _primaryPageLayoutControl.ClearSelection();
+                Parked = true;
             }
             catch (Exception ex)
             {
@@ -1770,6 +1838,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 EnablePageDisplay = true;
                 ImageViewerPageNavigationEnabled = false;
                 _primaryPageLayoutControl.SelectFirstPage();
+                Parked = false;
             }
             catch (Exception ex)
             {

@@ -133,6 +133,7 @@ namespace Extract.FileActionManager.Forms
                     = _expectedPaginationAttributesBrowseButton.Enabled
                     = _expectedPaginationAttributesPathTagButton.Enabled
                     = _expectedPaginationAttributesCheckBox.Checked;
+                _requireAllPagesToBeViewedCheckBox.Checked = Settings.RequireAllPagesToBeViewed;
             }
             catch (Exception ex)
             {
@@ -160,7 +161,8 @@ namespace Extract.FileActionManager.Forms
                     _outputActionComboBox.Text,
                     _outputPriorityComboBox.ToEnumValue<EFilePriority>(),
                     _expectedPaginationAttributesCheckBox.Checked,
-                    _expectedPaginationAttributesTextBox.Text);
+                    _expectedPaginationAttributesTextBox.Text,
+                    _requireAllPagesToBeViewedCheckBox.Checked);
 
                 if (string.IsNullOrWhiteSpace(_outputPathTextBox.Text))
                 {
