@@ -2857,13 +2857,16 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <param name="attributesFilePath">The attributes file path</param>
         /// <returns>A collection of labels for each candidate attribute</returns>
-        internal static IEnumerable<string> CollectLabelsFromLabeledCandidateAttributesFile(string attributesFilePath)
+        internal static List<string> CollectLabelsFromLabeledCandidateAttributesFile(string attributesFilePath)
         {
             try
             {
                 var attributes = _afUtility.Value.GetAttributesFromFile(attributesFilePath);
                 attributes.ReportMemoryUsage();
-                return CollectLabelsFromLabeledCandidateAttributes(attributes);
+
+                // Convert to a list so that any exceptions generated processing the attributes are caught here where the filename debug info will be added
+                // https://extract.atlassian.net/browse/ISSUE-15952
+                return CollectLabelsFromLabeledCandidateAttributes(attributes).ToList();
             }
             catch (Exception e)
             {

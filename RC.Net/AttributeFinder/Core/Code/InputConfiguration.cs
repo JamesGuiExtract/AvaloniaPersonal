@@ -183,6 +183,8 @@ namespace Extract.AttributeFinder
                 List<string> imageFiles = new List<string>();
                 if (InputPathType == InputType.Folder)
                 {
+                    ExtractException.Assert("ELI46666", "Input directory doesn't exist", Directory.Exists(InputPath), "Directory", InputPath);
+
                     // Get all image files where there is a corresponding uss file
                     foreach (var imagePath in Directory.EnumerateFiles(InputPath, "*.uss", SearchOption.AllDirectories)
                         .Select(ussPath => Path.ChangeExtension(ussPath, null))
@@ -197,6 +199,7 @@ namespace Extract.AttributeFinder
                 // Text file list
                 else if (InputPathType == InputType.TextFile)
                 {
+                    ExtractException.Assert("ELI46667", "Input file doesn't exist", File.Exists(InputPath), "File", InputPath);
                     foreach (var line in File.ReadLines(InputPath))
                     {
                         cancellationToken.ThrowIfCancellationRequested();
@@ -208,7 +211,7 @@ namespace Extract.AttributeFinder
                 // CSV of images and answers
                 else if (InputPathType == InputType.Csv)
                 {
-                    ExtractException.Assert("ELI39756", "Input file does not exist", File.Exists(InputPath));
+                    ExtractException.Assert("ELI39756", "Input file doesn't exist", File.Exists(InputPath), "File", InputPath);
                     answers = new List<string>();
                     using (var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser(InputPath))
                     {
@@ -253,8 +256,8 @@ namespace Extract.AttributeFinder
                                 continue;
                             }
 
-                            ExtractException.Assert("ELI39758", "Image path must not be relative", Path.IsPathRooted(imageName));
-                            ExtractException.Assert("ELI39759", "File doesn't exist", File.Exists(imageName));
+                            ExtractException.Assert("ELI39758", "Image path must not be relative", Path.IsPathRooted(imageName), "Image path", imageName);
+                            ExtractException.Assert("ELI39759", "Image file doesn't exist", File.Exists(imageName), "Image path", imageName);
                             imageFiles.Add(imageName);
                             answers.Add(answer);
                             updateStatus(new StatusArgs { StatusMessage = "Getting input files: {0:N0} files", Int32Value = 1 });
