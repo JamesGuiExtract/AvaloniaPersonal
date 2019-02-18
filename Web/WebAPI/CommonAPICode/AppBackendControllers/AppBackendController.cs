@@ -232,7 +232,7 @@ namespace WebAPI.Controllers
         /// Gets the specified document page as a PDF file.
         /// </summary>
         /// <returns></returns>
-        [HttpGet("DocumentPage/{Page}")]
+        [HttpGet("DocumentPage/{page}")]
         [Authorize]
         [ProducesResponseType(200, Type = typeof(FileResult))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
