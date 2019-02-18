@@ -1423,7 +1423,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (RequireAllPagesToBeViewed && !AllPagesViewed)
             {
                 if (MessageBox.Show(null,
-                    "There are pages that have not been viewed; proceed anyway?",
+                    "There are pages that have not been viewed. Proceed anyway?",
                     "Unviewed pages", MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
                     MessageBoxDefaultButton.Button2, 0) == DialogResult.No)
                 {

@@ -203,6 +203,8 @@
             // _expectedPaginationAttributesBrowseButton
             // 
             this._expectedPaginationAttributesBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._expectedPaginationAttributesBrowseButton.EnsureFileExists = false;
+            this._expectedPaginationAttributesBrowseButton.EnsurePathExists = false;
             this._expectedPaginationAttributesBrowseButton.Location = new System.Drawing.Point(516, 235);
             this._expectedPaginationAttributesBrowseButton.Name = "_expectedPaginationAttributesBrowseButton";
             this._expectedPaginationAttributesBrowseButton.Size = new System.Drawing.Size(27, 21);
@@ -236,6 +238,8 @@
             // _outputPathBrowseButton
             // 
             this._outputPathBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._outputPathBrowseButton.EnsureFileExists = false;
+            this._outputPathBrowseButton.EnsurePathExists = false;
             this._outputPathBrowseButton.Location = new System.Drawing.Point(516, 28);
             this._outputPathBrowseButton.Name = "_outputPathBrowseButton";
             this._outputPathBrowseButton.Size = new System.Drawing.Size(27, 21);
@@ -249,9 +253,9 @@
             this._requireAllPagesToBeViewedCheckBox.AutoSize = true;
             this._requireAllPagesToBeViewedCheckBox.Location = new System.Drawing.Point(16, 266);
             this._requireAllPagesToBeViewedCheckBox.Name = "_requireAllPagesToBeViewedCheckBox";
-            this._requireAllPagesToBeViewedCheckBox.Size = new System.Drawing.Size(172, 17);
+            this._requireAllPagesToBeViewedCheckBox.Size = new System.Drawing.Size(148, 17);
             this._requireAllPagesToBeViewedCheckBox.TabIndex = 9;
-            this._requireAllPagesToBeViewedCheckBox.Text = "Require all pages to be viewed";
+            this._requireAllPagesToBeViewedCheckBox.Text = "Warn for unviewed pages";
             this._requireAllPagesToBeViewedCheckBox.UseVisualStyleBackColor = true;
             // 
             // PaginationSettingsDialog

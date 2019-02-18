@@ -929,12 +929,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     LoadDocumentForPagination(fileName, fileID);
 
-                    if (_paginationPanel.IsPaginationSuggested(fileName))
+                    bool paginationSuggested = _paginationPanel.IsPaginationSuggested(fileName);
+                    // https://extract.atlassian.net/browse/ISSUE-15805
+                    // In the case that we are configured to require viewing all pages for pagination,
+                    // anytime there is more than one page, go straight to the pagination tab.
+                    bool pagesShouldBeViewed =
+                        _paginationPanel.RequireAllPagesToBeViewed && _paginationPanel.PageCount > 1;
+
+                    if (paginationSuggested || pagesShouldBeViewed)
                     {
                         // When jumping straight into pagination, still update the title bar to
                         // reflect the active document.
                         string imageName = Path.GetFileName(fileName);
-                        base.Text = imageName + " - " + _brandingResources.ApplicationTitle;
+                        base.Text = imageName + " - " + _brandingResources.ApplicationTitle + " (" + _actionName + ")";
                         if (_imageViewerForm != null)
                         {
                             _imageViewerForm.Text = imageName + " - " +
@@ -942,20 +949,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         }
 
                         _tabControl.SelectedTab = _paginationTab;
-                        _paginationPanel.PendingChanges = true;
+                        _paginationPanel.PendingChanges = paginationSuggested;
 
                         // If pagination has been suggested, don't bother loading the data for the
                         // current document; either the suggestion will be accepted trigger new
                         // files to be loaded or the suggestion will be rejected triggering the
                         // document to be sent back to the rules.
-                        return;
-                    }
-                    // https://extract.atlassian.net/browse/ISSUE-15805
-                    // In the case that we are configured to require viewing all pages for pagination,
-                    // anytime there is more than one page, go straight to the pagination tab.
-                    else if (_paginationPanel.RequireAllPagesToBeViewed && _paginationPanel.PageCount > 1)
-                    {
-                        _tabControl.SelectedTab = _paginationTab;
                         return;
                     }
                     else
@@ -2033,7 +2032,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _selectWordHighlightCommand.Enabled = false;
                 }
 
-                base.Text = _brandingResources.ApplicationTitle;
                 if (_imageViewerForm != null)
                 {
                     _imageViewerForm.Text = _brandingResources.ApplicationTitle + " Image Window";
@@ -2065,7 +2063,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     }
 
                     string imageName = Path.GetFileName(_imageViewer.ImageFile);
-                    base.Text = imageName + " - " + base.Text;
+                    base.Text = imageName + " - " + _brandingResources.ApplicationTitle + " (" + _actionName + ")";
                     if (_imageViewerForm != null)
                     {
                         _imageViewerForm.Text = imageName + " - " + _imageViewerForm.Text;
@@ -2105,18 +2103,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
                 else if (!string.IsNullOrEmpty(_actionName))
                 {
-                    base.Text = "Waiting - " + base.Text;
+                    base.Text = "Waiting - " + _brandingResources.ApplicationTitle + " (" + _actionName + ")";
 
                     if (DataEntryControlHost != null)
                     {
                         DataEntryControlHost.LoadData(null, null, forDisplay: true);
                     }
                 }
-
-                if (!string.IsNullOrEmpty(_actionName))
+                else
                 {
-                    // [DataEntry:740] Show the name of the current action in the title bar.
-                    base.Text += " (" + _actionName + ")";
+                    base.Text = _brandingResources.ApplicationTitle;
                 }
 
                 // If in standalone mode, no need to enable/disable _saveAndCommitFileCommand
@@ -2910,7 +2906,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _paginationPanel.RequireAllPagesToBeViewed && !_paginationPanel.AllPagesViewed)
                     {
                         if (MessageBox.Show(null, 
-                            "There are pages that have not been viewed; proceed anyway?",
+                            "There are pages that have not been viewed. Proceed anyway?",
                             "Unviewed pages", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, 
                             MessageBoxDefaultButton.Button2, 0) == DialogResult.No)
                         {
