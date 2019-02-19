@@ -4678,6 +4678,7 @@ STDMETHODIMP CFileProcessingDB::ResumeWebSession(long nFAMSessionID, long* pnFil
 
 		// Set active FAM, if there was one for this session
 		m_bFAMRegistered = false;
+		m_nActiveFAMID = 0;
 		ipRecords = getThisAsCOMPtr()->GetResultsForQuery(strActiveFAMQuery.c_str());
 		if (ipRecords->adoEOF == VARIANT_FALSE)
 		{

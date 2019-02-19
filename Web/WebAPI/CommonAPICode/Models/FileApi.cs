@@ -188,6 +188,11 @@ namespace WebAPI.Models
         {
             get
             {
+                if (string.IsNullOrEmpty(SessionId))
+                {
+                    return 0;
+                }
+
                 return FileProcessingDB.FAMSessionID;
             }
         }
@@ -211,17 +216,17 @@ namespace WebAPI.Models
                         Releasing?.Invoke(this, new EventArgs());
                     }
 
-                    _inUse = value;
-
                     if (value)
                     {
                         UsesSinceClose++;
                     }
                     else
                     {
-                        DocumentSession = (false, 0, 0, new DateTime());
+                        SuspendSession();
                         _instanceReleased.Set();
                     }
+
+                    _inUse = value;
                 }
             }
         }
@@ -275,6 +280,16 @@ namespace WebAPI.Models
         }
 
         /// <summary>
+        /// Disassociates a session to make this instance available for other API sessions to use.
+        /// </summary>
+        public void SuspendSession()
+        {
+            DocumentSession = (false, 0, 0, new DateTime());
+            _sessionId = null;
+            _apiContext.FAMSessionId = 0;
+        }
+
+        /// <summary>
         /// Ends any associated session in the FAM database and makes this instance available for
         /// other API sessions to use.
         /// </summary>
@@ -287,7 +302,7 @@ namespace WebAPI.Models
 
                 try
                 {
-                    if (FAMSessionId != 0)
+                    if (FileProcessingDB.FAMSessionID != 0)
                     {
                         FileProcessingDB.UnregisterActiveFAM();
                         FileProcessingDB.RecordFAMSessionStop();

@@ -314,6 +314,7 @@ namespace WebAPI.Models
             try
             {
                 ExtractException.Assert("ELI45238", "No active user", _user != null);
+                ExtractException.Assert("ELI46669", "No open document", FileApi.DocumentSession.IsOpen);
 
                 double durationInSeconds = duration > 0
                     ? duration / 1000.0
