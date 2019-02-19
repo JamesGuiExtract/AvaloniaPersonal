@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Extract.Web.WebAPI.AppBackendTester
 {
-    class Program
+    class AppBackendTester
     {
         static string _textFilePrefix;
         static User _user;
@@ -126,8 +126,8 @@ namespace Extract.Web.WebAPI.AppBackendTester
                     totalTasksCompleted += tasksCompleted;
                 }
 
-                Log(FormattableString.Invariant($"Total tasks started: {totalTasksStarted}"));
-                Log(FormattableString.Invariant($"Total tasks completed: {totalTasksCompleted}"));
+                Log(FormattableString.Invariant($"Total sessions started: {totalTasksStarted}"));
+                Log(FormattableString.Invariant($"Total sessions completed: {totalTasksCompleted}"));
 
                 Log("Time elapsed: " + t.Elapsed);
             }
@@ -213,8 +213,8 @@ namespace Extract.Web.WebAPI.AppBackendTester
                     tasksCompleted++;
                 }
             }
-            Log(FormattableString.Invariant($"Tasks started: {tasksStarted}"));
-            Log(FormattableString.Invariant($"Tasks completed: {tasksCompleted}"));
+            Log(FormattableString.Invariant($"Sessions started: {tasksStarted}"));
+            Log(FormattableString.Invariant($"Sessions completed: {tasksCompleted}"));
             return (tasksStarted, tasksCompleted);
         }
 
