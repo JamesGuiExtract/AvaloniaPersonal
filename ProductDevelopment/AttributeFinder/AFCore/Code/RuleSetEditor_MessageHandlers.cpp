@@ -124,7 +124,8 @@ void CRuleSetEditor::OnFileSave()
 			// Validate that the rule set is unencrypted and licensed to be saved
 			validateRuleSetCanBeSaved();
 
-			if (m_strCurrentFileName.empty())
+			if (m_strCurrentFileName.empty() || 
+				_strcmpi(getExtensionFromFullPath(m_strLastFileOpened).c_str(), ".etf") == 0)
 			{
 				// if current rule set hasn't been saved yet.
 				OnFileSaveas();
@@ -186,8 +187,12 @@ void CRuleSetEditor::OnFileSaveas()
 		// Validate that the rule set is unencrypted and licensed to be saved
 		validateRuleSetCanBeSaved();
 
+		string strDefaultFileName = _strcmpi(getExtensionFromFullPath(m_strLastFileOpened).c_str(), ".etf") == 0
+			? getFileNameWithoutExtension(m_strLastFileOpened)
+			: "";
+
 		// ask user to select file to save to
-		CFileDialog fileDlg(FALSE, ".rsd", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialog fileDlg(FALSE, ".rsd", strDefaultFileName.c_str(), OFN_ENABLESIZING | OFN_EXPLORER |
 			OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT,
 			"Ruleset definition files (*.rsd)|*.rsd|All Files (*.*)|*.*||", this);
 

@@ -145,6 +145,7 @@ CRuleSetEditor::CRuleSetEditor(const string& strFileName /*=""*/,
 
 				// update the current filename
 				m_strCurrentFileName = strFileName;
+				m_strLastFileOpened = strFileName;
 			}
 
 			// at this point, regardless of whether the user decided to
@@ -160,6 +161,7 @@ CRuleSetEditor::CRuleSetEditor(const string& strFileName /*=""*/,
 
 			// update the current filename
 			m_strCurrentFileName = strFileName;
+			m_strLastFileOpened = strFileName;
 		}
 	
 		// Create the associated IPersistStream interface

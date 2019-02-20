@@ -17,6 +17,7 @@
 #include <VectorOperations.h>
 #include <MiscLeadUtils.h>
 #include <UPI.h>
+#include <LicenseUtils.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -225,7 +226,10 @@ STDMETHODIMP CRuleSet::LoadFrom(BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlag
 			ue.addDebugInfo("File to load", strFileName);
 			throw ue;
 		}
-		m_bIsEncrypted = bIsEncrypted;
+		// https://extract.atlassian.net/browse/ISSUE-15984
+		// Don't consider encrypted if loaded internally and a full RDT license is present.
+		m_bIsEncrypted = bIsEncrypted &&
+			(!isRdtLicensed() || !isInternalToolsLicensed());
 
 		// mark this object as dirty depending upon bSetDirtyFlagToTrue
 		m_bDirty = (bSetDirtyFlagToTrue == VARIANT_TRUE);
