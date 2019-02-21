@@ -11,6 +11,7 @@
 #include <LicenseMgmt.h>
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
+#include <LeadToolsLicenseRestrictor.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -1716,25 +1717,29 @@ void CImageLineUtility::findLines(string strImageFileName, long nPageNum, double
 	// https://extract.atlassian.net/browse/ISSUE-13210
 	loadImagePage(strImageFileName, hBitmap, fileInfo, lfo);
 
-	// Convert to bitonal since LeadTool's line finding only works on 1 bit images.
-	// No dithering gives better results than the default (ordered?) dither method
-	// https://extract.atlassian.net/browse/ISSUE-13210
-	const long nDEFAULT_NUMBER_OF_COLORS = 0;
-	L_INT nRet = L_ColorResBitmap(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE), 1, CRF_NODITHERING | CRF_FIXEDPALETTE,
-		 NULL, NULL, nDEFAULT_NUMBER_OF_COLORS, NULL, NULL);
-	throwExceptionIfNotSuccess(nRet, "ELI38459", 
-		"Internal error: Unable to convert image to bi-tonal!", strImageFileName);
-	
-	// ViewPerspective appears to be valid in situations where ELO_IGNOREVIEWPERSPECTIVE
-	// does not work.  (For instance BMPs can be loaded with a valid BOTTOM_LEFT view perspective,
-	// but ELO_IGNOREVIEWPERSPECTIVE will not ignore that view perspective).  For that reason, 
-	// compensate for view perspective.  Its important to use fileInfo's ViewPerspective here
-	// rather than hBitmap's.  
-	if (fileInfo.ViewPerspective != TOP_LEFT)
 	{
-		nRet = L_ChangeBitmapViewPerspective(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE), TOP_LEFT);
-		throwExceptionIfNotSuccess(nRet, "ELI20623", 
-			"Internal error: ChangeBitmapViewPerspective operation failed!", strImageFileName); 
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
+		// Convert to bitonal since LeadTool's line finding only works on 1 bit images.
+		// No dithering gives better results than the default (ordered?) dither method
+		// https://extract.atlassian.net/browse/ISSUE-13210
+		const long nDEFAULT_NUMBER_OF_COLORS = 0;
+		L_INT nRet = L_ColorResBitmap(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE), 1, CRF_NODITHERING | CRF_FIXEDPALETTE,
+			NULL, NULL, nDEFAULT_NUMBER_OF_COLORS, NULL, NULL);
+		throwExceptionIfNotSuccess(nRet, "ELI38459",
+			"Internal error: Unable to convert image to bi-tonal!", strImageFileName);
+
+		// ViewPerspective appears to be valid in situations where ELO_IGNOREVIEWPERSPECTIVE
+		// does not work.  (For instance BMPs can be loaded with a valid BOTTOM_LEFT view perspective,
+		// but ELO_IGNOREVIEWPERSPECTIVE will not ignore that view perspective).  For that reason, 
+		// compensate for view perspective.  Its important to use fileInfo's ViewPerspective here
+		// rather than hBitmap's.  
+		if (fileInfo.ViewPerspective != TOP_LEFT)
+		{
+			nRet = L_ChangeBitmapViewPerspective(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE), TOP_LEFT);
+			throwExceptionIfNotSuccess(nRet, "ELI20623",
+				"Internal error: ChangeBitmapViewPerspective operation failed!", strImageFileName);
+		}
 	}
 
 	// L_RotateBitmap takes the rotation degrees in hundredths of a degree.  Convert
@@ -1744,6 +1749,8 @@ void CImageLineUtility::findLines(string strImageFileName, long nPageNum, double
 	// If the specified rotation is >= gnMIN_ROTATION, rotate the image as requested 
 	if (abs(nRotation) >= gnMIN_ROTATION)
 	{
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
 		// Determine if the image is to be rotated such that it is to be closer to perpendicular
 		// to the original orientation than parallel.
 		bool perpendicular = (round(dRotation / 90) % 2 != 0);
@@ -1754,9 +1761,9 @@ void CImageLineUtility::findLines(string strImageFileName, long nPageNum, double
 		// orientation-- otherwise unless the image is square, text is likely to extend out of the
 		// image bounds in one direction while there will be empty whitespace at either end in the
 		// other direction.
-		nRet = L_RotateBitmap(&hBitmap, nRotation, perpendicular ? ROTATE_RESIZE : 0, 
+		L_INT nRet = L_RotateBitmap(&hBitmap, nRotation, perpendicular ? ROTATE_RESIZE : 0,
 			RGB(255, 255, 255));
-		throwExceptionIfNotSuccess(nRet, "ELI20465", 
+		throwExceptionIfNotSuccess(nRet, "ELI20465",
 			"Internal error: Unable to apply rotation to image!", strImageFileName);
 
 		// If the image was rotated and allowed to be resized, it needs to be trimmed back to the
@@ -1767,9 +1774,10 @@ void CImageLineUtility::findLines(string strImageFileName, long nPageNum, double
 			int	nXTrimAmount = (hBitmap.Width - sizeOrig.cy) / 2;
 			int	nYTrimAmount = (hBitmap.Height - sizeOrig.cx) / 2;
 
-			nRet = L_TrimBitmap(&hBitmap, nXTrimAmount, nYTrimAmount,
+			L_INT nRet = L_TrimBitmap(&hBitmap, nXTrimAmount, nYTrimAmount,
 				hBitmap.Width - (2 * nXTrimAmount), hBitmap.Height - (2 * nYTrimAmount));
-			throwExceptionIfNotSuccess(nRet, "ELI30319", 
+
+			throwExceptionIfNotSuccess(nRet, "ELI30319",
 				"Internal error: Unable to trim rotated image!", strImageFileName);
 		}
 	}

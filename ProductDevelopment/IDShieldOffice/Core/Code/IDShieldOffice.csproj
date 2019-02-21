@@ -65,81 +65,81 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Leadtools, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Annotations, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Annotations, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Annotations.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Annotations.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs.Bmp, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs.Bmp, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.Bmp.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Bmp.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs.Cal, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs.Cal, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.Cal.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Cal.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs.Cmp, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs.Cmp, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.Cmp.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Cmp.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs.Eps, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs.Eps, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.Eps.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Eps.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs.Fax, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs.Fax, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.Fax.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Fax.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs.Gif, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs.Gif, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.Gif.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Gif.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs.Pcx, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs.Pcx, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.Pcx.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Pcx.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs.Pdf, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs.Pdf, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.Pdf.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Pdf.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs.Png, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs.Png, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.Png.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Png.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs.Psd, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs.Psd, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.Psd.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Psd.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs.Raw, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs.Raw, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.Raw.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Raw.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs.Tif, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs.Tif, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.Tif.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Tif.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs.Wmf, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs.Wmf, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.Wmf.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Wmf.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Kernel.Annotations, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Kernel.Annotations, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Kernel.Annotations.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Kernel.Annotations.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Pdf, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Pdf, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Pdf.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Pdf.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.WinForms, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.WinForms, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.WinForms.dll</HintPath>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="SandDock, Version=3.0.3.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL">
       <SpecificVersion>True</SpecificVersion>

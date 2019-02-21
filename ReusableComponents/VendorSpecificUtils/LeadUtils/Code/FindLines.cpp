@@ -10,6 +10,7 @@
 #include <UCLIDExceptionDlg.h>
 
 #include <cmath>
+#include "LeadToolsLicenseRestrictor.h"
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -160,18 +161,22 @@ void LeadToolsLineFinder::findLines(pBITMAPHANDLE pBitmap, L_UINT uFlags, vector
 		// Call L_LineRemoveBitmap to search for lines.  lineRemoveCB will be called for
 		// each line that is discovered.  Pass a pointer to this class to the function
 		// to allow lineRemoveCB to add this line to the current collection.
-		int nRet = L_LineRemoveBitmap(m_pBitmap, &m_lr, lineRemoveCB, (LPVOID *)this, 0);
-
-		_lastCodePos = "30";
-
-		// If the exception flag is set, throw the exception.
-		if (m_bException)
 		{
-			throw m_ue;
-		}
+			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 
-		// If the return value from L_LineRemoveBitmap otherwise indicates failure, throw an exception
-		throwExceptionIfNotSuccess(nRet, "ELI19045", "Failure when searching for image lines!");
+			int nRet = L_LineRemoveBitmap(m_pBitmap, &m_lr, lineRemoveCB, (LPVOID*)this, 0);
+
+			_lastCodePos = "30";
+
+			// If the exception flag is set, throw the exception.
+			if (m_bException)
+			{
+				throw m_ue;
+			}
+
+			// If the return value from L_LineRemoveBitmap otherwise indicates failure, throw an exception
+			throwExceptionIfNotSuccess(nRet, "ELI19045", "Failure when searching for image lines!");
+		}
 
 		// [P16:2884] A higher LINEREMOVE::iWall settings means some lines will have a larger width
 		// than appropriate.  Attempt to correct such lines.
@@ -249,6 +254,9 @@ void LeadToolsLineFinder::correctFatLines(vector<LineRect>& rvecLines)
 			// Create a new bitmap from the image region that was reported as a line.
 			BITMAPHANDLE hBitmapRegion;
 			LeadToolsBitmapFreeer bitmapFreeer(hBitmapRegion, true);
+
+			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
 			L_CopyBitmapRect(&hBitmapRegion, m_pBitmap, sizeof(BITMAPHANDLE), 
 				m_pvecLines->at(i).left, m_pvecLines->at(i).top, 
 				m_pvecLines->at(i).Width(), m_pvecLines->at(i).Height());
@@ -544,6 +552,7 @@ bool LeadToolsLineFinder::extendLine(LineRect &rrectLine, int nDirection)
 
 		_lastCodePos = "30";
 
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 		// Each loop scans progressively further out along the line
 		while (!bErrorReadingPixel)
 		{
@@ -813,6 +822,7 @@ int LeadToolsLineFinder::initializeTrackingPos(LineRect rectLine, int nDirection
 
 	// Scan from the end of the line, eliminating scan lines as white pixels are
 	// found in each
+	LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 	for (int i = nPos; nLen > abs(nPos - i); i += nDirection)
 	{
 		vector< set<int>::iterator > vecItersToDelete;

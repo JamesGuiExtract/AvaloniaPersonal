@@ -71,7 +71,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_17\Include;..\..\..\APIs\Nuance_20\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_20\Include;..\..\..\APIs\Nuance_20\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -94,7 +94,7 @@
       <AdditionalDependencies>ltwvc_a.lib;ltfil_u.lib;ltkrn_u.lib;ltdis_u.lib;ltann_u.lib;KernelAPI.lib</AdditionalDependencies>
       <OutputFile>..\..\..\..\Binaries\$(Configuration)\$(ProjectName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\APIs\LeadTools_17\Lib;..\..\..\APIs\Nuance_20\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\APIs\LeadTools_20\Lib;..\..\..\APIs\Nuance_20\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\UCLIDImageUtils.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -124,7 +124,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_17\Include;..\..\..\APIs\Nuance_20\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_20\Include;..\..\..\APIs\Nuance_20\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -149,7 +149,7 @@
       <AdditionalDependencies>ltwvc_a.lib;ltfil_u.lib;ltkrn_u.lib;ltdis_u.lib;ltann_u.lib;KernelAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\Binaries\$(Configuration)\$(ProjectName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\APIs\LeadTools_17\Lib;..\..\..\APIs\Nuance_20\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\APIs\LeadTools_20\Lib;..\..\..\APIs\Nuance_20\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\UCLIDImageUtils.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\Debug/UCLIDImageUtils.pdb</ProgramDatabaseFile>

@@ -14,6 +14,7 @@
 #include <TemporaryFileName.h>
 #include <LeadToolsFormatHelpers.h>
 #include <LeadToolsBitmapFreeer.h>
+#include <LeadToolsLicenseRestrictor.h>
 
 #include <afxmt.h>
 #include <vector>
@@ -145,8 +146,13 @@ STDMETHODIMP CImageCleanupEngine::CleanupImageInternalUseOnly(BSTR bstrInputFile
 		// Get the save file options
 		SAVEFILEOPTION sfo =
 			GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
-		throwExceptionIfNotSuccess(L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION)),
-			"ELI27308", "Unable to get default save options!");
+
+		{
+			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
+			throwExceptionIfNotSuccess(L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION)),
+				"ELI27308", "Unable to get default save options!");
+		}
 
 		// Attach mutex to CSingleLock and lock it
 		CSingleLock snglLock(&sg_mutexINLITE_MUTEX, TRUE);
@@ -268,8 +274,12 @@ void CImageCleanupEngine::cleanImagePage(BITMAPHANDLE& rhBitmap, const ICiServer
 
 	try
 	{
-		// lock the bitmap to allow safe access to the bitmaps memory
-		L_AccessBitmap(&rhBitmap);
+		{
+			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
+			// lock the bitmap to allow safe access to the bitmaps memory
+			L_AccessBitmap(&rhBitmap);
+		}
 
 		// Ensure the bitmap is unlocked and the image is closed if an exception is thrown
 		ICiImagePtr ipciImage = __nullptr;
@@ -334,15 +344,18 @@ void CImageCleanupEngine::cleanImagePage(BITMAPHANDLE& rhBitmap, const ICiServer
 
 			// copy the cleaned page back into memory one row at a time using the new row size
 			_lastCodePos = "80";
-			for (long j=0; j < rhBitmap.Height; j++)
 			{
-				L_INT32 nRet = (L_INT32) L_PutBitmapRow(&rhBitmap, (pNewImage+(j*ulNewRowSize)), 
-					j, ulNewRowSize);
-				if (nRet < 0)
+				LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+				for (long j = 0; j < rhBitmap.Height; j++)
 				{
-					throwExceptionIfNotSuccess(nRet, "ELI17103", "Could not put the bitmap row.");
+					L_INT32 nRet = (L_INT32)L_PutBitmapRow(&rhBitmap, (pNewImage + (j * ulNewRowSize)),
+						j, ulNewRowSize);
+					if (nRet < 0)
+					{
+						throwExceptionIfNotSuccess(nRet, "ELI17103", "Could not put the bitmap row.");
+					}
+					_lastCodePos = "80 Row# " + asString(j);
 				}
-				_lastCodePos = "80 Row# " + asString(j);
 			}
 
 			// unlock the safe array
@@ -354,8 +367,11 @@ void CImageCleanupEngine::cleanImagePage(BITMAPHANDLE& rhBitmap, const ICiServer
 			ipciImage = __nullptr;
 			_lastCodePos = "100";
 
-			// Unlock the bitmap
-			L_ReleaseBitmap(&rhBitmap);
+			{
+				LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+				// Unlock the bitmap
+				L_ReleaseBitmap(&rhBitmap);
+			}
 		}
 		catch(...)
 		{
@@ -370,8 +386,11 @@ void CImageCleanupEngine::cleanImagePage(BITMAPHANDLE& rhBitmap, const ICiServer
 				CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27311");
 			}
 
-			// Unlock the bitmap
-			L_ReleaseBitmap(&rhBitmap);
+			{
+				LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+				// Unlock the bitmap
+				L_ReleaseBitmap(&rhBitmap);
+			}
 
 			throw;
 		}
@@ -534,10 +553,14 @@ void CImageCleanupEngine::swapPalette(BITMAPHANDLE& rhBitmap)
 			= tmpPalette[0].rgbReserved = tmpPalette[1].rgbReserved = 0;
 		tmpPalette[1].rgbBlue = tmpPalette[1].rgbGreen = tmpPalette[1].rgbRed = 255;
 
-		// Swap the palette
-		L_INT nRet = L_ColorResBitmap(&rhBitmap, &rhBitmap, sizeof(BITMAPHANDLE), 1,
-			CRF_USERPALETTE, &tmpPalette[0], NULL, 2, NULL, NULL);
-		throwExceptionIfNotSuccess(nRet, "ELI20320", "Could not modify color palette.");
+		{
+			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
+			// Swap the palette
+			L_INT nRet = L_ColorResBitmap(&rhBitmap, &rhBitmap, sizeof(BITMAPHANDLE), 1,
+				CRF_USERPALETTE, &tmpPalette[0], NULL, 2, NULL, NULL);
+			throwExceptionIfNotSuccess(nRet, "ELI20320", "Could not modify color palette.");
+		}
 	}
 }
 //--------------------------------------------------------------------------------------------------

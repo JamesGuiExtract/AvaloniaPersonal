@@ -1,5 +1,6 @@
 ﻿using Extract.FileActionManager.Forms;
 using Extract.Imaging;
+using Extract.Imaging.Utilities;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -179,6 +180,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         public RasterizePdfTask()
         {
+            UnlockLeadtools.UnlockPdfSupport(false);
         }
 
         /// <summary>
@@ -189,6 +191,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
+                UnlockLeadtools.UnlockPdfSupport(false);
                 CopyFrom(task);
             }
             catch (Exception ex)
@@ -617,7 +620,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_licenseId1, "ELI32228", _COMPONENT_DESCRIPTION);
                 LicenseUtilities.ValidateLicense(_licenseId2, "ELI34322", _COMPONENT_DESCRIPTION);
-                
+
                 // Name of the file being processed that will have it's name changed in the database
                 var fileName = pFileRecord.Name;
 
@@ -783,7 +786,7 @@ namespace Extract.FileActionManager.FileProcessors
                         // the alternate method.
                         _useAlternateMethod = !reader.ReadBoolean();
                     }
-                    
+
                     if (reader.Version >= 3)
                     {
                         _useAlternateMethod = reader.ReadBoolean();

@@ -65,7 +65,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\..\APIs\LeadTools_17\Include;..\..\..\APIs\LeadTools_17\Include\ClassLib;..\..\..\COMComponents\UCLIDComponentsLM\COMLMCore\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\..\APIs\Leadtools_20\Include;..\..\..\APIs\Leadtools_20\Include\ClassLib;..\..\..\COMComponents\UCLIDComponentsLM\COMLMCore\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LEADUTILS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -90,7 +90,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;ltwvc_a.lib;ltfil_u.lib;ltkrn_u.lib;ltdis_u.lib;ltann_u.lib;ltimgcor_u.lib;ltimgefx_u.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\Binaries\Release/LeadUtils.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\APIs\LeadTools_17\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\APIs\Leadtools_20\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <ImportLibrary>.\..\Release/LeadUtils.lib</ImportLibrary>
@@ -113,7 +113,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\..\APIs\LeadTools_17\Include;..\..\..\APIs\LeadTools_17\Include\ClassLib;..\..\..\COMComponents\UCLIDComponentsLM\COMLMCore\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\..\APIs\Leadtools_20\Include;..\..\..\APIs\Leadtools_20\Include\ClassLib;..\..\..\COMComponents\UCLIDComponentsLM\COMLMCore\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LEADUTILS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -138,7 +138,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;ltwvc_a.lib;ltfil_u.lib;ltkrn_u.lib;ltdis_u.lib;ltann_u.lib;ltimgcor_u.lib;ltimgefx_u.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\Binaries\Debug/LeadUtils.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\APIs\LeadTools_17\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\APIs\Leadtools_20\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\Debug/LeadUtils.pdb</ProgramDatabaseFile>
@@ -162,6 +162,7 @@
     <ClCompile Include="GroupLines.cpp" />
     <ClCompile Include="LeadToolsBitmap.cpp" />
     <ClCompile Include="LeadToolsFormatHelpers.cpp" />
+    <ClCompile Include="LeadToolsLicenseRestrictor.cpp" />
     <ClCompile Include="LeadUtils.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -194,6 +195,8 @@
     <ClInclude Include="LeadToolsBitmap.h" />
     <ClInclude Include="LeadToolsBitmapFreeer.h" />
     <ClInclude Include="LeadToolsFormatHelpers.h" />
+    <ClInclude Include="LeadToolsLicensing.h" />
+    <ClInclude Include="LeadToolsLicenseRestrictor.h" />
     <ClInclude Include="LeadUtils.h" />
     <ClInclude Include="LineRect.h" />
     <ClInclude Include="LocalPDFOptions.h" />

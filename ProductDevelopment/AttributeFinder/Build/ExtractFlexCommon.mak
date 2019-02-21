@@ -57,10 +57,11 @@ ObfuscateFiles:
 CopyExtractFlexCommonFiles: CleanupExtractFlexCommonFiles ObfuscateFiles
     @ECHO Copying the ExtractFlexCommon files to installation directory...
 	@COPY /v  "$(BinariesFolder)\Obfuscated\*.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Dotnet\Leadtools*.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Dotnet\Leadtools*.dll" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
+	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\Leadtools_20\Dotnet\*.*" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles" /v /s /e /y
+	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\Leadtools_20\Dotnet\*.*" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
 	@COPY /V "$(RCNETDir)\APIs\EnterpriseDT\Bin\*.*" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
 	@XCOPY "$(LEADTOOLS_API_DIR)\*.*" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
+	@COPY /V "$(LEADTOOLS_API_ROOT)\License\*.OCL" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles"
     @XCOPY "$(NUANCE_API_DIR)\*.*" "$(ExtractFlexCommonInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
 	@COPY /V "$(BinariesFolder)\Interop.UCLID_EXCEPTIONMGMTLib.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"
 	@COPY /V "$(BinariesFolder)\Interop.UCLID_COMUTILSLib.dll" "$(ExtractFlexCommonInstallFilesRootDir)\DotNetFiles"

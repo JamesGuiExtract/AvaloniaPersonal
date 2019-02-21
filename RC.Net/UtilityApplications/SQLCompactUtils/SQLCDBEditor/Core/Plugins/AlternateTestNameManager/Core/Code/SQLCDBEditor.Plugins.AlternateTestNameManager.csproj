@@ -48,17 +48,17 @@
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Leadtools.Annotations, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
-      <HintPath>..\..\..\..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.Annotations.dll</HintPath>
+    <Reference Include="Leadtools.Annotations, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <HintPath>..\..\..\..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\DotNet\Leadtools.Annotations.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
-      <HintPath>..\..\..\..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.Codecs.dll</HintPath>
+    <Reference Include="Leadtools.Codecs, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <HintPath>..\..\..\..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\DotNet\Leadtools.Codecs.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Drawing, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
-      <HintPath>..\..\..\..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.Drawing.dll</HintPath>
+    <Reference Include="Leadtools.Drawing, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <HintPath>..\..\..\..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\DotNet\Leadtools.Drawing.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.WinForms, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
-      <HintPath>..\..\..\..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.WinForms.dll</HintPath>
+    <Reference Include="Leadtools.WinForms, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <HintPath>..\..\..\..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\DotNet\Leadtools.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

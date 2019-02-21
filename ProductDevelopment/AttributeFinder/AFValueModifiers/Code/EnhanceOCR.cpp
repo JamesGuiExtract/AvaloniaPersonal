@@ -12,6 +12,7 @@
 #include <RegExLoader.h>
 #include <RuleSetProfiler.h>
 #include <AFTagManager.h>
+#include <LeadToolsLicenseRestrictor.h>
 
 // add license management function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
@@ -1818,11 +1819,15 @@ vector<ILongRectanglePtr> CEnhanceOCR::removeHighConfidenceText(ISpatialStringPt
 //--------------------------------------------------------------------------------------------------
 void CEnhanceOCR::prepareImagePage(vector<ILongRectanglePtr> &vecRectsToEnhance)
 {
-	// Convert the image to 16-bit in order for some of the built-in Leadtools filters to work
-	// correctly.
-	L_INT nRes = L_ColorResBitmap(&m_apPageBitmap->m_hBitmap, &m_apPageBitmap->m_hBitmap,
-		sizeof(BITMAPHANDLE), 16, CRF_FIXEDPALETTE, NULL, NULL, 0, NULL, NULL);
-	throwExceptionIfNotSuccess(nRes, "ELI36540", "Image processing error");
+	{
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
+		// Convert the image to 16-bit in order for some of the built-in Leadtools filters to work
+		// correctly.
+		L_INT nRes = L_ColorResBitmap(&m_apPageBitmap->m_hBitmap, &m_apPageBitmap->m_hBitmap,
+			sizeof(BITMAPHANDLE), 16, CRF_FIXEDPALETTE, NULL, NULL, 0, NULL, NULL);
+		throwExceptionIfNotSuccess(nRes, "ELI36540", "Image processing error");
+	}
 
 	// Re-load the original image, but with only the areas that need enhancement. The rest of the
 	// image will be blank.
@@ -1832,6 +1837,8 @@ void CEnhanceOCR::prepareImagePage(vector<ILongRectanglePtr> &vecRectsToEnhance)
 vector<ILongRectanglePtr> CEnhanceOCR::prepareImagePage(ISpatialStringPtr ipLowConfidenceText, 
 														vector<ILongRectanglePtr> vecZonesToIgnore)
 {
+	LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
 	removeBlackBorders(&m_apPageBitmap->m_hBitmap);
 
 	eraseImageZones(*m_apPageBitmap, vecZonesToIgnore);
@@ -1864,6 +1871,8 @@ vector<ILongRectanglePtr> CEnhanceOCR::prepareImagePage(ISpatialStringPtr ipLowC
 //--------------------------------------------------------------------------------------------------
 void CEnhanceOCR::removeBlackBorders(pBITMAPHANDLE phBitmap)
 {
+	LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
 	BORDERREMOVE borderRemove = {0};
 	borderRemove.uStructSize = sizeof(BORDERREMOVE);
 	borderRemove.iBorderPercent    = 25;
@@ -1930,12 +1939,14 @@ void CEnhanceOCR::eraseImageZones(LeadToolsBitmap &ltBitmap,
 void CEnhanceOCR::generateFilteredImage(string strFilter, set<ILongRectanglePtr> *psetRectsToFilter)
 {
 	// Work off a copy of the currently loaded m_apPageBitmap
-	BITMAPHANDLE hBitmapCopy = {0};
+	BITMAPHANDLE hBitmapCopy = { 0 };
 	LeadToolsBitmapFreeer bitmapCopyFreer(hBitmapCopy, true);
 
-	L_INT nRes = L_CopyBitmap(&hBitmapCopy, &m_apPageBitmap->m_hBitmap, sizeof(BITMAPHANDLE));
-	throwExceptionIfNotSuccess(nRes, "ELI36546", "Image processing error");
-
+	{
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+		L_INT nRes = L_CopyBitmap(&hBitmapCopy, &m_apPageBitmap->m_hBitmap, sizeof(BITMAPHANDLE));
+		throwExceptionIfNotSuccess(nRes, "ELI36546", "Image processing error");
+	}
 	// Apply the filter to the selected areas (if specified) or otherwise to the entire page.
 	if (psetRectsToFilter == __nullptr)
 	{
@@ -1969,8 +1980,13 @@ void CEnhanceOCR::generateFilteredImage(string strFilter, set<ILongRectanglePtr>
 	}
 
 	SAVEFILEOPTION sfOptions = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
-	L_GetDefaultSaveFileOption(&sfOptions, sizeof(sfOptions));
+	{
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
+		L_GetDefaultSaveFileOption(&sfOptions, sizeof(sfOptions));
+	}
 	sfOptions.PageNumber = 1;
+
 
 	// The OCR engine is able to process bitonal images faster and, in most cases, more accurately.
 	// It does seem on some testing that it is more accurate to output in grayscale in some cases
@@ -2004,9 +2020,15 @@ void CEnhanceOCR::applyFilters(pBITMAPHANDLE phBitmap, string strFilters, ILongR
 	BITMAPHANDLE hBitmapFilterCopy = {0};
 	LeadToolsBitmapFreeer bitmapFilterCopyFreer(hBitmapFilterCopy, true);
 
-	L_INT nRet = L_CopyBitmapRect(&hBitmapFilterCopy, phBitmap,
-		sizeof(BITMAPHANDLE), rect.left, rect.top, rect.Width(), rect.Height());
-	throwExceptionIfNotSuccess(nRet, "ELI36547", "Image processing error");
+	L_INT nRet = 0;
+
+	{
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
+		nRet = L_CopyBitmapRect(&hBitmapFilterCopy, phBitmap,
+			sizeof(BITMAPHANDLE), rect.left, rect.top, rect.Width(), rect.Height());
+		throwExceptionIfNotSuccess(nRet, "ELI36547", "Image processing error");
+	}
 
 	// If filtering using a combination of multiple filters, we will need to store the result of the
 	// first pass in a separate bitmap.
@@ -2051,7 +2073,8 @@ void CEnhanceOCR::applyFilters(pBITMAPHANDLE phBitmap, string strFilters, ILongR
 
 			phCurrentBitmap = &hBitmapCopy;
 
-			nRet = L_CopyBitmap(phCurrentBitmap, phBitmap, sizeof(BITMAPHANDLE));
+			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+			L_INT nRet = L_CopyBitmap(phCurrentBitmap, phBitmap, sizeof(BITMAPHANDLE));
 			throwExceptionIfNotSuccess(nRet, "ELI36549", "Image processing error");
 		}
 		else
@@ -2081,22 +2104,27 @@ void CEnhanceOCR::applyFilters(pBITMAPHANDLE phBitmap, string strFilters, ILongR
 		}
 		else if (strFilter == "despeckle")
 		{
+			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 			nRet = L_DespeckleBitmap(phCurrentBitmap, 0);
 		}
 		else if (strFilter == "median")
 		{
+			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 			nRet = L_MedianFilterBitmap(phCurrentBitmap, asLong(vecParameters[1]), 0);
 		}
 		else if (strFilter == "average")
 		{
+			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 			nRet = L_AverageFilterBitmap(phCurrentBitmap, asLong(vecParameters[1]), 0);
 		}
 		else if (strFilter == "gaussian")
 		{
+			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 			nRet = L_GaussianFilterBitmap(phCurrentBitmap, asLong(vecParameters[1]), 0);
 		}
 		else if (strFilter == "sharpen")
 		{
+			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 			nRet = L_SharpenBitmap(phCurrentBitmap, asLong(vecParameters[1]) * 20 - 1000, 0);
 		}
 		else if (strFilter == "smooth")
@@ -2108,6 +2136,7 @@ void CEnhanceOCR::applyFilters(pBITMAPHANDLE phBitmap, string strFilters, ILongR
 			smooth.uBitmapStructSize = sizeof(BITMAPHANDLE);
 			smooth.uFlags = SMOOTH_SINGLE_REGION | SMOOTH_LEAD_REGION | asLong(vecParameters[2]);
 
+			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 			nRet = L_ColorResBitmap(phCurrentBitmap, phCurrentBitmap,
 				sizeof(BITMAPHANDLE), 1, CRF_FIXEDPALETTE, NULL, NULL, 0, NULL, NULL);
 			throwExceptionIfNotSuccess(nRet, "ELI36550", "Image processing error");
@@ -2121,14 +2150,17 @@ void CEnhanceOCR::applyFilters(pBITMAPHANDLE phBitmap, string strFilters, ILongR
 		}
 		else if (strFilter == "min")
 		{
+			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 			nRet = L_MinFilterBitmap(phCurrentBitmap, asLong(vecParameters[1]), 0);
 		}
 		else if (strFilter == "max")
 		{
+			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 			nRet = L_MaxFilterBitmap(phCurrentBitmap, asLong(vecParameters[1]), 0);
 		}
 		else if (strFilter == "highPass")
 		{
+			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 			nRet = L_HighPassFilterBitmap(phBitmap, asLong(vecParameters[1]),
 					asLong(vecParameters[2]), 0);
 		}
@@ -2145,6 +2177,8 @@ void CEnhanceOCR::applyFilters(pBITMAPHANDLE phBitmap, string strFilters, ILongR
 
 		throwExceptionIfNotSuccess(nRet, "ELI36554", strFilter);
 	}
+
+	LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 
 	// If a filter combination is being used, combine the results of the two passes.
 	if (bCombinePasses)
@@ -2189,6 +2223,7 @@ void CEnhanceOCR::applyFilter(pBITMAPHANDLE pBitmap, L_INT nDim, const L_INT pFi
 	pSpatialFilter->fltBias = (long)(gnFILTER_SHADE_COUNT * (dThreshold - 0.5));
 	memcpy(pSpatialFilter->fltMatrix, pFilter, nCells * sizeof(L_INT));
 	
+	LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 	L_INT nRes = L_SpatialFilterBitmap(pBitmap, pSpatialFilter, 0);
 	throwExceptionIfNotSuccess(nRes, "ELI36557", "Image processing error.");
 }
@@ -2293,6 +2328,8 @@ ILongRectanglePtr CEnhanceOCR::inflateRect(ILongRectanglePtr ipRect, long nWidth
 //--------------------------------------------------------------------------------------------------
 void CEnhanceOCR::loadImagePageWithSpecifiedRectsOnly(vector<ILongRectanglePtr> &vecRectsToEnhance)
 {
+	LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
 	// Clear the image so that just the areas to enhance can be added back in.
 	L_INT nRes = L_FillBitmap(&m_apPageBitmap->m_hBitmap, gnCOLOR_WHITE);
 	throwExceptionIfNotSuccess(nRes, "ELI36566", "Image processing error");

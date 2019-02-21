@@ -3,6 +3,7 @@
 #include "MiscLeadUtils.h"
 
 #include <UCLIDException.h>
+#include "LeadToolsLicenseRestrictor.h"
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -35,6 +36,8 @@ LeadToolsBitmap::LeadToolsBitmap(const string strImageFileName, unsigned long ul
 		// configured dithering method
 		// https://extract.atlassian.net/browse/ISSUE-14596
 		loadImagePage(m_strImageFileName, m_hBitmap, m_FileInfo, lfo);
+		
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 
 		// Convert to specified bpp if necessary
 		if (nBitsPerPixel != m_FileInfo.BitsPerPixel)

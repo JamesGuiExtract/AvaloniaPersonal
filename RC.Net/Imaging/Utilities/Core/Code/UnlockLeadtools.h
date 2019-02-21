@@ -15,6 +15,9 @@ namespace Extract
 				UnlockLeadtools(void) {};
 
 			public:
+				// This loads the license file for Leadtools
+				static void UnlockLeadToolsSupport();
+
 				// Attempts to unlock the document support toolkit, if document support
 				// is not licensed and returnExceptionIfUnlicensed == true then an
 				// unlicensed exception will be returned, otherwise the return value

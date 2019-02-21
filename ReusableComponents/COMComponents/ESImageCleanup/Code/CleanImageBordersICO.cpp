@@ -8,6 +8,7 @@
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
 #include <MiscLeadUtils.h>
+#include <LeadToolsLicenseRestrictor.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -340,16 +341,21 @@ STDMETHODIMP CCleanImageBordersICO::Perform(void* pciRepair)
 					//------------------------------------------------
 
 					// create a new lead tools bitmap
-					throwExceptionIfNotSuccess(L_CreateBitmap(&hOldImage, sizeof(hOldImage), 
-						TYPE_CONV, ipciImage->Width, ipciImage->Height, 
-						ipciImage->BitsPerPixel, ORDER_RGB, NULL, TOP_LEFT, NULL, 0),
-						"ELI20338", "Failed to create the temporary bitmap!");
-					bOldAllocated = true;
-					_lastCodePos = "40_20";
+					{
+						LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 
-					// lock the bitmap so its memory may be accessed
-					L_AccessBitmap(&hOldImage);
-					_lastCodePos = "40_30";
+						throwExceptionIfNotSuccess(L_CreateBitmap(&hOldImage, sizeof(hOldImage),
+							TYPE_CONV, ipciImage->Width, ipciImage->Height,
+							ipciImage->BitsPerPixel, ORDER_RGB, NULL, TOP_LEFT, NULL, 0),
+							"ELI20338", "Failed to create the temporary bitmap!");
+
+						bOldAllocated = true;
+						_lastCodePos = "40_20";
+
+						// lock the bitmap so its memory may be accessed
+						L_AccessBitmap(&hOldImage);
+						_lastCodePos = "40_30";
+					}
 
 					// save the ClearImage image to memory
 					_variant_t vImageFile = ipciImage->SaveToMemory();
@@ -364,18 +370,25 @@ STDMETHODIMP CCleanImageBordersICO::Perform(void* pciRepair)
 					unsigned long ulRowSize = ipciImage->LineBytes;
 					_lastCodePos = "40_60";
 
-					_lastCodePos = "40_70";
-					// copy the image from ClearImage to LeadTools
-					for (long i=0; i < hOldImage.Height; i++)
+
+
 					{
-						L_INT32 nRet = (L_INT32) L_PutBitmapRow(&hOldImage, 
-							(pImage+(i*ulRowSize)), i, ulRowSize);
-						if (nRet < 0)
+						LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
+						_lastCodePos = "40_70";
+						
+						// copy the image from ClearImage to LeadTools
+						for (long i = 0; i < hOldImage.Height; i++)
 						{
-							throwExceptionIfNotSuccess(
-								nRet, "ELI20339", "Failed copying row of image!");
+							L_INT32 nRet = (L_INT32)L_PutBitmapRow(&hOldImage,
+								(pImage + (i * ulRowSize)), i, ulRowSize);
+							if (nRet < 0)
+							{
+								throwExceptionIfNotSuccess(
+									nRet, "ELI20339", "Failed copying row of image!");
+							}
+							_lastCodePos = "40_70 #" + asString(i);
 						}
-						_lastCodePos = "40_70 #" + asString(i);
 					}
 					_lastCodePos = "40_80";
 					
@@ -384,34 +397,38 @@ STDMETHODIMP CCleanImageBordersICO::Perform(void* pciRepair)
 					ipciImage->Close();
 					_lastCodePos = "40_90";
 
-					// unlock the LeadTools memory
-					L_ReleaseBitmap(&hOldImage);
-					_lastCodePos = "40_100";
+					{
+						LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 
-					// create a new LeadTools bitmap to paste the image to
-					throwExceptionIfNotSuccess(L_CreateBitmap(&hNewImage, sizeof(hNewImage), 
-						TYPE_CONV, nWidth, nHeight, hOldImage.BitsPerPixel, 
-						ORDER_RGB, NULL, TOP_LEFT, NULL, 0), 
-						"ELI20340", "Failed to create a new bitmap!");
-					bNewAllocated = true;
-					_lastCodePos = "40_110";
+						// unlock the LeadTools memory
+						L_ReleaseBitmap(&hOldImage);
+						_lastCodePos = "40_100";
 
-					// clear the image
-					throwExceptionIfNotSuccess(L_ClearBitmap(&hNewImage), "ELI20341",
-						"Unable to clear the bitmap!");
-					_lastCodePos = "40_120";
+						// create a new LeadTools bitmap to paste the image to
+						throwExceptionIfNotSuccess(L_CreateBitmap(&hNewImage, sizeof(hNewImage),
+							TYPE_CONV, nWidth, nHeight, hOldImage.BitsPerPixel,
+							ORDER_RGB, NULL, TOP_LEFT, NULL, 0),
+							"ELI20340", "Failed to create a new bitmap!");
+						bNewAllocated = true;
+						_lastCodePos = "40_110";
 
-					// now paste back with an offset
-					throwExceptionIfNotSuccess(L_CombineBitmap(&hNewImage, 4, 4, 
-						hOldImage.Width, hOldImage.Height, &hOldImage, 0, 0, 
-						CB_DST_NOP | CB_RES_MASTER | CB_SRC_MASTER | CB_DST_MASTER | CB_OP_OR, 0),
-						"ELI20342", "Unable to paste the bitmap!");
-					_lastCodePos = "40_130";
+						// clear the image
+						throwExceptionIfNotSuccess(L_ClearBitmap(&hNewImage), "ELI20341",
+							"Unable to clear the bitmap!");
+						_lastCodePos = "40_120";
 
-					// free the old bitmap
-					L_FreeBitmap(&hOldImage);
-					bOldAllocated = false;
-					_lastCodePos = "40_140";
+						// now paste back with an offset
+						throwExceptionIfNotSuccess(L_CombineBitmap(&hNewImage, 4, 4,
+							hOldImage.Width, hOldImage.Height, &hOldImage, 0, 0,
+							CB_DST_NOP | CB_RES_MASTER | CB_SRC_MASTER | CB_DST_MASTER | CB_OP_OR, 0),
+							"ELI20342", "Unable to paste the bitmap!");
+						_lastCodePos = "40_130";
+
+						// free the old bitmap
+						L_FreeBitmap(&hOldImage);
+						bOldAllocated = false;
+						_lastCodePos = "40_140";
+					}
 
 					//------------------------------------------------
 					// copy the image back to ClearImage
@@ -456,23 +473,30 @@ STDMETHODIMP CCleanImageBordersICO::Perform(void* pciRepair)
 					ipciRepair->Image = ipciImage;
 					_lastCodePos = "40_220";
 
-					// free the new bitmap
-					L_FreeBitmap(&hNewImage);
-					bNewAllocated = false;
-					_lastCodePos = "40_230";
+					{
+						LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+						// free the new bitmap
+						L_FreeBitmap(&hNewImage);
+						bNewAllocated = false;
+						_lastCodePos = "40_230";
+					}
 				}
 				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20344");
 			}
 			catch(UCLIDException& ue)
 			{
-				if (bOldAllocated)
+				if (bOldAllocated || bNewAllocated)
 				{
-					L_FreeBitmap(&hOldImage);
-				}
+					LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+					if (bOldAllocated)
+					{
+						L_FreeBitmap(&hOldImage);
+					}
 
-				if (bNewAllocated)
-				{
-					L_FreeBitmap(&hNewImage);
+					if (bNewAllocated)
+					{
+						L_FreeBitmap(&hNewImage);
+					}
 				}
 
 				throw ue;

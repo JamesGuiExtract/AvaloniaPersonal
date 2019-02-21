@@ -72,8 +72,6 @@ int getFormatFromString(const string& strFormat)
 				smapStringToFormat["PCT"] = FILE_PCT;
 				smapStringToFormat["PCD"] = FILE_PCD;
 				smapStringToFormat["DXF"] = FILE_DXF;
-				smapStringToFormat["AVI"] = FILE_AVI;
-				smapStringToFormat["WAV"] = FILE_WAV;
 				smapStringToFormat["FLI"] = FILE_FLI;
 				smapStringToFormat["CGM"] = FILE_CGM;
 				smapStringToFormat["EPSTIFF"] = FILE_EPSTIFF;
@@ -253,9 +251,7 @@ int getFormatFromString(const string& strFormat)
 				smapStringToFormat["IFF_ILBM_UNCOMPRESSED"] = FILE_IFF_ILBM_UNCOMPRESSED;
 				smapStringToFormat["IFF_CAT_UNCOMPRESSED"] = FILE_IFF_CAT_UNCOMPRESSED;
 				smapStringToFormat["RTF_RASTER"] = FILE_RTF_RASTER;
-				smapStringToFormat["SID"] = FILE_SID;
 				smapStringToFormat["WMZ"] = FILE_WMZ;
-				smapStringToFormat["DJVU"] = FILE_DJVU;
 				smapStringToFormat["AFPICA_G3_1D"] = FILE_AFPICA_G3_1D;
 				smapStringToFormat["AFPICA_G3_2D"] = FILE_AFPICA_G3_2D;
 				smapStringToFormat["AFPICA_G4"] = FILE_AFPICA_G4;
@@ -386,10 +382,6 @@ string getStringFromFormat(int nFormat)
 			return "PCD";
 		case FILE_DXF:
 			return "DXF";
-		case FILE_AVI:
-			return "AVI";
-		case FILE_WAV:
-			return "WAV";
 		case FILE_FLI:
 			return "FLI";
 		case FILE_CGM:
@@ -748,12 +740,8 @@ string getStringFromFormat(int nFormat)
 			return "IFF_CAT_UNCOMPRESSED";
 		case FILE_RTF_RASTER:
 			return "RTF_RASTER";
-		case FILE_SID:
-			return "SID";
 		case FILE_WMZ:
 			return "WMZ";
-		case FILE_DJVU:
-			return "DJVU";
 		case FILE_AFPICA_G3_1D:
 			return "AFPICA_G3_1D";
 		case FILE_AFPICA_G3_2D:
