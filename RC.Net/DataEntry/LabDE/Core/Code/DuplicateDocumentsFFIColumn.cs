@@ -880,6 +880,11 @@ namespace Extract.DataEntry.LabDE
                         new ExtractException("ELI37565",
                             "Specified current file is not available for processing.").Display();
                     }
+
+                    // https://extract.atlassian.net/browse/ISSUE-15961
+                    // If the file is to be made current, remove from CheckedOutFileIds so it isn't
+                    // released by ReleaseCheckedOutFiles.
+                    CheckedOutFileIds.Remove(newId);
                 }
 
                 PerformActions();

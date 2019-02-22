@@ -294,8 +294,6 @@ namespace Extract.DataEntry.LabDE
                 // the queue.
                 DataEntryApplication.FileRequestHandler.PauseProcessingQueue();
 
-                var filesToDelay = new List<int>();
-
                 if (!PromptForActions())
                 {
                     return false;
