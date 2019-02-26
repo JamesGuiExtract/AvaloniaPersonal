@@ -1040,6 +1040,16 @@ namespace Extract.FileActionManager.Utilities
                         {
                             _checkForETLChangesTimer.Stop();
 
+                            // Check the FAM still active
+                            if (_etlFAMDB.ActiveFAMID == 0 && _etlFAMDB.IsConnected)
+                            {
+                                ExtractException lostActiveFAM = new ExtractException("ELI46691", "Application Trace: ETL Polling ActiveFAM was lost");
+                                lostActiveFAM.Log();
+                                _etlFAMDB.RegisterActiveFAM();
+                                ExtractException restroredActiveFAM = new ExtractException("ELI46692", "Application Trace: ETL Polling ActiveFAM was restored.");
+                                restroredActiveFAM.Log();
+                            }
+
                             string restartSetting = _etlFAMDB.GetDBInfoSetting("ETLRestart", false);
                             DateTime restartTime;
                             if (!DateTime.TryParse(restartSetting, out restartTime))
