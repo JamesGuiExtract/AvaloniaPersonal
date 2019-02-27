@@ -122,6 +122,7 @@ public:
 	STDMETHOD(GetOCRImageLetterArray)( long* pnNumLetters,  void** ppLetters); 
 	STDMETHOD(CreateFromLetterArray)( long nNumLetters,  void* pLetters, BSTR bstrSourceDocName,
 		 ILongToObjectMap* pPageInfoMap); 
+	STDMETHOD(CreateFromILetters)(IIUnknownVector* pLetters, BSTR bstrSourceDocName, ILongToObjectMap* pPageInfoMap);
 	STDMETHOD(SelectWithFontSize)( VARIANT_BOOL bInclude,  long nMinFontSize,  long nMaxFontSize,  ISpatialString** ppResultString);
 	STDMETHOD(GetCharConfidence)( long* pnMinConfidence, 
 		 long* pnMaxConfidence,  long* pnAvgConfidence);

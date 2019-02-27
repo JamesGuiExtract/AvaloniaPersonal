@@ -156,6 +156,12 @@
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Nuance.OmniPage.CSDK.ArgTypes">
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\Nuance_20\Bin\Nuance.OmniPage.CSDK.ArgTypes.dll</HintPath>
+    </Reference>
+    <Reference Include="Nuance.OmniPage.CSDK.Objects">
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\Nuance_20\Bin\Nuance.OmniPage.CSDK.Objects.dll</HintPath>
+    </Reference>
     <Reference Include="OpenNLP.IKVM, Version=1.8.1.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\OpenNLP.IKVM.1.8.1\lib\OpenNLP.IKVM.exe</HintPath>
     </Reference>
@@ -195,6 +201,7 @@
     <Compile Include="AutoShrinkRedactionZonesSettingsDialog.Designer.cs">
       <DependentUpon>AutoShrinkRedactionZonesSettingsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="MicrFinder.cs" />
     <Compile Include="ConfigurableObjectControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -251,6 +258,12 @@
       <DependentUpon>LearningMachineOutputHandlerSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="ModifySpatialMode.cs" />
+    <Compile Include="MicrFinderSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MicrFinderSettingsDialog.Designer.cs">
+      <DependentUpon>MicrFinderSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="ModifySpatialModeSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -492,6 +505,10 @@
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj">
+      <Project>{DC72C952-D6ED-42F6-893D-8262BC9D183E}</Project>
+      <Name>Extract.Utilities.Parsers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Core\Code\Extract.AttributeFinder.csproj">
       <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
       <Name>Extract.AttributeFinder</Name>
@@ -521,6 +538,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="LearningMachineOutputHandlerSettingsDialog.resx">
       <DependentUpon>LearningMachineOutputHandlerSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MicrFinderSettingsDialog.resx">
+      <DependentUpon>MicrFinderSettingsDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="ModifySpatialModeSettingsDialog.resx">
       <DependentUpon>ModifySpatialModeSettingsDialog.cs</DependentUpon>

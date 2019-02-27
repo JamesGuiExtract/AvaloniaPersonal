@@ -582,7 +582,7 @@ STDMETHODIMP CMicrFinder::raw_GetComponentDescription(BSTR * pstrComponentDescri
 	{
 		ASSERT_ARGUMENT("ELI24342", pstrComponentDescription != __nullptr)
 
-		*pstrComponentDescription = _bstr_t("MICR finder").Detach();
+		*pstrComponentDescription = _bstr_t("Z_Legacy MICR finder").Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI24343")
 
@@ -1823,6 +1823,6 @@ EMicrReaderFlags CMicrFinder::getMicrReaderFlags()
 //-------------------------------------------------------------------------------------------------
 void CMicrFinder::validateLicense()
 {
-	VALIDATE_LICENSE( gnMICR_FINDING_ENGINE_FEATURE, "ELI24366", "MICR finder" );
+	VALIDATE_LICENSE( gnMICR_FINDING_ENGINE_FEATURE, "ELI24366", "Z_Legacy MICR finder" );
 }
 //-------------------------------------------------------------------------------------------------

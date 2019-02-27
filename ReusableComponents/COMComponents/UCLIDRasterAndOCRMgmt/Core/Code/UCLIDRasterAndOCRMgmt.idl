@@ -1343,6 +1343,10 @@ library UCLID_RASTERANDOCRMGMTLib
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: Loads the specified page into this instance
 		[id(110), helpstring("method LoadPageFromFile")] HRESULT LoadPageFromFile([in] BSTR bstrInputFile, long nPage);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Build a spatial string using the provided vector of ILetters.
+		[id(111), helpstring("method CreateFromILetters")] HRESULT CreateFromILetters(
+			[in] IIUnknownVector* pLetters, [in] BSTR bstrSourceDocName, [in] ILongToObjectMap* pPageInfoMap);
 	};
 
 	[

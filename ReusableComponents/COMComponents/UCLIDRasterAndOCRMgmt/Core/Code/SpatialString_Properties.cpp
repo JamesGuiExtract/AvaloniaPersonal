@@ -1956,7 +1956,7 @@ STDMETHODIMP CSpatialString::GetLastPageNumber(long* pRet)
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::GetCharConfidence(long* pnMinConfidence, long* pnMaxConfidence, 
-											long* pnAvgConfidence)
+											   long* pnAvgConfidence)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 

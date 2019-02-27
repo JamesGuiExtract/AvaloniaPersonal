@@ -3092,14 +3092,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                var sourceToOutputMap = _pendingDocuments.ToDictionary(
-                    pendingDocument => pendingDocument
-                        .PageControls
-                        .Select(pageControl => pageControl.Page.SourceDocument)
-                        .Distinct(),
-                    pendingDocument => pendingDocument);
+                var sourcesToOutputList = _pendingDocuments.Select(pendingDocument =>
+                    (sourceDocs:
+                        pendingDocument
+                            .PageControls
+                            .Select(pageControl => pageControl.Page.SourceDocument)
+                            .Distinct()
+                            .ToList(),
+                    pendingDocument: pendingDocument)
+                ).ToList();
 
-                if (sourceToOutputMap.Keys.Any(key => key.Count() > 1))
+                if (sourcesToOutputList.Any(x => x.sourceDocs.Count() > 1))
                 {
                     UtilityMethods.ShowMessageBox("It is not possible to save progress when multiple " +
                         "source documents have been combined into a single output document.",
@@ -3107,11 +3110,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return false;
                 }
 
+
                 var documentsToSave = new Dictionary<SourceDocument, List<OutputDocument>>();
-                foreach (var entry in sourceToOutputMap.Where(entry => entry.Key.Any()))
+                foreach (var (sourceDocs, pendingDocument) in sourcesToOutputList.Where(entry => entry.sourceDocs.Any()))
                 {
-                    var outputDocs = documentsToSave.GetOrAdd(entry.Key.Single(), _ => new List<OutputDocument>());
-                    outputDocs.Add(entry.Value);
+                    var outputDocs = documentsToSave.GetOrAdd(sourceDocs.Single(), _ => new List<OutputDocument>());
+                    outputDocs.Add(pendingDocument);
                 }
 
                 var orderedDocuments = _primaryPageLayoutControl.Documents.ToList();

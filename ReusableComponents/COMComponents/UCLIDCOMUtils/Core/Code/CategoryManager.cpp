@@ -435,13 +435,23 @@ bool CCategoryManager::componentImplementsRequiredInteraces(const string& strPro
 		return true;
 	}
 
-	// create the component
-	IUnknownPtr ipUnknown(strProgID.c_str());
-	if (ipUnknown == __nullptr)
+	IUnknownPtr ipUnknown;
+
+	try
 	{
-		UCLIDException ue("ELI04588", "Unable to create component!");
-		ue.addDebugInfo("ProgID", strProgID);
-		throw ue;
+		try
+		{
+			// create the component
+			ipUnknown = IUnknownPtr(strProgID.c_str());
+			ASSERT_RESOURCE_ALLOCATION("ELI46919", ipUnknown != __nullptr);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46918")
+	}
+	catch (UCLIDException &ue)
+	{
+		UCLIDException ueOuter("ELI04588", "Unable to create component!", ue);
+		ueOuter.addDebugInfo("ProgID", strProgID);
+		throw ueOuter;
 	}
 
 	// verify that the component implments each of the specified

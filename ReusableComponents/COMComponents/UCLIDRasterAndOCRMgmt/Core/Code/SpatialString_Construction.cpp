@@ -383,6 +383,56 @@ STDMETHODIMP CSpatialString::CreateFromLetterArray(long nNumLetters, void* pLett
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25667")
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::CreateFromILetters(IIUnknownVector* pLetters,
+											BSTR bstrSourceDocName, ILongToObjectMap* pPageInfoMap)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+		try
+	{
+		// Check arguments
+		IIUnknownVectorPtr ipLetters(pLetters);
+		ASSERT_ARGUMENT("ELI46903", ipLetters != __nullptr);
+		ASSERT_ARGUMENT("ELI46905", pPageInfoMap != __nullptr);
+		string strSourceDocName = asString(bstrSourceDocName);
+		ASSERT_ARGUMENT("ELI46906", !strSourceDocName.empty());
+
+		// Check license
+		validateLicense();
+
+		// Reset the spatial string
+		reset(true, true);
+
+		// Copy the source doc name
+		m_strSourceDocName = strSourceDocName;
+
+		// Copy the page info map
+		m_ipPageInfoMap = pPageInfoMap;
+
+		// After being assigned to a SpatialString, the page info map must not be modifed, otherwise
+		// it may affect other SpatialStrings that share these page infos.
+		m_ipPageInfoMap->SetReadonly();
+		
+		long nCount = ipLetters->Size();
+		vector<CPPLetter> vecLetters(nCount);
+		for (int i = 0; i < nCount; i++)
+		{
+			UCLID_RASTERANDOCRMGMTLib::ILetterPtr ipLetter(ipLetters->At(i));
+			ASSERT_RESOURCE_ALLOCATION("ELI46904", ipLetter != __nullptr);
+
+			ipLetter->GetCppLetter(&vecLetters[i]);
+		}
+
+		processLetters(&vecLetters[0], nCount);
+
+		// Update the dirty flag
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46902")
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::ReplaceAndDowngradeToHybrid(BSTR bstrReplacement)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
