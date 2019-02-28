@@ -9,7 +9,6 @@
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
 #include <CPPLetter.h>
-#include <LeadToolsLicenseRestrictor.h>
 
 // add license management function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
@@ -1008,7 +1007,6 @@ void CSplitRegionIntoContentAreas::PixelProcessor::process()
 		// Keep track of whether the PixelProcessor has requested that processing be aborted.
 		bool bAbort = false;
 
-		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 		// Cycle through each row of image data
 		for (int y = m_rect.top; y <= m_rect.bottom && !bAbort; y++)
 		{
@@ -1197,8 +1195,6 @@ int CSplitRegionIntoContentAreas::PixelEraser::processPixel(int x, int y)
 	{
 		try
 		{
-			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 			// "Erase" pixel by making it white.
 			L_PutPixelColor(&m_parent.m_apPageBitmap->m_hBitmap, y, x, gnCOLOR_WHITE);
 

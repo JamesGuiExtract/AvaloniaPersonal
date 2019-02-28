@@ -74,7 +74,7 @@ CopyFilesToInstallFolder:
 	@DeleteFiles  "$(DataEntryCoreInstallFilesDir)\DotNet\*.*" /S
 	@DeleteFiles "$(LabDEInstallBuildFiles)\Reports\*.*" /S
 	@DeleteFiles "$(LabDEInstallBuildFiles)\NonSelfRegFiles\*.*" /S
-	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\Leadtools_20\Dotnet\*.*" "$(DataEntryCoreInstallFilesDir)\DotNet" /v /s /e /y
+	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_17\Dotnet\leadtools*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet"
 	@COPY /v "$(BinariesFolder)\Obfuscated\*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(BinariesFolder)\DataEntryCC.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(BinariesFolder)\Obfuscated\DataEntryApplication.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 

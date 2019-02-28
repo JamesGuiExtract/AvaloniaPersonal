@@ -19,7 +19,6 @@
 
 #include <vector>
 #include <string>
-#include <LeadToolsLicenseRestrictor.h>
 
 using namespace std;
 
@@ -138,11 +137,8 @@ void setImageResolution(const string& strImageFileName, int nNewXResolution, int
 
 			// Get initialized SAVEFILEOPTION struct
 			SAVEFILEOPTION sfo = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
-			{
-				LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-				L_INT nRet = L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION));
-				throwExceptionIfNotSuccess(nRet, "ELI25294", "Failed getting default save options!");
-			}
+			L_INT nRet = L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION));
+			throwExceptionIfNotSuccess(nRet, "ELI25294", "Failed getting default save options!");
 
 			// Load, adjust, and save the file - one page at a time
 			for (int i = 1; i <= nPageCount; i++)
@@ -289,8 +285,6 @@ BOOL CAdjustImageResolutionApp::InitInstance()
 		// Load license files and validate the license
 		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 		validateLicense();
-
-		InitLeadToolsLicense();
 
 		// Set the image resolution
 		setImageResolution(strImageName, nXResolution, nYResolution, nMaxHeight, nMaxWidth);

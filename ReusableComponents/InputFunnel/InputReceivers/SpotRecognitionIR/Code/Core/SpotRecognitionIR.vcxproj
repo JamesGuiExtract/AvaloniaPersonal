@@ -71,7 +71,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code;..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\Include\ClassLib;..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\Include;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\..\..\ReusableComponents\MFCClasses\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code;..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include\ClassLib;..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\..\..\ReusableComponents\MFCClasses\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -94,7 +94,7 @@
       <AdditionalDependencies>ltwvc_a.lib;ltfil_u.lib;ltkrn_u.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\..\..\Binaries\$(Configuration)\$(ProjectName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\SpotRecognitionIR.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
@@ -124,7 +124,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code;..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\Include\ClassLib;..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\Include;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\..\..\ReusableComponents\MFCClasses\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code;..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include\ClassLib;..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Include;..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\..\..\ReusableComponents\MFCClasses\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -149,7 +149,7 @@
       <AdditionalDependencies>ltwvc_a.lib;ltfil_u.lib;ltkrn_u.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\..\..\Binaries\$(Configuration)\$(ProjectName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\SpotRecognitionIR.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\..\Debug/SpotRecognitionIR.pdb</ProgramDatabaseFile>

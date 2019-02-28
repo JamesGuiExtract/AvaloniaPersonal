@@ -1,4 +1,3 @@
-using Extract.Imaging.Utilities;
 using Extract.Licensing;
 using Leadtools;
 using Leadtools.Drawing;
@@ -22,14 +21,19 @@ namespace Extract.Imaging.Forms
         #region Constants
 
         /// <summary>
+        /// Licensing key to unlock document (anti-aliasing) support
+        /// </summary>
+        static readonly string _DOCUMENT_SUPPORT_KEY = "vhG42tyuh9";
+
+        /// <summary>
         /// The default image to use for an image that is not yet loaded.
         /// </summary>
-        internal static readonly RasterImage _LOADING_IMAGE = GetLoadingImage();
+        static internal readonly RasterImage _LOADING_IMAGE = GetLoadingImage();
 
         /// <summary>
         /// The image to use for an image that failed to load properly.
         /// </summary>
-        internal static readonly RasterImage _ERROR_IMAGE = GetErrorImage();
+        static internal readonly RasterImage _ERROR_IMAGE = GetErrorImage();
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
@@ -87,10 +91,7 @@ namespace Extract.Imaging.Forms
                 _OBJECT_NAME);
 
             // Turn on anti-aliasing
-
-            // Unlock the document support toolkit
-            UnlockLeadtools.UnlockDocumentSupport(false);
-
+            RasterSupport.Unlock(RasterSupportType.Document, _DOCUMENT_SUPPORT_KEY);
             RasterPaintProperties properties = _imageList.PaintProperties;
             properties.PaintDisplayMode |= RasterPaintDisplayModeFlags.ScaleToGray;
             _imageList.PaintProperties = properties;
@@ -317,7 +318,6 @@ namespace Extract.Imaging.Forms
         bool UpdateThumbnailsFromWorker(int startIndex, int endIndex)
         {
             bool success = true;
-            bool listUpdated = false;
             for (int i = startIndex; i <= endIndex; i++)
             {
                 RasterImageListItem item = _imageList.Items[i];
@@ -351,14 +351,10 @@ namespace Extract.Imaging.Forms
                                 item.Image.RotateViewPerspective(pageData.Orientation);
                             }
                         }
-                        listUpdated = true;
+
                         item.Invalidate();
                     }
                 }
-            }
-            if (listUpdated)
-            {
-                _imageList.Invalidate();
             }
 
             return success;
@@ -426,8 +422,7 @@ namespace Extract.Imaging.Forms
 
                     // Select this item
                     item.Selected = true;
-                    
-                    _imageList.Invalidate();
+                    item.Invalidate();
                 }
             }
         }
@@ -561,7 +556,6 @@ namespace Extract.Imaging.Forms
                             _imageViewer.PageNumber = page;
                         }
                     }
-                    _imageList.Invalidate();
                 }
             }
             catch (Exception ex)

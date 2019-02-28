@@ -9,10 +9,6 @@
 #include <cpputil.h>
 #include <io.h>
 #include <UCLIDException.h>
-#include <MiscLeadUtils.h>
-#include <LicenseMgmt.h>
-#include <ComponentLicenseIDs.h>
-#include <LeadToolsLicenseRestrictor.h>
 
 #include <vector>
 #include <string>
@@ -25,9 +21,6 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 using namespace std;
-
-// add license management password function
-DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
 //-------------------------------------------------------------------------------------------------
 void RemovePageFromImage ( string strFileName )
@@ -47,7 +40,6 @@ void RemovePageFromImage ( string strFileName )
 	fileInfo.Flags = 0;
 	int err;
 	
-	LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 	// Load image
 	err = L_LoadBitmapList( _bstr_t(strFileName.c_str()), &hFileBitmaps, 0, 0, NULL, &fileInfo );
 	if ( err != SUCCESS )
@@ -87,26 +79,15 @@ void RemovePageFromImage ( string strFileName )
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void validateLicense()
-{
-	VALIDATE_LICENSE(gnFLEXINDEX_IDSHIELD_SERVER_CORE, "ELI46651", "RemovePage");
-}
-//-------------------------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
 	try
 	{
-		// print ban
+		// print banner
 		cout << "Remove Image Page Utility" << endl;
 		cout << "Copyright 2004, UCLID Software, LLC." << endl;
 		cout << "All rights reserved." << endl;
 		cout << endl;
-
-		// Load license files ( this is need for IVariantVector )
-		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
-		validateLicense();
-
-		InitLeadToolsLicense();
 
 		// check for correct # of arguments
 		if (argc != 2 )

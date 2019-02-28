@@ -8,10 +8,6 @@
 #include <cpputil.h>
 #include <io.h>
 #include <UCLIDException.h>
-#include <LicenseMgmt.h>
-#include <ComponentLicenseIDs.h>
-#include <MiscLeadUtils.h>
-#include <LeadToolsLicenseRestrictor.h>
 
 #include <vector>
 #include <string>
@@ -23,9 +19,6 @@ using namespace std;
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
-
-// add license management password function
-DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
 unsigned long gulNumDocs = 0;
 unsigned long gulNumPages = 0;
@@ -62,16 +55,13 @@ void process(const string& strRootDir, bool bRecursive)
 		memset(&fileInfo, 0, sizeof(FILEINFO));
 
 		// get the page count
+		int iReturnCode = L_FileInfo((char *) strFile.c_str(), &fileInfo, sizeof(FILEINFO), 
+			FILEINFO_TOTALPAGES, NULL);
+		if (iReturnCode != SUCCESS)
 		{
-			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-			int iReturnCode = L_FileInfo((char *)strFile.c_str(), &fileInfo, sizeof(FILEINFO),
-				FILEINFO_TOTALPAGES, NULL);
-			if (iReturnCode != SUCCESS)
-			{
-				cout << strFileNameWithoutPath << " - ERROR! Unable to determine page count! (ErrorCode = " << iReturnCode << ")" << endl;
-				gulNumErrors++;
-				continue;
-			}
+			cout << strFileNameWithoutPath << " - ERROR! Unable to determine page count! (ErrorCode = " << iReturnCode << ")" << endl;
+			gulNumErrors++;
+			continue;
 		}
 
 		// increment the counters
@@ -103,15 +93,6 @@ void process(const string& strRootDir, bool bRecursive)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void validateLicense()
-{
-	// Requires Flex Index/ID Shield core license
-	static const unsigned long THIS_APP_ID = gnFLEXINDEX_IDSHIELD_CORE_OBJECTS;
-
-	VALIDATE_LICENSE(THIS_APP_ID, "ELI46650", "CountImagePages");
-}
-
-//-------------------------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
 	try
@@ -121,12 +102,6 @@ int main(int argc, char *argv[])
 		cout << "Copyright 2004, UCLID Software, LLC." << endl;
 		cout << "All rights reserved." << endl;
 		cout << endl;
-
-		// Load license files ( this is need for IVariantVector )
-		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
-		validateLicense();
-
-		InitLeadToolsLicense();
 
 		// check for correct # of arguments
 		if (argc < 2 || argc > 3)

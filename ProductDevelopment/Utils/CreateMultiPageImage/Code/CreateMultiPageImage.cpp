@@ -188,7 +188,7 @@ string getMultiPageImageName(const string& strPage1, const EFileNameType eFileTy
 				throw ue;
 			}
 
-			// get the location of the hyphen before the last period
+			// get the location of the hypen before the last period
 			size_t lastHypenFromLastDot = strPage1.find_last_of('-', lastDot - 1);
 			if (lastHypenFromLastDot == string::npos)
 			{
@@ -590,8 +590,6 @@ int main(int argc, char *argv[])
 		// Load license files ( this is need for IVariantVector )
 		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 		validateLicense();
-
-		InitLeadToolsLicense();
 
 		// check for correct # of arguments
 		if (argc != 2 && argc != 3 && argc != 6 && argc != 7)

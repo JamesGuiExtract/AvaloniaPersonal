@@ -23,15 +23,11 @@ public:
 	// Defaults to the currently used FILEPDFOPTIONS
 	FILEPDFOPTIONS m_pdfOptions;
 
-	// Defaults to the currently used RASTERIZEDOCOPTIONS
-	RASTERIZEDOCOPTIONS m_pdfRasterizeDocOptions;
-
 	// Applies the current m_pdfOptions.
 	void ApplyPDFOptions(const string &strELICode, const string &strErrorDescription);
 
 private:
 	FILEPDFOPTIONS m_pdfOptionsOriginal;
-	RASTERIZEDOCOPTIONS m_pdfRasterizeDocOptionsOriginal;
 	bool m_bInitialized;
 };
 

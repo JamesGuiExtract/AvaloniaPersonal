@@ -266,16 +266,21 @@ namespace Extract.FileActionManager.Utilities
                                 {
                                     if (_fileProcessingDb.ActiveFAMID == 0)
                                     {
-                                        _fileProcessingDb.RegisterActiveFAM();
-                                    }
-                                    dbService.StartActiveSchedule(_fileProcessingDb.ActiveFAMID);
-                                    dbService.RecordProcessStart();
 
-                                    ExtractException newActiveSessionException = new ExtractException("ELI46567",
-                                        "Application trace: ETL ActiveFAM registration has been restored.", startException);
-                                    newActiveSessionException.AddDebugData("Active FAM ID", _fileProcessingDb.ActiveFAMID);
-                                    newActiveSessionException.AddDebugData("ETL process", dbService.Description);
-                                    newActiveSessionException.Log();
+                                        _fileProcessingDb.RegisterActiveFAM();
+                                        dbService.StartActiveSchedule(_fileProcessingDb.ActiveFAMID);
+                                        dbService.RecordProcessStart();
+
+                                        ExtractException newActiveSessionException = new ExtractException("ELI46567", 
+                                            "Application trace: ETL ActiveFAM registration has been restored.");
+                                        newActiveSessionException.AddDebugData("Active FAM ID", _fileProcessingDb.ActiveFAMID);
+                                        newActiveSessionException.AddDebugData("ETL process", dbService.Description);
+                                        newActiveSessionException.Log();
+                                    }
+                                    else
+                                    {
+                                        throw startException.AsExtract("ELI46566");
+                                    }
                                 }
                                 
 

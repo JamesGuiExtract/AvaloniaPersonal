@@ -1,7 +1,7 @@
 ﻿using Extract.Drawing;
 using Extract.Imaging.Forms;
-using Extract.Imaging.Utilities;
 using Extract.Utilities.Forms;
+using Leadtools;
 using Leadtools.Drawing;
 using System;
 using System.Drawing;
@@ -16,8 +16,17 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// The contents of a <see cref="PageThumbnailControl"/>. Created and disposed of dynamically as
     /// the owning <see cref="PageThumbnailControl"/> needs to be displayed or is scrolled out-of-view.
     /// </summary>
-    partial class PageThumbnailControlContents : UserControl
+    internal partial class PageThumbnailControlContents : UserControl
     {
+        #region Constants
+
+        /// <summary>
+        /// Licensing key to unlock document (anti-aliasing) support
+        /// </summary>
+        static readonly string _DOCUMENT_SUPPORT_KEY = "vhG42tyuh9";
+
+        #endregion Constants
+
         #region Fields
 
         /// <summary>
@@ -56,8 +65,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 InitializeComponent();
 
                 // Turn on anti-aliasing
-                UnlockLeadtools.UnlockDocumentSupport(false);
-
+                RasterSupport.Unlock(RasterSupportType.Document, _DOCUMENT_SUPPORT_KEY);
                 RasterPaintProperties properties = _rasterPictureBox.PaintProperties;
                 properties.PaintDisplayMode |= RasterPaintDisplayModeFlags.ScaleToGray;
                 _rasterPictureBox.PaintProperties = properties;
@@ -395,7 +403,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         components.Dispose();
                     }
                 }
-                catch (Exception ex)
+                catch (System.Exception ex)
                 {
                     ex.ExtractLog("ELI43380");
                 }

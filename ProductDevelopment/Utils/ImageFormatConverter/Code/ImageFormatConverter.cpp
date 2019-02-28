@@ -31,8 +31,6 @@
 #include <string>
 #include <set>
 #include <unordered_map>
-#include <LeadToolsLicenseRestrictor.h>
-
 using namespace std;
 
 #ifdef _DEBUG
@@ -599,10 +597,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 
 			// Get initialized SAVEFILEOPTION struct
 			SAVEFILEOPTION sfOptions = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
-			{
-				LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-				L_GetDefaultSaveFileOption(&sfOptions, sizeof(sfOptions));
-			};
+			L_GetDefaultSaveFileOption( &sfOptions, sizeof ( sfOptions ));
 
 			// Set type-specific output options
 			L_INT	nType;
@@ -729,8 +724,6 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 				// Convert view perspective is specified.
 				if (nViewPerspective > 0)
 				{
-					LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 					nRet = L_ChangeBitmapViewPerspective(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE), nViewPerspective);
 					throwExceptionIfNotSuccess(nRet, "ELI34136", 
 						"ChangeBitmapViewPerspective operation failed.", strInputFileName); 
@@ -739,8 +732,6 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 				// Load the existing annotations if bRetainAnnotations and they exist.
 				if(bRetainAnnotations && hasAnnotations(strInputFileName, lfo, iFormat))
 				{
-					LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 					nRet = L_AnnLoad(pszInputFile, &hFileContainer, &lfo);
 					throwExceptionIfNotSuccess(nRet, "ELI23584", "Could not load annotations.",
 						strInputFileName);
@@ -750,8 +741,6 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 				bool bSavedTag = false;
 				if (hFileContainer != __nullptr)
 				{
-					LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 					// Retrieve the first annotation item
 					HANNOBJECT	hFirst = NULL;
 					nRet = L_AnnGetItem( hFileContainer, &hFirst );
@@ -815,9 +804,6 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 						// Create a new bitmap handle
 						BITMAPHANDLE tmpBmp = {0};
 						LeadToolsBitmapFreeer tmpFree(tmpBmp);
-
-						LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 						nRet = L_CreateBitmap(&tmpBmp, sizeof(BITMAPHANDLE), TYPE_CONV,
 							fileInfo.Width + iPadWidth, fileInfo.Height + iPadHeight,
 							fileInfo.BitsPerPixel, fileInfo.Order, hBitmap.pPalette, TOP_LEFT, NULL, 0);
@@ -854,8 +840,6 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 
 				if (bSavedTag)
 				{
-					LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 					// Clear any previously defined annotations
 					// If not done, any annotations applied to this page may be applied to 
 					// successive pages (P16 #2216)
@@ -890,7 +874,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 				throw uex;
 			}
 
-			// Ensure the output directory exists
+			// Ensure the outut directory exists
 			string strOutDir = getDirectoryFromFullPath(strOutputFileName);
 			if (!isValidFolder(strOutDir))
 			{
@@ -915,8 +899,6 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 		{
 			try
 			{
-				LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 				// Destroy the annotation container
 				throwExceptionIfNotSuccess(L_AnnDestroy(hFileContainer, 0), "ELI23593",
 					"Unable to destroy annotation container.");
@@ -929,8 +911,6 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 		}
 		if (bRetainAnnotations)
 		{
-			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 			// Clear any previously defined annotations
 			// If not done, any annotations applied to this page may be applied to 
 			// successive pages (P16 #2216)
@@ -1311,8 +1291,6 @@ BOOL CImageFormatConverterApp::InitInstance()
 				// Load license files and validate the license
 				LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 				validateLicense();
-
-				InitLeadToolsLicense();
 
 				// [LegacyRCAndUtils:6471]
 				if (!strPagesToRemove.empty())

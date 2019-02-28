@@ -361,9 +361,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Testing.Utilities", "..\..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj", "{F3314BBE-B008-488D-A2E0-351C49D914D7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Imaging.Utilities", "..\..\..\..\..\RC.Net\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj", "{E610E652-0891-40D4-B5CA-A622B87C7979}"
-	ProjectSection(ProjectDependencies) = postProject
-		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FAMProcess", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\FAMProcess\Code\FAMProcess.vcxproj", "{E07E00CC-656A-424A-977E-27B8B8D2C286}"
 	ProjectSection(ProjectDependencies) = postProject

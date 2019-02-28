@@ -1,5 +1,4 @@
 ﻿using Extract;
-using Extract.Imaging.Utilities;
 using Extract.Licensing;
 using Leadtools;
 using Leadtools.Codecs;
@@ -103,8 +102,6 @@ namespace ResolutionNormalizer
 
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
                     "ELI38890", "Resolution Normalizer");
-
-                UnlockLeadtools.UnlockLeadToolsSupport();
 
                 Arguments? arguments = ParseArguments(args);
                 if (!arguments.HasValue)
@@ -311,7 +308,7 @@ namespace ResolutionNormalizer
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(errorInfo.Length > 0
-                ? string.Format(CultureInfo.CurrentCulture, errorInfo.First(),
+                ? string.Format(CultureInfo.CurrentCulture, errorInfo.First(), 
                     errorInfo.Skip(1).ToArray())
                 : "Usage:");
             sb.AppendLine("------------");
@@ -338,15 +335,15 @@ namespace ResolutionNormalizer
         /// </summary>
         /// <returns>A properly initialized <see cref="RasterCodecs"/> instance.</returns>
         static RasterCodecs GetCodecs()
-        {
+        {            
             RasterCodecs codecs = new RasterCodecs();
 
             // The same options used by our other applications.
             codecs.Options.Pdf.Save.UseImageResolution = true;
             codecs.Options.Tiff.Load.IgnoreViewPerspective = true;
             codecs.Options.Pdf.Load.DisplayDepth = _DEFAULT_PDF_DISPLAY_DEPTH;
-            codecs.Options.RasterizeDocument.Load.XResolution = _DEFAULT_PDF_RESOLUTION;
-            codecs.Options.RasterizeDocument.Load.YResolution = _DEFAULT_PDF_RESOLUTION;
+            codecs.Options.Pdf.Load.XResolution = _DEFAULT_PDF_RESOLUTION;
+            codecs.Options.Pdf.Load.YResolution = _DEFAULT_PDF_RESOLUTION;
 
             return codecs;
         }

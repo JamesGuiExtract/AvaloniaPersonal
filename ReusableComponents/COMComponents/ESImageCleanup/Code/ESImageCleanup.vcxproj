@@ -76,7 +76,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\APIs\ClearImage_7_0\include;..\..\..\APIs\Leadtools_20\Include;..\..\UCLIDCOMUtils\Core\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\BaseUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\APIs\ClearImage_7_0\include;..\..\..\APIs\LeadTools_17\Include;..\..\UCLIDCOMUtils\Core\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\BaseUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -96,7 +96,7 @@
       <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;ltwvc_a.lib;ltfil_u.lib;ltkrn_u.lib;ltdis_u.lib;ltann_u.lib;ltimgefx_u.lib;Ltimgclr_u.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\APIs\Leadtools_20\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\APIs\LeadTools_17\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\ESImageCleanup.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -122,7 +122,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\APIs\Inlite_5_7\include;..\..\..\APIs\Leadtools_20\Include;..\..\UCLIDCOMUtils\Core\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\BaseUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\APIs\Inlite_5_7\include;..\..\..\APIs\LeadTools_17\Include;..\..\UCLIDCOMUtils\Core\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\BaseUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -140,7 +140,7 @@
       <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;ltwvc_a.lib;ltfil_u.lib;ltkrn_u.lib;ltdis_u.lib;ltann_u.lib;ltimgefx_u.lib;Ltimgclr_u.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\APIs\Leadtools_20\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\APIs\LeadTools_17\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\ESImageCleanup.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>

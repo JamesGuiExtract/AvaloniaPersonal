@@ -182,10 +182,6 @@ private:
 };
 
 //------------------------------------------------------------------------------------------------
-// PURPOSE: Load the LeadTools license file
-LEADUTILS_API void InitLeadToolsLicense();
-
-//------------------------------------------------------------------------------------------------
 // PURPOSE: Retrieves a user friendly description of the specified Leadtools error code.
 LEADUTILS_API string getErrorCodeDescription(int iErrorCode);
 //------------------------------------------------------------------------------------------------

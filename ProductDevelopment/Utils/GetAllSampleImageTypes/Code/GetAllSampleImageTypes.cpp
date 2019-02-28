@@ -195,6 +195,14 @@ string getFormatAsString(L_INT liFormatEnum)
 		strFormatString = "DXF";
 		break;
 
+	case FILE_AVI:
+		strFormatString = "AVI";
+		break;
+
+	case FILE_WAV:
+		strFormatString = "WAV";
+		break;
+
 	case FILE_FLI:
 		strFormatString = "FLI";
 		break;
@@ -871,6 +879,30 @@ string getFormatAsString(L_INT liFormatEnum)
 		strFormatString = "XDOC";
 		break;
 
+	case FILE_MOV:
+		strFormatString = "MOV";
+		break;
+
+	case FILE_MIDI:
+		strFormatString = "MIDI";
+		break;
+
+	case FILE_MPEG1:
+		strFormatString = "MPEG1";
+		break;
+
+	case FILE_AU:
+		strFormatString = "AU";
+		break;
+
+	case FILE_AIFF:
+		strFormatString = "AIFF";
+		break;
+
+	case FILE_MPEG2:
+		strFormatString = "MPEG2";
+		break;
+
 	case FILE_SVG:
 		strFormatString = "SVG";
 		break;
@@ -1071,8 +1103,16 @@ string getFormatAsString(L_INT liFormatEnum)
 		strFormatString = "RTF_RASTER";
 		break;
 
+	case FILE_SID:
+		strFormatString = "SID";
+		break;
+
 	case FILE_WMZ:
 		strFormatString = "WMZ";
+		break;
+
+	case FILE_DJVU:
+		strFormatString = "DJVU";
 		break;
 
 	case FILE_AFPICA_G3_1D:
@@ -1458,8 +1498,6 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 
 					// check license
 					validateLicense();
-
-					InitLeadToolsLicense();
 
 					// if the output directory doesn't exist, create it
 					if (!isValidFolder(strOutputDirectory))

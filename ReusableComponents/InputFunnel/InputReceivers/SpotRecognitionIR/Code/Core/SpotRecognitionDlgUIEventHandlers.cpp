@@ -16,7 +16,6 @@
 #include <Win32Util.h>
 #include <MiscLeadUtils.h>
 #include <COMUtils.h>
-#include <LeadToolsLicenseRestrictor.h>
 
 #include <l_bitmap.h>
 #include <ltwrappr.h>
@@ -1333,14 +1332,11 @@ string SpotRecognitionDlg::getZoneText(IRasterZonePtr& ripZone, IProgressStatus*
 
 	// Create temporary file for bitmap output
 	TemporaryFileName tempOutFile( true, NULL, ".bmp", true );
-	{
-		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 
-		L_INT nRet = L_FileConvert((char*)tempImgFile.getName().c_str(),
-			(char*)tempOutFile.getName().c_str(), FILE_BMP, 0, 0, 8, 0, NULL, NULL, NULL);
-		throwExceptionIfNotSuccess(nRet, "ELI03419", "Unable to convert image.",
-			(LPCTSTR)m_UCLIDGenericDisplayCtrl.getImageName());
-	}
+	L_INT nRet = L_FileConvert( (char *)tempImgFile.getName().c_str(),
+		(char *)tempOutFile.getName().c_str(), FILE_BMP, 0, 0, 8, 0, NULL, NULL, NULL);
+	throwExceptionIfNotSuccess(nRet, "ELI03419", "Unable to convert image.",
+		(LPCTSTR) m_UCLIDGenericDisplayCtrl.getImageName());
 
 	// specify the use of a training file associated with the current input type
 	// if any errors are encountered, ignore them

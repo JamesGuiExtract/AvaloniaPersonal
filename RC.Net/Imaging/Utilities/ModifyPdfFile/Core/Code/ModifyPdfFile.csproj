@@ -87,11 +87,11 @@
     <Reference Include="Aspose.Pdf, Version=9.8.0.0, Culture=neutral, PublicKeyToken=6947866647e416ec, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\APIs\Aspose\Aspose.Pdf for .Net 9.8\Bin\net4.0\Aspose.Pdf.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
-      <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\DotNet\Leadtools.dll</HintPath>
+    <Reference Include="Leadtools, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
-      <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\DotNet\Leadtools.Codecs.dll</HintPath>
+    <Reference Include="Leadtools.Codecs, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.Codecs.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

@@ -159,7 +159,6 @@ private:
 	// Returns true for black, false for white.  If the image is grayscale, true will
 	// be returned for < 50% color saturation.  If an error was encountered reading the
 	// pixel (ie, the pixel is off-page), rbErrorReadingPixel will be set to true
-	// NOTE: The caller of this function should protect with LeadToolsLicenseRestrictor
 	bool checkPixel(int nX, int nY, bool &rbErrorReadingPixel);
 
 	// Declare the callback function used for L_LineRemoveBitmap a friend so that it can access addLine

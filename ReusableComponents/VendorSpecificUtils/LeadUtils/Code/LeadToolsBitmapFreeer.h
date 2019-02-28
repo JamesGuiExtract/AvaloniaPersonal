@@ -3,7 +3,6 @@
 
 #include "LeadUtils.h"
 #include "MiscLeadUtils.h"
-#include "LeadToolsLicenseRestrictor.h"
 
 #include <l_bitmap.h>		// LeadTools Imaging library
 
@@ -17,7 +16,6 @@ public:
 		// Initialize the BITMAPHANDLE if desired
 		if (bInitializeBMH)
 		{
-			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 			L_InitBitmap( &m_bitmapHandle, sizeof( BITMAPHANDLE ), 0, 0, 0 );
 		}
 	}
@@ -27,7 +25,6 @@ public:
 		// Free the BITMAPHANDLE only if it has been allocated
 		if (m_bitmapHandle.Flags.Allocated)
 		{
-			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 			L_FreeBitmap(&m_bitmapHandle);
 		}
 	}

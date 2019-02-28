@@ -122,9 +122,7 @@ m_bCurrentSessionIsWebSession(false)
 
 		// If PDF support is licensed initialize support
 		// NOTE: no exception is thrown or logged if PDF support is not licensed.
-		//initPDFSupport();
-		// This initializes all licensed leadtool items
-		InitLeadToolsLicense();
+		initPDFSupport();
 
 		// Post message indicating that the database's connection is not yet established
 		postStatusUpdateNotification(kConnectionNotEstablished);

@@ -6,7 +6,6 @@
 #include "LeadToolsFormatHelpers.h"
 #include "ExtractZoneAsImage.h"
 #include "LocalPDFOptions.h"
-#include "LeadToolsLicensing.h"
 
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -22,7 +21,6 @@
 #include <ByteStreamManipulator.h>
 #include <EncryptionEngine.h>
 #include <ValueRestorer.h>
-#include <ComponentLicenseIDs.h>
 
 #include <cmath>
 #include <cstdio>
@@ -133,7 +131,6 @@ PDFSecuritySettings::~PDFSecuritySettings()
 {
 	try
 	{
-		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 		if (m_pOriginalOptions.get() != __nullptr)
 		{
 			try
@@ -180,9 +177,6 @@ void PDFSecuritySettings::setPDFSaveOptions(const string& strUserPassword,
 	if (nUserLength > 0 || nOwnerLength > 0)
 	{
 		FILEPDFSAVEOPTIONS pdfsfo = GetLeadToolsSizedStruct<FILEPDFSAVEOPTIONS>(0);
-		
-		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 		throwExceptionIfNotSuccess(
 			L_GetPDFSaveOptions(&pdfsfo, sizeof(FILEPDFSAVEOPTIONS)), "ELI32201",
 			"Failed to get PDF save options.");
@@ -293,35 +287,6 @@ unsigned int PDFSecuritySettings::getLeadtoolsPermissions(long nPermissions)
 
 //-------------------------------------------------------------------------------------------------
 // Exported DLL Functions
-//-------------------------------------------------------------------------------------------------
-void InitLeadToolsLicense()
-{
-	try
-	{
-		string leadtoolsLicensePath = getModuleDirectory("BaseUtils.dll");
-		if (LicenseManagement::isPDFLicensed())
-		{
-			leadtoolsLicensePath += "\\LEADTOOLS_PDF.OCL";
-			throwExceptionIfNotSuccess(
-				L_SetLicenseFile((L_CHAR*)leadtoolsLicensePath.c_str(), (L_CHAR*)gstrLEADTOOLS_DEVELOPER_PDF_KEY.c_str()),
-				"ELI41718", "Unable to load LeadTools PDF license file",
-				leadtoolsLicensePath
-			);
-		}
-		else
-		{
-			leadtoolsLicensePath += "\\LEADTOOLS.OCL";
-			throwExceptionIfNotSuccess(
-				L_SetLicenseFile((L_CHAR*)leadtoolsLicensePath.c_str(), (L_CHAR*)gstrLEADTOOLS_DEVELOPER_KEY.c_str()),
-				"ELI46680", "Unable to load LeadTools license file",
-				leadtoolsLicensePath
-			);
-		}
-
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41717")
-
-}
 //-------------------------------------------------------------------------------------------------
 string getErrorCodeDescription(int iErrorCode)
 {
@@ -474,7 +439,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		// If skipImageAreaConfirmation registry value is set, don't honor bConfirmApplication.
 		bConfirmApplication &= !skipImageAreaConfirmation();
 
-		// Indicates whether the application of text has been skipped for any redaction in order to
+		// Indicates whether the appication of text has been skipped for any redaction in order to
 		// validate applied image areas per bConfirmApplication.
 		bool bSkippedApplicationOfText = false;
 
@@ -502,12 +467,8 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 
 					// Get initialized SAVEFILEOPTION struct
 					SAVEFILEOPTION sfOptions = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
-					{
-						LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
-						nRet = L_GetDefaultSaveFileOption(&sfOptions, sizeof(sfOptions));
-						throwExceptionIfNotSuccess(nRet, "ELI27299", "Unable to get default save options.");
-					}
+					nRet = L_GetDefaultSaveFileOption(&sfOptions, sizeof(sfOptions));
+					throwExceptionIfNotSuccess(nRet, "ELI27299", "Unable to get default save options.");
 					_lastCodePos = "60";
 
 					// Get the pointer to the first raster zone (we will remember the
@@ -539,7 +500,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						mapPageResolutions[i] = pair<int, int>(fileInfo.XResolution, fileInfo.YResolution);
 						
 						// https://extract.atlassian.net/browse/ISSUE-12096
-						// We are no longer outputting PDFs as bitonal by having first converted them
+						// We are no longer outputing PDFs as bitonal by having first converted them
 						// to tiff images. But ensure we don't save PDFs in an uncompressed format
 						// (FILE_RAS_PDF) because the resulting files are enormous. Change
 						// FILE_RAS_PDF to FILE_RAS_PDF_G4 or FILE_RAS_PDF_JPEG depending on whether
@@ -572,8 +533,6 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						// or retaining existing annotations
 						if (bApplyAsAnnotations || bLoadExistingAnnotations)
 						{
-							LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 							ANNRECT rect = {0, 0, fileInfo.Width, fileInfo.Height};
 							nRet = L_AnnCreateContainer(NULL, &rect, FALSE, &hContainer );
 							throwExceptionIfNotSuccess(nRet, "ELI14581",
@@ -590,8 +549,6 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						if (bLoadExistingAnnotations)
 						{
 							HANNOBJECT hFileContainer = NULL; // Annotation container to hold existing annotations
-
-							LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 							try
 							{
 								// Load any existing annotations on this page
@@ -625,7 +582,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 											throwExceptionIfNotSuccess(nRet, "ELI36838",
 												"Could not burn annotations into the image.");
 
-											// Free the callback procedure instance
+											// Free the callback proc instance
 											FreeProcInstance((FARPROC) burnRedactions);
 											pfnBurnAnnotationsCallBack = __nullptr;
 
@@ -716,8 +673,6 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 								_lastCodePos = "70_D_Page#" + strPageNumber;
 								if (bApplyAsAnnotations)
 								{
-									LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 									// Create a redaction annotation object
 									HANNOBJECT hRedaction;
 									nRet = L_AnnCreate(ANNOBJECT_REDACT, &hRedaction);
@@ -809,12 +764,9 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 							// Save the collected redaction annotations
 							//   Save in WANG-mode for greatest compatibility
 							//   The next call to SaveBitmap will include these annotations
-							{
-								LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-								nRet = L_AnnSaveTag(hContainer, ANNFMT_WANGTAG, FALSE);
-								throwExceptionIfNotSuccess(nRet, "ELI14611",
-									"Could not save redaction annotation objects.");
-							}
+							nRet = L_AnnSaveTag(hContainer, ANNFMT_WANGTAG, FALSE );
+							throwExceptionIfNotSuccess(nRet, "ELI14611", 
+								"Could not save redaction annotation objects.");
 
 							{
 								ValueRestorer<bool>(bSavingImagePage, false);
@@ -827,11 +779,7 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 							// Clear any previously defined annotations
 							// If not done, any annotations applied to this page may be applied to 
 							// successive pages [FlexIDSCore #2216]
-							{
-								LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
-								nRet = L_SetTag(ANNTAG_TIFF, 0, 0, NULL);
-							}
+							nRet = L_SetTag(ANNTAG_TIFF, 0, 0, NULL);
 
 							// Reset annotations applied to page flag
 							bAnnotationsAppliedToPage = false;
@@ -841,7 +789,6 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 						// Destroy the annotation container
 						if (hContainer != __nullptr)
 						{
-							LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 							nRet = L_AnnDestroy(hContainer, ANNFLAG_RECURSE);
 							throwExceptionIfNotSuccess(nRet, "ELI15361",
 								"Could not destroy annotation container.");
@@ -860,7 +807,6 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 					// Clear any previously defined annotations
 					// If not done, any annotations applied to this page may be applied to 
 					// successive pages [FlexIDSCore #2216]
-					LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 					L_SetTag(ANNTAG_TIFF, 0, 0, NULL);
 					bAnnotationsAppliedToPage = false;
 				}
@@ -871,7 +817,6 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 					try
 					{
 						// Destroy the annotation container
-						LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 						throwExceptionIfNotSuccess(L_AnnDestroy(hContainer, ANNFLAG_RECURSE), 
 							"ELI27297",	"Application trace: Unable to destroy annotation container.");
 					}
@@ -1048,8 +993,8 @@ void confirmImageAreas(const string& strImageFileName,
 			// Ensure the page is loaded in the same DPI as was used when drawing the image areas.
 			// NOTE: This applies only for PDF documents.
 			CLocalPDFOptions localPDFOptions;
-			localPDFOptions.m_pdfRasterizeDocOptions.uXResolution = mapPageResolutions.at(i).first;
-			localPDFOptions.m_pdfRasterizeDocOptions.uYResolution = mapPageResolutions.at(i).second;
+			localPDFOptions.m_pdfOptions.nXResolution = mapPageResolutions.at(i).first;
+			localPDFOptions.m_pdfOptions.nYResolution = mapPageResolutions.at(i).second;
 			localPDFOptions.ApplyPDFOptions("ELI37113", "Failed to apply PDF options.");
 
 			// Set FILEINFO_FORMATVALID (this will speed up the L_LoadBitmap calls)
@@ -1069,13 +1014,10 @@ void confirmImageAreas(const string& strImageFileName,
 			// why).
 			const long nDEFAULT_NUMBER_OF_COLORS = 0;
 			L_UINT flags = CRF_FIXEDPALETTE | CRF_NODITHERING;
-			{
-				LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-				nRet = L_ColorResBitmap(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE), 1, flags,
-					NULL, NULL, nDEFAULT_NUMBER_OF_COLORS, NULL, NULL);
-				throwExceptionIfNotSuccess(nRet, "ELI35342", "Could not load image page.",
-					strImageFileName);
-			}
+			L_INT nRet = L_ColorResBitmap(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE), 1, flags,
+				 NULL, NULL, nDEFAULT_NUMBER_OF_COLORS, NULL, NULL);
+			throwExceptionIfNotSuccess(nRet, "ELI35342", "Could not load image page.",
+				strImageFileName);
 
 			// If checking redactions that have been applied as annotations, check them by burning
 			// them into hBitmap, then checking the pixels in hBitmap.
@@ -1083,7 +1025,6 @@ void confirmImageAreas(const string& strImageFileName,
 			{
 				// Annotation container to hold existing annotations
 				HANNOBJECT hFileContainer = __nullptr; 
-				LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 				try
 				{
 					// Load any existing annotations on this page
@@ -1161,9 +1102,9 @@ void confirmImageAreas(const string& strImageFileName,
 					// around the outside of the zone. I was unable to directly solve the issue in
 					// time for the 9.1 release. However, in almost all cases extractZoneAsBitmap
 					// does have the redaction oriented correctly and centered in the image area;
-					// therefore, if when checking the pixels of this zone, we exclude the extra area
+					// threfore, if when checking the pixels of this zone, we exclude the extra area
 					// around the edge that wasn't present in the original zone, we should avoid
-					// testing any area that is not actually part of the redaction.
+					// testing any area that is not actually part of the redation.
 					int nExcessWidth = hBitmapImageZone.Width - 
 									   (int)sqrt(pow((double)(it->m_nEndX - it->m_nStartX), 2) +
 												 pow((double)(it->m_nEndY - it->m_nStartY), 2));
@@ -1189,7 +1130,6 @@ void confirmImageAreas(const string& strImageFileName,
 
 					// Loop though each row of the extracted zone to confirm the image area has been
 					// applied.
-					LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 					for (int nRow = nYPadding; nRow < hBitmapImageZone.Height - nYPadding; nRow++)
 					{
 						// Loop through each pixel in the row.
@@ -1238,8 +1178,8 @@ void confirmImageAreas(const string& strImageFileName,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35337");
 }
 //-------------------------------------------------------------------------------------------------
-void createMultiPageImage(vector<string> vecImageFiles, string strOutputFileName,
-	bool bOverwriteExistingFile)
+void createMultiPageImage(vector<string> vecImageFiles, string strOutputFileName, 
+						  bool bOverwriteExistingFile)
 {
 	// Check for file existence if overwrite is false
 	if (!bOverwriteExistingFile)
@@ -1278,10 +1218,7 @@ void createMultiPageImage(vector<string> vecImageFiles, string strOutputFileName
 
 	// Get initialized SAVEFILEOPTION struct
 	SAVEFILEOPTION sfOptions = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
-	{
-		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-		L_GetDefaultSaveFileOption(&sfOptions, sizeof(sfOptions));
-	}
+	L_GetDefaultSaveFileOption( &sfOptions, sizeof ( sfOptions ));
 
 	// for each page that exists for this image, if an image file
 	// exists with the corresponding name, then load it and add it
@@ -1304,10 +1241,8 @@ void createMultiPageImage(vector<string> vecImageFiles, string strOutputFileName
 			// Set flags to get file information when loading bitmap
 			loadImagePage(strPage, 1, hTmpBmp, false);
 
-			// Save the page to the multi-page image using the format of the first page of the image
+			// Save the page to the multipage image using the format of the first page of the image
 			sfOptions.PageNumber = i + 1;
-
-			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 			L_INT nRet = L_SaveBitmap(pszOutput, &hTmpBmp, fileInfo.Format, 
 				fileInfo.BitsPerPixel, nCompression, &sfOptions);
 			throwExceptionIfNotSuccess(nRet, "ELI09045",
@@ -1361,7 +1296,6 @@ void getFileInformation(const string& strImageFileName, bool bIncludePageCount, 
 
 			if (dwStartIndex == 0)
 			{
-				LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 				nRet = L_FileInfo(pszFileName, &rFileInfo, sizeof(FILEINFO), flags, pLFO);
 			}
 			else
@@ -1373,8 +1307,6 @@ void getFileInformation(const string& strImageFileName, bool bIncludePageCount, 
 
 				CHandle hFile(CreateFile(pszFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL));
 				SetFilePointer(hFile, dwStartIndex, __nullptr, FILE_BEGIN);
-
-				LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 				nRet = L_StartFeedInfo(&hInfo, &rFileInfo, sizeof(FILEINFO), flags, pLFO);
 				if (nRet == SUCCESS)
 				{
@@ -1502,12 +1434,13 @@ void initPDFSupport()
 		bool bCouldNotUnlock = false;
 
 		// Only unlock read support if not already unlocked
-		if ( L_IsSupportLocked(L_SUPPORT_RASTER_PDF_READ) == L_TRUE )
+		if ( L_IsSupportLocked(L_SUPPORT_PDF_READ) == L_TRUE )
 		{
 			// Unlock support for PDF Reading
-			InitLeadToolsLicense();
+			L_UnlockSupport(L_SUPPORT_PDF_READ, L_KEY_PDF_READ);
+
 			// check if pdf support was unlocked
-			if( L_IsSupportLocked(L_SUPPORT_RASTER_PDF_READ) == L_TRUE )
+			if( L_IsSupportLocked(L_SUPPORT_PDF_READ) == L_TRUE )
 			{
 				// log an exception
 				UCLIDException ue("ELI19815", "Unable to unlock PDF read support.");
@@ -1520,13 +1453,13 @@ void initPDFSupport()
 		}
 
 		// only unlock write support if not already unlocked
-		if ( L_IsSupportLocked(L_SUPPORT_RASTER_PDF_SAVE) == L_TRUE )
+		if ( L_IsSupportLocked(L_SUPPORT_PDF_SAVE) == L_TRUE )
 		{
 			// unlock support for PDF writing
-			InitLeadToolsLicense();
+			L_UnlockSupport(L_SUPPORT_PDF_SAVE, L_KEY_PDF_SAVE);
 
 			// check if pdf support was unlocked
-			if( L_IsSupportLocked(L_SUPPORT_RASTER_PDF_SAVE) == L_TRUE )
+			if( L_IsSupportLocked(L_SUPPORT_PDF_SAVE) == L_TRUE )
 			{
 				// log an exception
 				UCLIDException ue("ELI19863", "Unable to unlock PDF save support.");
@@ -1545,37 +1478,23 @@ void initPDFSupport()
 
 	// Get initialized FILEPDFOPTIONS struct
 	FILEPDFOPTIONS pdfOptions = GetLeadToolsSizedStruct<FILEPDFOPTIONS>(0);
-
-	LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 	// Individual scope for L_GetPDFOptions() and L_SetPDFOptions()
 	{
 		// Retrieve default load options
 		L_GetPDFOptions( &pdfOptions, sizeof(pdfOptions) );
 
 		// Only set options if not already the correct options
-		if ( pdfOptions.nDisplayDepth != nDisplayDepth )
+		if ( pdfOptions.nXResolution != iOpenXRes ||
+				pdfOptions.nYResolution != iOpenYRes ||
+				pdfOptions.nDisplayDepth != nDisplayDepth )
 		{
-			// Define desired display depth settings
+			// Define desired resolution and display depth settings
+			pdfOptions.nXResolution = iOpenXRes;
+			pdfOptions.nYResolution = iOpenYRes;
 			pdfOptions.nDisplayDepth = nDisplayDepth;
 
 			// Apply settings
 			L_SetPDFOptions( &pdfOptions );
-		}
-	}
-
-	RASTERIZEDOCOPTIONS rasterizeDocOptions = GetLeadToolsSizedStruct<RASTERIZEDOCOPTIONS>(0);
-	{
-		L_GetRasterizeDocOptions(&rasterizeDocOptions, rasterizeDocOptions.uStructSize);
-		if (rasterizeDocOptions.uXResolution != iOpenXRes ||
-			rasterizeDocOptions.uYResolution != iOpenYRes)
-		{
-			// Define desired resolution 
-			rasterizeDocOptions.uXResolution = iOpenXRes;
-			rasterizeDocOptions.uYResolution = iOpenYRes;
-
-			// Apply Settings
-			L_SetRasterizeDocOptions(&rasterizeDocOptions);
 		}
 	}
 }
@@ -1611,7 +1530,7 @@ void unlockDocumentSupport()
 	{
 		// Unlock Document/Medical support only if 
 		// Annotation package is licensed (P13 #4499)
-		InitLeadToolsLicense();
+		L_UnlockSupport(L_SUPPORT_DOCUMENT, L_KEY_DOCUMENT);
 
 		// check if document support was unlocked
 		if(L_IsSupportLocked(L_SUPPORT_DOCUMENT) == L_TRUE)
@@ -1945,9 +1864,6 @@ bool hasAnnotations(const string& strFilename, LOADFILEOPTION &lfo, int iFileFor
 	// attempt to read annotations from the tiff tag
 	L_UINT16 uType = 0;
 	L_UINT uCount = 0;
-
-	LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 	int iRet = L_ReadFileTag((char*)strFilename.c_str(), ANNTAG_TIFF, &uType, &uCount, NULL, &lfo);
 
 	// if there is no annotation tag, this file does not contain annotations
@@ -1974,8 +1890,6 @@ bool hasAnnotations(const string& strFilename, int iPageNumber)
 	{
 		return false;
 	}
-
-	LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 
 	// create the load file options
 	LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
@@ -2112,12 +2026,8 @@ void loadImagePage(const string& strImageFileName, unsigned long ulPage, BITMAPH
 		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
 
 		// Get the default load options and set the page
-		{
-			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
-			throwExceptionIfNotSuccess(L_GetDefaultLoadFileOption(&lfo, sizeof(LOADFILEOPTION)),
-				"ELI13283", "Unable to get default file load options for LeadTools imaging library.");
-		}
+		throwExceptionIfNotSuccess(L_GetDefaultLoadFileOption(&lfo, sizeof(LOADFILEOPTION)),
+			"ELI13283", "Unable to get default file load options for LeadTools imaging library.");
 		lfo.PageNumber = ulPage;
 
 		loadImagePage(strImageFileName, rBitmap, rflInfo, lfo, bChangeViewPerspective);
@@ -2153,14 +2063,10 @@ void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap,
 				}
 				if (dwStartIndex == 0)
 				{
-					LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 					nRet = L_LoadBitmap(pszImageFile, &rBitmap, sizeof(BITMAPHANDLE), 0, ORDER_RGB, &lfo, &rFileInfo);
 				}
 				else
 				{
-					LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 					CHandle hFile(CreateFile(pszImageFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL));
 					DWORD dwFileSize = GetFileSize(hFile, NULL) - dwStartIndex;
 					nRet = L_LoadFileOffset((L_HFILE)hFile.operator HANDLE(), dwStartIndex, dwFileSize, &rBitmap, sizeof(BITMAPHANDLE), 0,
@@ -2206,8 +2112,6 @@ void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap,
 			// then attempt to change the view perspective
 			if (bChangeViewPerspective && rBitmap.ViewPerspective != TOP_LEFT)
 			{
-				LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 				throwExceptionIfNotSuccess(L_ChangeBitmapViewPerspective(NULL, &rBitmap,
 					sizeof(BITMAPHANDLE), TOP_LEFT),"ELI14634",
 					"Unable to change bitmap perspective.");
@@ -2256,12 +2160,8 @@ void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, FILEINFO&
 	{
 		// Create default save file options and set the page number
 		SAVEFILEOPTION sfo = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
-		{
-			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
-			throwExceptionIfNotSuccess(L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION)),
-				"ELI27292", "Unable to get default save file options.");
-		}
+		throwExceptionIfNotSuccess(L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION)),
+			"ELI27292", "Unable to get default save file options.");
 		sfo.PageNumber = lPageNumber;
 
 		saveImagePage(hBitmap, strOutputFile, flInfo, sfo);
@@ -2305,12 +2205,8 @@ void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, int nFile
 			long nNumFailedAttempts = 0;
 			while (nNumFailedAttempts < iRetryCount)
 			{
-				{
-					LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
-					nRet = L_SaveBitmap(pszOutFile, &hBitmap, nFileFormat, nBitsPerPixel,
-						nCompressionFactor, &sfo);
-				}
+				nRet = L_SaveBitmap(pszOutFile, &hBitmap, nFileFormat, nBitsPerPixel,
+					nCompressionFactor, &sfo);
 
 				// Check result
 				if (nRet == SUCCESS)
@@ -2362,9 +2258,6 @@ void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, int nFile
 //-------------------------------------------------------------------------------------------------
 COLORREF getPixelColor(BITMAPHANDLE &rBitmap, int iRow, int iCol)
 {
-	// Do not put a LeadToolsLicenseRestrictor at this level this method typically gets called in loop
-	// and it will work better to use that at a higher level
-
 	return L_GetPixelColor( &rBitmap, iRow, iCol );
 }
 //-------------------------------------------------------------------------------------------------
@@ -2653,8 +2546,6 @@ void applyAnnotationText(const PageRasterZone& rZone, HANNOBJECT& hContainer, HD
 		{
 			int iFontSize = getFontSizeThatFits(hDC, rZone, iYResolution);
 
-			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 			// Get the current annotation options
 			L_UINT uOptions = 0;
 			throwExceptionIfNotSuccess(L_AnnGetOptions(&uOptions), "ELI24470",
@@ -2667,7 +2558,7 @@ void applyAnnotationText(const PageRasterZone& rZone, HANNOBJECT& hContainer, HD
 			throwExceptionIfNotSuccess(L_AnnSetOptions(NULL, uOptions), "ELI24471",
 				"Could not set text annotation options.");
 
-			// Create a text annotation object
+			// Creat a text annotation object
 			HANNOBJECT hText;
 			throwExceptionIfNotSuccess(L_AnnCreate(ANNOBJECT_TEXT, &hText), "ELI24465", 
 				"Could not create text annotation object.");
@@ -2719,8 +2610,6 @@ void createLeadDC(HDC& hDC, BITMAPHANDLE& hBitmap)
 	// Create a device context if it has not been created already
 	if (hDC == NULL)
 	{
-		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 		hDC = L_CreateLeadDC(&hBitmap);
 		if (hDC == NULL)
 		{
@@ -2734,8 +2623,6 @@ void deleteLeadDC(HDC& hDC)
 {
 	if (hDC != __nullptr)
 	{
-		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
 		if (L_DeleteLeadDC(hDC) == L_FALSE)
 		{
 			// Still set this to NULL, even if we failed

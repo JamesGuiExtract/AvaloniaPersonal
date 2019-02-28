@@ -137,8 +137,8 @@ namespace Extract.Imaging
 
             // Use default DPI and display depth
             options.Pdf.Load.DisplayDepth = _DEFAULT_PDF_DISPLAY_DEPTH;
-            options.RasterizeDocument.Load.XResolution = _DEFAULT_PDF_RESOLUTION;
-            options.RasterizeDocument.Load.YResolution = _DEFAULT_PDF_RESOLUTION;
+            options.Pdf.Load.XResolution = _DEFAULT_PDF_RESOLUTION;
+            options.Pdf.Load.YResolution = _DEFAULT_PDF_RESOLUTION;
         }
 
         #endregion Methods
