@@ -49,7 +49,7 @@ using namespace UCLID_TESTINGFRAMEWORKINTERFACESLib;
 #import "..\..\..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb" named_guids
 using namespace UCLID_INPUTFUNNELLib;
 
-#import "Common Files\System\ADO\msado28.tlb" \
+#import "C:\Program Files (x86)\Common Files\System\ADO\msado28.tlb" \
 	rename ("EOF", "adoEOF")
 using namespace ADODB;
 

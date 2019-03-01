@@ -34,7 +34,7 @@
 #import "..\..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
 
-#import "Common Files\System\ADO\msado28.tlb" \
+#import "C:\Program Files (x86)\Common Files\System\ADO\msado28.tlb" \
 	rename ("EOF", "adoEOF")
 using namespace ADODB;
 
