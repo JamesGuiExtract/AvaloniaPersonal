@@ -1,9 +1,9 @@
 [submodule "Rules"]
 	path = Rules
-	url = M:\\GitRepos\\Rules
+	url = \\\\extract.local\\Eng\\GitRepos\\Rules
 [submodule "ReusableComponents/APIs"]
 	path = ReusableComponents/APIs
-	url = M:\\GitRepos\\RCAPIs
+	url = \\\\extract.local\\Eng\\GitRepos\\RCAPIs
 [submodule "RC.Net/APIs"]
 	path = RC.Net/APIs
-	url = M:\\GitRepos\\RCNetAPIs
+	url = \\\\extract.local\\Eng\\GitRepos\\RCNetAPIs
