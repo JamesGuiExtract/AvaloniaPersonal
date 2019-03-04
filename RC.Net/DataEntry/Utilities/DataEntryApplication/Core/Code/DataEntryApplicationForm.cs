@@ -949,7 +949,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         }
 
                         _tabControl.SelectedTab = _paginationTab;
-                        _paginationPanel.PendingChanges = paginationSuggested;
+
+                        // https://extract.atlassian.net/browse/ISSUE-16026
+                        // Setting PendingChanges explicity prevents the panel from calculating on
+                        // its own whether changes are pending. Set to true if pagination is
+                        // suggested, but don't set to false if pagination is not suggested.
+                        if (paginationSuggested)
+                        {
+                            _paginationPanel.PendingChanges = true;
+                        }
 
                         // If pagination has been suggested, don't bother loading the data for the
                         // current document; either the suggestion will be accepted trigger new
