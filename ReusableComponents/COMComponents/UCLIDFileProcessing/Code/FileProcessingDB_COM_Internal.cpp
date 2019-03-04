@@ -3612,9 +3612,22 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				END_CONNECTION_RETRY(ipConnection, "ELI34143");
 			}
 
+			// If current session is a web session then deleted files should not be returned
+			// https://extract.atlassian.net/browse/ISSUE-15990
+			string strWorkflowJoin = "";
+			if (m_bCurrentSessionIsWebSession)
+			{
+				long nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
+				ASSERT_RUNTIME_CONDITION("ELI46688", nWorkflowID > 0, "Internal logic error: No active workflow for web session");
+
+				strWorkflowJoin = "INNER JOIN WorkflowFile ON WorkflowFile.FileID = FAMFile.ID ";
+				strWhere += " AND WorkflowFile.WorkflowID = " + asString(nWorkflowID) + " AND WorkflowFile.Deleted = 0 ";
+			}
+
 			// Build the from clause
 			string strFrom = "FROM FAMFile INNER JOIN FileActionStatus "
 				"ON FileActionStatus.FileID = FAMFile.ID AND FileActionStatus.ActionID IN (<ActionIDPlaceHolder>) "
+				+ strWorkflowJoin
 				+ strWhere + ")";
 
 			// create query to select top records;
