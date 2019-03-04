@@ -250,7 +250,7 @@ namespace WebAPI.Models
                 // without error
                 // https://extract.atlassian.net/browse/WEB-55
                 // Modified to only return open document if there is no file ID specified so that you can open a specific file with, e.g., http://localhost:4205/?docid=11
-                if (FileApi.DocumentSession.IsOpen && id < 0)
+                if (FileApi.DocumentSession.IsOpen && (id < 0 || id == FileApi.DocumentSession.FileId))
                 {
                     return new DocumentIdResult()
                     {

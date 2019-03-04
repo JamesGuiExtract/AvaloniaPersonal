@@ -198,6 +198,58 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
+        /// Skip the document so that it will not be in the queue
+        /// </summary>
+        /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
+        [HttpPost("SkipDocument")]
+        [Authorize]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        public IActionResult SkipDocument(int duration = -1)
+        {
+            try
+            {
+                using (var data = new DocumentData(User, requireSession: true))
+                {
+                    data.CloseDocument(EActionStatus.kActionSkipped, duration);
+
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI46689");
+            }
+        }
+
+        /// <summary>
+        /// Fail the document so that it will not be in the queue
+        /// </summary>
+        /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
+        [HttpPost("FailDocument")]
+        [Authorize]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        public IActionResult FailDocument(int duration = -1)
+        {
+            try
+            {
+                using (var data = new DocumentData(User, requireSession: true))
+                {
+                    data.CloseDocument(EActionStatus.kActionFailed, duration);
+
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI46690");
+            }
+        }
+
+        /// <summary>
         /// Get page size and orientation info for a document
         /// </summary>
         /// <returns></returns>
