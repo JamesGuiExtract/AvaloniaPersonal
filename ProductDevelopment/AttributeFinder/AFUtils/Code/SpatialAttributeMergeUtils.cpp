@@ -1217,22 +1217,13 @@ void CSpatialAttributeMergeUtils::loadAttributeInfo(IAttributePtr ipAttribute,
 		// Cycle through each raster zone and obtain a CRect representing each.
 		long nCount = ipRasterZones->Size();
 		
-		ILongRectanglePtr ipPageBounds = __nullptr;
-		if (nCount > 0)
-		{
-			// Get the page bounds (for use by GetRectangularBounds).
-			// NOTE: All zones will be on the same page, so we only need to get the bounds once.
-			ipPageBounds = ipPage->GetOCRImageBounds();
-			ASSERT_RESOURCE_ALLOCATION("ELI30312", ipPageBounds != __nullptr);
-		}
-
 		for (long i = 0; i < nCount; i++)
 		{
 			IRasterZonePtr ipRasterZone = ipRasterZones->At(i);
 			ASSERT_RESOURCE_ALLOCATION("ELI22881", ipRasterZone != __nullptr);
 
 			// Obtain a rect describing the location of this raster zone.
-			ILongRectanglePtr ipRect = ipRasterZone->GetRectangularBounds(ipPageBounds);
+			ILongRectanglePtr ipRect = ipRasterZone->GetRectangularBounds(__nullptr);
 			ASSERT_RESOURCE_ALLOCATION("ELI22882", ipRect != __nullptr);
 
 			// Copy the ILongRectangle to a CRect to make rect comparisons easier.
