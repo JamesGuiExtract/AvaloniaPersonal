@@ -1,13 +1,15 @@
 ﻿using DevExpress.DashboardCommon;
 using DevExpress.DashboardCommon.ViewerData;
 using DevExpress.DashboardWin;
+using DevExpress.DashboardWin.Native;
 using DevExpress.XtraEditors;
+using DevExpress.XtraGrid;
+using DevExpress.XtraGrid.Views.Grid;
 using Extract;
 using Extract.Dashboard.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
@@ -347,6 +349,14 @@ namespace DashboardViewer
                     {
                         dashboardViewerMain.ClearMasterFilter(item.ComponentName);
                     }
+
+                    // Clear any column search filters
+                    var grid = ((IUnderlyingControlProvider)dashboardViewerMain).GetUnderlyingControl(item.ComponentName) as GridControl;
+                    var gridView = grid?.MainView as GridView;
+                    if (gridView != null)
+                    {
+                        gridView.ActiveFilter.Clear();
+                    }
                 }
             }
             catch (Exception ex)
@@ -468,7 +478,7 @@ namespace DashboardViewer
         {
             try
             {
-                if(_filteredItems.Contains(e.DashboardItemName))
+                if (_filteredItems.Contains(e.DashboardItemName))
                 {
                     _filteredItems.Remove(e.DashboardItemName);
                 }
@@ -647,7 +657,7 @@ namespace DashboardViewer
         void UpdateMainTitle()
         {
             bool filtered = _filteredItems.Count > 0;
-            toolStripButtonClearMasterFilter.Enabled = filtered;
+            toolStripButtonClearMasterFilter.Enabled = Dashboard != null;
             if (Dashboard is null)
             {
                 if (!IsDatabaseOverridden)
