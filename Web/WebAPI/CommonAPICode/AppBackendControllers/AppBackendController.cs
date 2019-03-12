@@ -201,17 +201,19 @@ namespace WebAPI.Controllers
         /// Skip the document so that it will not be in the queue
         /// </summary>
         /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
+        /// <param name="comment">Optional commment to apply to the file</param>
         [HttpPost("SkipDocument")]
         [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
-        public IActionResult SkipDocument(int duration = -1)
+        public IActionResult SkipDocument(int duration = -1, string comment = "")
         {
             try
             {
                 using (var data = new DocumentData(User, requireSession: true))
                 {
+                    data.SetComment(comment);
                     data.CloseDocument(EActionStatus.kActionSkipped, duration);
 
                     return NoContent();

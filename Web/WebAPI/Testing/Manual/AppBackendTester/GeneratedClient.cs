@@ -663,23 +663,29 @@ namespace Extract.Web.WebAPI.AppBackendTester
     
         /// <summary>Skip the document so that it will not be in the queue</summary>
         /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
+        /// <param name="comment">Optional commment to apply to the file</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task SkipDocumentAsync(int? duration)
+        public System.Threading.Tasks.Task SkipDocumentAsync(int? duration, string comment)
         {
-            return SkipDocumentAsync(duration, System.Threading.CancellationToken.None);
+            return SkipDocumentAsync(duration, comment, System.Threading.CancellationToken.None);
         }
     
         /// <summary>Skip the document so that it will not be in the queue</summary>
         /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
+        /// <param name="comment">Optional commment to apply to the file</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task SkipDocumentAsync(int? duration, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task SkipDocumentAsync(int? duration, string comment, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/SkipDocument?");
             if (duration != null) 
             {
                 urlBuilder_.Append("duration=").Append(System.Uri.EscapeDataString(ConvertToString(duration, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (comment != null) 
+            {
+                urlBuilder_.Append("comment=").Append(System.Uri.EscapeDataString(ConvertToString(comment, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
     

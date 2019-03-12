@@ -469,6 +469,26 @@ namespace WebAPI.Models
         }
 
         /// <summary>
+        /// Sets the FileActionComment of the EditAction for the open file
+        /// </summary>
+        /// <param name="comment">The comment text to apply</param>
+        public void SetComment(string comment)
+        {
+            try
+            {
+                ExtractException.Assert("ELI46694", "No open document", FileApi.DocumentSession.IsOpen);
+
+                int fileId = FileApi.DocumentSession.FileId;
+                int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.EditAction);
+                FileApi.FileProcessingDB.SetFileActionComment(fileId, actionId, comment);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46695");
+            }
+        }
+
+        /// <summary>
         /// get the specified file attribute set
         /// </summary>
         /// <param name="fileId">file id</param>
