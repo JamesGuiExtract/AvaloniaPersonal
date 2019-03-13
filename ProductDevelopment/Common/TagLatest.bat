@@ -136,6 +136,8 @@ cd %BUILD_VSS_ROOT%\Engineering\ProductDevelopment\Common
 :: Get the version to build from the LatestComponentVersion.mak files
 for /F "tokens=2 delims==" %%i in ( 'findstr FlexIndex LatestComponentVersions.mak') do set VersionToBuild=%%i
 
+@ECHO %FKBBuildNeeded%.
+
 %GitPath% commit -a -m "%VersionToBuild%" 2>&1 | tee "%TAGLOGFILE%" -Append
 IF %ERRORLEVEL% NEQ 0 (
 	Echo Unable to commit new version

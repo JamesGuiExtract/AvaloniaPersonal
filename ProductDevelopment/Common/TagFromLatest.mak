@@ -27,8 +27,8 @@ TagRepos:
 	$(GitPath) tag $(GitTagFlexIndexVersion) -m "$(FlexIndexVersion)"
 	cd %BUILD_VSS_ROOT%\Engineering\Rules
 	$(GitPath) tag $(GitTagFlexIndexVersion) -m "$(FlexIndexVersion)"
-	@ECHO FKBBuildNeeded  = $(FKBBuildNeeded)
-	!IF "$(FKBBuildNeeded)"=="True" 
+	@ECHO FKBBuildNeeded  = %FKBBuildNeeded%
+	!IF "%FKBBuildNeeded%"=="True" 
 		$(GitPath) tag $(GitTagFKBVersion) -m "$(FKBVersion)"
 	!ENDIF
 
