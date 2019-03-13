@@ -41,8 +41,8 @@ IF "%BUILD_STATUS%" NEQ "Started" (
 copy /Y P:\AttributeFinder\BuildVMLicense\*.* "C:\ProgramData\Extract Systems\LicenseFiles"
 
 IF EXIST "%TEMP%\nmakeErrors" del "%TEMP%\nmakeErrors"
-
-nmake /X "%TEMP%\nmakeErrors" /F AttributeFinderSDK.mak BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" %BuildScriptTarget% 2>&1 | tee "%LOGFILE%"
+@ECHO FKBBuildNeeded = %FKBBuildNeeded%
+nmake /X "%TEMP%\nmakeErrors" /F AttributeFinderSDK.mak FKBBuildNeeded=%FKBBuildNeeded% BuildConfig="Release" ProductRootDirName="%PRODUCT_ROOT%" ProductVersion="%~1" %BuildScriptTarget% 2>&1 | tee "%LOGFILE%"
 IF EXIST "%TEMP%\nmakeErrors" (
 	FIND "NMAKE : fatal error" "%TEMP%\nmakeErrors"
 :: If there were no errors nothing will be found and FIND will return an errorlevel of 1

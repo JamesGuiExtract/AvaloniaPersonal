@@ -136,7 +136,7 @@ cd %BUILD_VSS_ROOT%\Engineering\ProductDevelopment\Common
 :: Get the version to build from the LatestComponentVersion.mak files
 for /F "tokens=2 delims==" %%i in ( 'findstr FlexIndex LatestComponentVersions.mak') do set VersionToBuild=%%i
 
-@ECHO %FKBBuildNeeded%.
+@ECHO FKBBuildNeeded = %FKBBuildNeeded%
 
 %GitPath% commit -a -m "%VersionToBuild%" 2>&1 | tee "%TAGLOGFILE%" -Append
 IF %ERRORLEVEL% NEQ 0 (
@@ -146,7 +146,7 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 
 IF EXIST "%TEMP%\nmakeErrors" del "%TEMP%\nmakeErrors"
-nmake -F TagFromLatest.mak TagRepos 2>&1 | tee "%TAGLOGFILE%" -Append
+nmake -F TagFromLatest.mak FKBBuildNeeded=%FKBBuildNeeded%   TagRepos 2>&1 | tee "%TAGLOGFILE%" -Append
 IF EXIST "%TEMP%\nmakeErrors" (
 	FIND "NMAKE : fatal error" "%TEMP%\nmakeErrors"
 :: If there were no errors nothing will be found and FIND will return an errorlevel of 1
