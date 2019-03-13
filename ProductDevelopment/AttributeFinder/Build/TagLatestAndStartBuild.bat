@@ -5,7 +5,7 @@ CALL InitBuildEnv.Bat
 
 CALL %BUILD_VSS_ROOT%\Engineering\ProductDevelopment\Common\TagLatest.bat %~1
 IF %ERRORLEVEL% NEQ 0 (
-	Echo Vault exited with error.
+	Echo TagLatest exited with error.
 	Echo.
 	goto ExitWithError
 )
@@ -23,7 +23,7 @@ cd "%~p0"
 
 call AttributeFinderSDK.bat "%VersionToBuild%"
 IF %ERRORLEVEL% NEQ 0 (
-	Echo Vault exited with error.
+	Echo AttributeFinderSDK exited with error.
 	Echo.
 	goto ExitWithError
 )
@@ -34,7 +34,7 @@ goto Exit_Batch
 
 SET BUILD_STATUS="Failed"
 
-PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\SendBuildStatuseMail.ps1' ' %VersionToBuild% that was started' '%BUILD_STATUS%"
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& '%~p0..\..\Common\PowerShell\SendBuildStatuseMail.ps1' ' %VersionToBuild% that was started' '%BUILD_STATUS%'"
 
 :Exit_Batch
 
