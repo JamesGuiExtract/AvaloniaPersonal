@@ -86,7 +86,7 @@ Replace=$(BinariesFolder)\ReplaceString
 #
 BuildFKDBIfRequired:
 	@CD $(EngineeringRootDirectory)\Rules\Build_FKB
-	@IF "$(FKBBuildNeeded)"="True" @nmake /F FKBUpdate.mak CreateFKBInstall
+	@IF "$(FKBBuildNeeded)"=="True" @nmake /F FKBUpdate.mak CreateFKBInstall
 
 BuildAttributeFinderCore: BuildFKDBIfRequired
 	@Echo Building AttributeFinderCore...
