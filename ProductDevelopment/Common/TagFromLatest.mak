@@ -1,4 +1,5 @@
 !include LatestComponentVersions.mak
+!include ..\..\Rules\Build_FKB\FKBVersion.mak
 
 #Git tags converted from label
 GitTagFlexIndexVersion=$(FlexIndexVersion:v.=)
@@ -26,4 +27,7 @@ TagRepos:
 	$(GitPath) tag $(GitTagFlexIndexVersion) -m "$(FlexIndexVersion)"
 	cd %BUILD_VSS_ROOT%\Engineering\Rules
 	$(GitPath) tag $(GitTagFlexIndexVersion) -m "$(FlexIndexVersion)"
-	$(GitPath) tag $(GitTagFKBVersion) -m "$(FKBVersion)"
+	IF "$(FKBBuildNeeded)"=="True" (
+		$(GitPath) tag $(GitTagFKBVersion) -m "$(FKBVersion)"
+	)
+

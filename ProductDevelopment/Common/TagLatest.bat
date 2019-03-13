@@ -101,12 +101,37 @@ IF %ERRORLEVEL% NEQ 0 (
 
 cd %BUILD_VSS_ROOT%\Engineering\ProductDevelopment\Common
 
-cscript IncrementBuildVersion.vbs 2>&1 | tee "%TAGLOGFILE%" -Append
+cscript IncrementBuildVersion.vbs LatestComponentVersion.mak 2>&1 | tee "%TAGLOGFILE%" -Append
 IF %ERRORLEVEL% NEQ 0 (
 	Echo Unable to update version
 	Echo.
 	goto ExitWithError
 )
+
+cd %BUILD_VSS_ROOT%\Engineering\Rules\Build_FKB
+
+FOR /F "tokens=2 delims==" %%F IN ('findstr FKBVersion FKBVersion.mak') DO SET LAST_FKB_TAG=%%F
+SET LAST_FKB_TAG=%LAST_FKB_TAG: Ver. =/%
+SET LAST_FKB_TAG=%LAST_FKB_TAG:.=/%
+
+SET FKBBuildNeeded=False
+
+SET PATH=%PATH%;;C:\Program Files\Git\bin\
+
+FOR /F "tokens=*" %%F IN ('git log -n 1 --format^=format:"True" "%LAST_FKB_TAG%"..HEAD -- ..\ComponentData') DO (
+	SET FKBBuildNeeded=%%F
+)
+
+IF "%FKBBuildNeeded%"=="True" (
+	cscript IncrementBuildVersion.vbs FKBVersion.mak 2>&1 | tee "%TAGLOGFILE%" -Append
+	IF %ERRORLEVEL% NEQ 0 (
+		Echo Unable to update version
+		Echo.
+		goto ExitWithError
+	)
+)
+
+cd %BUILD_VSS_ROOT%\Engineering\ProductDevelopment\Common
 
 :: Get the version to build from the LatestComponentVersion.mak files
 for /F "tokens=2 delims==" %%i in ( 'findstr FlexIndex LatestComponentVersions.mak') do set VersionToBuild=%%i

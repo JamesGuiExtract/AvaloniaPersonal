@@ -13,13 +13,18 @@ Sub Main
 
 	'Open LatestComponentVersions file
 	dim objFSO
-	dim objOldLatestComponentVersions
-	dim objNewLatestComponentVersions
+	dim objOldVersionFile
+	dim objOldVersionFileName
+	dim objNewVersionFile
+	dim objNewVersionFileName
 	
 	Set objFSO = CreateObject("Scripting.FileSystemObject")
+
+	objOldVersionFileName = objArgs(0)
+	objNewVersionFileName = objOldVersionFileName + ".new"
 	
-	Set objOldLatestComponentVersions = objFSO.OpenTextFile("LatestComponentVersions.mak", 1)
-	Set objNewLatestComponentVersions = objFSO.CreateTextFile("LatestComponentVersions.new.mak", true)
+	Set objOldVersionFile = objFSO.OpenTextFile(objOldVersionFileName, 1)
+	Set objNewVersionFile = objFSO.CreateTextFile(objNewVersionFileName, true)
 	
 	Dim sLine
 	
@@ -35,9 +40,9 @@ Sub Main
 	Dim strValue
 	
 	'Load each line and if it has a number at the end of a line increment the number
-	Do Until objOldLatestComponentVersions.AtEndOfStream
+	Do Until objOldVersionFile.AtEndOfStream
 		'Get the line
-		sLine = objOldLatestComponentVersions.ReadLine
+		sLine = objOldVersionFile.ReadLine
 		
 		' Get the last number in the version
 		Set Matches = RegExOb.Execute(sLine) 
@@ -46,18 +51,18 @@ Sub Main
 		if (Matches.Count > 0 ) then
 			value = CInt(Matches(0).Value) + 1
 			strValue = CStr(value)
-			objNewLatestComponentVersions.WriteLine( RegExOb.Replace(sLine, strValue))
+			objNewVersionFile.WriteLine( RegExOb.Replace(sLine, strValue))
 		else
-			objNewLatestComponentVersions.WriteLine(sLine)
+			objNewVersionFile.WriteLine(sLine)
 		end if
 	Loop
 	
-	objOldLatestComponentVersions.Close()
-	objNewLatestComponentVersions.Close()
+	objOldVersionFile.Close()
+	objNewVersionFile.Close()
 	
 	'Delete the old latest components
-	objFSO.DeleteFile "LatestComponentVersions.mak"
+	objFSO.DeleteFile objOldVersionFileName
 	
 	'Rename the new
-	objFSO.MoveFile "LatestComponentVersions.new.mak", "LatestComponentVersions.mak"
+	objFSO.MoveFile objNewVersionFileName, objOldVersionFileName
 end sub

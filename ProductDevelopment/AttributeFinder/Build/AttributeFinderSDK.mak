@@ -84,7 +84,13 @@ Replace=$(BinariesFolder)\ReplaceString
 #############################################################################
 # B U I L D    T A R G E T S
 #
-BuildAttributeFinderCore:
+BuildFKDBIfRequired:
+	@IF "$(FKBBuildNeeded)"="True" (
+		@CD $(EngineeringRootDirectory)\Rules\Build_FKB
+		@nmake /F FKBUpdate.mak CreateFKBInstall
+	)
+
+BuildAttributeFinderCore: BuildFKDBIfRequired
 	@Echo Building AttributeFinderCore...
 	@CD "$(AFRootDirectory)\Build"
     @nmake /F AttributeFinderCore.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" $(AttributeCoreTarget)

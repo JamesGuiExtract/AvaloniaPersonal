@@ -28,7 +28,8 @@ ExtractFlexCommonInstallDir=$(PDRootDir)\AttributeFinder\Installation\ExtractFle
 ExtractFlexCommonInstallFilesRootDir=P:\ExtractFlexCommon
 RequiredInstallsDir=P:\AttributeFinder\RequiredInstalls
 
-FKBUpdateReleaseDir=$(BleedingEdgeVersionDir)\$(FKBVersion)
+FKBUpdateReleaseBaseDir=R:\FlexIndex\FKB
+FKBUpdateReleaseDir=$(FKBUpdateReleaseBaseDir)\$(FKBVersion)
 FKBUpdateInstallRoot=$(PDRootDir)\AttributeFinder\Installation\FKBInstall
 FKBInstallMediaDir=$(FKBUpdateInstallRoot)\Media\CD-ROM\DiskImages\DISK1
 
@@ -566,22 +567,18 @@ MakeExtractFlexCommonMergeModule: MakeExtractCommonMergeModule
     @TIME /T
     @ECHO.
 	
-BuildFKBUpdateIfRequired:
-	@IF NOT EXIST "$(FKBUpdateReleaseDir)" (
-		@ECHO Building FKB update
-		@ECHO.
-		@DATE /T
-		@TIME /T
-		@ECHO.
-		@CD "$(AFRootDirectory)\Build"
-		NMAKE /F FKBUpdate.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" CreateFKBInstall
-		@IF NOT EXIST "$(AFCoreInstallFilesRootDir)\FKBInstall" @MKDIR "$(AFCoreInstallFilesRootDir)\FKBInstall"
-		@COPY "$(FKBUpdateReleaseDir)\*.*" "$(AFCoreInstallFilesRootDir)\FKBInstall"
-		@ECHO.
-		@DATE /T
-		@TIME /T
-		@ECHO.
-	)
+CopyFKB:
+	@ECHO Copy FKB update
+	@ECHO.
+	@DATE /T
+	@TIME /T
+	@ECHO.
+	@IF NOT EXIST "$(AFCoreInstallFilesRootDir)\FKBInstall" @MKDIR "$(AFCoreInstallFilesRootDir)\FKBInstall"
+	@COPY "$(FKBUpdateReleaseDir)\*.*" "$(AFCoreInstallFilesRootDir)\FKBInstall"
+	@ECHO.
+	@DATE /T
+	@TIME /T
+	@ECHO.
 	
 BuildAFCoreMergeModule: CleanupPreviousBuildFolders MakeExtractFlexCommonMergeModule CopyFilesToInstallFolder  
     @ECHO Buliding the UCLIDFlexIndex Merge Module installation...
@@ -611,7 +608,7 @@ BuildDataEntryMergeModule: BuildAFCoreMergeModule
 
 MakeMergeModules: CleanUpMergeModulesFromPreviousBuilds BuildAFCoreMergeModule BuildDataEntryMergeModule 
 
-DoBuilds: SetupBuildEnv SetVersions BuildPDUtils BuildFKBUpdateIfRequired BuildLearningMachineTrainer
+DoBuilds: SetupBuildEnv SetVersions BuildPDUtils CopyFKB BuildLearningMachineTrainer
 
 DoEverythingNoGet: DoBuilds MakeMergeModules RegisterClearImage_7_0 CopyCommonFiles
     @ECHO.
