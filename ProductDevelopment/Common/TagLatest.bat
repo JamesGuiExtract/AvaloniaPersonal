@@ -101,7 +101,7 @@ IF %ERRORLEVEL% NEQ 0 (
 
 cd %BUILD_VSS_ROOT%\Engineering\ProductDevelopment\Common
 
-cscript IncrementBuildVersion.vbs LatestComponentVersion.mak 2>&1 | tee "%TAGLOGFILE%" -Append
+cscript IncrementBuildVersion.vbs LatestComponentVersions.mak 2>&1 | tee "%TAGLOGFILE%" -Append
 IF %ERRORLEVEL% NEQ 0 (
 	Echo Unable to update version
 	Echo.
