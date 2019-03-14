@@ -18,6 +18,7 @@
 #!ENDIF
 
 !include LatestComponentVersions.mak
+!include ..\..\Rules\Build_FKB\FKBVersion.mak
 
 #############################################################################
 # M A K E F I L E   V A R I A B L E S

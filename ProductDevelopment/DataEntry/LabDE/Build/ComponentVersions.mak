@@ -5,6 +5,7 @@
 # ProductRootDirName defined as a non-null string
 #
 !include ..\..\..\Common\LatestComponentVersions.mak
+!include ..\..\..\..\Rules\Build_FKB\FKBVersion.mak
 
 #############################################################################
 # O V E R R I D A B L E S

@@ -5,7 +5,6 @@
 # ProductRootDirName defined as a non-null string
 #
 
-!include ..\..\..\..\Common\LatestComponentVersions.mak
 !include ..\..\..\..\Common\Common.mak
 
 #############################################################################

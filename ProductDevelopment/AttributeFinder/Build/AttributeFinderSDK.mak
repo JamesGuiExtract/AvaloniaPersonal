@@ -106,7 +106,7 @@ CopyFilesToInstallFolder:
 
 CopyComponentVersionFile:
 	@ECHO Copying Component Version file...
-    @COPY /v "$(PDRootDir)\Common\LatestComponentVersions.mak" "$(FLEXIndexInstallFiles)\ComponentsVersions.txt"
+    @COPY /v /y /a "$(PDRootDir)\Common\LatestComponentVersions.mak" /a +"$(EngineeringRootDirectory)\Rules\Build_FKB\FKBVersion.mak" "$(FLEXIndexInstallFiles)\ComponentsVersions.txt"
 
 BuildFlexIndexSDKInstall: BuildAttributeFinderCore CopyFilesToInstallFolder
     @ECHO Building UCLID FlexIndex SDK installation...
