@@ -176,6 +176,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\HIMStatsDB.bak" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Issue_16038DB.bak" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>UnitTestingDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>

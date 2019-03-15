@@ -1,5 +1,6 @@
 ﻿using Extract.Database;
 using Extract.FileActionManager.Database.Test;
+using Extract.FileActionManager.FileProcessors;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
@@ -44,6 +45,7 @@ namespace Extract.ETL.Test
 
         static readonly string _DATABASE = "Resources.ExpandAttributes.bak";
         static readonly string _1000RASTER_ZONE = "Resources.Test1000.bak";
+        static readonly string _ISSUE_16038_DB = "Resources.Issue_16038DB.bak";
 
         static readonly string _RESULTS_DATABASE = "Resources.ExpandAttribute_ExpectedResults.bak";
         static readonly string _QUERY_ATTRIBUTE_RESULTS = @"
@@ -347,6 +349,56 @@ namespace Extract.ETL.Test
             {
                 _testDbManager.RemoveDatabase(testDBName);
             }
+        }
+
+        [Test]
+        [Category("Automated")]
+        [Category("ETL")]
+        [Description("This test the fix for https://extract.atlassian.net/browse/ISSUE-16038")]
+        public static void TestISSUE_16038()
+        {
+            string testDBName = "TestISSUE_16038";
+            try
+            {
+                var fileProcessingDb = _testDbManager.GetDatabase(_ISSUE_16038_DB, testDBName);
+
+                ExpandAttributes expandAttributes;
+
+                using (var connection = NewSqlConnection(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName))
+                {
+                    connection.Open();
+
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = "SELECT Settings FROM DatabaseService";
+                        var databaseServiceSettings = cmd.ExecuteScalar() as string;
+                        expandAttributes = ExpandAttributes.FromJson(databaseServiceSettings) as ExpandAttributes;
+                        expandAttributes.DatabaseServiceID = 1;
+                        expandAttributes.DatabaseServer = fileProcessingDb.DatabaseServer;
+                        expandAttributes.DatabaseName = fileProcessingDb.DatabaseName;
+                    }
+
+                    expandAttributes.RefreshStatus();
+
+                    // Process
+                    expandAttributes.Process(CancellationToken.None);
+
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = "SELECT AttributeSetForFileID FROM DashboardAttributeFields";
+                        var IDs = cmd.ExecuteReader().Cast<IDataRecord>().Select(r => r.GetInt64(0)).ToList();
+
+                        Assert.AreEqual(2, IDs.Count(), "DashboardAttributeFields table should contain 2 records.");
+
+                        Assert.That(IDs.Contains(2), "The AttributeSetForFileID of 2 should be in the DashboardAttributeFields table.");
+                    }
+                }
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDBName);
+            }
+
         }
 
         #endregion

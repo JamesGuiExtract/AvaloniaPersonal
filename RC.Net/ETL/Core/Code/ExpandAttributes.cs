@@ -375,7 +375,7 @@ namespace Extract.ETL
                 ExtractException.Assert("ELI46585", "Status cannot be null", _status != null);
 
                 int maxFileTaskSession = MaxReportableFileTaskSessionId(true);
-                int currentLastProcessed = _status.StartingFileTaskSessionId();
+                int currentLastProcessed = _status.LastFileTaskSessionIdProcessed();
 
                 // check if there is anything to do
                 if (currentLastProcessed >= maxFileTaskSession)
@@ -452,10 +452,10 @@ namespace Extract.ETL
 	                        [AttributeSetNameID], 
 	                        [VOA]
 	                    FROM [dbo].[AttributeSetForFile] [ASFF]
-                        WHERE [FileTaskSessionID] > @FirstFileTaskSessionInBatch
+                        WHERE [FileTaskSessionID] > @LastFileTaskSessionIDProcessed
 		                    AND [FileTaskSessionID] <= @LastfileTaskSessionInBatch";
 
-                cmd.Parameters.AddWithValue("@FirstFileTaskSessionInBatch", currentLastProcessed);
+                cmd.Parameters.AddWithValue("@LastFileTaskSessionIDProcessed", currentLastProcessed);
                 cmd.Parameters.AddWithValue("@LastfileTaskSessionInBatch", lastInBatch);
 
                 // Set the timeout so that it waits indefinitely
@@ -935,15 +935,15 @@ namespace Extract.ETL
             }
 
             /// <summary>
-            /// Method to return the minimum FileTaskSession that needs to be processed.
+            /// Method to return the last fully processed FileTaskSession ID.
             /// </summary>
-            /// <returns>The Minimum FileTaskSession that needs to be processed</returns>
-            public Int32 StartingFileTaskSessionId()
+            /// <returns>The last FileTaskSessionID that has been completely processed</returns>
+            public Int32 LastFileTaskSessionIdProcessed()
             {
                 try
                 {
                     return (LastIDProcessedForDashboardAttribute.Count() > 0) ?
-                        Math.Min(LastFileTaskSessionIDProcessed, LastIDProcessedForDashboardAttribute.Values.Min()) + 1 :
+                        Math.Min(LastFileTaskSessionIDProcessed, LastIDProcessedForDashboardAttribute.Values.Min()) :
                         LastFileTaskSessionIDProcessed;
 
                 }
