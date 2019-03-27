@@ -19,6 +19,7 @@
 #include <StopWatch.h>
 #include <StringTokenizer.h>
 #include <stringCSIS.h>
+#include <UPI.h>
 #include <ValueRestorer.h>
 #include <VectorOperations.h>
 #include <FAMDBSemaphore.h>
@@ -7372,4 +7373,17 @@ string CFileProcessingDB::getWebAppSetting(const string& strSettings, const stri
 	}
 
 	return "";
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::setDefaultSessionMemberValues()
+{
+	m_nFAMSessionID = 0;
+	m_bCurrentSessionIsWebSession = false;
+	m_strUPI = UPI::getCurrentProcessUPI().getUPI();
+	m_strMachineName = getComputerName();
+	m_strFAMUserName = getCurrentUserName();
+	m_strFPSFileName = "";
+	m_bFAMRegistered = false;
+	m_nActiveFAMID = 0;
+	m_nActiveActionID = -1;
 }

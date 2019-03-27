@@ -287,6 +287,7 @@ namespace WebAPI.Models
             DocumentSession = (false, 0, 0, new DateTime());
             _sessionId = null;
             _apiContext.FAMSessionId = 0;
+            FileProcessingDB.SuspendWebSession();
         }
 
         /// <summary>

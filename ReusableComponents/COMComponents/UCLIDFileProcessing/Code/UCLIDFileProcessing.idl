@@ -2028,6 +2028,9 @@ library UCLID_FILEPROCESSINGLib
 		// there is no registered FAMSession for nFAMSessionID
 		[id(198), helpstring("method ResumeWebSession")] HRESULT ResumeWebSession(
 			[in] long nFAMSessionID, [out] long* pnFileTaskSessionID, [out] long* pnOpenFileID, [out, retval] VARIANT_BOOL* pbIsFileOpen);
+		// -----------------------------------------------------------------------------------------------
+		// Suspends an existing FAMSession by resetting appropriate instance members so that this instance is no longer associated with a FAMSession
+		[id(199), helpstring("method SuspendWebSession")] HRESULT SuspendWebSession();
 	};
 
 	[

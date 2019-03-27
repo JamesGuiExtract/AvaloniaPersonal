@@ -238,39 +238,39 @@ namespace Extract.Web.WebAPI.AppBackendTester
             async Task GetDataTest()
             {
                 await Log(FormattableString.Invariant($"Getting data for document ID {id} for token {client.ShortID}"), async () =>
-                    documentData = await client.GetDocumentDataAsync());
+                    documentData = await client.GetDocumentDataAsync(id));
             }
 
             async Task GetInfoTest()
             {
                 await Log(FormattableString.Invariant($"Getting info for document ID {id} for token {client.ShortID}"), async () =>
-                    info = await client.GetPageInfoAsync());
+                    info = await client.GetPageInfoAsync(id));
             }
 
             async Task GetPageTest()
             {
                 var page = info == null ? 1 : pageGen.Next(1, info.PageCount + 1);
                 await Log(FormattableString.Invariant($"Getting page data for page {page} of document ID {id} for token {client.ShortID}"), async () =>
-                    await client.GetDocumentPageAsync(page));
+                    await client.GetDocumentPageAsync(id, page));
             }
 
             async Task SaveDocumentTest()
             {
                 await Log(FormattableString.Invariant($"Saving document ID {id} for token {client.ShortID}"), async () =>
-                    await client.SaveDocumentDataAsync(new DocumentDataInput(documentData.Attributes)));
+                    await client.SaveDocumentDataAsync(id, new DocumentDataInput(documentData.Attributes)));
             }
 
             async Task PageWordZonesTest()
             {
                 var page = info == null ? 1 : pageGen.Next(1, info.PageCount + 1);
                 await Log(FormattableString.Invariant($"Getting word zones from page {page} of document ID {id} for token {client.ShortID}"), async () =>
-                    await client.GetPageWordZonesAsync(page));
+                    await client.GetPageWordZonesAsync(id, page));
             }
 
             async Task QueueStatusTest()
             {
                 await Log(FormattableString.Invariant($"Getting queue status for token {client.ShortID}"), async () =>
-                    await client.GetQueueStatusAsync());
+                    await client.GetQueueStatusAsync(id));
             }
 
             async Task SettingsTest()
@@ -283,7 +283,7 @@ namespace Extract.Web.WebAPI.AppBackendTester
             async Task CloseDocumentTest()
             {
                 await Log(FormattableString.Invariant($"Closing document ID {id} for token {client.ShortID}"), async () =>
-                    await client.CloseDocumentAsync(true, (int)sw.ElapsedMilliseconds));
+                    await client.CloseDocumentAsync(id, true, (int)sw.ElapsedMilliseconds));
             }
 
             async Task GetNextDocumentTest()

@@ -329,19 +329,26 @@ namespace Extract.Web.WebAPI.AppBackendTester
         }
     
         /// <summary>Gets the number of document, pages and active users in the current verification queue.</summary>
+        /// <param name="docID">The open document ID. If &gt; 0 then this call will act as a ping to keep the current session alive.</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<QueueStatusResult> GetQueueStatusAsync()
+        public System.Threading.Tasks.Task<QueueStatusResult> GetQueueStatusAsync(int? docID)
         {
-            return GetQueueStatusAsync(System.Threading.CancellationToken.None);
+            return GetQueueStatusAsync(docID, System.Threading.CancellationToken.None);
         }
     
         /// <summary>Gets the number of document, pages and active users in the current verification queue.</summary>
+        /// <param name="docID">The open document ID. If &gt; 0 then this call will act as a ping to keep the current session alive.</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task<QueueStatusResult> GetQueueStatusAsync(System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<QueueStatusResult> GetQueueStatusAsync(int? docID, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/QueueStatus");
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/QueueStatus?");
+            if (docID != null) 
+            {
+                urlBuilder_.Append("docID=").Append(System.Uri.EscapeDataString(ConvertToString(docID, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            urlBuilder_.Length--;
     
             var client_ = _httpClient;
             try
@@ -427,26 +434,26 @@ namespace Extract.Web.WebAPI.AppBackendTester
     
         /// <summary>Reserves a document. The document will not be accessible by others
         /// until CloseDocument is called.</summary>
-        /// <param name="id">The file ID to open. If -1, the next queued document will be opened.</param>
+        /// <param name="docID">The file ID to open. If -1, the next queued document will be opened.</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<DocumentIdResult> OpenDocumentAsync(int id)
+        public System.Threading.Tasks.Task<DocumentIdResult> OpenDocumentAsync(int docID)
         {
-            return OpenDocumentAsync(id, System.Threading.CancellationToken.None);
+            return OpenDocumentAsync(docID, System.Threading.CancellationToken.None);
         }
     
         /// <summary>Reserves a document. The document will not be accessible by others
         /// until CloseDocument is called.</summary>
-        /// <param name="id">The file ID to open. If -1, the next queued document will be opened.</param>
+        /// <param name="docID">The file ID to open. If -1, the next queued document will be opened.</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task<DocumentIdResult> OpenDocumentAsync(int id, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<DocumentIdResult> OpenDocumentAsync(int docID, System.Threading.CancellationToken cancellationToken)
         {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
+            if (docID == null)
+                throw new System.ArgumentNullException("docID");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/OpenDocument/{id}");
-            urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/OpenDocument/{docID}");
+            urlBuilder_.Replace("{docID}", System.Uri.EscapeDataString(ConvertToString(docID, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
             try
@@ -562,28 +569,34 @@ namespace Extract.Web.WebAPI.AppBackendTester
         }
     
         /// <summary>Releases the document so that it is again available to others in the workflow.</summary>
+        /// <param name="docID">The currently opened document ID</param>
         /// <param name="commit">true if the document is to be committed as complete in
         ///             verification; false to keep the specified document in verification.</param>
         /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task CloseDocumentAsync(bool commit, int? duration)
+        public System.Threading.Tasks.Task CloseDocumentAsync(int docID, bool commit, int? duration)
         {
-            return CloseDocumentAsync(commit, duration, System.Threading.CancellationToken.None);
+            return CloseDocumentAsync(docID, commit, duration, System.Threading.CancellationToken.None);
         }
     
         /// <summary>Releases the document so that it is again available to others in the workflow.</summary>
+        /// <param name="docID">The currently opened document ID</param>
         /// <param name="commit">true if the document is to be committed as complete in
         ///             verification; false to keep the specified document in verification.</param>
         /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task CloseDocumentAsync(bool commit, int? duration, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task CloseDocumentAsync(int docID, bool commit, int? duration, System.Threading.CancellationToken cancellationToken)
         {
+            if (docID == null)
+                throw new System.ArgumentNullException("docID");
+    
             if (commit == null)
                 throw new System.ArgumentNullException("commit");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/CloseDocument?");
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/CloseDocument/{docID}?");
+            urlBuilder_.Replace("{docID}", System.Uri.EscapeDataString(ConvertToString(docID, System.Globalization.CultureInfo.InvariantCulture)));
             urlBuilder_.Append("commit=").Append(System.Uri.EscapeDataString(ConvertToString(commit, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             if (duration != null) 
             {
@@ -662,39 +675,38 @@ namespace Extract.Web.WebAPI.AppBackendTester
         }
     
         /// <summary>Skip the document so that it will not be in the queue</summary>
-        /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
-        /// <param name="comment">Optional commment to apply to the file</param>
+        /// <param name="docID">The currently open document ID</param>
+        /// <param name="skipData">Contains the Duration in ms, to use for updating the file task session record
+        ///             and the comment to apply to the file</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task SkipDocumentAsync(int? duration, string comment)
+        public System.Threading.Tasks.Task SkipDocumentAsync(int docID, SkipDocumentData skipData)
         {
-            return SkipDocumentAsync(duration, comment, System.Threading.CancellationToken.None);
+            return SkipDocumentAsync(docID, skipData, System.Threading.CancellationToken.None);
         }
     
         /// <summary>Skip the document so that it will not be in the queue</summary>
-        /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
-        /// <param name="comment">Optional commment to apply to the file</param>
+        /// <param name="docID">The currently open document ID</param>
+        /// <param name="skipData">Contains the Duration in ms, to use for updating the file task session record
+        ///             and the comment to apply to the file</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task SkipDocumentAsync(int? duration, string comment, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task SkipDocumentAsync(int docID, SkipDocumentData skipData, System.Threading.CancellationToken cancellationToken)
         {
+            if (docID == null)
+                throw new System.ArgumentNullException("docID");
+    
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/SkipDocument?");
-            if (duration != null) 
-            {
-                urlBuilder_.Append("duration=").Append(System.Uri.EscapeDataString(ConvertToString(duration, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            }
-            if (comment != null) 
-            {
-                urlBuilder_.Append("comment=").Append(System.Uri.EscapeDataString(ConvertToString(comment, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            }
-            urlBuilder_.Length--;
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/SkipDocument/{docID}");
+            urlBuilder_.Replace("{docID}", System.Uri.EscapeDataString(ConvertToString(docID, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
             try
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
+                    var content_ = new System.Net.Http.StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(skipData, _settings.Value));
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
     
                     PrepareRequest(client_, request_, urlBuilder_);
@@ -760,21 +772,27 @@ namespace Extract.Web.WebAPI.AppBackendTester
         }
     
         /// <summary>Fail the document so that it will not be in the queue</summary>
+        /// <param name="docID">The currently open document ID</param>
         /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task FailDocumentAsync(int? duration)
+        public System.Threading.Tasks.Task FailDocumentAsync(int docID, int? duration)
         {
-            return FailDocumentAsync(duration, System.Threading.CancellationToken.None);
+            return FailDocumentAsync(docID, duration, System.Threading.CancellationToken.None);
         }
     
         /// <summary>Fail the document so that it will not be in the queue</summary>
+        /// <param name="docID">The currently open document ID</param>
         /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task FailDocumentAsync(int? duration, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task FailDocumentAsync(int docID, int? duration, System.Threading.CancellationToken cancellationToken)
         {
+            if (docID == null)
+                throw new System.ArgumentNullException("docID");
+    
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/FailDocument?");
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/FailDocument/{docID}?");
+            urlBuilder_.Replace("{docID}", System.Uri.EscapeDataString(ConvertToString(docID, System.Globalization.CultureInfo.InvariantCulture)));
             if (duration != null) 
             {
                 urlBuilder_.Append("duration=").Append(System.Uri.EscapeDataString(ConvertToString(duration, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -852,19 +870,25 @@ namespace Extract.Web.WebAPI.AppBackendTester
         }
     
         /// <summary>Get page size and orientation info for a document</summary>
+        /// <param name="docID">The currently open document ID</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<PagesInfoResult> GetPageInfoAsync()
+        public System.Threading.Tasks.Task<PagesInfoResult> GetPageInfoAsync(int docID)
         {
-            return GetPageInfoAsync(System.Threading.CancellationToken.None);
+            return GetPageInfoAsync(docID, System.Threading.CancellationToken.None);
         }
     
         /// <summary>Get page size and orientation info for a document</summary>
+        /// <param name="docID">The currently open document ID</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task<PagesInfoResult> GetPageInfoAsync(System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<PagesInfoResult> GetPageInfoAsync(int docID, System.Threading.CancellationToken cancellationToken)
         {
+            if (docID == null)
+                throw new System.ArgumentNullException("docID");
+    
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/PageInfo");
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/PageInfo/{docID}");
+            urlBuilder_.Replace("{docID}", System.Uri.EscapeDataString(ConvertToString(docID, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
             try
@@ -949,23 +973,32 @@ namespace Extract.Web.WebAPI.AppBackendTester
         }
     
         /// <summary>Gets the specified document page as a PDF file.</summary>
+        /// <param name="docID">The currently open document ID</param>
+        /// <param name="page">The page to retrieve</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<FileResponse> GetDocumentPageAsync(int page)
+        public System.Threading.Tasks.Task<FileResponse> GetDocumentPageAsync(int docID, int page)
         {
-            return GetDocumentPageAsync(page, System.Threading.CancellationToken.None);
+            return GetDocumentPageAsync(docID, page, System.Threading.CancellationToken.None);
         }
     
         /// <summary>Gets the specified document page as a PDF file.</summary>
+        /// <param name="docID">The currently open document ID</param>
+        /// <param name="page">The page to retrieve</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task<FileResponse> GetDocumentPageAsync(int page, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<FileResponse> GetDocumentPageAsync(int docID, int page, System.Threading.CancellationToken cancellationToken)
         {
+            if (docID == null)
+                throw new System.ArgumentNullException("docID");
+    
             if (page == null)
                 throw new System.ArgumentNullException("page");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/DocumentPage/{page}");
-            urlBuilder_.Replace("{page}", System.Uri.EscapeDataString(ConvertToString(page, System.Globalization.CultureInfo.InvariantCulture)));
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/DocumentPage/{docID}?");
+            urlBuilder_.Replace("{docID}", System.Uri.EscapeDataString(ConvertToString(docID, System.Globalization.CultureInfo.InvariantCulture)));
+            urlBuilder_.Append("page=").Append(System.Uri.EscapeDataString(ConvertToString(page, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            urlBuilder_.Length--;
     
             var client_ = _httpClient;
             try
@@ -1058,19 +1091,25 @@ namespace Extract.Web.WebAPI.AppBackendTester
         }
     
         /// <summary>Gets the document data.</summary>
+        /// <param name="docID">The currently open document ID</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<DocumentDataResult> GetDocumentDataAsync()
+        public System.Threading.Tasks.Task<DocumentDataResult> GetDocumentDataAsync(int docID)
         {
-            return GetDocumentDataAsync(System.Threading.CancellationToken.None);
+            return GetDocumentDataAsync(docID, System.Threading.CancellationToken.None);
         }
     
         /// <summary>Gets the document data.</summary>
+        /// <param name="docID">The currently open document ID</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task<DocumentDataResult> GetDocumentDataAsync(System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<DocumentDataResult> GetDocumentDataAsync(int docID, System.Threading.CancellationToken cancellationToken)
         {
+            if (docID == null)
+                throw new System.ArgumentNullException("docID");
+    
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/DocumentData");
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/DocumentData/{docID}");
+            urlBuilder_.Replace("{docID}", System.Uri.EscapeDataString(ConvertToString(docID, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
             try
@@ -1170,21 +1209,27 @@ namespace Extract.Web.WebAPI.AppBackendTester
         }
     
         /// <summary>Saves the document data.</summary>
+        /// <param name="docID">The document ID that the data is for</param>
         /// <param name="documentData">The document data.</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task SaveDocumentDataAsync(DocumentDataInput documentData)
+        public System.Threading.Tasks.Task SaveDocumentDataAsync(int docID, DocumentDataInput documentData)
         {
-            return SaveDocumentDataAsync(documentData, System.Threading.CancellationToken.None);
+            return SaveDocumentDataAsync(docID, documentData, System.Threading.CancellationToken.None);
         }
     
         /// <summary>Saves the document data.</summary>
+        /// <param name="docID">The document ID that the data is for</param>
         /// <param name="documentData">The document data.</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task SaveDocumentDataAsync(DocumentDataInput documentData, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task SaveDocumentDataAsync(int docID, DocumentDataInput documentData, System.Threading.CancellationToken cancellationToken)
         {
+            if (docID == null)
+                throw new System.ArgumentNullException("docID");
+    
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/DocumentData");
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/DocumentData/{docID}");
+            urlBuilder_.Replace("{docID}", System.Uri.EscapeDataString(ConvertToString(docID, System.Globalization.CultureInfo.InvariantCulture)));
     
             var client_ = _httpClient;
             try
@@ -1259,24 +1304,30 @@ namespace Extract.Web.WebAPI.AppBackendTester
         }
     
         /// <summary>Gets the page word zones.</summary>
+        /// <param name="docID">The currently open document ID</param>
         /// <param name="page">The page.</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<WordZoneDataResult> GetPageWordZonesAsync(int page)
+        public System.Threading.Tasks.Task<WordZoneDataResult> GetPageWordZonesAsync(int docID, int page)
         {
-            return GetPageWordZonesAsync(page, System.Threading.CancellationToken.None);
+            return GetPageWordZonesAsync(docID, page, System.Threading.CancellationToken.None);
         }
     
         /// <summary>Gets the page word zones.</summary>
+        /// <param name="docID">The currently open document ID</param>
         /// <param name="page">The page.</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task<WordZoneDataResult> GetPageWordZonesAsync(int page, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<WordZoneDataResult> GetPageWordZonesAsync(int docID, int page, System.Threading.CancellationToken cancellationToken)
         {
+            if (docID == null)
+                throw new System.ArgumentNullException("docID");
+    
             if (page == null)
                 throw new System.ArgumentNullException("page");
     
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/PageWordZones?");
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/PageWordZones/{docID}?");
+            urlBuilder_.Replace("{docID}", System.Uri.EscapeDataString(ConvertToString(docID, System.Globalization.CultureInfo.InvariantCulture)));
             urlBuilder_.Append("page=").Append(System.Uri.EscapeDataString(ConvertToString(page, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             urlBuilder_.Length--;
     
@@ -1584,6 +1635,30 @@ namespace Extract.Web.WebAPI.AppBackendTester
         public static DocumentIdResult FromJson(string data)
         {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<DocumentIdResult>(data);
+        }
+    
+    }
+    
+    /// <summary>Data required when skipping a document</summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.13.18.0 (Newtonsoft.Json v11.0.0.0)")]
+    public partial class SkipDocumentData 
+    {
+        /// <summary>Duration in ms, to use for updating the file task session record when skipping a document</summary>
+        [Newtonsoft.Json.JsonProperty("Duration", Required = Newtonsoft.Json.Required.Always)]
+        public int Duration { get; set; }
+    
+        /// <summary>Comment to save when skipping a document</summary>
+        [Newtonsoft.Json.JsonProperty("Comment", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string Comment { get; set; }
+    
+        public string ToJson() 
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+        }
+    
+        public static SkipDocumentData FromJson(string data)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<SkipDocumentData>(data);
         }
     
     }

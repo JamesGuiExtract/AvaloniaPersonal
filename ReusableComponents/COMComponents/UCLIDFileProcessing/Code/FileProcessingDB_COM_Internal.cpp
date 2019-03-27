@@ -6791,17 +6791,15 @@ bool CFileProcessingDB::RecordFAMSessionStop_Internal(bool bDBLocked)
 
 			END_CONNECTION_RETRY(ipConnection, "ELI28905");
 
-			m_nFAMSessionID = 0;
-			m_nActiveActionID = -1;
-			m_strFPSFileName = "";
+			// Reset members set by starting/resuming a web and/or FAM session back to their defaults
+			setDefaultSessionMemberValues();
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30697");
 	}
 	catch(UCLIDException &ue)
 	{
-		m_nFAMSessionID = 0;
-		m_nActiveActionID = -1;
-		m_strFPSFileName = "";
+		// Reset members set by starting/resuming a web and/or FAM session back to their defaults
+		setDefaultSessionMemberValues();
 
 		if (!bDBLocked)
 		{

@@ -4723,6 +4723,20 @@ STDMETHODIMP CFileProcessingDB::ResumeWebSession(long nFAMSessionID, long* pnFil
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46657");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SuspendWebSession()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Reset members set by starting/resuming a web and/or FAM session back to their defaults
+		setDefaultSessionMemberValues();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46696");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::GetActiveUsers(BSTR bstrAction, IVariantVector** ppvecUserNames)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());

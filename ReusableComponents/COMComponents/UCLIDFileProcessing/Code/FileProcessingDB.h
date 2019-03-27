@@ -363,6 +363,7 @@ public:
 	STDMETHOD(AbortFAMSession)(long nFAMSessionID);
 	STDMETHOD(MarkFileDeleted)(long nFileID, long nWorkflowID);
 	STDMETHOD(ResumeWebSession)(long nFAMSessionID, long* pnFileTaskSessionID, long* pnOpenFileID, VARIANT_BOOL* pbIsFileOpen);
+	STDMETHOD(SuspendWebSession)();
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1487,6 +1488,7 @@ private:
 	bool AbortFAMSession_Internal(bool bDBLocked, long nFAMSessionID);
 	bool MarkFileDeleted_Internal(bool bDBLocked, long nFileID, long nWorkflowID);
 	void InvalidatePreviousCachedInfoIfNecessary();
+	void setDefaultSessionMemberValues();
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

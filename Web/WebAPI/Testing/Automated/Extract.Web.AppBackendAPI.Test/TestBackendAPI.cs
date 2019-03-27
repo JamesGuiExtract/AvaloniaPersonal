@@ -166,17 +166,17 @@ namespace Extract.Web.WebAPI.Test
 
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
-                controller.CloseDocument(commit: false)
+                controller.CloseDocument(openDocumentResult.Id, commit: false)
                     .AssertGoodResult<NoContentResult>();
 
                 Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
                 result = controller.OpenDocument();
-                result.AssertGoodResult<DocumentIdResult>();
+                openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
 
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
-                controller.CloseDocument(commit: true)
+                controller.CloseDocument(openDocumentResult.Id, commit: true)
                     .AssertGoodResult<NoContentResult>();
 
                 Assert.AreEqual(EActionStatus.kActionCompleted, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
@@ -212,7 +212,7 @@ namespace Extract.Web.WebAPI.Test
 
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
-                controller.CloseDocument(commit: false)
+                controller.CloseDocument(openDocumentResult.Id, commit: false)
                     .AssertGoodResult<NoContentResult>();
 
                 Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
@@ -223,7 +223,7 @@ namespace Extract.Web.WebAPI.Test
 
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(2, _VERIFY_ACTION, false));
 
-                controller.CloseDocument(commit: true)
+                controller.CloseDocument(openDocumentResult.Id, commit: true)
                     .AssertGoodResult<NoContentResult>();
 
                 Assert.AreEqual(EActionStatus.kActionCompleted, fileProcessingDb.GetFileStatus(2, _VERIFY_ACTION, false));
@@ -259,7 +259,7 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual(4, queueStatus.PendingDocuments);
 
                 result = controller1.OpenDocument();
-                result.AssertGoodResult<DocumentIdResult>();
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
 
                 result = controller1.GetQueueStatus();
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
@@ -278,7 +278,7 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual(2, queueStatus.ActiveUsers);
                 Assert.AreEqual(3, queueStatus.PendingDocuments);
 
-                controller1.CloseDocument(commit: true)
+                controller1.CloseDocument(openDocumentResult.Id, commit: true)
                     .AssertGoodResult<NoContentResult>();
 
                 result = controller1.OpenDocument();
@@ -331,13 +331,14 @@ namespace Extract.Web.WebAPI.Test
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
-                controller.CloseDocument(commit: false)
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+                controller.CloseDocument(openDocumentResult.Id, commit: false)
                     .AssertGoodResult<NoContentResult>();
 
                 Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(2, _VERIFY_ACTION, false));
 
                 result = controller.OpenDocument(2);
-                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+                openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(2, openDocumentResult.Id);
 
                 // Per GGK request, allow second call to OpenDocument to not fail and return the ID of the already
@@ -347,7 +348,7 @@ namespace Extract.Web.WebAPI.Test
                 openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(2, openDocumentResult.Id);
 
-                controller.CloseDocument(commit: false)
+                controller.CloseDocument(openDocumentResult.Id, commit: false)
                     .AssertGoodResult<NoContentResult>();
 
                 // After document is closed, OpenDocument should open the first file in the queue,
@@ -356,7 +357,7 @@ namespace Extract.Web.WebAPI.Test
                 openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(1, openDocumentResult.Id);
 
-                controller.CloseDocument(commit: false)
+                controller.CloseDocument(openDocumentResult.Id, commit: false)
                     .AssertGoodResult<NoContentResult>();
 
                 controller.Logout()
@@ -454,7 +455,7 @@ namespace Extract.Web.WebAPI.Test
 
                 // Query that required access to the document session should generate an unauthorized
                 // error that should abort previous document session.
-                result = controller2.GetPageInfo();
+                result = controller2.GetPageInfo(1);
                 result.AssertResultCode(StatusCodes.Status401Unauthorized);
 
                 // Ensure document 1 has now been reset to pending.
@@ -493,7 +494,7 @@ namespace Extract.Web.WebAPI.Test
                 var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(fileId, openDocumentResult.Id);
 
-                result = controller.GetPageInfo();
+                result = controller.GetPageInfo(openDocumentResult.Id);
                 var pagesInfo = result.AssertGoodResult<PagesInfoResult>();
 
                 Assert.AreEqual(pagesInfo.PageCount, 4, "Unexpected page count");
@@ -548,7 +549,7 @@ namespace Extract.Web.WebAPI.Test
                 var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(fileId, openDocumentResult.Id);
 
-                result = controller.GetPageInfo();
+                result = controller.GetPageInfo(openDocumentResult.Id);
                 var pagesInfo = result.AssertGoodResult<PagesInfoResult>();
 
                 Assert.AreEqual(pagesInfo.PageCount, 4, "Unexpected page count");
@@ -607,7 +608,7 @@ namespace Extract.Web.WebAPI.Test
                 using (var codecs = new ImageCodecs())
                     for (int page = 1; page <= 4; page++)
                     {
-                        result = controller.GetDocumentPage(page);
+                        result = controller.GetDocumentPage(openDocumentResult.Id, page);
                         var fileResult = result.AssertGoodResult<FileContentResult>();
 
                         using (var temporaryFile = new TemporaryFile(".pdf", false))
@@ -665,9 +666,9 @@ namespace Extract.Web.WebAPI.Test
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
-                result.AssertGoodResult<DocumentIdResult>();
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
 
-                result = controller.GetDocumentData();
+                result = controller.GetDocumentData(openDocumentResult.Id);
                 var attributeSet = result.AssertGoodResult<DocumentDataResult>();
 
                 Assert.IsTrue(attributeSet.Attributes.Count > 0);
@@ -727,9 +728,9 @@ namespace Extract.Web.WebAPI.Test
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
-                result.AssertGoodResult<DocumentIdResult>();
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
 
-                result = controller.GetDocumentData();
+                result = controller.GetDocumentData(openDocumentResult.Id);
                 var attributeSet = result.AssertGoodResult<DocumentDataResult>();
 
                 var updatedAttributes = attributeSet.Attributes.Skip(1);
@@ -740,10 +741,10 @@ namespace Extract.Web.WebAPI.Test
                     Attributes = new List<DocumentAttribute>(updatedAttributes)
                 };
 
-                controller.SaveDocumentData(updateAttributeSet)
+                controller.SaveDocumentData(openDocumentResult.Id, updateAttributeSet)
                     .AssertGoodResult<NoContentResult>();
 
-                result = controller.GetDocumentData();
+                result = controller.GetDocumentData(openDocumentResult.Id);
                 attributeSet = result.AssertGoodResult<DocumentDataResult>();
 
                 Assert.AreEqual(attributeSet.Attributes.Count(), updatedAttributes.Count());
@@ -786,7 +787,7 @@ namespace Extract.Web.WebAPI.Test
                 controller.ApplyTokenClaimPrincipalToContext(token);
 
                 result = controller.OpenDocument();
-                result.AssertGoodResult<DocumentIdResult>();
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
 
                 var documentText = new SpatialString();
                 documentText.LoadFrom(ussFileName, false);
@@ -798,7 +799,7 @@ namespace Extract.Web.WebAPI.Test
                     var pageText = documentText.GetSpecifiedPages(page, page);
                     IUnknownVector pageWords = pageText.GetWords();
 
-                    result = controller.GetPageWordZones(page);
+                    result = controller.GetPageWordZones(openDocumentResult.Id, page);
                     var wordZoneData = result.AssertGoodResult<WordZoneDataResult>();
                     Assert.AreEqual(pageWords.Size(), wordZoneData.Zones.Count(), "Unexpected number of words");
 
