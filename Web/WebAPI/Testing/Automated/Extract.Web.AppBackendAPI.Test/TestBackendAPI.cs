@@ -253,7 +253,7 @@ namespace Extract.Web.WebAPI.Test
                 var token = result.AssertGoodResult<JwtSecurityToken>();
                 controller1.ApplyTokenClaimPrincipalToContext(token);
 
-                result = controller1.GetQueueStatus();
+                result = controller1.GetQueueStatus(ping: false);
                 var queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(1, queueStatus.ActiveUsers);
                 Assert.AreEqual(4, queueStatus.PendingDocuments);
@@ -261,7 +261,7 @@ namespace Extract.Web.WebAPI.Test
                 result = controller1.OpenDocument();
                 result.AssertGoodResult<DocumentIdResult>();
 
-                result = controller1.GetQueueStatus();
+                result = controller1.GetQueueStatus(ping: false);
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(1, queueStatus.ActiveUsers);
                 Assert.AreEqual(3, queueStatus.PendingDocuments);
@@ -273,7 +273,7 @@ namespace Extract.Web.WebAPI.Test
                 token = result.AssertGoodResult<JwtSecurityToken>();
                 controller2.ApplyTokenClaimPrincipalToContext(token);
 
-                result = controller1.GetQueueStatus();
+                result = controller1.GetQueueStatus(ping: false);
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(2, queueStatus.ActiveUsers);
                 Assert.AreEqual(3, queueStatus.PendingDocuments);
@@ -284,7 +284,7 @@ namespace Extract.Web.WebAPI.Test
                 result = controller1.OpenDocument();
                 result.AssertGoodResult<DocumentIdResult>();
 
-                result = controller2.GetQueueStatus();
+                result = controller2.GetQueueStatus(ping: false);
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(2, queueStatus.ActiveUsers);
                 Assert.AreEqual(2, queueStatus.PendingDocuments);
@@ -292,7 +292,7 @@ namespace Extract.Web.WebAPI.Test
                 result = controller2.OpenDocument();
                 result.AssertGoodResult<DocumentIdResult>();
 
-                result = controller2.GetQueueStatus();
+                result = controller2.GetQueueStatus(ping: true);  // true just to make it can be called both ways without error.
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(2, queueStatus.ActiveUsers);
                 Assert.AreEqual(1, queueStatus.PendingDocuments);
@@ -300,7 +300,7 @@ namespace Extract.Web.WebAPI.Test
                 controller1.Logout()
                     .AssertGoodResult<NoContentResult>();
 
-                result = controller2.GetQueueStatus();
+                result = controller2.GetQueueStatus(ping: true);
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(1, queueStatus.ActiveUsers);
                 Assert.AreEqual(2, queueStatus.PendingDocuments);
@@ -427,7 +427,7 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual(1, openDocumentResult.Id);
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
-                result = controller.GetQueueStatus();
+                result = controller.GetQueueStatus(ping: false);
                 var beforeQueueStatus = result.AssertGoodResult<QueueStatusResult>();
 
                 // Simulate the web service being stopped.
@@ -445,20 +445,19 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
                 // Should be able to query queue status despite new controller not having access to the document session.
-                result = controller2.GetQueueStatus();
+                result = controller2.GetQueueStatus(ping: false);
                 var afterQueueStatus = result.AssertGoodResult<QueueStatusResult>();
 
                 // Document 1 should remain in processing state
                 Assert.AreEqual(beforeQueueStatus.PendingDocuments, afterQueueStatus.PendingDocuments);
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
-                // Query that required access to the document session should generate an unauthorized
-                // error that should abort previous document session.
+                // Session should be re-established upon call that requires it.
                 result = controller2.GetPageInfo();
-                result.AssertResultCode(StatusCodes.Status401Unauthorized);
+                result.AssertResultCode(StatusCodes.Status200OK);
 
-                // Ensure document 1 has now been reset to pending.
-                Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
+                // Would need to wait 5+ min to ensure document 1 would be been reset to pending.
+                // Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
             }
             finally
             {

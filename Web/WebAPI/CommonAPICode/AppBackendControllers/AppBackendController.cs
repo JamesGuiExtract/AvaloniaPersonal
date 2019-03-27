@@ -117,16 +117,18 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Gets the number of document, pages and active users in the current verification queue.
         /// </summary>
+        /// <param name="ping">If true, will ping the FAM session to keep it from timing out.
+        /// </param>
         [HttpGet("QueueStatus")]
         [Authorize]
         [ProducesResponseType(200, Type = typeof(QueueStatusResult))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
-        public IActionResult GetQueueStatus()
+        public IActionResult GetQueueStatus(bool ping = false)
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: false))
+                using (var data = new DocumentData(User, requireSession: ping))
                 {
                     var result = data.GetQueueStatus();
 
