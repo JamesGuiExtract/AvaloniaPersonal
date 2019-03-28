@@ -327,26 +327,21 @@ namespace Extract.Web.WebAPI.AppBackendTester
             {
             }
         }
-
+    
         /// <summary>Gets the number of document, pages and active users in the current verification queue.</summary>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task<QueueStatusResult> GetQueueStatusAsync(bool? ping)
+        public System.Threading.Tasks.Task<QueueStatusResult> GetQueueStatusAsync()
         {
-            return GetQueueStatusAsync(ping, System.Threading.CancellationToken.None);
+            return GetQueueStatusAsync(System.Threading.CancellationToken.None);
         }
-
+    
         /// <summary>Gets the number of document, pages and active users in the current verification queue.</summary>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task<QueueStatusResult> GetQueueStatusAsync(bool? ping, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task<QueueStatusResult> GetQueueStatusAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/QueueStatus?");
-            if (ping != null) 
-            {
-                urlBuilder_.Append("ping=").Append(System.Uri.EscapeDataString(ConvertToString(ping.Value, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            }
-            urlBuilder_.Length--;
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/AppBackend/QueueStatus");
     
             var client_ = _httpClient;
             try
@@ -1988,5 +1983,6 @@ namespace Extract.Web.WebAPI.AppBackendTester
             Result = result;
         }
     }
+
     #pragma warning restore
 }

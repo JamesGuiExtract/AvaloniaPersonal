@@ -270,7 +270,7 @@ namespace Extract.Web.WebAPI.AppBackendTester
             async Task QueueStatusTest()
             {
                 await Log(FormattableString.Invariant($"Getting queue status for token {client.ShortID}"), async () =>
-                    await client.GetQueueStatusAsync(false));
+                    await client.GetQueueStatusAsync());
             }
 
             async Task SettingsTest()
