@@ -12216,12 +12216,36 @@ bool CFileProcessingDB::MarkFileDeleted_Internal(bool bDBLocked, long nFileID, l
 
 			ipConnection = getDBConnection();
 
+			// Get all the Main sequence actions for the given workflow
+			string strMainSequenceActionQuery = "SELECT ID, ASCName FROM Action WHERE MainSequence = 1 AND WorkflowID =  " +
+				asString(nWorkflowID);
+
+			_RecordsetPtr ipMainSequenceSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI46706", ipMainSequenceSet != __nullptr);
+
+			ipMainSequenceSet->Open(strMainSequenceActionQuery.c_str(),
+				_variant_t((IDispatch*)ipConnection, true), adOpenStatic, adLockReadOnly, adCmdText);
+
+			map<long, string> mapMainSequenceActions;
+			while (ipMainSequenceSet->adoEOF == VARIANT_FALSE)
+			{
+				FieldsPtr ipFields = ipMainSequenceSet->Fields;
+				mapMainSequenceActions[getLongField(ipFields, "ID")] = getStringField(ipFields, "ASCName");
+				ipMainSequenceSet->MoveNext();
+			}
+			ipMainSequenceSet->Close();
+
 			TransactionGuard tg(ipConnection, adXactIsolated, &m_criticalSection);
 
 			string strMarkDeletedQuery = "UPDATE [WorkflowFile] SET [Deleted] = 1 "
 				"WHERE [FileID] = " + asString(nFileID) + " AND [WorkflowID] = " + asString(nWorkflowID);
 
 			long nAffected = executeCmdQuery(ipConnection, strMarkDeletedQuery.c_str(), false);
+
+			for (auto action = mapMainSequenceActions.begin(); action != mapMainSequenceActions.end(); action++)
+			{
+				setFileActionState(ipConnection, nFileID, action->second, nWorkflowID, "U", "", true, false, action->first);
+			}
 
 			ASSERT_RUNTIME_CONDITION("ELI46299", nAffected == 1, "Failed to mark file deleted.");
 
