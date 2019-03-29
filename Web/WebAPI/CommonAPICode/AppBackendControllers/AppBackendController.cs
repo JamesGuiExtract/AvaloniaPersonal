@@ -240,6 +240,67 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
+        /// Apply a comment to a document
+        /// </summary>
+        /// <param name="docID">The currently open document ID</param>
+        /// <param name="commentData">Contains the comment to apply to the document</param>
+        [HttpPut("Comment/{docID}")]
+        [Authorize]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        public IActionResult AddComment(int docID, [FromBody]  CommentData commentData = null)
+        {
+            try
+            {
+                using (var data = new DocumentData(User, requireSession: true))
+                {
+                    ExtractException.Assert("ELI46707", "The supplied document ID doesn't match the open session's document ID",
+                        docID == data.DocumentSessionFileId);
+
+                    data.SetComment(commentData?.Comment ?? "");
+
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI46708");
+            }
+        }
+
+        /// <summary>
+        /// The comment of a document
+        /// </summary>
+        /// <param name="docID">The currently open document ID</param>
+        /// <returns>The comment applied to the open document</returns>
+        [HttpGet("Comment/{docID}")]
+        [Authorize]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        public IActionResult GetComment(int docID)
+        {
+            try
+            {
+                using (var data = new DocumentData(User, requireSession: true))
+                {
+                    ExtractException.Assert("ELI46714", "The supplied document ID doesn't match the open session's document ID",
+                        docID == data.DocumentSessionFileId);
+
+                    var commentData = data.GetComment();
+
+                    return Ok(commentData);
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI46715");
+            }
+        }
+
+
+        /// <summary>
         /// Fail the document so that it will not be in the queue
         /// </summary>
         /// <param name="docID">The currently open document ID</param>
