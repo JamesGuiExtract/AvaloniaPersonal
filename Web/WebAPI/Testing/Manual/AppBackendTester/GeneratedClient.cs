@@ -1491,7 +1491,7 @@ namespace Extract.Web.WebAPI.AppBackendTester
             }
         }
     
-        /// <summary>Gets the page word zones.</summary>
+        /// <summary>The word zone data, grouped by line.</summary>
         /// <param name="docID">The currently open document ID</param>
         /// <param name="page">The page.</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
@@ -1500,7 +1500,7 @@ namespace Extract.Web.WebAPI.AppBackendTester
             return GetPageWordZonesAsync(docID, page, System.Threading.CancellationToken.None);
         }
     
-        /// <summary>Gets the page word zones.</summary>
+        /// <summary>The word zone data, grouped by line.</summary>
         /// <param name="docID">The currently open document ID</param>
         /// <param name="page">The page.</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
@@ -2182,7 +2182,7 @@ namespace Extract.Web.WebAPI.AppBackendTester
         /// <summary>Gets a list of SpatialLineZones instances, each of which represents one word
         /// from OCR results. NOTE: Non-spatial text will not be included in these zones.</summary>
         [Newtonsoft.Json.JsonProperty("Zones", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.Generic.ICollection<SpatialLineZone> Zones { get; set; }
+        public System.Collections.Generic.ICollection<System.Collections.Generic.ICollection<SpatialLineZone>> Zones { get; set; }
     
         public string ToJson() 
         {

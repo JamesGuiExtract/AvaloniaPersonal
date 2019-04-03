@@ -570,7 +570,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Gets the word zone data.
+        /// The word zone data, grouped by line.
         /// </summary>
         /// <param name="fileId">The file identifier.</param>
         /// <param name="page">The page.</param>

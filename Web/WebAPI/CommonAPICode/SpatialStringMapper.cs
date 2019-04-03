@@ -13,7 +13,7 @@ namespace WebAPI
     /// This static class converts spatial info from SpatialString instances to data models used for
     /// API call return values.
     /// </summary>
-    public static class SpatialStringMapper
+    internal static class SpatialStringMapper
     {
         #region Methods
 
@@ -66,21 +66,17 @@ namespace WebAPI
         /// </summary>
         /// <param name="spatialString">The spatial string.</param>
         /// <returns></returns>
-        public static List<SpatialLineZone> MapSpatialStringToWordZoneData(this SpatialString spatialString)
+        public static List<List<SpatialLineZone>> MapSpatialStringToWordZoneData(this SpatialString spatialString)
         {
             try
             {
-                var wordZoneData = new List<SpatialLineZone>();
-                var words = spatialString.GetWords();
-                int count = words.Size();
-                for (int i = 0; i < count; i++)
-                {
-                    var word = (SpatialString)words.At(i);
-                    if (word.HasSpatialInfo())
-                    {
-                        wordZoneData.Add(word.MakeLineInfo(false).Single().SpatialLineZone);
-                    }
-                }
+                List<List<SpatialLineZone>> wordZoneData =
+                    spatialString.GetLines().ToIEnumerable<SpatialString>()
+                        .Select(line => line.GetWords().ToIEnumerable<SpatialString>()
+                            .Where(word => word.HasSpatialInfo())
+                            .Select(word => word.MakeLineInfo(false).Single().SpatialLineZone)
+                            .ToList())
+                        .ToList();
 
                 return wordZoneData;
             }

@@ -463,7 +463,7 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Gets the page word zones.
+        /// The word zone data, grouped by line.
         /// </summary>
         /// <param name="docID">The currently open document ID</param>
         /// <param name="page">The page.</param>

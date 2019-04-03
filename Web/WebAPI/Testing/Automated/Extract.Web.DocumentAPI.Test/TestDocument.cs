@@ -426,19 +426,25 @@ namespace Extract.Web.WebAPI.Test
                 for (int page = 1; page <= pageCount; page++)
                 {
                     var pageText = ussData.GetSpecifiedPages(page, page);
-                    IUnknownVector pageWords = pageText.GetWords();
-                    int wordCount = pageWords.Size();
+                    List<ComRasterZone> pageWords =
+                        pageText.GetLines().ToIEnumerable<SpatialString>()
+                            .SelectMany(line => line.GetWords().ToIEnumerable<SpatialString>()
+                                .Where(word => word.HasSpatialInfo())
+                                .Select(word => (ComRasterZone)word.GetOriginalImageRasterZones().At(0)))
+                            .ToList();
+                    int wordCount = pageWords.Count;
 
                     var wordZoneData = controller.GetPageWordZones(fileId, page)
-                        .AssertGoodResult<WordZoneDataResult>();
-                    Assert.AreEqual(wordCount, wordZoneData.Zones.Count(), "Unexpected number of words");
+                        .AssertGoodResult<WordZoneDataResult>()
+                        .Zones
+                        .SelectMany(line => line)
+                        .ToList();
+                    Assert.AreEqual(wordCount, wordZoneData.Count, "Unexpected number of words");
 
-                    for (int i = 0; i < wordCount ; i++)
+                    for (int i = 0; i < wordZoneData.Count(); i++)
                     {
-                        var wordZone = wordZoneData.Zones[i];
-
-                        SpatialString spatialStringWord = (SpatialString)pageWords.At(i);
-                        var spatialStringZone = (ComRasterZone)spatialStringWord.GetOriginalImageRasterZones().At(0);
+                        var wordZone = wordZoneData[i];
+                        var spatialStringZone = pageWords[i];
 
                         Assert.AreEqual(page, wordZone.PageNumber, "Incorrect page");
                         Assert.AreEqual(spatialStringZone.StartX, wordZone.StartX, "Incorrect StartX");
