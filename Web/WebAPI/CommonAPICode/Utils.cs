@@ -21,6 +21,16 @@ namespace WebAPI
         /// </summary>
         public static string _WORKFLOW_NAME = "WorkflowName";
 
+        /// <summary>
+        /// The name of the FAMSessionID claim used for ClaimsPrincipals
+        /// </summary>
+        public static string _FAM_SESSION_ID = "FAMSessionId";
+
+        /// <summary>
+        /// The name of the ExpiresTime claim used for ClaimsPrincipals 
+        /// </summary>
+        public static string _EXPIRES_TIME = "ExpiresTime";
+
         private static IHostingEnvironment _environment = null;
         private static ApiContext _currentApiContext = null;
         private static object _apiContextLock = new Object();
@@ -44,17 +54,17 @@ namespace WebAPI
         {
             get
             {
-                HTTPError.Assert("ELI46363",_environment != null, "Environment is null");
+                HTTPError.Assert("ELI46363", _environment != null, "Environment is null");
                 return _environment;
             }
-            
+
             set
             {
                 HTTPError.Assert("ELI46364", value != null, "Environment is being set to null");
                 _environment = value;
             }
         }
-        
+
 
         /// <summary>
         /// String compare made easier to use and read...
@@ -64,8 +74,8 @@ namespace WebAPI
         /// <param name="s2">the string to compare "this" too</param>
         /// <param name="ignoreCase">true to ignore case</param>
         /// <returns>true if string matches</returns>
-        public static bool IsEquivalent(this string s1, 
-                                        string s2, 
+        public static bool IsEquivalent(this string s1,
+                                        string s2,
                                         bool ignoreCase = true)
         {
             if (String.Compare(s1, s2, ignoreCase, CultureInfo.InvariantCulture) == 0)
@@ -128,8 +138,8 @@ namespace WebAPI
             {
                 lock (_apiContextLock)
                 {
-                    _currentApiContext = new ApiContext(databaseServerName, 
-                                                        databaseName, 
+                    _currentApiContext = new ApiContext(databaseServerName,
+                                                        databaseName,
                                                         workflowName,
                                                         dbNumberOfConnectionRetries,
                                                         dbConnectionRetryTimeout,
@@ -234,7 +244,7 @@ namespace WebAPI
                 var context = new ApiContext(databaseServerName, databaseName, workflowName);
                 context.SessionId = user.GetClaim(JwtRegisteredClaimNames.Jti);
                 context.FAMSessionId = user.Claims
-                    .Where(claim => claim.Type.Equals("FAMSessionId", StringComparison.OrdinalIgnoreCase))
+                    .Where(claim => claim.Type.Equals(_FAM_SESSION_ID, StringComparison.OrdinalIgnoreCase))
                     .Select(claim => Int32.TryParse(claim.Value, out int id) ? id : 0)
                     .FirstOrDefault();
 
@@ -267,7 +277,7 @@ namespace WebAPI
         public static string GetUsername(this ClaimsPrincipal claimsPrincipal)
         {
             var usernameClaim = claimsPrincipal.Claims
-                .SingleOrDefault(claim => 
+                .SingleOrDefault(claim =>
                     claim.Type.Equals(JwtRegisteredClaimNames.Sub, StringComparison.OrdinalIgnoreCase));
 
             if (usernameClaim == null)
@@ -281,6 +291,22 @@ namespace WebAPI
             ExtractException.Assert("ELI46291", "Username not found", usernameClaim != null);
 
             return usernameClaim.Value;
+        }
+
+        /// <summary>
+        /// This checks for the Custom claims added with a Login or SessionLogin
+        /// </summary>
+        /// <param name="claimsPrincipal">The claims principal</param>
+        /// <returns></returns>
+        public static bool HasExpectedClaims(this ClaimsPrincipal claimsPrincipal)
+        {
+            List<string> claimNames = new List<string>()
+            {
+                _EXPIRES_TIME,
+                _WORKFLOW_NAME,
+                _FAM_SESSION_ID
+            };
+            return claimsPrincipal.Claims.Where(c => claimNames.Contains(c.Type)).Count() == claimNames.Count();
         }
 
         /// <summary>

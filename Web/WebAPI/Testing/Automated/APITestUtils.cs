@@ -245,25 +245,25 @@ namespace Extract.Web.WebAPI.Test
         /// <summary>
         /// Validates a the <see cref="IActionResult"/> has the specified HTTP status code.
         /// </summary>
-        public static void AssertResultCode(this Task<IActionResult> resultTask, int expectedCode)
+        public static void AssertResultCode(this Task<IActionResult> resultTask, int expectedCode, string message = "")
         {
-            AssertResultCode(resultTask.Result, expectedCode);
+            AssertResultCode(resultTask.Result, expectedCode, message);
         }
 
         /// <summary>
         /// Validates a the <see cref="IActionResult"/> has the specified HTTP status code.
         /// </summary>
-        public static void AssertResultCode(this IActionResult result, int expectedCode)
+        public static void AssertResultCode(this IActionResult result, int expectedCode, string message = "")
         {
             try
             {
                 if (result is ObjectResult objectResult)
                 {
-                    Assert.AreEqual(expectedCode, objectResult.StatusCode);
+                    Assert.AreEqual(expectedCode, objectResult.StatusCode, message);
                 }
                 else if (result is StatusCodeResult statusCodeResult)
                 {
-                    Assert.AreEqual(expectedCode, statusCodeResult.StatusCode);
+                    Assert.AreEqual(expectedCode, statusCodeResult.StatusCode, message);
                 }
                 else
                 {

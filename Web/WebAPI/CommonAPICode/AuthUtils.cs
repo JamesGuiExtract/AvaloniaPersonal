@@ -68,12 +68,15 @@ namespace WebAPI
         /// </summary>
         /// <param name="user">the User DTO instance</param>
         /// <param name="context">the user's context</param>
+        /// <param name="expireTime">The DateTime that the Token will expire, if null is 
+        /// specified will default to current time + <see cref="TokenTimeout"/></param>
         /// <returns>JSON-encoded JWT.</returns>
-        internal static LoginToken GenerateToken(User user, ApiContext context)
+        internal static LoginToken GenerateToken(User user, ApiContext context, DateTime? expireTime = null)
         {
             try
             {
                 var now = DateTime.UtcNow;
+                var expires = expireTime ?? now.Add(TokenTimeout);
 
                 // Specifically add the jti (nonce), iat (issued timestamp), and sub (subject/user) claims.
                 var claims = new Claim[]
@@ -84,10 +87,9 @@ namespace WebAPI
 
                     // Add custom claims. The workflow name may be from the user login request.
                     new Claim(_WORKFLOW_NAME, context.WorkflowName),
-                    new Claim("FAMSessionId", context.FAMSessionId.ToString(CultureInfo.InvariantCulture))
+                    new Claim(_FAM_SESSION_ID, context.FAMSessionId.ToString(CultureInfo.InvariantCulture)),
+                    new Claim(_EXPIRES_TIME, expires.ToString("o"))
                 };
-
-                var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims));
 
                 // Create the JWT and write it to a string
                 var jwt = new JwtSecurityToken(
@@ -95,7 +97,7 @@ namespace WebAPI
                     audience: Audience,
                     claims: claims,
                     notBefore: now,
-                    expires: now.Add(TokenTimeout),
+                    expires: expires,
                     signingCredentials: new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256));
 
                 var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);

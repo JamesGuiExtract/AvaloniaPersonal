@@ -1,11 +1,12 @@
 ﻿using Extract;
-using UCLID_FILEPROCESSINGLib;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
+using System.Globalization;
 using System.Net;
+using UCLID_FILEPROCESSINGLib;
 using WebAPI.Models;
 
 using static WebAPI.Utils;
@@ -22,7 +23,7 @@ namespace WebAPI.Controllers
     {
         /// <summary>
         /// Authenticates a user. Prefix the returned access_token with "Bearer " to use for authorization
-        /// in subsequent API calls.
+        /// for the SessionLogin call.
         /// </summary>
         /// <param name="user">Login credentials. WorkflowName is optional;
         /// specify only if a special workflow is required.</param>
@@ -48,9 +49,6 @@ namespace WebAPI.Controllers
                     // IPAddress is used to identify the caller via the "Machine" column in FAMSession. If no RemoteIpAddress
                     // exists, this is likely a unit test; assume 127.0.0.1.
                     string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
-
-                    // Starts an active FAM session via FileProcessingDB and ties the active context to the session
-                    data.OpenSession(user, ipAddress, false);
 
                     // Token is specific to user and FAMSessionId
                     var token = AuthUtils.GenerateToken(user, context);
@@ -90,6 +88,53 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
+        /// Authenticates a user session. Prefix the returned access_token with "Bearer " to use for authorization
+        /// in subsequent API calls.
+        /// </summary>
+        [HttpPost("SessionLogin")]
+        [Authorize]
+        [ProducesResponseType(200, Type = typeof(LoginToken))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        public IActionResult SessionLogin()
+        {
+            try
+            {
+                ExtractException.Assert("ELI46738", "User claims are missing.", User.HasExpectedClaims());
+                var workflow = this.User.GetClaim(_WORKFLOW_NAME);
+
+                var context = LoginContext(workflow);
+                using (var sessionData = new DocumentData(context))
+                {
+                    // IPAddress is used to identify the caller via the "Machine" column in FAMSession. If no RemoteIpAddress
+                    // exists, this is likely a unit test; assume 127.0.0.1.
+                    string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
+
+                    // Starts an active FAM session via FileProcessingDB and ties the active context to the session
+                    sessionData.OpenSession(User, ipAddress, false);
+
+                    var user = new User
+                    {
+                        Username = User.GetUsername(),
+                        WorkflowName = User.GetClaim(Utils._WORKFLOW_NAME)
+                    };
+
+                    // Get the expires date from the claims
+                    DateTime expires = DateTime.Parse(User.GetClaim(_EXPIRES_TIME).Trim('"'), null, DateTimeStyles.RoundtripKind);
+
+                    // Token is specific to user and FAMSessionId
+                    var token = AuthUtils.GenerateToken(user, context, expires);
+
+                    return Ok(token);
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI46719");
+            }
+        }
+
+        /// <summary>
         /// Gets settings for the application.
         /// </summary>
         [HttpGet("Settings")]
@@ -101,6 +146,9 @@ namespace WebAPI.Controllers
         {
             try
             {
+                ExtractException.Assert("ELI46737", "OpenDocument requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
                 using (var data = new DocumentData(User, requireSession: false))
                 {
                     var result = data.GetSettings();
@@ -128,6 +176,9 @@ namespace WebAPI.Controllers
         {
             try
             {
+                ExtractException.Assert("ELI46736", "OpenDocument requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
                 bool fileIsOpen = docID > 0;
                 using (var data = new DocumentData(User, requireSession: fileIsOpen))
                 {
@@ -162,6 +213,9 @@ namespace WebAPI.Controllers
         {
             try
             {
+                ExtractException.Assert("ELI46725", "OpenDocument requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
                 using (var data = new DocumentData(User, requireSession: true))
                 {
                     var documentId = data.OpenDocument(docID);
@@ -191,6 +245,9 @@ namespace WebAPI.Controllers
         {
             try
             {
+                ExtractException.Assert("ELI46726", "OpenDocument requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
                 using (var data = new DocumentData(User, requireSession: true))
                 {
                     ExtractException.Assert("ELI46698", "The supplied document ID doesn't match the open session's document ID",
@@ -222,12 +279,15 @@ namespace WebAPI.Controllers
         {
             try
             {
+                ExtractException.Assert("ELI46727", "OpenDocument requires an active Session Login token.",
+                   User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
                 using (var data = new DocumentData(User, requireSession: true))
                 {
                     ExtractException.Assert("ELI46701", "The supplied document ID doesn't match the open session's document ID",
                         docID == data.DocumentSessionFileId);
 
-                    data.SetComment(skipData?.Comment ?? "");
+                    data.SetComment(skipData?.Comment ?? string.Empty);
                     data.CloseDocument(EActionStatus.kActionSkipped, skipData?.Duration ?? -1);
 
                     return NoContent();
@@ -253,12 +313,15 @@ namespace WebAPI.Controllers
         {
             try
             {
+                ExtractException.Assert("ELI46728", "OpenDocument requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
                 using (var data = new DocumentData(User, requireSession: true))
                 {
                     ExtractException.Assert("ELI46707", "The supplied document ID doesn't match the open session's document ID",
                         docID == data.DocumentSessionFileId);
 
-                    data.SetComment(commentData?.Comment ?? "");
+                    data.SetComment(commentData?.Comment ?? string.Empty);
 
                     return NoContent();
                 }
@@ -283,6 +346,9 @@ namespace WebAPI.Controllers
         {
             try
             {
+                ExtractException.Assert("ELI46729", "OpenDocument requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
                 using (var data = new DocumentData(User, requireSession: true))
                 {
                     ExtractException.Assert("ELI46714", "The supplied document ID doesn't match the open session's document ID",
@@ -314,6 +380,9 @@ namespace WebAPI.Controllers
         {
             try
             {
+                ExtractException.Assert("ELI46730", "OpenDocument requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
                 using (var data = new DocumentData(User, requireSession: true))
                 {
                     ExtractException.Assert("ELI46702", "The supplied document ID doesn't match the open session's document ID",
@@ -344,6 +413,9 @@ namespace WebAPI.Controllers
         {
             try
             {
+                ExtractException.Assert("ELI46731", "OpenDocument requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
                 using (var data = new DocumentData(User, requireSession: true))
                 {
                     ExtractException.Assert("ELI46703", "The supplied document ID doesn't match the open session's document ID",
@@ -380,6 +452,9 @@ namespace WebAPI.Controllers
         {
             try
             {
+                ExtractException.Assert("ELI46732", "OpenDocument requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
                 using (var data = new DocumentData(User, requireSession: true))
                 {
                     ExtractException.Assert("ELI46704", "The supplied document ID doesn't match the open session's document ID",
@@ -411,6 +486,9 @@ namespace WebAPI.Controllers
         {
             try
             {
+                ExtractException.Assert("ELI46733", "OpenDocument requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
                 using (var data = new DocumentData(User, requireSession: true))
                 {
@@ -446,6 +524,9 @@ namespace WebAPI.Controllers
         {
             try
             {
+                ExtractException.Assert("ELI46734", "OpenDocument requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
                 using (var data = new DocumentData(User, requireSession: true))
                 {
                     ExtractException.Assert("ELI46699", "The supplied document ID doesn't match the open session's document ID",
@@ -478,6 +559,9 @@ namespace WebAPI.Controllers
         {
             try
             {
+                ExtractException.Assert("ELI46735", "OpenDocument requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
                 using (var data = new DocumentData(User, requireSession: true))
                 {
