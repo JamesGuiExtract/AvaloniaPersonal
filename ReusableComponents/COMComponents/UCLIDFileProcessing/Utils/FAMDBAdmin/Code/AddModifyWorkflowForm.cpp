@@ -111,9 +111,11 @@ namespace Extract
 				loadWorkflow();
 				_loadBalanceWeightComboBox->SelectedItem =
 					ipWorkflowDefinition->LoadBalanceWeight.ToString();
+				
+				_redactionWebAppSettings = dynamic_cast<RedactionVerificationSettings^>(
+						loadWebAppSettings(RedactionVerificationSettings::typeid));
 
-				_redactionVerifyCheckBox->Checked =
-					(loadWebAppSettings(RedactionVerificationSettings::typeid) != __nullptr);
+				_redactionVerifyCheckBox->Checked = _redactionWebAppSettings != __nullptr;
 			}
 			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI41952");
 		}
