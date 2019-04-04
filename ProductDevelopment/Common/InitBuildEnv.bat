@@ -2,7 +2,7 @@
 
 SET BUILD_VSS_ROOT=%BUILD_DRIVE%%BUILD_DIRECTORY%\%PRODUCT_ROOT%
 
-SET NUANCE_API_ROOT=%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\Nuance_20
+SET NUANCE_API_ROOT=%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\Nuance_19
 SET NUANCE_API_DIR=%NUANCE_API_ROOT%\bin
 SET LEADTOOLS_API_DIR=%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\LeadTools_17\Bin
 SET LEADTOOLS_API_DOTNET=%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\LeadTools_17\DotNet

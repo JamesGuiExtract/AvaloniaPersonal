@@ -69,7 +69,7 @@
   <ItemGroup>
     <Reference Include="CAPI_PInvoke, Version=20.20.0.0, Culture=neutral, PublicKeyToken=d277acbc760e5eaf, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\Nuance_20\Bin\CAPI_PInvoke.dll</HintPath>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\Nuance_19\Bin\CAPI_PInvoke.dll</HintPath>
     </Reference>
     <Reference Include="edtFTPnetPRO, Version=7.3.1.20, Culture=neutral, PublicKeyToken=0dce1ad63760d80b, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\EnterpriseDT\Bin\edtFTPnetPRO.dll</HintPath>
