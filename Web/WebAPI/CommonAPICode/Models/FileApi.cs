@@ -132,19 +132,44 @@ namespace WebAPI.Models
 
         internal void ResumeSession(int requestedFAMSessionId)
         {
-            if (_fileProcessingDB.ResumeWebSession(requestedFAMSessionId, out int fileTaskSessionID, out int fileID))
+            try
             {
-                DocumentSession =
-                (
-                    true,
-                    fileTaskSessionID,
-                    fileID,
-                    DateTime.Now
-                );
+                if (_fileProcessingDB.ResumeWebSession(requestedFAMSessionId, out int fileTaskSessionID, out int fileID))
+                {
+                    DocumentSession =
+                    (
+                        true,
+                        fileTaskSessionID,
+                        fileID,
+                        DateTime.Now
+                    );
+                }
+                else
+                {
+                    DocumentSession = (false, 0, 0, new DateTime());
+                }
             }
-            else
+            catch (Exception ex)
             {
-                DocumentSession = (false, 0, 0, new DateTime());
+                var sessionExists = false;
+                try
+                {
+                    sessionExists = _fileProcessingDB.IsFAMSessionOpen(requestedFAMSessionId);
+                }
+                catch (Exception ex_)
+                {
+                    ex_.ExtractLog("ELI46722");
+                    throw ex.AsExtract("ELI46723");
+                }
+
+                if (sessionExists)
+                {
+                    throw ex;
+                }
+                else
+                {
+                    throw new HTTPError("ELI46721", 401, "Session does not exist");
+                }
             }
         }
 

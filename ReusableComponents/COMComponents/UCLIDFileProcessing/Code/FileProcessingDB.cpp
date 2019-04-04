@@ -4796,6 +4796,30 @@ STDMETHODIMP CFileProcessingDB::MarkFileDeleted(long nFileID, long nWorkflowID)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46298");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::IsFAMSessionOpen(long nFAMSessionID, VARIANT_BOOL* pbIsFAMSessionOpen)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_nFAMSessionID = nFAMSessionID;
+		string strFAMSessionID = asString(nFAMSessionID);
+
+		string strSessionQuery =
+			"SELECT 1"
+			" FROM dbo.[FAMSession]"
+			" WHERE [StopTime] IS NULL"
+			" AND [FAMSession].[ID] = " + strFAMSessionID;
+
+		_RecordsetPtr ipRecords = getThisAsCOMPtr()->GetResultsForQuery(strSessionQuery.c_str());
+
+		*pbIsFAMSessionOpen = asVariantBool(!ipRecords->adoEOF);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46724");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

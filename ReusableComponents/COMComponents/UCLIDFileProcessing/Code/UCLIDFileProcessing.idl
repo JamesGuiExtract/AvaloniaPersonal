@@ -2031,6 +2031,9 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// Suspends an existing FAMSession by resetting appropriate instance members so that this instance is no longer associated with a FAMSession
 		[id(199), helpstring("method SuspendWebSession")] HRESULT SuspendWebSession();
+		// -----------------------------------------------------------------------------------------------
+		// Checks to see if a particular session ID is still open (doesn't have a Stop time)
+		[id(200), helpstring("method IsFAMSessionOpen")] HRESULT IsFAMSessionOpen([in] long nFAMSessionID, [out, retval] VARIANT_BOOL* pbIsFAMSessionOpen);
 	};
 
 	[
