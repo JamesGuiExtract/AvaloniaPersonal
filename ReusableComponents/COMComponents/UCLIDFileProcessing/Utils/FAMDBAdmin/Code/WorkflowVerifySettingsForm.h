@@ -118,7 +118,6 @@ namespace Extract {
 
 #pragma region Helper methods
 
-			Void loadActionsCombos();
 			Void loadRedactionTypeGrid();
 			System::Collections::Generic::IEnumerable<String ^>^ getConfiguredRedactionTypes();
 

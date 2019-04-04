@@ -20,8 +20,6 @@ namespace Extract
 			{
 				InitializeComponent();
 
-				ASSERT_ARGUMENT("ELI45074", workflowID > 0);
-
 				_pipfamDatabase = new IFileProcessingDBPtr();
 				*_pipfamDatabase = famDatabase;
 
@@ -34,7 +32,7 @@ namespace Extract
 
 				// Create the pointer to the smart pointer for the WorkflowDefinition
 				_pipWorkflowDefinition = new IWorkflowDefinitionPtr;
-				if (_workflowID >= 0)
+				if (_workflowID > 0)
 				{
 					ipWorkflowDefinition = _ipfamDatabase->GetWorkflowDefinition(_workflowID);
 				}
@@ -50,7 +48,6 @@ namespace Extract
 		{
 			try
 			{
-				loadActionsCombos();
 				loadRedactionTypeGrid();
 
 				// Now that settings have been loaded into the form, do not expose settings to
@@ -84,24 +81,6 @@ namespace Extract
 #pragma region Helper methods
 
 #pragma region Helper methods
-
-		Void WorkflowVerifySettingsForm::loadActionsCombos()
-		{
-			IVariantVectorPtr mainSequenceActions(CLSID_VariantVector);
-
-			// If this is a new workflow load all the actions
-			// if this is an existing workflow just load the actions associated with the workflow
-			IIUnknownVectorPtr actions = _ipfamDatabase->GetWorkflowActions(_workflowID);
-			long count = actions->Size();
-			for (long i = 0; i < count; i++)
-			{
-				IVariantVectorPtr properties = actions->At(i);
-				if (properties->Item[2].boolVal == VARIANT_TRUE)
-				{
-					mainSequenceActions->PushBack(properties->Item[1]);
-				}
-			}
-		}
 
 		Void WorkflowVerifySettingsForm::loadRedactionTypeGrid()
 		{
