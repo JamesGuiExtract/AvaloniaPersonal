@@ -15,10 +15,18 @@ namespace Extract {
 			RedactionVerificationSettings();
 			~RedactionVerificationSettings();
 
+			void InitializeDefaults();
+
+			[OnDeserializing]
+			void OnDeserializing(StreamingContext context);
+
 			// A enumeration of strings representing the types that should be available to apply to
 			// redactions.
 			[DataMember]
 			property System::Collections::Generic::IEnumerable<String ^> ^RedactionTypes;
+
+			[DataMember]
+			property int InactivityTimeout;
 		};
 	}
 };

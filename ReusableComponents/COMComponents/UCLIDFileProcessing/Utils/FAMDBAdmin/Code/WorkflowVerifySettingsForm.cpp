@@ -67,6 +67,14 @@ namespace Extract
 				auto settings = gcnew RedactionVerificationSettings();
 
 				settings->RedactionTypes = getConfiguredRedactionTypes();
+				if (_autoCloseSessionCheckBox->Checked)
+				{
+					settings->InactivityTimeout = Decimal::ToInt32(_inactivityTimeoutMinutesUpDown->Value);
+				}
+				else
+				{
+					settings->InactivityTimeout = 0;
+				}
 
 				_settings = settings;
 
@@ -74,6 +82,16 @@ namespace Extract
 				DialogResult = System::Windows::Forms::DialogResult::OK;
 			}
 			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45077");			
+		}
+
+		Void WorkflowVerifySettingsForm::HandleAutoCloseSessionCheckBox_CheckedChanged(System::Object^  sender, System::EventArgs^ e)
+		{
+			try
+			{
+				_inactivityTimeoutMinutesUpDown->Enabled = _autoCloseSessionCheckBox->Checked;
+				
+			}
+			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI46740");
 		}
 
 #pragma endregion
@@ -93,6 +111,19 @@ namespace Extract
 				for each (String^ redactionType in _settings->RedactionTypes)
 				{
 					_redactionTypesDataGridView->Rows->Add(gcnew array<String^> { redactionType });
+				}
+
+				if (_settings->InactivityTimeout > 0)
+				{
+					_autoCloseSessionCheckBox->Checked = true;
+					_inactivityTimeoutMinutesUpDown->Value = _settings->InactivityTimeout;
+				}
+				else
+				{
+					RedactionVerificationSettings defaults;
+					_autoCloseSessionCheckBox->Checked = false;
+					_inactivityTimeoutMinutesUpDown->Value = defaults.InactivityTimeout;
+					_inactivityTimeoutMinutesUpDown->Enabled = false;
 				}
 			}
 		}

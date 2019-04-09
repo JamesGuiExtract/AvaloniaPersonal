@@ -135,6 +135,9 @@ namespace Extract.Web.WebAPI.Test
                 Assert.IsTrue(settings.RedactionTypes.SequenceEqual(
                     new[] { "DOB", "SSN",  "TestType" }), "Failed to retrieve redaction types");
 
+                // Default value
+                Assert.IsTrue(settings.InactivityTimeout == 5);
+
                 controller.Logout()
                     .AssertGoodResult<NoContentResult>();
             }

@@ -112,6 +112,7 @@ namespace Extract {
 #pragma region Event handlers
 
 			Void HandleWorkflowVerifySettingsForm_Load(System::Object^  sender, System::EventArgs^  e);
+			Void HandleAutoCloseSessionCheckBox_CheckedChanged(System::Object^  sender, System::EventArgs^ e);
 			Void HandleOkButton_Click(System::Object^  sender, System::EventArgs^  e);
 
 #pragma endregion
@@ -180,6 +181,10 @@ private: System::Windows::Forms::DataGridView^  _redactionTypesDataGridView;
 
 
 private: System::Windows::Forms::DataGridViewTextBoxColumn^  _docTypeColumn;
+private: System::Windows::Forms::CheckBox^  _autoCloseSessionCheckBox;
+private: System::Windows::Forms::NumericUpDown^  _inactivityTimeoutMinutesUpDown;
+
+
 
 
 
@@ -202,21 +207,36 @@ private: System::Windows::Forms::DataGridViewTextBoxColumn^  _docTypeColumn;
 			/// </summary>
 			void InitializeComponent(void)
 			{
+				System::Windows::Forms::Label^  label2;
 				this->okButton = (gcnew System::Windows::Forms::Button());
 				this->cancelButton = (gcnew System::Windows::Forms::Button());
 				this->label1 = (gcnew System::Windows::Forms::Label());
 				this->_redactionTypesDataGridView = (gcnew System::Windows::Forms::DataGridView());
 				this->_docTypeColumn = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
+				this->_autoCloseSessionCheckBox = (gcnew System::Windows::Forms::CheckBox());
+				this->_inactivityTimeoutMinutesUpDown = (gcnew System::Windows::Forms::NumericUpDown());
+				label2 = (gcnew System::Windows::Forms::Label());
 				(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->_redactionTypesDataGridView))->BeginInit();
+				(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->_inactivityTimeoutMinutesUpDown))->BeginInit();
 				this->SuspendLayout();
+				// 
+				// label2
+				// 
+				label2->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
+				label2->AutoSize = true;
+				label2->Location = System::Drawing::Point(267, 252);
+				label2->Name = L"label2";
+				label2->Size = System::Drawing::Size(102, 13);
+				label2->TabIndex = 4;
+				label2->Text = L"minutes of inactivity.";
 				// 
 				// okButton
 				// 
 				this->okButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-				this->okButton->Location = System::Drawing::Point(228, 245);
+				this->okButton->Location = System::Drawing::Point(228, 282);
 				this->okButton->Name = L"okButton";
 				this->okButton->Size = System::Drawing::Size(75, 23);
-				this->okButton->TabIndex = 6;
+				this->okButton->TabIndex = 5;
 				this->okButton->Text = L"O&K";
 				this->okButton->UseVisualStyleBackColor = true;
 				this->okButton->Click += gcnew System::EventHandler(this, &WorkflowVerifySettingsForm::HandleOkButton_Click);
@@ -226,10 +246,10 @@ private: System::Windows::Forms::DataGridViewTextBoxColumn^  _docTypeColumn;
 				this->cancelButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
 				this->cancelButton->CausesValidation = false;
 				this->cancelButton->DialogResult = System::Windows::Forms::DialogResult::Cancel;
-				this->cancelButton->Location = System::Drawing::Point(309, 245);
+				this->cancelButton->Location = System::Drawing::Point(309, 282);
 				this->cancelButton->Name = L"cancelButton";
 				this->cancelButton->Size = System::Drawing::Size(75, 23);
-				this->cancelButton->TabIndex = 7;
+				this->cancelButton->TabIndex = 6;
 				this->cancelButton->Text = L"&Cancel";
 				this->cancelButton->UseVisualStyleBackColor = true;
 				// 
@@ -239,7 +259,7 @@ private: System::Windows::Forms::DataGridViewTextBoxColumn^  _docTypeColumn;
 				this->label1->Location = System::Drawing::Point(13, 17);
 				this->label1->Name = L"label1";
 				this->label1->Size = System::Drawing::Size(84, 13);
-				this->label1->TabIndex = 4;
+				this->label1->TabIndex = 0;
 				this->label1->Text = L"Redaction types";
 				// 
 				// _redactionTypesDataGridView
@@ -253,7 +273,7 @@ private: System::Windows::Forms::DataGridViewTextBoxColumn^  _docTypeColumn;
 				this->_redactionTypesDataGridView->Location = System::Drawing::Point(125, 12);
 				this->_redactionTypesDataGridView->Name = L"_redactionTypesDataGridView";
 				this->_redactionTypesDataGridView->Size = System::Drawing::Size(258, 220);
-				this->_redactionTypesDataGridView->TabIndex = 5;
+				this->_redactionTypesDataGridView->TabIndex = 1;
 				// 
 				// _docTypeColumn
 				// 
@@ -261,13 +281,39 @@ private: System::Windows::Forms::DataGridViewTextBoxColumn^  _docTypeColumn;
 				this->_docTypeColumn->HeaderText = L"Doc Type";
 				this->_docTypeColumn->Name = L"_docTypeColumn";
 				// 
+				// _autoCloseSessionCheckBox
+				// 
+				this->_autoCloseSessionCheckBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
+				this->_autoCloseSessionCheckBox->AutoSize = true;
+				this->_autoCloseSessionCheckBox->Location = System::Drawing::Point(16, 251);
+				this->_autoCloseSessionCheckBox->Name = L"_autoCloseSessionCheckBox";
+				this->_autoCloseSessionCheckBox->Size = System::Drawing::Size(183, 17);
+				this->_autoCloseSessionCheckBox->TabIndex = 2;
+				this->_autoCloseSessionCheckBox->Text = L"Automatically close sessions after";
+				this->_autoCloseSessionCheckBox->UseVisualStyleBackColor = true;
+				this->_autoCloseSessionCheckBox->CheckedChanged += gcnew System::EventHandler(this, &WorkflowVerifySettingsForm::HandleAutoCloseSessionCheckBox_CheckedChanged);
+				// 
+				// _inactivityTimeoutMinutesUpDown
+				// 
+				this->_inactivityTimeoutMinutesUpDown->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
+				this->_inactivityTimeoutMinutesUpDown->Location = System::Drawing::Point(210, 250);
+				this->_inactivityTimeoutMinutesUpDown->Maximum = System::Decimal(gcnew cli::array< System::Int32 >(4) { 60, 0, 0, 0 });
+				this->_inactivityTimeoutMinutesUpDown->Minimum = System::Decimal(gcnew cli::array< System::Int32 >(4) { 1, 0, 0, 0 });
+				this->_inactivityTimeoutMinutesUpDown->Name = L"_inactivityTimeoutMinutesUpDown";
+				this->_inactivityTimeoutMinutesUpDown->Size = System::Drawing::Size(51, 20);
+				this->_inactivityTimeoutMinutesUpDown->TabIndex = 3;
+				this->_inactivityTimeoutMinutesUpDown->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) { 1, 0, 0, 0 });
+				// 
 				// WorkflowVerifySettingsForm
 				// 
 				this->AcceptButton = this->okButton;
 				this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 				this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 				this->CancelButton = this->cancelButton;
-				this->ClientSize = System::Drawing::Size(395, 278);
+				this->ClientSize = System::Drawing::Size(395, 315);
+				this->Controls->Add(label2);
+				this->Controls->Add(this->_inactivityTimeoutMinutesUpDown);
+				this->Controls->Add(this->_autoCloseSessionCheckBox);
 				this->Controls->Add(this->_redactionTypesDataGridView);
 				this->Controls->Add(this->label1);
 				this->Controls->Add(this->cancelButton);
@@ -282,12 +328,13 @@ private: System::Windows::Forms::DataGridViewTextBoxColumn^  _docTypeColumn;
 				this->Text = L"Redaction Verification Settings";
 				this->Load += gcnew System::EventHandler(this, &WorkflowVerifySettingsForm::HandleWorkflowVerifySettingsForm_Load);
 				(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->_redactionTypesDataGridView))->EndInit();
+				(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->_inactivityTimeoutMinutesUpDown))->EndInit();
 				this->ResumeLayout(false);
 				this->PerformLayout();
 
 			}
-#pragma endregion
 
+			#pragma endregion
 		};
 	}
 }

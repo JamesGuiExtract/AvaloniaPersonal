@@ -7,11 +7,22 @@ namespace Extract
 	{
 		RedactionVerificationSettings::RedactionVerificationSettings()
 		{
-			RedactionTypes = gcnew List<String^>();
+			InitializeDefaults();
 		}
 
 		RedactionVerificationSettings::~RedactionVerificationSettings()
 		{
+		}
+
+		void RedactionVerificationSettings::InitializeDefaults()
+		{
+			RedactionTypes = gcnew List<String^>();
+			InactivityTimeout = 5;
+		}
+
+		void RedactionVerificationSettings::OnDeserializing(StreamingContext context)
+		{
+			InitializeDefaults();
 		}
 	}
 }
