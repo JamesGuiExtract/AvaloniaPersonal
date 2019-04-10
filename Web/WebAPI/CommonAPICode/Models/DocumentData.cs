@@ -1183,6 +1183,8 @@ namespace WebAPI.Models
             }
         }
 
+        public EWorkflowType WorkflowType => FileApi.Workflow.Type;
+
         #region Private Members
 
         FileApi FileApi

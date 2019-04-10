@@ -138,7 +138,9 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\RC.Net\Core\Code\Extract.csproj" />
+    <ProjectReference Include="..\..\..\RC.Net\AttributeFinder\Rules\Core\Code\Extract.AttributeFinder.Rules.csproj" />
+    <ProjectReference Include="..\..\..\RC.Net\Core\Code\Extract.csproj">
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Update="app.config">

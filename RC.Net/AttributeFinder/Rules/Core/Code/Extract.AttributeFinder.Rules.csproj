@@ -153,6 +153,9 @@
       <HintPath>..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.Queries.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\APIs\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="OpenNLP.IKVM, Version=1.8.1.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\OpenNLP.IKVM.1.8.1\lib\OpenNLP.IKVM.exe</HintPath>
     </Reference>
@@ -165,7 +168,8 @@
     <Reference Include="CAPI_PInvoke, Version=19.11.0.0, Culture=neutral, PublicKeyToken=d277acbc760e5eaf, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\Nuance_19\Bin\CAPI_PInvoke.dll</HintPath>
-    </Reference><Reference Include="System" />
+    </Reference>
+    <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
@@ -278,6 +282,7 @@
       <DependentUpon>NERFinderSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="ParallelRuleSet.cs" />
+    <Compile Include="AnnotationProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

@@ -141,6 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\RC.Net\Core\Code\Extract.csproj" />
+      
   </ItemGroup>
   <ItemGroup>
     <Content Update="app.config">

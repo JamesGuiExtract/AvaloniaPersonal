@@ -513,6 +513,41 @@ namespace WebAPI.Controllers
             }
         }
 
+        /// <summary>Transform a DocumentAttribute in some way</summary>
+        /// <param name="docID">The currently open document ID</param>
+        /// <param name="pageNumber">The page scope of the operation</param>
+        /// <param name="parameters">The parameters</param>
+        [HttpPost("ProcessAnnotation/{docID}/{pageNumber}")]
+        [Authorize]
+        [ProducesResponseType(200, Type = typeof(DocumentAttribute))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404, Type = typeof(ErrorResult))]
+        public IActionResult ProcessAnnotation(int docID, int pageNumber, [FromBody] ProcessAnnotationParameters parameters)
+        {
+            try
+            {
+                using (var data = new DocumentData(User, requireSession: true))
+                {
+                    ExtractException.Assert("ELI46749", "The supplied document ID doesn't match the open session's document ID",
+                        docID == data.DocumentSessionFileId);
+
+                    var fileName = data.GetSourceFileName(docID);
+                    var translator = new AttributeTranslator(fileName, parameters.Annotation);
+                    var attribute = translator.ComAttribute;
+                    var updated = Extract.AttributeFinder.Rules.AnnotationProcessor.ProcessAttribute(fileName, pageNumber, attribute, parameters.OperationType, parameters.Definition);
+                    var mapper = new AttributeMapper(null, data.WorkflowType);
+                    var updatedAttribute =  mapper.MapAttribute(updated, false);
+
+                    return Ok(updatedAttribute);
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI46750");
+            }
+        }
+
         /// <summary>
         /// Saves the document data.
         /// </summary>

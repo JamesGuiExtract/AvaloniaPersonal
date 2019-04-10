@@ -111,7 +111,7 @@ namespace WebAPI
         /// extract software to represent spatial strings; <c>true</c> to include data that may be
         /// useful to 3rd party integrators.</param>
         /// <returns>DocumentAttribute object</returns>
-        private DocumentAttribute MapAttribute(IAttribute attr, bool verboseSpatialData)
+        public DocumentAttribute MapAttribute(IAttribute attr, bool verboseSpatialData)
         {
             var docAttr = new DocumentAttribute();
 

@@ -152,6 +152,28 @@ namespace WebAPI
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AttributeTranslator"/> class to replace all
+        /// existing attribute data for the document.
+        /// </summary>
+        /// <param name="sourceDocName">Name of the source document.</param>
+        /// <param name="attribute">The attribute to translate.</param>
+        public AttributeTranslator(string sourceDocName, DocumentAttribute attribute)
+        {
+            try
+            {
+                bool spatialInfoRequired = attribute.HasPositionInfo ?? false;
+
+                InitializeSourceDocument(sourceDocName, spatialInfoRequired);
+
+                ComAttribute = ConvertAttribute(attribute);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46751");
+            }
+        }
+
         #endregion Constructors
 
         #region Properties
@@ -166,6 +188,8 @@ namespace WebAPI
                 return _attributes;
             }
         }
+
+        public IAttribute ComAttribute { get; private set; }
 
         #endregion Constructors
 
