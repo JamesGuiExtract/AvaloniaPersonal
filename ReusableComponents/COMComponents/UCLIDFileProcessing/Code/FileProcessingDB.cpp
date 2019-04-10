@@ -89,7 +89,8 @@ m_bRunningAllWorkflows(false),
 m_nLastFAMFileID(0),
 m_bDeniedFastCountPermission(false),
 m_ipFAMTagManager(__nullptr),
-m_bCurrentSessionIsWebSession(false)
+m_bCurrentSessionIsWebSession(false),
+m_dwLastPingTime(0)
 {
 	try
 	{

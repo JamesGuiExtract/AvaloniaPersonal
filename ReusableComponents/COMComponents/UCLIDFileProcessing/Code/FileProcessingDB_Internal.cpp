@@ -7386,4 +7386,5 @@ void CFileProcessingDB::setDefaultSessionMemberValues()
 	m_bFAMRegistered = false;
 	m_nActiveFAMID = 0;
 	m_nActiveActionID = -1;
+	m_dwLastPingTime = 0;
 }
