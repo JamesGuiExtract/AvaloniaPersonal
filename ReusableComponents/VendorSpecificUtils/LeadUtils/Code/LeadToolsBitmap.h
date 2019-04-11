@@ -16,6 +16,7 @@ public:
 		int nBitsPerPixel = 1, bool bUseDithering = true, bool bUseAdaptiveThresholdToConvertToBitonal = false);
 
 	// Returns the value of the pixel at the given point (true = black, false = white)
+	// NOTE: The caller of this function should protect with LeadToolsLicenseRestrictor
 	bool isPixelBlack(CPoint point);
 	bool isPixelBlack(int x, int y);
 

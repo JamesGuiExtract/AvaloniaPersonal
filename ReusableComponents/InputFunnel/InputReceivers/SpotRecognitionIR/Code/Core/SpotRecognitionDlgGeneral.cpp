@@ -31,6 +31,7 @@
 #include <LicenseMgmt.h>
 #include <AfxAppMainWindowRestorer.h>
 #include <LeadToolsBitmapFreeer.h>
+#include <LeadToolsLicenseRestrictor.h>
 
 #include <io.h>
 
@@ -1080,11 +1081,15 @@ void SpotRecognitionDlg::openFile(const string& strFileName)
 					// Get initialized FILEINFO struct
 					FILEINFO FileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 
-					// Get the file information 
-					L_INT nRetCode = L_FileInfo(const_cast<char*>(strFileToOpenName.c_str()), 
-						&FileInfo, sizeof(FILEINFO), 0, NULL);
-					throwExceptionIfNotSuccess(nRetCode, "ELI03089", 
-						"Unable to open image file.", strFileToOpenName);
+					{
+						LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
+						// Get the file information 
+						L_INT nRetCode = L_FileInfo(const_cast<char*>(strFileToOpenName.c_str()),
+							&FileInfo, sizeof(FILEINFO), 0, NULL);
+						throwExceptionIfNotSuccess(nRetCode, "ELI03089",
+							"Unable to open image file.", strFileToOpenName);
+					}
 
 					// The following call must be made here in case
 					// the file is invalid, we don't want to clear
@@ -2069,7 +2074,7 @@ ISpatialStringPtr SpotRecognitionDlg::recognizeParagraphTextInImage(
 	// check if we are recognizing text in a particular region
 	if(pRect)
 	{
-		// this area will be used in determinig whether or not to show the progress bar
+		// this area will be used in determining whether or not to show the progress bar
 		long nArea = abs((pRect->right - pRect->left) * (pRect->bottom - pRect->top));
 	
 		// initialize the progress status object, if the area is the appropriate size
@@ -2228,122 +2233,112 @@ string SpotRecognitionDlg::createSubImage(const std::string& strOriginalImageFil
 	// Get initialized FILEINFO struct
 	FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 
-	// Get file info
-	L_INT nRet = L_FileInfo(const_cast<char*>(strOriginalImageFileName.c_str()), &fileInfo, 
-		sizeof(FILEINFO), 0, NULL);
-
-	// get original file info
-	if (nRet < 1)
 	{
-		UCLIDException uclidException("ELI03245", "Failed to get original image info.");
-		uclidException.addDebugInfo("strImageFileName", strOriginalImageFileName);
-		uclidException.addDebugInfo("Error Code", nRet);
-		throw uclidException;
-	}
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 
-	// Get initialized FILEPDFOPTIONS struct
-	FILEPDFOPTIONS pdfOptions = GetLeadToolsSizedStruct<FILEPDFOPTIONS>(0);
+		// Get initialized RASTERIZEDOCOPTIONs struct
+		RASTERIZEDOCOPTIONS pdfRasterize = GetLeadToolsSizedStruct<RASTERIZEDOCOPTIONS>(0);
+		L_INT nRet = L_GetRasterizeDocOptions(&pdfRasterize, sizeof(pdfRasterize));
+		throwExceptionIfNotSuccess(nRet, "ELI16870", "Could not retrieve PDF load options.");
 
-	// Retrieve current PDF load options
-	nRet = L_GetPDFOptions( &pdfOptions, sizeof(pdfOptions) );
-	throwExceptionIfNotSuccess(nRet, "ELI16870", "Could not retrieve PDF load options.");
+		// Get initialized LOADFILEOPTION struct. 
+		// IgnoreViewPerspective to avoid a black region at the bottom of the image
+		LOADFILEOPTION loadOptions = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
 
-	// Get initialized LOADFILEOPTION struct. 
-	// IgnoreViewPerspective to avoid a black region at the bottom of the image
-	LOADFILEOPTION loadOptions = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
+		// Add Page, Image Resolution and IgnoreViewPerspective to default load options
+		nRet = L_GetDefaultLoadFileOption(&loadOptions, sizeof(LOADFILEOPTION));
+		loadOptions.PageNumber = pImagePortionInfo->PageNumber;
+		loadOptions.XResolution = pdfRasterize.uXResolution;
+		loadOptions.YResolution = pdfRasterize.uYResolution;
 
-	// Add Page, Image Resolution and IgnoreViewPerspective to default load options
-	nRet = L_GetDefaultLoadFileOption(&loadOptions, sizeof(LOADFILEOPTION));
-	loadOptions.PageNumber = pImagePortionInfo->PageNumber;
-	loadOptions.XResolution = pdfOptions.nXResolution;
-	loadOptions.YResolution = pdfOptions.nYResolution;
+		// Load this page
+		nRet = L_LoadFile(_bstr_t(strOriginalImageFileName.c_str()), &origImageHandle,
+			sizeof(BITMAPHANDLE), 0, 0, LOADFILE_ALLOCATE | LOADFILE_STORE, NULL, NULL,
+			&loadOptions, &fileInfo);
+		throwExceptionIfNotSuccess(nRet, "ELI16948", "Could not load the file.",
+			strOriginalImageFileName);
 
-	// Load this page
-	nRet = L_LoadFile( _bstr_t(strOriginalImageFileName.c_str()), &origImageHandle, 
-		sizeof(BITMAPHANDLE), 0, 0, LOADFILE_ALLOCATE | LOADFILE_STORE, NULL, NULL, 
-		&loadOptions, &fileInfo );
-	throwExceptionIfNotSuccess(nRet, "ELI16948", "Could not load the file.",
-		strOriginalImageFileName);
 
-	// Define associated rectangle
-	RECT rc;
-	rc.left = nOffsetX;
-	rc.top = nOffsetY;
-	rc.right = nSubImageWidth + nOffsetX;
-	rc.bottom = pImagePortionInfo->Height + nOffsetY;
+		// Define associated rectangle
+		RECT rc;
+		rc.left = nOffsetX;
+		rc.top = nOffsetY;
+		rc.right = nSubImageWidth + nOffsetX;
+		rc.bottom = pImagePortionInfo->Height + nOffsetY;
 
-	// Make sure coordinates are in View Perspective of the Bitmap
-	nRet = L_RectToBitmap( &origImageHandle, TOP_LEFT, &rc );
-	throwExceptionIfNotSuccess(nRet, "ELI16871", "Could not adjust coordinates.");
-	nOffsetX = rc.left;
-	nOffsetY = rc.top;
-	nSubImageWidth = rc.right - rc.left;
-	pImagePortionInfo->Height = rc.bottom - rc.top;
+		// Make sure coordinates are in View Perspective of the Bitmap
+		nRet = L_RectToBitmap(&origImageHandle, TOP_LEFT, &rc);
+		throwExceptionIfNotSuccess(nRet, "ELI16871", "Could not adjust coordinates.");
+		nOffsetX = rc.left;
+		nOffsetY = rc.top;
+		nSubImageWidth = rc.right - rc.left;
+		pImagePortionInfo->Height = rc.bottom - rc.top;
 
-	// get the rect image inside the original one
-	nRet = L_CopyBitmapRect(&subImageHandle, &origImageHandle, sizeof(BITMAPHANDLE), 
-		nOffsetX, nOffsetY, nSubImageWidth, pImagePortionInfo->Height);
-	if (nRet < 1)
-	{
-		UCLIDException uclidException("ELI03247", "Failed to get the sub image from original image.");
-		uclidException.addDebugInfo("strImageFileName", strOriginalImageFileName);
-		uclidException.addDebugInfo("Error Code", nRet);
-		throw uclidException;
-	}
-
-	// Rotate the copied bitmap to match the current view
-	// Allow the image to be resized with new pixels stored as white
-	int nRotationAngle = (int)(-1 * dRotationAngle);
-	if (nRotationAngle != 0)
-	{
-		nRet = L_RotateBitmap( &subImageHandle, nRotationAngle * 100, ROTATE_RESIZE, 
-			RGB(255,255,255) );
+		// get the rect image inside the original one
+		nRet = L_CopyBitmapRect(&subImageHandle, &origImageHandle, sizeof(BITMAPHANDLE),
+			nOffsetX, nOffsetY, nSubImageWidth, pImagePortionInfo->Height);
 		if (nRet < 1)
 		{
-			UCLIDException uclidException("ELI16712", "Failed to rotate the bitmap.");
-			uclidException.addDebugInfo("Rotation Angle", nRotationAngle);
+			UCLIDException uclidException("ELI03247", "Failed to get the sub image from original image.");
+			uclidException.addDebugInfo("strImageFileName", strOriginalImageFileName);
 			uclidException.addDebugInfo("Error Code", nRet);
 			throw uclidException;
 		}
+
+		// Rotate the copied bitmap to match the current view
+		// Allow the image to be resized with new pixels stored as white
+		int nRotationAngle = (int)(-1 * dRotationAngle);
+		if (nRotationAngle != 0)
+		{
+			nRet = L_RotateBitmap(&subImageHandle, nRotationAngle * 100, ROTATE_RESIZE,
+				RGB(255, 255, 255));
+			if (nRet < 1)
+			{
+				UCLIDException uclidException("ELI16712", "Failed to rotate the bitmap.");
+				uclidException.addDebugInfo("Rotation Angle", nRotationAngle);
+				uclidException.addDebugInfo("Error Code", nRet);
+				throw uclidException;
+			}
+		}
+
+		// get extension from original file
+		string strFileExtension(getExtensionFromFullPath(strOriginalImageFileName, true));
+
+		// generate a temp file, but do not delete it automatically
+		TemporaryFileName subImageFile(true, NULL, strFileExtension.c_str(), false);
+
+		// Prepare the default save options
+		int nFileFormat = fileInfo.Format;
+		int nBitsPerPixel = subImageHandle.BitsPerPixel;
+
+		// Get initialized SAVEFILEOPTION struct
+		SAVEFILEOPTION sfo = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
+
+		// Special settings for PDF input / output image
+		if (strFileExtension == ".pdf")
+		{
+			nFileFormat = FILE_RAS_PDF_G4;
+			nBitsPerPixel = 1;
+			sfo.Flags = ESO_PDF_SAVE_USE_BITMAP_DPI;
+		}
+
+		try
+		{
+			// save the new image file
+			nRet = L_SaveBitmap(const_cast<char*>(subImageFile.getName().c_str()),
+				&subImageHandle, nFileFormat, nBitsPerPixel, 2, &sfo);
+			throwExceptionIfNotSuccess(nRet, "ELI03248",
+				"Failed to save the sub image into a file.", subImageFile.getName());
+			waitForFileToBeReadable(subImageFile.getName());
+		}
+		catch (UCLIDException & uex)
+		{
+			uex.addDebugInfo("strOriginalImageFileName", strOriginalImageFileName);
+			throw uex;
+		}
+
+		return subImageFile.getName();
 	}
-
-	// get extension from original file
-	string strFileExtension( getExtensionFromFullPath( strOriginalImageFileName, true ) );
-
-	// generate a temp file, but do not delete it automatically
-	TemporaryFileName subImageFile(true, NULL, strFileExtension.c_str(), false);
-
-	// Prepare the default save options
-	int nFileFormat = fileInfo.Format;
-	int nBitsPerPixel = subImageHandle.BitsPerPixel;
-
-	// Get initialized SAVEFILEOPTION struct
-	SAVEFILEOPTION sfo = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
-
-	// Special settings for PDF input / output image
-	if (strFileExtension == ".pdf")
-	{
-		nFileFormat = FILE_RAS_PDF_G4;
-		nBitsPerPixel = 1;
-		sfo.Flags = ESO_PDF_SAVE_USE_BITMAP_DPI;
-	}
-
-	try
-	{
-		// save the new image file
-		nRet = L_SaveBitmap(const_cast<char*>(subImageFile.getName().c_str()), 
-			&subImageHandle, nFileFormat, nBitsPerPixel, 2, &sfo);
-		throwExceptionIfNotSuccess(nRet, "ELI03248",
-			"Failed to save the sub image into a file.", subImageFile.getName());
-		waitForFileToBeReadable(subImageFile.getName());
-	}
-	catch(UCLIDException& uex)
-	{
-		uex.addDebugInfo("strOriginalImageFileName", strOriginalImageFileName);
-		throw uex;
-	}
-
-	return subImageFile.getName();
 }
 //-------------------------------------------------------------------------------------------------
 IRasterZonePtr SpotRecognitionDlg::getOCRZone(long lID)

@@ -9,6 +9,7 @@
 #include <cpputil.h>
 
 #include <Math.h>
+#include "LeadToolsLicenseRestrictor.h"
 
 using namespace std;
 
@@ -140,8 +141,11 @@ void extractZoneAsBitmap(BITMAPHANDLE *phBitmap, long nStartX, long nStartY, lon
 
 	// Make sure coordinates are in View Perspective of the Bitmap
 	L_INT nRet;
-	nRet = L_RectToBitmap( phBitmap, TOP_LEFT, &rectImageZone );
-	throwExceptionIfNotSuccess(nRet, "ELI16873", "Could not adjust coordinates.");
+	{
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+		nRet = L_RectToBitmap(phBitmap, TOP_LEFT, &rectImageZone);
+		throwExceptionIfNotSuccess(nRet, "ELI16873", "Could not adjust coordinates.");
+	}
 
 	// for inclined text
 	double dImageZoneAngle = 0;
@@ -155,6 +159,8 @@ void extractZoneAsBitmap(BITMAPHANDLE *phBitmap, long nStartX, long nStartY, lon
 			rectImageZone.top, abs(rectImageZone.right - rectImageZone.left),
 			abs(rectImageZone.top - rectImageZone.bottom)); 
 		throwExceptionIfNotSuccess(nRet, "ELI03351", "Unable to copy portion of bitmap!");
+
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 
 		// if slope is -ve
 		if (dSlope < 0)
@@ -209,6 +215,8 @@ void extractZoneAsBitmap(BITMAPHANDLE *phBitmap, long nStartX, long nStartY, lon
 	}
 	else
 	{
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
 		L_INT nRet = L_CopyBitmapRect(phSubImageBitmap, phBitmap, sizeof(BITMAPHANDLE), rectImageZone.left,
 			rectImageZone.top, abs(rectImageZone.right - rectImageZone.left),
 			abs(rectImageZone.top - rectImageZone.bottom));			 
@@ -229,6 +237,8 @@ void extractZoneAsImage(BITMAPHANDLE *phBitmap, long nStartX,
 	LeadToolsBitmapFreeer freeer( hBitmapImageZone, true );
 	extractZoneAsBitmap(phBitmap, nStartX, nStartY, nEndX, nEndY, nHeight, &hBitmapImageZone);
 	
+	LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
 	L_INT nRet = L_SaveBitmap( (char*) strZoneImageFileName.c_str(), &hBitmapImageZone, 
 		iOutputImageFormat, hBitmapImageZone.BitsPerPixel, 2, NULL);
 	throwExceptionIfNotSuccess(nRet, "ELI03359", "Unable to copy portion of rotated image!",
@@ -305,19 +315,22 @@ void extractPolygonAsImage(const string& strImageFile,
 {
 	BITMAPHANDLE hBitmap;
 	LeadToolsBitmapFreeer freeerBM( hBitmap, true );
-	
+
 	// Get initialized FILEINFO struct
 	FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 	
 	// Load the bitmap
-	L_INT nRet = L_LoadBitmap( (char*) strImageFile.c_str(), &hBitmap, 
-		sizeof(BITMAPHANDLE), 0, ORDER_RGB, NULL, &fileInfo);
-	throwExceptionIfNotSuccess(nRet, "ELI15923", "Unable to load bitmap.", 
-		strImageFile);
-
-	if (hBitmap.ViewPerspective != TOP_LEFT)
 	{
-		L_ChangeBitmapViewPerspective(NULL, &hBitmap, sizeof(BITMAPHANDLE), TOP_LEFT);
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+		L_INT nRet = L_LoadBitmap((char*)strImageFile.c_str(), &hBitmap,
+			sizeof(BITMAPHANDLE), 0, ORDER_RGB, NULL, &fileInfo);
+		throwExceptionIfNotSuccess(nRet, "ELI15923", "Unable to load bitmap.",
+			strImageFile);
+
+		if (hBitmap.ViewPerspective != TOP_LEFT)
+		{
+			L_ChangeBitmapViewPerspective(NULL, &hBitmap, sizeof(BITMAPHANDLE), TOP_LEFT);
+		}
 	}
 	
 	// crop the region bounded within a smallest rectangular inside the original image
@@ -327,9 +340,12 @@ void extractPolygonAsImage(const string& strImageFile,
 	// Individual scope for L_CopyBitmapRect()
 	BITMAPHANDLE hFinal;
 	LeadToolsBitmapFreeer freeerFinal( hFinal, true );
-
-	nRet = L_CopyBitmapRect(&hFinal, &hBitmap, sizeof(BITMAPHANDLE), nStartX, 
-		nStartY, nWidth, nHeight); 
+	{
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+		L_INT nRet = L_CopyBitmapRect(&hFinal, &hBitmap, sizeof(BITMAPHANDLE), nStartX,
+			nStartY, nWidth, nHeight);
+		throwExceptionIfNotSuccess(nRet, "ELI46677", "Unable to copy bitmap rect.", strImageFile);
+	}
 	
 	// calculate the origin (0,0)(i.e. top-left corner) of the sub image according to the start point
 	resetOrigin(vecPolygonVertices, nStartX, nStartY);
@@ -357,24 +373,32 @@ void extractPolygonAsImage(const string& strImageFile,
 	XForm.nYOffset = 0;
 
 	// Create a polygonal region 
-	nRet = L_SetBitmapRgnPolygon(&hFinal, &XForm, pPolyPt, nLen, L_POLY_WINDING, L_RGN_SETNOT);
+	{
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+		L_INT nRet = L_SetBitmapRgnPolygon(&hFinal, &XForm, pPolyPt, nLen, L_POLY_WINDING, L_RGN_SETNOT);
+		throwExceptionIfNotSuccess(nRet, "ELI46678", "Unable to set bitmap region polygon.", strImageFile);
 
-	// fill the region with whatever is the background color
-	// take the top-left pixel's color as the background color
-	COLORREF bgdColor = L_GetPixelColor(&hBitmap, 0, 0);
-	
-	// wipe out anything outside the region with bgdColor
-	nRet = L_FillBitmap(&hFinal, bgdColor);
-	L_FreeBitmapRgn(&hFinal);
 
-	// Get the correct compression factor
-	int nCompression = getCompressionFactor(fileInfo.Format);
+		// fill the region with whatever is the background color
+		// take the top-left pixel's color as the background color
+		COLORREF bgdColor = L_GetPixelColor(&hBitmap, 0, 0);
 
-	// now save the new bitmap to a file
-	nRet = L_SaveBitmap( (char*) strOutputImageFile.c_str(), &hFinal, fileInfo.Format, 
-		hFinal.BitsPerPixel, nCompression, NULL);
-	throwExceptionIfNotSuccess(nRet, "ELI23548", "Unable to copy portion of image.",
-		strOutputImageFile);	
+		// wipe out anything outside the region with bgdColor
+		nRet = L_FillBitmap(&hFinal, bgdColor);
+		throwExceptionIfNotSuccess(nRet, "ELI46679", "Unable to fill region.", strImageFile);
+		L_FreeBitmapRgn(&hFinal);
+
+
+		// Get the correct compression factor
+		int nCompression = getCompressionFactor(fileInfo.Format);
+
+		// now save the new bitmap to a file
+
+		nRet = L_SaveBitmap((char*)strOutputImageFile.c_str(), &hFinal, fileInfo.Format,
+			hFinal.BitsPerPixel, nCompression, NULL);
+		throwExceptionIfNotSuccess(nRet, "ELI23548", "Unable to copy portion of image.",
+			strOutputImageFile);
+	}
 
 	// Wait for file access
 	waitForFileToBeReadable(strOutputImageFile);

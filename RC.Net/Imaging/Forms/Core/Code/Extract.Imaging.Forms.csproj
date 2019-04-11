@@ -68,28 +68,28 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Leadtools, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.dll</HintPath>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Annotations, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Annotations, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Annotations.dll</HintPath>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Annotations.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.dll</HintPath>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Drawing, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.Drawing.dll</HintPath>
+    <Reference Include="Leadtools.Drawing, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\DotNet\Leadtools.Drawing.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.ImageProcessing.Color, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.ImageProcessing.Color, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\DotNet\Leadtools.ImageProcessing.Color.dll</HintPath>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\DotNet\Leadtools.ImageProcessing.Color.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.WinForms, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.WinForms, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.WinForms.dll</HintPath>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />

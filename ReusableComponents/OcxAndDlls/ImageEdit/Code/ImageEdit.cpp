@@ -21,6 +21,7 @@
 
 #include <ltwrappr.h>
 #include <LicenseMgmt.h>
+#include <MiscLeadUtils.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -55,13 +56,12 @@ BOOL CImageEditApp::InitInstance()
 		{
 			// Unlock Document/Medical support only if 
 			// Annotation package is licensed (P13 #4499)
-			LSettings::UnlockSupport(L_SUPPORT_DOCUMENT, L_KEY_DOCUMENT);
+			InitLeadToolsLicense();
 
 			// check if document support was unlocked
 			if( L_IsSupportLocked(L_SUPPORT_DOCUMENT) == L_TRUE )
 			{
-				UCLIDException ue("ELI19819", "Unable to unlock document support.");
-				ue.addDebugInfo("Document Key", L_KEY_DOCUMENT, true);
+				UCLIDException ue("ELI19819", "Unable to document support is unavailable.");
 				ue.log();
 			}
 		}

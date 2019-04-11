@@ -69,7 +69,7 @@
     <Reference Include="Extract.Utilities.Forms">
       <HintPath>$(ProgramFiles)\Extract Systems\CommonComponents\Extract.Utilities.Forms.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.WinForms, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.WinForms, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
       <HintPath>$(ProgramFiles)\Extract Systems\CommonComponents\Leadtools.WinForms.dll</HintPath>
     </Reference>

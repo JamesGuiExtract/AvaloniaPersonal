@@ -21,6 +21,7 @@
 #include <cpputil.h>
 #include <LicenseMgmt.h>
 #include <Misc.h>
+#include "LeadToolsLicenseRestrictor.h"
 
 //--------------------------------------------------------------------------------------------------
 // Exported DLL functions
@@ -71,8 +72,11 @@ void pasteImageAtLocation(const string& strInputImage, const string& strOutputIm
 			SAVEFILEOPTION sfo = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
 
 			// Get the default save options
-			throwExceptionIfNotSuccess(L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION)),
-				"ELI20071", "Failed getting default save options!"); 
+			{
+				LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+				throwExceptionIfNotSuccess(L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION)),
+					"ELI20071", "Failed getting default save options!");
+			}
 
 			// Loop through each page of the image
 			_lastCodePos = "40";
@@ -178,6 +182,7 @@ void loadStampBitmap(const string& strPasteImage, const FILEINFO& flInInfo,
 		}
 
 		// if BitsPerPixel are not the same, convert the stamp image to the source BitsPerPixel
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 		if (rflPasteInfo.BitsPerPixel != flInInfo.BitsPerPixel)
 		{
 			// load the paste image, set the pixel depth to match the source image
@@ -269,6 +274,7 @@ void placeStamp(BITMAPHANDLE& hStampBmp, BITMAPHANDLE& hDestBmp, double dHorizPe
 		matchPalette(hDestBmp, hStampBmp);
 
 		// Stamp the image on the page
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 		L_INT nRet = L_CombineBitmap(&hDestBmp, lX, lY, lStampWidth, lStampHeight,
 			&hStampBmp, 0, 0, CB_DST_0 | CB_OP_OR, 0);
 		if (nRet != SUCCESS)
@@ -298,6 +304,8 @@ void matchPalette(BITMAPHANDLE& hBmpSource, BITMAPHANDLE& rhBmpDest)
 	// only 1-8 bit images are palettized
 	if (hBmpSource.BitsPerPixel <= 8)
 	{
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
 		// set the destination image's color palette to match the source image
 		throwExceptionIfNotSuccess(L_ColorResBitmap(&rhBmpDest, &rhBmpDest, sizeof(BITMAPHANDLE),
 			hBmpSource.BitsPerPixel, CRF_USERPALETTE, hBmpSource.pPalette, 0, 

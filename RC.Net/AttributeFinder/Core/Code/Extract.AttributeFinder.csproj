@@ -100,7 +100,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\binaries\Debug\Extract.Interop.Zip.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907" />
+    <Reference Include="Leadtools, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907" />
     <Reference Include="Lucene.Net, Version=4.0.0.0, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.dll</HintPath>

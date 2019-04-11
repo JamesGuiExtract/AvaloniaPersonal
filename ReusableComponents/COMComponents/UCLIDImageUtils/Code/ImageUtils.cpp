@@ -13,6 +13,7 @@
 #include <LeadToolsBitmap.h>
 #include <LeadToolsBitmapFreeer.h>
 #include <ComponentLicenseIDs.h>
+#include <LeadToolsLicenseRestrictor.h>
 
 using namespace std;
 
@@ -253,6 +254,8 @@ STDMETHODIMP CImageUtils::GetImageStats(BSTR strImage, IRasterZone * pRaster,
 		ipImageStats->FGPixelsInRow = ipVecFGPixelsInRow;
 
 		long nCurrConsecutiveRows = 0;
+
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 		for ( long iRow = 0; iRow < bmZoneBitmap.Height; iRow++ )
 		{
 			long nPixelsFoundInRow = 0;
@@ -410,6 +413,8 @@ void CImageUtils::handleRotatedImage(const std::string& strImageFileName, int nP
 	{
 		// Verify that Document support is licensed
 		unlockDocumentSupport();
+
+		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 
 		// Rotate the loaded bitmap, resizing as needed and filling new pixels with WHITE
 		int nRet = L_RotateBitmap( phBitmap, nRotationAngle*100, ROTATE_RESIZE, 

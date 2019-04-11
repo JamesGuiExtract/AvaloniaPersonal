@@ -66,13 +66,13 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Leadtools, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs, Version=17.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_17\Dotnet\Leadtools.Codecs.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
