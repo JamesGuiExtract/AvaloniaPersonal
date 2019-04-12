@@ -24,9 +24,10 @@
 #include <RegistryPersistenceMgr.h>
 #include <RegConstants.h>
 #include <KernelAPI.h>
+#include <ScansoftErr.h>
+#include <OcrMethods.h>
+
 #include "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\OcrConstants.h"
-#include "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\OcrMethods.h"
-#include "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\ScansoftErr.h"
 
 #include <string>
 #include <set>

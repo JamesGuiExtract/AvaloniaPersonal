@@ -13,9 +13,10 @@
 #include <KernelAPI.h>
 #include <TemporaryFileName.h>
 
-#include "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\ScansoftErr.h"
+#include <ScansoftErr.h>
+#include <OcrMethods.h>
+
 #include "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\OcrConstants.h"
-#include "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\OcrMethods.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

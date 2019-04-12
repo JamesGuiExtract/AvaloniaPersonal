@@ -1,5 +1,5 @@
 #include <UCLIDException.h>
-#include "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\ScansoftErr.h"
+#include <ScansoftErr.h>
 
 //-------------------------------------------------------------------------------------------------
 // RecMemoryReleaser

@@ -8,10 +8,10 @@
 #include <KernelAPI.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
+#include <ScansoftErr.h>
+#include <OcrMethods.h>
 
 #include "..\..\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\OcrConstants.h"
-#include "..\..\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\OcrMethods.h"
-#include "..\..\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\ScansoftErr.h"
 
 #include <set>
 

@@ -23,6 +23,7 @@
 #include <EncryptionEngine.h>
 #include <ValueRestorer.h>
 #include <ComponentLicenseIDs.h>
+#include <MiscNuanceUtils.h>
 
 #include <cmath>
 #include <cstdio>
@@ -1439,12 +1440,29 @@ int getNumberOfPagesInImage( const string& strImageFileName )
 {
 	try
 	{
-		// Get initialized FILEINFO struct
-		FILEINFO fileInfo;
-		getFileInformation(strImageFileName, true, fileInfo);
+		int pageCount = 0;
+		try
+		{
+			pageCount = getNumberOfPagesInImageNuance(strImageFileName);
+		}
+		catch (UCLIDException e)
+		{
+			e.log();
+			pageCount = 0;
+		}
 
+		// There are some instances where Nuance is unable to get the page count
+		if (pageCount == 0)
+		{
+			// Get initialized FILEINFO struct
+			FILEINFO fileInfo;
+			getFileInformation(strImageFileName, true, fileInfo);
+
+			// Return actual page count
+			return fileInfo.TotalPages;
+		}
 		// Return actual page count
-		return fileInfo.TotalPages;
+		return pageCount;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI15314");
 }

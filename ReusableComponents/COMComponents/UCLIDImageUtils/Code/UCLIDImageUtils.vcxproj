@@ -71,7 +71,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_20\Include;..\..\..\APIs\Nuance_19\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_20\Include;..\..\..\APIs\Nuance_19\Include;..\..\..\VendorSpecificUtils\NuanceUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -124,7 +124,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_20\Include;..\..\..\APIs\Nuance_19\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\APIs\LeadTools_20\Include;..\..\..\APIs\Nuance_19\Include;..\..\..\VendorSpecificUtils\NuanceUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -165,8 +165,6 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\OcrMethods.cpp" />
-    <ClCompile Include="..\..\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\ScansoftErr.cpp" />
     <ClCompile Include="ImageConverter.cpp" />
     <ClCompile Include="ImageLineUtility.cpp" />
     <ClCompile Include="ImageStats.cpp" />
@@ -219,8 +217,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\OcrMethods.h" />
-    <ClInclude Include="..\..\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\ScansoftErr.h" />
     <ClInclude Include="ImageConverter.h" />
     <ClInclude Include="ImageLineUtility.h" />
     <ClInclude Include="ImageStats.h" />
@@ -236,6 +232,9 @@
     <ProjectReference Include="..\..\..\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcxproj">
       <Project>{08cc1afb-7b9d-42e5-b823-dc72cdc06631}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\VendorSpecificUtils\NuanceUtils\Code\NuanceUtils.vcxproj">
+      <Project>{48e97f8f-c697-4fcd-9928-6b9370eab3dd}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcxproj">
       <Project>{6fa06b83-ac26-49b7-8138-9342792eacc4}</Project>

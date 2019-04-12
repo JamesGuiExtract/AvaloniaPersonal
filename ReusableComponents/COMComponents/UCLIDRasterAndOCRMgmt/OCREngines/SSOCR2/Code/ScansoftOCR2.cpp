@@ -3,10 +3,10 @@
 #include "SSOCR2.h"
 #include "ScansoftOCR2.h"
 #include "ScansoftOCRCfg.h"
-#include "ScansoftErr.h"
 #include "OCRConstants.h"
 #include "OcrMethods.h"
 
+#include <ScansoftErr.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <cpputil.h>

@@ -65,7 +65,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\..\APIs\Leadtools_20\Include;..\..\..\APIs\Leadtools_20\Include\ClassLib;..\..\..\COMComponents\UCLIDComponentsLM\COMLMCore\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\..\APIs\Leadtools_20\Include;..\..\..\APIs\Leadtools_20\Include\ClassLib;..\..\..\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\NuanceUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LEADUTILS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -113,7 +113,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\..\APIs\Leadtools_20\Include;..\..\..\APIs\Leadtools_20\Include\ClassLib;..\..\..\COMComponents\UCLIDComponentsLM\COMLMCore\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\BaseUtils\Code;..\..\..\APIs\Leadtools_20\Include;..\..\..\APIs\Leadtools_20\Include\ClassLib;..\..\..\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\VendorSpecificUtils\NuanceUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LEADUTILS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -213,6 +213,9 @@
     <ProjectReference Include="..\..\..\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcxproj">
       <Project>{6fa06b83-ac26-49b7-8138-9342792eacc4}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NuanceUtils\Code\NuanceUtils.vcxproj">
+      <Project>{48e97f8f-c697-4fcd-9928-6b9370eab3dd}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,9 +1,11 @@
 #pragma once
 
+#include "NuanceUtils.h"
+
 #include <KernelAPI.h>
 
 #include <string>
 
 using namespace std;
 
-void loadPageFromImageHandle(const string& strImage, HIMGFILE hImage, int iPageIndex, HPAGE* phPage);
+NUANCEUTILS_API void loadPageFromImageHandle(const string& strImage, HIMGFILE hImage, int iPageIndex, HPAGE* phPage);
