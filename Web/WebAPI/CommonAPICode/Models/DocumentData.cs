@@ -415,7 +415,8 @@ namespace WebAPI.Models
 
                 var results = GetAttributeSetForFile(fileId);
                 var mapper = new AttributeMapper(results, FileApi.Workflow.Type);
-                return mapper.MapAttributesToDocumentAttributeSet(includeNonSpatial, verboseSpatialData);
+                return mapper.MapAttributesToDocumentAttributeSet(
+                    includeNonSpatial, verboseSpatialData, splitMultiPageAttributes: true);
             }
             catch (Exception ex)
             {

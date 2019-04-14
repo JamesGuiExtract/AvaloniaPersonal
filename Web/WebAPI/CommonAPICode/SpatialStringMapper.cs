@@ -105,7 +105,26 @@ namespace WebAPI
 
                 Position position = new Position();
 
-                IUnknownVector lines = spatialString.GetLines();
+                // https://extract.atlassian.net/browse/ISSUE-16215
+                // GetLines is currently based on text for hybrid strings, not the spatial zones. In this case
+                // we are concerned with the spatial zones, so for hybrid strings, create new SpatialString
+                // representing a "line" for each zone.
+                IUnknownVector lines;
+                if (spatialString.GetMode() == ESpatialStringMode.kHybridMode)
+                {
+                    lines = new IUnknownVector();
+                    foreach (var zone in spatialString.GetOCRImageRasterZones().ToIEnumerable<IRasterZone>())
+                    {
+                        var line = new SpatialString();
+                        line.CreateHybridString((new[] { zone }).ToIUnknownVector<IRasterZone>(),
+                            spatialString.String, spatialString.SourceDocName, spatialString.SpatialPageInfos);
+                        lines.PushBack(line);
+                    }
+                }
+                else
+                {
+                    lines = spatialString.GetLines();
+                }
 
                 SortedSet<int> setOfPages = new SortedSet<int>();
                 var lineCount = lines.Size();
@@ -180,22 +199,6 @@ namespace WebAPI
                 {
                     yield return descendant;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Converts comVector into an enumerable.
-        /// </summary>
-        /// <typeparam name="T">The type of object in the vector.</typeparam>
-        /// <param name="comVector">The <see cref="IIUnknownVector"/> to convert.</param>
-        /// <returns>An enumerable of type T.</returns>
-        public static IEnumerable<T> ToIEnumerable<T>(this IIUnknownVector comVector)
-        {
-            int size = comVector.Size();
-
-            for (int i = 0; i < size; i++)
-            {
-                yield return (T)comVector.At(i);
             }
         }
 

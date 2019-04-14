@@ -178,8 +178,11 @@ namespace WebAPI
         /// <param name="verboseSpatialData"><c>false</c> to include only the spatial data needed for
         /// extract software to represent spatial strings; <c>true</c> to include data that may be
         /// useful to 3rd party integrators.</param>
+        /// <param name="splitMultiPageAttributes"><c>true</c> to split multi-page attributes into a separate
+        /// attribute for every page; <c>false</c> to map multi-page attributes as they are.</param>
         /// <returns>corresponding DocumentAttributeSet</returns>
-        public DocumentDataResult MapAttributesToDocumentAttributeSet(bool includeNonSpatial, bool verboseSpatialData)
+        public DocumentDataResult MapAttributesToDocumentAttributeSet(
+            bool includeNonSpatial, bool verboseSpatialData, bool splitMultiPageAttributes)
         {
             IAttribute attr = null;
 
@@ -197,8 +200,28 @@ namespace WebAPI
                         continue;
                     }
 
-                    var docAttr = MapAttribute(attr, verboseSpatialData);
-                    rootDocAttrSet.Attributes.Add(docAttr);
+                    if (splitMultiPageAttributes && attr.Value.IsMultiPage())
+                    {
+                        foreach (var page in attr.Value.GetPages(false, "").ToIEnumerable<SpatialString>())
+                        {
+                            var pageAttr = new AttributeClass();
+                            pageAttr.Name = attr.Name;
+                            pageAttr.Type = attr.Type;
+
+                            // Main use case for splitting by page is redaction verfication where having
+                            // full attribute text is likely to be more useful that true spatial data.
+                            page.ReplaceAndDowngradeToHybrid(attr.Value.String);
+                            pageAttr.Value = page;
+
+                            var attrDTO = MapAttribute(pageAttr, verboseSpatialData);
+                            rootDocAttrSet.Attributes.Add(attrDTO);
+                        }
+                    }
+                    else
+                    {
+                        var attrDTO = MapAttribute(attr, verboseSpatialData);
+                        rootDocAttrSet.Attributes.Add(attrDTO);
+                    }
                 }
 
                 return rootDocAttrSet;
