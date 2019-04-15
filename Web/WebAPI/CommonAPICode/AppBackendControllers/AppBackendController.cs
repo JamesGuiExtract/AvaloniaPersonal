@@ -497,8 +497,12 @@ namespace WebAPI.Controllers
 
                     // https://extract.atlassian.net/browse/WEB-59
                     // Per discussion with GGK, non-spatial attributes will not be sent to the web app.
+                    // https://extract.atlassian.net/browse/ISSUE-16202
+                    // For redaction verification, split multi-page attributes into separate attributes
+                    // per page so the front-end doesn't need code to deal with multi-page attributes.
                     var result = data.GetDocumentData(
-                        data.DocumentSessionFileId, includeNonSpatial: false, verboseSpatialData: false);
+                        data.DocumentSessionFileId, includeNonSpatial: false, verboseSpatialData: false,
+                        splitMultiPageAttributes: true);
 
                     return Ok(result);
                 }

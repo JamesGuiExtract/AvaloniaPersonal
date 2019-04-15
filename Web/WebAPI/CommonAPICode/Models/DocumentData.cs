@@ -404,10 +404,13 @@ namespace WebAPI.Models
         /// <param name="verboseSpatialData"><c>false</c> to include only the spatial data needed for
         /// extract software to represent spatial strings; <c>true</c> to include data that may be
         /// useful to 3rd party integrators.</param>
+        /// <param name="splitMultiPageAttributes"><c>true</c> to split multi-page attributes into a separate
+        /// attribute for every page; <c>false</c> to map multi-page attributes as they are.</param>
+        /// <returns>corresponding DocumentAttributeSet</returns>
         /// <returns>DocumentAttributeSet instance, including error info iff there is an error</returns>
         /// <remarks>The DocumentData CTOR must be constructed with useAttributeDbMgr = true</remarks>
         public DocumentDataResult GetDocumentData(int fileId, 
-            bool includeNonSpatial, bool verboseSpatialData)
+            bool includeNonSpatial, bool verboseSpatialData, bool splitMultiPageAttributes)
         {
             try
             {
@@ -416,7 +419,7 @@ namespace WebAPI.Models
                 var results = GetAttributeSetForFile(fileId);
                 var mapper = new AttributeMapper(results, FileApi.Workflow.Type);
                 return mapper.MapAttributesToDocumentAttributeSet(
-                    includeNonSpatial, verboseSpatialData, splitMultiPageAttributes: true);
+                    includeNonSpatial, verboseSpatialData, splitMultiPageAttributes);
             }
             catch (Exception ex)
             {

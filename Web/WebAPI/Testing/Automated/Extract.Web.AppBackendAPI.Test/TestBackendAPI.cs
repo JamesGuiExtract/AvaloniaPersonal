@@ -2,7 +2,6 @@
 using Extract.FileActionManager.FileProcessors;
 using Extract.Imaging;
 using Extract.Testing.Utilities;
-using Extract.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
@@ -756,7 +755,7 @@ namespace Extract.Web.WebAPI.Test
                         result = controller.GetDocumentPage(openDocumentResult.Id, page);
                         var fileResult = result.AssertGoodResult<FileContentResult>();
 
-                        using (var temporaryFile = new TemporaryFile(".pdf", false))
+                        using (var temporaryFile = new Utilities.TemporaryFile(".pdf", false))
                         using (var fileStream = File.OpenWrite(temporaryFile.FileName))
                         {
                             fileStream.Write(fileResult.FileContents, 0, fileResult.FileContents.Length);

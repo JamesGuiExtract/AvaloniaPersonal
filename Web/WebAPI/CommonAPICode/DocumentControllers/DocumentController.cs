@@ -372,7 +372,8 @@ namespace WebAPI.Controllers
                 {
                     data.AssertRequestFileId("ELI45199", Id);
 
-                    var result = data.GetDocumentData(Id, includeNonSpatial: true, verboseSpatialData: true);
+                    var result = data.GetDocumentData(
+                        Id, includeNonSpatial: true, verboseSpatialData: true, splitMultiPageAttributes: false);
 
                     return Ok(result);
                 }

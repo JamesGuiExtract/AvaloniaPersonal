@@ -1,6 +1,5 @@
 ﻿using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
-using Extract.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
@@ -266,7 +265,7 @@ namespace Extract.Web.WebAPI.Test
 
                 for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
                 {
-                    string outputFileName = FileSystemMethods.GetTemporaryFileName();
+                    string outputFileName = Utilities.FileSystemMethods.GetTemporaryFileName();
                     File.WriteAllText(outputFileName, fileProcessingDb.GetFileNameFromFileID(i));
                     tempFiles.Add(outputFileName);
 
@@ -895,8 +894,9 @@ namespace Extract.Web.WebAPI.Test
             voa.PushBack(attr);
 
             var mapper = new AttributeMapper(voa, UCLID_FILEPROCESSINGLib.EWorkflowType.kExtraction);
-            var docAttrr = mapper.MapAttributesToDocumentAttributeSet(includeNonSpatial: true, verboseSpatialData: true);
-            Assert.IsFalse(docAttrr.Attributes.Any(a =>
+            var docAttr = mapper.MapAttributesToDocumentAttributeSet(
+                includeNonSpatial: true, verboseSpatialData: true, splitMultiPageAttributes: false);
+            Assert.IsFalse(docAttr.Attributes.Any(a =>
                 a.SpatialPosition.Pages.Count != a.SpatialPosition.Pages.Distinct().Count()));
         }
 
@@ -951,7 +951,8 @@ namespace Extract.Web.WebAPI.Test
                 using (var data = new DocumentData(Utils.CurrentApiContext))
                 {
                     Assert.IsTrue(data != null, "null DocumentData reference");
-                    return data.GetDocumentData(fileId, includeNonSpatial: true, verboseSpatialData: true);
+                    return data.GetDocumentData(
+                        fileId, includeNonSpatial: true, verboseSpatialData: true, splitMultiPageAttributes: false);
                 }
             }
             finally

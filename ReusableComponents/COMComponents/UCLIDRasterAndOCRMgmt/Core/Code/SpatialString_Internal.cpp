@@ -493,9 +493,9 @@ bool CSpatialString::isMultiPage()
         {
             case kNonSpatialMode:
             {
-                // This operation requires that this object is a spatial string
-                UCLIDException ue( "ELI14762", "Non spatial strings cannot be multi-page spatial strings!");
-                throw ue;
+				// Don't force caller to have to separately check if a string is spatial; if it's
+				// not spatial it's not multi-page.
+				return false;
             }
             break;
             case kHybridMode:
