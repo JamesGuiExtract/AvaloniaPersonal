@@ -10,6 +10,7 @@ using UCLID_FILEPROCESSINGLib;
 using WebAPI.Models;
 
 using static WebAPI.Utils;
+using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace WebAPI.Controllers
 {
@@ -534,8 +535,11 @@ namespace WebAPI.Controllers
 
                     var fileName = data.GetSourceFileName(docID);
                     var translator = new AttributeTranslator(fileName, parameters.Annotation);
-                    var attribute = translator.ComAttribute;
-                    var updated = Extract.AttributeFinder.Rules.AnnotationProcessor.ProcessAttribute(fileName, pageNumber, attribute, parameters.OperationType, parameters.Definition);
+                    var attribute = (ComAttribute) translator.ComAttribute;
+
+                    var annotationProcessorType = Type.GetTypeFromProgID("Extract.AttributeFinder.Rules.AnnotationProcessor");
+                    var annotationProcessor = (UCLID_AFCORELib.IAnnotationProcessor)Activator.CreateInstance(annotationProcessorType);
+                    var updated = annotationProcessor.ProcessAttribute(fileName, pageNumber, attribute, parameters.OperationType, parameters.Definition);
                     var mapper = new AttributeMapper(null, data.WorkflowType);
                     var updatedAttribute =  mapper.MapAttribute(updated, false);
 

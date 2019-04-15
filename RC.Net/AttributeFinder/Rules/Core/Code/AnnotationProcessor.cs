@@ -1,15 +1,19 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Runtime.InteropServices;
 using UCLID_AFCORELib;
 using UCLID_AFSELECTORSLib;
 using UCLID_COMUTILSLib;
+using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.AttributeFinder.Rules
 {
+    [ComVisible(true)]
+    [Guid("1AEBE03C-C621-456C-B98B-DA8CF5B7553C")]
     [CLSCompliant(false)]
-    public static class AnnotationProcessor
+    public class AnnotationProcessor: IAnnotationProcessor
     {
-        public static IAttribute ProcessAttribute(string fileName, int pageNum, IAttribute attribute, string operationType, string definition)
+        public ComAttribute ProcessAttribute(string fileName, int pageNum, ComAttribute attribute, string operationType, string definition)
         {
             switch (operationType.ToUpperInvariant())
             {
@@ -20,7 +24,7 @@ namespace Extract.AttributeFinder.Rules
             }
         }
 
-        private static IAttribute Modify(string fileName, int pageNum, IAttribute attribute, string operation)
+        private static ComAttribute Modify(string fileName, int pageNum, ComAttribute attribute, string operation)
         {
             dynamic model = JObject.Parse(operation);
             if (model.AutoShrinkRedactionZones != null)
@@ -33,17 +37,17 @@ namespace Extract.AttributeFinder.Rules
             throw new ExtractException("ELI46747", "Unknown operation. Path: " + ((JObject)model).Path);
         }
 
-        private static IAttribute ModifyWithOutputHandler(IAttribute attribute, IOutputHandler oh)
+        private static ComAttribute ModifyWithOutputHandler(ComAttribute attribute, IOutputHandler oh)
         {
             var attributes = new IUnknownVectorClass();
             attributes.PushBack(attribute);
             var afdoc = new AFDocumentClass
             {
-                Attribute = (UCLID_AFCORELib.Attribute)attribute
+                Attribute = attribute
             };
 
             oh.ProcessOutput(attributes, afdoc, null);
-            return attributes.Size() > 0 ? (IAttribute)attributes.At(0) : null;
+            return attributes.Size() > 0 ? (ComAttribute)attributes.At(0) : null;
         }
     }
 

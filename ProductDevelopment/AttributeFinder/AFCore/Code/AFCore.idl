@@ -590,6 +590,20 @@ library UCLID_AFCORELib
 
 	[
 		object,
+		uuid("3A870A7E-5BE0-4D00-ABD3-8F10B523AF22"),
+		dual,
+		helpstring("IAnnotationProcessor Interface"),
+		pointer_default(unique)
+	]
+	interface IAnnotationProcessor : IDispatch
+	{
+		[id(1), helpstring("method ProcessAttribute")] HRESULT ProcessAttribute(
+			[in] BSTR fileName, long pageNumber, IAttribute* attribute, BSTR operationType, BSTR definition,
+			[out, retval] IAttribute* *updatedAttribute);
+	}
+
+	[
+		object,
 		uuid(28A2337C-2F24-4F0B-ADBC-95FE5E51AB59),
 		dual,
 		helpstring("IOutputHandler Interface"),
