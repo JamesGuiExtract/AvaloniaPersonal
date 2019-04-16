@@ -367,5 +367,21 @@ namespace WebAPI
                 throw ExtractException.AsExtractException("ELI46745", ex);
             }
         }
+
+        internal static void ReportMemoryUsage(object comObject)
+        {
+            try
+            {
+                IManageableMemory manageableMemoryObject = comObject as IManageableMemory;
+                ExtractException.Assert("ELI46752", "COM object memory is not manageable.",
+                    manageableMemoryObject != null);
+
+                manageableMemoryObject.ReportMemoryUsage();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI46753", ex);
+            }
+        }
     }
 }

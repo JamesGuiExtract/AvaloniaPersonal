@@ -7,8 +7,6 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
-using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_IMAGEUTILSLib;
@@ -1341,6 +1339,9 @@ namespace WebAPI.Models
             {
                 var ussData = new SpatialString();
                 ussData.LoadFrom(ussFileName, false);
+
+                Utils.ReportMemoryUsage(ussData);
+
                 return ussData;
             }
 
