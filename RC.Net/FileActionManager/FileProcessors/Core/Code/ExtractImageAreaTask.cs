@@ -1,5 +1,6 @@
 ﻿using Extract.FileActionManager.Forms;
 using Extract.Imaging;
+using Extract.Imaging.Utilities;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -556,12 +557,14 @@ namespace Extract.FileActionManager.FileProcessors
                 // Initialize the path tag instances with sourceDocName.
                 string dataFileName = pFAMTM.ExpandTagsAndFunctions(DataFileName, sourceDocName);
 
-                // Extract image areas.
-                foreach (RasterZone rasterZone in GetZonesToExtract(dataFileName))
+                using (var leadtoolsGuard = new LeadtoolsGuard())
                 {
-                    OutputImageArea(sourceDocName, rasterZone);
+                    // Extract image areas.
+                    foreach (RasterZone rasterZone in GetZonesToExtract(dataFileName))
+                    {
+                        OutputImageArea(sourceDocName, rasterZone);
+                    }
                 }
-
                 // If we reached this point then processing was successful
                 return EFileProcessingResult.kProcessingSuccessful;
             }

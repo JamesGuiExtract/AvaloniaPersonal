@@ -208,28 +208,31 @@ namespace SplitMultiPageImage
                 // Get format for the extension of the output file
                 string stringFormat = GetStringFormat(reader);
 
-                // Iterate over each page
-                for (int i = 1; i <= reader.PageCount; i++)
+                using (var r = new LeadtoolsGuard())
                 {
-                    RasterImage image = reader.ReadPage(i);
-
-                    // Retain annotations if necessary
-                    RasterTagMetadata tag = null;
-                    if (retainAnnotations)
+                    // Iterate over each page
+                    for (int i = 1; i <= reader.PageCount; i++)
                     {
-                        tag = reader.ReadTagOnPage(i);
-                    }
+                        RasterImage image = reader.ReadPage(i);
 
-                    // Create the output file
-                    string output = GetOutputFileName(baseFileName, i, stringFormat);
-                    using (ImageWriter writer = codecs.CreateWriter(output, reader.Format, false))
-                    {
-                        writer.AppendImage(image);
-                        if (tag != null)
+                        // Retain annotations if necessary
+                        RasterTagMetadata tag = null;
+                        if (retainAnnotations)
                         {
-                            writer.WriteTagOnPage(tag, 1);
+                            tag = reader.ReadTagOnPage(i);
                         }
-                        writer.Commit(overwrite);
+
+                        // Create the output file
+                        string output = GetOutputFileName(baseFileName, i, stringFormat);
+                        using (ImageWriter writer = codecs.CreateWriter(output, reader.Format, false))
+                        {
+                            writer.AppendImage(image);
+                            if (tag != null)
+                            {
+                                writer.WriteTagOnPage(tag, 1);
+                            }
+                            writer.Commit(overwrite);
+                        }
                     }
                 }
             }

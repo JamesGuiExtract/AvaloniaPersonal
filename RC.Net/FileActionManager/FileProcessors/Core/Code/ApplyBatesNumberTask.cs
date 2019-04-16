@@ -638,41 +638,44 @@ namespace Extract.FileActionManager.FileProcessors
             TemporaryFile outputFile = null;
             try
             {
-                // Get the file info along with the page information
-                reader = _codecs.CreateReader(fileName);
-
-                // Get the image information
-                pageCount = reader.PageCount;
-                RasterImageFormat format = reader.Format;
-
-                if (progressStatus != null)
+                using (var leadtoolsGuard = new LeadtoolsGuard())
                 {
-                    progressStatus.InitProgressStatus("Applying Bates numbers...", 0,
-                        (pageCount / 4) + 1, true);
-                }
+                    // Get the file info along with the page information
+                    reader = _codecs.CreateReader(fileName);
 
-                // Create a temporary file to apply the Bates number to, copy back after
-                // number is applied
-                outputFile = new TemporaryFile(Path.GetExtension(fileName), true);
+                    // Get the image information
+                    pageCount = reader.PageCount;
+                    RasterImageFormat format = reader.Format;
 
-                // Generate bates numbers
-                batesNumbers = new List<string>(generator.GetNextNumberStrings(pageCount));
-
-                // Apply the bates number to each page
-                writer = _codecs.CreateWriter(outputFile.FileName, format, false);
-                for (int i = 1; i <= pageCount; i++)
-                {
-                    // Start a new progress status group every 4 pages
-                    if (progressStatus != null && i % 4 == 1)
+                    if (progressStatus != null)
                     {
-                        progressStatus.StartNextItemGroup("", 1);
+                        progressStatus.InitProgressStatus("Applying Bates numbers...", 0,
+                            (pageCount / 4) + 1, true);
                     }
-                    
-                    ApplyBatesNumberToPage(batesNumbers[i - 1], i, fileName, reader, writer);
+
+                    // Create a temporary file to apply the Bates number to, copy back after
+                    // number is applied
+                    outputFile = new TemporaryFile(Path.GetExtension(fileName), true);
+
+                    // Generate bates numbers
+                    batesNumbers = new List<string>(generator.GetNextNumberStrings(pageCount));
+
+                    // Apply the bates number to each page
+                    writer = _codecs.CreateWriter(outputFile.FileName, format, false);
+                    for (int i = 1; i <= pageCount; i++)
+                    {
+                        // Start a new progress status group every 4 pages
+                        if (progressStatus != null && i % 4 == 1)
+                        {
+                            progressStatus.StartNextItemGroup("", 1);
+                        }
+
+                        ApplyBatesNumberToPage(batesNumbers[i - 1], i, fileName, reader, writer);
+                    }
+                    reader.Dispose();
+                    reader = null;
+                    writer.Commit(true);
                 }
-                reader.Dispose();
-                reader = null;
-                writer.Commit(true);
 
                 // Copy the output file to the destination
                 File.Copy(outputFile.FileName, fileName, true);
@@ -739,76 +742,78 @@ namespace Extract.FileActionManager.FileProcessors
                 RasterGraphics rg = null;
                 try
                 {
-                    // Load the image page
-                    image = reader.ReadPage(pageNumber);
-
-                    // https://extract.atlassian.net/browse/ISSUE-12168
-                    // To avoid an error from RasterImagePainter.CreateGraphics below, the image
-                    // must first be converted to 24 bits-per-pixel.
-                    int? originalBitsPerPixel = null;
-                    if (image.BitsPerPixel != 24)
+                    using (var leadtoolsGuard = new LeadtoolsGuard())
                     {
-                        originalBitsPerPixel = image.BitsPerPixel;
-                        image.ConvertBitsPerPixel(24);
+                        // Load the image page
+                        image = reader.ReadPage(pageNumber);
+
+                        // https://extract.atlassian.net/browse/ISSUE-12168
+                        // To avoid an error from RasterImagePainter.CreateGraphics below, the image
+                        // must first be converted to 24 bits-per-pixel.
+                        int? originalBitsPerPixel = null;
+                        if (image.BitsPerPixel != 24)
+                        {
+                            originalBitsPerPixel = image.BitsPerPixel;
+                            image.ConvertBitsPerPixel(24);
+                        }
+
+                        // Compute the anchor point for the text
+                        Point anchorPoint = GetAnchorPoint(_format.PageAnchorAlignment,
+                            _format.HorizontalInches, _format.VerticalInches, image);
+
+                        // Load the existing annotation objects
+                        RasterTagMetadata tag = reader.ReadTagOnPage(pageNumber);
+
+                        // Compute the appropriate font size
+                        pixelFont = FontMethods.ConvertFontToUnits(_format.Font,
+                        image.YResolution, GraphicsUnit.Pixel);
+
+                        rg = RasterImagePainter.CreateGraphics(image);
+
+                        // Compute the bounds for the string
+                        Rectangle bounds = DrawingMethods.ComputeStringBounds(batesNumber,
+                            rg.Graphics, pixelFont, 0, 0F, anchorPoint,
+                            _format.AnchorAlignment);
+
+                        // Ensure the Bates number fits on the image page
+                        Rectangle pageBounds = new Rectangle(new Point(0, 0),
+                            image.ImageSize.AsSize());
+
+                        if (!pageBounds.Contains(bounds))
+                        {
+                            wontFitOnPage = true;
+
+                            // Throw exception
+                            ExtractException ee = new ExtractException("ELI27991",
+                                "Bates number will appear off of the page with current settings.");
+                            ee.AddDebugData("Bates Number String", batesNumber, false);
+                            ee.AddDebugData("Bounds For Bates Number", bounds, false);
+                            ee.AddDebugData("Bates Number Anchor Point", anchorPoint, false);
+                            ee.AddDebugData("Page Number", pageNumber, false);
+                            ee.AddDebugData("Image Bounds", pageBounds, false);
+                            ee.AddDebugData("Image File Name", inputFile, false);
+                            throw ee;
+                        }
+
+                        // Draw the Bates number on the image
+                        DrawingMethods.DrawString(batesNumber, rg.Graphics,
+                            rg.Graphics.Transform, pixelFont, 0, 0F, bounds, null, null);
+
+                        // Restore the original bit-depth.
+                        if (originalBitsPerPixel.HasValue)
+                        {
+                            image.ConvertBitsPerPixel(originalBitsPerPixel.Value);
+                        }
+
+                        // Save the image page (use append to add it to the end of the file)
+                        writer.AppendImage(image);
+
+                        // If there were annotation tags, save those as well
+                        if (tag != null)
+                        {
+                            writer.WriteTagOnPage(tag, pageNumber);
+                        }
                     }
-
-                    // Compute the anchor point for the text
-                    Point anchorPoint = GetAnchorPoint(_format.PageAnchorAlignment,
-                        _format.HorizontalInches, _format.VerticalInches, image);
-
-                    // Load the existing annotation objects
-                    RasterTagMetadata tag = reader.ReadTagOnPage(pageNumber);
-
-                    // Compute the appropriate font size
-                    pixelFont = FontMethods.ConvertFontToUnits(_format.Font,
-                    image.YResolution, GraphicsUnit.Pixel);
-
-                    rg = RasterImagePainter.CreateGraphics(image);
-
-                    // Compute the bounds for the string
-                    Rectangle bounds = DrawingMethods.ComputeStringBounds(batesNumber,
-                        rg.Graphics, pixelFont, 0, 0F, anchorPoint,
-                        _format.AnchorAlignment);
-
-                    // Ensure the Bates number fits on the image page
-                    Rectangle pageBounds = new Rectangle(new Point(0, 0),
-                        image.ImageSize.AsSize());
-
-                    if (!pageBounds.Contains(bounds))
-                    {
-                        wontFitOnPage = true;
-
-                        // Throw exception
-                        ExtractException ee = new ExtractException("ELI27991",
-                            "Bates number will appear off of the page with current settings.");
-                        ee.AddDebugData("Bates Number String", batesNumber, false);
-                        ee.AddDebugData("Bounds For Bates Number", bounds, false);
-                        ee.AddDebugData("Bates Number Anchor Point", anchorPoint, false);
-                        ee.AddDebugData("Page Number", pageNumber, false);
-                        ee.AddDebugData("Image Bounds", pageBounds, false);
-                        ee.AddDebugData("Image File Name", inputFile, false);
-                        throw ee;
-                    }
-
-                    // Draw the Bates number on the image
-                    DrawingMethods.DrawString(batesNumber, rg.Graphics,
-                        rg.Graphics.Transform, pixelFont, 0, 0F, bounds, null, null);
-
-                    // Restore the original bit-depth.
-                    if (originalBitsPerPixel.HasValue)
-                    {
-                        image.ConvertBitsPerPixel(originalBitsPerPixel.Value);
-                    }
-
-                    // Save the image page (use append to add it to the end of the file)
-                    writer.AppendImage(image);
-
-                    // If there were annotation tags, save those as well
-                    if (tag != null)
-                    {
-                        writer.WriteTagOnPage(tag, pageNumber);
-                    }
-
                     // Successfully completed, break from loop
                     break;
                 }

@@ -322,12 +322,15 @@ namespace Extract.AttributeFinder
 
                 // Pixels are stored as sequential R, G, B
                 var pixelValues = new byte[numberOfPixels];
-                for (int i = 0, j = 0; i < numberOfPixels; i++, j += 3)
+                using (var r = new LeadtoolsGuard())
                 {
-                    pixelValues[i] = RasterHsvColor.FromRasterColor(
-                        new RasterColor(bitmapBytes[j], bitmapBytes[j + 1], bitmapBytes[j + 2])).V;
+                    for (int i = 0, j = 0; i < numberOfPixels; i++, j += 3)
+                    {
+                        pixelValues[i] = RasterHsvColor.FromRasterColor(
+                            new RasterColor(bitmapBytes[j], bitmapBytes[j + 1], bitmapBytes[j + 2])).V;
+                    }
+                    bitmap.UnlockBits(bitmapData);
                 }
-                bitmap.UnlockBits(bitmapData);
 
                 var pixelStrings = pixelValues.Select(b =>
                 {

@@ -192,6 +192,7 @@ namespace ResolutionNormalizer
         {
             try
             {
+                using (var leadtoolsGuard = new LeadtoolsGuard())
                 using (CodecsImageInfo info = codecs.GetInformation(fileName, false, page))
                 {
                     RasterImage image = null;
