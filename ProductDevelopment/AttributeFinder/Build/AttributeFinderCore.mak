@@ -241,6 +241,8 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Utilities.ContextTags.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Utilities.ContextTags.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\ResolutionNormalizer.exe" /mapout:"$(BinariesFolder)\Map\mapResolutionNormalizer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\LearningMachineEditor.exe" /mapout:"$(BinariesFolder)\Map\mapLearningMachineEditor.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	editbin.exe /largeaddressaware "$(BinariesFolder)\Obfuscated\LearningMachineEditor.exe"
+	sn -Ra "$(BinariesFolder)\Obfuscated\LearningMachineEditor.exe" "$(StrongNameKeyDir)\ExtractInternalKey.snk"
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Interop.Zip.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Interop.Zip.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\StatisticsReporter.exe" /mapout:"$(BinariesFolder)\Map\mapStatisticsReporter.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.DataCaptureStats.dll" /mapout:"$(BinariesFolder)\Map\Extract.DataCaptureStats.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
