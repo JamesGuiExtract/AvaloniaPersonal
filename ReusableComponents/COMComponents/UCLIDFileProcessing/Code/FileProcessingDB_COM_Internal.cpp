@@ -4559,7 +4559,7 @@ bool CFileProcessingDB::SetFileActionComment_Internal(bool bDBLocked, long nFile
 			string strComment = asString(bstrComment);
 
 			// Get the current user name
-			string strUserName = getCurrentUserName();
+			string strUserName = (m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName;
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;

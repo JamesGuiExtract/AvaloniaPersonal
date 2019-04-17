@@ -180,7 +180,7 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			: "";
 		string strAddSkipRecord = strState == "S" ?
 			"INSERT INTO SkippedFile (UserName, FileID, ActionID) SELECT '"
-			+ getCurrentUserName() + "' AS UserName, FAMFile.ID, "
+			+ ((m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName) + "' AS UserName, FAMFile.ID, "
 			+ strActionID + " AS ActionID FROM FAMFile WHERE FAMFile.ID IN (" : "";
 
 		// This is used when processing state changes to "U", "C", "F" and if restartable processing
@@ -561,7 +561,8 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 						// [LRCAU #5853]
 						executeCmdQuery(ipConnection, "Update SkippedFile Set FAMSessionID = " + 
 							asString(m_nFAMSessionID) + ", DateTimeStamp = GETDATE(), UserName = '"
-							+ getCurrentUserName() + "' WHERE FileID = " + asString(nFileID));
+							+ ((m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName) 
+							+ "' WHERE FileID = " + asString(nFileID));
 					}
 				}
 			}
@@ -2298,7 +2299,8 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 
 			// Need to add any new skipped records (files may be entering skipped status)
 			string strAddSkipped = "INSERT INTO SkippedFile (FileID, ActionID, UserName, FAMSessionID) SELECT "
-				" FAMFile.ID, " + strToActionID + " AS NewActionID, '" + getCurrentUserName()
+				" FAMFile.ID, " + strToActionID + " AS NewActionID, '" 
+				+ ((m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName)
 				+ "' AS NewUserName, " + ((m_nFAMSessionID == 0) ? "NULL" : asString(m_nFAMSessionID)) + 
 				" AS FAMSessionID FROM FAMFile "
 				"INNER JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID AND "
@@ -4027,7 +4029,7 @@ void CFileProcessingDB::addSkipFileRecord(const _ConnectionPtr &ipConnection,
 		}
 		else
 		{
-			string strUserName = getCurrentUserName();
+			string strUserName = (m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName;
 
 			// Add a new row
 			ipSkippedSet->AddNew();
@@ -7057,7 +7059,7 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 	if (eStatus == kActionSkipped)
 	{
 		// Get the current user name
-		string strUserName = getCurrentUserName();
+		string strUserName = (m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName;
 
 		// Add all files to the skipped table for this action
 		string strSQL = "INSERT INTO [SkippedFile] ([FileID], [ActionID], [UserName]) ";
