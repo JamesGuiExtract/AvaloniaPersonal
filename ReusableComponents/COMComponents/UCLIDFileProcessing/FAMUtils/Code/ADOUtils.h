@@ -228,6 +228,24 @@ FAMUTILS_API void updateConnectionStringProperties(string& rstrConnectionString,
 FAMUTILS_API long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQuery,
 	bool bDisplayExceptions = false, long *pnOutputID = __nullptr);
 
+// Overload with five arguments that returns named long value.
+// PROMISE:	To execute the SQL Query and return the number of records affected
+// NOTES:	strSQLQuery must be a query that returns no records
+//			if bDisplayExceptions == false any exceptions will be thrown to caller
+//			if bDisplayExceptions == true any exceptions will be displayed and 0 will be returned
+//			If pnOutputID is not NULL, then resultColumnName must be non-empty, and name the
+//			column that the value of will be returned in pnOutputID.
+//			If pnOutputID is not NULL, it is assumed that the query will return a single long value.
+//			Typically this ID will be generated using the "Output" SQL clause.
+// REQUIRED: This call must be made from code that has either explicitly locked the database or is
+//			testing for the case that optimistic locking failed. Outside of the FileProcessingDB
+//			class FileProcessingDB::ExecuteCommandReturnColumnValue() should be used instead.
+FAMUTILS_API long executeCmdQuery(const _ConnectionPtr& ipDBConnection,
+	const std::string& strSQLQuery,
+	const std::string& resultColumnName,
+	bool bDisplayExceptions = false,
+	long* pnOutputID = nullptr);
+
 // Overload with five arguments that returns named long long value.
 // PROMISE:	To execute the SQL Query and return the number of records affected
 // NOTES:	strSQLQuery must be a query that returns no records
@@ -243,8 +261,8 @@ FAMUTILS_API long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const st
 FAMUTILS_API long executeCmdQuery( const _ConnectionPtr& ipDBConnection, 
 								   const std::string& strSQLQuery,
 								   const std::string& resultColumnName,
-								   bool bDisplayExceptions = false, 
-								   long long *pnOutputID = nullptr );
+								   bool bDisplayExceptions, 
+								   long long *pnOutputID );
 
 // Returns ID from the given table by looking up the strKey in the key column and if
 // the key is not found it is added to the table if bAddKey is true and the new ID is returned

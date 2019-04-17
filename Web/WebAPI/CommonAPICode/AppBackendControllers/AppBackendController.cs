@@ -203,6 +203,9 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <param name="docID">The file ID to open. If -1, the next queued document will be opened.
         /// </param>
+        /// <param name="processSkipped">If <paramref name="docID"/> is -1, if this is <c>true</c> then the document to open
+        /// will be the next one in the skipped queue for the user, if <c>false</c> the next document in the pending queue will be opened
+        /// </param>
         [HttpPost("OpenDocument/{docID}")]
         [Authorize]
         [ProducesResponseType(200, Type = typeof(DocumentIdResult))]
@@ -210,7 +213,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404, Type = typeof(ErrorResult))]
         [ProducesResponseType(423, Type = typeof(ErrorResult))]
-        public IActionResult OpenDocument(int docID = -1)
+        public IActionResult OpenDocument(int docID = -1, bool processSkipped = false)
         {
             try
             {
@@ -219,7 +222,7 @@ namespace WebAPI.Controllers
 
                 using (var data = new DocumentData(User, requireSession: true))
                 {
-                    var documentId = data.OpenDocument(docID);
+                    var documentId = data.OpenDocument(docID, processSkipped);
 
                     return Ok(documentId);
                 }

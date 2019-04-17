@@ -4823,6 +4823,25 @@ STDMETHODIMP CFileProcessingDB::IsFAMSessionOpen(long nFAMSessionID, VARIANT_BOO
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46724");
 }
+STDMETHODIMP CFileProcessingDB::GetNumberSkippedForCurrentUser(long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, long* pnFilesSkipped)
+{
+	try
+	{
+		string strQuery =
+			"SELECT COUNT(ID) as NumberSkippedForUser "
+			"FROM SkippedFile "
+			"WHERE UserName = '<UserName>' AND ActionID = " + asString(nActionID);
+		
+		string strUser = (m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName;
+
+		replaceVariable(strQuery, "<UserName>", strUser);
+		long lNumberSkipped;
+		executeCmdQuery(getDBConnection(), strQuery, "NumberSkippedForUser", false, &lNumberSkipped);
+
+		*pnFilesSkipped = lNumberSkipped;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46754");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

@@ -225,6 +225,8 @@ namespace WebAPI.Models
                 result.PendingPages = stats.NumPagesPending;
                 result.ActiveUsers = users.Size;
 
+                result.skippedDocumentsForCurrentUser = FileApi.FileProcessingDB.GetNumberSkippedForCurrentUser(actionId, false);
+
                 return result;
             }
             catch (Exception ex)
@@ -237,8 +239,10 @@ namespace WebAPI.Models
         /// Checkouts the document.
         /// </summary>
         /// <param name="id">The identifier.</param>
+        /// <param name="processSkipped">If <paramref name="id"/> is -1, if this is <c>true</c> then the document to open
+        /// will be the next one in the skipped queue for the user, if <c>false</c> the next document in the pending queue will be opend</param>
         /// <returns></returns>
-        public DocumentIdResult OpenDocument(int id)
+        public DocumentIdResult OpenDocument(int id, bool processSkipped = false)
         {
             try
             {
@@ -268,7 +272,7 @@ namespace WebAPI.Models
                 }
                 else
                 {
-                    var fileRecords = FileApi.FileProcessingDB.GetFilesToProcess(FileApi.Workflow.EditAction, 1, false, "");
+                    var fileRecords = FileApi.FileProcessingDB.GetFilesToProcess(FileApi.Workflow.EditAction, 1, processSkipped, _user.GetUsername());
                     if (fileRecords.Size() == 0)
                     {
                         return new DocumentIdResult()

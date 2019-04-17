@@ -789,51 +789,59 @@ void updateConnectionStringProperties(string& rstrConnectionString, const string
 long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQuery,
 	bool bDisplayExceptions, long *pnOutputID)
 {
-	ASSERT_ARGUMENT("ELI18818", ipDBConnection != __nullptr);
-
-	_RecordsetPtr ipResult(__nullptr);
+	return executeCmdQuery(ipDBConnection, strSQLQuery, "ID", bDisplayExceptions, pnOutputID);
+}
+//-------------------------------------------------------------------------------------------------
+long executeCmdQuery( const _ConnectionPtr& ipDBConnection, 
+					  const std::string& strSQLQuery,
+					  const std::string& resultColumnName,
+					  bool bDisplayExceptions, 
+					  long *pnOutputID )
+{
+	ASSERT_ARGUMENT( "ELI46755", ipDBConnection != nullptr );
 
 	variant_t vtRecordsAffected = 0L;
 	try
 	{
 		try
 		{
-			if (pnOutputID == __nullptr)
+			if ( pnOutputID == nullptr )
 			{
-				ipDBConnection->Execute(strSQLQuery.c_str(),
-					&vtRecordsAffected, adCmdText | adExecuteNoRecords);
+				ipDBConnection->Execute( strSQLQuery.c_str(),
+										 &vtRecordsAffected, 
+										 adCmdText | adExecuteNoRecords );
 			}
 			else
 			{
-				ipResult = ipDBConnection->Execute(strSQLQuery.c_str(), __nullptr, adCmdUnknown);
-				ASSERT_RESOURCE_ALLOCATION("ELI34111", ipResult != __nullptr);
+				ASSERT_ARGUMENT( "ELI46756", !resultColumnName.empty() );
+				_RecordsetPtr ipResult = ipDBConnection->Execute( strSQLQuery.c_str(), 
+																  nullptr, 
+																  adCmdUnknown );
+				ASSERT_RESOURCE_ALLOCATION( "ELI46757", ipResult != nullptr );
 
-				// If pnOutputID is provided, it is assumed the query will return a single record
-				// with a field name of "ID".
+				// If pnOutputID is provided, it is assumed the query will return a 
+				// single record, with a field name contained in resultColumName.
 				ipResult->MoveFirst();
-				*pnOutputID = getLongField(ipResult->Fields, "ID");
+				*pnOutputID = getLongField( ipResult->Fields, resultColumnName );
 			}
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI14382");
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION( "ELI46758" );
 	}
-	catch(UCLIDException& ue)
+	catch( UCLIDException& ue )
 	{
-		ue.addDebugInfo("SQL", strSQLQuery, true);
+		ue.addDebugInfo( "SQL", strSQLQuery, true );
 
-		if (ipResult != __nullptr)
+		if ( !bDisplayExceptions )
 		{
-			UCLIDException uexOuter = UCLIDException("ELI43266", "Record not found", ue);
-			ue = uexOuter;
+			// Rethrow the exception
+			throw ue;
 		}
 
-		if (bDisplayExceptions)
-		{
-			ue.display();
-			return 0;
-		}
-		
-		throw ue;
+		// Display exception
+		ue.display();
+		return 0;
 	} 
+
 	return vtRecordsAffected.lVal;
 }
 //-------------------------------------------------------------------------------------------------

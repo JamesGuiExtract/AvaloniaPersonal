@@ -2034,6 +2034,9 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// Checks to see if a particular session ID is still open (doesn't have a Stop time)
 		[id(200), helpstring("method IsFAMSessionOpen")] HRESULT IsFAMSessionOpen([in] long nFAMSessionID, [out, retval] VARIANT_BOOL* pbIsFAMSessionOpen);
+		// -----------------------------------------------------------------------------------------------
+		// Returns the number of skipped files for the user
+		[id(201), helpstring("method GetNumberSkippedForCurrentUser")] HRESULT GetNumberSkippedForCurrentUser([in] long nActionID, [in] VARIANT_BOOL bRevertTimedOutFAMs, [out, retval] long* pnFilesSkipped);
 	};
 
 	[

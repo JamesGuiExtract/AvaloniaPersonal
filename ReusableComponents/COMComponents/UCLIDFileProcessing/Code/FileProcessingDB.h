@@ -365,6 +365,7 @@ public:
 	STDMETHOD(ResumeWebSession)(long nFAMSessionID, long* pnFileTaskSessionID, long* pnOpenFileID, VARIANT_BOOL* pbIsFileOpen);
 	STDMETHOD(SuspendWebSession)();
 	STDMETHOD(IsFAMSessionOpen)(long nFAMSessionID, VARIANT_BOOL* pbIsFAMSessionOpen);
+	STDMETHOD(GetNumberSkippedForCurrentUser)(long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, long* pnFilesSkipped);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);

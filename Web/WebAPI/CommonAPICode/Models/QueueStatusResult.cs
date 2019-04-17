@@ -21,5 +21,10 @@ namespace WebAPI.Models
         /// The number of users active in the queue (including the current user)
         /// </summary>
         public int ActiveUsers;
+
+        /// <summary>
+        /// Number of skipped documents for the current user.
+        /// </summary>
+        public int skippedDocumentsForCurrentUser;
     }
 }
