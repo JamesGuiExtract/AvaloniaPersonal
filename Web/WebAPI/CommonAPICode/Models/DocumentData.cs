@@ -726,7 +726,11 @@ namespace WebAPI.Models
                 AssertDocumentSession("ELI45297");
 
                 AttributeDbMgr.CreateNewAttributeSetForFile(
-                    FileApi.DocumentSession.Id, FileApi.Workflow.OutputAttributeSet, fileData, true, true, true, false);
+                    FileApi.DocumentSession.Id, FileApi.Workflow.OutputAttributeSet, fileData,
+                    vbStoreDiscreteFields: false,
+                    vbStoreRasterZone: false,
+                    vbStoreEmptyAttributes: true,
+                    closeConnection: false);
             }
             catch (Exception ex)
             {
