@@ -15,24 +15,27 @@ LeadToolsLicenseRestrictor::LeadToolsLicenseRestrictor()
 {
 	try
 	{
-		static bool clientLicense = !(LicenseManagement::isLicensed(gnFLEXINDEX_SERVER_OBJECTS) ||
-			LicenseManagement::isLicensed(gnFLEXINDEX_IDSHIELD_SERVER_CORE)) || LicenseManagement::isPDFLicensed();
-		static int threads = (clientLicense) ? nMAX_CLIENT_PDF_THREADS : nMAX_SERVER_THREADS;
-
-		DWORD threadID = GetCurrentThreadId();
+		if (!LicenseManagement::isLicensed(gnLEADTOOLS_ALL_CORES))
 		{
-			CSingleLock lock(&cs, TRUE);
-			if (threadSet.find(threadID) != threadSet.end())
-			{
-				// This thread already has the semaphore
-				return;
-			}
-		}
-		m_upleadtoolsRestrictedSemaphor.reset(new Win32Semaphore(threads, threads, strLEADTOOLS_LICENSE_RESTRICTION_SEMAPHORE_NAME));
-		m_upleadtoolsRestrictedSemaphor->acquire();
+			static bool clientLicense = !(LicenseManagement::isLicensed(gnFLEXINDEX_SERVER_OBJECTS) ||
+				LicenseManagement::isLicensed(gnFLEXINDEX_IDSHIELD_SERVER_CORE)) || LicenseManagement::isPDFLicensed();
+			static int threads = (clientLicense) ? nMAX_CLIENT_PDF_THREADS : nMAX_SERVER_THREADS;
 
-		CSingleLock lock(&cs, TRUE);
-		threadSet.emplace(threadID);
+			DWORD threadID = GetCurrentThreadId();
+			{
+				CSingleLock lock(&cs, TRUE);
+				if (threadSet.find(threadID) != threadSet.end())
+				{
+					// This thread already has the semaphore
+					return;
+				}
+			}
+			m_upleadtoolsRestrictedSemaphor.reset(new Win32Semaphore(threads, threads, strLEADTOOLS_LICENSE_RESTRICTION_SEMAPHORE_NAME));
+			m_upleadtoolsRestrictedSemaphor->acquire();
+
+			CSingleLock lock(&cs, TRUE);
+			threadSet.emplace(threadID);
+		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46675");
 }

@@ -230,6 +230,10 @@ const unsigned int gnDATA_ENTRY_VERIFICATION_LOGGING	= gnBASE_OFFSET + 86;
 // This should be included in any license that includes gnPDF_READWRITE_FEATURE 
 const unsigned int gnPDF_READ_ONLY						= gnBASE_OFFSET + 87;
 
+// Disables the use of the semaphore for restricting the leadtools to 2 or 4 cores based on licens
+// This is to allow licensing all the cores on a machine
+const unsigned int gnLEADTOOLS_ALL_CORES				= gnBASE_OFFSET + 88;
+
 //-------------------------------------------------------------------------------------------------
 // Constants for items licensed for FLEX Index / ID Shield integration
 //-------------------------------------------------------------------------------------------------
