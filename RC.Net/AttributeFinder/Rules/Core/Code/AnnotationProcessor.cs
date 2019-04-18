@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using UCLID_AFCORELib;
 using UCLID_AFSELECTORSLib;
@@ -11,6 +12,7 @@ namespace Extract.AttributeFinder.Rules
     [ComVisible(true)]
     [Guid("1AEBE03C-C621-456C-B98B-DA8CF5B7553C")]
     [CLSCompliant(false)]
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     public class AnnotationProcessor: IAnnotationProcessor
     {
         public ComAttribute ProcessAttribute(string fileName, int pageNum, ComAttribute attribute, string operationType, string definition)
@@ -51,6 +53,7 @@ namespace Extract.AttributeFinder.Rules
         }
     }
 
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     public abstract class Context
     {
         public Context ParentContext { get; set; }
@@ -68,6 +71,7 @@ namespace Extract.AttributeFinder.Rules
         }
     }
 
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     public abstract class OperationType : Context
     {
         public const string ModifyOperation = "MODIFY";
@@ -80,6 +84,7 @@ namespace Extract.AttributeFinder.Rules
         }
     }
 
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     public abstract class RuleObjectModel : Context
     {
         public RuleObjectModel(Context context) { }
@@ -88,6 +93,7 @@ namespace Extract.AttributeFinder.Rules
     }
 
     [CLSCompliant(false)]
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     public class AutoShrinkRedactionZonesModel : RuleObjectModel
     {
         public AutoShrinkRedactionZonesModel(Context context) : base(context) { }
@@ -104,6 +110,7 @@ namespace Extract.AttributeFinder.Rules
             return x;
         }
     }
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     public abstract class AttributeSelectorModel: RuleObjectModel
     {
         public AttributeSelectorModel(Context context) : base(context) { }
@@ -123,6 +130,7 @@ namespace Extract.AttributeFinder.Rules
     }
 
     [CLSCompliant(false)]
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     public class QueryBasedASModel: AttributeSelectorModel
     {
         public QueryBasedASModel(Context context) : base(context) { }
