@@ -85,12 +85,12 @@ STDMETHODIMP CImageUtils::CreateMultiPageImage(IVariantVector *pvecSinglePageIma
 			// Load the vector with the SinglePageImage names
 			string strPageFileName = asString(_bstr_t(ipvecImages->GetItem(i)));
 			// Make sure that if the file being opened is a pdf file that PDF support is licensed
-			LicenseManagement::verifyFileTypeLicensed(  strPageFileName );
+			LicenseManagement::verifyFileTypeLicensedRO(  strPageFileName );
 			vecImages.push_back( strPageFileName );
 		}
 		string strOutputFileName = asString(strOutputImageFileName);
 		// Make sure that if the file being saved is a pdf file that PDF support is licensed
-		LicenseManagement::verifyFileTypeLicensed(  strOutputFileName );
+		LicenseManagement::verifyFileTypeLicensedRW(  strOutputFileName );
 		// Create the Multipage image file
 		createMultiPageImage(vecImages, strOutputFileName, false);
 	}
@@ -110,9 +110,6 @@ STDMETHODIMP CImageUtils::IsMultiPageImage( BSTR strImageFileName, VARIANT_BOOL 
 		validateLicense();
 
 		string strImage = asString(strImageFileName);
-		
-		// Make sure that if the file being opened is a pdf file that PDF support is licensed
-		LicenseManagement::verifyFileTypeLicensed( strImage );
 		
 		// Get number of pages in image file
 		int nPages = getNumberOfPagesInImage( strImage );
@@ -140,7 +137,7 @@ STDMETHODIMP CImageUtils::GetImagePageNumbers(BSTR strImageFileName,
 		string strImage = asString(strImageFileName);
 		
 		// Make sure that if the file being opened is a pdf file that PDF support is licensed
-		LicenseManagement::verifyFileTypeLicensed( strImage );
+		LicenseManagement::verifyFileTypeLicensedRO( strImage );
 
 		// get total number of pages of this image
 		int nTotalNumberOfPages = ::getNumberOfPagesInImage(strImage);
@@ -226,7 +223,7 @@ STDMETHODIMP CImageUtils::GetImageStats(BSTR strImage, IRasterZone * pRaster,
 		string strImageName = asString(strImage);
 		
 		// Make sure that if the file being opened is a pdf file that PDF support is licensed
-		LicenseManagement::verifyFileTypeLicensed( strImageName );
+		LicenseManagement::verifyFileTypeLicensedRO( strImageName );
 
 		// Load the page into bitmap
 		unique_ptr<LeadToolsBitmap> apPageBitmap(new LeadToolsBitmap(strImageName, pRaster->PageNumber,

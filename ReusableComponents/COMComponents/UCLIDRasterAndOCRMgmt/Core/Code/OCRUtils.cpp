@@ -278,7 +278,7 @@ void COCRUtils::processImageFile(const string& strImageFile, int nMaxNumOfPages,
 								 IOCRParameters* pOCRParameters)
 {
 	// Make sure that if the image is a pdf that PDF support is licensed
-	LicenseManagement::verifyFileTypeLicensed( strImageFile );
+	LicenseManagement::verifyFileTypeLicensedRO( strImageFile );
 
 	// define a string to store the output file name without extension
 	// by default it is the name of the input image file

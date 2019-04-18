@@ -128,7 +128,8 @@ namespace Extract.Imaging.Forms
                 if (_reader.IsPdf)
                 {
                     ExtractException.Assert("ELI40273", "PDF capability is required",
-                        LicenseUtilities.IsLicensed(LicenseIdName.PdfReadWriteFeature));
+                        LicenseUtilities.IsLicensed(LicenseIdName.PdfReadWriteFeature) ||
+                        LicenseUtilities.IsLicensed(LicenseIdName.PdfReadOnly));
                 }
 
                 _pageCount = _reader.PageCount;

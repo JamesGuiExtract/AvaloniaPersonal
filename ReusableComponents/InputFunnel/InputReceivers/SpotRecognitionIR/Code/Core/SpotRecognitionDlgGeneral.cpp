@@ -1018,7 +1018,7 @@ void SpotRecognitionDlg::openFile(const string& strFileName)
 		try
 		{
 			// Make sure that if the file being opened is a pdf file that PDF support is licensed
-			LicenseManagement::verifyFileTypeLicensed( strFileToOpenName );
+			LicenseManagement::verifyFileTypeLicensedRO( strFileToOpenName );
 			// clear content of the page number edit box
 			m_apToolBar->setCurrentGoToPageText("");
 
@@ -2218,7 +2218,7 @@ string SpotRecognitionDlg::createSubImage(const std::string& strOriginalImageFil
 	ASSERT_ARGUMENT("ELI15837", pImagePortionInfo != __nullptr);
 
 	// Make sure that if the original image is pdf, PDF support is licensed
-	LicenseManagement::verifyFileTypeLicensed( strOriginalImageFileName );
+	LicenseManagement::verifyFileTypeLicensedRW( strOriginalImageFileName );
 
 	// get top left corner coordinates in image pixels as the offset
 	long nOffsetX = pImagePortionInfo->StartX;

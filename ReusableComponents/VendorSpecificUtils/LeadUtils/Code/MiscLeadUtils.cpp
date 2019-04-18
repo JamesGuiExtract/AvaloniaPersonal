@@ -309,6 +309,15 @@ void InitLeadToolsLicense()
 				leadtoolsLicensePath
 			);
 		}
+		else if (LicenseManagement::isPDFReadLicensed())
+		{
+			leadtoolsLicensePath += "\\LEADTOOLS_PDF_READ.OCL";
+			throwExceptionIfNotSuccess(
+				L_SetLicenseFile((L_CHAR*)leadtoolsLicensePath.c_str(), (L_CHAR*)gstrLEADTOOLS_DEVELOPER_PDF_READ_KEY.c_str()),
+				"ELI46760", "Unable to load LeadTools PDF Read license file",
+				leadtoolsLicensePath
+			);
+		}
 		else
 		{
 			leadtoolsLicensePath += "\\LEADTOOLS.OCL";
@@ -409,8 +418,8 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		_lastCodePos = "10";
 
 		// Make sure that if the file being opened/saved is a pdf file that PDF support is licensed
-		LicenseManagement::verifyFileTypeLicensed(strImageFileName);
-		LicenseManagement::verifyFileTypeLicensed(strOutputImageName);
+		LicenseManagement::verifyFileTypeLicensedRO(strImageFileName);
+		LicenseManagement::verifyFileTypeLicensedRW(strOutputImageName);
 
 		// Sort the vector of zones by page
 		sort(rvecZones.begin(), rvecZones.end(), compareZoneByPage);
@@ -1008,7 +1017,7 @@ void confirmImageAreas(const string& strImageFileName,
 			unlockDocumentSupport();
 		}
 
-		LicenseManagement::verifyFileTypeLicensed(strImageFileName);
+		LicenseManagement::verifyFileTypeLicensedRO(strImageFileName);
 
 		// Sort the vector of zones by page
 		// (Assuming this is called from fillImageArea, the zones should already be sorted... but

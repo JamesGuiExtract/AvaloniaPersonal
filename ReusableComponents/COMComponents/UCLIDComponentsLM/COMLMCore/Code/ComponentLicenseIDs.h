@@ -226,6 +226,10 @@ const unsigned int gnREMOVE_IMAGE_PAGES					= gnBASE_OFFSET + 85;
 // Enables logging of input and events in the data entry verification UI.
 const unsigned int gnDATA_ENTRY_VERIFICATION_LOGGING	= gnBASE_OFFSET + 86;
 
+// Enables PDF Read functionallity with out PDF Write
+// This should be included in any license that includes gnPDF_READWRITE_FEATURE 
+const unsigned int gnPDF_READ_ONLY						= gnBASE_OFFSET + 87;
+
 //-------------------------------------------------------------------------------------------------
 // Constants for items licensed for FLEX Index / ID Shield integration
 //-------------------------------------------------------------------------------------------------

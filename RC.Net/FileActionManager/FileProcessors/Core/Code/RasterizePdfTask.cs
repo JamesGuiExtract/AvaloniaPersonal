@@ -168,7 +168,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The license ids to validate in licensing calls
         /// </summary>
-        static readonly LicenseIdName _licenseId1 = LicenseIdName.PdfReadWriteFeature;
+        static readonly LicenseIdName _licenseId1 = LicenseIdName.PdfReadOnly;
         static readonly LicenseIdName _licenseId2 = LicenseIdName.OcrOnClientFeature;
 
         #endregion Fields

@@ -277,7 +277,7 @@ void CImageEditCtrl::SetImage(LPCTSTR szImagePath)
 	// if file is pdf make sure PDF Support is enabled
 	try
 	{
-		LicenseManagement::verifyFileTypeLicensed( szImagePath );
+		LicenseManagement::verifyFileTypeLicensedRO( szImagePath );
 	}
 	catch(...)
 	{

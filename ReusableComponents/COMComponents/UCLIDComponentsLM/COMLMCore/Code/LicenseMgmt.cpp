@@ -459,7 +459,25 @@ bool LicenseManagement::isPDFLicensed()
 	return bLicensed;
 }
 //-------------------------------------------------------------------------------------------------
-void LicenseManagement::verifyFileTypeLicensed( std::string strFileName )
+bool LicenseManagement::isPDFReadLicensed()
+{
+	bool bLicensed = true;
+
+	try
+	{
+		// Check PDF read license
+		validatePDFReadLicense();
+	}
+	catch (...)
+	{
+		// PDF Read/Write is not licensed
+		bLicensed = false;
+	}
+
+	return bLicensed;
+}
+//-------------------------------------------------------------------------------------------------
+void LicenseManagement::verifyFileTypeLicensedRW( std::string strFileName )
 {
 	if (isPDFFile( strFileName ))
 	{
@@ -467,6 +485,19 @@ void LicenseManagement::verifyFileTypeLicensed( std::string strFileName )
 		{
 			UCLIDException ue("ELI13429", "PDF read/write support is not licensed.");
 			ue.addDebugInfo("PDFFileName", strFileName );
+			throw ue;
+		}
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void LicenseManagement::verifyFileTypeLicensedRO(std::string strFileName)
+{
+	if (isPDFFile(strFileName))
+	{
+		if (!isPDFReadLicensed())
+		{
+			UCLIDException ue("ELI46761", "PDF read support is not licensed.");
+			ue.addDebugInfo("PDFFileName", strFileName);
 			throw ue;
 		}
 	}
@@ -882,6 +913,12 @@ void LicenseManagement::validatePDFLicense()
 	static const unsigned long ALLOW_PDF_READWRITE_ID = gnPDF_READWRITE_FEATURE;
 
 	VALIDATE_LICENSE( ALLOW_PDF_READWRITE_ID, "ELI13431", "PDF Read Write" );
+}
+void LicenseManagement::validatePDFReadLicense()
+{
+	static const unsigned long ALLOW_PDF_READ_ONLY_ID = gnPDF_READ_ONLY;
+	
+	VALIDATE_LICENSE(ALLOW_PDF_READ_ONLY_ID, "ELI46759", "PDF Read-only support");
 }
 //-------------------------------------------------------------------------------------------------
 void LicenseManagement::initializeHighMemTestMode()

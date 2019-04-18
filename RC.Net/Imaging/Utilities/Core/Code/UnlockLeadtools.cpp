@@ -48,6 +48,11 @@ void UnlockLeadtools::UnlockLeadToolsSupport()
 			LicenseFileName = Path::Combine(ExtractCommonPath, "LEADTOOLS_PDF.OCL");
 			LicenseKey = marshal_as<String^>(gstrLEADTOOLS_DEVELOPER_PDF_KEY);
 		}
+		else if (LicenseManagement::isPDFReadLicensed())
+		{
+			LicenseFileName = Path::Combine(ExtractCommonPath, "LEADTOOLS_PDF_READ.OCL");
+			LicenseKey = marshal_as<String^>(gstrLEADTOOLS_DEVELOPER_PDF_READ_KEY);
+		}
 		else
 		{
 			LicenseFileName = Path::Combine(ExtractCommonPath, "LEADTOOLS.OCL");

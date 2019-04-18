@@ -939,7 +939,7 @@ namespace Extract.Imaging
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.PdfReadWriteFeature,
+                LicenseUtilities.ValidateLicense(LicenseIdName.PdfReadOnly,
                     "ELI32223", "Convert PDF to TIF");
 
                 List<string> arguments = new List<string>(new[] { inputFile, outputFile, "/tif" });
@@ -1000,8 +1000,11 @@ namespace Extract.Imaging
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.PdfReadWriteFeature,
-                    "ELI35638", "Convert PDF to TIF");
+                if (!useAlternateMethod)
+                {
+                    LicenseUtilities.ValidateLicense(LicenseIdName.PdfReadWriteFeature,
+                        "ELI35638", "Convert PDF to TIF");
+                }
 
                 var arguments = useAlternateMethod
                     ? new string[] { inputFile, outputFile, "/pdf", "/am" }

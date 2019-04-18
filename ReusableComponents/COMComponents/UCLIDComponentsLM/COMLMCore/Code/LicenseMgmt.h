@@ -148,12 +148,22 @@ public:
     // PURPOSE: This function checks for licensing of PDF Functionality
     static bool isPDFLicensed();
 
-    //=======================================================================
-    // PURPOSE: This function checks the extension of the filename and throws
-    //			an UCLIDException if the file type is not licensed
-    static void verifyFileTypeLicensed(string strFileName );
+	//=======================================================================
+	// PURPOSE: This function returns true if PDF Read licensed, if PDF Read-Write
+	// is licensed and PDF Read is not it will return false
+	static bool isPDFReadLicensed();
 
     //=======================================================================
+    // PURPOSE: This function checks the extension of the filename and throws
+    //			an UCLIDException if the file type is not licensed for Read Write
+    static void verifyFileTypeLicensedRW(string strFileName );
+	
+	//=======================================================================
+	// PURPOSE: This function checks the extension of the filename and throws
+	//			an UCLIDException if the file type is not licensed for Read Only
+	static void verifyFileTypeLicensedRO(string strFileName);
+    
+	//=======================================================================
     // PURPOSE: This function checks licensing of Annotation functionality
     static bool isAnnotationLicensed();
 
@@ -267,6 +277,11 @@ private:
 
     // Throws exception if the PDF Read-Write is not licensed
     static void validatePDFLicense();
+
+	// Throws exception if the PDF Read is not licensed
+	// if used for loading license files the PDF Read Write should be
+	// checked first
+	static void validatePDFReadLicense();
 
     // Checks whether a component ID is licensed or not
     // NOTE: This method expects that the caller has protected this call
