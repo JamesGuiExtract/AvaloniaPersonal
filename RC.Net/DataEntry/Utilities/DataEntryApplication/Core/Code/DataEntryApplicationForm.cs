@@ -3,6 +3,7 @@ using Extract.DataEntry.Utilities.DataEntryApplication.Properties;
 using Extract.FileActionManager.Forms;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
+using Extract.Imaging.Utilities;
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
@@ -466,6 +467,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 // License SandDock before creating the form
                 SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
+
+                UnlockLeadtools.UnlockLeadToolsSupport();
 
                 _settings = settings;
 
