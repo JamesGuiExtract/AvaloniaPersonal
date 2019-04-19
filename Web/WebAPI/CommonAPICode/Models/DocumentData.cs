@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text;
 using UCLID_COMUTILSLib;
@@ -582,9 +583,12 @@ namespace WebAPI.Models
         /// <param name="page">The page.</param>
         public WordZoneDataResult GetWordZoneData(int fileId, int page)
         {
+            SpatialString ussData = null;
+            SpatialString pageData = null;
+
             try
             {
-                SpatialString ussData = GetUssData(fileId);
+                ussData = GetUssData(fileId);
 
                 HTTPError.Assert("ELI45362", StatusCodes.Status404NotFound,
                     ussData != null,
@@ -602,7 +606,7 @@ namespace WebAPI.Models
                     page <= ussData.GetLastPageNumber(), "Page not found",
                     ("Page", page, true), ("Test", "value", false));
 
-                var pageData = ussData.GetSpecifiedPages(page, page);
+                pageData = ussData.GetSpecifiedPages(page, page);
                 var wordZoneData = pageData.MapSpatialStringToWordZoneData();
 
                 return new WordZoneDataResult
@@ -613,6 +617,18 @@ namespace WebAPI.Models
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI42124");
+            }
+            finally
+            {
+                if (ussData != null)
+                {
+                    Marshal.FinalReleaseComObject(ussData);
+                }
+
+                if (pageData != null)
+                {
+                    Marshal.FinalReleaseComObject(pageData);
+                }
             }
         }
 
