@@ -70,7 +70,9 @@
 6085,RemoveImagePages
 6086,DataEntryVerification_Logging
 6087,PDF_ReadOnly
-6088,LeadToolsAllCores
+6088,LeadtoolsAllCores
+6089,Leadtools2ExtraCores
+6090,Leadtools4ExtraCores
 
 // IDs for FLEX Index / ID Shield integration efforts
 6101,Laserfiche_Integration_Verification

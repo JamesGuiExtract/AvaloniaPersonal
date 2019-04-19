@@ -30,6 +30,20 @@ LeadToolsLicenseRestrictor::LeadToolsLicenseRestrictor()
 					return;
 				}
 			}
+
+			// Check for extra licensed cores
+			if (LicenseManagement::isLicensed(gnLEADTOOLS_2_EXTRA_CORES)) 
+			{
+				CSingleLock lock(&cs, TRUE);
+				threads += 2;
+			}
+
+			if (LicenseManagement::isLicensed(gnLEADTOOLS_4_EXTRA_CORES))
+			{
+				CSingleLock lock(&cs, TRUE);
+				threads += 4;
+			}
+
 			m_upleadtoolsRestrictedSemaphor.reset(new Win32Semaphore(threads, threads, strLEADTOOLS_LICENSE_RESTRICTION_SEMAPHORE_NAME));
 			m_upleadtoolsRestrictedSemaphor->acquire();
 

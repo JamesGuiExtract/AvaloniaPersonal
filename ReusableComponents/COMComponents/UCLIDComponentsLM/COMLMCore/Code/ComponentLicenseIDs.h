@@ -234,6 +234,12 @@ const unsigned int gnPDF_READ_ONLY						= gnBASE_OFFSET + 87;
 // This is to allow licensing all the cores on a machine
 const unsigned int gnLEADTOOLS_ALL_CORES				= gnBASE_OFFSET + 88;
 
+// Adds +2 core license to base leadtools license
+const unsigned int gnLEADTOOLS_2_EXTRA_CORES			= gnBASE_OFFSET + 89;
+
+// Adds +4 core license to base leadtools license
+const unsigned int gnLEADTOOLS_4_EXTRA_CORES			= gnBASE_OFFSET + 90;
+
 //-------------------------------------------------------------------------------------------------
 // Constants for items licensed for FLEX Index / ID Shield integration
 //-------------------------------------------------------------------------------------------------
