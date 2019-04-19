@@ -189,6 +189,9 @@ namespace WebAPI
             }
         }
 
+        /// <summary>
+        ///  Gets this instance's data as an <see cref="IAttribute"/>.
+        /// </summary>
         public IAttribute ComAttribute { get; private set; }
 
         #endregion Constructors

@@ -648,12 +648,14 @@ namespace WebAPI.Models
                 var uploads = workflow.DocumentFolder;
                 HTTPError.Assert("ELI46336", !String.IsNullOrWhiteSpace(uploads), "Target location not configured.");
 
-                if (!Directory.Exists(uploads))
-                {
-                    Directory.CreateDirectory(uploads);
-                }
-
                 var fullPath = GetSafeFilename(uploads, fileName);
+
+                string directory = Path.GetDirectoryName(fullPath);
+
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
 
                 using (var fs = new FileStream(fullPath, FileMode.Create))
                 {
@@ -684,7 +686,12 @@ namespace WebAPI.Models
             string filenameOnly = Path.GetFileName(filename);
             string guid = Guid.NewGuid().ToString();
             string newName = Inv($"{guid}_{filenameOnly}");
-            string fullfilename = Path.Combine(path, newName);
+
+            // https://extract.atlassian.net/browse/ISSUE-15733
+            // In order to prevent performance issues from having too many files in the same folder, 
+            // create a folder hierarchy 2 levels deep with 256 * 4096 = 1M potential buckets where it is
+            // very unlikely to have more than 1K items in any one folder.
+            string fullfilename = Path.Combine(path, guid.Substring(0,2), guid.Substring(2,3), newName);
 
             return fullfilename;
         }
@@ -1205,6 +1212,9 @@ namespace WebAPI.Models
             }
         }
 
+        /// <summary>
+        /// Gets the workflow type
+        /// </summary>
         public EWorkflowType WorkflowType => FileApi.Workflow.Type;
 
         #region Private Members
