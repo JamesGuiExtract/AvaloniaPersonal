@@ -253,7 +253,8 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 													bool bQueueChangeIfProcessing,
 													bool bAllowQueuedStatusOverride,
 													long nActionID, bool bRemovePreviousSkipped,
-													const string& strFASTComment)
+													const string& strFASTComment,
+													bool bThisIsRevertingStuckFile)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI03279");
 
@@ -537,7 +538,11 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 
 				if (strNewState == "S")
 				{
-					if (nSkippedActionID == -1 || bSkippedRemoved)
+					// If this is a stuck-in-processing file then don't take over the session (nor throw an exception if there is no current session)
+					if (bThisIsRevertingStuckFile)
+					{
+					}
+					else if (nSkippedActionID == -1 || bSkippedRemoved)
 					{
 						_lastCodePos = "310";
 
@@ -4640,7 +4645,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 			// processing when the FAM crashed are applied now.
 			setFileActionState(ipConnection, getLongField(ipFields, "FileID"), 
 				strActionName, -1, strRevertToStatus, 
-				"", false, true, getLongField(ipFields, "ActionID"), false, strFASTComment);
+				"", false, true, getLongField(ipFields, "ActionID"), false, strFASTComment, true);
 
 			ipFileSet->MoveNext();
 		}

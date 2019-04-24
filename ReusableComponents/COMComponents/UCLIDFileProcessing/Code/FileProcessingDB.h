@@ -828,7 +828,7 @@ private:
 	EActionStatus setFileActionState(_ConnectionPtr ipConnection, long nFileID,
 		string strAction, long nWorkflowID, const string& strState, const string& strException,
 		bool bQueueChangeIfProcessing, bool bAllowQueuedStatusOverride, long nActionID = -1,
-		bool bRemovePreviousSkipped = false, const string& strFASTComment = "");
+		bool bRemovePreviousSkipped = false, const string& strFASTComment = "", bool bThisIsRevertingStuckFile = false);
 
 	// PROMISE: To set the specified group of files' action state for the specified action.
 	// NOTE:	This will clear the skipped file state for any file ID in the list if
