@@ -147,7 +147,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                ExtractException.Assert("ELI46737", "OpenDocument requires an active Session Login token.",
+                ExtractException.Assert("ELI46737", "GetSettings requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 using (var data = new DocumentData(User, requireSession: false))
@@ -177,9 +177,6 @@ namespace WebAPI.Controllers
         {
             try
             {
-                ExtractException.Assert("ELI46736", "OpenDocument requires an active Session Login token.",
-                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
-
                 bool fileIsOpen = docID > 0;
                 using (var data = new DocumentData(User, requireSession: fileIsOpen))
                 {
@@ -249,7 +246,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                ExtractException.Assert("ELI46726", "OpenDocument requires an active Session Login token.",
+                ExtractException.Assert("ELI46726", "CloseDocument requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 using (var data = new DocumentData(User, requireSession: true))
@@ -283,7 +280,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                ExtractException.Assert("ELI46727", "OpenDocument requires an active Session Login token.",
+                ExtractException.Assert("ELI46727", "SkipDocument requires an active Session Login token.",
                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 using (var data = new DocumentData(User, requireSession: true))
@@ -317,7 +314,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                ExtractException.Assert("ELI46728", "OpenDocument requires an active Session Login token.",
+                ExtractException.Assert("ELI46728", "PutComment requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 using (var data = new DocumentData(User, requireSession: true))
@@ -350,7 +347,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                ExtractException.Assert("ELI46729", "OpenDocument requires an active Session Login token.",
+                ExtractException.Assert("ELI46729", "GetComment requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 using (var data = new DocumentData(User, requireSession: true))
@@ -384,7 +381,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                ExtractException.Assert("ELI46730", "OpenDocument requires an active Session Login token.",
+                ExtractException.Assert("ELI46730", "FailDocument requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 using (var data = new DocumentData(User, requireSession: true))
@@ -417,7 +414,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                ExtractException.Assert("ELI46731", "OpenDocument requires an active Session Login token.",
+                ExtractException.Assert("ELI46731", "GetPageInfo requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 using (var data = new DocumentData(User, requireSession: true))
@@ -456,7 +453,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                ExtractException.Assert("ELI46732", "OpenDocument requires an active Session Login token.",
+                ExtractException.Assert("ELI46732", "GetDocument requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 using (var data = new DocumentData(User, requireSession: true))
@@ -490,7 +487,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                ExtractException.Assert("ELI46733", "OpenDocument requires an active Session Login token.",
+                ExtractException.Assert("ELI46733", "GetDocumentData requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
@@ -570,7 +567,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                ExtractException.Assert("ELI46734", "OpenDocument requires an active Session Login token.",
+                ExtractException.Assert("ELI46734", "SaveDocumentData requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 using (var data = new DocumentData(User, requireSession: true))
@@ -605,7 +602,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                ExtractException.Assert("ELI46735", "OpenDocument requires an active Session Login token.",
+                ExtractException.Assert("ELI46735", "GetPageWordZones requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
