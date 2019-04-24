@@ -165,23 +165,18 @@ namespace WebAPI.Models
             {
                 HTTPError.AssertRequest("ELI45234", _user != null, "No active user");
 
+                // https://extract.atlassian.net/browse/ISSUE-16239
+                // From the FAM's perspective UnregisterActiveFAM will close any current open document.
+                // Don't manually close the document here; it will interfere with properly reverting
+                // files to either the skipped or pending state.
+
                 try
                 {
-                    if (FileApi.DocumentSession.IsOpen)
-                    {
-                        CloseDocument(EActionStatus.kActionPending);
-                    }
+                    FileApi.EndSession();
                 }
-                finally
+                catch (Exception ex)
                 {
-                    try
-                    {
-                        FileApi.EndSession();
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.ExtractLog("ELI46270");
-                    }
+                    ex.ExtractLog("ELI46270");
                 }
             }
             catch (Exception ex)

@@ -325,6 +325,7 @@ namespace WebAPI.Models
             {
                 _sessionId = null;
                 _apiContext.FAMSessionId = 0;
+                DocumentSession = (false, 0, 0, new DateTime());
 
                 try
                 {
