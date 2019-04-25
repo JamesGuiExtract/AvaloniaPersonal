@@ -776,12 +776,14 @@ namespace WebAPI.Models
                 HTTPError.Assert("ELI46339", !String.IsNullOrWhiteSpace(uploads),
                     "Target location not configured");
 
-                if (!Directory.Exists(uploads))
-                {
-                    Directory.CreateDirectory(uploads);
-                }
-
                 var fullPath = GetSafeFilename(uploads, "SubmittedText.txt");
+
+                string directory = Path.GetDirectoryName(fullPath);
+
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
 
                 using (var fs = new FileStream(fullPath, FileMode.Create))
                 {
