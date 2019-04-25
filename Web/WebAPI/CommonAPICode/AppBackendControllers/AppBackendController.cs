@@ -183,7 +183,8 @@ namespace WebAPI.Controllers
                     ExtractException.Assert("ELI46697", "The supplied document ID doesn't match the open session's document ID",
                         !fileIsOpen || docID == data.DocumentSessionFileId);
 
-                    var result = data.GetQueueStatus();
+                    var userName = this.User.GetUsername();
+                    var result = data.GetQueueStatus(userName);
 
                     return Ok(result);
                 }

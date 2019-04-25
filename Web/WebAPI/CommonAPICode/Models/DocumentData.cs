@@ -207,7 +207,7 @@ namespace WebAPI.Models
         /// <summary>
         /// Gets the number of document, pages and active users in the current verification queue.
         /// </summary>
-        public QueueStatusResult GetQueueStatus()
+        public QueueStatusResult GetQueueStatus(string userName)
         {
             try
             {
@@ -221,7 +221,7 @@ namespace WebAPI.Models
                 result.PendingPages = stats.NumPagesPending;
                 result.ActiveUsers = users.Size;
 
-                result.skippedDocumentsForCurrentUser = FileApi.FileProcessingDB.GetNumberSkippedForCurrentUser(actionId, false);
+                result.skippedDocumentsForCurrentUser = FileApi.FileProcessingDB.GetNumberSkippedForUser(userName, actionId, false);
 
                 return result;
             }

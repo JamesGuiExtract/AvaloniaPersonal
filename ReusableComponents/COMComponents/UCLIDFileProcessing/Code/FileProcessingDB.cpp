@@ -4823,7 +4823,7 @@ STDMETHODIMP CFileProcessingDB::IsFAMSessionOpen(long nFAMSessionID, VARIANT_BOO
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46724");
 }
-STDMETHODIMP CFileProcessingDB::GetNumberSkippedForCurrentUser(long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, long* pnFilesSkipped)
+STDMETHODIMP CFileProcessingDB::GetNumberSkippedForUser(BSTR bstrUserName, long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, long* pnFilesSkipped)
 {
 	try
 	{
@@ -4832,7 +4832,7 @@ STDMETHODIMP CFileProcessingDB::GetNumberSkippedForCurrentUser(long nActionID, V
 			"FROM SkippedFile "
 			"WHERE UserName = '<UserName>' AND ActionID = " + asString(nActionID);
 		
-		string strUser = (m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName;
+		string strUser = asString(bstrUserName);
 
 		replaceVariable(strQuery, "<UserName>", strUser);
 		long lNumberSkipped;

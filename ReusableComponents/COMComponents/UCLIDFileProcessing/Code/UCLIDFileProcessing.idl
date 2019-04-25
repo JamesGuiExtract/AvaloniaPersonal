@@ -2036,7 +2036,8 @@ library UCLID_FILEPROCESSINGLib
 		[id(200), helpstring("method IsFAMSessionOpen")] HRESULT IsFAMSessionOpen([in] long nFAMSessionID, [out, retval] VARIANT_BOOL* pbIsFAMSessionOpen);
 		// -----------------------------------------------------------------------------------------------
 		// Returns the number of skipped files for the user
-		[id(201), helpstring("method GetNumberSkippedForCurrentUser")] HRESULT GetNumberSkippedForCurrentUser([in] long nActionID, [in] VARIANT_BOOL bRevertTimedOutFAMs, [out, retval] long* pnFilesSkipped);
+		[id(201), helpstring("method GetNumberSkippedForUser")] HRESULT GetNumberSkippedForUser([in] BSTR bstrUserName, [in] long nActionID,
+			[in] VARIANT_BOOL bRevertTimedOutFAMs, [out, retval] long* pnFilesSkipped);
 	};
 
 	[
