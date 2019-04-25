@@ -75,9 +75,13 @@ namespace WebAPI.Controllers
         {
             try
             {
-                using (var data = new DocumentData(User, requireSession: true))
+                var requireSession = User.GetClaim(_FAM_SESSION_ID) != "0";
+                using (var data = new DocumentData(User, requireSession))
                 {
-                    data.CloseSession();
+                    if (requireSession)
+                    {
+                        data.CloseSession();
+                    }
 
                     return NoContent();
                 }
