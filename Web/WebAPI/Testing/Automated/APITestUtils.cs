@@ -1,4 +1,5 @@
 ﻿using Extract.FileActionManager.Database.Test;
+using Extract.Imaging.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -68,6 +69,7 @@ namespace Extract.Web.WebAPI.Test
         {
             try
             {
+                UnlockLeadtools.UnlockLeadToolsSupport();
                 FileProcessingDB fileProcessingDb = testManager.InitializeDatabase(dbResource, dbName);
                 ApiTestUtils.SetDefaultApiContext(dbName);
                 fileProcessingDb.ActiveWorkflow = ApiTestUtils.CurrentApiContext.WorkflowName;

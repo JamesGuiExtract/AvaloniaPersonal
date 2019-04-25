@@ -344,15 +344,19 @@ namespace Extract.Web.WebAPI.Test
                 var token = result.AssertGoodResult<JwtSecurityToken>();
                 controller1.ApplyTokenClaimPrincipalToContext(token);
 
+                // Should be able to get status without a session login
                 result = controller1.GetQueueStatus();
-                result.AssertResultCode(500, "Action should have a valid session login token.");
+                var queueStatus = result.AssertGoodResult<QueueStatusResult>();
+                Assert.AreEqual(0, queueStatus.ActiveUsers);
+                Assert.AreEqual(4, queueStatus.PendingDocuments);
 
+                // ... as well as with a session login
                 var sessionResult = controller1.SessionLogin();
                 var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
                 controller1.ApplyTokenClaimPrincipalToContext(sessionToken);
 
                 result = controller1.GetQueueStatus();
-                var queueStatus = result.AssertGoodResult<QueueStatusResult>();
+                queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(1, queueStatus.ActiveUsers);
                 Assert.AreEqual(4, queueStatus.PendingDocuments);
 
@@ -386,15 +390,11 @@ namespace Extract.Web.WebAPI.Test
                 result.AssertGoodResult<DocumentIdResult>();
 
                 result = controller2.GetQueueStatus();
-                result.AssertResultCode(500, "Action should have a valid session login token.");
-
-                controller2.ApplyTokenClaimPrincipalToContext(sessionToken);
-
-                result = controller2.GetQueueStatus();
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(2, queueStatus.ActiveUsers);
                 Assert.AreEqual(2, queueStatus.PendingDocuments);
 
+                controller2.ApplyTokenClaimPrincipalToContext(sessionToken);
                 result = controller2.OpenDocument();
                 result.AssertGoodResult<DocumentIdResult>();
 
