@@ -2,6 +2,6 @@
 
 #include <string>
 
-const std::string gstrLEADTOOLS_DEVELOPER_KEY = "+sxAXtRTj5bgbVbDLdFik5qRAsBrLhUIsN3l3qZptzOvoIPYPWOJ13qYpXqhCnFE";
-const std::string gstrLEADTOOLS_DEVELOPER_PDF_KEY = "88xpXudTo5bBbQHDIdFrk86RWcBRLmAIv92c3tlpnDOooLHYKGOp1wSYpXqhCnFE";
-const std::string gstrLEADTOOLS_DEVELOPER_PDF_READ_KEY = "gMxrXpVTxpbjbVTDDNFGk92RPMBjLn8Ivd2h3uFppDOVoK3YNGOZ12GYtXqhCnFE";
+const std::string gstrLEADTOOLS_DEVELOPER_KEY = "2swYXtpT35bmbSvDW9E9k8yRLMAeLi4Iqt2G3sRptTPhoKXYCmO31yiYk3qhCnFE";
+const std::string gstrLEADTOOLS_DEVELOPER_PDF_KEY = "x8xrXupT3pbjbRzDHNF5k+6RWcBjLhMIst2j3s9plzPsoIDYFWOy1wCYtXqhCnFE";
+const std::string gstrLEADTOOLS_DEVELOPER_PDF_READ_KEY = "68xlXvxTpJbWbQfDX9FDk8+RPMAaLhsIud3o3qVpnzPpoJjYNWOo1zyYpXqhCnFE";
