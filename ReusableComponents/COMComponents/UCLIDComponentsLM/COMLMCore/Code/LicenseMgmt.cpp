@@ -494,7 +494,7 @@ void LicenseManagement::verifyFileTypeLicensedRO(std::string strFileName)
 {
 	if (isPDFFile(strFileName))
 	{
-		if (!isPDFReadLicensed())
+		if (!(isPDFReadLicensed() || isPDFLicensed()))
 		{
 			UCLIDException ue("ELI46761", "PDF read support is not licensed.");
 			ue.addDebugInfo("PDFFileName", strFileName);
