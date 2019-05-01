@@ -116,10 +116,10 @@ LoopTrace::LoopTrace()
 //--------------------------------------------------------------------------------------------------
 void LoopTrace::calculateExtents(void)
 {
-	dMinX = LineSegment::INFINITY;
-	dMinY = LineSegment::INFINITY;
-	dMaxX = -LineSegment::INFINITY;
-	dMaxY = -LineSegment::INFINITY;
+	dMinX = HUGE_VAL;
+	dMinY = HUGE_VAL;
+	dMaxX = -HUGE_VAL;
+	dMaxY = -HUGE_VAL;
 
 	vector<LineSegment>::const_iterator iter;
 	for (iter = vecSegments.begin(); iter != vecSegments.end(); iter++)

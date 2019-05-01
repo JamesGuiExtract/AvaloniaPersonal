@@ -34,7 +34,6 @@ FKBUpdateInstallRoot=$(PDRootDir)\AttributeFinder\Installation\FKBInstall
 FKBInstallMediaDir=$(FKBUpdateInstallRoot)\Media\CD-ROM\DiskImages\DISK1
 
 AFCoreInstallFilesRootDir=P:\AttributeFinder\CoreInstallation\Files
-LMInstallFilesRootDir=P:\LicenseManager\Files
 AFCoreMergeModuleInstallRoot=$(PDRootDir)\AttributeFinder\Installation\UCLID FlexIndex
 
 PDCommonDir=$(PDRootDir)\Common

@@ -34,18 +34,8 @@ CounterData::CounterData()
 	: m_nCountsDecrementedInProcess(0)
 	, m_nLastCountValue(0)
 	, m_nCountDecrementAccumulation(0)
-	, m_pSafeNetDataCell(nullptr)
 {
 }
-//--------------------------------------------------------------------------------------------------
-CounterData::CounterData(DataCell* pDataCell)
-	: m_nCountsDecrementedInProcess(0)
-	, m_nLastCountValue(0)
-	, m_nCountDecrementAccumulation(0)
-	, m_pSafeNetDataCell(pDataCell)
-{
-}
-
 
 //--------------------------------------------------------------------------------------------------
 // CounterInfo

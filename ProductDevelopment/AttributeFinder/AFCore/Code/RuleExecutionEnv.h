@@ -8,6 +8,7 @@
 #include <string>
 #include <map>
 #include <stack>
+#include <memory>
 using namespace std;
 
 #include <afxmt.h>

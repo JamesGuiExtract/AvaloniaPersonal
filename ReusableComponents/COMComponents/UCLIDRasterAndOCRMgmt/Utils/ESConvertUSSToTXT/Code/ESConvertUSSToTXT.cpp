@@ -201,7 +201,7 @@ BOOL CESConvertUSSToTXTApp::InitInstance()
 				}
 
 				// Convert the file
-				convertUSSFile( strInputName, strOutputName, eNoUSS );
+				//convertUSSFile( strInputName, strOutputName, eNoUSS );
 
 				// No UI needed, just return
 			}
@@ -237,9 +237,10 @@ BOOL CESConvertUSSToTXTApp::InitInstance()
 //-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
-void CESConvertUSSToTXTApp::convertUSSFile(const string strInputFileName, 
-										   const string strOutputFileName, 
-										   const EHandlingType eNoUSSFile)
+void CESConvertUSSToTXTApp:: convertUSSFile(
+	const std::string strInputFileName, 
+	const std::string strOutputFileName, 
+	const EHandlingType eNoUSSFile)
 {
 	try
 	{
@@ -309,30 +310,8 @@ void CESConvertUSSToTXTApp::decrementCounter(ISpatialStringPtr ipText)
 		return;
 	}
 
-	// Create the License Manager object
-	SafeNetLicenseMgr snlMgr( gusblFlexIndex );
-
-	// Decrement counter once if non-spatial (P16 #1907)
-	long nNumberOfPages = 1;
-
-	// Decrement counter once for each page if spatial
-	if ( ipText->HasSpatialInfo() == VARIANT_TRUE)
-	{
-		nNumberOfPages = ipText->GetLastPageNumber() - ipText->GetFirstPageNumber() + 1;
-	}
-
-	switch (m_eCounterToDecrement)
-	{
-	case kIndexing:
-		snlMgr.decreaseCellValue( gdcellFlexIndexingCounter, nNumberOfPages );
-		break;
-	case kPagination:
-		snlMgr.decreaseCellValue( gdcellFlexPaginationCounter, nNumberOfPages );
-		break;
-	case kRedaction:
-		snlMgr.decreaseCellValue( gdcellIDShieldRedactionCounter, nNumberOfPages );
-		break;
-	}
+	UCLIDException ue("ELI46762", "ESConvertUSSToTXT app does not support Databse Counters.");
+	throw ue;
 }
 //-------------------------------------------------------------------------------------------------
 bool CESConvertUSSToTXTApp::usbCountersDisabled()

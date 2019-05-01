@@ -8,7 +8,6 @@ class EXPORT_BaseUtils MathVars
 {
 public:
 	static double ZERO;
-	static const double INFINITY;
 	static const double PI;
 
 	static bool isEqual(const double dValue1, const double dValue2);

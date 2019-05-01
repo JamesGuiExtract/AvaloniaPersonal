@@ -4,6 +4,7 @@
 #include "RegistryPersistenceMgr.h"
 #include "UCLIDException.h"
 #include "cpputil.h"
+#include <VersionHelpers.h>
 
 #include <tlhelp32.h>  // for Windows 95 
 #include <winperf.h>   // for Windows NT 
@@ -30,19 +31,6 @@ typedef bool  (*LPEnableDebugPriv)(void);
 #define PROCESS_COUNTER     "process" 
 #define PROCESSID_COUNTER   "id process" 
 #define UNKNOWN_TASK        "unknown" 
-
-//--------------------------------------------------------------------------------------------------
-// PURPOSE: Changes the process's privilege so that kill works properly.
-// REQUIRE: None.
-// PROMISE: Always returns true.
-// ARGS:	None.
-// AUTHOR:	Wayne Lenius
-// NOTES:	This function is just an internal support function, and is not exported 
-//				from the DLL.
-bool enableDebugPriv95(void) 
-{ 
-   return true; 
-} 
 
 //--------------------------------------------------------------------------------------------------
 // PURPOSE: Changes the process's privilege so that kill works properly.
@@ -550,57 +538,21 @@ bool windowIsOfDefaultWindowsDialogClass(HWND hWnd)
 //--------------------------------------------------------------------------------------------------
 DWORD getTaskList(TASK_LIST arrTaskList[], DWORD dwMaxTasks)
 {
-	OSVERSIONINFO		verInfo = {0}; 
-	LPGetTaskList		GetTaskListProc; 
-	LPEnableDebugPriv	EnableDebugPrivProc; 
+	// Check if Vista or greater
+	if (IsWindowsVistaOrGreater())
+	{
+		/////////////////
+		// Set privileges
+		/////////////////
+		enableDebugPrivNT();
 
-	// Determine operating system version
-	verInfo.dwOSVersionInfoSize = sizeof( verInfo ); 
-	GetVersionEx( &verInfo ); 
-
-	// Point to appropriate function for determining task list
-	// and enabling debug privileges
-	switch (verInfo.dwPlatformId) 
-	{ 
-	case VER_PLATFORM_WIN32_NT: 
-		// Check for Windows 2000
-		if (verInfo.dwMajorVersion >= 5)
-		{
-			GetTaskListProc     = getTaskList95; 
-			EnableDebugPrivProc = enableDebugPrivNT; 
-		}
-		// Check for Windows NT 4.0
-		else if (verInfo.dwMajorVersion == 4)
-		{
-			GetTaskListProc     = getTaskListNT; 
-			EnableDebugPrivProc = enableDebugPrivNT; 
-		}
-		else
-		{
-			// Not supported
-			return 0;
-		}
-		break; 
-
-	case VER_PLATFORM_WIN32_WINDOWS: 
-		GetTaskListProc     = getTaskList95; 
-		EnableDebugPrivProc = enableDebugPriv95; 
-		break; 
-
-	default: 
-		return 0; 
-	} 
-
-    /////////////////
-    // Set privileges
-    /////////////////
-    EnableDebugPrivProc(); 
-
-	///////////////////////
-	// Create the task list
-	///////////////////////
-	return GetTaskListProc(arrTaskList, dwMaxTasks); 
-	
+		///////////////////////
+		// Create the task list
+		///////////////////////
+		return getTaskList95(arrTaskList, dwMaxTasks);
+	}
+	// Not supported
+	return 0;
 }
 //--------------------------------------------------------------------------------------------------
 unsigned long killNamedProcess(const char *pszProcessName)
@@ -724,188 +676,81 @@ void flashWindow(HWND hWnd, bool bSetFocus)
 	}
 }
 //--------------------------------------------------------------------------------------------------
-string getPlatformAsString(PLATFORM platform)
+string getPlatformAsString()
 {
-	string strReturnString = "";
+	string strKeyString = "";
 
-	switch(platform)
+	if (!IsWindowsServer())
 	{
-	case WIN9X:
-		strReturnString = "Windows 9X";
-		break;
-		
-	case WINNT:
-		strReturnString = "Windows NT";
-		break;
-
-	case WIN2KSERVER:
-		strReturnString = "Windows 2000 Server";
-		break;
-
-	case WINXP:
-		strReturnString = "Windows XP";
-		break;
-
-	case WIN2003SERVER:
-		strReturnString = "Windows 2003 Server";
-		break;
-
-	case WINVISTA:
-		strReturnString = "Windows Vista";
-		break;
-
-	case WIN2008SERVER:
-		strReturnString = "Windows 2008 Server";
-		break;
-
-	case WIN7:
-		strReturnString = "Windows 7";
-		break;
-		
-	case WIN2008SERVERR2:
-		strReturnString = "Windows 2008 Server R2";
-		break;
-
-	default:
-		strReturnString = "Unknown";
-		break;
-	}
-
-	return strReturnString;
-}
-//--------------------------------------------------------------------------------------------------
-PLATFORM GetPlatform()
-{
-	// Create an OSVERSIONINFOEX struct and zero it out
-	OSVERSIONINFOEX osvi;
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-
-	// Set the sizeof flag
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-
-	// Attempt to get the version info
-	if (!GetVersionEx((OSVERSIONINFO*) &osvi))
-	{
-		// If failed to get the version info, return UNKNOWN
-		return UNKNOWN;
-	}
-
-	// Value for return information
-	PLATFORM platReturnVal = UNKNOWN;
-
-	// Check the platform ID first
-	switch (osvi.dwPlatformId)
-	{
-	case VER_PLATFORM_WIN32_WINDOWS:
-		platReturnVal = WIN9X;
-		break;
-
-	// WinNT platforms, need to check the major versions first
-	case VER_PLATFORM_WIN32_NT:
+		if (IsWindowsVersionOrGreater(10, 10, 0))
 		{
-			switch(osvi.dwMajorVersion)
+			strKeyString = "Windows 10";
+		}
+		else if (IsWindows8Point1OrGreater())
+		{
+			strKeyString = "Windows 8.1";
+		}
+		else if (IsWindows8OrGreater())
+		{
+			strKeyString = "Windows 8";
+		}
+		else if (IsWindows7OrGreater())
+		{
+			strKeyString = "Windows 7";
+		}
+		else if (IsWindowsVistaOrGreater())
+		{
+			strKeyString = "Windows Vista";
+		}
+		else if (IsWindowsXPOrGreater())
+		{
+			strKeyString = "Windows XP";
+		}
+		else
+		{
+			strKeyString = "UNKNOWN";
+		}
+	}
+	else
+	{
+		if (IsWindowsVersionOrGreater(10, 10, 0))
+		{
+			strKeyString = "Windows Server 2016 or higher";
+		}
+		else if (IsWindows8Point1OrGreater())
+		{
+			strKeyString = "Windows Server 2012 R2";
+		}
+		else if (IsWindows8OrGreater())
+		{
+			strKeyString = "Windows Server 2012";
+		}
+		else if (IsWindows7OrGreater())
+		{
+			strKeyString = "Windows Server 2008 R2";
+		}
+		else if (IsWindowsVistaOrGreater())
+		{
+			strKeyString = "Windows Server 2008";
+		}
+		else if (IsWindowsXPOrGreater())
+		{
+			// Determine if Windows 2003 or Windows 2003 R2
+			if (GetSystemMetrics(SM_SERVERR2) == 0)
 			{
-			case 4:
-				platReturnVal = WINNT;
-				break;
-
-			case 5:
-				{
-					// Win2K, WinXP, Win2003
-					// Check minor versions to distinguish
-					switch(osvi.dwMinorVersion)
-					{
-					case 0:
-						platReturnVal = WIN2KSERVER;
-						break;
-
-					case 1:
-						platReturnVal = WINXP;
-						break;
-
-					case 2:
-						platReturnVal = WIN2003SERVER;
-						break;
-					}
-				}
-				break;
-
-			case 6:
-				{
-					// Version 6 - WinVista, Win2008, Win7, Win2008R2
-					// Check minor version to distinguish
-					switch(osvi.dwMinorVersion)
-					{
-					case 0:
-						if (osvi.wProductType == VER_NT_SERVER)
-						{
-							platReturnVal = WIN2008SERVER;
-						}
-						else
-						{
-							platReturnVal = WINVISTA;
-						}
-						break;
-
-					case 1:
-						if (osvi.wProductType == VER_NT_SERVER)
-						{
-							platReturnVal = WIN2008SERVERR2;
-						}
-						else
-						{
-							platReturnVal = WIN7;
-						}
-						break;
-					}
-					break;
-					
-				}
-				break;
+				strKeyString = "Windows Server 2003";
+			}
+			else
+			{
+				strKeyString = "Windows Server 2003 R2";
 			}
 		}
-		break;
+		else
+		{
+			strKeyString = "UNKNOWN";
+		}
 	}
-
-	return platReturnVal;
-}
-//--------------------------------------------------------------------------------------------------
-bool isPlatformWin2KOrGreater()
-{
-	// Create an OSVERSIONINFOEX struct and zero it out
-	OSVERSIONINFOEX osvi;
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-
-	// Set the sizeof flag
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-
-	// Attempt to get the version info
-	if (!GetVersionEx((OSVERSIONINFO*) &osvi))
-	{
-		// If failed to get the version info, return false
-		return false;
-	}
-
-	return (osvi.dwMajorVersion >= 5);
-}
-//--------------------------------------------------------------------------------------------------
-bool isPlatformWinVistaOrGreater()
-{
-	// Create an OSVERSIONINFOEX struct and zero it out
-	OSVERSIONINFOEX osvi;
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-
-	// Set the sizeof flag
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-
-	// Attempt to get the version info
-	if (!GetVersionEx((OSVERSIONINFO*) &osvi))
-	{
-		// If failed to get the version info, return false
-		return false;
-	}
-
-	return (osvi.dwMajorVersion >= 6);
+	return strKeyString;
 }
 
 //--------------------------------------------------------------------------------------------------

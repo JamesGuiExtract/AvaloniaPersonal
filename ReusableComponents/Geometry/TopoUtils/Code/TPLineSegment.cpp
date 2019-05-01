@@ -58,7 +58,7 @@ bool TPLineSegment::contains(const TPPoint& p) const
 {
 	double dMySlope = getSlope();
 
-	if (fabs(dMySlope) == MathVars::INFINITY)
+	if (fabs(dMySlope) == HUGE_VAL)
 	{
 		// this line is vertical.. the TPPoint can lie on this line only if the x
 		// values match
@@ -133,7 +133,7 @@ bool TPLineSegment::intersects(const TPLineSegment& line2, TPPoint& intersection
 	double dMySlope = getSlope();
 	double dLine2Slope = line2.getSlope();
 
-	if (fabs(dMySlope) != MathVars::INFINITY && fabs(dLine2Slope) != MathVars::INFINITY)
+	if (fabs(dMySlope) != HUGE_VAL && fabs(dLine2Slope) != HUGE_VAL)
 	{
 		// neither of the two lines are vertical
 
@@ -198,7 +198,7 @@ bool TPLineSegment::intersects(const TPLineSegment& line2, TPPoint& intersection
 		// of the two line segments
 		return bIntersectionXOK && bIntersectionYOK;
 	}
-	else if (fabs(dMySlope) != MathVars::INFINITY)
+	else if (fabs(dMySlope) != HUGE_VAL)
 	{
 		// i am not vertical but line 2 is.
 
@@ -233,7 +233,7 @@ bool TPLineSegment::intersects(const TPLineSegment& line2, TPPoint& intersection
 		}
 
 	}
-	else if (fabs(dLine2Slope) != MathVars::INFINITY)
+	else if (fabs(dLine2Slope) != HUGE_VAL)
 	{
 		// i am vertical, but line 2 is not
 
@@ -284,7 +284,7 @@ double TPLineSegment::getSlope(void) const
 	// if the line is vertical, then return a slope of + or - infinity as appropriate.
 	if (fabs(dX) < MathVars::ZERO)
 	{
-		return (dY / fabs(dY)) * MathVars::INFINITY;
+		return (dY / fabs(dY)) * HUGE_VAL;
 	}
 	else
 	{

@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <list>
 #include <set>
+#include <memory>
 using namespace std;
 
 ///////////////////////////

@@ -13,6 +13,7 @@
 #include <RegistryPersistenceMgr.h>
 #include <Win32Util.h>
 #include <XBrowseForFolder.h>
+#include <VersionHelpers.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -27,7 +28,7 @@ DBInfoCombo::DBInfoCombo(EDBInfoType eDBInfoType)
 m_strServer("")
 {
 	// Get vista-or-later flag value
-	m_bVistaOrLater = isPlatformWinVistaOrGreater();
+	m_bVistaOrLater = IsWindowsVistaSP2OrGreater();
 }
 	
 //-------------------------------------------------------------------------------------------------

@@ -18,6 +18,7 @@
     <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
     <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
     <Keyword>AtlProj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -25,13 +26,13 @@
     <UseOfMfc>Dynamic</UseOfMfc>
     <UseOfAtl>Dynamic</UseOfAtl>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>Dynamic</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -299,14 +300,6 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\ReusableComponents\InputFunnel\Utils\SRIRImageViewer\SRIRImageViewer.vcxproj">
       <Project>{694bc78e-fd76-4275-8f0b-12a658af5e39}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\REUSABLECOMPONENTS\VENDORSPECIFICUTILS\SAFENETUTILS\AutomatedTest\Code\SafeNetUtilsTest.vcxproj">
-      <Project>{71141d5b-9f4f-4811-8016-e071435fc5bb}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\REUSABLECOMPONENTS\VENDORSPECIFICUTILS\SAFENETUTILS\USBLICENSEKEYMANAGER\Code\USBLicenseKeyManager.vcxproj">
-      <Project>{62844206-c3ae-4992-a13e-0edc60b85e07}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Utils\AdjustImageResolution\Code\AdjustImageResolution.vcxproj">

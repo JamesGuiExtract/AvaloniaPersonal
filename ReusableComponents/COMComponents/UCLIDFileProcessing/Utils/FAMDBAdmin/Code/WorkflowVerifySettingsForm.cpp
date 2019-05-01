@@ -110,7 +110,7 @@ namespace Extract
 				// if this is an existing workflow just load the actions associated with the workflow
 				for each (String^ redactionType in _settings->RedactionTypes)
 				{
-					_redactionTypesDataGridView->Rows->Add(gcnew array<String^> { redactionType });
+					_redactionTypesDataGridView->Rows->Add(gcnew cli::array<String^> { redactionType });
 				}
 
 				if (_settings->InactivityTimeout > 0)

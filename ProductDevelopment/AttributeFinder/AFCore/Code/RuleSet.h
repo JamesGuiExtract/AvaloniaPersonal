@@ -4,7 +4,6 @@
 
 #include "resource.h"       // main symbols
 #include "RuleSetEditor.h"
-#include "SafeNetLicenseMgr.h"
 #include "IdentifiableObject.h"
 #include "CounterInfo.h"
 
@@ -186,10 +185,6 @@ private:
 	// ms_referenceCount)
 	static CCriticalSection ms_criticalSectionConstruction;
 
-	// The should be only one SafeNetLicenseMgr object
-	// protected by ms_criticalSectionCounterData
-	static unique_ptr<SafeNetLicenseMgr> m_apSafeNetMgr;
-	
 	// A vector of RuleExecutionCounters to be decremented when rules are run. If specified, when
 	// running a ruleset each counter shall be tried in order until one with the proper counterID
 	// is found with enough counts available. If there is no available counter with enough counts

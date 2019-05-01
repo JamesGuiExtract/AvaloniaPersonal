@@ -1,4 +1,9 @@
 #include "StdAfx.h"
+
+#define pointer_safety Pointer_safety
+#define errc Errc
+#define io_errc IO_errc
+
 #include "LeadToolsGuard.h"
 
 #include <LeadToolsLicenseRestrictor.h>
@@ -13,14 +18,14 @@ LeadtoolsGuard::LeadtoolsGuard()
 	{
 		m_pRestrict = new LeadToolsLicenseRestrictor();
 	}
-	catch (Exception ^e)
+	catch (Exception ^)
 	{
 		if (m_pRestrict != nullptr)
 		{
 			delete m_pRestrict;
 			m_pRestrict = nullptr;
 		}
-		throw e;
+		throw;
 	}
 }
 //----------------------------------------------------------------------------------------------------------------------

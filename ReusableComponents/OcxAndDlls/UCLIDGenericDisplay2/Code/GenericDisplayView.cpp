@@ -768,8 +768,8 @@ void CGenericDisplayView::OnMouseMoveEditctrl1(short Button, short Shift, long x
 					if (dImgWidth != 0.0 && dImgHeight != 0.0)
 					{
 						// Append the percentage to the coordinate value
-						sprintf_s (pszBufX, sizeof(pszBufX), "%s, %d%%", pszBufX, round(dXPos/dImgWidth*100));
-						sprintf_s (pszBufY, sizeof(pszBufY), "%s, %d%%", pszBufY, round(dYPos/dImgHeight*100));
+						sprintf_s (pszBufX, sizeof(pszBufX), "%s, %ld%%", pszBufX, lround(dXPos/dImgWidth*100));
+						sprintf_s (pszBufY, sizeof(pszBufY), "%s, %ld%%", pszBufY, lround(dYPos/dImgHeight*100));
 					}
 				}
 			}
@@ -784,8 +784,8 @@ void CGenericDisplayView::OnMouseMoveEditctrl1(short Button, short Shift, long x
 			if (bDisplayPercentage && m_iImgWidth != 0 && m_iImgHeight != 0)
 			{
 				// set the X, Y coordinate value with the percentage
-				sprintf_s (pszBufX, sizeof(pszBufX), "X : %d, %d%%", (int)dXPos, round(dXPos/m_iImgWidth*100));
-				sprintf_s (pszBufY, sizeof(pszBufY), "Y : %d, %d%%", (int)dYPos, round(dYPos/m_iImgHeight*100));
+				sprintf_s (pszBufX, sizeof(pszBufX), "X : %d, %ld%%", (int)dXPos, lround(dXPos/m_iImgWidth*100));
+				sprintf_s (pszBufY, sizeof(pszBufY), "Y : %d, %ld%%", (int)dYPos, lround(dYPos/m_iImgHeight*100));
 			}
 			else
 			{
@@ -804,8 +804,8 @@ void CGenericDisplayView::OnMouseMoveEditctrl1(short Button, short Shift, long x
 			if (bDisplayPercentage && m_iViewSizeX != 0 && m_iViewSizeY != 0)
 			{
 				// set the X, Y coordinate value with the percentage
-				sprintf_s (pszBufX, sizeof(pszBufX), "X : %d, %d%%", (int)dXPos, round(dXPos/m_iViewSizeX*100));
-				sprintf_s (pszBufY, sizeof(pszBufY), "Y : %d, %d%%", (int)dYPos, round(dYPos/m_iViewSizeY*100));
+				sprintf_s (pszBufX, sizeof(pszBufX), "X : %d, %ld%%", (int)dXPos, lround(dXPos/m_iViewSizeX*100));
+				sprintf_s (pszBufY, sizeof(pszBufY), "Y : %d, %ld%%", (int)dYPos, lround(dYPos/m_iViewSizeY*100));
 			}
 			else
 			{

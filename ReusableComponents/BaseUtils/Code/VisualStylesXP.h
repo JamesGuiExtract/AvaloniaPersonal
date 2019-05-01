@@ -9,7 +9,6 @@
 
 #include "BaseUtils.h"
 #include <uxtheme.h>
-#include <tmschema.h>
 
 class EXPORT_BaseUtils CVisualStylesXP
 {

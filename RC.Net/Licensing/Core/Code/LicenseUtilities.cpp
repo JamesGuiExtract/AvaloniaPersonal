@@ -360,7 +360,7 @@ void LicenseUtilities::RegisterObject(int objectId, MapLabel^ mapLabel)
 //--------------------------------------------------------------------------------------------------
 // Private methods
 //--------------------------------------------------------------------------------------------------
-array<Byte>^ LicenseUtilities::CreateInternalArray()
+cli::array<System::Byte>^ LicenseUtilities::CreateInternalArray()
 {
     try
     {
@@ -401,7 +401,7 @@ bool LicenseUtilities::CheckData(Assembly^ assembly)
     if (assemblyName != nullptr)
     {
         // Get the public key for this assembly
-        array<Byte>^ publicKey = assemblyName->GetPublicKey();
+        cli::array<Byte>^ publicKey = assemblyName->GetPublicKey();
 
         if (publicKey != nullptr && publicKey->Length != 0)
         {

@@ -3,6 +3,7 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 #include <string>
+#include <memory>
 #include <RegistryPersistenceMgr.h>
 
 /////////////////////////////////////////////////////////////////////////////

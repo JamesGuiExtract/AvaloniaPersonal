@@ -467,7 +467,7 @@ void CFAMDBAdminSummaryDlg::OnContextViewFailed()
 				string strUser = getStringField(ipRecordSet->Fields, "UserName");
 				CTime timeStamp = getTimeDateField(ipRecordSet->Fields, "DateTimeStamp");
 				char pszTime[20];
-				sprintf_s(pszTime, sizeof(pszTime), "%ld", timeStamp.GetTime());
+				sprintf_s(pszTime, sizeof(pszTime), "%lld", static_cast<long long>(timeStamp.GetTime()));
 
 				outputLines.push(
 					",," + strMachine + "," + strUser + ",," + string(pszTime) +"," + strException);

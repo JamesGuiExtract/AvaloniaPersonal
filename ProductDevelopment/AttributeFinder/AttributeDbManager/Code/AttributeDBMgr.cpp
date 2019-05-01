@@ -1662,7 +1662,7 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 			{
 				UCLIDException ue("ELI46597", "VOA field is null");
 				ue.addDebugInfo("File ID", fileID);
-				ue.addDebugInfo("Attribute set name", attributeSetName);
+				ue.addDebugInfo("Attribute set name", asString(attributeSetName));
 				ue.addDebugInfo("Relative index", relativeIndex);
 				throw ue;
 			}

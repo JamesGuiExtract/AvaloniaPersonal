@@ -9,7 +9,6 @@
 using namespace std;
 
 
-const double LineSegment::INFINITY = 1.7E307;
 const double LineSegment::ZERO_PLUS = 1E-8;
 
 //--------------------------------------------------------------------------------------------------

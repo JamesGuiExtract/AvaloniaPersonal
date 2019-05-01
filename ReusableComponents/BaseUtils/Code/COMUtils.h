@@ -9,6 +9,7 @@
 #include <ComCat.h>
 #include <string>
 #include <vector>
+#include <memory>
 
 // Name of IMemoryManger implementer to be used to allow IManageableMemory implementers to report
 // their memory usage.

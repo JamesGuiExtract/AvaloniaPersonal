@@ -720,7 +720,7 @@ string UCLIDException::createLogString(const char* pszMachineName, const char* p
 		{
 			// Get current time as string
 			char pszTime[20] = {0};
-			sprintf_s(pszTime, sizeof(pszTime), "%ld", time(NULL));
+			sprintf_s(pszTime, sizeof(pszTime), "%lld", static_cast<long long>(time(NULL)));
 			strTime = pszTime;
 		}
 

@@ -4,15 +4,15 @@
 // produce the type library (GenericDisplay.tlb) that will become a resource in
 // GenericDisplay.ocx.
 
-#include <olectl.h>
-#include <idispids.h>
-
 [ uuid(14981573-9117-11D4-9725-008048FBC96E), version(1.0),
   helpfile("UCLIDGenericDisplay.hlp"),
   helpstring("UCLIDGenericDisplay ActiveX Control module"),
   control ]
 library UCLIDGENERICDISPLAYLib
 {
+	#include <olectl.h>
+	#include <idispids.h>
+
 	importlib(STDOLE_TLB);
 	importlib(STDTYPE_TLB);
 

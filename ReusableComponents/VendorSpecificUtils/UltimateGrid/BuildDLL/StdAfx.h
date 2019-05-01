@@ -10,14 +10,14 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-// Default target to Windows XP
+// Default target to Windows Vista
 #ifndef WINVER
-#define WINVER 0x0501
+#define WINVER 0x0600
 #endif
 
 
 #ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0501
+#define _WIN32_WINNT 0x0600
 #endif
 
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers

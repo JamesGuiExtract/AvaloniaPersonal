@@ -52,9 +52,6 @@ CCriticalSection CRuleSet::ms_criticalSectionCounterData;
 // ms_referenceCount)
 CCriticalSection CRuleSet::ms_criticalSectionConstruction;
 
-// License manager instance
-unique_ptr<SafeNetLicenseMgr> CRuleSet::m_apSafeNetMgr(__nullptr);
-
 // Max accumulation = 10 (use char index 4 followed by char index 2 as a long);
 #define _MAX_COUNTER_ACCUMULATION "D804155D-471C-4C81-A07D-9392AD45661C"
 
@@ -141,8 +138,7 @@ CRuleSet::~CRuleSet()
 			}
 		}
 
-		// Before releasing the connection to m_apSafeNetMgr, flush any accumulated values that have
-		// not yet been decremented.
+		// if this is the last reference flush any accumulated values that have not yet been decremented.
 		if (ms_referenceCount == 0)
 		{
 			try
@@ -150,9 +146,6 @@ CRuleSet::~CRuleSet()
 				CSingleLock lg(&ms_criticalSectionCounterData, TRUE);
 
 				flushCounters();
-
-				// If no more instances of RuleSet exist release the SafeNetMgr ( license )
-				m_apSafeNetMgr.reset(__nullptr);
 			}
 			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33414")
 		}
@@ -2384,45 +2377,6 @@ void CRuleSet::decrementCounter(CounterInfo& counter, int nNumToDecrement, bool 
 		int nLastCount = (ipSecureCounter == nullptr)
 			? -1
 			: ipSecureCounter->DecrementCounter(nCurrentAccumulation);
-
-		// For legacy purposes, allow a USB key as a fallback if there is no proper counter
-		// available in m_ipRuleExecutionCounters.
-		if (ipSecureCounter == nullptr && counterData.m_pSafeNetDataCell != nullptr)
-		{
-			// if this is the first instance of RuleSet will need to allocate the pointer
-			bool bFoundKey = false;
-			if ( m_apSafeNetMgr.get() == __nullptr )
-			{
-				{
-					// https://extract.atlassian.net/browse/ISSUE-13451
-					// Use a temporary SafeNetLicenseMgr to see if a USB key can immediately be
-					// found. If a USB key is not immediately found, assume no USB key is being used
-					// rather than lock up processing while retrying.
-					SafeNetLicenseMgr testUSBMgr(gusblFlexIndex, true, false);
-					if (testUSBMgr.hasLicense())
-					{
-						bFoundKey = true;
-					}
-				}
-
-				if (bFoundKey)
-				{
-					// If a USB key was found in the above check, establish a permanent
-					// SafeNetLicenseMgr instance for decrementing counts.
-					m_apSafeNetMgr = unique_ptr<SafeNetLicenseMgr>(new SafeNetLicenseMgr(gusblFlexIndex));
-				}
-			}
-			else
-			{
-				bFoundKey = true;
-			}
-
-			if (bFoundKey)
-			{
-				nLastCount = m_apSafeNetMgr->decreaseCellValue(
-					*(counterData.m_pSafeNetDataCell), nCurrentAccumulation);
-			}
-		}
 
 		if (nLastCount < 0)
 		{

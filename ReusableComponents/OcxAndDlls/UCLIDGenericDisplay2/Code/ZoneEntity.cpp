@@ -702,7 +702,7 @@ EGripHandle ZoneEntity::getGripHandle(int iGripHandleId)
 	// top-left client coordinate system. For this reason the result is mirrored on the 
     // x-axis, and the first & third quadrants become the second & fourth quadrants 
 	// respectively and vice versa.
-    switch (round(dAngle / 45.0))
+    switch (lround(dAngle / 45.0))
     {
 		// 45 degrees
         case 1:

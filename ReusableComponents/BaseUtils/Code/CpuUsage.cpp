@@ -3,6 +3,7 @@
 #include "CpuUsage.h"
 #include "UCLIDException.h"
 #include "Win32Util.h"
+#include <VersionHelpers.h>
 
 #pragma pack(push,8)
 #include "PerfCounters.h"
@@ -47,10 +48,10 @@ CCpuUsage::CCpuUsage()
 	try
 	{
 		// If the current platform is not Win2K or greater then throw an exception
-		if (!isPlatformWin2KOrGreater())
+		if (!IsWindowsVistaOrGreater())
 		{
 			UCLIDException uex("ELI21589", "Unsupported operating system for CpuUsage!");
-			uex.addDebugInfo("Platform", getPlatformAsString(GetPlatform()));
+			uex.addDebugInfo("Platform", getPlatformAsString());
 			throw uex;
 		}
 

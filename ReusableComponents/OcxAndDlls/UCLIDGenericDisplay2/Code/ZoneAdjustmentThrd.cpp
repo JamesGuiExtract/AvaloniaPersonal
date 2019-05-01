@@ -99,8 +99,8 @@ void CZoneAdjustmentThrd::start(ZoneEntity* pZoneEntity, int iEX, int iEY, int i
 
 		// Determine the coordinates at which the vector connecting the start and end points results
 		// in the minimum allowed length of the zone.
-		m_nXTrackingLimit = (int)round(gnMINIMUM_TRACKING_DIST * m_dVectorX);
-		m_nYTrackingLimit = (int)round(gnMINIMUM_TRACKING_DIST * m_dVectorY);
+		m_nXTrackingLimit = (int)lround(gnMINIMUM_TRACKING_DIST * m_dVectorX);
+		m_nYTrackingLimit = (int)lround(gnMINIMUM_TRACKING_DIST * m_dVectorY);
 	}
 
 	// Start tracking zone adjustment

@@ -234,7 +234,7 @@ void processComponentIDFile(const string& strComponentIDFile, string& rstrIdFile
 	catch(UCLIDException& uex)
 	{
 		// Ensure the file is closed
-		if (fIn != NULL)
+		if (fIn.is_open())
 		{
 			fIn.close();
 		}
@@ -243,7 +243,7 @@ void processComponentIDFile(const string& strComponentIDFile, string& rstrIdFile
 	}
 
 	// Ensure the file is closed
-	if (fIn != NULL)
+	if (fIn.is_open())
 	{
 		fIn.close();
 	}

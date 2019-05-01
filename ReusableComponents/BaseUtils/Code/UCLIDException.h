@@ -30,6 +30,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 
 using namespace std;
 
@@ -419,7 +420,7 @@ public:
 	// PROMISE: To return the current exception handler, if any.  If there is no current
 	//			exception handler, NULL will be returned.
 	// ARGS:	UCLIDExceptionHandler* pHandler - the UCLIDExceptionHandler to handle all exceptions	
-	static UCLIDExceptionHandler* UCLIDException::setExceptionHandler(UCLIDExceptionHandler* pHandler);
+	static UCLIDExceptionHandler* setExceptionHandler(UCLIDExceptionHandler* pHandler);
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: The UCLIDException will display itself using the default UCLIDExceptionHandler.
 	// REQUIRE: 

@@ -2086,7 +2086,7 @@ void CEnhanceOCR::applyFilters(pBITMAPHANDLE phBitmap, string strFilters, ILongR
 		if (m_mapCustomFilters.find(strFilter) != m_mapCustomFilters.end())
 		{
 			vector<L_INT> &vecFilter = m_mapCustomFilters[strFilter];
-			long nDim = round(sqrt((double)vecFilter.size()));
+			long nDim = lround(sqrt((double)vecFilter.size()));
 			applyFilter(phCurrentBitmap, nDim, &vecFilter[0], asDouble("0." + vecParameters[1]));
 		}
 		else if (strFilter == "medium")
@@ -2525,7 +2525,7 @@ bool CEnhanceOCR::applyOCRAttempt(ZoneData& zoneData, ZoneData& OCRAttemptData)
 	double dSpanRatio = (zoneData.m_nSpan > 0)
 		? (double)OCRAttemptData.m_nSpan / (double)zoneData.m_nSpan
 		: 1.0;
-	long ulAdjustedConfidence = (unsigned long)round(OCRAttemptData.m_nConfidence * dSpanRatio);
+	long ulAdjustedConfidence = (unsigned long)lround(OCRAttemptData.m_nConfidence * dSpanRatio);
 
 	// If this result is substantially better than the existing result simply replace the entire
 	// zone's text with the new OCRAttemptData.
@@ -2723,7 +2723,7 @@ void CEnhanceOCR::updateZoneData(ZoneData& zoneData, bool bIsOriginal, double dS
 	{
 		double dRawConfidence = dConfidenceValue / nSpatialLetterCount;
 		double dAverageRatio = dWordCharRatioValue / nLetterCount;
-		zoneData.m_nConfidence = round(dRawConfidence * dAverageRatio);
+		zoneData.m_nConfidence = lround(dRawConfidence * dAverageRatio);
 
 		// Store the original zone confidence and span so these can be used for comparison at a
 		// later time.
@@ -3267,7 +3267,7 @@ unsigned long CEnhanceOCR::OCRResult::Span(double dFactor, unsigned long nMaxCha
 	}
 	
 	// dFactor normalizes char width based on the filter currently being used.
-	return (unsigned long)round((double)ulSpan * dFactor);
+	return (unsigned long)lround((double)ulSpan * dFactor);
 }
 //--------------------------------------------------------------------------------------------------
 long CEnhanceOCR::OCRResult::CompareVerticalArea(const OCRResult &other) const
@@ -3366,7 +3366,7 @@ long CEnhanceOCR::OCRResult::GetConfidence(long nIndex) const
 	}
 
 	long nConfidence = m_vecLetters[nIndex].m_bIsSpatial && m_vecLetters[nIndex].m_usGuess1 != '^'
-		? round(((m_vecLetters[nIndex].m_ucCharConfidence + 
+		? lround(((m_vecLetters[nIndex].m_ucCharConfidence + 
 				  m_vecSourceResults[nIndex]->m_nOverallConfidence) / 2)
 			* m_vecSourceResults[nIndex]->m_dWordCharRatio)
 		: 0;

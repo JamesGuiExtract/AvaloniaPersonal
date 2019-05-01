@@ -1753,7 +1753,7 @@ void CImageLineUtility::findLines(string strImageFileName, long nPageNum, double
 
 		// Determine if the image is to be rotated such that it is to be closer to perpendicular
 		// to the original orientation than parallel.
-		bool perpendicular = (round(dRotation / 90) % 2 != 0);
+		bool perpendicular = (lround(dRotation / 90) % 2 != 0);
 		CSize sizeOrig(hBitmap.Width, hBitmap.Height);
 
 		// Rotate the bitmap.

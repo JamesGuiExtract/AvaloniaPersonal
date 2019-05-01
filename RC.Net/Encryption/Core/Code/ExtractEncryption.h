@@ -95,7 +95,7 @@ namespace Extract
 			//					   event handler which could potentially circumvent the
 			//					   check used to determine if the calling assembly was
 			//					   signed by Extract Systems
-			static void EncryptStream(Stream^ plainData, Stream^ cipherData, array<Byte>^ password,
+			static void EncryptStream(Stream^ plainData, Stream^ cipherData, cli::array<Byte>^ password,
 				MapLabel^ mapLabel);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To decrypt the specified binary file
@@ -106,7 +106,7 @@ namespace Extract
 			//					   check used to determine if the calling assembly was
 			//					   signed by Extract Systems
 			// RETURNS:	An array of bytes containing the decrypted data
-			static array<Byte>^ DecryptBinaryFile(String^ fileName, MapLabel^ mapLabel);
+			static cli::array<Byte>^ DecryptBinaryFile(String^ fileName, MapLabel^ mapLabel);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To decrypt the specified encrypted text file
 			//
@@ -150,7 +150,7 @@ namespace Extract
 			//					   event handler which could potentially circumvent the
 			//					   check used to determine if the calling assembly was
 			//					   signed by Extract Systems
-			static void DecryptStream(Stream^ cipherData, Stream^ plainData, array<Byte>^ password,
+			static void DecryptStream(Stream^ cipherData, Stream^ plainData, cli::array<Byte>^ password,
 				MapLabel^ mapLabel);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To convert the specified string to the specified hash version
@@ -160,7 +160,7 @@ namespace Extract
 			//					   event handler which could potentially circumvent the
 			//					   check used to determine if the calling assembly was
 			//					   signed by Extract Systems
-			static array<Byte>^ GetHashedBytes(String^ value, int version, MapLabel^ mapLabel);
+			static cli::array<Byte>^ GetHashedBytes(String^ value, int version, MapLabel^ mapLabel);
 
 		private:
 
@@ -171,31 +171,31 @@ namespace Extract
 			// Private variables
             //--------------------------------------------------------------------------------------
 			// The array used to store the public key for this assembly
-			static array<Byte>^ _myArray = CreateInternalArray();
+			static cli::array<Byte>^ _myArray = CreateInternalArray();
 
             //--------------------------------------------------------------------------------------
 			// Private methods
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To encrypt and array of bytes.
-			static array<Byte>^ Encrypt(array<Byte>^ plainBytes);
+			static cli::array<Byte>^ Encrypt(cli::array<Byte>^ plainBytes);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To encrypt a stream with a key generated from the specified password hash
-			static void Encrypt(Stream^ plain, Stream^ cipher, array<Byte>^ passwordHash);
+			static void Encrypt(Stream^ plain, Stream^ cipher, cli::array<Byte>^ passwordHash);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To decrypt an array of bytes.
-			static array<Byte>^ Decrypt(array<Byte>^ cipherBytes);
+			static cli::array<Byte>^ Decrypt(cli::array<Byte>^ cipherBytes);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To decrypt a stream with a key generated from the specified password
 			static void Decrypt(Stream^ cipher, Stream^ plain, String^ password);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To decrypt a stream with a key generated from the specified password hash
-			static void Decrypt(Stream^ cipher, Stream^ plain, int version, array<Byte>^ passwordHash);
+			static void Decrypt(Stream^ cipher, Stream^ plain, int version, cli::array<Byte>^ passwordHash);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To get the version number from the encrypted stream
 			static int GetEncryptedStreamVersion(Stream^ cipher);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To create an array containing the public key data for this assembly
-			static array<Byte>^ CreateInternalArray();
+			static cli::array<Byte>^ CreateInternalArray();
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To check the given assemblies public key against the public key for this
 			//			assembly.  Returns true if they match or false otherwise.
@@ -212,7 +212,7 @@ namespace Extract
 			// ARGS:	passwordHash - The hash value of the password to use in key generation
 			//			hashVersion - The version of the ComputeHash to use to generate other data
 			// NOTE:	The password hash must have a length of 64.
-			static RijndaelManaged^ GetRijndael(array<Byte>^ passwordHash, int hashVersion);
+			static RijndaelManaged^ GetRijndael(cli::array<Byte>^ passwordHash, int hashVersion);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To return a new instance of the RSA encryption object.
 			static RSACryptoServiceProvider^ GetRSA();
@@ -220,15 +220,15 @@ namespace Extract
 			// PURPOSE: To compute the hash value of the specified string
 			// ARGS:	data - The string to be decrypted
 			//			version - The version of the hashcode to produce
-			static array<Byte>^ ComputeHash(String^ value, int version);
+			static cli::array<Byte>^ ComputeHash(String^ value, int version);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To compute the hash value of the specified byte array
 			// ARGS:	data - The string to be decrypted
 			//			version - The version of the hashcode to produce
-			static array<Byte>^ ComputeHash(array<Byte>^ value, int version);
+			static cli::array<Byte>^ ComputeHash(cli::array<Byte>^ value, int version);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To compute a checksum for the specified value
-			static int ComputeCheckSum(array<Byte>^ value, HashAlgorithm^ algorithm);
+			static int ComputeCheckSum(cli::array<Byte>^ value, HashAlgorithm^ algorithm);
             //--------------------------------------------------------------------------------------
 			// PURPOSE:	Added to remove FxCop error - http://msdn.microsoft.com/en-us/ms182169.aspx
 			//			Microsoft.Design::CA1053 - Static holder types should not have constructors
@@ -264,14 +264,14 @@ namespace Extract
 			}
 
 			[System::Runtime::CompilerServices::Extension]
-			static void ExtractEncrypt(Stream^ plainData, Stream^ cipherData, array<Byte>^ password,
+			static void ExtractEncrypt(Stream^ plainData, Stream^ cipherData, cli::array<Byte>^ password,
 				MapLabel^ mapLabel)
 			{
 				ExtractEncryption::EncryptStream(plainData, cipherData, password, mapLabel);
 			}
 
 			[System::Runtime::CompilerServices::Extension]
-			static void ExtractDecrypt(Stream^ cipherData, Stream^ plainData, array<Byte>^ password,
+			static void ExtractDecrypt(Stream^ cipherData, Stream^ plainData, cli::array<Byte>^ password,
 				MapLabel^ mapLabel)
 			{
 				ExtractEncryption::DecryptStream(cipherData, plainData, password, mapLabel);

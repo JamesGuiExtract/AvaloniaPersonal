@@ -848,14 +848,6 @@ EXPORT_BaseUtils bool endsWith(const string& strValue, const string& strEnding);
 //-------------------------------------------------------------------------------------------------
 // ********* Number Operations **********
 //-------------------------------------------------------------------------------------------------
-// PROMISE: To return the rounded value of a number, closest to the nearest
-//          integer.
-//          Example: -5.5 is rounded to -6
-//                    1.4 is rounded to 1
-//                    2.6 is rounded to 3
-//                    0.4 is rounded to 0
-//                   -3.4 is rounded to -3
-EXPORT_BaseUtils long round(double dNum);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: Will convert nNum (12340095) to a comma formatted number string (12,340,095)
 EXPORT_BaseUtils string commaFormatNumber(LONGLONG nNum);

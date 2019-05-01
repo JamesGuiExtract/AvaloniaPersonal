@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SafeNetLicenseMgr.h"
-
 #include <string>
 #include <map>
 
@@ -17,21 +15,18 @@ const int giINDEXING_PAGES_COUNTERID = 5;
 struct CounterData
 {
 	CounterData();
-	CounterData(DataCell* pSafeNetDataCell);
 
 	int m_nCountsDecrementedInProcess;
 	int m_nLastCountValue;
 	int m_nCountDecrementAccumulation;
-	DataCell* m_pSafeNetDataCell;
 };
 
-// Static CounterData instances to be used to track counts for the standard Extract counters. These
-// instances include the SafeNet cells to be used if it is necessary to decrement from a USB key.
-static CounterData ms_indexingByDocCounterData(&gdcellFlexIndexingCounter);
-static CounterData ms_indexingByPageCounterData(&gdcellFlexIndexingCounter);
-static CounterData ms_paginationCounterData(&gdcellFlexPaginationCounter);
-static CounterData ms_redactionByDocCounterData(&gdcellIDShieldRedactionCounter);
-static CounterData ms_redactionByPageCounterData(&gdcellIDShieldRedactionCounter);
+// Static CounterData instances to be used to track counts for the standard Extract counters. 
+static CounterData ms_indexingByDocCounterData;
+static CounterData ms_indexingByPageCounterData;
+static CounterData ms_paginationCounterData;
+static CounterData ms_redactionByDocCounterData;
+static CounterData ms_redactionByPageCounterData;
 
 // Information about a rule execution counter.
 class CounterInfo
@@ -65,7 +60,6 @@ public:
 	ISecureCounterPtr GetSecureCounter() { return m_ipSecureCounter; }
 
 	// Gets the static CounterData instance used to track counter accumulation in the process
-	// (as well as to provide access to the SafeNet cells should USB decrements be necessary).
 	CounterData& GetCounterData();
 
 	/////////////////////
@@ -94,7 +88,7 @@ private:
 
 	// Keeps track of all counter names that have been used to ensure different threads aren't
 	// attempting to decrement the same counter ID, but with different names.
-	static std::map<long, string> ms_mapCounterNames;
+	static std::map<long, std::string> ms_mapCounterNames;
 
 	// Keeps track of the CounterData instance for tracking counter accumulation across all threads.
 	static std::map<long, CounterData> ms_mapCustomCounterData;

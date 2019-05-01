@@ -2,7 +2,7 @@
 
 #include "resource.h"
 #include <string>
-#include <memory.h>
+#include <memory>
 #include <IConfigurationSettingsPersistenceMgr.h>
 
 using namespace std;

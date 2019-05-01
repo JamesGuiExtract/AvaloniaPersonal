@@ -25,14 +25,14 @@
     <UseOfMfc>Dynamic</UseOfMfc>
     <UseOfAtl>Dynamic</UseOfAtl>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Dynamic</UseOfMfc>
     <UseOfAtl>Dynamic</UseOfAtl>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>Windows7.1SDK</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -70,7 +70,7 @@
       <InterfaceIdentifierFileName>FAMProcess_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>FAMProcess_p.c</ProxyFileName>
       <ErrorCheckStubData>false</ErrorCheckStubData>
-      <ValidateAllParameters>false</ValidateAllParameters>
+      <ValidateAllParameters>true</ValidateAllParameters>
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -119,7 +119,7 @@
       </DllDataFileName>
       <InterfaceIdentifierFileName>FAMProcess_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>FAMProcess_p.c</ProxyFileName>
-      <ValidateAllParameters>false</ValidateAllParameters>
+      <ValidateAllParameters>true</ValidateAllParameters>
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>

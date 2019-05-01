@@ -41,7 +41,6 @@ public:
 	EXPORT_BaseUtils friend bool operator == (const LineSegment& l1, const LineSegment& l2);
 
 public:
-	static const double INFINITY;
 	static const double ZERO_PLUS;
 
 	Point p1, p2;

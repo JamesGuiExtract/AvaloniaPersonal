@@ -9,19 +9,8 @@
 
 #include "resource.h"		// main symbols
 
-#include <afxmt.h>			// to define CMutex used by SafeNetLicenseMgr
-
-#include <SafeNetLicenseMgr.h>
-
-//-------------------------------------------------------------------------------------------------
-// Supported handling options for missing input file
-//-------------------------------------------------------------------------------------------------
-typedef enum EHandlingType
-{
-	kHandlingType_Exception,
-	kHandlingType_NoOutput,
-	kHandlingType_ZeroLengthOutput,
-}	EHandlingType;
+//#include <afxmt.h>			// to define CMutex used by SafeNetLicenseMgr
+#include <string>
 
 class CESConvertUSSToTXTApp : public CWinApp
 {
@@ -35,18 +24,30 @@ public:
 // Implementation
 	DECLARE_MESSAGE_MAP()
 
-private:
+	//-------------------------------------------------------------------------------------------------
+	// Supported handling options for missing input file
+	//-------------------------------------------------------------------------------------------------
+	enum EHandlingType
+	{
+		kHandlingType_Exception,
+		kHandlingType_NoOutput,
+		kHandlingType_ZeroLengthOutput,
+	};
+
+
 	enum ECounterType {
 		kIndexing,
 		kPagination,
 		kRedaction
 	};
 
+private:
+
 	// Counter to decrement
 	ECounterType m_eCounterToDecrement;
 
 	// Writes the test from the strInputFileName USS file to the strOutputFileName TXT file
-	void convertUSSFile(const string strInputFileName, const string strOutputFileName, 
+	void convertUSSFile(const std::string strInputFileName, const std::string strOutputFileName, 
 		const EHandlingType eNoUSSFile);
 
 	// Decrements the page-level redaction counter

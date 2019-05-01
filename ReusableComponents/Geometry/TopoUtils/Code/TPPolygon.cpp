@@ -27,8 +27,8 @@ using namespace std;
 //--------------------------------------------------------------------------------------------------
 // initialize the max to 0.0 and the min to INFINITY
 TPPolygon::TPPolygon() :
-m_dMinX(MathVars::INFINITY),
-m_dMinY(MathVars::INFINITY),
+m_dMinX(HUGE_VAL),
+m_dMinY(HUGE_VAL),
 m_dMaxX(0.0),
 m_dMaxY(0.0)
 {
@@ -417,10 +417,10 @@ void TPPolygon::calculateExtents(const TPPoint& p)
 {
 	if (m_vecPoints.empty())
 	{
-		m_dMinX = MathVars::INFINITY;
-		m_dMinY = MathVars::INFINITY;
-		m_dMaxX = -MathVars::INFINITY;
-		m_dMaxY = -MathVars::INFINITY;
+		m_dMinX = HUGE_VAL;
+		m_dMinY = HUGE_VAL;
+		m_dMaxX = -HUGE_VAL;
+		m_dMaxY = -HUGE_VAL;
 	}
 
 	if (p.m_dX < m_dMinX)

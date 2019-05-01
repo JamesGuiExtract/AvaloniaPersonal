@@ -4,8 +4,6 @@
 // produce the type library (ImageEdit.tlb) that will become a resource in
 // ImageEdit.ocx.
 
-#include <olectl.h>
-#include <idispids.h>
 
 [ uuid(65C0B2EA-166A-4212-92C8-42E5A319C093), version(1.0),
   helpfile("ImageEdit.hlp"),
@@ -13,6 +11,9 @@
   control ]
 library IMAGEEDITLib
 {
+	#include <olectl.h>
+	#include <idispids.h>
+
 	importlib(STDOLE_TLB);
 	importlib(STDTYPE_TLB);
 

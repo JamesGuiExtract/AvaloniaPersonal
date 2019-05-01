@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 #include <QuickMenuChooser.h>
 #include <ImageButtonWithStyle.h>

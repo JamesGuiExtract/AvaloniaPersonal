@@ -945,20 +945,6 @@ bool vectorContainsStringWithPrefix(const vector<string>& vecStrings,
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
-long round(double dNum)
-{
-	if (dNum >= 0)
-	{
-		// FIXTHIS: casting
-		return (long) floor(dNum + 0.5);
-	}
-	else
-	{
-		// FIXTHIS: casting
-		return (long) ceil(dNum - 0.5);
-	}
-}
-//-------------------------------------------------------------------------------------------------
 bool isValidIdentifier(const string& strName)
 {
 	try

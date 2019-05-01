@@ -1,5 +1,9 @@
 #include "stdafx.h"
 
+#define pointer_safety Pointer_safety
+#define errc Errc
+#define io_errc IO_errc
+
 #include "UnlockLeadtools.h"
 #include <UCLIDException.h>
 #include <MiscLeadUtils.h>

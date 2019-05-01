@@ -1,3 +1,4 @@
+#include "StdAfx.h"
 #include "zlibExterns.h"
 #include <UCLIDException.h>
 #include <cpputil.h>
@@ -23,14 +24,18 @@ m_buffer( buffer )
 
 Deflater::~Deflater()
 {
-	int iRet = deflateEnd(&m_strm);
-	ASSERT_RUNTIME_CONDITION( "ELI38939", 
-							  Z_OK == iRet, 
-							  Util::Format( "In: %s, Compression end failed: %s",
-											__FUNCTION__,
-											Z_DATA_ERROR == iRet 
-											? "unflushed data present in stream" 
-											: "inconsistent stream state" ).c_str() );
+	try
+	{
+		int iRet = deflateEnd(&m_strm);
+		ASSERT_RUNTIME_CONDITION("ELI38939",
+			Z_OK == iRet,
+			Util::Format("In: %s, Compression end failed: %s",
+				__FUNCTION__,
+				Z_DATA_ERROR == iRet
+				? "unflushed data present in stream"
+				: "inconsistent stream state").c_str());
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI44674");
 }
 
 void Deflater::Deflate()

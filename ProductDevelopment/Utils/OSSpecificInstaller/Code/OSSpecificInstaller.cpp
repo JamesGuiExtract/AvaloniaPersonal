@@ -7,6 +7,7 @@
 #include <io.h>
 #include <string>
 #include <sstream>
+#include <VersionHelpers.h>
 
 using namespace std;
 
@@ -75,13 +76,14 @@ bool IsWindows10()
 	osviOver6.dwMajorVersion = 10;
 	osviOver6.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	osviOver6.dwMinorVersion = 0;
-	ULONGLONG dwMask;
+	ULONGLONG dwMask = 0;
 	VER_SET_CONDITION(dwMask, VER_MAJORVERSION, VER_EQUAL);
 	VER_SET_CONDITION(dwMask, VER_MINORVERSION, VER_EQUAL);
 	if (VerifyVersionInfo(&osviOver6, VER_MAJORVERSION | VER_MINORVERSION, dwMask) == TRUE)
 	{
 		return true;
 	}
+	return false;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -91,95 +93,74 @@ string GetOSKey()
 {
 	string strKeyString = "";
 
-	// Need to obtain the OS type
-    OSVERSIONINFOEX osvi;
-    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-    ::GetVersionEx( (OSVERSIONINFO *)&osvi );
-
-	// Check if workstation - then OS will be XP_64
-	if (osvi.wProductType == VER_NT_WORKSTATION)
+	if (!IsWindowsServer())
 	{
-		// Windows XP is version 5
-		if (osvi.dwMajorVersion == 5)
+		if (IsWindowsVersionOrGreater(10, 0, 0))
+		{
+			strKeyString = "W10";
+		}
+		else if (IsWindows8Point1OrGreater())
+		{
+			strKeyString = "W81";
+		}
+		else if (IsWindows8OrGreater())
+		{
+			strKeyString = "W8";
+		}
+		else if (IsWindows7OrGreater())
+		{
+			strKeyString = "W7";
+		}
+		else if (IsWindowsVistaOrGreater())
+		{
+			strKeyString = "VISTA";
+		}
+		else if (IsWindowsXPOrGreater())
 		{
 			strKeyString = "XP";
 		}
-		// Windows 6 is Vista or Windows 7
-		else if (osvi.dwMajorVersion == 6)
-		{
-			// Minor version of 0 is Vista
-			if (osvi.dwMinorVersion == 0)
-			{
-				strKeyString = "VISTA";
-			}
-			// Minor version of 1 is Windows 7
-			else if (osvi.dwMinorVersion == 1)
-			{
-				strKeyString = "W7";
-			}
-			// Minor version of 2 is Windows 8
-			else if (osvi.dwMinorVersion == 2)
-			{
-				strKeyString = "W8";
-			}
-			// Minor version of 2 is Windows 8.1
-			else if (osvi.dwMinorVersion == 3)
-			{
-				strKeyString = "W81";
-			}
-		}
-		// Windows 10
-		else if (osvi.dwMajorVersion == 10)
-		{
-			if (osvi.dwMinorVersion == 0)
-			{
-				strKeyString = "W10";
-			}
-		}
-	}
-	// Check for Windows Server 2003 versions - not interested in Windows Home Server
-	else if ((osvi.dwMajorVersion == 5) && (osvi.wSuiteMask != VER_SUITE_WH_SERVER))
-	{
-		// Determine if Windows 2003 or Windows 2003 R2
-		if (GetSystemMetrics(SM_SERVERR2) == 0)
-		{
-			strKeyString = "WS03";
-		}
 		else
 		{
-			strKeyString = "WS03R2";
+			strKeyString = "UNKNOWN";
 		}
 	}
-	// Check for Windows Server 2008 versions
-	else if (osvi.dwMajorVersion == 6)
+	else 
 	{
-		// If Minor version is 0 then it is Windows Server 2008
-		if (osvi.dwMinorVersion == 0)
+		if (IsWindowsVersionOrGreater(10, 0, 0))
 		{
-			strKeyString = "W08";
+			strKeyString = "WS16";
 		}
-		// If Minor version is 1 then it is Windows Server 2008 R2
-		else if (osvi.dwMinorVersion == 1)
-		{
-			strKeyString = "W08R2";
-		}
-		// Minor version of 2 is Windows Server 2012
-		else if (osvi.dwMinorVersion == 2)
-		{
-			strKeyString = "WS12";
-		}
-		// Minor version of 3 is Windows Server 2012R2
-		else if (osvi.dwMinorVersion == 3)
+		else if (IsWindows8Point1OrGreater())
 		{
 			strKeyString = "WS12R2";
 		}
-	}
-	// Major version of 10 is Windows Server 2016
-	else if (osvi.dwMajorVersion == 10)
-	{
-		if (osvi.dwMinorVersion == 0)
+		else if (IsWindows8OrGreater())
 		{
-			strKeyString = "WS16";
+			strKeyString = "WS12";
+		}
+		else if (IsWindows7OrGreater())
+		{
+			strKeyString = "W08R2";
+		}
+		else if (IsWindowsVistaOrGreater())
+		{
+			strKeyString = "W08";
+		}
+		else if (IsWindowsXPOrGreater())
+		{
+			// Determine if Windows 2003 or Windows 2003 R2
+			if (GetSystemMetrics(SM_SERVERR2) == 0)
+			{
+				strKeyString = "WS03";
+			}
+			else
+			{
+				strKeyString = "WS03R2";
+			}
+		}
+		else
+		{
+			strKeyString = "UNKNOWN";
 		}
 	}
 	return strKeyString;

@@ -25,8 +25,6 @@ using namespace System::Security::Permissions;
 [assembly:ComVisible(false)];
 [assembly: RuntimeCompatibility(WrapNonExceptionThrows=true)]; // Wraps C++ exceptions as .NET
 
-[assembly:SecurityPermission(SecurityAction::RequestMinimum, UnmanagedCode = true)];
-
 // This namespace currently only contains one type.
 // As a general rule you should not create a new namespace for just a couple
 // of types, but this namespace has been created specifically to provide

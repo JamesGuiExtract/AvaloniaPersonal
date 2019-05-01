@@ -263,12 +263,12 @@ bool UpdateVersionInfoInTmpFile(const string& sSrcFileName, const string& sTmpFi
 			string sInBuf;
 			std::ifstream inFile(sSrcFileName.c_str());
 			bool bInXmlVersionNode = false;
-			if (inFile)
+			if (inFile.good())
 			{
-				while (inFile)
+				while (!inFile.eof())
 				{
 					// If the return count is 0 then need to break out of the loop
-					if (getline(inFile,sInBuf) == 0 )
+					if (getline(inFile,sInBuf))
 					{
 						break;
 					}

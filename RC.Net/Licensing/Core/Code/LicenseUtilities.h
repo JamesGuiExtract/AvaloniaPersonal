@@ -111,7 +111,7 @@ namespace Extract
 			// Private variables
             //--------------------------------------------------------------------------------------
 			// The array used to store the public key for this assembly
-			static array<Byte>^ _myArray = CreateInternalArray();
+			static cli::array<System::Byte>^ _myArray = CreateInternalArray();
 
 			// The dictionary of license ID's to LicenseStateCache objects
 			static Dictionary<LicenseIdName, LicenseStateCache^>^ _licenseCache
@@ -124,7 +124,7 @@ namespace Extract
 			// Private methods
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To create an array containing the public key data for this assembly
-			static array<Byte>^ CreateInternalArray();
+			static cli::array<System::Byte>^ CreateInternalArray();
             //--------------------------------------------------------------------------------------
 			static Dictionary<LicenseIdName, LicenseStateCache^>^ CreateLicenseCacheCollection();
             //--------------------------------------------------------------------------------------

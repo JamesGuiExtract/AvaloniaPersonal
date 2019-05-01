@@ -6,6 +6,7 @@
 #include "FileProcessorsConfigMgr.h"
 
 #include <string>
+#include <memory>
 #include <ImageButtonWithStyle.h>
 #include <RegistryPersistenceMgr.h>
 

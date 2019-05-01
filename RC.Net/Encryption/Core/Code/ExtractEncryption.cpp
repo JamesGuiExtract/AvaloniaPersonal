@@ -219,7 +219,7 @@ void ExtractEncryption::EncryptFile(String^ fileToEncrypt, String^ encryptedFile
 			"Encrypted file name", encryptedFileName);
 
 		// Get all the bytes from the file and encrypt them
-		array<Byte>^ cipherBytes = Encrypt(File::ReadAllBytes(fileToEncrypt));
+		cli::array<Byte>^ cipherBytes = Encrypt(File::ReadAllBytes(fileToEncrypt));
 
 		// Write the encrypted file
 		File::WriteAllBytes(encryptedFileName, cipherBytes);
@@ -246,7 +246,7 @@ String^ ExtractEncryption::EncryptString(String^ data, MapLabel^ mapLabel)
 		if (!String::IsNullOrEmpty(data))
 		{
 			// Get the plain text as an array of bytes
-			array<Byte>^ plainText = StringMethods::ConvertStringToBytes(data);
+			cli::array<Byte>^ plainText = StringMethods::ConvertStringToBytes(data);
 
 			// Encrypt the bytes and convert the encrypted bytes to a string
 			returnData = StringMethods::ConvertBytesToHexString(Encrypt(plainText));
@@ -282,7 +282,7 @@ void ExtractEncryption::EncryptTextFile(System::String ^data, System::String ^en
 			"Encrypted file name", encryptedFileName);
 
 		// Encrypt the string
-		array<Byte>^ encryptedBytes = Encrypt(StringMethods::ConvertStringToBytes(data));
+		cli::array<Byte>^ encryptedBytes = Encrypt(StringMethods::ConvertStringToBytes(data));
 
 		// Write the encrypted data to the file
 		File::WriteAllBytes(encryptedFileName, encryptedBytes);
@@ -306,7 +306,7 @@ void ExtractEncryption::EncryptStream(Stream^ plainData, Stream^ cipherData, Str
 }
 //--------------------------------------------------------------------------------------------------
 [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
-void ExtractEncryption::EncryptStream(Stream^ plainData, Stream^ cipherData, array<Byte>^ password,
+void ExtractEncryption::EncryptStream(Stream^ plainData, Stream^ cipherData, cli::array<Byte>^ password,
 	MapLabel^ mapLabel)
 {
 	try
@@ -324,7 +324,7 @@ void ExtractEncryption::EncryptStream(Stream^ plainData, Stream^ cipherData, arr
 }
 //--------------------------------------------------------------------------------------------------
 [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
-array<Byte>^ ExtractEncryption::DecryptBinaryFile(String^ fileName, MapLabel^ mapLabel)
+cli::array<Byte>^ ExtractEncryption::DecryptBinaryFile(String^ fileName, MapLabel^ mapLabel)
 {
 	try
 	{
@@ -341,7 +341,7 @@ array<Byte>^ ExtractEncryption::DecryptBinaryFile(String^ fileName, MapLabel^ ma
 			"File to decrypt", fileName);
 
 		// Decrypt the data from the file
-		array<Byte>^ returnData = Decrypt(File::ReadAllBytes(fileName));
+		cli::array<Byte>^ returnData = Decrypt(File::ReadAllBytes(fileName));
 
 		// Return the decrypted data
 		return returnData;
@@ -370,7 +370,7 @@ String^ ExtractEncryption::DecryptTextFile(String^ fileName, Encoding^ encoding,
 			"File to decrypt", fileName);
 
 		// Get the decrypted bytes from the file
-		array<Byte>^ plainBytes = Decrypt(File::ReadAllBytes(fileName));
+		cli::array<Byte>^ plainBytes = Decrypt(File::ReadAllBytes(fileName));
 
 		// Return the data as a String^ with the specified Encoding
 		return encoding->GetString(plainBytes);
@@ -397,7 +397,7 @@ String^ ExtractEncryption::DecryptString(String^ data, MapLabel^ mapLabel)
 		if (!String::IsNullOrEmpty(data))
 		{
 			// Get the cipher text as an array of bytes
-			array<Byte>^ cipherText = StringMethods::ConvertHexStringToBytes(data);
+			cli::array<Byte>^ cipherText = StringMethods::ConvertHexStringToBytes(data);
 
 			// Decrypt the bytes and convert the decrypted bytes to a string
 			returnData = StringMethods::ConvertBytesToString(Decrypt(cipherText));
@@ -425,7 +425,7 @@ void ExtractEncryption::DecryptStream(Stream^ cipherData, Stream^ plainData, Str
 }
 //--------------------------------------------------------------------------------------------------
 [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
-void ExtractEncryption::DecryptStream(Stream^ cipherData, Stream^ plainData, array<Byte>^ password,
+void ExtractEncryption::DecryptStream(Stream^ cipherData, Stream^ plainData, cli::array<Byte>^ password,
 	MapLabel^ mapLabel)
 {
 	try
@@ -446,7 +446,7 @@ void ExtractEncryption::DecryptStream(Stream^ cipherData, Stream^ plainData, arr
 }
 //--------------------------------------------------------------------------------------------------
 [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
-array<Byte>^ ExtractEncryption::GetHashedBytes(String^ value, int version, MapLabel^ mapLabel)
+cli::array<Byte>^ ExtractEncryption::GetHashedBytes(String^ value, int version, MapLabel^ mapLabel)
 {
 	try
 	{
@@ -465,7 +465,7 @@ array<Byte>^ ExtractEncryption::GetHashedBytes(String^ value, int version, MapLa
 //--------------------------------------------------------------------------------------------------
 // Private methods
 //--------------------------------------------------------------------------------------------------
-array<Byte>^ ExtractEncryption::Encrypt(array<Byte>^ plainBytes)
+cli::array<Byte>^ ExtractEncryption::Encrypt(cli::array<Byte>^ plainBytes)
 {
 	RijndaelManaged^ rjndl = nullptr;
 	RSACryptoServiceProvider^ rsa = nullptr;
@@ -480,7 +480,7 @@ array<Byte>^ ExtractEncryption::Encrypt(array<Byte>^ plainBytes)
 		rsa = GetRSA();
 
 		// Encrypt the Rijndael key
-		array<Byte>^ keyEncrypted = rsa->Encrypt(rjndl->Key, false);
+		cli::array<Byte>^ keyEncrypted = rsa->Encrypt(rjndl->Key, false);
 
 		// Create the memory stream to write to
 		memoryStream = gcnew MemoryStream();
@@ -504,7 +504,7 @@ array<Byte>^ ExtractEncryption::Encrypt(array<Byte>^ plainBytes)
 		cryptoStream->FlushFinalBlock();
 
 		// Return the encrypted bytes
-		array<Byte>^ data = memoryStream->ToArray();
+		cli::array<Byte>^ data = memoryStream->ToArray();
 
 		// Scope for pin_ptr
 		{
@@ -541,7 +541,7 @@ array<Byte>^ ExtractEncryption::Encrypt(array<Byte>^ plainBytes)
 	}
 }
 //--------------------------------------------------------------------------------------------------
-void ExtractEncryption::Encrypt(Stream^ plain, Stream^ cipher, array<Byte>^ passwordHash)
+void ExtractEncryption::Encrypt(Stream^ plain, Stream^ cipher, cli::array<Byte>^ passwordHash)
 {
 	RijndaelManaged^ rjndl = nullptr;
 	CryptoStream^ cryptoStream = nullptr;
@@ -565,7 +565,7 @@ void ExtractEncryption::Encrypt(Stream^ plain, Stream^ cipher, array<Byte>^ pass
 		rjndl = GetRijndael(passwordHash, HashVersion);
 		cryptoStream = gcnew CryptoStream(cipher, rjndl->CreateEncryptor(),
 			CryptoStreamMode::Write);
-		auto buffer = gcnew array<Byte>(_BUFFER_SIZE);
+		auto buffer = gcnew cli::array<Byte>(_BUFFER_SIZE);
 		auto bytes = plain->Read(buffer, 0, _BUFFER_SIZE);
 		while (bytes > 0)
 		{
@@ -593,7 +593,7 @@ void ExtractEncryption::Encrypt(Stream^ plain, Stream^ cipher, array<Byte>^ pass
 	}
 }
 //--------------------------------------------------------------------------------------------------
-array<Byte>^ ExtractEncryption::Decrypt(array<Byte>^ cipherBytes)
+cli::array<Byte>^ ExtractEncryption::Decrypt(cli::array<Byte>^ cipherBytes)
 {
 	RijndaelManaged^ rjndl = nullptr;
 	RSACryptoServiceProvider^ rsa = nullptr;
@@ -606,7 +606,7 @@ array<Byte>^ ExtractEncryption::Decrypt(array<Byte>^ cipherBytes)
 			CheckData(Assembly::GetCallingAssembly()));
 
 		// Create an array to hold version number
-		array<Byte>^ version = gcnew array<Byte>(4);
+		cli::array<Byte>^ version = gcnew cli::array<Byte>(4);
 
 		// Get the version number
 		Array::Copy(cipherBytes, 0, version, 0, 4);
@@ -631,11 +631,11 @@ array<Byte>^ ExtractEncryption::Decrypt(array<Byte>^ cipherBytes)
 		}
 
 		// Get the key
-		array<Byte>^ key = gcnew array<Byte>(_KEY_SIZE);
+		cli::array<Byte>^ key = gcnew cli::array<Byte>(_KEY_SIZE);
 		Array::Copy(cipherBytes, 4, key, 0, _KEY_SIZE);
 
 		// Get the initialization vector
-		array<Byte>^ iv = gcnew array<Byte>(_IV_LENGTH);
+		cli::array<Byte>^ iv = gcnew cli::array<Byte>(_IV_LENGTH);
 		Array::Copy(cipherBytes, 4 + _KEY_SIZE, iv, 0, _IV_LENGTH);
 		
 		// Get a Rijndael instance for performing the decryption
@@ -652,7 +652,7 @@ array<Byte>^ ExtractEncryption::Decrypt(array<Byte>^ cipherBytes)
 			rjndl->CreateDecryptor(rsa->Decrypt(key, false), iv), CryptoStreamMode::Write);
 
 		// Create an array to hold the remainder of the bytes and copy the bytes to it
-		array<Byte>^ temp = gcnew array<Byte>(cipherBytes->Length - (4 + _KEY_SIZE + _IV_LENGTH));
+		cli::array<Byte>^ temp = gcnew cli::array<Byte>(cipherBytes->Length - (4 + _KEY_SIZE + _IV_LENGTH));
 		Array::Copy(cipherBytes, (4 + _KEY_SIZE + _IV_LENGTH), temp, 0, temp->Length);
 
 		// For all of the remaining bytes in the cipher text, decrypt them
@@ -719,7 +719,7 @@ void ExtractEncryption::Decrypt(Stream^ cipher, Stream^ plain, String^ password)
 }
 //--------------------------------------------------------------------------------------------------
 void ExtractEncryption::Decrypt(Stream^ cipher, Stream^ plain, int version,
-	array<Byte>^ passwordHash)
+	cli::array<Byte>^ passwordHash)
 {
 	switch(version)
 	{
@@ -739,7 +739,7 @@ void ExtractEncryption::Decrypt(Stream^ cipher, Stream^ plain, int version,
 					hashAlgorithm = (version == 2) ? gcnew MD5Cng() : MD5::Create();
 
 					// Read the password check sum and validate it
-					auto data = gcnew array<Byte>(4);
+					auto data = gcnew cli::array<Byte>(4);
 					cipher->Read(data, 0, 4);
 					auto checkSum = BitConverter::ToInt32(data, 0);
 					if (ComputeCheckSum(passwordHash, hashAlgorithm) != checkSum)
@@ -752,7 +752,7 @@ void ExtractEncryption::Decrypt(Stream^ cipher, Stream^ plain, int version,
 				rjndl = GetRijndael(passwordHash, 1);
 				cryptoStream = gcnew CryptoStream(plain, rjndl->CreateDecryptor(),
 					CryptoStreamMode::Write);
-				auto buffer = gcnew array<Byte>(_BUFFER_SIZE);
+				auto buffer = gcnew cli::array<Byte>(_BUFFER_SIZE);
 				auto bytes = cipher->Read(buffer, 0, _BUFFER_SIZE);
 				while (bytes > 0)
 				{
@@ -797,7 +797,7 @@ int ExtractEncryption::GetEncryptedStreamVersion(Stream^ cipherStream)
 		auto expectedEncodingLength = expectedTag->Length;
 
 		// Read the tag length from the stream
-		auto data = gcnew array<Byte>(4);
+		auto data = gcnew cli::array<Byte>(4);
 		cipherStream->Read(data, 0, 4);
 		auto length = BitConverter::ToInt32(data, 0);
 		if (length != expectedEncodingLength)
@@ -809,7 +809,7 @@ int ExtractEncryption::GetEncryptedStreamVersion(Stream^ cipherStream)
 		}
 
 		// Read and validate the tag
-		auto tag = gcnew array<Byte>(length);
+		auto tag = gcnew cli::array<Byte>(length);
 		cipherStream->Read(tag, 0, length);
 		if (!_STREAM_ENCRYPT_TAG->Equals(encoding->GetString(tag), StringComparison::Ordinal))
 		{
@@ -841,7 +841,7 @@ int ExtractEncryption::GetEncryptedStreamVersion(Stream^ cipherStream)
 	}
 }
 //--------------------------------------------------------------------------------------------------
-array<Byte>^ ExtractEncryption::CreateInternalArray()
+cli::array<Byte>^ ExtractEncryption::CreateInternalArray()
 {
 	try
 	{
@@ -863,7 +863,7 @@ bool ExtractEncryption::CheckData(Assembly^ assembly)
 	if (assemblyName != nullptr)
 	{
 		// Get the public key for this assembly
-		array<Byte>^ publicKey = assemblyName->GetPublicKey();
+		cli::array<Byte>^ publicKey = assemblyName->GetPublicKey();
 
 		if (publicKey != nullptr && publicKey->Length != 0)
 		{
@@ -897,7 +897,7 @@ RijndaelManaged^ ExtractEncryption::GetRijndael()
 	return rjndl;
 }
 //--------------------------------------------------------------------------------------------------
-RijndaelManaged^ ExtractEncryption::GetRijndael(array<Byte>^ passwordHash, int hashVersion)
+RijndaelManaged^ ExtractEncryption::GetRijndael(cli::array<Byte>^ passwordHash, int hashVersion)
 {
 	if (passwordHash->Length != 64)
 	{
@@ -906,10 +906,10 @@ RijndaelManaged^ ExtractEncryption::GetRijndael(array<Byte>^ passwordHash, int h
 		ee->AddDebugData("Required Length", 64, false);
 	}
 
-	array<Byte>^ otherHash = nullptr;
+	cli::array<Byte>^ otherHash = nullptr;
 
 	// Create an array to hold the modified key
-	array<Byte>^ keyBytes = gcnew array<Byte>(getDestinationLength());
+	cli::array<Byte>^ keyBytes = gcnew cli::array<Byte>(getDestinationLength());
 
 	// Scope for pin_ptr
 	{
@@ -964,7 +964,7 @@ RSACryptoServiceProvider^ ExtractEncryption::GetRSA()
 	RSACryptoServiceProvider^ rsa = gcnew RSACryptoServiceProvider();
 
 	// Create an array to hold the modified key
-	array<Byte>^ keyBytes = gcnew array<Byte>(getDestinationLength());
+	cli::array<Byte>^ keyBytes = gcnew cli::array<Byte>(getDestinationLength());
 
 	// Scope for pin_ptr
 	{
@@ -986,13 +986,13 @@ RSACryptoServiceProvider^ ExtractEncryption::GetRSA()
 	return rsa;
 }
 //--------------------------------------------------------------------------------------------------
-array<Byte>^ ExtractEncryption::ComputeHash(String^ value, int version)
+cli::array<Byte>^ ExtractEncryption::ComputeHash(String^ value, int version)
 {
 	auto encoding = gcnew UnicodeEncoding();
 	return ComputeHash(encoding->GetBytes(value), version);
 }
 //--------------------------------------------------------------------------------------------------
-array<Byte>^ ExtractEncryption::ComputeHash(array<Byte>^ value, int version)
+cli::array<Byte>^ ExtractEncryption::ComputeHash(cli::array<Byte>^ value, int version)
 {
 	switch(version)
 	{
@@ -1009,7 +1009,7 @@ array<Byte>^ ExtractEncryption::ComputeHash(array<Byte>^ value, int version)
 	}
 }
 //--------------------------------------------------------------------------------------------------
-int ExtractEncryption::ComputeCheckSum(array<Byte>^ hash, HashAlgorithm^ algorithm)
+int ExtractEncryption::ComputeCheckSum(cli::array<Byte>^ hash, HashAlgorithm^ algorithm)
 {
 	try
 	{
