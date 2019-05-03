@@ -7,13 +7,6 @@
 #include <cpputil.h>
 #include <COMUtils.h>
 #include <CompressionEngine.h>
-#include <TemporaryFileName.h>
-
-//-------------------------------------------------------------------------------------------------
-// Constants
-//-------------------------------------------------------------------------------------------------
-const string gstrSPATIAL_STRING_FILE_SIGNATURE = "UCLID Spatial String (USS) File";
-const _bstr_t gbstrSPATIAL_STRING_STREAM_NAME("SpatialString");
 
 //-------------------------------------------------------------------------------------------------
 // CSpatialString
@@ -471,18 +464,15 @@ STDMETHODIMP CSpatialString::LoadFrom(BSTR strFullFileName,
 		}
 		else if (eFileType == kUSSFile)
 		{
-			// If we reached here, it's because the file is not a text file
-			// Any file that's not a text file is assumed to be a USS file.
-			// The .uss file may be compressed.
-			// create a temporary file with the uncompressed output
-			TemporaryFileName tmpFile(true);
-			CompressionEngine::decompressFile(strInputFile, tmpFile.getName());
-
-			// Load this object from the file
-			IPersistStreamPtr ipPersistStream = getThisAsCOMPtr();
-			ASSERT_RESOURCE_ALLOCATION("ELI16919", ipPersistStream != __nullptr);
-			readObjectFromFile(ipPersistStream, get_bstr_t(tmpFile.getName().c_str()), 
-				gbstrSPATIAL_STRING_STREAM_NAME, false, gstrSPATIAL_STRING_FILE_SIGNATURE);
+			// Load from new-style USS (zip file with individual pages saved as numbered files)
+			if (CompressionEngine::isZipFile(strInputFile))
+			{
+				loadFromArchive(strInputFile);
+			}
+			else
+			{
+				loadFromStorageObject(strInputFile, getThisAsCOMPtr());
+			}
 
 			////////////////////////////////////////
 			// Check for SourceDocName image, prefer
@@ -525,6 +515,83 @@ STDMETHODIMP CSpatialString::LoadFrom(BSTR strFullFileName,
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::LoadPageFromFile(BSTR bstrInputFile, long nPage)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		string inputFile = asString(bstrInputFile);
+
+		if (CompressionEngine::isZipFile(inputFile))
+		{
+			loadPagesFromArchive(inputFile, false, nPage, true);
+		}
+		else
+		{
+			// Load the entire string and then truncate it to the desired page
+			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipThis = getThisAsCOMPtr();
+			loadFromStorageObject(inputFile, ipThis);
+			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr page = ipThis->GetSpecifiedPages(nPage, nPage);
+			copyFromSpatialString(page);
+
+			// Page info maps for large files are noticeable when looking for memory leaks (1000 page infos is about a MB).
+			// These stick around for a while in .NET if ReportMemoryUsage() isn't used everywhere (e.g., if you call GetWords() and forget to report the word spatial strings).
+			// To minimize this, rid of the extra pages so the map is smaller
+			if (getPageInfoMap()->Size > 1)
+			{
+				UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr pageInfo = m_ipPageInfoMap->GetValue(nPage);
+				m_ipPageInfoMap.CreateInstance(CLSID_LongToObjectMap);
+				m_ipPageInfoMap->Set(nPage, pageInfo);
+			}
+		}
+
+		////////////////////////////////////////
+		// Check for SourceDocName image, prefer
+		// image in same location as USS file
+		////////////////////////////////////////
+
+		// Get folder for USS file
+		string	strFolder = getDirectoryFromFullPath(inputFile);
+
+		// Get filename without extension
+		string	strSourceFile = getFileNameWithoutExtension(inputFile);
+
+		// Check existence of SourceDocName file in present folder
+		string	strNewSource = strFolder + "\\" + strSourceFile;
+		// if the new source file exists, replace the existing source doc name
+		if (isFileOrFolderValid(strNewSource))
+		{
+			m_strSourceDocName = strNewSource;
+		}
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46767");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::AppendToFile(BSTR bstrOutputFile)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		string outputFile = asString(bstrOutputFile);
+		ASSERT_RUNTIME_CONDITION("ELI46765", isValidFile(outputFile), "File to append to doesn't exist");
+
+		appendToArchive(outputFile, true);
+		
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46766");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::SaveTo(BSTR strFullFileName, VARIANT_BOOL bCompress,
 									VARIANT_BOOL bClearDirty)
 {
@@ -554,14 +621,6 @@ STDMETHODIMP CSpatialString::SaveTo(BSTR strFullFileName, VARIANT_BOOL bCompress
 		}
 		else if (eFileType == kUSSFile)
 		{
-			// If we reached here, it's because the file is not a text file
-			// Any file that's not a text file is assumed to be a USS file.
-			// Create a temporary file (which will later be compressed and
-			// saved with the specified file name)
-			TemporaryFileName tmpFile(true);
-			string strOutputFileName = asCppBool(bCompress) ? 
-				tmpFile.getName() : stdstrFullFileName;
-
 			// Save this object to the file using the UNC path [FlexIDSCore #3519]
 			string strSourceDocName = m_strSourceDocName;
 			try
@@ -574,9 +633,7 @@ STDMETHODIMP CSpatialString::SaveTo(BSTR strFullFileName, VARIANT_BOOL bCompress
 					m_strSourceDocName = ::getUNCPath(strSourceDocName);
 				}
 
-				writeObjectToFile(this, _bstr_t(strOutputFileName.c_str()), 
-					gbstrSPATIAL_STRING_STREAM_NAME, asCppBool(bClearDirty), 
-					gstrSPATIAL_STRING_FILE_SIGNATURE);
+				savePagesToArchive(stdstrFullFileName, getThisAsCOMPtr()->GetPages(VARIANT_FALSE, ""), asCppBool(bCompress));
 			}
 			catch (...)
 			{
@@ -590,16 +647,7 @@ STDMETHODIMP CSpatialString::SaveTo(BSTR strFullFileName, VARIANT_BOOL bCompress
 			m_strSourceDocName = strSourceDocName;
 
 			// Wait until the file is readable
-			waitForFileToBeReadable(strOutputFileName);
-
-			// if requested, compress the above created temporary file and 
-			// save as the specified filename
-			if (bCompress == VARIANT_TRUE)
-			{
-				// Compress the file (compress file includes a call to waitForFileToBeReadable
-				// no need to include one here)
-				CompressionEngine::compressFile(tmpFile.getName(), stdstrFullFileName);
-			}
+			waitForFileToBeReadable(stdstrFullFileName);
 		}
 		else
 		{

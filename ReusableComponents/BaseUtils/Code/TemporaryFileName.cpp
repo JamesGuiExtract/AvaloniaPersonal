@@ -96,7 +96,7 @@ void TemporaryFileName::init(string strDir, const char *pszPrefix, const char* p
 	string strPrefix = (pszPrefix != __nullptr ? pszPrefix : "");
 
 	// check for NULL suffix
-	if (pszSuffix != __nullptr && pszSuffix != "")
+	if (pszSuffix != __nullptr && pszSuffix[0] != '\0')
 	{
 		strSuffix = pszSuffix;
 		makeLowerCase(strSuffix);

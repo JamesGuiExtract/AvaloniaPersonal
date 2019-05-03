@@ -214,3 +214,19 @@ void CompressionEngine::decompressFile(const std::string& strInputFile,
 	}
 }
 //-------------------------------------------------------------------------------------------------
+bool CompressionEngine::isZipFile(const std::string & strFile)
+{
+	ifstream stream(strFile);
+    std::string result(4, ' ');
+    stream.read(&result[0], 4);
+	return result == "PK\x3\x4" || result == "PK\x5\x6";
+}
+//-------------------------------------------------------------------------------------------------
+bool CompressionEngine::isGZipFile(const std::string & strFile)
+{
+	ifstream stream(strFile);
+    std::string result(2, ' ');
+    stream.read(&result[0], 2);
+	return result == "\x1f\x8b";
+}
+//-------------------------------------------------------------------------------------------------

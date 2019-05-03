@@ -20,7 +20,9 @@
 //////////////////////////////////////////////////////////////////////
 const UINT BUFFERSIZE = 2048;
 
-CZipper::CZipper(LPCTSTR szFilePath, LPCTSTR szRootFolder, bool bAppend) : m_uzFile(0)
+CZipper::CZipper(LPCTSTR szFilePath, LPCTSTR szRootFolder, bool bAppend, bool bCompress) :
+m_uzFile(0),
+m_bCompress(bCompress)
 {
 	CloseZip();
 
@@ -180,7 +182,7 @@ bool CZipper::AddFileToZip(LPCTSTR szFilePath, bool bIgnoreFilePath)
 									0, 
 									NULL,
 									Z_DEFLATED,
-									Z_DEFAULT_COMPRESSION);
+									m_bCompress ? Z_DEFAULT_COMPRESSION : Z_NO_COMPRESSION);
 
 	if (nRet == ZIP_OK)
 	{
@@ -274,7 +276,7 @@ bool CZipper::AddFileToZip(LPCTSTR szFilePath, LPCTSTR szRelFolderPath)
 									0, 
 									NULL,
 									Z_DEFLATED,
-									Z_DEFAULT_COMPRESSION);
+									m_bCompress ? Z_DEFAULT_COMPRESSION : Z_NO_COMPRESSION);
 
 	if (nRet == ZIP_OK)
 	{
@@ -302,6 +304,94 @@ bool CZipper::AddFileToZip(LPCTSTR szFilePath, LPCTSTR szRelFolderPath)
 
 	return (nRet == ZIP_OK);
 }
+
+// This method is a simplified version of the above, AddFileToZip(LPCTSTR szFilePath, bool bIgnoreFilePath),
+// that writes the file to the supplied path inside the zip instead of building a path based on the source file name
+bool CZipper::AddFileToPathInZip(LPCTSTR szFilePath, LPCTSTR szPathInZip)
+{
+	if (!m_uzFile)
+		return FALSE;
+
+	// szPathInZip cannot contain drive info
+	if (strchr(szPathInZip, ':'))
+		return FALSE;
+
+	// if the file is relative then we need to append the root before opening
+	char szFullFilePath[MAX_PATH] = {0};
+	
+	lstrcpy(szFullFilePath, szFilePath);
+	PrepareSourcePath(szFullFilePath);
+
+	// save file attributes and time
+	zip_fileinfo zfi;
+
+	zfi.internal_fa = 0;
+	zfi.external_fa = ::GetFileAttributes(szFilePath);
+	
+	// save file time
+	SYSTEMTIME st;
+
+	GetLastModified(szFullFilePath, st, TRUE);
+
+	zfi.dosDate = 0;
+	zfi.tmz_date.tm_year = st.wYear;
+	zfi.tmz_date.tm_mon = st.wMonth - 1;
+	zfi.tmz_date.tm_mday = st.wDay;
+	zfi.tmz_date.tm_hour = st.wHour;
+	zfi.tmz_date.tm_min = st.wMinute;
+	zfi.tmz_date.tm_sec = st.wSecond;
+
+	// load input file
+	HANDLE hInputFile = ::CreateFile(szFullFilePath, 
+									GENERIC_READ,
+									0,
+									NULL,
+									OPEN_EXISTING,
+									FILE_ATTRIBUTE_READONLY,
+									NULL);
+
+	if (hInputFile == INVALID_HANDLE_VALUE)
+		return FALSE;
+
+	// open the file in the zip making sure we remove any leading '\'
+	int nRet = zipOpenNewFileInZip(m_uzFile, 
+									szPathInZip,
+									&zfi, 
+									NULL, 
+									0,
+									NULL,
+									0, 
+									NULL,
+									Z_DEFLATED,
+									m_bCompress ? Z_DEFAULT_COMPRESSION : Z_NO_COMPRESSION);
+
+	if (nRet == ZIP_OK)
+	{
+		m_info.nFileCount++;
+
+		// read the file and output to zip
+		char pBuffer[BUFFERSIZE];
+		DWORD dwBytesRead = 0, dwFileSize = 0;
+
+		while (nRet == ZIP_OK && ::ReadFile(hInputFile, pBuffer, BUFFERSIZE, &dwBytesRead, NULL))
+		{
+			dwFileSize += dwBytesRead;
+
+			if (dwBytesRead)
+				nRet = zipWriteInFileInZip(m_uzFile, pBuffer, dwBytesRead);
+			else
+				break;
+		}
+
+		m_info.dwUncompressedSize += dwFileSize;
+	}
+
+	zipCloseFileInZip(m_uzFile);
+	::CloseHandle(hInputFile);
+
+	return (nRet == ZIP_OK);
+}
+
 
 bool CZipper::AddFolderToZip(LPCTSTR szFolderPath, bool bIgnoreFilePath)
 {
@@ -365,7 +455,7 @@ bool CZipper::AddFolderToZip(LPCTSTR szFolderPath, bool bIgnoreFilePath)
 		0, 
 		NULL,
 		Z_DEFLATED,
-		Z_DEFAULT_COMPRESSION);
+		m_bCompress ? Z_DEFAULT_COMPRESSION : Z_NO_COMPRESSION);
 	
 	zipCloseFileInZip(m_uzFile);
 
@@ -425,7 +515,7 @@ bool CZipper::OpenZip(LPCTSTR szFilePath, LPCTSTR szRootFolder, bool bAppend)
 	if (bAppend && ::GetFileAttributes(szFullPath) == 0xffffffff)
 		bAppend = false;
 
-	m_uzFile = zipOpen(szFullPath, bAppend ? 1 : 0);
+	m_uzFile = zipOpen(szFullPath, bAppend ? APPEND_STATUS_ADDINZIP : APPEND_STATUS_CREATE);
 
 	if (m_uzFile)
 	{

@@ -20,4 +20,8 @@ public:
 	static void decompressFile(const std::string& strInputFile, 
 		const std::string& strOutputFile);
 	//---------------------------------------------------------------------------------------------
+	static bool isZipFile(const std::string& strFile);
+	//---------------------------------------------------------------------------------------------
+	static bool isGZipFile(const std::string& strFile);
+	//---------------------------------------------------------------------------------------------
 };

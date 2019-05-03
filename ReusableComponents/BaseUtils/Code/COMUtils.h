@@ -155,8 +155,9 @@ void EXPORT_BaseUtils readObjectFromFile(IPersistStreamPtr ipObject, BSTR bstrFi
 //          bClearDirty - true if the dirty flag should be set to false; false if the dirty flag
 //                        should be unchanged.
 //          strSignature - The file signature to include with the object; ignored if empty.
+//          bWriteDirectlyToDestination - if false, write to a temp file first and then copy to destination
 void EXPORT_BaseUtils writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, 
-	BSTR bstrObjectName, bool bClearDirty, string strSignature = "");
+	BSTR bstrObjectName, bool bClearDirty, string strSignature = "", bool bWriteDirectlyToDestination = false);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: Reads the storage object from the specified file.
 // PARAMS:  ppStorage - Will be set to the storage object read if successful.

@@ -24,7 +24,7 @@ struct Z_FileInfo
 class EXT_ZLIB_UTILS_DLL CZipper  
 {
 public:
-	CZipper(LPCTSTR szFilePath = NULL, LPCTSTR szRootFolder = NULL, bool bAppend = FALSE);
+	CZipper(LPCTSTR szFilePath = NULL, LPCTSTR szRootFolder = NULL, bool bAppend = FALSE, bool bCompress = TRUE);
 	virtual ~CZipper();
 
 	// simple interface
@@ -34,6 +34,9 @@ public:
 	// works with prior opened zip
 	bool AddFileToZip(LPCTSTR szFilePath, bool bIgnoreFilePath = FALSE);
 	bool AddFileToZip(LPCTSTR szFilePath, LPCTSTR szRelFolderPath); // replaces path info from szFilePath with szFolder
+	// This method is a simplified version of the above, AddFileToZip(LPCTSTR szFilePath, bool bIgnoreFilePath),
+	// that writes the file to the supplied path inside the zip instead of building a path based on the source file name
+	bool AddFileToPathInZip(LPCTSTR szFilePath, LPCTSTR szPathInZip);
 	bool AddFolderToZip(LPCTSTR szFolderPath, bool bIgnoreFilePath = FALSE);
 
 	// extended interface
@@ -45,6 +48,7 @@ protected:
 	void* m_uzFile;
 	char m_szRootFolder[MAX_PATH + 1];
 	Z_FileInfo m_info;
+	bool m_bCompress;
 
 protected:
 	void PrepareSourcePath(LPTSTR szPath);

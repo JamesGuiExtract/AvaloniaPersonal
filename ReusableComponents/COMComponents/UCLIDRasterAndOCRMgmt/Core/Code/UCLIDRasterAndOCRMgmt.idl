@@ -1330,6 +1330,15 @@ library UCLID_RASTERANDOCRMGMTLib
 		// REQUIRE: GetMode() == kHybridMode
 		[id(108), helpstring("method GetPseudoSpatialFromHybrid")] HRESULT GetPseudoSpatialFromHybrid
 			([out, retval]  ISpatialString** pVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Writes the SpatialString substring to an existing USS archive file
+		// REQUIRE: GetMode() == kSpatialMode
+		//			bstrOutputFile is a valid USS archive file (zipped collection of pages saved as numbered files)
+		//			No page in this instance is already represented in the archive
+		[id(109), helpstring("method AppendToFile")] HRESULT AppendToFile([in] BSTR bstrOutputFile);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Loads the specified page into this instance
+		[id(110), helpstring("method LoadPageFromFile")] HRESULT LoadPageFromFile([in] BSTR bstrInputFile, long nPage);
 	};
 
 	[

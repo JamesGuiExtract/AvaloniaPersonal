@@ -191,7 +191,8 @@ private:
 	IWorkItemRecordPtr createWorkItem(string strFileName, string strPages);
 
 	// Stitches the results for individual pages together
-	ISpatialStringPtr stitchWorkItems(const string &strInputFile, long nWorkItemGroupID, IFileProcessingDBPtr ipDB);
+	// Returns true if there was at least one recognized character, false if the output is blank
+	bool stitchWorkItems(const string & strInputFile, const string & strOutputFile, long nWorkItemGroupID, IFileProcessingDBPtr ipDB);
 
 	// Gets the MiscUtils object used for saving objects to stringized byte stream
 	IMiscUtilsPtr getMiscUtils();

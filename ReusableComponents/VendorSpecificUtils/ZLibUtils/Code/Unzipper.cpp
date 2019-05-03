@@ -369,6 +369,76 @@ bool CUnzipper::UnzipFile(LPCTSTR szFolder, bool bIgnoreFilePath)
 	return (nRet == UNZ_OK);
 }
 
+// This method is a simplified version of the above, UnzipFile, that writes the file to the supplied path
+// instead of building a path based on the file name in the zip
+bool CUnzipper::UnzipFileTo(LPCTSTR szFilePath)
+{
+	if (!m_uzFile)
+		return FALSE;
+
+	if (!CreateFilePath(szFilePath))
+		return FALSE;
+
+	UZ_FileInfo info;
+	GetFileInfo(info);
+
+	// if the item is a folder then it has been created. Return 'TRUE'
+	if (info.bFolder)
+	{
+		return TRUE;
+	}
+
+	// open the input and output files
+	if (!CreateFilePath(szFilePath))
+		return FALSE;
+
+	HANDLE hOutputFile = ::CreateFile(szFilePath, 
+										GENERIC_WRITE,
+										0,
+										NULL,
+										CREATE_ALWAYS,
+										FILE_ATTRIBUTE_NORMAL,
+										NULL);
+
+	if (INVALID_HANDLE_VALUE == hOutputFile)
+		return FALSE;
+
+	if (unzOpenCurrentFile(m_uzFile) != UNZ_OK)
+		return FALSE;
+
+	// read the file and output
+	int nRet = UNZ_OK;
+	char pBuffer[BUFFERSIZE];
+
+	do
+	{
+		nRet = unzReadCurrentFile(m_uzFile, pBuffer, BUFFERSIZE);
+
+		if (nRet > 0)
+		{
+			// output
+			DWORD dwBytesWritten = 0;
+
+			if (!::WriteFile(hOutputFile, pBuffer, nRet, &dwBytesWritten, NULL) ||
+				dwBytesWritten != (DWORD)nRet)
+			{
+				nRet = UNZ_ERRNO;
+				break;
+			}
+		}
+	}
+	while (nRet > 0);
+
+	CloseHandle(hOutputFile);
+	unzCloseCurrentFile(m_uzFile);
+	waitForFileToBeReadable(szFilePath);
+
+	if (nRet == UNZ_OK)
+		SetFileModTime(szFilePath, info.dwDosDate);
+
+	return (nRet == UNZ_OK);
+}
+
 bool CUnzipper::GotoFile(int nFile)
 {
 	if (!m_uzFile)

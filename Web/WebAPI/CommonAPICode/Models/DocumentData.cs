@@ -578,30 +578,24 @@ namespace WebAPI.Models
         /// <param name="page">The page.</param>
         public WordZoneDataResult GetWordZoneData(int fileId, int page)
         {
-            SpatialString ussData = null;
             SpatialString pageData = null;
 
             try
             {
-                ussData = GetUssData(fileId);
-
-                HTTPError.Assert("ELI45362", StatusCodes.Status404NotFound,
-                    ussData != null,
-                    "Word data is not available for document");
-
-                HTTPError.Assert("ELI46431", StatusCodes.Status404NotFound,
-                    ussData.HasSpatialInfo(), "Spatial data not available",
-                    ("Page", page, true), ("Test", "value", false));
-
                 HTTPError.AssertRequest("ELI46420",
                         page > 0, "Invalid page number",
                         ("Page", page, true), ("Test", "value", false));
 
+                pageData = GetUssData(fileId, page);
+
+                HTTPError.Assert("ELI45362", StatusCodes.Status404NotFound,
+                    pageData != null,
+                    "Word data is not available for document");
+
                 HTTPError.Assert("ELI46421", StatusCodes.Status404NotFound,
-                    page <= ussData.GetLastPageNumber(), "Page not found",
+                    !String.IsNullOrWhiteSpace(pageData.String), "Page not found",
                     ("Page", page, true), ("Test", "value", false));
 
-                pageData = ussData.GetSpecifiedPages(page, page);
                 var wordZoneData = pageData.MapSpatialStringToWordZoneData();
 
                 return new WordZoneDataResult
@@ -615,11 +609,6 @@ namespace WebAPI.Models
             }
             finally
             {
-                if (ussData != null)
-                {
-                    Marshal.FinalReleaseComObject(ussData);
-                }
-
                 if (pageData != null)
                 {
                     Marshal.FinalReleaseComObject(pageData);
@@ -1035,13 +1024,13 @@ namespace WebAPI.Models
             }
             else
             {
-                var documentText = GetUssData(fileName);
-
-                HTTPError.Assert("ELI46405", StatusCodes.Status404NotFound,
-                    documentText != null, "Document text not found");
-
                 if (page == -1)
                 {
+                    var documentText = GetUssData(fileName);
+
+                    HTTPError.Assert("ELI46405", StatusCodes.Status404NotFound,
+                        documentText != null, "Document text not found");
+
                     var spatialPages = documentText.GetPages(vbIncludeBlankPages: true, strTextForBlankPage: "");
                     var pageCount = spatialPages.Size();
                     for (int i = 0; i < pageCount; i++)
@@ -1054,14 +1043,18 @@ namespace WebAPI.Models
                 {
                     HTTPError.AssertRequest("ELI46418",
                         page > 0, "Invalid page number",
-                        ("Page", page, true),("Test", "value", false));
-
-                    HTTPError.Assert("ELI46419", StatusCodes.Status404NotFound,
-                        page <= documentText.GetLastPageNumber(), "Page not found",
                         ("Page", page, true), ("Test", "value", false));
 
-                    var spatialPage = documentText.GetSpecifiedPages(page, page);
-                    pages.Add(new PageText(page, spatialPage.String));
+                    var pageText = GetUssData(fileName, page);
+
+                    HTTPError.Assert("ELI46776", StatusCodes.Status404NotFound,
+                        pageText != null, "Document text not found");
+
+                    HTTPError.Assert("ELI46419", StatusCodes.Status404NotFound,
+                        !String.IsNullOrWhiteSpace(pageText.String), "Page not found",
+                        ("Page", page, true), ("Test", "value", false));
+
+                    pages.Add(new PageText(page, pageText.String));
                 }
             }
 
@@ -1351,10 +1344,11 @@ namespace WebAPI.Models
         /// Gets the USS file data as a <see cref="SpatialString"/> for the specified file.
         /// </summary>
         /// <param name="fileId">The ID for which the data is needed.</param>
+        /// <param name="page">The page number to retrieve. -1 to retrieve the entire string.</param>
         /// <returns>A <see cref="SpatialString"/> representing the OCR data.</returns>
-        SpatialString GetUssData(int fileId)
+        SpatialString GetUssData(int fileId, int page = -1)
         {
-            return GetUssData(GetSourceFileName(fileId));
+            return GetUssData(GetSourceFileName(fileId), page);
         }
 
         /// <summary>
@@ -1362,14 +1356,22 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="fileName">The source document name of the file for which the data is needed.
         /// </param>
+        /// <param name="page">The page number to retrieve. -1 to retrieve the entire string.</param>
         /// <returns>A <see cref="SpatialString"/> representing the OCR data.</returns>
-        SpatialString GetUssData(string fileName)
+        SpatialString GetUssData(string fileName, int page = -1)
         {
             var ussFileName = fileName + ".uss";
             if (File.Exists(ussFileName))
             {
                 var ussData = new SpatialString();
-                ussData.LoadFrom(ussFileName, false);
+                if (page > 0)
+                {
+                    ussData.LoadPageFromFile(ussFileName, page);
+                }
+                else
+                {
+                    ussData.LoadFrom(ussFileName, false);
+                }
 
                 Utils.ReportMemoryUsage(ussData);
 

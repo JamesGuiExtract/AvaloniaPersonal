@@ -181,6 +181,8 @@ public:
 	STDMETHOD(CreateFromSpatialStrings)(IIUnknownVector *pStrings);
 	STDMETHOD(GetUnrotatedPageInfoMap)( ILongToObjectMap **pVal);
 	STDMETHOD(GetPseudoSpatialFromHybrid)(ISpatialString** ppResultString);
+	STDMETHOD(AppendToFile)(BSTR bstrOutputFile);
+	STDMETHOD(LoadPageFromFile)(BSTR bstrInputFile, long nPage);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown **pObject);
@@ -657,5 +659,28 @@ private:
 	UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr makeBlankPage(int nPage, string textForPage);
 	//----------------------------------------------------------------------------------------------
 	IOCRParametersPtr getOCRParameters();
+	//----------------------------------------------------------------------------------------------
+	// Loads spatial string from (optionally gzipped) COM storage object
+	void loadFromStorageObject(const string& strInputFile, UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLoadInto);
+	//----------------------------------------------------------------------------------------------
+	// Loads individual pages from numbered files in a zip archive and puts them together
+	void loadFromArchive(const string& strInputFile);
+	//----------------------------------------------------------------------------------------------
+	// Loads individual pages from numbered files in a zip archive
+	// If bReadInfoOnly is true then the returned map will have a key for each page but null values
+	// If bReadInfoOnly is false then the returned map will have corresponding page spatial strings for each key
+	// If nPage > 0 then only the specified page number will be returned (or an empty map if that page doesn't exist in the archive)
+	// If bLoadIntoThis is true then the specified page will be loaded into this instance and the return value will be null
+	ILongToObjectMapPtr loadPagesFromArchive(const string& strInputFile, bool bReadInfoOnly, long nPage=-1, bool bLoadIntoThis=false);
+	//----------------------------------------------------------------------------------------------
+	// Save individual pages into numbered files in a zip archive
+	// If bCompress is true then the default compression level (6) will be used to deflate the pages
+	// If bAppend is true then the pages will be added to an existing zip file, else an existing file will be overwritten
+	void savePagesToArchive(const string& strOutputFile, IIUnknownVectorPtr ipPages, bool bCompress = true, bool bAppend = false);
+	//----------------------------------------------------------------------------------------------
+	// Split into pages and save as numbered files in a zip archive
+	// The pages represented by this instance must not already exist in the archive
+	// If bCompress is true then the default compression level (6) will be used to deflate the pages
+	void appendToArchive(const string & strOutputFile, bool bCompress = true);
 	//----------------------------------------------------------------------------------------------
 };

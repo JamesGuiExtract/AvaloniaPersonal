@@ -241,8 +241,6 @@ STDMETHODIMP CLongToObjectMap::Set(long key, IUnknown *pObject)
 
 	try
 	{
-		ASSERT_ARGUMENT("ELI25998", pObject != __nullptr);
-
 		// validate license
 		validateLicense();
 

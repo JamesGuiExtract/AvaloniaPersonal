@@ -70,12 +70,19 @@ namespace WebAPI
         {
             try
             {
+                var lines = spatialString.GetLines();
+                Utils.ReportMemoryUsage(lines);
                 List<List<SpatialLineZone>> wordZoneData =
-                    spatialString.GetLines().ToIEnumerable<SpatialString>()
-                        .Select(line => line.GetWords().ToIEnumerable<SpatialString>()
+                    lines.ToIEnumerable<SpatialString>()
+                        .Select(line =>
+                        {
+                            var words = line.GetWords();
+                            Utils.ReportMemoryUsage(words);
+                            return words.ToIEnumerable<SpatialString>()
                             .Where(word => word.HasSpatialInfo())
                             .Select(word => word.MakeLineInfo(false).Single().SpatialLineZone)
-                            .ToList())
+                            .ToList();
+                        })
                         .ToList();
 
                 return wordZoneData;

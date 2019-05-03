@@ -728,7 +728,7 @@ void readStreamFromStorage(IStream** ppStream, IStoragePtr ipStorage, BSTR bstrS
 }
 //-------------------------------------------------------------------------------------------------
 void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrObjectName, 
-				  bool bClearDirty, string strSignature)
+				  bool bClearDirty, string strSignature, bool bWriteDirectlyToDestination)
 {
 	TemporaryFileName *pTempOutFile = __nullptr;
 	IStreamPtr ipStream(__nullptr);
@@ -749,7 +749,7 @@ void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrO
 			// To avoid corrupting existing files, if writing to an existing file, save first to a
 			// temporary filename, then overwrite the original only if the write is successful.
 			string strFileName;
-			if (isValidFile(strPermanentFileName))
+			if (!bWriteDirectlyToDestination && isValidFile(strPermanentFileName))
 			{
 				pTempOutFile = new TemporaryFileName(true);
 				strFileName = pTempOutFile->getName();

@@ -516,6 +516,25 @@ bool containsAlphaChar(const string& strText)
 {
     return strText.find_first_of(gstrALPHA) != string::npos;
 }
+//--------------------------------------------------------------------------------------------------
+bool isInteger(const string& strText)
+{
+	if (strText.empty())
+	{
+		return false;
+	}
+
+	for (int i = 0; i < strText.size(); i++)
+	{
+		char c = strText[i];
+		if (c < '0' || c > '9')
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
 //-------------------------------------------------------------------------------------------------
 // This function performs a search of the text to determine if it contains either:
 //  1) all of the include text as a substring (false == matchSingleChar)

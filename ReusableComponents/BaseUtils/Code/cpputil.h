@@ -718,6 +718,8 @@ EXPORT_BaseUtils bool containsAlphaNumericChar(const string& strText);
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils bool containsAlphaChar(const string& strText);
 //-------------------------------------------------------------------------------------------------
+EXPORT_BaseUtils bool isInteger(const string& strText);
+//-------------------------------------------------------------------------------------------------
 // This function performs a search of the text to determine if it contains either:
 //  1) all of the include text as a substring (MatchSubstring)
 //  2) any character of the include text (MatchSingleChar)

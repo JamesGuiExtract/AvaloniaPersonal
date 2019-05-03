@@ -226,6 +226,7 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 		string strOutputFileName = strInputFileName + ".uss";
 
 		ISpatialStringPtr ipSS = __nullptr;
+		bool bHasNoSpatialPages = false;
 		
 		EFileType eFileType = getFileType(strInputFileName);
 		if (eFileType == kTXTFile || eFileType == kXMLFile || eFileType == kCSVFile)
@@ -314,20 +315,14 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 			}
 
 			// Stitch the results
-			ipSS = stitchWorkItems(strInputFileName ,nWorkGroup, ipDB);
+			bHasNoSpatialPages = !stitchWorkItems(strInputFileName, strOutputFileName, nWorkGroup, ipDB);
 
 			if (ipProgressStatus != NULL)
 			{
 				ipProgressStatus->CompleteCurrentItemGroup();
 			}
-
-			if (ipSS == NULL)
-			{
-				*pResult = kProcessingCancelled;
-				return S_OK;
-			}
 		}
-		if (ipSS->Size == 0)
+		if (ipSS != __nullptr && ipSS->Size == 0 || ipSS == __nullptr && bHasNoSpatialPages)
 		{
 			UCLIDException ue("ELI34137", "Application trace: OCR output is blank");
 			ue.addDebugInfo("File", strInputFileName);
@@ -335,11 +330,15 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 		}
 
 		// OutputFileName = InputFileName.uss even if cleaned image was used
-		ipSS->SaveTo(strOutputFileName.c_str(), VARIANT_TRUE, VARIANT_TRUE);
+		// (NOTE: stitchWorkItems saves the string itself)
+		if (ipSS != __nullptr)
+		{
+			ipSS->SaveTo(strOutputFileName.c_str(), VARIANT_TRUE, VARIANT_TRUE);
+		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11047")
-
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 STDMETHODIMP COCRFileProcessor::raw_Cancel()
@@ -1212,17 +1211,11 @@ long COCRFileProcessor::createWorkItems(long nActionID, IFileRecordPtr ipFileRec
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI36912");
 }
 //-------------------------------------------------------------------------------------------------
-ISpatialStringPtr COCRFileProcessor::stitchWorkItems(const string &strInputFile, long nWorkItemGroupID, IFileProcessingDBPtr ipDB)
+bool COCRFileProcessor::stitchWorkItems(const string &strInputFile, const string & strOutputFile, long nWorkItemGroupID, IFileProcessingDBPtr ipDB)
 {
 	try
 	{
 		IIUnknownVectorPtr ipWorkItems;
-
-		IIUnknownVectorPtr ipPagesToStitch(CLSID_IUnknownVector);
-		ASSERT_RESOURCE_ALLOCATION("ELI36858", ipPagesToStitch != __nullptr);
-
-		ISpatialStringPtr ipSS(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI36860", ipSS != __nullptr);
 
 		// Setup the aggregate exception to use if pages fail
 		bool bFailedWorkItem = false;
@@ -1232,6 +1225,7 @@ ISpatialStringPtr COCRFileProcessor::stitchWorkItems(const string &strInputFile,
 		// Get lists of the workitems in small groups
 		long nStart = 0;
 		bool bDone = false;
+		bool hasAtLeastOnePage = false;
 		while (!bDone)
 		{
 			ipWorkItems = ipDB->GetWorkItemsForGroup(nWorkItemGroupID, nStart, gnMAX_WORK_ITEMS_TO_GET_PER_CALL);
@@ -1270,13 +1264,19 @@ ISpatialStringPtr COCRFileProcessor::stitchWorkItems(const string &strInputFile,
 				if (ipOutput->GetMode() == kSpatialMode)
 				{
 					ipOutput->SourceDocName = strInputFile.c_str();
+					IHasOCRParametersPtr ipHasOCRParameters(ipOutput);
+					ASSERT_RESOURCE_ALLOCATION("ELI46181", ipHasOCRParameters != __nullptr);
+					ipHasOCRParameters->OCRParameters = getOCRParameters();
 
-					ipPagesToStitch->PushBack(ipOutput);
-				}
-				// Use blank page as entire output if no text is recognized (for SourceDocName and OCREngineVersion)
-				else
-				{
-					ipSS = ipOutput;
+					if (hasAtLeastOnePage)
+					{
+						ipOutput->AppendToFile(strOutputFile.c_str());
+					}
+					else
+					{
+						hasAtLeastOnePage = true;
+						ipOutput->SaveTo(strOutputFile.c_str(), VARIANT_TRUE, VARIANT_FALSE);
+					}
 				}
 			}
 			bDone = nWorkItems < gnMAX_WORK_ITEMS_TO_GET_PER_CALL;
@@ -1289,16 +1289,20 @@ ISpatialStringPtr COCRFileProcessor::stitchWorkItems(const string &strInputFile,
 			aggregateException.log();
 		}
 
-		if (ipPagesToStitch->Size() > 0)
+		// If no page was recognized, write out an empty spatial string so that there will be a USS file whenever the OCR task succeeds
+		if (!hasAtLeastOnePage)
 		{
-			ipSS->CreateFromSpatialStrings(ipPagesToStitch);
+			ISpatialStringPtr ipOutput(CLSID_SpatialString);
+			ASSERT_RESOURCE_ALLOCATION("ELI36860", ipOutput != __nullptr);
+
+			IHasOCRParametersPtr ipHasOCRParameters(ipOutput);
+			ASSERT_RESOURCE_ALLOCATION("ELI46763", ipHasOCRParameters != __nullptr);
+			ipHasOCRParameters->OCRParameters = getOCRParameters();
+
+			ipOutput->SaveTo(strOutputFile.c_str(), VARIANT_TRUE, VARIANT_FALSE);
 		}
 
-		IHasOCRParametersPtr ipHasOCRParameters(ipSS);
-		ASSERT_RESOURCE_ALLOCATION("ELI46181", ipHasOCRParameters != __nullptr);
-		ipHasOCRParameters->OCRParameters = getOCRParameters();
-
-		return ipSS;
+		return hasAtLeastOnePage;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI37133");
 }

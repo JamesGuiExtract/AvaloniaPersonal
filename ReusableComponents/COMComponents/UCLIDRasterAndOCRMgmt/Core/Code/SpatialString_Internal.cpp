@@ -9,15 +9,22 @@
 #include <ComponentLicenseIDs.h>
 #include <LicenseMgmt.h>
 #include <MiscLeadUtils.h>
+#include <CompressionEngine.h>
+#include <TemporaryFileName.h>
 
 #include <math.h>
 #include <set>
+
+#include <Zipper.h>
+#include <Unzipper.h>
 
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
 const CRect grectNULL = CRect(0, 0, 0, 0);
 const double gfCharWidthToAvgCharRatio = 1.1;
+const string gstrSPATIAL_STRING_FILE_SIGNATURE = "UCLID Spatial String (USS) File";
+const _bstr_t gbstrSPATIAL_STRING_STREAM_NAME("SpatialString");
 
 //-------------------------------------------------------------------------------------------------
 // Private methods
@@ -4208,3 +4215,256 @@ UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialString::makeBlankPage(int n
 
 	return ipPage;
 }
+//-------------------------------------------------------------------------------------------------
+ILongToObjectMapPtr CSpatialString::loadPagesFromArchive(const string& strFileName, bool bReadInfoOnly,
+	long nPage /*= -1*/,
+	bool bLoadIntoThis /*= false*/)
+{
+	bool returnAllPages = nPage < 0;
+	ASSERT_ARGUMENT("ELI46768", !(returnAllPages && bLoadIntoThis));
+	ASSERT_ARGUMENT("ELI46769", !(bReadInfoOnly && bLoadIntoThis));
+
+	ILongToObjectMapPtr pageMap = __nullptr;
+	if (bLoadIntoThis)
+	{
+		// Clear this instance in case the requested page doesn't exist
+		reset(true, true);
+	}
+	else
+	{
+		pageMap.CreateInstance(CLSID_LongToObjectMap);
+		ASSERT_RESOURCE_ALLOCATION("ELI46770", pageMap != __nullptr);
+	}
+
+	CUnzipper uz(strFileName.c_str());
+	unique_ptr<TemporaryFileName> tmpFile;
+	string tmpPath;
+	if (!bReadInfoOnly)
+	{
+		tmpFile = std::make_unique<TemporaryFileName>(true);
+		tmpPath = tmpFile->getName();
+	}
+	if (uz.GotoFirstFile(NULL))
+	{
+		do
+		{
+			UZ_FileInfo info;
+			uz.GetFileInfo(info);
+			if (info.bFolder)
+			{
+				continue;
+			}
+
+			// Get page number and file type from the name
+			string fileName = info.szFileName;
+			size_t p = fileName.find('.');
+			if (p <= 0)
+			{
+				continue;
+			}
+			string baseName = fileName.substr(0, p);
+			if (!isInteger(baseName))
+			{
+				continue;
+			}
+			p = fileName.rfind('.');
+			if (p > fileName.length() - 2)
+			{
+				continue;
+			}
+			string ext = fileName.substr(p + 1);
+			makeLowerCase(ext);
+			if (ext != "uss")
+			{
+				continue;
+			}
+
+			long pageNumber = asLong(baseName);
+			if (pageNumber > 0
+				&& (bLoadIntoThis || !pageMap->Contains(pageNumber))
+				&& (returnAllPages || pageNumber == nPage))
+			{
+				if (bReadInfoOnly)
+				{
+					pageMap->Set(pageNumber, __nullptr);
+				}
+				else
+				{
+					uz.UnzipFileTo(tmpPath.c_str());
+					if (bLoadIntoThis)
+					{
+						loadFromStorageObject(tmpPath, getThisAsCOMPtr());
+						return __nullptr;
+					}
+					else
+					{
+						UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr page(CLSID_SpatialString);
+						ASSERT_RESOURCE_ALLOCATION("ELI46786", page != __nullptr)
+
+						loadFromStorageObject(tmpPath, page);
+						pageMap->Set(pageNumber, page);
+					}
+				}
+				if (!returnAllPages)
+				{
+					break;
+				}
+			}
+		} while (uz.GotoNextFile(NULL));
+	}
+
+	return pageMap;
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialString::loadFromStorageObject(const string& strInputFile, UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLoadInto)
+{
+	// Load this object from the file
+	IPersistStreamPtr ipPersistStream = ipLoadInto;
+	ASSERT_RESOURCE_ALLOCATION("ELI46772", ipPersistStream != __nullptr);
+
+	if (CompressionEngine::isGZipFile(strInputFile))
+	{
+		// The .uss file may be compressed.
+		// create a temporary file with the uncompressed output
+		TemporaryFileName tmpFile(true);
+		CompressionEngine::decompressFile(strInputFile, tmpFile.getName());
+
+		readObjectFromFile(ipPersistStream, get_bstr_t(tmpFile.getName().c_str()),
+			gbstrSPATIAL_STRING_STREAM_NAME, false, gstrSPATIAL_STRING_FILE_SIGNATURE);
+	}
+	else
+	{
+		readObjectFromFile(ipPersistStream, get_bstr_t(strInputFile.c_str()),
+			gbstrSPATIAL_STRING_STREAM_NAME, false, gstrSPATIAL_STRING_FILE_SIGNATURE);
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialString::loadFromArchive(const string& strFileName)
+{
+	// Get the existing page numbers
+	ILongToObjectMapPtr pageMap = loadPagesFromArchive(strFileName, true);
+
+	long count = pageMap->Size;
+	if (count == 0)
+	{
+		getThisAsCOMPtr()->CreateNonSpatialString("", "");
+	}
+	else if (count == 1)
+	{
+		// If there's only one page, then load it directly into this instance 
+		loadPagesFromArchive(strFileName, false, pageMap->GetKeys()->Item[0], true);
+	}
+	else
+	{
+		pageMap = loadPagesFromArchive(strFileName, false);
+
+		// Put the pages in order
+		IIUnknownVectorPtr pages(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI46773", pages != __nullptr);
+
+		IVariantVectorPtr pageNumbers = pageMap->GetKeys();
+		for (long i = 0; i < count; i++)
+		{
+			pages->PushBack(pageMap->GetValue(pageNumbers->Item[i]));
+		}
+
+		// Combine the pages
+		getThisAsCOMPtr()->CreateFromSpatialStrings(pages);
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialString::savePagesToArchive(const string& strOutputFile, IIUnknownVectorPtr ipPages, bool bCompress, bool bAppend)
+{
+	long previousPage = 0;
+	long count = ipPages->Size();
+
+	// Validate the input
+	for (long i = 0; i < count; i++)
+	{
+		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr page = ipPages->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI46783", page != __nullptr)
+
+		// loadFromArchive requires spatial mode strings, since it uses CreateFromSpatialStrings,
+		// so assert that the pages to save are spatial so that the archive will be loadable.
+		ASSERT_RUNTIME_CONDITION("ELI46771", page->GetMode() == kSpatialMode,
+			"Mode must be kSpatialMode to save");
+
+		long firstPage = page->GetFirstPageNumber();
+		long lastPage = page->GetLastPageNumber();
+		ASSERT_RUNTIME_CONDITION("ELI46774", firstPage == lastPage && firstPage > previousPage,
+			"Expecting input collection to contain single-page strings in strictly ascending page order");
+	}
+
+	// Write to the archive
+	if (isValidFile(strOutputFile))
+	{
+		waitForFileAccess(strOutputFile, giMODE_WRITE_ONLY);
+	}
+	CZipper z(strOutputFile.c_str(), NULL, bAppend, bCompress);
+
+	TemporaryFileName tmpPageFile(true);
+	string tmpPagePath = tmpPageFile.getName();
+	_bstr_t bstrtTmpPagePath = get_bstr_t(tmpPagePath);
+	for (long i = 0; i < count; i++)
+	{
+		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr page = ipPages->At(i);
+		ASSERT_RESOURCE_ALLOCATION("ELI46784", page != __nullptr)
+
+		long pageNumber = page->GetFirstPageNumber();
+
+		// Create a new page info collection with only the necessary page in it
+		ILongToObjectMapPtr pageInfos = page->GetSpatialPageInfos();
+		ASSERT_RESOURCE_ALLOCATION("ELI46782", pageInfos != __nullptr)
+
+		if (pageInfos->Size > 1)
+		{
+			UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr pageInfo = pageInfos->GetValue(pageNumber);
+			ASSERT_RESOURCE_ALLOCATION("ELI46781", pageInfo != __nullptr)
+
+			pageInfos.CreateInstance(CLSID_LongToObjectMap);
+			ASSERT_RESOURCE_ALLOCATION("ELI46782", pageInfos != __nullptr)
+
+			pageInfos->Set(pageNumber, pageInfo);
+			page->PutSpatialPageInfos(pageInfos);
+		}
+
+		writeObjectToFile(page, bstrtTmpPagePath, gbstrSPATIAL_STRING_STREAM_NAME, false, gstrSPATIAL_STRING_FILE_SIGNATURE, true);
+		waitForFileToBeReadable(tmpPagePath);
+
+		// Build internal zip file path
+		char pszTemp[16];
+		sprintf_s(pszTemp, sizeof(pszTemp), "%04u", pageNumber);
+		string baseName(pszTemp);
+		string internalPath = baseName + "." + asString(page->OCREngineVersion) + ".uss";
+
+		z.AddFileToPathInZip(bstrtTmpPagePath, internalPath.c_str());
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialString::appendToArchive(const string& strOutputFile, bool bCompress)
+{
+	// Retrieve the page numbers that already exist in the zip
+	ILongToObjectMapPtr existingPageMap = loadPagesFromArchive(strOutputFile, true);
+	long existingCount = existingPageMap->Size;
+
+	IIUnknownVectorPtr pages = getThisAsCOMPtr()->GetPages(VARIANT_FALSE, "");
+	ASSERT_RESOURCE_ALLOCATION("ELI46764", pages != __nullptr);
+
+	if (existingCount == 0)
+	{
+		savePagesToArchive(strOutputFile, pages, bCompress);
+	}
+	else
+	{
+		// Ensure that there are no pages in common in the substring and the existing archive
+		for (long i = 0, count = pages->Size(); i < count; i++)
+		{
+			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr page = pages->At(i);
+			long firstPage = page->GetFirstPageNumber();
+			ASSERT_RUNTIME_CONDITION("ELI46775", !existingPageMap->Contains(firstPage), "Page already exists in the archive");
+		}
+
+		savePagesToArchive(strOutputFile, pages, bCompress, true);
+	}
+}
+//-------------------------------------------------------------------------------------------------

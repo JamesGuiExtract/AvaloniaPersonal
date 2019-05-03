@@ -77,6 +77,9 @@ public:
 	bool GotoNextFile(LPCTSTR szExt = NULL);
 	bool GetFileInfo(UZ_FileInfo& info);
 	bool UnzipFile(LPCTSTR szFolder = NULL, bool bIgnoreFilePath = FALSE);
+	// This method is a simplified version of the above, UnzipFile, that writes the file to the supplied path
+	// instead of building a path based on the file name in the zip
+	bool UnzipFileTo(LPCTSTR szFilePath);
 
 	// helpers
 	bool GotoFile(LPCTSTR szFileName, bool bIgnoreFilePath = TRUE);
