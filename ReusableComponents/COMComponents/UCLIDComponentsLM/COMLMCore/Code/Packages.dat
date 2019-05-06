@@ -63,7 +63,8 @@
 ////////////////////
 !OCROnServer,6021
 !OCROnClient,6022
-!FlexShieldServerCore,6025:6047:6048:$OCROnServer:$FlexIndexAndIDShieldCore:$OCROnClient
+// NOTE: 6073 is being included as a fix for issues in 11.2  - this should be removed in 11.3 and up
+!FlexShieldServerCore,6025:6047:6048:6073:6087:$OCROnServer:$FlexIndexAndIDShieldCore:$OCROnClient
 !FlexServer,6023:$FlexShieldServerCore:$FlexIndex
 !RuleWritingCore,6024:$InputFunnelCore
 !DataEntryCore,6029
@@ -74,16 +75,16 @@
 
 FLEX Index,0
 -    Client (read & verify voa files),$FlexIndex:$OCROnClient:6047
--    Server/SDK,$FlexServer
+-    Server/SDK(w/ PDF read only),$FlexServer
 
 ID Shield,0
 -    Client/No OCR (Verify redactions only),$IDShield:6045:6047
 -    Client (Verify redactions w/client OCR),$IDShield:$OCROnClient:6045:6047
--    Server (OCR + run rules + auto-redact),$IDShield:6044:6045:$FlexShieldServerCore
+-    Server (OCR + run rules + auto-redact + PDF read only),$IDShield:6044:6045:$FlexShieldServerCore
 
 LabDE,0
 -    Client (Verify data),$LabDEClient:6047
--    Server,$LabDEServer
+-    Server (w/ PDF read only),$LabDEServer
 
 FLEX Index / ID Shield Utilities,0
 -    Create Searchable PDF,6079
@@ -96,6 +97,7 @@ FLEX Index / ID Shield Utilities,0
 -    MICR Finding Engine,6081
 -    Modify PDF,6082:6073:6087
 -    Pagination Utility,6051
+// NOTE: 6073 is being included as a fix for issues in 11.2  - this should be removed in 11.3 and up
 -    PDF Read only(11.2.0.36),6073:6087
 -    PDF Read+Write,6073:6087
 -    Remove Image Pages,6085
