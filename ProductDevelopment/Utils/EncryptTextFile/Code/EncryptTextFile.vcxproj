@@ -115,7 +115,7 @@
       <AssemblerListingLocation>.\..\Debug/</AssemblerListingLocation>
       <ObjectFileName>.\..\Debug/</ObjectFileName>
       <ProgramDataBaseFileName>.\..\Debug/</ProgramDataBaseFileName>
-      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformation>false</BrowseInformation>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -131,6 +131,7 @@
       <ProgramDatabaseFile>.\..\Debug/EncryptFile.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>

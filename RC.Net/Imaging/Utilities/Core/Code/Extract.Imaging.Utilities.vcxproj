@@ -68,7 +68,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4945;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformation>false</BrowseInformation>
     </ClCompile>
     <Link>
       <AdditionalDependencies>
@@ -80,6 +80,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <KeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</KeyFile>
       <DelaySign>true</DelaySign>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Command>CommonDebugPostBuild.bat "$(TargetPath)"</Command>
