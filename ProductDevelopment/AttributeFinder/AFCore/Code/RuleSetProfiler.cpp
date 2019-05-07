@@ -229,7 +229,7 @@ CRuleSetProfiler::~CRuleSetProfiler()
 			}
 		}
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33620");
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI33620");
 }
 //--------------------------------------------------------------------------------------------------
 bool CRuleSetProfiler::IsProfilingActiveOnThread()
