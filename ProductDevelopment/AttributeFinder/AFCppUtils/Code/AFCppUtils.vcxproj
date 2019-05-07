@@ -117,7 +117,7 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\AFUtils\Code;..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\AFCore\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;_AFXEXT;EXPORT_AFCPPUTILS_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
