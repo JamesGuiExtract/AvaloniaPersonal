@@ -91,7 +91,6 @@ CopyFilesToInstallFolder: CreateDestinationFolders
     @COPY /V  "$(BinariesFolder)\UCLIDTestingFrameworkCore.dll" "$(RDTInstallFilesRootDir)\SelfRegCommonComponents"
     @COPY /V  "$(BinariesFolder)\AFDataScorersTest.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
 	@COPY /V  "$(BinariesFolder)\AFValueFinderTest.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
-	@COPY /V  "$(BinariesFolder)\SafeNetUtilsTest.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
 	@COPY /V  "$(BinariesFolder)\SpatialStringAutomatedTest.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
 	@COPY /V  "$(BinariesFolder)\SpatialStringSearcherTest.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
 	@COPY /V  "$(BinariesFolder)\SpotRecIRAutoTest.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTComponents"
