@@ -119,7 +119,7 @@
       </DllDataFileName>
       <InterfaceIdentifierFileName>ESImageCleanup_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>ESImageCleanup_p.c</ProxyFileName>
-      <ValidateAllParameters>false</ValidateAllParameters>
+      <ValidateAllParameters>true</ValidateAllParameters>
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
