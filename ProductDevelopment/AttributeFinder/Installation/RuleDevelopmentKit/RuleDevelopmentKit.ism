@@ -325,7 +325,6 @@
 		<row><td>NonSelfRegCommon</td><td>{4CEEF54D-9017-40FC-BB20-28BA50FC1090}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RasterZoneTester.dll</td><td>{55E680F8-657F-46BD-831C-35ABA107CEBA}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>rasterzonetester.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RedactionTester.dll</td><td>{FE6FB54D-7A24-49CD-90FF-A8642E8A116A}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>redactiontester.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>SafeNetUtilsTest.dll</td><td>{1944BEC9-8FF3-4B2D-B693-6FDAC5151688}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>SafeNetUtilsTest.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>SpatialStringAutomatedTest.dll</td><td>{24B755A3-2AA4-46BF-A0A9-B08B65B610B5}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>SpatialStringAutomatedTest.d</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>SpatialStringSearcherTest.dll</td><td>{3500F62F-152E-4651-8790-0BC0D880343D}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>SpatialStringSearcherTest.dl</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>SpotRecIRAutoTest.dll</td><td>{CCE85CA0-04FE-4FBF-AF95-B59F03809DCD}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>SpotRecIRAutoTest.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -1160,7 +1159,6 @@
 		<row><td>TestingFiles</td><td>AFValueFinderTest.dll</td></row>
 		<row><td>TestingFiles</td><td>BaseUtilsTest.dll</td></row>
 		<row><td>TestingFiles</td><td>RasterZoneTester.dll</td></row>
-		<row><td>TestingFiles</td><td>SafeNetUtilsTest.dll</td></row>
 		<row><td>TestingFiles</td><td>SpatialStringAutomatedTest.dll</td></row>
 		<row><td>TestingFiles</td><td>SpatialStringSearcherTest.dll</td></row>
 		<row><td>TestingFiles</td><td>SpotRecIRAutoTest.dll</td></row>
@@ -1186,7 +1184,6 @@
 		<row><td>AFUtilsTest.dll</td><td>AFUtilsTest.dll</td><td>AFUTIL~1.DLL|AFUtilsTest.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\AFUtilsTest.dll</td><td>17</td><td/></row>
 		<row><td>AFValueFinderTest.dll</td><td>AFValueFinderTest.dll</td><td>AFVALU~1.DLL|AFValueFinderTest.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\AFValueFinderTest.dll</td><td>17</td><td/></row>
 		<row><td>CountyTester.dll</td><td>CountyTester.dll</td><td>COUNTY~1.DLL|CountyTester.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\CountyTester.dll</td><td>17</td><td/></row>
-		<row><td>SafeNetUtilsTest.dll</td><td>SafeNetUtilsTest.dll</td><td>SAFENE~1.DLL|SafeNetUtilsTest.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\SafeNetUtilsTest.dll</td><td>17</td><td/></row>
 		<row><td>SpatialStringAutomatedTest.d</td><td>SpatialStringAutomatedTest.dll</td><td>SPATIA~1.DLL|SpatialStringAutomatedTest.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\SpatialStringAutomatedTest.dll</td><td>17</td><td/></row>
 		<row><td>SpatialStringSearcherTest.dl</td><td>SpatialStringSearcherTest.dll</td><td>SPATIA~1.DLL|SpatialStringSearcherTest.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\SpatialStringSearcherTest.dll</td><td>17</td><td/></row>
 		<row><td>SpotRecIRAutoTest.dll</td><td>SpotRecIRAutoTest.dll</td><td>SPOTRE~1.DLL|SpotRecIRAutoTest.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGRDTCOMPO_FILES&gt;\SpotRecIRAutoTest.dll</td><td>17</td><td/></row>
@@ -1346,7 +1343,6 @@
 		<row><td>NonSelfRegCommon</td><td/><td/><td>_D6198984_8972_4217_BDA2_B23267AA1193_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>RasterZoneTester.dll</td><td/><td/><td>_0CDFC925_E00D_4C43_872C_928F405F92CC_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>RedactionTester.dll</td><td/><td/><td>_E3C82770_0C8B_4480_812B_48AA19DB7EBA_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>SafeNetUtilsTest.dll</td><td/><td/><td>_3658B247_3A83_4960_BEF4_2AC6C0482878_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>SpatialStringAutomatedTest.dll</td><td/><td/><td>_41C52096_18E4_499F_BCC3_711EC0B65667_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>SpatialStringSearcherTest.dll</td><td/><td/><td>_6F1C70AF_9BB9_4BC4_BC01_7B43F4737661_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>SpotRecIRAutoTest.dll</td><td/><td/><td>_65AAF6E8_F79E_44B2_BDB0_2098176F881B_FILTER</td><td/><td/><td/><td/></row>
