@@ -1084,7 +1084,7 @@ LRESULT FileProcessingDlg::OnProcessingComplete(WPARAM wParam, LPARAM lParam)
 		// If any files failed we will automatically show the user the failed list on the report page.
 		if (m_nNumFailed > 0)
 		{
-			m_propSheet.SetActivePage(&m_propStatisticsPage);
+			m_propSheet.SetActivePage(&m_propProcessingPage);
 		}
 
 		// The dialog will only auto-terminate on completion of processing if...
