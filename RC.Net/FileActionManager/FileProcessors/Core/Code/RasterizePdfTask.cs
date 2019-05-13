@@ -168,7 +168,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The license ids to validate in licensing calls
         /// </summary>
-        static readonly LicenseIdName _licenseId1 = LicenseIdName.PdfReadOnly;
+        static readonly LicenseIdName _licenseId1 = LicenseIdName.PdfReadWriteFeature;
         static readonly LicenseIdName _licenseId2 = LicenseIdName.OcrOnClientFeature;
 
         #endregion Fields
@@ -585,6 +585,10 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
+                if (LicenseUtilities.IsLicensed(_licenseId1) || LicenseUtilities.IsLicensed(_licenseId2))
+                {
+                    return;
+                }
                 LicenseUtilities.ValidateLicense(_licenseId1, "ELI32248", _COMPONENT_DESCRIPTION);
                 LicenseUtilities.ValidateLicense(_licenseId2, "ELI34321", _COMPONENT_DESCRIPTION);
             }
@@ -617,10 +621,6 @@ namespace Extract.FileActionManager.FileProcessors
             string destFile = string.Empty;
             try
             {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(_licenseId1, "ELI32228", _COMPONENT_DESCRIPTION);
-                LicenseUtilities.ValidateLicense(_licenseId2, "ELI34322", _COMPONENT_DESCRIPTION);
-
                 // Name of the file being processed that will have it's name changed in the database
                 var fileName = pFileRecord.Name;
 
@@ -641,16 +641,39 @@ namespace Extract.FileActionManager.FileProcessors
 
                 try
                 {
+                    if (UseAlternateMethod)
+                    {
+                        LicenseUtilities.ValidateLicense(_licenseId2, "ELI34322", _COMPONENT_DESCRIPTION);
+                    }
+                    else
+                    {
+                        LicenseUtilities.ValidateLicense(_licenseId1, "ELI32228", _COMPONENT_DESCRIPTION);
+                    }
+
                     ImageMethods.ConvertPdfToTif(
                         pdfFile, destFile, UseAlternateMethod, PreserveColorDepth);
                 }
                 catch (Exception ex)
                 {
-                    var ee = new ExtractException("ELI35267",
-                        (UseAlternateMethod ? "Alternate" : "Normal") +
-                        " rasterization method failed; attempting " +
-                        (UseAlternateMethod ? "normal method." : "alternate method."), ex);
-                    ee.Log();
+                    bool isOtherMethodLicensed = (UseAlternateMethod) ? 
+                        LicenseUtilities.IsLicensed(_licenseId1) : LicenseUtilities.IsLicensed(_licenseId2);
+
+                    if (isOtherMethodLicensed)
+                    {
+                        var ee = new ExtractException("ELI35267",
+                            (UseAlternateMethod ? "Alternate" : "Normal") +
+                            " rasterization method failed; attempting " +
+                            (UseAlternateMethod ? "normal method." : "alternate method."), ex);
+                        ee.Log();
+                    }
+                    else
+                    {
+                        var ee = new ExtractException("ELI46780",
+                            (UseAlternateMethod ? "Alternate" : "Normal") +
+                            " rasterization method failed; " +
+                            (UseAlternateMethod ? "Normal method " : "Alternate method ") + "is not licensed.", ex);
+                        throw ee;
+                    }
 
                     ImageMethods.ConvertPdfToTif(
                         pdfFile, destFile, !UseAlternateMethod, PreserveColorDepth);
@@ -731,7 +754,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                return LicenseUtilities.IsLicensed(_licenseId1) &&
+                return LicenseUtilities.IsLicensed(_licenseId1) ||
                        LicenseUtilities.IsLicensed(_licenseId2);
             }
             catch (Exception ex)

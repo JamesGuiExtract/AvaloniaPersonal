@@ -1299,7 +1299,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 					nuanceConvertImage(strInputName, strOutputName, eOutputType, bPreserveColor,
 						strPagesToRemove, eExplicitFormat);
 				}
-				else
+				else if (!(isPDFFile(strInputName) || eOutputType == kFileType_Pdf) || LicenseManagement::isPDFLicensed())
 				{
 					if (bRetainAnnotations)
 					{
@@ -1316,7 +1316,11 @@ BOOL CImageFormatConverterApp::InitInstance()
 						this->m_hInstance, strUserPassword, strOwnerPassword, nOwnerPermissions,
 						nViewPerspective, bPreserveColor, strPagesToRemove);
 				}
-
+				else
+				{
+					UCLIDException noLeadToolsPDF("ELI46777", "Leadtools PDF Read+Write needs to be licensed");
+					throw noLeadToolsPDF;
+				}
 				// No UI needed, just return
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI15898");
