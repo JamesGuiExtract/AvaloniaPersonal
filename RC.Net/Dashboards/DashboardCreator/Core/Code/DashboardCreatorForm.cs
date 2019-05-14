@@ -424,7 +424,7 @@ namespace DashboardCreator
         {
             try
             {
-                _dashboardShared.GridConfigurationsFromXML(Dashboard?.UserData);
+                _dashboardShared?.GridConfigurationsFromXML(Dashboard?.UserData);
 
                 UpdateTitle();
             }
