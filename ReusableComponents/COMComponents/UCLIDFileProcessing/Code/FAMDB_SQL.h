@@ -1760,7 +1760,7 @@ const string gstrGET_WORK_ITEM_TO_PROCESS =
 "		WHERE FileActionStatus.ActionID IN (<ActionIDs>)\r\n"
 "	    AND WorkItem.ID IN (\r\n"
 "			SELECT TOP(<MaxWorkItems>) WorkItem.ID\r\n"
-"			FROM WorkItem\r\n"
+"			FROM WorkItem WITH (ROWLOCK, UPDLOCK, READPAST) \r\n"
 "			INNER JOIN WorkItemGroup ON WorkItem.WorkItemGroupID = WorkItemGroup.ID\r\n"
 "			INNER JOIN FAMFile ON FAMFile.ID = WorkItemGroup.FileID\r\n"
 "			INNER JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID\r\n"

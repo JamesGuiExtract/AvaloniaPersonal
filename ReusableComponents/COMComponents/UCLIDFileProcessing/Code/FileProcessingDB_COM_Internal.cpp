@@ -3584,11 +3584,14 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				// simple check to see if there are any files available.
 				string strGateKeeperQuery =
 					"IF EXISTS ("
-					"	SELECT * FROM [FileActionStatus] " + strWhere +
+					"	SELECT TOP 1 [FileActionStatus].[FileID] FROM [FileActionStatus] WITH (NOLOCK) " + strWhere +
 					"		AND [FileActionStatus].[ActionID] IN (<ActionIDPlaceHolder>))"
 					"		OR ([ActionStatus] = 'R' "
 					"		AND [FileActionStatus].[ActionID] IN (<ActionIDPlaceHolder>))"
 					") SELECT 1 AS ID ELSE SELECT 0 AS ID";
+
+				// For the gate keeper query if Skippled file is joined add NOLOCK query hint
+				replaceVariable(strGateKeeperQuery, "INNER JOIN SkippedFile", "INNER JOIN SkippedFile WITH (NOLOCK) ");
 
 				// Update the select statement with the action ID
 				replaceVariable(strGateKeeperQuery, strActionIDPlaceHolder, strActionIDs);
@@ -3625,7 +3628,7 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 			}
 
 			// Build the from clause
-			string strFrom = "FROM FAMFile INNER JOIN FileActionStatus "
+			string strFrom = "FROM FAMFile INNER JOIN FileActionStatus WITH (ROWLOCK, UPDLOCK, READPAST ) "
 				"ON FileActionStatus.FileID = FAMFile.ID AND FileActionStatus.ActionID IN (<ActionIDPlaceHolder>) "
 				+ strWorkflowJoin
 				+ strWhere + ")";
@@ -3718,7 +3721,7 @@ bool CFileProcessingDB::GetFileToProcess_Internal(bool bDBLocked, long nFileID, 
 				"SELECT FAMFile.ID, FileName, Pages, FileSize, ActionID, "
 				"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority, "
 				"COALESCE(ActionStatus, 'U') AS ActionStatus "
-				"FROM FAMFile LEFT JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID "
+				"FROM FAMFile LEFT JOIN FileActionStatus WITH (ROWLOCK, UPDLOCK, READPAST ) ON FileActionStatus.FileID = FAMFile.ID "
 				"	AND FileActionStatus.ActionID = <ActionID> "
 				"WHERE [FAMFile].[ID] = <FileID>";
 
