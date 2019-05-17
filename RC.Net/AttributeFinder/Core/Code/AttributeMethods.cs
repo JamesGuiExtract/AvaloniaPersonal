@@ -599,7 +599,7 @@ namespace Extract.AttributeFinder
 
                     if (newPageData.Size() > 0)
                     {
-                        newUSSData.CreateFromSpatialStrings(newPageData);
+                        newUSSData.CreateFromSpatialStrings(newPageData, false);
                         newUSSData.SpatialPageInfos = newSpatialPageInfos;
                     }
                 }

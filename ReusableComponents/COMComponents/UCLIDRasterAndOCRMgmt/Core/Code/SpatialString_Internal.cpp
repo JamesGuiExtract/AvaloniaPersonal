@@ -17,6 +17,11 @@
 
 #include <Zipper.h>
 #include <Unzipper.h>
+#include <rapidjson/document.h>
+#include <rapidjson/filereadstream.h>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/pointer.h>
+
 
 //--------------------------------------------------------------------------------------------------
 // Constants
@@ -25,6 +30,12 @@ const CRect grectNULL = CRect(0, 0, 0, 0);
 const double gfCharWidthToAvgCharRatio = 1.1;
 const string gstrSPATIAL_STRING_FILE_SIGNATURE = "UCLID Spatial String (USS) File";
 const _bstr_t gbstrSPATIAL_STRING_STREAM_NAME("SpatialString");
+
+// CPPLetters
+const CPPLetter gletterSLASH_R('\r','\r','\r',-1,-1,-1,-1,-1,false,false,false,0,100,0);
+const CPPLetter gletterSLASH_N('\n','\n','\n',-1,-1,-1,-1,-1,false,false,false,0,100,0);
+const CPPLetter gletterSPACE(' ',' ',' ',-1,-1,-1,-1,-1,false,false,false,0,100,0);
+const CPPLetter gletterTAB('\t','\t','\t',-1,-1,-1,-1,-1,false,false,false,0,100,0);
 
 //-------------------------------------------------------------------------------------------------
 // Private methods
@@ -312,6 +323,26 @@ void CSpatialString::insertString(long nPos, const string& strText)
             // Since the string is either hybrid or non-spatial, just update the text
             m_strString.insert(nPos, strText);
         }
+		// This string is kSpatialMode and this is an append operation
+		// Don't recompute the whole string just to append a non-spatial string
+		else if (nPos > 0 && nPos == m_strString.length())
+		{
+			if (!strText.empty())
+			{
+				// Update the end-of-paragraph flag of the last letter if needed
+				CPPLetter& lastOldLetter = m_vecLetters[nPos - 1];
+				if ((strText[0] == '\r' || strText[0] == '\n')
+					&& !isWhitespaceChar(lastOldLetter.m_usGuess1))
+				{
+					lastOldLetter.m_bIsEndOfParagraph = true;
+				}
+				m_strString += strText;
+
+				vector<CPPLetter> newLetters;
+				getNonSpatialLetters(strText, newLetters);
+				m_vecLetters.insert(m_vecLetters.end(), newLetters.begin(), newLetters.end());
+			}
+		}
         else
         {
             // Get the current letter vector
@@ -4216,7 +4247,9 @@ UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr CSpatialString::makeBlankPage(int n
 	return ipPage;
 }
 //-------------------------------------------------------------------------------------------------
-ILongToObjectMapPtr CSpatialString::loadPagesFromArchive(const string& strFileName, bool bReadInfoOnly,
+typedef map<long, UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr> PageMap;
+unique_ptr<PageMap> CSpatialString::loadPagesFromArchive(const string& strFileName, bool bReadInfoOnly,
+	string* strOriginalSourceDocName /*= __nullptr*/, 
 	long nPage /*= -1*/,
 	bool bLoadIntoThis /*= false*/)
 {
@@ -4224,7 +4257,7 @@ ILongToObjectMapPtr CSpatialString::loadPagesFromArchive(const string& strFileNa
 	ASSERT_ARGUMENT("ELI46768", !(returnAllPages && bLoadIntoThis));
 	ASSERT_ARGUMENT("ELI46769", !(bReadInfoOnly && bLoadIntoThis));
 
-	ILongToObjectMapPtr pageMap = __nullptr;
+	unique_ptr<PageMap> pageMap;
 	if (bLoadIntoThis)
 	{
 		// Clear this instance in case the requested page doesn't exist
@@ -4232,8 +4265,7 @@ ILongToObjectMapPtr CSpatialString::loadPagesFromArchive(const string& strFileNa
 	}
 	else
 	{
-		pageMap.CreateInstance(CLSID_LongToObjectMap);
-		ASSERT_RESOURCE_ALLOCATION("ELI46770", pageMap != __nullptr);
+		pageMap = std::make_unique<PageMap>();
 	}
 
 	CUnzipper uz(strFileName.c_str());
@@ -4255,15 +4287,17 @@ ILongToObjectMapPtr CSpatialString::loadPagesFromArchive(const string& strFileNa
 				continue;
 			}
 
-			// Get page number and file type from the name
 			string fileName = info.szFileName;
+
+			// Get page number and file type from the name
 			size_t p = fileName.find('.');
 			if (p <= 0)
 			{
 				continue;
 			}
 			string baseName = fileName.substr(0, p);
-			if (!isInteger(baseName))
+			long pageNumber;
+			if (!isAllNumericChars(baseName, pageNumber))
 			{
 				continue;
 			}
@@ -4274,35 +4308,76 @@ ILongToObjectMapPtr CSpatialString::loadPagesFromArchive(const string& strFileNa
 			}
 			string ext = fileName.substr(p + 1);
 			makeLowerCase(ext);
-			if (ext != "uss")
+			if (ext != "uss" && ext != "json")
 			{
 				continue;
 			}
 
-			long pageNumber = asLong(baseName);
+			// Load info from, e.g., 0000.json
+			// This file needs to come before the page(s) that are to be loaded (in the Central Directory Header) or it may never be read.
+			// 7zip and windows built-in explorer zip utility sort files alphabetically by filename so it is easy to add this file
+			// to set or change the source doc name
+			if (pageNumber == 0
+				&& ext == "json"
+				&& strOriginalSourceDocName != __nullptr)
+			{
+				if (tmpPath.empty())
+				{
+					tmpFile = std::make_unique<TemporaryFileName>(true);
+					tmpPath = tmpFile->getName();
+				}
+				uz.UnzipFileTo(tmpPath.c_str());
+				ifstream ifs(tmpPath);
+				rapidjson::IStreamWrapper isw(ifs);
+				rapidjson::Document document;
+				document.ParseStream(isw);
+				if (!document.HasParseError())
+				{
+					const auto& sdnIt = document.FindMember("SourceDocName");
+					if (sdnIt != document.MemberEnd())
+					{
+						*strOriginalSourceDocName = sdnIt->value.GetString();
+					}
+				}
+			}
+
 			if (pageNumber > 0
-				&& (bLoadIntoThis || !pageMap->Contains(pageNumber))
+				&& (bLoadIntoThis || pageMap->find(pageNumber) == pageMap->end())
 				&& (returnAllPages || pageNumber == nPage))
 			{
 				if (bReadInfoOnly)
 				{
-					pageMap->Set(pageNumber, __nullptr);
+					pageMap->insert(make_pair(pageNumber, __nullptr));
 				}
 				else
 				{
 					uz.UnzipFileTo(tmpPath.c_str());
 					if (bLoadIntoThis)
 					{
-						loadFromStorageObject(tmpPath, getThisAsCOMPtr());
+						if (ext == "uss")
+						{
+							loadFromStorageObject(tmpPath, getThisAsCOMPtr());
+						}
+						else
+						{
+							loadFromGoogleJson(tmpPath, pageNumber, getThisAsCOMPtr());
+						}
 						return __nullptr;
 					}
 					else
 					{
 						UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr page(CLSID_SpatialString);
-						ASSERT_RESOURCE_ALLOCATION("ELI46786", page != __nullptr)
+						ASSERT_RESOURCE_ALLOCATION("ELI46786", page != __nullptr);
 
-						loadFromStorageObject(tmpPath, page);
-						pageMap->Set(pageNumber, page);
+						if (ext == "uss")
+						{
+							loadFromStorageObject(tmpPath, page);
+						}
+						else
+						{
+							loadFromGoogleJson(tmpPath, pageNumber, page);
+						}
+						pageMap->insert(make_pair(pageNumber, page));
 					}
 				}
 				if (!returnAllPages)
@@ -4339,12 +4414,41 @@ void CSpatialString::loadFromStorageObject(const string& strInputFile, UCLID_RAS
 	}
 }
 //-------------------------------------------------------------------------------------------------
+void CSpatialString::saveToStorageObject(const string& strFullFileName, UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipSpatialString, bool bCompress, bool bClearDirty)
+{
+	unique_ptr<TemporaryFileName> tmpFile;
+	string strOutputFileName = strFullFileName;
+	bool useTempFile = bCompress;
+	if (useTempFile)
+	{
+		tmpFile = std::make_unique<TemporaryFileName>(true);
+		strOutputFileName = tmpFile->getName();
+	}
+	writeObjectToFile(ipSpatialString, _bstr_t(strOutputFileName.c_str()), 
+		gbstrSPATIAL_STRING_STREAM_NAME, bClearDirty, 
+		gstrSPATIAL_STRING_FILE_SIGNATURE, useTempFile);
+
+	// Wait until the file is readable
+	waitForFileToBeReadable(strOutputFileName);
+
+	// if requested, compress the above created temporary file and 
+	// save as the specified filename
+	if (bCompress)
+	{
+		// Compress the file (compress file includes a call to waitForFileToBeReadable
+		// no need to include one here)
+		CompressionEngine::compressFile(strOutputFileName, strFullFileName);
+	}
+}
+//-------------------------------------------------------------------------------------------------
 void CSpatialString::loadFromArchive(const string& strFileName)
 {
-	// Get the existing page numbers
-	ILongToObjectMapPtr pageMap = loadPagesFromArchive(strFileName, true);
+	string originalSourceDocName;
 
-	long count = pageMap->Size;
+	// Get the existing page numbers
+	auto pageMap = loadPagesFromArchive(strFileName, true, &originalSourceDocName);
+
+	long count = pageMap->size();
 	if (count == 0)
 	{
 		getThisAsCOMPtr()->CreateNonSpatialString("", "");
@@ -4352,7 +4456,7 @@ void CSpatialString::loadFromArchive(const string& strFileName)
 	else if (count == 1)
 	{
 		// If there's only one page, then load it directly into this instance 
-		loadPagesFromArchive(strFileName, false, pageMap->GetKeys()->Item[0], true);
+		loadPagesFromArchive(strFileName, false, __nullptr, pageMap->begin()->first, true);
 	}
 	else
 	{
@@ -4361,15 +4465,18 @@ void CSpatialString::loadFromArchive(const string& strFileName)
 		// Put the pages in order
 		IIUnknownVectorPtr pages(CLSID_IUnknownVector);
 		ASSERT_RESOURCE_ALLOCATION("ELI46773", pages != __nullptr);
-
-		IVariantVectorPtr pageNumbers = pageMap->GetKeys();
-		for (long i = 0; i < count; i++)
+		for (auto& p : *pageMap)
 		{
-			pages->PushBack(pageMap->GetValue(pageNumbers->Item[i]));
+			pages->PushBack(p.second);
 		}
 
 		// Combine the pages
-		getThisAsCOMPtr()->CreateFromSpatialStrings(pages);
+		getThisAsCOMPtr()->CreateFromSpatialStrings(pages, VARIANT_FALSE);
+	}
+
+	if (!originalSourceDocName.empty())
+	{
+		m_strSourceDocName = originalSourceDocName;
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -4441,30 +4548,443 @@ void CSpatialString::savePagesToArchive(const string& strOutputFile, IIUnknownVe
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CSpatialString::appendToArchive(const string& strOutputFile, bool bCompress)
+void CSpatialString::appendToArchive(const string& strOutputFile, bool bCompress, bool bCheckForExistingPages)
 {
-	// Retrieve the page numbers that already exist in the zip
-	ILongToObjectMapPtr existingPageMap = loadPagesFromArchive(strOutputFile, true);
-	long existingCount = existingPageMap->Size;
-
 	IIUnknownVectorPtr pages = getThisAsCOMPtr()->GetPages(VARIANT_FALSE, "");
 	ASSERT_RESOURCE_ALLOCATION("ELI46764", pages != __nullptr);
 
-	if (existingCount == 0)
+	if (bCheckForExistingPages)
 	{
-		savePagesToArchive(strOutputFile, pages, bCompress);
+		// Retrieve the page numbers that already exist in the zip
+		auto existingPageMap = loadPagesFromArchive(strOutputFile, true);
+		long existingCount = existingPageMap->size();
+
+		if (existingCount == 0)
+		{
+			savePagesToArchive(strOutputFile, pages, bCompress);
+		}
+		else
+		{
+			// Ensure that there are no pages in common in the substring and the existing archive
+			for (long i = 0, count = pages->Size(); i < count; i++)
+			{
+				UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr page = pages->At(i);
+				long firstPage = page->GetFirstPageNumber();
+				ASSERT_RUNTIME_CONDITION("ELI46775", existingPageMap->find(firstPage) == existingPageMap->end(), "Page already exists in the archive");
+			}
+
+			savePagesToArchive(strOutputFile, pages, bCompress, true);
+		}
 	}
 	else
 	{
-		// Ensure that there are no pages in common in the substring and the existing archive
-		for (long i = 0, count = pages->Size(); i < count; i++)
-		{
-			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr page = pages->At(i);
-			long firstPage = page->GetFirstPageNumber();
-			ASSERT_RUNTIME_CONDITION("ELI46775", !existingPageMap->Contains(firstPage), "Page already exists in the archive");
-		}
-
+		// Append or create without regard to contents
 		savePagesToArchive(strOutputFile, pages, bCompress, true);
 	}
 }
 //-------------------------------------------------------------------------------------------------
+void CSpatialString::loadFromGoogleJson(const string& strInputFile, long nPageNumber, UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLoadInto)
+{
+	FILE* fp;
+	errno_t error = fopen_s(&fp, strInputFile.c_str(), "rb");
+	if (error)
+	{
+		UCLIDException uex("ELI46794", "Error opening temp file");
+		uex.addDebugInfo("Error Number", error);
+		throw uex;
+	}
+	char readBuffer[65536];
+	rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+	rapidjson::Document document;
+	document.ParseStream(is);
+	fclose(fp);
+
+	if (document.HasParseError())
+	{
+		UCLIDException uex("ELI46795", "Error parsing JSON");
+		uex.addDebugInfo("Page Number", nPageNumber);
+		throw uex;
+	}
+
+	// Check for fullTextAnnotation object in the full json that is returned from GCV
+	const rapidjson::Value* textAnnotation = rapidjson::GetValueByPointer(document, "/responses/0/fullTextAnnotation");
+	if (textAnnotation == __nullptr)
+	{
+		// Else, assume the whole document is the fullTextAnnotation object (not sure which makes more sense to store)
+		textAnnotation = rapidjson::GetValueByPointer(document, "");
+	}
+
+	const rapidjson::Value* page = rapidjson::GetValueByPointer(*textAnnotation, "/pages/0");
+	if (page == __nullptr)
+	{
+		ipLoadInto->Clear();
+		return;
+	}
+
+	// Width and height may be in pixel or points.
+	// They are in points when there are normalizedVertices instead of vertices
+	// Points will be translated to pixels later in this method
+	auto& widthIt = page->FindMember("width");
+	auto& heightIt = page->FindMember("height");
+	ASSERT_RUNTIME_CONDITION("ELI46790", widthIt != page->MemberEnd() && heightIt != page->MemberEnd(), "Width and height information is missing");
+	long width = widthIt->value.GetInt();
+	long height = heightIt->value.GetInt();
+	bool hasNormalizedVertices = false;
+	bool hasVertices = false;
+	double widthConvertedFromPoints = width * 300 / 72;
+	double heightConvertedFromPoints = height * 300 / 72;
+
+	vector<CPPLetter> letters;
+	vector<double> thetas;
+	const auto& textIt = textAnnotation->FindMember("text");
+	if (textIt != textAnnotation->MemberEnd())
+	{
+		rapidjson::SizeType length = textIt->value.GetStringLength();
+		letters.reserve(length);
+		thetas.reserve(length);
+	}
+
+	const auto& blocksIt = page->FindMember("blocks");
+	if (blocksIt != page->MemberEnd())
+	{
+		for (auto& block : blocksIt->value.GetArray())
+		{
+			const auto& paragraphsIt = block.FindMember("paragraphs");
+			if (paragraphsIt != block.MemberEnd())
+			{
+				for (auto& paragraph : paragraphsIt->value.GetArray())
+				{
+					const auto wordsIt = paragraph.FindMember("words");
+					if (wordsIt != paragraph.MemberEnd())
+					{
+						// Add symbols from these words to letters and also collect rotation angles and set vertice/normalizedVertice flags, if not already set
+						const auto& words = wordsIt->value.GetArray();
+						addWordsToLetterArray(words, (unsigned short)nPageNumber, widthConvertedFromPoints, heightConvertedFromPoints, letters, hasVertices, hasNormalizedVertices, thetas);
+					}
+
+					// Add empty line after each paragraph (this won't be quite consistent with SSOCR2,
+					// since the last paragraph of the document will end with an empty line, but I guess it's close enough)
+					letters.insert(letters.end(), { gletterSLASH_R, gletterSLASH_N });
+				}
+			}
+		}
+	}
+
+	if (hasNormalizedVertices)
+	{
+		height = (long)round(heightConvertedFromPoints);
+		width = (long)round(widthConvertedFromPoints);
+	}
+
+	// Create spatial string in image coordinates
+	UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr imagePageInfo(CLSID_SpatialPageInfo);
+	imagePageInfo->Initialize(width, height, UCLID_RASTERANDOCRMGMTLib::kRotNone, 0);
+	ILongToObjectMapPtr imagePageInfos(CLSID_LongToObjectMap);
+	imagePageInfos->Set(nPageNumber, imagePageInfo);
+	ipLoadInto->CreateFromLetterArray(letters.size(), &letters[0], "Unknown", imagePageInfos);
+
+
+	// Calculate the predominate text angle, create OCR-coordinate page info and translate the string
+	UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr newPageInfo(CLSID_SpatialPageInfo);
+	ILongToObjectMapPtr newPageInfos(CLSID_LongToObjectMap);
+	newPageInfos->Set(nPageNumber, newPageInfo);
+
+	sort(thetas.begin(), thetas.end());
+	double medTheta = thetas[thetas.size() / 2]; // range (-PI, PI)
+	long rotation = (long)round(medTheta * 2 / MathVars::PI) % 1 * 90; // (-180, -90, 0, 90, 180)
+	double deskew = medTheta * 180 / MathVars::PI; // range (-180, 180)
+	deskew -= rotation;
+
+	UCLID_RASTERANDOCRMGMTLib::EOrientation orientation = UCLID_RASTERANDOCRMGMTLib::kRotNone;
+	switch ((rotation + 360) % 360)
+	{
+		case 0:
+		{
+			break;
+		}
+		case 180:
+		{
+			orientation = UCLID_RASTERANDOCRMGMTLib::kRotDown;
+			break;
+		}
+		case 90:
+		{
+			orientation = UCLID_RASTERANDOCRMGMTLib::kRotLeft;
+			break;
+		}
+		case 270:
+		{
+			orientation = UCLID_RASTERANDOCRMGMTLib::kRotRight;
+			break;
+		}
+		default:
+		{
+			THROW_LOGIC_ERROR_EXCEPTION("ELI46788");
+		}
+	}
+	newPageInfo->Initialize(width, height, orientation, deskew);
+	ipLoadInto->TranslateToNewPageInfo(newPageInfos);
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialString::addWordsToLetterArray(const rapidjson::Value::ConstArray& words,
+		unsigned short pageNumber, double widthConvertedFromPoints, double heightConvertedFromPoints,
+		vector<CPPLetter>& letters, bool& hasVertices, bool& hasNormalizedVertices, vector<double>& thetas)
+{
+	CPPLetter letter(-1, -1, -1, -1, -1, -1, -1, pageNumber, false, false, true, 0, 100, 0);
+	for (long wordIdx = 0, numWords = words.Size(); wordIdx < numWords; ++wordIdx)
+	{
+		try
+		{
+			try
+			{
+				const auto& word = words[wordIdx];
+				AnnotationSpatialProperties wordProperties;
+				bool wordPropertiesAreSet = false;
+
+				// SYMBOLS
+				const auto& symbolsIt = word.FindMember("symbols");
+				if (symbolsIt != word.MemberEnd())
+				{
+					const auto& symbols = symbolsIt->value.GetArray();
+					for (long symbolIdx = 0, numSymbols = symbols.Size(); symbolIdx < numSymbols; ++symbolIdx)
+					{
+						const auto& symbol = symbols[symbolIdx];
+						const auto& textIt = symbol.FindMember("text");
+						if (textIt != symbol.MemberEnd())
+						{
+							string text = textIt->value.GetString();
+							unsigned short c = text.length() == 0 ? (unsigned short)'^' : getWindows1252FromUTF8(text);
+							letter.m_usGuess1 = letter.m_usGuess2 = letter.m_usGuess3 = c;
+
+							const auto& confidenceIt = symbol.FindMember("confidence");
+							if (confidenceIt != symbol.MemberEnd())
+							{
+								letter.m_ucCharConfidence = (unsigned char)(confidenceIt->value.GetDouble() * 100);
+							}
+
+							// Set spatial info for character directly or by dividing up the word bounds
+							AnnotationSpatialProperties symbolProperties;
+							bool symbolPropertiesAreSet = getAnnotationSpatialInfo(symbol, hasVertices, hasNormalizedVertices, symbolProperties);
+							if (!symbolPropertiesAreSet)
+							{
+								if (!wordPropertiesAreSet)
+								{
+									wordPropertiesAreSet = getAnnotationSpatialInfo(word, hasVertices, hasNormalizedVertices, wordProperties);
+								}
+								if (wordPropertiesAreSet)
+								{
+									getSymbolSpatialInfoFromWord(wordProperties, numSymbols, symbolIdx, symbolProperties);
+									symbolPropertiesAreSet = true;
+								}
+							}
+							if (symbolPropertiesAreSet)
+							{
+								setLetterBounds(letter, symbolProperties, hasNormalizedVertices ? widthConvertedFromPoints : 1, hasNormalizedVertices ? heightConvertedFromPoints : 1);
+								thetas.push_back(symbolProperties.theta);
+							}
+
+							// Get break properties
+							string breakType = "UNKNOWN";
+							const auto& propertyIt = symbol.FindMember("property");
+							if (propertyIt != symbol.MemberEnd())
+							{
+								const auto& symbolProperties = propertyIt->value;
+								const auto& detectedBreakIt = symbolProperties.FindMember("detectedBreak");
+								if (detectedBreakIt != symbolProperties.MemberEnd())
+								{
+									bool prefixBreak = false;
+									const auto& detectedBreak = detectedBreakIt->value;
+									const auto& breakTypeIt = detectedBreak.FindMember("type");
+									if (breakTypeIt != detectedBreak.MemberEnd())
+									{
+										breakType = breakTypeIt->value.GetString();
+									}
+									const auto& isPrefixIt = detectedBreak.FindMember("isPrefix");
+									if (isPrefixIt != detectedBreak.MemberEnd())
+									{
+										prefixBreak = isPrefixIt->value.GetBool();
+									}
+
+									// The spec has this isPrefix property but I haven't seen it in any output so rather than try to handle this just ignore prefix breaks
+									if (prefixBreak)
+									{
+										breakType = "UNKNOWN";
+									}
+								}
+							}
+
+							if ((symbolIdx == numSymbols - 1 && wordIdx == numWords - 1))
+							{
+								letter.m_bIsEndOfParagraph = letter.m_bIsEndOfZone = true;
+							}
+							else if (breakType == "EOL_SURE_SPACE")
+							{
+								letter.m_bIsEndOfZone = true;
+							}
+
+							letters.push_back(letter);
+
+							if (breakType == "SPACE")
+							{
+								letters.push_back(gletterSPACE);
+							}
+							else if (breakType == "SURE_SPACE")
+							{
+								letters.push_back(gletterTAB);
+							}
+							else if (breakType == "EOL_SURE_SPACE" || breakType == "LINE_BREAK")
+							{
+								letters.insert(letters.end(), { gletterSLASH_R, gletterSLASH_N });
+							}
+						}
+					}
+				}
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46793")
+		}
+		catch (UCLIDException& uex)
+		{
+			uex.addDebugInfo("Word Index", wordIdx);
+			throw uex;
+		}
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CSpatialString::getSymbolSpatialInfoFromWord(const AnnotationSpatialProperties& wordProperties, long numSymbolsInWord, long symbolIdx,
+	AnnotationSpatialProperties& symbolProperties)
+{
+	double symbolWidth = wordProperties.width / numSymbolsInWord;
+	symbolProperties.height = wordProperties.height;
+	symbolProperties.width = symbolWidth;
+	symbolProperties.theta = wordProperties.theta;
+	symbolProperties.orientation = wordProperties.orientation;
+
+	double startOfSymbol = symbolIdx * symbolWidth;
+	double endOfSymbol = startOfSymbol + symbolWidth;
+	double cosTheta = cos(wordProperties.theta);
+	double sinTheta = sin(wordProperties.theta);
+	double startX = startOfSymbol * cosTheta;
+	double endX = endOfSymbol * cosTheta;
+	double startY = startOfSymbol * sinTheta;
+	double endY = endOfSymbol * sinTheta;
+	symbolProperties.x1 = wordProperties.x1 + startX;
+	symbolProperties.y1 = wordProperties.y1 + startY;
+	symbolProperties.x2 = wordProperties.x1 + endX;
+	symbolProperties.y2 = wordProperties.y1 + endY;
+	symbolProperties.x3 = wordProperties.x4 + endX;
+	symbolProperties.y3 = wordProperties.y4 + endY;
+	symbolProperties.x4 = wordProperties.x4 + startX;
+	symbolProperties.y4 = wordProperties.y4 + startY;
+}
+//----------------------------------------------------------------------------------------------
+void CSpatialString::setLetterBounds(CPPLetter& letter, const AnnotationSpatialProperties& properties,
+	const double& denormalizationFactorX, const double& denormalizationFactorY)
+{
+	double top, right, bottom, left;
+	switch (properties.orientation)
+	{
+		case 0:
+		{
+			top = (properties.y1 + properties.y2) / 2;
+			right = (properties.x2 + properties.x3) / 2;
+			bottom = (properties.y3 + properties.y4) / 2;
+			left = (properties.x1 + properties.x4) / 2;
+			break;
+		}
+		case 180:
+		{
+			top = (properties.y3 + properties.y4) / 2;
+			right = (properties.x1 + properties.x4) / 2;
+			bottom = (properties.y1 + properties.y2) / 2;
+			left = (properties.x2 + properties.x3) / 2;
+			break;
+		}
+		case 90:
+		{
+			top = (properties.y1 + properties.y4) / 2;
+			right = (properties.x1 + properties.x2) / 2;
+			bottom = (properties.y2 + properties.y3) / 2;
+			left = (properties.x3 + properties.x4) / 2;
+			break;
+		}
+		case 270:
+		{
+			top = (properties.y2 + properties.y3) / 2;
+			right = (properties.x3 + properties.x4) / 2;
+			bottom = (properties.y1 + properties.y4) / 2;
+			left = (properties.x1 + properties.x2) / 2;
+			break;
+		}
+		default:
+		{
+			THROW_LOGIC_ERROR_EXCEPTION("ELI46787");
+		}
+	}
+	letter.m_ulTop = (unsigned long)(top * denormalizationFactorY);
+	letter.m_ulRight = (unsigned long)(right * denormalizationFactorX);
+	letter.m_ulBottom = (unsigned long)(bottom * denormalizationFactorY);
+	letter.m_ulLeft = (unsigned long)(left * denormalizationFactorX);
+	letter.m_bIsSpatial = true;
+}
+//----------------------------------------------------------------------------------------------
+bool CSpatialString::getAnnotationSpatialInfo(const rapidjson::Value& el, bool& hasVertices,
+	bool& hasNormalizedVertices, CSpatialString::AnnotationSpatialProperties& properties)
+{
+	rapidjson::Value::ConstMemberIterator vertIt;
+	const auto& bbIt = el.FindMember("boundingBox");
+	if (bbIt != el.MemberEnd())
+	{
+		if (hasVertices)
+		{
+			vertIt = bbIt->value.FindMember("vertices");
+		}
+		else if (hasNormalizedVertices)
+		{
+			vertIt = bbIt->value.FindMember("normalizedVertices");
+		}
+		else
+		{
+			vertIt = bbIt->value.FindMember("vertices");
+			if (vertIt != bbIt->value.MemberEnd())
+			{
+				hasVertices = true;
+			}
+			else
+			{
+				vertIt = bbIt->value.FindMember("normalizedVertices");
+				if (vertIt != bbIt->value.MemberEnd())
+				{
+					hasNormalizedVertices = true;
+				}
+			}
+		}
+
+		if (vertIt != bbIt->value.MemberEnd())
+		{
+			rapidjson::Value::ConstArray& v = vertIt->value.GetArray();
+			if (vertIt != bbIt->value.MemberEnd() && v.Size() > 3)
+			{
+				const auto& v = vertIt->value.GetArray();
+				properties.x1 = v[0]["x"].GetDouble();
+				properties.y1 = v[0]["y"].GetDouble();
+				properties.x2 = v[1]["x"].GetDouble();
+				properties.y2 = v[1]["y"].GetDouble();
+				properties.x3 = v[2]["x"].GetDouble();
+				properties.y3 = v[2]["y"].GetDouble();
+				properties.x4 = v[3]["x"].GetDouble();
+				properties.y4 = v[3]["y"].GetDouble();
+				double dx2 = (properties.x2 - properties.x1);
+				double dy2 = (properties.y2 - properties.y1);
+				double dx4 = (properties.x4 - properties.x1);
+				double dy4 = (properties.y4 - properties.y1);
+				properties.theta = atan2(dy2, dx2); // range (-PI, PI)
+				properties.orientation = (long)round(properties.theta * 2 / MathVars::PI + 4) % 4 * 90; // (0, 90, 180, 270)
+				properties.width = sqrt(dx2 * dx2 + dy2 * dy2);
+				properties.height = sqrt(dx4 * dx4 + dy4 * dy4);
+
+				return true;
+			}
+		}
+	}
+	return false;
+}

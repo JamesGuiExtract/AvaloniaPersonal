@@ -71,7 +71,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\VendorSpecificUtils\ZLibUtils\Code;..\..\..\..\BaseUtils\Code;..\..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\APIs\Leadtools_20\Include;..\..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\Geometry\TopoUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\VendorSpecificUtils\ZLibUtils\Code;..\..\..\..\BaseUtils\Code;..\..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\APIs\Leadtools_20\Include;..\..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\APIs;..\..\..\..\Geometry\TopoUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -124,7 +124,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\VendorSpecificUtils\ZLibUtils\Code;..\..\..\..\BaseUtils\Code;..\..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\APIs\Leadtools_20\Include;..\..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\Geometry\TopoUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\VendorSpecificUtils\ZLibUtils\Code;..\..\..\..\BaseUtils\Code;..\..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\APIs\Leadtools_20\Include;..\..\..\..\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\APIs;..\..\..\..\Geometry\TopoUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>

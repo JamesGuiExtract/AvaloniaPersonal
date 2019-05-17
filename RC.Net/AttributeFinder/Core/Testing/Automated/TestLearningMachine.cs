@@ -1878,7 +1878,7 @@ namespace Extract.AttributeFinder.Test
 
             var pages = ss.GetPages(true, "");
             pages.Remove(0);
-            ss.CreateFromSpatialStrings(pages);
+            ss.CreateFromSpatialStrings(pages, false);
             voa.LoadFrom(attributeFilePaths[3], false);
 
             // No exception is thrown
@@ -1931,7 +1931,7 @@ namespace Extract.AttributeFinder.Test
 
             var pages = ss.GetPages(true, "");
             pages.Remove(0);
-            ss.CreateFromSpatialStrings(pages);
+            ss.CreateFromSpatialStrings(pages, false);
 
             // No exception is thrown
             lm.ComputeAnswer(ss, voa, true);

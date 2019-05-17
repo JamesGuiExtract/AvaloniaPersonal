@@ -293,13 +293,13 @@ STDMETHODIMP CSpatialString::GetOriginalImageLetterArray(long* pnNumLetters, voi
 		// Make sure this string is spatial
 		verifySpatialness();
 
-		m_vecOrignalImageLetters.clear();
-		m_vecOrignalImageLetters.reserve(m_vecLetters.size());
-		m_vecOrignalImageLetters.insert(m_vecOrignalImageLetters.begin(),
+		m_vecOriginalImageLetters.clear();
+		m_vecOriginalImageLetters.reserve(m_vecLetters.size());
+		m_vecOriginalImageLetters.insert(m_vecOriginalImageLetters.begin(),
 			m_vecLetters.begin(), m_vecLetters.end());
 
-		*pnNumLetters = m_vecOrignalImageLetters.size();
-		*ppLetters = &(m_vecOrignalImageLetters[0]);
+		*pnNumLetters = m_vecOriginalImageLetters.size();
+		*ppLetters = &(m_vecOriginalImageLetters[0]);
 
 		translateToNewPageInfo((CPPLetter *)*ppLetters, *pnNumLetters, __nullptr);
 	

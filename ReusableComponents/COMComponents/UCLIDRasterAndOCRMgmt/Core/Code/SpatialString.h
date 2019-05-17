@@ -12,6 +12,7 @@
 #include <vector>
 #include <map>
 #include <utility>
+#include <rapidjson/document.h>
 
 using namespace std;
 
@@ -178,10 +179,10 @@ public:
 	STDMETHOD(SetSurroundingWhitespace)(ISpatialString *pString, long nPos, long* pnNewPos);
 	STDMETHOD(TranslateToNewPageInfo)(ILongToObjectMap* pPageInfoMap);
 	STDMETHOD(ValidatePageDimensions)();
-	STDMETHOD(CreateFromSpatialStrings)(IIUnknownVector *pStrings);
+	STDMETHOD(CreateFromSpatialStrings)(IIUnknownVector *pStrings, VARIANT_BOOL vbInsertPageBreaks);
 	STDMETHOD(GetUnrotatedPageInfoMap)( ILongToObjectMap **pVal);
 	STDMETHOD(GetPseudoSpatialFromHybrid)(ISpatialString** ppResultString);
-	STDMETHOD(AppendToFile)(BSTR bstrOutputFile);
+	STDMETHOD(AppendToFile)(BSTR bstrOutputFile, VARIANT_BOOL vbCheckForExistingPages);
 	STDMETHOD(LoadPageFromFile)(BSTR bstrInputFile, long nPage);
 
 // ICopyableObject
@@ -229,7 +230,7 @@ private:
 
 	// A vector of letters containing spatial information about each letter in the string in
 	// original image coordinates rather than in OCR coordinates (as m_vecLetters is)
-	vector<CPPLetter> m_vecOrignalImageLetters;
+	vector<CPPLetter> m_vecOriginalImageLetters;
 
 	// the page info map and a method to access it that guarantees that the map
 	// object is never null (i.e. the method will initialize m_ipPageInfoMap to an empty map
@@ -663,6 +664,35 @@ private:
 	// Loads spatial string from (optionally gzipped) COM storage object
 	void loadFromStorageObject(const string& strInputFile, UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLoadInto);
 	//----------------------------------------------------------------------------------------------
+	// Loads spatial string from GCV json format
+	// nPageNumber is assigned to the result (page number is not stored in the GCV json)
+	void loadFromGoogleJson(const string& strInputFile, long nPageNumber, UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLoadInto);
+	//----------------------------------------------------------------------------------------------
+	static void addWordsToLetterArray(const rapidjson::Value::ConstArray& words,
+		unsigned short pageNumber, double widthConvertedFromPoints, double heightConvertedFromPoints,
+		vector<CPPLetter>& letters, bool& hasVertices, bool& hasNormalizedVertices, vector<double>& thetas);
+	//----------------------------------------------------------------------------------------------
+	struct AnnotationSpatialProperties
+	{
+		double y1;
+		double x1;
+		double y2;
+		double x2;
+		double y3;
+		double x3;
+		double y4;
+		double x4;
+		double width;
+		double height;
+		double theta;
+		long orientation;
+	};
+	static bool getAnnotationSpatialInfo(const rapidjson::Value& el, bool& hasVertices, bool& hasNormalizedVertices, AnnotationSpatialProperties& properties);
+	//----------------------------------------------------------------------------------------------
+	static void getSymbolSpatialInfoFromWord(const AnnotationSpatialProperties& wordProperties, long numSymbolsInWord, long symbolIdx, AnnotationSpatialProperties& symbolProperties);
+	//----------------------------------------------------------------------------------------------
+	static void setLetterBounds(CPPLetter& letter, const AnnotationSpatialProperties& properties, const double& denormalizationFactorX, const double& denormalizationFactorY);
+	//----------------------------------------------------------------------------------------------
 	// Loads individual pages from numbered files in a zip archive and puts them together
 	void loadFromArchive(const string& strInputFile);
 	//----------------------------------------------------------------------------------------------
@@ -671,16 +701,18 @@ private:
 	// If bReadInfoOnly is false then the returned map will have corresponding page spatial strings for each key
 	// If nPage > 0 then only the specified page number will be returned (or an empty map if that page doesn't exist in the archive)
 	// If bLoadIntoThis is true then the specified page will be loaded into this instance and the return value will be null
-	ILongToObjectMapPtr loadPagesFromArchive(const string& strInputFile, bool bReadInfoOnly, long nPage=-1, bool bLoadIntoThis=false);
+	unique_ptr<map<long, UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr>> loadPagesFromArchive(const string& strInputFile, bool bReadInfoOnly, string* strOriginalSourceDocName=__nullptr, long nPage=-1, bool bLoadIntoThis=false);
 	//----------------------------------------------------------------------------------------------
 	// Save individual pages into numbered files in a zip archive
 	// If bCompress is true then the default compression level (6) will be used to deflate the pages
 	// If bAppend is true then the pages will be added to an existing zip file, else an existing file will be overwritten
-	void savePagesToArchive(const string& strOutputFile, IIUnknownVectorPtr ipPages, bool bCompress = true, bool bAppend = false);
+	static void savePagesToArchive(const string& strOutputFile, IIUnknownVectorPtr ipPages, bool bCompress = true, bool bAppend = false);
 	//----------------------------------------------------------------------------------------------
 	// Split into pages and save as numbered files in a zip archive
 	// The pages represented by this instance must not already exist in the archive
 	// If bCompress is true then the default compression level (6) will be used to deflate the pages
-	void appendToArchive(const string & strOutputFile, bool bCompress = true);
+	void appendToArchive(const string & strOutputFile, bool bCompress, bool bCheckForExistingPages);
+	//----------------------------------------------------------------------------------------------
+	static void saveToStorageObject(const string & strFullFileName, UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipSpatialString, bool bCompress, bool bClearDirty);
 	//----------------------------------------------------------------------------------------------
 };

@@ -488,7 +488,7 @@ STDMETHODIMP CSpatialString::LoadFrom(BSTR strFullFileName,
 			// Check existence of SourceDocName file in present folder
 			string	strNewSource = strFolder + "\\" + strSourceFile;
 			// if the new source file exists, replace the existing source doc name
-			if (isFileOrFolderValid(strNewSource))
+			if (isValidFile(strNewSource))
 			{
 				// Retain original source doc name
 				strOrigSourceDocName = m_strSourceDocName;
@@ -528,7 +528,12 @@ STDMETHODIMP CSpatialString::LoadPageFromFile(BSTR bstrInputFile, long nPage)
 
 		if (CompressionEngine::isZipFile(inputFile))
 		{
-			loadPagesFromArchive(inputFile, false, nPage, true);
+			string originalSourceDocName;
+			loadPagesFromArchive(inputFile, false, &originalSourceDocName, nPage, true);
+			if (!originalSourceDocName.empty())
+			{
+				m_strSourceDocName = originalSourceDocName;
+			}
 		}
 		else
 		{
@@ -573,7 +578,7 @@ STDMETHODIMP CSpatialString::LoadPageFromFile(BSTR bstrInputFile, long nPage)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46767");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSpatialString::AppendToFile(BSTR bstrOutputFile)
+STDMETHODIMP CSpatialString::AppendToFile(BSTR bstrOutputFile, VARIANT_BOOL vbCheckForExistingPages)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -585,7 +590,7 @@ STDMETHODIMP CSpatialString::AppendToFile(BSTR bstrOutputFile)
 		string outputFile = asString(bstrOutputFile);
 		ASSERT_RUNTIME_CONDITION("ELI46765", isValidFile(outputFile), "File to append to doesn't exist");
 
-		appendToArchive(outputFile, true);
+		appendToArchive(outputFile, true, asCppBool(vbCheckForExistingPages));
 		
 		return S_OK;
 	}
@@ -633,7 +638,15 @@ STDMETHODIMP CSpatialString::SaveTo(BSTR strFullFileName, VARIANT_BOOL bCompress
 					m_strSourceDocName = ::getUNCPath(strSourceDocName);
 				}
 
-				savePagesToArchive(stdstrFullFileName, getThisAsCOMPtr()->GetPages(VARIANT_FALSE, ""), asCppBool(bCompress));
+				if (m_eMode == kNonSpatialMode)
+				{
+					saveToStorageObject(stdstrFullFileName, getThisAsCOMPtr(), asCppBool(bCompress), asCppBool(bClearDirty));
+				}
+				else
+				{
+					IIUnknownVectorPtr pages = getThisAsCOMPtr()->GetPages(VARIANT_FALSE, "");
+					savePagesToArchive(stdstrFullFileName, pages, asCppBool(bCompress));
+				}
 			}
 			catch (...)
 			{
@@ -734,7 +747,7 @@ STDMETHODIMP CSpatialString::LoadFromMultipleFiles(IVariantVector *pvecFiles, BS
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSpatialString::CreateFromSpatialStrings(IIUnknownVector *pStrings)
+STDMETHODIMP CSpatialString::CreateFromSpatialStrings(IIUnknownVector *pStrings, VARIANT_BOOL vbInsertPageBreaks)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -799,22 +812,12 @@ STDMETHODIMP CSpatialString::CreateFromSpatialStrings(IIUnknownVector *pStrings)
 			else if (nCurrPage == nLastProcessedPage)
 			{
 				// will be adding string on the start of a new line
-				m_strString += "\r\n";
-
-				// Get the letters from the string
-				vector<CPPLetter> vecLetters;
-				getNonSpatialLetters("\r\n", vecLetters);
-				m_vecLetters.insert(m_vecLetters.end(),vecLetters.begin(), vecLetters.end());
+				getThisAsCOMPtr()->AppendString("\r\n");
 				nPos += 2;
 			}
-			else if (nCurrPage != nLastProcessedPage)
+			else if (nCurrPage != nLastProcessedPage && vbInsertPageBreaks)
 			{
-				m_strString += "\r\n\r\n";
-
-				// Get the letters from the string
-				vector<CPPLetter> vecLetters;
-				getNonSpatialLetters("\r\n\r\n", vecLetters);
-				m_vecLetters.insert(m_vecLetters.end(),vecLetters.begin(), vecLetters.end());
+				getThisAsCOMPtr()->AppendString("\r\n\r\n");
 				nPos += 4;
 			}
 

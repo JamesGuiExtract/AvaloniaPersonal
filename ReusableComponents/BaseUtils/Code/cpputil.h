@@ -718,7 +718,7 @@ EXPORT_BaseUtils bool containsAlphaNumericChar(const string& strText);
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils bool containsAlphaChar(const string& strText);
 //-------------------------------------------------------------------------------------------------
-EXPORT_BaseUtils bool isInteger(const string& strText);
+EXPORT_BaseUtils bool isAllNumericChars(const string& strText, long& nAsLong);
 //-------------------------------------------------------------------------------------------------
 // This function performs a search of the text to determine if it contains either:
 //  1) all of the include text as a substring (MatchSubstring)
@@ -1103,3 +1103,5 @@ namespace Util
 	EXPORT_BaseUtils std::basic_string<TCHAR> base64Encode(std::stringstream& input);
 
 }		// end of namespace Util
+//-------------------------------------------------------------------------------------------------
+EXPORT_BaseUtils char getWindows1252FromUTF8(const string& strCharacter);

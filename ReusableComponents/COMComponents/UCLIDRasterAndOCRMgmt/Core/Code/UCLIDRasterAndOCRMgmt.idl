@@ -1310,6 +1310,7 @@ library UCLID_RASTERANDOCRMGMTLib
 		[id(105), helpstring("method ValidatePageDimensions")] HRESULT ValidatePageDimensions();
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: Creates the SpatialString from the SpatialStrings in the Strings vector
+		//          If vbInsertPageBreaks == VARIANT_TRUE, \r\n\r\n will be added between pages.
 		// REQUIRE: GetMode() == kSpatialMode for all strings in pStrings vector
 		//			If the strings are on different pages 
 		//				All pages in order
@@ -1318,7 +1319,7 @@ library UCLID_RASTERANDOCRMGMTLib
 		//			the PageInfo must be the same. Consecutive strings on the same page
 		//			will be place on separate lines
 		[id(106), helpstring("method CreateFromSpatialStrings")] HRESULT CreateFromSpatialStrings
-			([in] IIUnknownVector* pStrings);
+			([in] IIUnknownVector* pStrings, VARIANT_BOOL vbInsertPageBreaks);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: Returns the spatial page info map of the spatial string without any deskew or
 		//			rotation set on the PageInfos
@@ -1332,10 +1333,13 @@ library UCLID_RASTERANDOCRMGMTLib
 			([out, retval]  ISpatialString** pVal);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: Writes the SpatialString substring to an existing USS archive file
+		//			If vbCheckForExistingPages is VARIANT_TRUE then the archive will be scanned for existing pages.
+		//			Throws an exception if there are page numbers in this instance that already exist in the archive.
+		//			If vbCheckForExistingPages is VARIANT_FALSE then there will be no check and no exception thrown for this reason.
 		// REQUIRE: GetMode() == kSpatialMode
 		//			bstrOutputFile is a valid USS archive file (zipped collection of pages saved as numbered files)
 		//			No page in this instance is already represented in the archive
-		[id(109), helpstring("method AppendToFile")] HRESULT AppendToFile([in] BSTR bstrOutputFile);
+		[id(109), helpstring("method AppendToFile")] HRESULT AppendToFile([in] BSTR bstrOutputFile, VARIANT_BOOL vbCheckForExistingPages);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: Loads the specified page into this instance
 		[id(110), helpstring("method LoadPageFromFile")] HRESULT LoadPageFromFile([in] BSTR bstrInputFile, long nPage);

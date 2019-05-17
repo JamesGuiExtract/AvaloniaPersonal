@@ -236,6 +236,19 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 			ASSERT_RESOURCE_ALLOCATION("ELI31683", ipSS != __nullptr);
 
 			ipSS->LoadFrom(strInputFileName.c_str(), VARIANT_FALSE);
+
+			if (ipSS != __nullptr && ipSS->Size == 0)
+			{
+				UCLIDException ue("ELI34137", "Application trace: OCR output is blank");
+				ue.addDebugInfo("File", strInputFileName);
+				ue.log();
+			}
+
+			// OutputFileName = InputFileName.uss even if cleaned image was used
+			if (ipSS != __nullptr)
+			{
+				ipSS->SaveTo(strOutputFileName.c_str(), VARIANT_TRUE, VARIANT_TRUE);
+			}
 		}
 		else if (pDB == __nullptr || !m_bParallelize || ipFileRecord->Pages <= gnPAGES_PER_WORK_ITEM)
 		{
@@ -279,6 +292,19 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 			{
 				ipSS->SourceDocName = strInputFileName.c_str();
 			}
+
+			if (ipSS != __nullptr && ipSS->Size == 0)
+			{
+				UCLIDException ue("ELI46791", "Application trace: OCR output is blank");
+				ue.addDebugInfo("File", strInputFileName);
+				ue.log();
+			}
+
+			// OutputFileName = InputFileName.uss even if cleaned image was used
+			if (ipSS != __nullptr)
+			{
+				ipSS->SaveTo(strOutputFileName.c_str(), VARIANT_TRUE, VARIANT_TRUE);
+			}
 		}
 		else
 		{
@@ -315,27 +341,21 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 			}
 
 			// Stitch the results
-			bHasNoSpatialPages = !stitchWorkItems(strInputFileName, strOutputFileName, nWorkGroup, ipDB);
+			// (NOTE: stitchWorkItems saves the string after stitching)
+			bool bHasSpatialPages = stitchWorkItems(strInputFileName, strOutputFileName, nWorkGroup, ipDB);
+
+			if (!bHasSpatialPages)
+			{
+				UCLIDException ue("ELI46792", "Application trace: OCR output is blank");
+				ue.addDebugInfo("File", strInputFileName);
+				ue.log();
+			}
 
 			if (ipProgressStatus != NULL)
 			{
 				ipProgressStatus->CompleteCurrentItemGroup();
 			}
 		}
-		if (ipSS != __nullptr && ipSS->Size == 0 || ipSS == __nullptr && bHasNoSpatialPages)
-		{
-			UCLIDException ue("ELI34137", "Application trace: OCR output is blank");
-			ue.addDebugInfo("File", strInputFileName);
-			ue.log();
-		}
-
-		// OutputFileName = InputFileName.uss even if cleaned image was used
-		// (NOTE: stitchWorkItems saves the string itself)
-		if (ipSS != __nullptr)
-		{
-			ipSS->SaveTo(strOutputFileName.c_str(), VARIANT_TRUE, VARIANT_TRUE);
-		}
-
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11047")
@@ -987,7 +1007,7 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessWorkItem(IWorkItemRecord *pWorkItem, 
 
 			// Create the joint string
 			ipSS.CreateInstance(CLSID_SpatialString);
-			ipSS->CreateFromSpatialStrings(ipPages);
+			ipSS->CreateFromSpatialStrings(ipPages, VARIANT_TRUE);
 			
 		}
 		ASSERT_RESOURCE_ALLOCATION("ELI36856", ipSS != __nullptr);
@@ -1263,6 +1283,13 @@ bool COCRFileProcessor::stitchWorkItems(const string &strInputFile, const string
 				// https://extract.atlassian.net/browse/ISSUE-12448
 				if (ipOutput->GetMode() == kSpatialMode)
 				{
+					// If not last group of pages, add trailing double-newline to be consistent
+					// (each page in the group has an added \r\n\r\n except the last)
+					if (i < nWorkItems - 1)
+					{
+						ipOutput->AppendString("\r\n\r\n");
+					}
+
 					ipOutput->SourceDocName = strInputFile.c_str();
 					IHasOCRParametersPtr ipHasOCRParameters(ipOutput);
 					ASSERT_RESOURCE_ALLOCATION("ELI46181", ipHasOCRParameters != __nullptr);
@@ -1270,7 +1297,7 @@ bool COCRFileProcessor::stitchWorkItems(const string &strInputFile, const string
 
 					if (hasAtLeastOnePage)
 					{
-						ipOutput->AppendToFile(strOutputFile.c_str());
+						ipOutput->AppendToFile(strOutputFile.c_str(), VARIANT_FALSE);
 					}
 					else
 					{

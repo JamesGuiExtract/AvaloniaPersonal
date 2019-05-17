@@ -2738,7 +2738,7 @@ bool CTestSpatialString::testCase25Helper(vector<string>& rvecFilesToJoin, strin
 	ipSS.CreateInstance(CLSID_SpatialString);
 
 	// Join the 2 strings
-	ipSS->CreateFromSpatialStrings(ipStringsToCombine);
+	ipSS->CreateFromSpatialStrings(ipStringsToCombine, VARIANT_TRUE);
 
 	m_ipSpatialString->LoadFrom( get_bstr_t( expected ), VARIANT_FALSE );
 

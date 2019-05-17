@@ -18,6 +18,9 @@
 #include "UCLIDException.h"
 
 #include <afxmt.h>
+#include <locale>
+#include <codecvt>
+#include <string>
 
 using namespace std;
 
@@ -517,20 +520,24 @@ bool containsAlphaChar(const string& strText)
     return strText.find_first_of(gstrALPHA) != string::npos;
 }
 //--------------------------------------------------------------------------------------------------
-bool isInteger(const string& strText)
+bool isAllNumericChars(const string& strText, long& nAsLong)
 {
 	if (strText.empty())
 	{
 		return false;
 	}
-
-	for (int i = 0; i < strText.size(); i++)
+	for (auto& c : strText)
 	{
-		char c = strText[i];
 		if (c < '0' || c > '9')
 		{
 			return false;
 		}
+	}
+	char* pszError;
+	nAsLong = strtol(strText.c_str(), &pszError, 10);
+	if (pszError[0])
+	{
+		return false;
 	}
 
 	return true;
@@ -1567,7 +1574,7 @@ bool endsWith(const string& strValue, const string& strEnding)
 		return false;
 	}
 }
-
+//--------------------------------------------------------------------------------------------------
 VectorOfString Split( const std::string& source, const char delimiter )
 {
 	VectorOfString results;
@@ -1587,4 +1594,86 @@ VectorOfString Split( const std::string& source, const char delimiter )
 	}
 
 	return std::move( results );
+}
+//--------------------------------------------------------------------------------------------------
+EXPORT_BaseUtils char getWindows1252FromUTF8(const string& strCharacter)
+{
+	ASSERT_ARGUMENT("ELI46789", !strCharacter.empty());
+
+	if (strCharacter.length() == 1)
+	{
+		return strCharacter[0];
+	}
+
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	std::wstring UTF16VersionOfString = converter.from_bytes(strCharacter);
+	ASSERT_ARGUMENT("ELI46796", UTF16VersionOfString.length() == 1);
+
+	unsigned long code = (unsigned long)UTF16VersionOfString[0];
+	if (code <= 0x007F || (code >= 0x00A0 && code <= 0x00FF))
+	{
+		return (char)code;
+	}
+
+	switch (code)
+	{
+		case 0x20AC:
+			return (char)0x80;
+		case 0xFFFD:
+			return (char)0x81;
+		case 0x201A:
+			return (char)0x82;
+		case 0x0192:
+			return (char)0x83;
+		case 0x201E:
+			return (char)0x84;
+		case 0x2026:
+			return (char)0x85;
+		case 0x2020:
+			return (char)0x86;
+		case 0x2021:
+			return (char)0x87;
+		case 0x02C6:
+			return (char)0x88;
+		case 0x2030:
+			return (char)0x89;
+		case 0x0160:
+			return (char)0x8A;
+		case 0x2039:
+			return (char)0x8B;
+		case 0x0152:
+			return (char)0x8C;
+		case 0x017D:
+			return (char)0x8E;
+		case 0x2018:
+			return (char)0x91;
+		case 0x2019:
+			return (char)0x92;
+		case 0x201C:
+			return (char)0x93;
+		case 0x201D:
+			return (char)0x94;
+		case 0x2022:
+			return (char)0x95;
+		case 0x2013:
+			return (char)0x96;
+		case 0x2014:
+			return (char)0x97;
+		case 0x02DC:
+			return (char)0x98;
+		case 0x2122:
+			return (char)0x99;
+		case 0x0161:
+			return (char)0x9A;
+		case 0x203A:
+			return (char)0x9B;
+		case 0x0153:
+			return (char)0x9C;
+		case 0x017E:
+			return (char)0x9E;
+		case 0x0178:
+			return (char)0x9F;
+		default:
+			return '^';
+	}
 }
