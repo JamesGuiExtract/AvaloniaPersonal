@@ -1243,7 +1243,10 @@ long CSpatialStringViewerDlg::getPageAtPos(long nPos)
 			{
 				m_ipSpatialString->GetNextOCRImageSpatialLetter(nPos, &ipLetter);
 			}
-			nCurrPage = ipLetter->GetPageNumber();
+			if (ipLetter != __nullptr)
+			{
+				nCurrPage = ipLetter->GetPageNumber();
+			}
 		}
 		return nCurrPage;
 	}
