@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28803.352
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AFConditions", "..\..\..\AFConditions\Code\AFConditions.vcxproj", "{CCB36FA6-1C27-43AD-AC7A-D49A3DBCE149}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -833,6 +833,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NuanceUtils", "..\..\..\..\
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESConvertUSSToTXT", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Utils\ESConvertUSSToTXT\Code\ESConvertUSSToTXT.vcxproj", "{2ABF7BC9-B805-4308-B9C6-00244C83C258}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.GoogleCloud", "..\..\..\..\..\RC.Net\GoogleCloud\Extract.GoogleCloud.csproj", "{4C79246F-BA4E-4DF4-8495-56133F965743}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -5525,6 +5527,36 @@ Global
 		{2ABF7BC9-B805-4308-B9C6-00244C83C258}.Template|x64.Build.0 = Release|Win32
 		{2ABF7BC9-B805-4308-B9C6-00244C83C258}.Template|x86.ActiveCfg = Release|Win32
 		{2ABF7BC9-B805-4308-B9C6-00244C83C258}.Template|x86.Build.0 = Release|Win32
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Debug|Win32.Build.0 = Debug|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Debug|x64.Build.0 = Debug|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Debug|x86.Build.0 = Debug|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Release|Win32.ActiveCfg = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Release|Win32.Build.0 = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Release|x64.ActiveCfg = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Release|x64.Build.0 = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Release|x86.ActiveCfg = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Release|x86.Build.0 = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Template|Any CPU.ActiveCfg = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Template|Any CPU.Build.0 = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Template|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Template|Mixed Platforms.Build.0 = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Template|Win32.ActiveCfg = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Template|Win32.Build.0 = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Template|x64.ActiveCfg = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Template|x64.Build.0 = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Template|x86.ActiveCfg = Release|Any CPU
+		{4C79246F-BA4E-4DF4-8495-56133F965743}.Template|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

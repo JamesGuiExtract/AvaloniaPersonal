@@ -117,6 +117,13 @@
     </Compile>
     <Compile Include="ApplyBatesNumberTask.cs" />
     <Compile Include="BatesNumberGeneratorWithDatabase.cs" />
+    <Compile Include="CloudOCRTask.cs" />
+    <Compile Include="CloudOCRTaskSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CloudOCRTaskSettingsDialog.Designer.cs">
+      <DependentUpon>CloudOCRTaskSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="SplitMultipageDocumentTask.cs" />
     <Compile Include="PaginationTaskForm.FormStateManager.cs">
       <DependentUpon>PaginationTaskForm.cs</DependentUpon>
@@ -293,6 +300,10 @@
     <ProjectReference Include="..\..\..\..\Encryption\Core\Code\Extract.Encryption.vcxproj">
       <Project>{C79815C7-A80A-41AA-AB02-F6AC83EFA579}</Project>
       <Name>Extract.Encryption</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\GoogleCloud\Extract.GoogleCloud.csproj">
+      <Project>{4c79246f-ba4e-4df4-8495-56133f965743}</Project>
+      <Name>Extract.GoogleCloud</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj">
       <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
