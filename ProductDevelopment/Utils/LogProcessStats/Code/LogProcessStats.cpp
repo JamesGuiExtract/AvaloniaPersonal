@@ -78,7 +78,7 @@ void displayUsage(const string& rstrError)
 		strMessage += rstrError + "\n------\n";
 	}
 	strMessage += "LogProcessStats.exe <process_id|process_name> <refresh_interval> ";
-	strMessage += "<log_files_directory> [/el]\n";
+	strMessage += "<log_files_directory> [/s <serverName> /d <databaseName>] [/el]\n";
 	strMessage += "Other flags: [/?]\n";
 	strMessage += "\n";
 	strMessage += "Usage:\n";
@@ -93,6 +93,8 @@ void displayUsage(const string& rstrError)
 	strMessage += "\tto place the log files.\n";
 	strMessage += "\n";
 	strMessage += "Optional Argmuments:\n";
+	strMessage += "/s <serverName>  /d <databaseName> : Logs locks in the database, <databaseName> on server <serverName>\n ";
+	strMessage += "\tData is logged to file DBLocks.csv\n";
 	strMessage += "/el: Log exceptions, do not display them\n";
 	strMessage += "/?:  Display this help\n";
 	strMessage += "\n";
@@ -340,6 +342,9 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 					UCLIDExceptionDlg exceptionDlg;
 					UCLIDException::setExceptionHandler( &exceptionDlg );
 
+					string databaseName = "";
+					string databaseServer= "";
+
 					// init license management [p13 #4882]
 					LicenseManagement::loadLicenseFilesFromFolder(
 						LICENSE_MGMT_PASSWORD);
@@ -371,27 +376,45 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 
 					// check to ensure there were between 3 and 4 command line arguments (since
 					// we have the optional /el that can appear at the end of the argument list
-					if (argc < 4 || argc > 5)
+					if (argc < 4 || argc > 9)
 					{
 						displayUsage("Incorrect number of arguments on the command line!");
 						return EXIT_FAILURE;
 					}
 					
-					// if the user passed in 4 arguments then we need to check to make sure the last
-					// argument was /el otherwise there is invalid input
-					if (argc == 5)
+					// Check for optional arguments
+					if (argc >= 5)
 					{
-						string strTemp(argv[4]);
-						if (strTemp == "/el")
+						for (int i = 4; i < argc; i++)
 						{
-							bDisplayExceptions = false;
-						}
-						else
-						{
-							string strTemp("Invalid command line string.\nUnrecognized argument: ");
-							strTemp.append(argv[4]);
-							displayUsage(strTemp);
-							return EXIT_FAILURE;
+							string strTemp(argv[i]);
+							if (strTemp == "/el")
+							{
+								bDisplayExceptions = false;
+							}
+							else if (strTemp == "/d")
+							{
+								i++;
+								if (i < argc)
+								{
+									databaseName = argv[i];
+								}
+							}
+							else if (strTemp == "/s")
+							{
+								i++;
+								if (i < argc)
+								{
+									databaseServer = argv[i];
+								}
+							}
+							else
+							{
+								string strTemp("Invalid command line string.\nUnrecognized argument: ");
+								strTemp.append(argv[i]);
+								displayUsage(strTemp);
+								return EXIT_FAILURE;
+							}
 						}
 					}
 
@@ -435,12 +458,32 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 
 					cout << "Beginning logging - Ctrl+C to end. " << endl;
 
+					ILogDBLocksPtr ipDbLocksLogger = __nullptr;
+
+					// if /d and /s where specified start the logging
+					if (!databaseName.empty() && !databaseServer.empty())
+					{
+						ipDbLocksLogger.CreateInstance(CLSID_LogDBLocks);
+						ASSERT_RESOURCE_ALLOCATION("ELI46821", ipDbLocksLogger != __nullptr);
+						ipDbLocksLogger->DatabaseServer = databaseServer.c_str();
+						ipDbLocksLogger->DatabaseName = databaseName.c_str();
+						ipDbLocksLogger->PollingTime = lRefreshInterval;
+						ipDbLocksLogger->LogDirectory = strWorkingDirectory.c_str();
+
+						ipDbLocksLogger->StartLogging();
+					}
+
 					// start logging
 					// NOTE: this will not return until user presses Ctrl+C
 					gapLogProcessInfo->start();
 
 					// reset the unique_ptr to NULL (must do this before call to CoUninitialize)
 					gapLogProcessInfo.reset();
+
+					if (ipDbLocksLogger != __nullptr)
+					{
+						ipDbLocksLogger->StopLogging();
+					}
 
 					CoUninitialize();		
 				}

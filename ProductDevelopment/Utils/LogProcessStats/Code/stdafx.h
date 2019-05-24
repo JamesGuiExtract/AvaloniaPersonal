@@ -41,4 +41,6 @@
 #include <afxcmn.h>			// MFC support for Windows Common Controls
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
-// TODO: reference additional headers your program requires here
+
+#import "..\..\..\..\RC.Net\Database\Logger\Code\Extract.Database.Logger.tlb" named_guids
+using namespace Extract_Database_Logger;

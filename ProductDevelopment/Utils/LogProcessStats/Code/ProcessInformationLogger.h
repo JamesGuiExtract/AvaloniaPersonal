@@ -108,5 +108,9 @@ private:
 	// initial time stamp we can have a basic row count that starts at 0 and increases by the
 	// amount of time the process has been running (as opposed to a simple row count)
 	map<string, __time64_t> m_mapFirstTimeStamp;
+
+	// Added as a member variable so the initialization of the CoInitializeSecurity call
+	// is at the time ProcessInformationLogger is created.
+	ProcessStatisticsManager m_psmMyManager;
 };
 //--------------------------------------------------------------------------------------------------

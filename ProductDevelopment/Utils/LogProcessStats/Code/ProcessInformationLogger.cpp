@@ -38,7 +38,8 @@ ProcessInformationLogger::ProcessInformationLogger(const set<long> &rsetPID,
 		m_strWorkingDirectory(rstrWorkingDirectory),
 		m_cCpuUsage(),
 		m_bKeepLooping(true),
-		m_tLastCpuTime(0)
+		m_tLastCpuTime(0),
+		m_psmMyManager()
 {
 	m_ulBreakInterval = min(m_ulRefreshInterval, gulBREAK_INTERVAL);
 	_time64(&m_tLastCleanTime);
@@ -64,8 +65,7 @@ void ProcessInformationLogger::start()
 		bAllCsv = true;
 	}
 
-	ProcessStatisticsManager psmMyManager;
-	
+
 	// the map contains a list of all of the data points that we have seen.
 	// the key is based on the IPS.getKeyValue() method.  we use the
 	// map to store the last data point and then compare the last point
@@ -77,7 +77,7 @@ void ProcessInformationLogger::start()
 	{
 		// vector to hold all of the stats that we get back from the ProcessStatisticsManager
 		vector<IndividualProcessStatistics> vecProcStats;
-		__time64_t tCurrentTime = psmMyManager.getProcessStatistics(
+		__time64_t tCurrentTime = m_psmMyManager.getProcessStatistics(
 										vecProcStats, m_setPIDs, m_setPNames);
 		// log the cpu usage
 		logCPUUsage(tCurrentTime);

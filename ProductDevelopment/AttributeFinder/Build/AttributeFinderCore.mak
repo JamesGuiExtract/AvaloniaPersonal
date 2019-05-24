@@ -259,6 +259,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Dashboard.Forms.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Dashboard.Forms.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract64.Core.dll" /mapout:"$(BinariesFolder)\Map\mapExtract64.Cores.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Code.Attributes.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Code.Attributes.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Database.Logger.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Database.Logger.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
 
 	@ECHO.
     @DATE /T
@@ -468,6 +469,7 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\DataEntryApplication.exe" /b >>"$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\DataEntry.nl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.FileActionManager.FAMFileInspector.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Utilities.ContextTags.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
+	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Database.Logger.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
 
 #    @COPY /V "$(BinariesFolder)\sit_grammar.xml" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V "$(BinariesFolder)\ImageViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
