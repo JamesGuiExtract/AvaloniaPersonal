@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28917.181
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AutoIncrementVssLabel", "..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcxproj", "{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}"
 EndProject
@@ -112,6 +112,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetAllSampleImageTypes", "..\..\GetAllSampleImageTypes\Code\GetAllSampleImageTypes.vcxproj", "{7DEBCE89-F997-40D9-BEE4-451323197CB3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LogProcessStats", "..\..\LogProcessStats\Code\LogProcessStats.vcxproj", "{019EE5EB-D6A9-4231-9807-E485DF279745}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F54C2B01-3777-4EE0-8C0E-FCAE11459949} = {F54C2B01-3777-4EE0-8C0E-FCAE11459949}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetWordLengthDist", "..\..\GetWordLengthDist\Code\GetWordLengthDist.vcxproj", "{49DCB86A-B4B4-421B-B7F4-C3EF46644875}"
 EndProject
