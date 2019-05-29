@@ -55,7 +55,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\..\APIs\Nuance_19\Include;..\..\..\..\..\BaseUtils\Code;..\..\..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\UCLIDCOMUtils\Core\Code;..\..\..\Core\Code;..\..\..\OCREngines\SSOCR2\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\APIs\Nuance_20\Include;..\..\..\..\..\BaseUtils\Code;..\..\..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\UCLIDCOMUtils\Core\Code;..\..\..\Core\Code;..\..\..\OCREngines\SSOCR2\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -70,7 +70,7 @@
     <Link>
       <AdditionalDependencies>KernelAPI.lib;RecAPIPlus.lib;recpdf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\..\..\binaries\debug\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\..\..\APIs\Nuance_19\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\..\APIs\Nuance_20\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\debug\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -86,7 +86,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\..\APIs\Nuance_19\Include;..\..\..\..\..\BaseUtils\Code;..\..\..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\UCLIDCOMUtils\Core\Code;..\..\..\Core\Code;..\..\..\OCREngines\SSOCR2\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\..\APIs\Nuance_20\Include;..\..\..\..\..\BaseUtils\Code;..\..\..\..\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\UCLIDCOMUtils\Core\Code;..\..\..\Core\Code;..\..\..\OCREngines\SSOCR2\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -99,7 +99,7 @@
     <Link>
       <AdditionalDependencies>KernelAPI.lib;RecAPIPlus.lib;recpdf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\..\..\binaries\release\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\..\..\APIs\Nuance_19\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\..\APIs\Nuance_20\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>

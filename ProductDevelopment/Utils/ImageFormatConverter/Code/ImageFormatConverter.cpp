@@ -346,7 +346,7 @@ void initNuanceEngineAndLicense()
 // Will perform the image conversion
 void nuanceConvertImage(const string strInputFileName, const string strOutputFileName, 
 				  EConverterFileType eOutputType, bool bPreserveColor, string strPagesToRemove,
-				  IMF_FORMAT nExplicitFormat)
+				  IMF_FORMAT nExplicitFormat, int nCompressionLevel)
 {
 	// [LegacyRCAndUtils:6275]
 	// Since we will be using the Nuance engine, ensure we are licensed for it.
@@ -391,6 +391,11 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 				case kFileType_Jpg:
 					strExt = ".jpg";
 					break;
+			}
+
+			if (nCompressionLevel > 0)
+			{
+				kRecSetCompressionLevel(0, nCompressionLevel);
 			}
 
 			// Create a temporary file into which the results should be written until the entire
@@ -947,21 +952,25 @@ unordered_map<string, pair<IMF_FORMAT, string>> getFormats()
 	mapFormats["tifg32"]          = make_pair(FF_TIFG32, "          \tStandard G3 2D TIFF image format.");
 	mapFormats["tifg4"]           = make_pair(FF_TIFG4, "           \tStandard G4 TIFF image format.");
 	mapFormats["tiflzw"]          = make_pair(FF_TIFLZW, "          \tTIFF-LZW image format incorporating Unisys compression.");
-	mapFormats["jpg_superb"]      = make_pair(FF_JPG_SUPERB, "      \tJPEG format with negligible information loss.");
-	mapFormats["jpg_good"]        = make_pair(FF_JPG_GOOD, "        \tJPEG format with average information loss.  (Results in medium-size image files when saving.)");
-	mapFormats["jpg_min"]         = make_pair(FF_JPG_MIN, "         \tJPEG format optimized for minimum image file size. Worst image quality.");
-	mapFormats["pdf_min"]         = make_pair(FF_PDF_MIN, "         \tAdobe PDF format. Minimum image file size.");
-	mapFormats["pdf_good"]        = make_pair(FF_PDF_GOOD, "        \tAdobe PDF format. Results in medium-size image files when saving.");
-	mapFormats["pdf_superb"]      = make_pair(FF_PDF_SUPERB, "      \tAdobe PDF format with negligible information loss.");
-	mapFormats["pdf_mrc_min"]     = make_pair(FF_PDF_MRC_MIN, "     \tAdobe PDF format with MRC technology. Optimized for minimum image file size.");
-	mapFormats["pdf_mrc_good"]    = make_pair(FF_PDF_MRC_GOOD, "    \tAdobe PDF format with MRC technology. (Results in medium-size image files when saving.)");
-	mapFormats["pdf_mrc_superb"]  = make_pair(FF_PDF_MRC_SUPERB, "  \tAdobe PDF format with MRC technology. PDF with small information loss.");
+	mapFormats["jpg"]             = make_pair(FF_JPG, "             \tJPEG format with configurable compression level (1-5).");
+	mapFormats["jpg_superb"]      = make_pair(FF_JPG_SUPERB, "      \t(deprecated) JPEG format with negligible information loss.");
+	mapFormats["jpg_good"]        = make_pair(FF_JPG_GOOD, "        \t(deprecated) JPEG format with average information loss.  (Results in medium-size image files when saving.)");
+	mapFormats["jpg_min"]         = make_pair(FF_JPG_MIN, "         \t(deprecated) JPEG format optimized for minimum image file size. Worst image quality.");
+	mapFormats["jpg2k"]           = make_pair(FF_JPG2K, "           \tJPEG2000 format with configurable compression level (1-5).");
+	mapFormats["pdf"]             = make_pair(FF_PDF, "             \tAdobe PDF format with configurable compression level (1-5).");
+	mapFormats["pdf_min"]         = make_pair(FF_PDF_MIN, "         \t(deprecated) Adobe PDF format. Minimum image file size.");
+	mapFormats["pdf_good"]        = make_pair(FF_PDF_GOOD, "        \t(deprecated) Adobe PDF format. Results in medium-size image files when saving.");
+	mapFormats["pdf_superb"]      = make_pair(FF_PDF_SUPERB, "      \t(deprecated) Adobe PDF format with negligible information loss.");
+	mapFormats["pdf_mrc"]         = make_pair(FF_PDF_MRC, "         \tAdobe PDF format with MRC technology with configurable compression level.");
+	mapFormats["pdf_mrc_min"]     = make_pair(FF_PDF_MRC_MIN, "     \t(deprecated) Adobe PDF format with MRC technology. Optimized for minimum image file size.");
+	mapFormats["pdf_mrc_good"]    = make_pair(FF_PDF_MRC_GOOD, "    \t(deprecated) Adobe PDF format with MRC technology. (Results in medium-size image files when saving.)");
+	mapFormats["pdf_mrc_superb"]  = make_pair(FF_PDF_MRC_SUPERB, "  \t(deprecated) Adobe PDF format with MRC technology. PDF with small information loss.");
 	return mapFormats;
 }
 //-------------------------------------------------------------------------------------------------
 void usage()
 {
-	string strUsage = "This application has 3 required arguments and 9 optional arguments:\n";
+	string strUsage = "This application has 3 required arguments and 10 optional arguments:\n";
 		strUsage += "An input image file (.tif or .pdf) \n"
 					"An output image file (.pdf or .tif) \n"
 					"An output file type (/pdf, /tif or /jpg).\n\n"
@@ -997,10 +1006,12 @@ void usage()
 		{
 			strUsage += " \t\t" + it->second.first + it->second.second + "\n";
 		}
+		strUsage += "The optional argument (/compression <1-5>) allows specification of the compression level for applicable Nuance file formats (pdf, pdf_mrc, jpg, jpg2k).\n";
+		strUsage += "\twhere 1 is the highest level of compression and 5 is the weakest level.\n";
 		strUsage += "\nUsage:\n";
 		strUsage += "ImageFormatConverter.exe <strInput> <strOutput> <out_type> [/retain] "
 					"[/user \"<Password>\"] [/owner \"<Password>\" <Permissions>] [/vp [perspective_id]] "
-					"[/am] [/RemovePages \"<Pages>\"] [/color] [/ef <filename>] [/format <format>]\n"
+					"[/am] [/RemovePages \"<Pages>\"] [/color] [/ef <filename>] [/format <format>] [/compression <level>]\n"
 					"where:\n"
 					"out_type is /pdf, /tif or /jpg,\n"
 					"<Password> is the password to apply (user and/or owner) to the PDF (requires out_type = /pdf).\n"
@@ -1104,6 +1115,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 				bool bPreserveColor = false;
 				string strPagesToRemove;
 				IMF_FORMAT eExplicitFormat = (IMF_FORMAT)-1;
+				int nCompressionLevel = -1;
 				for (size_t i=3; i < uiParamCount; i++)
 				{
 					string strTemp = vecParams[i];
@@ -1237,6 +1249,28 @@ BOOL CImageFormatConverterApp::InitInstance()
 						}
 						eExplicitFormat = search->second.first;
 					}
+					else if (strTemp == "/compression")
+					{
+						if (++i == uiParamCount)
+						{
+							usage();
+							return FALSE;
+						}
+
+						strTemp = vecParams[i];
+						try
+						{
+							nCompressionLevel = asLong(strTemp);
+						}
+						catch (...) {}
+
+						if (nCompressionLevel < 1 || nCompressionLevel > 5)
+						{
+							string strMsg = "Invalid compression level! Expecting 1-5, got '" + strTemp + "'";
+							AfxMessageBox(strMsg.c_str());
+							return FALSE;
+						}
+					}
 					else
 					{
 						usage();
@@ -1297,7 +1331,7 @@ BOOL CImageFormatConverterApp::InitInstance()
 					}
 
 					nuanceConvertImage(strInputName, strOutputName, eOutputType, bPreserveColor,
-						strPagesToRemove, eExplicitFormat);
+						strPagesToRemove, eExplicitFormat, nCompressionLevel);
 				}
 				else if (!(isPDFFile(strInputName) || eOutputType == kFileType_Pdf) || LicenseManagement::isPDFLicensed())
 				{
