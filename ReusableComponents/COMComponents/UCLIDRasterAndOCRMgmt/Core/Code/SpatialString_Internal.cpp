@@ -4691,7 +4691,7 @@ void CSpatialString::loadFromGoogleJson(const string& strInputFile, long nPageNu
 
 	sort(thetas.begin(), thetas.end());
 	double medTheta = thetas[thetas.size() / 2]; // range (-PI, PI)
-	long rotation = (long)round(medTheta * 2 / MathVars::PI) % 1 * 90; // (-180, -90, 0, 90, 180)
+	long rotation = (long)round(medTheta * 2 / MathVars::PI) % 3 * 90; // (-180, -90, 0, 90, 180)
 	double deskew = medTheta * 180 / MathVars::PI; // range (-180, 180)
 	deskew -= rotation;
 
@@ -4739,7 +4739,11 @@ void CSpatialString::addWordsToLetterArray(const rapidjson::Value::ConstArray& w
 			{
 				const auto& word = words[wordIdx];
 				AnnotationSpatialProperties wordProperties;
-				bool wordPropertiesAreSet = false;
+				bool wordPropertiesAreSet = getAnnotationSpatialInfo(word, hasVertices, hasNormalizedVertices, wordProperties);
+				if (wordPropertiesAreSet)
+				{
+					thetas.push_back(wordProperties.theta);
+				}
 
 				// SYMBOLS
 				const auto& symbolsIt = word.FindMember("symbols");
@@ -4767,10 +4771,6 @@ void CSpatialString::addWordsToLetterArray(const rapidjson::Value::ConstArray& w
 							bool symbolPropertiesAreSet = getAnnotationSpatialInfo(symbol, hasVertices, hasNormalizedVertices, symbolProperties);
 							if (!symbolPropertiesAreSet)
 							{
-								if (!wordPropertiesAreSet)
-								{
-									wordPropertiesAreSet = getAnnotationSpatialInfo(word, hasVertices, hasNormalizedVertices, wordProperties);
-								}
 								if (wordPropertiesAreSet)
 								{
 									getSymbolSpatialInfoFromWord(wordProperties, numSymbols, symbolIdx, symbolProperties);
@@ -4780,7 +4780,6 @@ void CSpatialString::addWordsToLetterArray(const rapidjson::Value::ConstArray& w
 							if (symbolPropertiesAreSet)
 							{
 								setLetterBounds(letter, symbolProperties, hasNormalizedVertices ? widthConvertedFromPoints : 1, hasNormalizedVertices ? heightConvertedFromPoints : 1);
-								thetas.push_back(symbolProperties.theta);
 							}
 
 							// Get break properties
