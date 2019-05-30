@@ -4691,7 +4691,7 @@ void CSpatialString::loadFromGoogleJson(const string& strInputFile, long nPageNu
 
 	sort(thetas.begin(), thetas.end());
 	double medTheta = thetas[thetas.size() / 2]; // range (-PI, PI)
-	long rotation = (long)round(medTheta * 2 / MathVars::PI) % 3 * 90; // (-180, -90, 0, 90, 180)
+	long rotation = (long)round(medTheta * 2 / MathVars::PI) * 90; // (-180, -90, 0, 90, 180)
 	double deskew = medTheta * 180 / MathVars::PI; // range (-180, 180)
 	deskew -= rotation;
 
