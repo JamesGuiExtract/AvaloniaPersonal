@@ -4647,26 +4647,39 @@ void CSpatialString::loadFromGoogleJson(const string& strInputFile, long nPageNu
 	const auto& blocksIt = page->FindMember("blocks");
 	if (blocksIt != page->MemberEnd())
 	{
+		long blockIdx = 0;
 		for (auto& block : blocksIt->value.GetArray())
 		{
 			const auto& paragraphsIt = block.FindMember("paragraphs");
 			if (paragraphsIt != block.MemberEnd())
 			{
+				long paragraphIdx = 0;
 				for (auto& paragraph : paragraphsIt->value.GetArray())
 				{
 					const auto wordsIt = paragraph.FindMember("words");
 					if (wordsIt != paragraph.MemberEnd())
 					{
-						// Add symbols from these words to letters and also collect rotation angles and set vertice/normalizedVertice flags, if not already set
-						const auto& words = wordsIt->value.GetArray();
-						addWordsToLetterArray(words, (unsigned short)nPageNumber, widthConvertedFromPoints, heightConvertedFromPoints, letters, hasVertices, hasNormalizedVertices, thetas);
+						try
+						{
+							// Add symbols from these words to letters and also collect rotation angles and set vertice/normalizedVertice flags, if not already set
+							const auto& words = wordsIt->value.GetArray();
+							addWordsToLetterArray(words, (unsigned short)nPageNumber, widthConvertedFromPoints, heightConvertedFromPoints, letters, hasVertices, hasNormalizedVertices, thetas);
+						}
+						catch (UCLIDException& uex)
+						{
+							uex.addDebugInfo("Paragraph Index", paragraphIdx);
+							uex.addDebugInfo("Block Index", blockIdx);
+							throw;
+						}
 					}
 
 					// Add empty line after each paragraph (this won't be quite consistent with SSOCR2,
 					// since the last paragraph of the document will end with an empty line, but I guess it's close enough)
 					letters.insert(letters.end(), { gletterSLASH_R, gletterSLASH_N });
+					paragraphIdx++;
 				}
 			}
+			blockIdx++;
 		}
 	}
 
@@ -4963,15 +4976,36 @@ bool CSpatialString::getAnnotationSpatialInfo(const rapidjson::Value& el, bool& 
 			rapidjson::Value::ConstArray& v = vertIt->value.GetArray();
 			if (vertIt != bbIt->value.MemberEnd() && v.Size() > 3)
 			{
-				const auto& v = vertIt->value.GetArray();
-				properties.x1 = v[0]["x"].GetDouble();
-				properties.y1 = v[0]["y"].GetDouble();
-				properties.x2 = v[1]["x"].GetDouble();
-				properties.y2 = v[1]["y"].GetDouble();
-				properties.x3 = v[2]["x"].GetDouble();
-				properties.y3 = v[2]["y"].GetDouble();
-				properties.x4 = v[3]["x"].GetDouble();
-				properties.y4 = v[3]["y"].GetDouble();
+				double *points[4][2] = {
+					{ &properties.x1, &properties.y1 },
+					{ &properties.x2, &properties.y2 },
+					{ &properties.x3, &properties.y3 },
+					{ &properties.x4, &properties.y4 } };
+
+				for (long i = 0; i < 4; i++)
+				{
+					const auto& v = vertIt->value[i];
+					const auto& x = v.FindMember("x");
+					// If coordinate is omitted it's value is 0
+					// https://cloud.google.com/vision/docs/reference/rpc/google.cloud.vision.v1p2beta1#zero-coordinate-values_2
+					if (x == v.MemberEnd())
+					{
+						*points[i][0] = 0;
+					}
+					else
+					{
+						*points[i][0] = x->value.GetDouble();
+					}
+					const auto& y = vertIt->value[i].FindMember("y");
+					if (y == v.MemberEnd())
+					{
+						*points[i][1] = 0;
+					}
+					else
+					{
+						*points[i][1] = y->value.GetDouble();
+					}
+				}
 				double dx2 = (properties.x2 - properties.x1);
 				double dy2 = (properties.y2 - properties.y1);
 				double dx4 = (properties.x4 - properties.x1);
