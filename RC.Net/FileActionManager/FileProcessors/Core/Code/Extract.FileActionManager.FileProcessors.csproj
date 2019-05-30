@@ -456,6 +456,9 @@
       <SubType>Designer</SubType>
       <DependentUpon>ApplyBatesNumberSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="CloudOCRTaskSettingsDialog.resx">
+      <DependentUpon>CloudOCRTaskSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="PaginationTaskSettingsDialog.resx">
       <DependentUpon>PaginationTaskSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>

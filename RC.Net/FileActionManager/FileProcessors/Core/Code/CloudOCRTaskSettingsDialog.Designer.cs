@@ -91,6 +91,7 @@
             this._credentialsJSONFileBrowseButton.Size = new System.Drawing.Size(40, 22);
             this._credentialsJSONFileBrowseButton.TabIndex = 2;
             this._credentialsJSONFileBrowseButton.Text = "...";
+            this._credentialsJSONFileBrowseButton.TextControl = this._credentialsJSONFileTextBox;
             this._credentialsJSONFileBrowseButton.UseVisualStyleBackColor = true;
             // 
             // _credentialsJSONFilePathTagButton
