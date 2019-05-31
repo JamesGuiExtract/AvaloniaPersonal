@@ -373,7 +373,7 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 string inputPath = pFileRecord.Name;
                 string outputPath = inputPath + ".uss";
-                GoogleCloudOCR.ProcessFile(inputPath, outputPath, pProgressStatus);
+                GoogleCloudOCR.ProcessFile(inputPath, outputPath, pFileRecord.FileID, pProgressStatus);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }

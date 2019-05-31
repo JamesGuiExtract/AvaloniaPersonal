@@ -79,12 +79,13 @@ namespace Extract.GoogleCloud
         /// </summary>
         /// <param name="inputPath">The TIF or PDF file to be OCRed</param>
         /// <param name="outputPath">The USS file path to write the output to. If this file already exists then it will be deleted</param>
+        /// <param name="fileID">Optional ID to append to the generated cloud storage name</param>
         /// <param name="progressStatus">Optional <see cref="ProgressStatus"/> object</param>
-        public void ProcessFile(string inputPath, string outputPath, ProgressStatus progressStatus = null)
+        public void ProcessFile(string inputPath, string outputPath, int fileID = -1, ProgressStatus progressStatus = null)
         {
             try
             {
-                ProcessFileAsync(inputPath, outputPath, progressStatus).GetAwaiter().GetResult();
+                ProcessFileAsync(inputPath, outputPath, fileID, progressStatus).GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
@@ -97,8 +98,9 @@ namespace Extract.GoogleCloud
         /// </summary>
         /// <param name="inputPath">The TIF or PDF file to be OCRed</param>
         /// <param name="outputPath">The USS file path to write the output to. If this file already exists then it will be deleted</param>
+        /// <param name="fileID">Optional ID to append to the generated cloud storage name</param>
         /// <param name="progressStatus">Optional <see cref="ProgressStatus"/> object</param>
-        public async Task ProcessFileAsync(string inputPath, string outputPath, ProgressStatus progressStatus = null)
+        public async Task ProcessFileAsync(string inputPath, string outputPath, int fileID = -1, ProgressStatus progressStatus = null)
         {
             string uploadedImageName = null;
             IEnumerable<(int pageNumber, DataObject blob)> output = null;
@@ -113,7 +115,7 @@ namespace Extract.GoogleCloud
 
                 string extension = Path.GetExtension(inputPath).ToLowerInvariant();
                 string imageType = extension == ".pdf" ? "application/pdf" : "image/tiff";
-                uploadedImageName = GetSafeName(inputPath);
+                uploadedImageName = GetSafeName(fileID);
                 using (var fileStream = new FileStream(inputPath, FileMode.Open))
                 {
                     progressStatus?.StartNextItemGroup("Uploading image file", 1);
@@ -253,9 +255,9 @@ namespace Extract.GoogleCloud
                     select (pageNum, blob)).ToList();
         }
 
-        private static string GetSafeName(string path)
+        private static string GetSafeName(int fileID)
         {
-            return Guid.NewGuid().ToString() + "_" + Path.GetFileName(path);
+            return Guid.NewGuid().ToString() + "_FamFileID=" + fileID.ToString(CultureInfo.InvariantCulture);
         }
 
         #endregion Private Methods
