@@ -267,27 +267,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets a value indicating whether any object has an active reference to this instance.
-        /// </summary>
-        /// <value><see langword="true"/> if there is an active reference; otherwise,
-        /// <see langword="false"/>.
-        /// </value>
-        public bool HasActiveReference
-        {
-            get
-            {
-                try
-                {
-                    return _references.Any();
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI35425");
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets or sets a value indicating whether multiple (non-deleted) copies of this page exist
         /// in the UI.
         /// </summary>

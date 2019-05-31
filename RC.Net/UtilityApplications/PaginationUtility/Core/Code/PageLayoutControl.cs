@@ -24,6 +24,12 @@ namespace Extract.UtilityApplications.PaginationUtility
     internal partial class PageLayoutControl : UserControl
     {
         /// <summary>
+        /// The number of pages that can be safely loaded at once without exceeding the limit of
+        /// Window's user objects.
+        /// </summary>
+        internal static readonly int _MAX_LOADED_PAGES = 1000;
+
+        /// <summary>
         /// Displays a wait cursor and suspends layout and painting of the _flowLayoutPanel during
         /// an operation which is re-organizing controls in the panel.
         /// </summary>
@@ -3869,19 +3875,19 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Determines if all <see cref="Page"/>s <see paramref="pagesToLoad"/> can be loaded
-        /// without exceeding <see cref="PaginationUtilityForm._MAX_LOADED_PAGES"/> and if not takes
+        /// without exceeding <see cref="_MAX_LOADED_PAGES"/> and if not takes
         /// appropriate action (including adjusting the pages in <see paramref="pagesToLoad"/>).
         /// </summary>
         /// <param name="pageCountToLoad">The number of <see cref="Page"/>s to about to be loaded.
         /// </param>
         void AssertAllPagesBeLoaded(int pageCountToLoad)
         {
-            int remainingPages = PaginationUtilityForm._MAX_LOADED_PAGES - PageCount;
+            int remainingPages = _MAX_LOADED_PAGES - PageCount;
             if (remainingPages < pageCountToLoad)
             {
                 throw new ExtractException("ELI45516",
                     "No more than " +
-                    PaginationUtilityForm._MAX_LOADED_PAGES.ToString(CultureInfo.CurrentCulture) +
+                    _MAX_LOADED_PAGES.ToString(CultureInfo.CurrentCulture) +
                     " pages may be loaded at once.\r\n\r\n");
             }
         }
@@ -4414,11 +4420,11 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (copiedPages != null && _commandTargetControl != null)
                     {
-                        int pasteMaxCount = PaginationUtilityForm._MAX_LOADED_PAGES - PageCount;
+                        int pasteMaxCount = _MAX_LOADED_PAGES - PageCount;
                         if (copiedPages.Count(page => page.Key != null) > pasteMaxCount)
                         {
                             MessageBox.Show("No more than " +
-                                PaginationUtilityForm._MAX_LOADED_PAGES.ToString(CultureInfo.CurrentCulture) +
+                                _MAX_LOADED_PAGES.ToString(CultureInfo.CurrentCulture) +
                                 " pages may be loaded at once.\r\n\r\n" +
                                 "The pages on the clipboard cannot be inserted until existing\r\n" +
                                 "pages are output or deleted.", "Page limit reached",

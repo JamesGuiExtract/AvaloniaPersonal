@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Extract.AttributeFinder;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -118,6 +120,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get;
             private set;
+        }
+
+        /// <summary>
+        /// Gets or sets any <see cref="PaginationRequest"/> that has been recorded for this document
+        /// (to be executed by a server-side task).
+        /// </summary>
+        public PaginationRequest PaginationRequest
+        {
+            get;
+            set;
         }
 
         /// <summary>

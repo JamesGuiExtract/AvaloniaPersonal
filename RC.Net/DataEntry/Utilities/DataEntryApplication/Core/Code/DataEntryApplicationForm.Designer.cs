@@ -331,6 +331,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._paginationPanel.CacheImages = false;
             this._paginationPanel.CommitOnlySelection = false;
+            this._paginationPanel.CreateDocumentOnOutput = true;
             this._paginationPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this._paginationPanel.ExpectedPaginationAttributesPath = null;
             this._paginationPanel.AutoSelectForReprocess = true;

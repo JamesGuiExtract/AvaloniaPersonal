@@ -36,6 +36,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public Page Page
         {
+            [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
             get;
             private set;
         }
@@ -45,6 +46,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public OutputDocument OutputDocument
         {
+            [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
             get;
             private set;
         }
@@ -76,6 +78,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public ReadOnlyCollection<Page> Pages
         {
+            [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
             get;
             private set;
         }

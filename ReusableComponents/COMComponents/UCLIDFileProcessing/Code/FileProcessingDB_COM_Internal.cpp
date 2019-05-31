@@ -10508,7 +10508,7 @@ bool CFileProcessingDB::AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, l
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrOutputFile,
+bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, long nOutputFileID,
 													  IIUnknownVector* pSourcePageInfo,
 													  IIUnknownVector* pDeletedSourcePageInfo,
 													  long nFileTaskSessionID)
@@ -10521,13 +10521,6 @@ bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrO
 			IIUnknownVectorPtr ipDeletedSourcePageInfo(pDeletedSourcePageInfo);
 			ASSERT_ARGUMENT("ELI39683", ipSourcePageInfo != __nullptr
 										|| ipDeletedSourcePageInfo != __nullptr);
-
-			string strOutputFile = "NULL";
-			if (bstrOutputFile != __nullptr)
-			{
-				strOutputFile = asString(bstrOutputFile);
-				replaceVariable(strOutputFile, "'", "''");
-			}
 
 			// Compile selection queries that will produce a result set with the corresponding
 			// source and destination pages for all pages in the output document.
@@ -10543,7 +10536,7 @@ bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrO
 					string strSourceDocName = asString(ipPageInfo->StringKey);
 					replaceVariable(strSourceDocName, "'", "''");
 					string strPageNum = asString(ipPageInfo->StringValue);
-					string strDestPage = bstrOutputFile == __nullptr ? "NULL" : asString(i + 1);
+					string strDestPage = (nOutputFileID <= 0) ? "NULL" : asString(i + 1);
 
 					string strPageSelection = gstrSELECT_SINGLE_PAGINATED_PAGE;
 					replaceVariable(strPageSelection, "<SourceFileName>", strSourceDocName);
@@ -10579,7 +10572,7 @@ bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrO
 			// Use this data in gstrINSERT_INTO_PAGINATION which will compute the OriginalFileID
 			// and OriginalPage columns for all of the new data.
 			string strSQL = gstrINSERT_INTO_PAGINATION;
-			replaceVariable(strSQL, "<DestFileName>", strOutputFile);
+			replaceVariable(strSQL, "<DestFileID>", (nOutputFileID <= 0) ? "NULL" : asString(nOutputFileID));
 			replaceVariable(strSQL, "<SelectPaginations>", asString(vecPageSelections, false, "\r\nUNION\r\n"));
 			replaceVariable(strSQL, "<FAMSessionID>", asString(nFileTaskSessionID));
 
@@ -10612,7 +10605,7 @@ bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, BSTR bstrO
 		{
 			return false;
 		}
-		ue.addDebugInfo("PaginatedFile", asString(bstrOutputFile));
+		ue.addDebugInfo("PaginatedFileID", nOutputFileID);
 		throw ue;
 	}
 	return true;

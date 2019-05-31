@@ -744,7 +744,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 if (copyOriginalDocument)
-                {                    
+                {
                     // If the document has not been changed from its original form, it can simply be
                     // copied to _fileName rather than require it to be re-assembled.
                     File.Copy(firstPage.OriginalDocumentName, FileName);

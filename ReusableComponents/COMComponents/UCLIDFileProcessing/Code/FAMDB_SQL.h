@@ -1941,13 +1941,10 @@ static const string gstrSELECT_SINGLE_PAGINATED_PAGE =
 	"	FROM [FAMFile] WHERE [FileName] = '<SourceFileName>'";
 
 static const string gstrINSERT_INTO_PAGINATION =
-	"DECLARE @DestFileID INT \r\n"
-	"SELECT @DestFileID = [ID] FROM [FAMFile] WHERE [FileName] = '<DestFileName>' \r\n"
-
 	"INSERT INTO [Pagination] ([SourceFileID], [SourcePage], [DestFileID], [DestPage], [OriginalFileID], [OriginalPage], [FileTaskSessionID]) \r\n"
 	"	SELECT [NewPaginations].[SourceFileID], \r\n"
 	"		[NewPaginations].[SourcePage], \r\n"
-	"		@DestFileID AS [DestFileID], \r\n"
+	"		<DestFileID> AS [DestFileID], \r\n"
 	"		[NewPaginations].[DestPage], \r\n"
 	"		COALESCE([OriginalPages].[OriginalFileID], [NewPaginations].[SourceFileID]), \r\n"
 	"		COALESCE([OriginalPages].[OriginalPage], [NewPaginations].[SourcePage]), \r\n"

@@ -19,6 +19,7 @@ using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.FileActionManager.FileProcessors
 {
@@ -1174,28 +1175,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // Add the file to the DB and check it out for this process before actually writing
                 // it to outputPath to prevent a running file supplier from grabbing it and another
                 // process from getting it.
-                _paginationPanel.AddFileWithNameConflictResolve(e, priority);
-
-                // Add pagination history before the image is created so that it does not
-                // get queued by a watching supplier
-                // https://extract.atlassian.net/browse/ISSUE-13760
-                // Format source page info into an IUnknownVector of StringPairs (filename, page).
-                var sourcePageInfo = e.SourcePageInfo
-                    .Where(info => !info.Deleted)
-                    .Select(info => new StringPairClass()
-                    {
-                        StringKey = info.DocumentName,
-                        StringValue = info.Page.ToString(CultureInfo.InvariantCulture)
-                    })
-                    .ToIUnknownVector();
-                var deletedSourcePageInfo = e.SourcePageInfo
-                    .Where(info => info.Deleted)
-                    .Select(info => new StringPairClass()
-                    {
-                        StringKey = info.DocumentName,
-                        StringValue = info.Page.ToString(CultureInfo.InvariantCulture)
-                    })
-                    .ToIUnknownVector();
+                int fileId = _paginationPanel.AddFileWithNameConflictResolve(e, priority);
 
                 var firstSourceFile = e.SourcePageInfo
                     .Select(pageInfo => pageInfo.DocumentName)
@@ -1206,43 +1186,35 @@ namespace Extract.FileActionManager.FileProcessors
                 ExtractException.Assert("ELI40090", "FileTaskSession was not started.",
                     _fileTaskSessionMap.TryGetValue(GetFileID(firstSourceFile), out var sessionData));
 
-                FileProcessingDB.AddPaginationHistory(
-                    e.OutputFileName, sourcePageInfo, deletedSourcePageInfo, sessionData.SessionID);
-
-                // Produce a uss file for the paginated document using the uss data from the
-                // source documents
-                int pageCounter = 1;
-                var pageMap = new Dictionary<Tuple<string, int>, List<int>>();
-                foreach (var pageInfo in e.SourcePageInfo.Where(info => !info.Deleted))
-                {
-                    var sourcePage = new Tuple<string, int>(pageInfo.DocumentName, pageInfo.Page);
-                    var destPages = new List<int>();
-                    if (!pageMap.TryGetValue(sourcePage, out destPages))
-                    {
-                        destPages = new List<int>();
-                        pageMap[sourcePage] = destPages;
-                    }
-
-                    destPages.Add(pageCounter++);
-                }
-
-                var newSpatialPageInfos = AttributeMethods.CreateUSSForPaginatedDocument(
-                    e.OutputFileName, pageMap, e.RotatedPages);
-
-                var documentData = e.DocumentData as PaginationDocumentData;
-                if (documentData != null && documentData.Attributes != null && documentData.Attributes.Size() > 0)
-                {
-                    AttributeMethods.TranslateAttributesToNewDocument(
-                        documentData.Attributes, e.OutputFileName, pageMap, e.RotatedPages, newSpatialPageInfos);
-
-                    string dataFileName = e.OutputFileName + ".voa";
-                    documentData.Attributes.SaveTo(dataFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
-                    documentData.Attributes.ReportMemoryUsage();
-                }
+                e.DocumentData.PaginationRequest = new PaginationRequest(sessionData.SessionID, fileId);
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40091");
+            }
+        }
+
+        /// <summary>
+        /// Sets a newly created file to pending for the OutputAction
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance containing the
+        /// FileID of the newly created file.</param>
+        void HandlePaginationPanel_OutputDocumentCreated(object sender, CreatingOutputDocumentEventArgs e)
+        {
+            try
+            {
+                FileProcessingDB.SetStatusForFile(e.FileID,
+                    _settings.OutputAction,
+                    -1, // Current workflow
+                    EActionStatus.kActionPending,
+                    vbAllowQueuedStatusOverride: false,
+                    vbQueueChangeIfProcessing: false,
+                    poldStatus: out var _);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI43308");
             }
         }
 
@@ -1442,30 +1414,6 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI41476");
-            }
-        }
-
-        /// <summary>
-        /// Sets a newly created file to pending for the OutputAction
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance containing the
-        /// FileID of the newly created file.</param>
-        void HandlePaginationPanel_OutputDocumentCreated(object sender, CreatingOutputDocumentEventArgs e)
-        {
-            try
-            {
-                FileProcessingDB.SetStatusForFile(e.FileID,
-                    _settings.OutputAction,
-                    -1, // Current workflow
-                    EActionStatus.kActionPending,
-                    vbAllowQueuedStatusOverride: false,
-                    vbQueueChangeIfProcessing: false,
-                    poldStatus: out var _);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI43308");
             }
         }
 

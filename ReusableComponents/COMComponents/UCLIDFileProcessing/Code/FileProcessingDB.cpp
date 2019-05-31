@@ -3860,7 +3860,7 @@ STDMETHODIMP CFileProcessingDB::AddFileNoQueue(BSTR bstrFile, long long llFileSi
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39575");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::AddPaginationHistory(BSTR bstrOutputFile,
+STDMETHODIMP CFileProcessingDB::AddPaginationHistory(long nOutputFileID,
 													 IIUnknownVector* pSourcePageInfo,
 													 IIUnknownVector* pDeletedSourcePageInfo,
 													 long nFileTaskSessionID)
@@ -3871,13 +3871,13 @@ STDMETHODIMP CFileProcessingDB::AddPaginationHistory(BSTR bstrOutputFile,
 	{
 		validateLicense();
 		
-		if (!AddPaginationHistory_Internal(false, bstrOutputFile, pSourcePageInfo, pDeletedSourcePageInfo, nFileTaskSessionID))
+		if (!AddPaginationHistory_Internal(false, nOutputFileID, pSourcePageInfo, pDeletedSourcePageInfo, nFileTaskSessionID))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
 				gstrMAIN_DB_LOCK);
 
-			AddPaginationHistory_Internal(true, bstrOutputFile, pSourcePageInfo, pDeletedSourcePageInfo, nFileTaskSessionID);
+			AddPaginationHistory_Internal(true, nOutputFileID, pSourcePageInfo, pDeletedSourcePageInfo, nFileTaskSessionID);
 		}
 		return S_OK;
 	}

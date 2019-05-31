@@ -3191,7 +3191,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _fileTaskSessionID.HasValue);
 
                 FileProcessingDB.AddPaginationHistory(
-                    e.OutputFileName, sourcePageInfo, deletedSourcePageInfo, _fileTaskSessionID.Value);
+                    e.FileID, sourcePageInfo, deletedSourcePageInfo, _fileTaskSessionID.Value);
 
                 // Produce a uss file for the paginated document using the uss data from the
                 // source documents

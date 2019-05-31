@@ -178,6 +178,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._paginationPanel.BackColor = System.Drawing.Color.Transparent;
             this._paginationPanel.CacheImages = false;
             this._paginationPanel.CommitOnlySelection = true;
+            this._paginationPanel.CreateDocumentOnOutput = false;
             this._paginationPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this._paginationPanel.ExpectedPaginationAttributesPath = null;
             this._paginationPanel.AutoSelectForReprocess = false;

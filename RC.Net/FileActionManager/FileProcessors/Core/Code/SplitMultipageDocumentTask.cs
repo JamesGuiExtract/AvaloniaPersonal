@@ -465,7 +465,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     // Even if document wasn't paginated, record to the database the fact that this
                     // document was processed, yet didn't produce any new output documents.
-                    AddPaginationHistory(pDB, fileTaskSessionID, sourceDocName, sourceDocName,
+                    AddPaginationHistory(pDB, fileTaskSessionID, sourceDocName, pFileRecord.FileID,
                         Enumerable.Range(1, pageCount));
                 }
 
@@ -689,17 +689,22 @@ namespace Extract.FileActionManager.FileProcessors
 
                     ImageMethods.StaplePagesAsNewDocument(new[] { imagePage }, tempFile.FileName);
 
-                    if (!pDB.IsFileNameInWorkflow(outputFileName, pFileRecord.WorkflowID))
+                    int fileId = -1;
+                    if (pDB.IsFileNameInWorkflow(outputFileName, pFileRecord.WorkflowID))
+                    {
+                        fileId = pDB.GetFileID(outputFileName);
+                    }
+                    else
                     {
                         long fileSize = new FileInfo(tempFile.FileName).Length;
 
-                        pDB.AddFileNoQueue(
+                        fileId = pDB.AddFileNoQueue(
                             outputFileName, fileSize, 1, EFilePriority.kPriorityNormal,
                             pFileRecord.WorkflowID);
                     }
 
                     // Record pagination to DB.
-                    AddPaginationHistory(pDB, fileTaskSessionID, sourceDocName, outputFileName, new[] { pageNum } );
+                    AddPaginationHistory(pDB, fileTaskSessionID, sourceDocName, fileId, new[] { pageNum } );
 
                     File.Copy(tempFile.FileName, outputFileName, true);
                 }
@@ -778,11 +783,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// </param>
         /// <param name="fileTaskSessionID">The file task session identifier.</param>
         /// <param name="sourceDocName">Name of the source document.</param>
-        /// <param name="outputDocName">Name of the output document.</param>
+        /// <param name="outputDocId">Name of the output document.</param>
         /// <param name="pages">The pages numbers of the source document added to the output document.
         /// </param>
         static void AddPaginationHistory(FileProcessingDB pDB, int fileTaskSessionID,
-            string sourceDocName, string outputDocName, IEnumerable<int> pages)
+            string sourceDocName, int outputDocId, IEnumerable<int> pages)
         {
             var sourcePageInfo = pages.Select(pageNum =>
                     new StringPairClass()
@@ -791,7 +796,7 @@ namespace Extract.FileActionManager.FileProcessors
                         StringValue = pageNum.ToString(CultureInfo.InvariantCulture)
                     }
                 ).ToIUnknownVector();
-            pDB.AddPaginationHistory(outputDocName, sourcePageInfo, null, fileTaskSessionID);
+            pDB.AddPaginationHistory(outputDocId, sourcePageInfo, null, fileTaskSessionID);
         }
 
         /// <summary>

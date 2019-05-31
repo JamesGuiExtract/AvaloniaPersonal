@@ -1827,12 +1827,12 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: To add data to the Pagination table indicating the source of all pages for the
 		//			newly generated bstrOutputFile.
 		//			pSourcePageInfo is expected to be an IUnknownVector with the same number of items
-		//			as there are pages in bstrOutputFile. Each item in the vector is expected to be a
+		//			as there are pages in nOutputFileID. Each item in the vector is expected to be a
 		//			IStringPair instance where the StringKey is the filename of the document the
 		//			respective page came from and the StringValue is the string representation of the
 		//			page number.
 		[id(160), helpstring("method AddPaginationHistory")] HRESULT AddPaginationHistory(
-			[in] BSTR bstrOutputFile, [in] IIUnknownVector* pSourcePageInfo,
+			[in] long nOutputFileID, [in] IIUnknownVector* pSourcePageInfo,
 			IIUnknownVector* pDeletedSourcePageInfo, [in] long nFileTaskSessionID);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Applies the specified durations to the specified FileTaskSession row. The
