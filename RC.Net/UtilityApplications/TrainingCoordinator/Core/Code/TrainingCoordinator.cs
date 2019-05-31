@@ -178,7 +178,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                     if (newDataCount == 0
                         && service is TrainingDataCollector.TrainingDataCollector
                         || newDataCount < MinimumNewRecordsRequiredForTraining
-                        && service is MLModelTrainer.MLModelTrainer trainer)
+                        && service is MLModelTrainer.MLModelTrainer)
                     {
                         var unit = newDataCount == 1 ? "record" : "records";
                         Log += UtilityMethods.FormatCurrent($"{DateTime.Now}\r\n",

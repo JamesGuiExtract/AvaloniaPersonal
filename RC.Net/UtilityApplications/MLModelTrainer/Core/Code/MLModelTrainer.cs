@@ -886,8 +886,8 @@ namespace Extract.UtilityApplications.MLModelTrainer
                                 appTrace.Log(logFileToEmail);
                             }
                         }
-                        else if (errorMessage.ToLowerInvariant().Contains("memory")
-                            || outputMessage.ToLowerInvariant().Contains("memory"))
+                        else if (errorMessage.ToUpperInvariant().Contains("MEMORY")
+                            || outputMessage.ToUpperInvariant().Contains("MEMORY"))
                         {
                             var warning = new ExtractException("ELI45292", "Possible out-of-memory error encountered testing ML model");
                             warning.AddDebugData("Error message", errorMessage, false);
@@ -1011,7 +1011,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
 
         // Get unit in last place value of a double
         // https://stackoverflow.com/a/16702336
-        double ULP(double value)
+        static double ULP(double value)
         {
             if (double.IsNaN(value))
             {
@@ -1080,7 +1080,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
             int maxBackups = NumberOfBackupsToKeep;
             if (maxBackups > 0 && File.Exists(QualifiedModelDestination))
             {
-                string nextBackupDir = DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd.HH.mm") + "UTC";
+                string nextBackupDir = DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd.HH.mm", CultureInfo.InvariantCulture) + "UTC";
                 string path = Path.GetDirectoryName(QualifiedModelDestination);
                 string fileName = Path.GetFileName(QualifiedModelDestination);
                 string backupRoot = Path.Combine(path, "__ml_model_backups__");

@@ -48,7 +48,6 @@ namespace Extract.UtilityApplications.NERAnnotator
         Random _rng;
         Tokenizer _tokenizer;
         SentenceDetectorME _sentenceDetector;
-        UCLID_AFUTILSLib.AFUtilityClass _afutil = new UCLID_AFUTILSLib.AFUtilityClass();
         SpatialStringSearcher _searcher = new SpatialStringSearcher();
 
         // Function to return character indexes that an attribute's value overlaps
@@ -408,7 +407,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                 {
                     // Create all records in memory before writing anything
                     // so that the transaction time is shorter
-                    var recordList = records.ToList();
+                    records = records.ToList();
                     using (var connection = NewSqlDBConnection())
                     {
                         connection.Open();
@@ -664,7 +663,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                     {
                         if (openTags.Any())
                         {
-                            var (matched, value) = FindMatchesForToken(page, tokenSpans, i, entities, false, onGoing: true);
+                            var (matched, _) = FindMatchesForToken(page, tokenSpans, i, entities, false, onGoing: true);
                             var matchedEntities = matched.Select(t => t.entityZones);
                             var openAttributes = openTags.Keys.Select(t => t.entityZones);
                             var intersection = matchedEntities.Intersect(openAttributes);

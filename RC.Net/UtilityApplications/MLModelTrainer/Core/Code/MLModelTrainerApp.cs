@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -66,7 +67,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
                                     try
                                     {
                                         var type = prop.PropertyType;
-                                        var value = Convert.ChangeType(args[argNum], type);
+                                        var value = Convert.ChangeType(args[argNum], type, CultureInfo.InvariantCulture);
                                         propertiesToSet.Add((prop, value));
                                         continue;
                                     }

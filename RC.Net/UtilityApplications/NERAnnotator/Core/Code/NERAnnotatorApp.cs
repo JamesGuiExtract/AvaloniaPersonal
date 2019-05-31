@@ -8,7 +8,7 @@ using Extract.Utilities;
 
 namespace Extract.UtilityApplications.NERAnnotator
 {
-    public class NERAnnotatorApp
+    public static class NERAnnotatorApp
     {
         [STAThread]
         static int Main(string[] args)
