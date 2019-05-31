@@ -260,7 +260,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract64.Core.dll" /mapout:"$(BinariesFolder)\Map\mapExtract64.Cores.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Code.Attributes.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Code.Attributes.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Database.Logger.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Database.Logger.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
-	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.GoogleCloud.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Database.Logger.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.GoogleCloud.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.GoogleCloud.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
 
 	@ECHO.
     @DATE /T
