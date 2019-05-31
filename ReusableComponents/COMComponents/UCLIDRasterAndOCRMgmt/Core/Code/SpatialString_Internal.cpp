@@ -4893,38 +4893,41 @@ void CSpatialString::setLetterBounds(CPPLetter& letter, const AnnotationSpatialP
 	const double& denormalizationFactorX, const double& denormalizationFactorY)
 {
 	double top, right, bottom, left;
+	// TranslateToNewPageInfo() treats top as the y of top-left corner, bottom as the y of the bottom-right corner, etc.
+	// so set these properties accordingly or else the spatial info of skewed letters can get squashed
+	// https://extract.atlassian.net/browse/ISSUE-16415
 	switch (properties.orientation)
 	{
 		case 0:
 		{
-			top = (properties.y1 + properties.y2) / 2;
-			right = (properties.x2 + properties.x3) / 2;
-			bottom = (properties.y3 + properties.y4) / 2;
-			left = (properties.x1 + properties.x4) / 2;
+			top = properties.y1;
+			right = properties.x3;
+			bottom = properties.y3;
+			left = properties.x1;
 			break;
 		}
 		case 180:
 		{
-			top = (properties.y3 + properties.y4) / 2;
-			right = (properties.x1 + properties.x4) / 2;
-			bottom = (properties.y1 + properties.y2) / 2;
-			left = (properties.x2 + properties.x3) / 2;
+			top = properties.y3;
+			right = properties.x1;
+			bottom = properties.y1;
+			left = properties.x3;
 			break;
 		}
 		case 90:
 		{
-			top = (properties.y1 + properties.y4) / 2;
-			right = (properties.x1 + properties.x2) / 2;
-			bottom = (properties.y2 + properties.y3) / 2;
-			left = (properties.x3 + properties.x4) / 2;
+			top = properties.y4;
+			right = properties.x2;
+			bottom = properties.y2;
+			left = properties.x4;
 			break;
 		}
 		case 270:
 		{
-			top = (properties.y2 + properties.y3) / 2;
-			right = (properties.x3 + properties.x4) / 2;
-			bottom = (properties.y1 + properties.y4) / 2;
-			left = (properties.x1 + properties.x2) / 2;
+			top = properties.y2;
+			right = properties.x4;
+			bottom = properties.y4;
+			left = properties.x2;
 			break;
 		}
 		default:
