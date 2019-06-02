@@ -36,6 +36,13 @@ namespace Extract.DataCaptureStats
             Value = value;
         }
 
+        public AccuracyDetail(AccuracyDetailLabel label, string path, string attribute)
+        {
+            Label = label;
+            Path = path;
+            Attribute = attribute;
+        }
+
         #endregion Constructors
 
         #region Properties
@@ -54,6 +61,8 @@ namespace Extract.DataCaptureStats
         /// Gets or sets the numeric value of this detail
         /// </summary>
         public int Value { get; set; }
+
+        public string Attribute { get; set; } = "";
 
         #endregion Properties
 
@@ -75,7 +84,8 @@ namespace Extract.DataCaptureStats
             if (other == null
                 || other.Label != Label
                 || other.Path != Path
-                || other.Value != Value)
+                || other.Value != Value
+                || other.Attribute != Attribute)
             {
                 return false;
             }
@@ -92,7 +102,8 @@ namespace Extract.DataCaptureStats
             return HashCode.Start
                 .Hash(Label)
                 .Hash(Path)
-                .Hash(Value);
+                .Hash(Value)
+                .Hash(Attribute ?? "");
         }
 
         /// <summary>
@@ -103,7 +114,7 @@ namespace Extract.DataCaptureStats
         /// </returns>
         public override string ToString()
         {
-            return String.Format(CultureInfo.CurrentCulture, "{0}|{1}|{2}", Label, Path, Value);
+            return String.Format(CultureInfo.CurrentCulture, "{0}|{1}|{2}|{3}", Label, Path, Value, Attribute ?? "");
         }
 
         #endregion Overrides

@@ -2,6 +2,7 @@
 using Extract.DataCaptureStats;
 using Extract.Licensing;
 using Extract.Utilities;
+using Extract.AttributeFinder;
 using StatisticsReporter.Properties;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,16 @@ using GroupByCriterion = Extract.Utilities.Union<
     StatisticsReporter.GroupByDBField,
     StatisticsReporter.GroupByFoundXPath,
     StatisticsReporter.GroupByExpectedXPath>;
+using UCLID_COMUTILSLib;
+using System.Threading;
+using System.Threading.Tasks;
+using TestOutputPerFileSpec = System.Collections.Generic.KeyValuePair<
+    string, System.Collections.Generic.List<
+        (string fileName, string name, string value, string subattribute)>>;
+using TestOutputAggregateSpec = System.Collections.Generic.KeyValuePair<
+    Extract.DataCaptureStats.AccuracyDetailLabel, System.Collections.Generic.List<
+        (string fileName, string name, string value, string subattribute)>>;
+using UCLID_AFCORELib;
 
 namespace StatisticsReporter
 {
@@ -70,11 +81,19 @@ namespace StatisticsReporter
                     throw new ExtractException("ELI41542", "Config file must be specified on the command line.");
                 }
 
-                string configFileName = args[0];
+                string configFileName = Path.GetFullPath(args[0]);
+
+                // Allow relative paths in the config file
+                Directory.SetCurrentDirectory(Path.GetDirectoryName(configFileName));
+
                 ReportSettings = new ConfigSettings<Settings>(configFileName);
 
                 // Verify that there are settings that make sense
-                ExtractException.Assert("ELI41543", "Must specify ReportOutputFileName in config file.", !string.IsNullOrWhiteSpace(ReportSettings.Settings.ReportOutputFileName));
+                ExtractException.Assert("ELI41543", UtilityMethods.FormatInvariant(
+                    $"Must specify {nameof(ReportSettings.Settings.ReportOutputFileName)} in config file."),
+                    !string.IsNullOrWhiteSpace(ReportSettings.Settings.ReportOutputFileName));
+
+                var reportOutputPath = Path.GetFullPath(ReportSettings.Settings.ReportOutputFileName);
 
                 // Transfer settings to the DataCapture settings
                 DataCaptureSettings dcSettings = new DataCaptureSettings();
@@ -116,7 +135,8 @@ namespace StatisticsReporter
                         .Select(s =>
                         {
                             using (var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser
-                                (new StringReader(s)) { Delimiters = new[] { "," } })
+                                (new StringReader(s))
+                            { Delimiters = new[] { "," } })
                             {
                                 string[] tokens = csvReader.ReadFields();
                                 ExtractException.Assert("ELI41904", "At least two tokens are required (Label, GroupByCriterion)",
@@ -172,7 +192,7 @@ namespace StatisticsReporter
                 range = ConvertDateTimeStrings(ReportSettings.Settings.StartDateTime, ReportSettings.Settings.EndDateTime);
                 dcSettings.StartDate = range.Item1;
                 dcSettings.EndDate = range.Item2;
-                
+
                 // Make sure the Start date is less than the end date
                 if (dcSettings.StartDate > dcSettings.EndDate)
                 {
@@ -191,69 +211,217 @@ namespace StatisticsReporter
                 // Create the Process Statistics 
                 ProcessStatistics Statistics = new ProcessStatistics(dcSettings);
 
-                // Set the delegates
-                Statistics.PerFileAction = AttributeTreeComparer.CompareAttributes;
+                var outputPerFileVOAs = ReportSettings.Settings.OutputPerFileTestResultVOAs;
+                var outputAggregateVOAs = ReportSettings.Settings.OutputAggregateTestResultVOAs;
+                var perFilePathTagFunction = ReportSettings.Settings.PerFileTestResultPathTagFunction;
+                if (outputPerFileVOAs)
+                {
+                    ExtractException.Assert("ELI46829", UtilityMethods.FormatInvariant(
+                        $"Must specify {nameof(ReportSettings.Settings.PerFileTestResultPathTagFunction)} in config file",
+                        $" when {nameof(ReportSettings.Settings.OutputPerFileTestResultVOAs)} = True."),
+                        !string.IsNullOrWhiteSpace(ReportSettings.Settings.PerFileTestResultPathTagFunction));
+                }
+
+                // Set the delegate
+                if (outputPerFileVOAs || outputAggregateVOAs)
+                {
+                    Statistics.PerFileAction = AttributeTreeComparer.CompareAttributesPlus;
+                }
+                else
+                {
+                    Statistics.PerFileAction = AttributeTreeComparer.CompareAttributes;
+                }
+
+                string timeStamp = DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd.HH.mm.ss", CultureInfo.InvariantCulture) + "UTC";
+                Console.WriteLine(UtilityMethods.FormatInvariant($"Processing started at {timeStamp}"));
+
+                reportOutputPath = reportOutputPath.Replace("$(DateTimeStamp)", timeStamp);
+                var reportFolder = Path.GetDirectoryName(reportOutputPath);
+                Directory.CreateDirectory(reportFolder);
+
+                var reportBaseName = Path.GetFileNameWithoutExtension(reportOutputPath);
+                var voaBasePath = outputAggregateVOAs ? Path.Combine(reportFolder, reportBaseName) : null;
 
                 // Start time to show how much time the processing took
                 Stopwatch timeToProcess = new Stopwatch();
                 timeToProcess.Start();
 
-                // Get the results for the per file comparisons
-                var Results = Statistics.ProcessData();
-
-                // Aggregate/summarize the results
-                foreach (var group in Results)
-                {
-                    group.AccuracyDetails =
-                        group.AccuracyDetails.AggregateStatistics()
-                        .SummarizeStatistics(ReportSettings.Settings.ErrorIfContainerOnlyConflict);
-                }
-
-                if (ReportSettings.Settings.ReportOutputFileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
-                {
-                    var statsData = Results.AccuracyDetailsToCsv();
-
-                    // Save the data to the configured output file
-                    File.WriteAllText(ReportSettings.Settings.ReportOutputFileName, statsData);
-                }
-                else
-                {
-                    var statsData = Results.Select(group => group.AccuracyDetailsToHtml());
-                    var groupByFieldLabels = Results.FirstOrDefault()?.GroupByNames ?? new string [0];
-
-                    // Get the Html page to save
-                    string HtmlOutputPage = CreateHtmlPage(statsData, ReportSettings, range, groupByFieldLabels);
-
-                    // Save the data to the configured output file
-                    File.WriteAllText(ReportSettings.Settings.ReportOutputFileName, HtmlOutputPage);
-                }
-
-                // Stop the timer and write the elapsed time
-                timeToProcess.Stop();
-                Console.WriteLine("Elapsed time {0}", timeToProcess.Elapsed);
-            }
-            catch (Exception e)
-            {
-                e.AsExtract("ELI41525").Log();
-                Console.Error.WriteLine(e.Message);
                 try
                 {
-                    if (ReportSettings != null && range != null)
-                    {
-                        string HtmlOutput = CreateHtmlPage(Enumerable.Empty<string>(), ReportSettings, range, new string[0]);
-                        // Save the data to the configured output file
+                    // Get the results for the per file comparisons
+                    var (Results, collections) = Statistics.ProcessData();
 
-                        File.WriteAllText(ReportSettings.Settings.ReportOutputFileName, HtmlOutput);
+                    // Aggregate/summarize the results
+                    foreach (var group in Results)
+                    {
+                        group.AccuracyDetails =
+                            group.AccuracyDetails.AggregateStatistics()
+                            .SummarizeStatistics(ReportSettings.Settings.ErrorIfContainerOnlyConflict);
                     }
+
+                    if (reportOutputPath.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var statsData = Results.AccuracyDetailsToCsv();
+
+                        // Save the data to the configured output file
+                        File.WriteAllText(reportOutputPath, statsData);
+                    }
+                    else
+                    {
+                        var statsData = Results.Select(group => group.AccuracyDetailsToHtml());
+                        var groupByFieldLabels = Results.FirstOrDefault()?.GroupByNames ?? new string [0];
+
+                        // Get the Html page to save
+                        string HtmlOutputPage = CreateHtmlPage(statsData, ReportSettings, range, groupByFieldLabels);
+
+                        // Save the data to the configured output file
+                        File.WriteAllText(reportOutputPath, HtmlOutputPage);
+                    }
+
+                    Console.WriteLine("Report written, elapsed time {0}", timeToProcess.Elapsed);
+
+                    if (outputAggregateVOAs || outputPerFileVOAs)
+                    {
+                        Console.WriteLine("Writing test output VOAs...");
+
+                        timeToProcess.Restart();
+                        WriteVOAs(collections, outputAggregateVOAs, voaBasePath, outputPerFileVOAs, perFilePathTagFunction);
+                        Console.WriteLine("VOAs written, elapsed time {0}", timeToProcess.Elapsed);
+                    }
+
+                    timeToProcess.Stop();
                 }
-                catch(Exception ex)
+                catch (Exception)
                 {
-                    ex.AsExtract("ELI41589").Log();
+                    try
+                    {
+                        if (ReportSettings != null && range != null)
+                        {
+                            string HtmlOutput = CreateHtmlPage(Enumerable.Empty<string>(), ReportSettings, range, new string[0]);
+
+                            // Save the data to the configured output file
+                            File.WriteAllText(reportOutputPath, HtmlOutput);
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        ex.AsExtract("ELI41589").Log();
+                    }
+
+                    throw;
                 }
-                Environment.ExitCode = 1;
             }
+            catch(Exception ex)
+            {
+                ex.AsExtract("ELI41525").Log();
+                Console.Error.WriteLine(ex.Message);
+            }
+            Environment.ExitCode = 1;
         }
 
+        static void WriteVOAs(IEnumerable<(string fileName, IEnumerable<AccuracyDetail> pathAndAttribute)> collections, 
+            bool outputAggregateVOAs, string aggregateVOABasePath, bool outputPerFileVOAs, string perFilePathTagFunction)
+        {
+            if (!outputAggregateVOAs && !outputPerFileVOAs)
+            {
+                return;
+            }
+
+            // Setup parallelizable tasks for each type of output
+            var aggregates = outputAggregateVOAs
+                ? new Dictionary<AccuracyDetailLabel, List<(string fileName, string name, string value, string subattribute)>>
+                    {
+                        {AccuracyDetailLabel.Correct, new List<(string fileName, string name, string value, string subattribute)>()},
+                        {AccuracyDetailLabel.Incorrect, new List<(string fileName, string name, string value, string subattribute)>()},
+                        {AccuracyDetailLabel.Missed, new List<(string fileName, string name, string value, string subattribute)>()}
+                    }
+                : null;
+            var perFile = outputPerFileVOAs
+                ? new Dictionary<string, List<(string fileName, string name, string value, string subattribute)>>()
+                : null;
+
+            foreach (var (fileName, pathAndAttribute) in collections.OrderBy(t => t.fileName))
+            {
+                foreach (var detail in pathAndAttribute)
+                {
+                    var data = (fileName, detail.Label.ToString(), detail.Path, detail.Attribute);
+                    if (outputPerFileVOAs)
+                    {
+                        var list = perFile.GetOrAdd(fileName, _ => new List<(string fileName, string name, string value, string subattribute)>());
+                        list.Add(data);
+                    }
+                    if (outputAggregateVOAs)
+                    {
+                        switch (detail.Label)
+                        {
+                            case AccuracyDetailLabel.Correct:
+                            case AccuracyDetailLabel.Incorrect:
+                            case AccuracyDetailLabel.Missed:
+                                aggregates[detail.Label].Add(data);
+                                break;
+                            default:
+                                throw new ExtractException("ELI46827", UtilityMethods.FormatInvariant($"Logic error: Unexpected label '{detail.Label}'"));
+                        }
+                    }
+                }
+            }
+
+            // Put specs into a list of the two union cases
+            var allSpecs = new List<Union<TestOutputPerFileSpec, TestOutputAggregateSpec>>();
+            if (outputPerFileVOAs)
+            {
+                allSpecs.AddRange(perFile.AsEnumerable().Select(kv => new Union<TestOutputPerFileSpec, TestOutputAggregateSpec>(kv)));
+            }
+            if (outputAggregateVOAs)
+            {
+                allSpecs.AddRange(aggregates.AsEnumerable().Select(kv => new Union<TestOutputPerFileSpec, TestOutputAggregateSpec>(kv)));
+            }
+
+            // Helper function to create each attribute tree
+            var miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtilsClass());
+            UCLID_AFCORELib.Attribute buildAttr(AttributeCreator creator, string sdn, string name, string value, string subattribute)
+            {
+                var top = creator.Create(name, value);
+                var sub = (UCLID_AFCORELib.Attribute)miscUtils.Value.GetObjectFromStringizedByteStream(subattribute);
+                top.SubAttributes.PushBack(sub);
+
+                // Update source doc name so that feedback attributes will be viewable, e.g.
+                foreach (var a in top.EnumerateDepthFirst())
+                {
+                    a.Value.SourceDocName = sdn;
+                }
+                return top;
+            }
+
+            // Process the tasks
+            Parallel.ForEach(allSpecs, spec =>
+            {
+                var acc = new IUnknownVectorClass();
+                var creator = new AttributeCreator("Dummy");
+                spec.Match(file =>
+                {
+                    foreach (var (_, name, value, subattribute) in file.Value)
+                    {
+                        acc.PushBack(buildAttr(creator, file.Key, name, value, subattribute));
+                    }
+                    var afdoc = new AFDocumentClass();
+                    afdoc.Attribute.Value.SourceDocName = file.Key;
+                    var pathTags = new AttributeFinderPathTags { Document = afdoc };
+
+                    var outputPath = pathTags.Expand(perFilePathTagFunction);
+                    acc.SaveTo(outputPath, false, null);
+                },
+                aggregate =>
+                {
+                    foreach (var (fileName, name, value, subattribute) in aggregate.Value)
+                    {
+                        acc.PushBack(buildAttr(creator, fileName, name, value, subattribute));
+                    }
+
+                    acc.SaveTo(UtilityMethods.FormatInvariant($"{aggregateVOABasePath}.{aggregate.Key}.voa"), false, null);
+                });
+            });
+        }
 
         /// <summary>
         /// Display the usage on the command line

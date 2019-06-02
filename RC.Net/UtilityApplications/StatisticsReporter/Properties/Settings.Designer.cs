@@ -12,7 +12,7 @@ namespace StatisticsReporter.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -121,13 +121,49 @@ namespace StatisticsReporter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Statistics-$(DateTimeStamp).html")]
         public string ReportOutputFileName {
             get {
                 return ((string)(this["ReportOutputFileName"]));
             }
             set {
                 this["ReportOutputFileName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool OutputAggregateTestResultVOAs {
+            get {
+                return ((bool)(this["OutputAggregateTestResultVOAs"]));
+            }
+            set {
+                this["OutputAggregateTestResultVOAs"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool OutputPerFileTestResultVOAs {
+            get {
+                return ((bool)(this["OutputPerFileTestResultVOAs"]));
+            }
+            set {
+                this["OutputPerFileTestResultVOAs"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<SourceDocName>.testoutput.voa")]
+        public string PerFileTestResultPathTagFunction {
+            get {
+                return ((string)(this["PerFileTestResultPathTagFunction"]));
+            }
+            set {
+                this["PerFileTestResultPathTagFunction"] = value;
             }
         }
         

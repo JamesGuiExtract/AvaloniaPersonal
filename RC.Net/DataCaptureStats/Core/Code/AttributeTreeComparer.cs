@@ -25,6 +25,8 @@ namespace Extract.DataCaptureStats
 
         #endregion Constants
 
+        static ThreadLocal<MiscUtils> _miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtilsClass());
+
         /// <summary>
         /// Compares one set of attributes with another. The per-file, map function of the design
         /// </summary>
@@ -32,10 +34,43 @@ namespace Extract.DataCaptureStats
         /// <param name="containerXPath">The XPath to select attributes that will be considered as containers only</param>
         /// <remarks><see paramref="found"/> and <see paramref="expected"/> hierarchies may be modified
         /// by this method.</remarks>
-        /// <param name="cancelToken">CancellationToke to allow cancel of comparison</param>
-        /// <returns></returns>
+        /// <param name="cancelToken">CancellationToken to allow cancellation of comparison</param>
         public static IEnumerable<AccuracyDetail> CompareAttributes(IUnknownVector expected, IUnknownVector found,
             string ignoreXPath = DefaultIgnoreXPath, string containerXPath = DefaultContainerXPath,
+            CancellationToken cancelToken = default(CancellationToken))
+        {
+            // Return only count accuracy details
+            return CompareAttributes(expected, found, ignoreXPath, containerXPath, false, cancelToken);
+        }
+
+        /// <summary>
+        /// Compares one set of attributes with another and collects the correct, incorrect and missed attributes
+        /// </summary>
+        /// <param name="ignoreXPath">The XPath to select attributes to ignore.</param>
+        /// <param name="containerXPath">The XPath to select attributes that will be considered as containers only</param>
+        /// <remarks><see paramref="found"/> and <see paramref="expected"/> hierarchies may be modified
+        /// by this method.</remarks>
+        /// <param name="cancelToken">CancellationToken to allow cancellation of comparison</param>
+        public static IEnumerable<AccuracyDetail> CompareAttributesPlus(IUnknownVector expected, IUnknownVector found,
+            string ignoreXPath = DefaultIgnoreXPath, string containerXPath = DefaultContainerXPath,
+            CancellationToken cancelToken = default(CancellationToken))
+        {
+            // Return count and collection accuracy details
+            return CompareAttributes(expected, found, ignoreXPath, containerXPath, true, cancelToken);
+        }
+
+        /// <summary>
+        /// Compares one set of attributes with another. The per-file, map function of the design
+        /// </summary>
+        /// <param name="ignoreXPath">The XPath to select attributes to ignore.</param>
+        /// <param name="containerXPath">The XPath to select attributes that will be considered as containers only</param>
+        /// <remarks><see paramref="found"/> and <see paramref="expected"/> hierarchies may be modified
+        /// by this method.</remarks>
+        /// <param name="collectMatchData">Whether to collect each correct/incorrect/missed attribute in addition to counts</param>
+        /// <param name="cancelToken">CancellationToken to allow cancellation of comparison</param>
+        private static IEnumerable<AccuracyDetail> CompareAttributes(IUnknownVector expected, IUnknownVector found,
+            string ignoreXPath = DefaultIgnoreXPath, string containerXPath = DefaultContainerXPath,
+            bool collectMatchData = true,
             CancellationToken cancelToken = default(CancellationToken))
         {
             try
@@ -65,7 +100,7 @@ namespace Extract.DataCaptureStats
                     }
                 }
 
-                return CompareAttributesAfterXPathModifications(expected, found, containerAttributes, cancelToken);
+                return CompareAttributesAfterXPathModifications(expected, found, containerAttributes, collectMatchData, cancelToken);
             }
             catch (Exception ex)
             {
@@ -351,29 +386,47 @@ namespace Extract.DataCaptureStats
 
         /// <summary>
         /// Adds to the count of the path in the <see paramref="pathsToCounts"/> dictionary
-        /// that corresponds to the path of each of <see paramref="attributes"/> 
+        /// that corresponds to the path of each of <see paramref="attributes"/>.
+        /// Optionally collects the attributes with their paths.
         /// </summary>
         /// <param name="attributes">The attributes to count.</param>
-        /// <param name="pathsToCounts">The dictionary of paths to counts.</param>
+        /// <param name="pathsToCounts">If non-null, will be updated with the counts of attribute paths</param>
+        /// <param name="pathAndAttribute">If non-null, will be filled with correct/incorrect/missed attributes with their paths</param>
         /// <param name="qualifiedAncestorName">The fully qualified name of the ancestor
         /// of these attributes.</param>
         /// <param name="containerOnlyPaths">The set of container only attribute paths to be updated
         /// based on these attributes.</param>
         /// <param name="containerAttributes">The attributes that matched the container-only XPath pattern</param>
-        /// <param name="recurse">if set to <c>true</c> recursively count subattributes.</param>
+        /// <param name="recursivelyCount">if set to <c>true</c> recursively count subattributes.</param>
+        /// <param name="recursivelyCollect">if set to <c>true</c> recursively collect attributes.</param>
         private static void CountAttributes(
             IEnumerable<IAttribute> attributes,
             Dictionary<string, int> pathsToCounts,
+            List<(string, Func<string>)> pathAndAttribute,
             string qualifiedAncestorName,
             Dictionary<string, bool> containerOnlyPaths,
             HashSet<IAttribute> containerAttributes,
-            bool recurse)
+            bool recursivelyCount,
+            bool recursivelyCollect)
         {
+            ExtractException.Assert("ELI46828", UtilityMethods.FormatInvariant(
+                $"It is invalid to specify {nameof(recursivelyCollect)}=true when {nameof(recursivelyCount)}=false"),
+                !recursivelyCollect || recursivelyCount);
+
             foreach (var attribute in attributes)
             {
                 string qualifiedName = GetQualifiedName(attribute, qualifiedAncestorName);
-                int count = pathsToCounts.GetOrAdd(qualifiedName, _ => 0);
-                pathsToCounts[qualifiedName] = count + 1;
+
+                if (pathsToCounts != null)
+                {
+                    int count = pathsToCounts.GetOrAdd(qualifiedName, _ => 0);
+                    pathsToCounts[qualifiedName] = count + 1;
+                }
+
+                if (pathAndAttribute != null)
+                {
+                    pathAndAttribute.Add((qualifiedName, () => _miscUtils.Value.GetObjectAsStringizedByteStream(attribute)));
+                }
                 
                 // Update the container-only status. Don't overwrite a false value with a true value
                 if (!containerAttributes.Contains(attribute))
@@ -385,11 +438,12 @@ namespace Extract.DataCaptureStats
                     containerOnlyPaths[qualifiedName] = true;
                 }
 
-                // Count all the subattributes recursively
-                if (recurse)
+                // Count all the subattributes recursively if specified
+                if (recursivelyCount)
                 {
                     CountAttributes(attribute.SubAttributes.ToIEnumerable<IAttribute>(), pathsToCounts,
-                       qualifiedName, containerOnlyPaths, containerAttributes, true);
+                        recursivelyCollect ? pathAndAttribute : null,
+                        qualifiedName, containerOnlyPaths, containerAttributes, true, recursivelyCollect);
                 }
             }
         }
@@ -401,10 +455,13 @@ namespace Extract.DataCaptureStats
         /// <param name="topLevelExpected">The expected attributes.</param>
         /// <param name="topLevelFound">The found attributes.</param>
         /// <param name="containerAttributes">The attributes that matched the container-only XPath pattern</param>
+        /// <param name="collectMatchData">Whether to collect each correct/incorrect/missed attribute in addition to counts</param>
+        /// <param name="cancelToken">CancellationToken to allow cancellation of comparison</param>
         /// <returns>An enumeration of <see cref="AccuracyDetail"/> items representing the result of the comparison</returns>
         private static IEnumerable<AccuracyDetail> CompareAttributesAfterXPathModifications(
             IUnknownVector topLevelExpected, IUnknownVector topLevelFound, HashSet<IAttribute> containerAttributes,
-            CancellationToken canceToken)
+            bool collectMatchData,
+            CancellationToken cancelToken)
         {
             ExtractException.Assert("ELI41502", "Unable to compare Attributes.",
                 topLevelFound != null && topLevelExpected != null);
@@ -415,36 +472,50 @@ namespace Extract.DataCaptureStats
             var totalIncorrectFound = new Dictionary<string, int>(StringComparer);
             var containerOnly = new Dictionary<string, bool>(StringComparer);
 
+            // Lists to hold attributes to save for investigational purposes
+            List<(string, Func<string>)> listOfMissed = null;
+            List<(string, Func<string>)> listOfCorrectFound = null;
+            List<(string, Func<string>)> listOfIncorrectFound = null;
+            if (collectMatchData)
+            {
+                listOfMissed = new List<(string, Func<string>)>();
+                listOfCorrectFound = new List<(string, Func<string>)>();
+                listOfIncorrectFound = new List<(string, Func<string>)>();
+            }
+
             #region Function Definitions
 
-            // These functions increment counts in the paths-to-counts dictionaries and also
-            // update the dictionary of paths-to-container-only? status
+            // These functions increment counts in the paths-to-counts dictionaries,
+            // update the dictionary of paths-to-container-only? status, and
+            // collect attributes for investigational purposes
 
             // Recursively count expected paths
-            Action<IUnknownVector, string> countExpected = (expected, qualifiedAncestorName) =>
-                CountAttributes(expected.ToIEnumerable<IAttribute>(), totalExpected,
-                                qualifiedAncestorName, containerOnly, containerAttributes, recurse: true);
+            void countExpected(IUnknownVector expected, string qualifiedAncestorName) =>
+                CountAttributes(expected.ToIEnumerable<IAttribute>(), totalExpected, null,
+                                qualifiedAncestorName, containerOnly, containerAttributes, true, false);
 
             // Recursively count found paths of attribute enumeration as incorrect
-            Action<IEnumerable<IAttribute>, string> countAttributesAsIncorrectlyFound = (found, qualifiedAncestorName) =>
-                CountAttributes(found, totalIncorrectFound,
-                qualifiedAncestorName, containerOnly, containerAttributes, recurse: true);
+            void countAttributesAsIncorrectlyFound(IEnumerable<IAttribute> found, string qualifiedAncestorName) =>
+                CountAttributes(found, totalIncorrectFound, listOfIncorrectFound,
+                qualifiedAncestorName, containerOnly, containerAttributes, true, false);
 
             // Recursively count found paths of VOA as incorrect
-            Action<IUnknownVector, string> countVoaAsIncorrectlyFound = (found, qualifiedAncestorName) =>
-                CountAttributes(found.ToIEnumerable<IAttribute>(), totalIncorrectFound,
-                                qualifiedAncestorName, containerOnly, containerAttributes, recurse: true);
+            void countVoaAsIncorrectlyFound(IUnknownVector found, string qualifiedAncestorName) =>
+                CountAttributes(found.ToIEnumerable<IAttribute>(), totalIncorrectFound, listOfIncorrectFound,
+                                qualifiedAncestorName, containerOnly, containerAttributes, true, false);
 
             // Count an attribute as correctly found
-            Action<IAttribute, string> countAttributeAsCorrectlyFound = (found, qualifiedAncestorName) =>
-                CountAttributes(Enumerable.Repeat(found, 1), totalCorrectFound,
-                qualifiedAncestorName, containerOnly, containerAttributes, recurse: false);
+            void countAttributeAsCorrectlyFound(IAttribute found, string qualifiedAncestorName) =>
+                CountAttributes(Enumerable.Repeat(found, 1), totalCorrectFound, listOfCorrectFound,
+                qualifiedAncestorName, containerOnly, containerAttributes, false, false);
 
-            // Compares the found against the expected attributes. Defined as a lambda to create
-            // a closure around the counts dictionaries. This is so the caller doesn't need to explicitly
-            // create an object instance for each comparison.
-            Action<IUnknownVector, IUnknownVector, string> internalCompareAttributes = null;
-            internalCompareAttributes = (expected, found, qualifiedAncestorName) =>
+            // Collect an attribute as missed
+            void collectAttributesAsMissed(IEnumerable<IAttribute> expected, string qualifiedAncestorName) =>
+                CountAttributes(expected, null, listOfMissed,
+                qualifiedAncestorName, containerOnly, containerAttributes, false, false);
+
+            // Compares the found against the expected attributes
+            void internalCompareAttributes(IUnknownVector expected, IUnknownVector found, string qualifiedAncestorName)
             {
                 try
                 {
@@ -468,7 +539,7 @@ namespace Extract.DataCaptureStats
                         expected.ToIEnumerable<IAttribute>().SelectMany((expectedAttribute, expectedIndex) =>
                             found.ToIEnumerable<IAttribute>().Select((foundAttribute, foundIndex) =>
                             {
-                                canceToken.ThrowIfCancellationRequested();
+                                cancelToken.ThrowIfCancellationRequested();
 
                                 // Compute the score for this attribute pair
                                 var score = ComputeScore(expectedAttribute, foundAttribute, containerAttributes);
@@ -490,6 +561,8 @@ namespace Extract.DataCaptureStats
                     // Unused found attributes will be counted as incorrect
                     var foundAttributeUsedState = new bool[found.Size()];
 
+                    var expectedAttributeUsedState = new bool[expected.Size()];
+
                     // Loop while there is an item in the list.
                     // Because the list is sorted, the last item in the list
                     // should be the best match out of all expected vs. found
@@ -499,10 +572,11 @@ namespace Extract.DataCaptureStats
                     AttributeScoreData bestMatch;
                     while ((bestMatch = attributeScores.LastOrDefault()) != null)
                     {
-                        canceToken.ThrowIfCancellationRequested();
+                        cancelToken.ThrowIfCancellationRequested();
 
-                        // Mark the found attribute as used
+                        // Mark the found and expected attributes as used
                         foundAttributeUsedState[bestMatch.FoundIndex] = true;
+                        expectedAttributeUsedState[bestMatch.ExpectedIndex] = true;
 
                         // Get the attributes from the expected and found lists
                         var e = (IAttribute)expected.At(bestMatch.ExpectedIndex);
@@ -527,12 +601,19 @@ namespace Extract.DataCaptureStats
                         .Select(i => (IAttribute)found.At(i));
 
                     countAttributesAsIncorrectlyFound(unused, qualifiedAncestorName);
+
+                    // Count each unused expected attribute as missed
+                    var unusedExpected = Enumerable.Range(0, expectedAttributeUsedState.Length)
+                        .Where(i => !expectedAttributeUsedState[i])
+                        .Select(i => (IAttribute)expected.At(i));
+
+                    collectAttributesAsMissed(unusedExpected, qualifiedAncestorName);
                 }
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI41503");
                 }
-            };
+            }
 
             #endregion Function Definitions
 
@@ -547,7 +628,7 @@ namespace Extract.DataCaptureStats
                 .Select(pathStatusPair => pathStatusPair.Key), StringComparer);
 
             // Make accuracy detail items out of each collection. Don't include container-only items for any other label
-            return containerOnlySet.Select(path => new AccuracyDetail(AccuracyDetailLabel.ContainerOnly, path, 0))
+            var result = containerOnlySet.Select(path => new AccuracyDetail(AccuracyDetailLabel.ContainerOnly, path, 0))
             .Concat(totalExpected
                 .Where(pathCountPair => !containerOnlySet.Contains(pathCountPair.Key))
                 .Select(pathCountPair => new AccuracyDetail(AccuracyDetailLabel.Expected, pathCountPair.Key, pathCountPair.Value)))
@@ -557,6 +638,22 @@ namespace Extract.DataCaptureStats
             .Concat(totalIncorrectFound
                 .Where(pathCountPair => !containerOnlySet.Contains(pathCountPair.Key))
                 .Select(pathCountPair => new AccuracyDetail(AccuracyDetailLabel.Incorrect, pathCountPair.Key, pathCountPair.Value)));
+
+            if (collectMatchData)
+            {
+                result = result
+                .Concat(listOfCorrectFound
+                    .Where(pathCollectionPair => !containerOnlySet.Contains(pathCollectionPair.Item1))
+                    .Select(x => new AccuracyDetail(AccuracyDetailLabel.Correct, x.Item1, x.Item2())))
+                .Concat(listOfIncorrectFound
+                    .Where(pathCollectionPair => !containerOnlySet.Contains(pathCollectionPair.Item1))
+                    .Select(x => new AccuracyDetail(AccuracyDetailLabel.Incorrect, x.Item1, x.Item2())))
+                .Concat(listOfMissed
+                    .Where(pathCollectionPair => !containerOnlySet.Contains(pathCollectionPair.Item1))
+                    .Select(x => new AccuracyDetail(AccuracyDetailLabel.Missed, x.Item1, x.Item2())));
+            }
+
+            return result;
         }
     }
 }

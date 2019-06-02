@@ -27,7 +27,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="ReportOutputFileName" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">Statistics-$(DateTimeStamp).html</Value>
     </Setting>
     <Setting Name="ApplyDateRangeToFound" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -52,6 +52,15 @@
     </Setting>
     <Setting Name="Header1" Type="System.String" Scope="User">
       <Value Profile="(Default)">Extract Statistics Report</Value>
+    </Setting>
+    <Setting Name="OutputPerFileTestResultVOAs" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="OutputAggregateTestResultVOAs" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="PerFileTestResultPathTagFunction" Type="System.String" Scope="User">
+      <Value Profile="(Default)">&lt;SourceDocName&gt;.testoutput.voa</Value>
     </Setting>
   </Settings>
 </SettingsFile>

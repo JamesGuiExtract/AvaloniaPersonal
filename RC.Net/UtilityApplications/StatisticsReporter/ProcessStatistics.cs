@@ -1,8 +1,6 @@
 ﻿using Extract;
 using Extract.AttributeFinder;
 using Extract.DataCaptureStats;
-using Extract.Interop;
-using Extract.Interop.Zip;
 using Extract.Utilities;
 using System;
 using System.Collections.Concurrent;
@@ -19,6 +17,8 @@ using GroupByCriterion = Extract.Utilities.Union<
     StatisticsReporter.GroupByDBField,
     StatisticsReporter.GroupByFoundXPath,
     StatisticsReporter.GroupByExpectedXPath>;
+
+using UCLID_AFCORELib;
 
 namespace StatisticsReporter
 {
@@ -356,6 +356,7 @@ namespace StatisticsReporter
         /// Connection to the database
         /// </summary>
         SqlConnection _Connection;
+        volatile int _errorCount = 0;
 
         #endregion
 
@@ -387,7 +388,8 @@ namespace StatisticsReporter
         /// Processes the data by retrieving the voa data from the database and creating the results for each file
         /// </summary>
         /// <returns>An <see cref="IEnumerable{GroupStatistics}"/></returns>
-        public List<GroupStatistics> ProcessData()
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public (List<GroupStatistics> stats, IEnumerable<(string fileName, IEnumerable<AccuracyDetail> pathAndAttribute)> collections) ProcessData()
         {
             try
             {
@@ -399,6 +401,7 @@ namespace StatisticsReporter
 
                 // Used to hold the results from the comparisons
                 var Results = new ConcurrentBag<Tuple<string[], IEnumerable<AccuracyDetail>>>();
+                var investigationInfo = new ConcurrentBag<(string fileName, IEnumerable<AccuracyDetail> pathAndAttribute)>();
 
                 // Track the number of pending threads
                 int numberPending = 0;
@@ -419,6 +422,9 @@ namespace StatisticsReporter
                         .Select(c => c.Match(dbField => (GroupByDBField?) dbField, _ => null, _ => null))
                         .Where(c => c != null)
                         .Select(c => c.Value)
+                        // Add file name in order to sort and update sdn for investigation info
+                        .Concat(new [] { GroupByDBField.FileName })
+                        .Distinct()
                         .ToList();
 
                     // Create a semaphore to limit the number of threads that get queued (memory may be a problem)
@@ -474,20 +480,39 @@ namespace StatisticsReporter
                                         .ToArray();
 
                                     // Compare the VOAs
-                                    var output = PerFileAction(ExpectedAttributes,
+                                    var allOutput = PerFileAction(ExpectedAttributes,
                                               FoundAttributes,
                                               Settings.FileSettings.XPathToIgnore,
                                               Settings.FileSettings.XPathOfContainerOnlyAttributes,
                                               default(CancellationToken))
                                               .ToList();
 
+                                    var output = new List<AccuracyDetail>();
+                                    var collected = new List<AccuracyDetail>();
+                                    foreach (var x in allOutput)
+                                    {
+                                        if (string.IsNullOrEmpty(x.Attribute))
+                                        {
+                                            output.Add(x);
+                                        }
+                                        else
+                                        {
+                                            collected.Add(x);
+                                        }
+                                    }
+
                                     // Add the comparison results to the Results
                                     Results.Add(Tuple.Create<string[], IEnumerable<AccuracyDetail>>(groupBy, output));
+                                    investigationInfo.Add((dBFieldValues[GroupByDBField.FileName], collected));
                                 }
                             }
                             catch (Exception ex)
                             {
                                 ex.AsExtract("ELI41544").Log();
+                                if (_errorCount++ == 0)
+                                {
+                                    Console.Error.WriteLine(UtilityMethods.FormatCurrent($"Errors have been logged. First Error: {ex}"));
+                                }
                             }
                             finally
                             {
@@ -513,7 +538,8 @@ namespace StatisticsReporter
                         xpath => xpath.ToString(),
                         xpath => xpath.ToString()))
                     .ToArray();
-                return Results
+
+                var stats = Results
                     .GroupBy(t => t.Item1, new GroupByComparer())
                     .Select(group =>
                         {
@@ -522,6 +548,8 @@ namespace StatisticsReporter
                         })
                     .OrderBy(g => g.GroupByValues, new GroupByComparer())
                     .ToList();
+
+                return (stats, investigationInfo);
             }
             catch (Exception e)
             {
