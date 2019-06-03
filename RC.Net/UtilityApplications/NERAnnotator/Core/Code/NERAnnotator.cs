@@ -617,7 +617,7 @@ namespace Extract.UtilityApplications.NERAnnotator
 
                 // Skip this page, depending on uninteresting-page-inclusion settings
                 if (_settings.PercentUninterestingPagesToInclude < 100
-                    && !entities.Any()
+                    && !entities.Any(p => p.entityZones.Any())
                     && _rng.Next(1, 101) > _settings.PercentUninterestingPagesToInclude)
                 {
                     continue;
