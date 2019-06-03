@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28527.54
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LICode2019", "LICode2019.csproj", "{336B6E37-80F2-4E8B-A01A-532EC11304CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LICodeDB", "..\..\AddIns\LICodeDB\Core\Code\LICodeDB.csproj", "{74416F8A-22A0-45E1-9F29-9CBC0A7A735B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{336B6E37-80F2-4E8B-A01A-532EC11304CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{336B6E37-80F2-4E8B-A01A-532EC11304CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{336B6E37-80F2-4E8B-A01A-532EC11304CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{336B6E37-80F2-4E8B-A01A-532EC11304CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74416F8A-22A0-45E1-9F29-9CBC0A7A735B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74416F8A-22A0-45E1-9F29-9CBC0A7A735B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74416F8A-22A0-45E1-9F29-9CBC0A7A735B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74416F8A-22A0-45E1-9F29-9CBC0A7A735B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EAE9BF98-33A5-4224-ABEE-5A43683BBD1C}
+	EndGlobalSection
+EndGlobal
