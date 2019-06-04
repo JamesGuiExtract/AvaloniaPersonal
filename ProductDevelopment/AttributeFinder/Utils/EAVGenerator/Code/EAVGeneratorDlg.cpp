@@ -452,7 +452,8 @@ void CEAVGeneratorDlg::addSubAttributes(IAttributePtr ipAttribute,
         IAttributePtr	ipThisSub = ipSubAttributes->At( i );
 
         // Add the instanceGUID to the set of GUID's
-        addGUIDToSet(ipThisSub);
+		// Commented-out because this causes a flood of exceptions when viewing test output VOA files
+        //addGUIDToSet(ipThisSub);
 
         // Get Value
         ISpatialStringPtr ipValue = ipThisSub->Value;
@@ -933,6 +934,7 @@ void CEAVGeneratorDlg::saveAttributes(const CString& zFileName)
                 throw ue;
             }
 
+			m_bFileModified = false;
             setCurrentFileName(zFileName);
         }
         CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39252")
@@ -1159,6 +1161,10 @@ void CEAVGeneratorDlg::updateButtons()
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::updateList(int nColumnNumber, const CString& zText)
 {
+	// Set dirty flag
+	m_bFileModified = true;
+	updateWindowCaption(m_strCurrentFileName.c_str());
+
     // current selected item
     int nSelectedItemIndex = getCurrentSelectedListItemIndex();
 
@@ -1244,17 +1250,17 @@ void CEAVGeneratorDlg::updateWindowCaption(const CString& zFileName)
     const string strWINDOW_TITLE = "VOA File Viewer";
     
     // Compute the window caption
-    string strResult;
+    string strResult = m_bFileModified ? "*" : "";
     if (zFileName.GetLength() > 0)
     {
         // Only display the filename and not the full path.
-        strResult = getFileNameFromFullPath( LPCTSTR(zFileName) );
+        strResult += getFileNameFromFullPath( LPCTSTR(zFileName) );
         strResult += " - ";
         strResult += strWINDOW_TITLE;
     }
     else
     {
-        strResult = strWINDOW_TITLE;
+        strResult += strWINDOW_TITLE;
     }
 
     // Update the window caption
