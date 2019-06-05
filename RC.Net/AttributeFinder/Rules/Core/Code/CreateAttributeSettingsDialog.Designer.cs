@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.Label label1;
             System.Windows.Forms.Label label2;
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreateAttributeSettingsDialog));
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
@@ -56,6 +57,8 @@
             this._downButton = new Extract.Utilities.Forms.ExtractDownButton();
             this._upButton = new Extract.Utilities.Forms.ExtractUpButton();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this._exportButton = new System.Windows.Forms.Button();
+            this._importButton = new System.Windows.Forms.Button();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this._nameDataGridView)).BeginInit();
@@ -66,7 +69,7 @@
             // 
             label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(12, 229);
+            label1.Location = new System.Drawing.Point(12, 311);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(35, 13);
             label1.TabIndex = 11;
@@ -76,7 +79,7 @@
             // 
             label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(12, 298);
+            label2.Location = new System.Drawing.Point(12, 380);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(34, 13);
             label2.TabIndex = 13;
@@ -86,7 +89,7 @@
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(450, 444);
+            this._okButton.Location = new System.Drawing.Point(450, 527);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(87, 23);
             this._okButton.TabIndex = 15;
@@ -98,7 +101,7 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(552, 444);
+            this._cancelButton.Location = new System.Drawing.Point(552, 527);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(87, 23);
             this._cancelButton.TabIndex = 16;
@@ -107,12 +110,15 @@
             // 
             // _attributeValueTextBox
             // 
+            this._attributeValueTextBox.AcceptsReturn = true;
             this._attributeValueTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._attributeValueTextBox.Location = new System.Drawing.Point(12, 320);
+            this._attributeValueTextBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._attributeValueTextBox.Location = new System.Drawing.Point(15, 402);
             this._attributeValueTextBox.Multiline = true;
             this._attributeValueTextBox.Name = "_attributeValueTextBox";
-            this._attributeValueTextBox.Size = new System.Drawing.Size(525, 40);
+            this._attributeValueTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._attributeValueTextBox.Size = new System.Drawing.Size(624, 40);
             this._attributeValueTextBox.TabIndex = 11;
             this._attributeValueTextBox.TextChanged += new System.EventHandler(this.TextBox_TextChanged);
             this._attributeValueTextBox.Enter += new System.EventHandler(this.HandleFocusEnter);
@@ -120,9 +126,15 @@
             // 
             // _rootTextBox
             // 
+            this._rootTextBox.AcceptsReturn = true;
+            this._rootTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this._rootTextBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._rootTextBox.Location = new System.Drawing.Point(16, 27);
+            this._rootTextBox.Multiline = true;
             this._rootTextBox.Name = "_rootTextBox";
-            this._rootTextBox.Size = new System.Drawing.Size(521, 20);
+            this._rootTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._rootTextBox.Size = new System.Drawing.Size(623, 81);
             this._rootTextBox.TabIndex = 0;
             this._rootTextBox.TextChanged += new System.EventHandler(this.TextBox_TextChanged);
             this._rootTextBox.Enter += new System.EventHandler(this.HandleFocusEnter);
@@ -133,15 +145,15 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(13, 9);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(272, 13);
+            this.label3.Size = new System.Drawing.Size(298, 13);
             this.label3.TabIndex = 15;
-            this.label3.Text = "For each attribute (or node) selected by this XPath query";
+            this.label3.Text = "Root (for each attribute, node, selected by this XPath query...)";
             // 
             // label4
             // 
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 367);
+            this.label4.Location = new System.Drawing.Point(12, 449);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(31, 13);
             this.label4.TabIndex = 17;
@@ -149,12 +161,15 @@
             // 
             // _attributeTypeTextBox
             // 
+            this._attributeTypeTextBox.AcceptsReturn = true;
             this._attributeTypeTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._attributeTypeTextBox.Location = new System.Drawing.Point(15, 389);
+            this._attributeTypeTextBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._attributeTypeTextBox.Location = new System.Drawing.Point(15, 471);
             this._attributeTypeTextBox.Multiline = true;
             this._attributeTypeTextBox.Name = "_attributeTypeTextBox";
-            this._attributeTypeTextBox.Size = new System.Drawing.Size(522, 40);
+            this._attributeTypeTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._attributeTypeTextBox.Size = new System.Drawing.Size(624, 40);
             this._attributeTypeTextBox.TabIndex = 14;
             this._attributeTypeTextBox.TextChanged += new System.EventHandler(this.TextBox_TextChanged);
             this._attributeTypeTextBox.Enter += new System.EventHandler(this.HandleFocusEnter);
@@ -163,7 +178,7 @@
             // _removeButton
             // 
             this._removeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._removeButton.Location = new System.Drawing.Point(552, 132);
+            this._removeButton.Location = new System.Drawing.Point(552, 204);
             this._removeButton.Name = "_removeButton";
             this._removeButton.Size = new System.Drawing.Size(87, 23);
             this._removeButton.TabIndex = 3;
@@ -174,7 +189,7 @@
             // _AddButton
             // 
             this._AddButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._AddButton.Location = new System.Drawing.Point(552, 74);
+            this._AddButton.Location = new System.Drawing.Point(552, 146);
             this._AddButton.Name = "_AddButton";
             this._AddButton.Size = new System.Drawing.Size(87, 23);
             this._AddButton.TabIndex = 1;
@@ -196,14 +211,23 @@
             this._nameDataGridView.ColumnHeadersVisible = false;
             this._nameDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column1});
-            this._nameDataGridView.Location = new System.Drawing.Point(16, 74);
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._nameDataGridView.DefaultCellStyle = dataGridViewCellStyle1;
+            this._nameDataGridView.Location = new System.Drawing.Point(16, 137);
             this._nameDataGridView.MinimumSize = new System.Drawing.Size(521, 148);
             this._nameDataGridView.Name = "_nameDataGridView";
             this._nameDataGridView.ReadOnly = true;
             this._nameDataGridView.RowHeadersVisible = false;
             this._nameDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this._nameDataGridView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._nameDataGridView.Size = new System.Drawing.Size(521, 148);
+            this._nameDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this._nameDataGridView.Size = new System.Drawing.Size(521, 167);
             this._nameDataGridView.TabIndex = 22;
             this._nameDataGridView.TabStop = false;
             this._nameDataGridView.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this._nameDataGridView_RowEnter);
@@ -216,12 +240,15 @@
             // 
             // _attributeNameTextBox
             // 
+            this._attributeNameTextBox.AcceptsReturn = true;
             this._attributeNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._attributeNameTextBox.Location = new System.Drawing.Point(15, 251);
+            this._attributeNameTextBox.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._attributeNameTextBox.Location = new System.Drawing.Point(15, 333);
             this._attributeNameTextBox.Multiline = true;
             this._attributeNameTextBox.Name = "_attributeNameTextBox";
-            this._attributeNameTextBox.Size = new System.Drawing.Size(522, 40);
+            this._attributeNameTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this._attributeNameTextBox.Size = new System.Drawing.Size(624, 40);
             this._attributeNameTextBox.TabIndex = 8;
             this._attributeNameTextBox.TextChanged += new System.EventHandler(this.TextBox_TextChanged);
             this._attributeNameTextBox.Enter += new System.EventHandler(this.HandleFocusEnter);
@@ -230,7 +257,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(12, 52);
+            this.label5.Location = new System.Drawing.Point(13, 119);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(163, 13);
             this.label5.TabIndex = 24;
@@ -240,7 +267,7 @@
             // 
             this._nameCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._nameCheckBox.AutoSize = true;
-            this._nameCheckBox.Location = new System.Drawing.Point(105, 228);
+            this._nameCheckBox.Location = new System.Drawing.Point(105, 310);
             this._nameCheckBox.Name = "_nameCheckBox";
             this._nameCheckBox.Size = new System.Drawing.Size(75, 17);
             this._nameCheckBox.TabIndex = 6;
@@ -255,7 +282,7 @@
             this._valueCheckBox.AutoSize = true;
             this._valueCheckBox.Checked = true;
             this._valueCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this._valueCheckBox.Location = new System.Drawing.Point(105, 297);
+            this._valueCheckBox.Location = new System.Drawing.Point(105, 379);
             this._valueCheckBox.Name = "_valueCheckBox";
             this._valueCheckBox.Size = new System.Drawing.Size(75, 17);
             this._valueCheckBox.TabIndex = 9;
@@ -268,7 +295,7 @@
             // 
             this._typeCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._typeCheckBox.AutoSize = true;
-            this._typeCheckBox.Location = new System.Drawing.Point(105, 366);
+            this._typeCheckBox.Location = new System.Drawing.Point(105, 448);
             this._typeCheckBox.Name = "_typeCheckBox";
             this._typeCheckBox.Size = new System.Drawing.Size(75, 17);
             this._typeCheckBox.TabIndex = 12;
@@ -281,7 +308,7 @@
             // 
             this._nameDoNotCreateIfEmptyCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._nameDoNotCreateIfEmptyCheckBox.AutoSize = true;
-            this._nameDoNotCreateIfEmptyCheckBox.Location = new System.Drawing.Point(308, 229);
+            this._nameDoNotCreateIfEmptyCheckBox.Location = new System.Drawing.Point(308, 311);
             this._nameDoNotCreateIfEmptyCheckBox.Name = "_nameDoNotCreateIfEmptyCheckBox";
             this._nameDoNotCreateIfEmptyCheckBox.Size = new System.Drawing.Size(229, 17);
             this._nameDoNotCreateIfEmptyCheckBox.TabIndex = 7;
@@ -293,7 +320,7 @@
             // 
             this._valueDoNotCreateIfEmptyCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._valueDoNotCreateIfEmptyCheckBox.AutoSize = true;
-            this._valueDoNotCreateIfEmptyCheckBox.Location = new System.Drawing.Point(308, 297);
+            this._valueDoNotCreateIfEmptyCheckBox.Location = new System.Drawing.Point(308, 379);
             this._valueDoNotCreateIfEmptyCheckBox.Name = "_valueDoNotCreateIfEmptyCheckBox";
             this._valueDoNotCreateIfEmptyCheckBox.Size = new System.Drawing.Size(229, 17);
             this._valueDoNotCreateIfEmptyCheckBox.TabIndex = 10;
@@ -305,7 +332,7 @@
             // 
             this._typeDoNotCreateIfEmptyCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this._typeDoNotCreateIfEmptyCheckBox.AutoSize = true;
-            this._typeDoNotCreateIfEmptyCheckBox.Location = new System.Drawing.Point(308, 366);
+            this._typeDoNotCreateIfEmptyCheckBox.Location = new System.Drawing.Point(308, 448);
             this._typeDoNotCreateIfEmptyCheckBox.Name = "_typeDoNotCreateIfEmptyCheckBox";
             this._typeDoNotCreateIfEmptyCheckBox.Size = new System.Drawing.Size(229, 17);
             this._typeDoNotCreateIfEmptyCheckBox.TabIndex = 13;
@@ -321,7 +348,7 @@
             // _duplicateButton
             // 
             this._duplicateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._duplicateButton.Location = new System.Drawing.Point(552, 103);
+            this._duplicateButton.Location = new System.Drawing.Point(552, 175);
             this._duplicateButton.Name = "_duplicateButton";
             this._duplicateButton.Size = new System.Drawing.Size(87, 23);
             this._duplicateButton.TabIndex = 2;
@@ -333,7 +360,7 @@
             // 
             this._downButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._downButton.Image = ((System.Drawing.Image)(resources.GetObject("_downButton.Image")));
-            this._downButton.Location = new System.Drawing.Point(604, 161);
+            this._downButton.Location = new System.Drawing.Point(604, 233);
             this._downButton.Name = "_downButton";
             this._downButton.Size = new System.Drawing.Size(35, 35);
             this._downButton.TabIndex = 5;
@@ -344,7 +371,7 @@
             // 
             this._upButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._upButton.Image = ((System.Drawing.Image)(resources.GetObject("_upButton.Image")));
-            this._upButton.Location = new System.Drawing.Point(552, 161);
+            this._upButton.Location = new System.Drawing.Point(552, 233);
             this._upButton.Name = "_upButton";
             this._upButton.Size = new System.Drawing.Size(35, 35);
             this._upButton.TabIndex = 4;
@@ -358,14 +385,38 @@
             this.dataGridViewTextBoxColumn1.ReadOnly = true;
             this.dataGridViewTextBoxColumn1.Width = 480;
             // 
+            // _exportButton
+            // 
+            this._exportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this._exportButton.Location = new System.Drawing.Point(16, 527);
+            this._exportButton.Name = "_exportButton";
+            this._exportButton.Size = new System.Drawing.Size(75, 23);
+            this._exportButton.TabIndex = 25;
+            this._exportButton.Text = "Export";
+            this._exportButton.UseVisualStyleBackColor = true;
+            this._exportButton.Click += new System.EventHandler(this._exportButton_Click);
+            // 
+            // _importButton
+            // 
+            this._importButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this._importButton.Location = new System.Drawing.Point(105, 527);
+            this._importButton.Name = "_importButton";
+            this._importButton.Size = new System.Drawing.Size(75, 23);
+            this._importButton.TabIndex = 26;
+            this._importButton.Text = "Import";
+            this._importButton.UseVisualStyleBackColor = true;
+            this._importButton.Click += new System.EventHandler(this._importButton_Click);
+            // 
             // CreateAttributeSettingsDialog
             // 
             this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(654, 504);
+            this.ClientSize = new System.Drawing.Size(654, 566);
             this.ControlBox = false;
+            this.Controls.Add(this._importButton);
+            this.Controls.Add(this._exportButton);
             this.Controls.Add(this._duplicateButton);
             this.Controls.Add(this._typeDoNotCreateIfEmptyCheckBox);
             this.Controls.Add(this._valueDoNotCreateIfEmptyCheckBox);
@@ -430,5 +481,7 @@
         private System.Windows.Forms.CheckBox _typeDoNotCreateIfEmptyCheckBox;
         private System.Windows.Forms.ErrorProvider _errorProvider;
         private System.Windows.Forms.Button _duplicateButton;
+        private System.Windows.Forms.Button _importButton;
+        private System.Windows.Forms.Button _exportButton;
     }
 }

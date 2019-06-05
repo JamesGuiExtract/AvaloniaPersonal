@@ -1,9 +1,11 @@
-﻿using Extract.Interop;
-using Extract.Licensing;
+﻿using Extract.Licensing;
+using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Extract.AttributeFinder.Rules
@@ -38,6 +40,11 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         bool _suspendTextAndCheckboxChangedEvents;
 
+        /// <summary>
+        /// Used to populate import/export file dialogs with last filename imported/exported for convenience
+        /// </summary>
+        private string _fileName;
+
         #endregion Fields
 
         #region Constructors
@@ -60,6 +67,11 @@ namespace Extract.AttributeFinder.Rules
                 Settings = settings;
 
                 InitializeComponent();
+
+                // Without this, shift+select doesn't select in-between rows.
+                // Added here as well as in the designer in case the generated code gets regenerated.
+                // https://extract.atlassian.net/browse/ISSUE-16448
+                _nameDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
 
                 _suspendTextAndCheckboxChangedEvents = true;
 
@@ -115,7 +127,6 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.
         /// </param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         protected override void OnLoad(EventArgs e)
         {
             try
@@ -145,12 +156,11 @@ namespace Extract.AttributeFinder.Rules
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         void HandleOkButtonClick(object sender, EventArgs e)
         {
             try
             {
-                if (Settings.SubattributeComponentCount < 1)
+                if (Settings.SubAttributeComponentCount < 1)
                 {
                     var caption = "Subattributes are required";
                     var text = "At least one Subattribute definition is required.\n" +
@@ -162,7 +172,7 @@ namespace Extract.AttributeFinder.Rules
                 }
 
                 var rootText = _rootTextBox.TextValue();
-                if (!CreateAttribute.TextIsValid(rootText, xPathEnabled: true))
+                if (!UtilityMethods.IsValidXPathExpression(rootText))
                 {
                     SetRootTextBoxErrorText();
                     _rootTextBox.Focus();
@@ -170,7 +180,7 @@ namespace Extract.AttributeFinder.Rules
                     return;
                 }
 
-                for (int i = 0; i < Settings.SubattributeComponentCount; ++i)
+                for (int i = 0; i < Settings.SubAttributeComponentCount; ++i)
                 {
                     var valid = Settings.AttributeIsValid(i);
                     if (!valid.Item1)
@@ -197,7 +207,6 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void _AddButton_Click(object sender, EventArgs e)
         {
             try
@@ -209,7 +218,7 @@ namespace Extract.AttributeFinder.Rules
 
                 ClearNameAndValueAndType();
 
-                Settings.AddSubattributeComponents(_attributeNameTextBox.TextValue(),
+                Settings.AddSubAttributeComponents(_attributeNameTextBox.TextValue(),
                                                    _attributeValueTextBox.TextValue(),
                                                    _attributeTypeTextBox.TextValue(),
                                                    _nameCheckBox.Checked,
@@ -262,7 +271,6 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="DataGridViewCellEventArgs"/> instance containing the event data.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void _nameDataGridView_RowEnter(object sender, DataGridViewCellEventArgs e)
         {
             try
@@ -306,7 +314,6 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void CheckBoxChanged(object sender, EventArgs e)
         {
             try
@@ -332,7 +339,6 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void TextBox_TextChanged(object sender, EventArgs e)
         {
             try
@@ -358,8 +364,16 @@ namespace Extract.AttributeFinder.Rules
                     // NOTE: if checkBox is null, then it is the _rootTextBox, which always takes an xpath statement,
                     // hence the "use xpath" flag is set to true below if null.
                     bool checkd = checkBox == null ? true : checkBox.Checked;
+                    bool isValid = false;
 
-                    var isValid = CreateAttribute.TextIsValid(text, checkd);
+                    if (checkBox == null && UtilityMethods.IsValidXPathExpression(text)
+                        || checkBox == _nameCheckBox && CreateAttribute.NameIsValid(text, checkd)
+                        || checkBox == _typeCheckBox && CreateAttribute.TypeIsValid(text, checkd)
+                        || checkBox == _valueCheckBox && CreateAttribute.ValueIsValid(text, checkd))
+                    {
+                        isValid = true;
+                    }
+
                     var msg = isValid ? "" : "invalid characters in statement";
 
                     _suspendTextAndCheckboxChangedEvents = true;
@@ -385,14 +399,13 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void _removeButton_Click(object sender, EventArgs e)
         {
             try
             {
                 foreach (DataGridViewRow row in _nameDataGridView.SelectedRows)
                 {
-                    Settings.DeleteSubattributeComponents(row.Index);
+                    Settings.DeleteSubAttributeComponents(row.Index);
                     _nameDataGridView.Rows.RemoveAt(row.Index);
                 }
 
@@ -400,7 +413,7 @@ namespace Extract.AttributeFinder.Rules
 
                 _AddButton.Enabled = true;
 
-                var gridRowsEmpty = Settings.SubattributeComponentCount == 0;
+                var gridRowsEmpty = Settings.SubAttributeComponentCount == 0;
                 _removeButton.Enabled = !gridRowsEmpty;
                 _duplicateButton.Enabled = !gridRowsEmpty;
 
@@ -424,7 +437,6 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void _upButton_Click(object sender, EventArgs e)
         {
             try
@@ -458,7 +470,6 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void _downButton_Click(object sender, EventArgs e)
         {
             try
@@ -468,7 +479,7 @@ namespace Extract.AttributeFinder.Rules
                     int index = row.Index;
                     int indexDown = index + 1;
 
-                    if (row.Index + 1 < Settings.SubattributeComponentCount)
+                    if (row.Index + 1 < Settings.SubAttributeComponentCount)
                     {
                         Settings.SwapAttributeComponents(index, indexDown);
                         SetTextAndChecksFromSubAttribute(indexDown);
@@ -492,19 +503,20 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void _duplicateButton_Click(object sender, EventArgs e)
         {
             try
             {
-                foreach (DataGridViewRow row in _nameDataGridView.SelectedRows)
+                foreach (var row in _nameDataGridView.SelectedRows
+                    .Cast<DataGridViewRow>()
+                    .OrderBy(row => row.Index))
                 {
                     Settings.DuplicateSubattribute(row.Index);
                 }
 
                 // Now update the grid view
                 int currentNumberOfRows = _nameDataGridView.Rows.Count;
-                int currentNumberOfSubattrs = Settings.SubattributeComponentCount;
+                int currentNumberOfSubattrs = Settings.SubAttributeComponentCount;
                 for (int i = currentNumberOfRows; i < currentNumberOfSubattrs; ++i)
                 {
                     var subattr = Settings.GetComponents(i);
@@ -528,7 +540,6 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void CheckBox_CheckStateChanged(object sender, EventArgs e)
         {
             try
@@ -544,25 +555,17 @@ namespace Extract.AttributeFinder.Rules
 
                 var text = textBox.TextValue();
                 var checkd = checkBox.Checked;
-                if (String.IsNullOrWhiteSpace(text) ||
-                    checkBox == _valueCheckBox && !checkd || // Any text is valid for non-XPath Value field
-                    CreateAttribute.TextIsValid(text, xPathEnabled: checkd))
+                if (   checkBox == _nameCheckBox && CreateAttribute.NameIsValid(text, checkd)
+                    || checkBox == _typeCheckBox && CreateAttribute.TypeIsValid(text, checkd)
+                    || checkBox == _valueCheckBox && CreateAttribute.ValueIsValid(text, checkd))
                 {
                     textBox.SetError(_errorProvider, String.Empty);
+                    textBox.RemoveRequiredMarker();
                     UpdateActiveSubattribute();
-
-                    if (checkBox == _typeCheckBox ||
-                        checkBox == _valueCheckBox)
-                    {
-                        if (checkd && String.IsNullOrWhiteSpace(text))
-                        {
-                            textBox.SetRequiredMarker();
-                        }
-                        else
-                        {
-                            textBox.RemoveRequiredMarker();
-                        }
-                    }
+                }
+                else if (checkd && String.IsNullOrWhiteSpace(text))
+                {
+                    textBox.SetRequiredMarker();
                 }
                 else
                 {
@@ -581,7 +584,6 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void HandleFocusEnter(object sender, EventArgs e)
         {
             try
@@ -604,7 +606,6 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void HandleFocusLeave(object sender, EventArgs e)
         {
             try
@@ -637,6 +638,71 @@ namespace Extract.AttributeFinder.Rules
         }
 
 
+        private void _exportButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (var saveDialog = new SaveFileDialog())
+                {
+                    saveDialog.Filter = "YAML files|*.yml|All files|*.*";
+                    saveDialog.FileName = "export.yml";
+                    if (!string.IsNullOrEmpty(_fileName))
+                    {
+                        saveDialog.InitialDirectory = Path.GetDirectoryName(_fileName);
+                    }
+
+                    var result = saveDialog.ShowDialog();
+                    if (result == DialogResult.OK)
+                    {
+                        Settings.SaveToYAML(saveDialog.FileName);
+                        _fileName = saveDialog.FileName;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46883");
+            }
+        }
+
+        private void _importButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (var openDialog = new OpenFileDialog())
+                {
+                    openDialog.Filter = "YAML files|*.yml|All files|*.*";
+                    openDialog.FileName = "export.yml";
+                    if (!string.IsNullOrEmpty(_fileName))
+                    {
+                        openDialog.FileName = Path.GetFileName(_fileName);
+                        openDialog.InitialDirectory = Path.GetDirectoryName(_fileName);
+                    }
+
+                    var result = openDialog.ShowDialog();
+                    if (result == DialogResult.OK)
+                    {
+                        Settings.LoadFromYAML(openDialog.FileName);
+
+                        _fileName = openDialog.FileName;
+
+                        // Workaround for crappy error provider code
+                        if (!string.IsNullOrEmpty(Settings.Root))
+                        {
+                            _rootTextBox.ForeColor = Color.Black;
+                        }
+
+                        LoadPageControls();
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46884");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Methods
@@ -647,6 +713,8 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         void LoadPageControls()
         {
+            _nameDataGridView.Rows.Clear();
+
             if (null == Settings)
             {
                 return;
@@ -654,12 +722,12 @@ namespace Extract.AttributeFinder.Rules
 
             _rootTextBox.Text = Settings.Root;
 
-            bool enableState = Settings.SubattributeComponentCount > 0 ? true : false;
+            bool enableState = Settings.SubAttributeComponentCount > 0 ? true : false;
             SetTextBoxEnabledStates(enableState);
             _duplicateButton.Enabled = enableState;
             _removeButton.Enabled = enableState;
 
-            for (int i = 0; i < Settings.SubattributeComponentCount; ++i)
+            for (int i = 0; i < Settings.SubAttributeComponentCount; ++i)
             {
                 var antv = Settings.GetComponents(i);
                 _nameDataGridView.Rows.Add(antv.Name);
@@ -711,7 +779,7 @@ namespace Extract.AttributeFinder.Rules
         /// <param name="subAttrIndex">Index of the sub attribute.</param>
         void SetTextAndChecksFromSubAttribute(int subAttrIndex)
         {
-            if (null == Settings || subAttrIndex >= Settings.SubattributeComponentCount)
+            if (null == Settings || subAttrIndex >= Settings.SubAttributeComponentCount)
             {
                 return;
             }
@@ -762,7 +830,7 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         void SetUseXpathCheckBoxEnabledStates()
         {
-            bool enableState = Settings.SubattributeComponentCount > 0;
+            bool enableState = Settings.SubAttributeComponentCount > 0;
 
             _nameCheckBox.Enabled = enableState;
             _valueCheckBox.Enabled = enableState;
@@ -885,7 +953,7 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         void ClearAndDisableNameAndValueAndType()
         {
-            if (Settings.SubattributeComponentCount == 0)
+            if (Settings.SubAttributeComponentCount == 0)
             {
                 _suspendTextAndCheckboxChangedEvents = true;
 
@@ -1136,6 +1204,5 @@ namespace Extract.AttributeFinder.Rules
         }
 
         #endregion Private Methods
-
     }
 }

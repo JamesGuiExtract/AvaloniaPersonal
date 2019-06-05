@@ -500,7 +500,7 @@ namespace RedactionPredictor
                                 {
                                     Root = "/*/*[not(/AttributeType)][not(starts-with(name(), '_'))]"
                                 };
-                                res.AddSubattributeComponents("ThisAttributeShouldBeClassified", "", "", false, false, false, false, false, false);
+                                res.AddSubAttributeComponents("ThisAttributeShouldBeClassified", "", "", false, false, false, false, false, false);
                                 return res;
                             })()
                         },
@@ -563,7 +563,7 @@ namespace RedactionPredictor
                     {
                         Root = "/*/*[not(starts-with(name(), '_'))] "
                     };
-                    res.AddSubattributeComponents("Bitmap", "es:Bitmap(20, 5, ., -1, 1)", "Feature", false, true, false, false, true, false);
+                    res.AddSubAttributeComponents("Bitmap", "es:Bitmap(20, 5, ., -1, 1)", "Feature", false, true, false, false, true, false);
                     return res;
                 })()
             };

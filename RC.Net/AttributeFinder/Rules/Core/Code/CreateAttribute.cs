@@ -5,12 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
+using YamlDotNet.Serialization;
 using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 
 namespace Extract.AttributeFinder.Rules
@@ -77,7 +79,6 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         public CreateAttribute()
         {
-            _subattributesToCreate = new List<AttributeNameAndTypeAndValue>();
         }
 
         /// <summary>
@@ -136,8 +137,7 @@ namespace Extract.AttributeFinder.Rules
         /// <value>
         /// The subattribute component count.
         /// </value>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Subattribute")]
-        public int SubattributeComponentCount
+        public int SubAttributeComponentCount
         {
             get
             {
@@ -145,9 +145,26 @@ namespace Extract.AttributeFinder.Rules
             }
         }
 
+        /// <summary>
+        /// The collection of attributes to create
+        /// </summary>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        public List<AttributeNameAndTypeAndValue> SubAttributesToCreate
+        {
+            get => _subattributesToCreate;
+            set => _subattributesToCreate = value;
+        }
+
         #endregion Properties
 
         #region Public Methods
+
+        public void AddSubAttributeComponents(AttributeNameAndTypeAndValue components)
+        {
+            _subattributesToCreate.Add(components);
+            _dirty = true;
+        }
 
         /// <summary>
         /// Adds the subattribute (component set) to the internal list.
@@ -161,8 +178,7 @@ namespace Extract.AttributeFinder.Rules
         /// <param name="doNotCreateIfNameIsEmpty">true or false</param>
         /// <param name="doNotCreateIfValueIsEmpty">true or false</param>
         /// <param name="doNotCreateIfTypeIsEmpty">true or false</param>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Subattribute")]
-        public void AddSubattributeComponents(string name, 
+        public void AddSubAttributeComponents(string name, 
                                               string value,
                                               string type,
                                               bool nameContainsXPath,
@@ -202,6 +218,7 @@ namespace Extract.AttributeFinder.Rules
                                                                         attribute.Value,
                                                                         attribute.NameContainsXPath,
                                                                         attribute.TypeContainsXPath,
+                                                                        // https://extract.atlassian.net/browse/ISSUE-16448
                                                                         attribute.ValueContainsXPath,
                                                                         attribute.DoNotCreateIfNameIsEmpty,
                                                                         attribute.DoNotCreateIfTypeIsEmpty,
@@ -218,7 +235,7 @@ namespace Extract.AttributeFinder.Rules
             try
             {
                 var subattr = GetComponents(index);
-                AddSubattributeComponents(subattr.Name,
+                AddSubAttributeComponents(subattr.Name,
                                           subattr.Value,
                                           subattr.TypeOfAttribute,
                                           subattr.NameContainsXPath,
@@ -308,15 +325,12 @@ namespace Extract.AttributeFinder.Rules
         /// Deletes the subattribute components object at the specifed index.
         /// </summary>
         /// <param name="index">The index of the object to remove.</param>
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Subattribute")]
-        [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object)")]
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public void DeleteSubattributeComponents(int index)
+        public void DeleteSubAttributeComponents(int index)
         {
             try
             {
                 ExtractException.Assert("ELI39451",
-                        String.Format("Index: {0}, is out-of-range: 0 to {1}",
+                        String.Format(CultureInfo.InvariantCulture, "Index: {0}, is out-of-range: 0 to {1}",
                                       index,
                                       _subattributesToCreate.Count - 1),
                         index >= 0 && index < _subattributesToCreate.Count);
@@ -336,20 +350,18 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         /// <param name="index1">The index1.</param>
         /// <param name="index2">The index2.</param>
-        [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object)")]
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public void SwapAttributeComponents(int index1, int index2)
         {
             try
             {
                 ExtractException.Assert("ELI39452",
-                        String.Format("Index1: {0}, is out-of-range: 0 to {1}",
+                        String.Format(CultureInfo.InvariantCulture, "Index1: {0}, is out-of-range: 0 to {1}",
                                       index1,
                                       _subattributesToCreate.Count - 1),
                         index1 >= 0 && index1 < _subattributesToCreate.Count);
 
                 ExtractException.Assert("ELI39453",
-                                        String.Format("Index2: {0}, is out-of-range: 0 to {1}",
+                                        String.Format(CultureInfo.InvariantCulture, "Index2: {0}, is out-of-range: 0 to {1}",
                                                       index2,
                                                       _subattributesToCreate.Count - 1),
                                         index2 >= 0 && index2 < _subattributesToCreate.Count);
@@ -392,47 +404,83 @@ namespace Extract.AttributeFinder.Rules
         }
 
         /// <summary>
-        /// Determines whether a component of the NameAndValueAndType is valid.
+        /// Determines whether the Name component of the NameAndValueAndType is valid.
         /// </summary>
         /// <param name="text">The text to validate.</param>
-        /// <param name="xPathEnabled">if set to <c>true</c> [x path enabled].</param>
-        /// <param name="emptyTextIsAllowed">if set to <c>true</c> [empty text is allowed].</param>
-        /// <param name="isValue">if true, and xPathEnabled is true, then any character is valid</param>
-        /// <returns>true if the text element validates</returns>
-        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "x")]
-        [SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]
-        [SuppressMessage("Microsoft.Interoperability", "CA1407:AvoidStaticMembersInComVisibleTypes")]
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        static public bool TextIsValid(string text, 
-                                       bool xPathEnabled, 
-                                       bool emptyTextIsAllowed = false, 
-                                       bool isValue = false)
+        /// <param name="isXPath">if set to <c>true</c> [x path enabled].</param>
+        static internal bool NameIsValid(string text, bool isXPath)
         {
-            if (String.IsNullOrWhiteSpace(text))
+            try
             {
-                return emptyTextIsAllowed && !xPathEnabled;
-            }
-
-            if (Char.IsDigit(text[0]))
-            {
-                return false;
-            }
-
-            if (xPathEnabled)
-            {
-                return UtilityMethods.IsValidXPathExpression(text);
-            }
-            else
-            {
-                if (isValue)
+                if (String.IsNullOrWhiteSpace(text))
                 {
-                    return true;
+                    return false;
+                }
+
+                if (isXPath)
+                {
+                    return UtilityMethods.IsValidXPathExpression(text);
                 }
                 else
                 {
                     return UtilityMethods.IsValidIdentifier(text);
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46880");
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the Value component of the NameAndValueAndType is valid.
+        /// </summary>
+        /// <param name="text">The text to validate.</param>
+        /// <param name="isXPath">if set to <c>true</c> [x path enabled].</param>
+        static internal bool ValueIsValid(string text, bool isXPath)
+        {
+            try
+            {
+                if (isXPath)
+                {
+                    return UtilityMethods.IsValidXPathExpression(text);
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46881");
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the Type component of the NameAndValueAndType is valid.
+        /// </summary>
+        /// <param name="text">The text to validate.</param>
+        /// <param name="isXPath">if set to <c>true</c> [x path enabled].</param>
+        static internal bool TypeIsValid(string text, bool isXPath)
+        {
+            try
+            {
+                if (isXPath)
+                {
+                    return UtilityMethods.IsValidXPathExpression(text);
+                }
+                else if (string.IsNullOrEmpty(text))
+                {
+                    return true;
+                }
+                else
+                {
+                    return text.Split('+').All(id => UtilityMethods.IsValidIdentifier(id));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46882");
             }
         }
 
@@ -487,9 +535,9 @@ namespace Extract.AttributeFinder.Rules
 
                 var subAttr = _subattributesToCreate[index];
 
-                bool bName = TextIsValid(subAttr.Name, subAttr.NameContainsXPath, emptyTextIsAllowed: false);
-                bool bValue = TextIsValid(subAttr.Value, subAttr.ValueContainsXPath, emptyTextIsAllowed: true, isValue: true);
-                bool bType = TextIsValid(subAttr.TypeOfAttribute, subAttr.TypeContainsXPath, emptyTextIsAllowed: true);
+                bool bName = NameIsValid(subAttr.Name, subAttr.NameContainsXPath);
+                bool bValue = ValueIsValid(subAttr.Value, subAttr.ValueContainsXPath);
+                bool bType = TypeIsValid(subAttr.TypeOfAttribute, subAttr.TypeContainsXPath);
                 bool bRet = bName && bValue && bType;
 
                 AttributeComponentId aci = new AttributeComponentId();
@@ -529,8 +577,8 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
-                var stateIsValid = TextIsValid(_root, xPathEnabled: true);
-                for (int i = 0; i < SubattributeComponentCount; ++i)
+                var stateIsValid = UtilityMethods.IsValidXPathExpression(_root);
+                for (int i = 0; i < SubAttributeComponentCount; ++i)
                 {
                     if (!AttributeIsValid(i).Item1)
                     {
@@ -543,6 +591,56 @@ namespace Extract.AttributeFinder.Rules
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39630");
+            }
+        }
+
+        /// <summary>
+        /// Saves this object to a YAML file
+        /// </summary>
+        /// <param name="fileName">The file to save to</param>
+        public void LoadFromYAML(string fileName)
+        {
+            try
+            {
+                DeserializerBuilder db = new DeserializerBuilder();
+                db.WithTagMapping("!CreateAttribute", typeof(CreateAttribute));
+                var deserializer = db.Build();
+                using (var reader = new StreamReader(fileName))
+                {
+                    var loaded = deserializer.Deserialize<CreateAttribute>(reader);
+                    CopyFrom(loaded);
+                }
+
+                _dirty = false;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46885");
+            }
+        }
+
+        /// <summary>
+        /// Saves this object to a YAML file
+        /// </summary>
+        /// <param name="fileName">The file to save to</param>
+        public void SaveToYAML(string fileName)
+        {
+            try
+            {
+                var sb = new SerializerBuilder();
+                sb.EmitDefaults();
+                sb.EnsureRoundtrip();
+                sb.WithTagMapping("!CreateAttribute", typeof(CreateAttribute));
+                var serializer = sb.Build();
+                using (var stream = new StreamWriter(fileName))
+                {
+                    serializer.Serialize(stream, this);
+                }
+                _dirty = false;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46886");
             }
         }
 
@@ -601,14 +699,19 @@ namespace Extract.AttributeFinder.Rules
                     var attrResult = objectList != null ? objectList.OfType<IAttribute>().ToList() : null;
                     if (null == attrResult)
                     {
-                        QueryResult = null == objectList ? result.ToString() : objectList[0].AsString();
-                        Failed = doNotCreateIfEmpty && String.IsNullOrWhiteSpace(QueryResult);
+                        QueryResult = result.ToString();
+                        Failed = doNotCreateIfEmpty && string.IsNullOrEmpty(QueryResult);
                         return;
                     }
 
                     if (attrResult.Count == 0)
                     {
-                        Failed = doNotCreateIfEmpty;
+                        if (objectList.Count != 0)
+                        {
+                            QueryResult = objectList[0].ToString();
+                        }
+
+                        Failed = doNotCreateIfEmpty && string.IsNullOrEmpty(QueryResult);
                         return;
                     }
 
@@ -678,7 +781,6 @@ namespace Extract.AttributeFinder.Rules
         /// </param>
         /// <param name="pProgressStatus">The <see cref="ProgressStatus"/> displaying the progress.
         /// </param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         [SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object)")]
         public void ProcessOutput(IUnknownVector pAttributes, AFDocument pDoc, ProgressStatus pProgressStatus)
         {
@@ -985,7 +1087,7 @@ namespace Extract.AttributeFinder.Rules
                     // now write each subattr...
                     foreach (var subattr in _subattributesToCreate)
                     {
-                        subattr.WriteSubattributeComponents(writer);                    
+                        subattr.WriteSubAttributeComponents(writer);                    
                     }
 
                     // Write to the provided IStream.
@@ -1193,9 +1295,7 @@ namespace Extract.AttributeFinder.Rules
         /// Writes the subattribute components.
         /// </summary>
         /// <param name="writer">The writer.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Subattribute")]
-        public void WriteSubattributeComponents(IStreamWriter writer)
+        public void WriteSubAttributeComponents(IStreamWriter writer)
         {
             try
             {
@@ -1221,7 +1321,6 @@ namespace Extract.AttributeFinder.Rules
         /// Reads the sub attribute components (intended to be used with a default constructed instance of this class).
         /// </summary>
         /// <param name="reader">The reader.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public void ReadSubAttributeComponents(IStreamReader reader)
         {
             try
@@ -1295,14 +1394,5 @@ namespace Extract.AttributeFinder.Rules
         {
             return character == '.' || character == '/' || character == '*' || character == '@';
         }
-
     }
-}
-
-
-
-
-
-
-
-
+} 

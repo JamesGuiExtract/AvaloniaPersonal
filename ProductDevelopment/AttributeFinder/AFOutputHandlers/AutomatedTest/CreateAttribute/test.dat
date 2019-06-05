@@ -1,3 +1,11 @@
 // Test es:Bitmap function on a PDF (since I couldn't make this work from nunit -Nat)
 // https://extract.atlassian.net/browse/ISSUE-14895
 <TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.pdf;;Test1.eav
+
+// Test that you can specify + in a type without using XPath
+// https://extract.atlassian.net/browse/ISSUE-14457
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif;;Test2.eav
+
+// Test that you can get the value of the Type XML attribute without using string()
+// https://extract.atlassian.net/browse/ISSUE-14459
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif;;Test3.eav
