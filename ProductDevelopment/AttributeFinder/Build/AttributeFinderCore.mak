@@ -354,6 +354,9 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@COPY "$(RCNETDir)\APIs\Lucene.Net.4.8.0\lib\net45\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY "$(RCNETDir)\APIs\zstd\1.1.0\build\VS_scripts\bin\Release\x64\zstdlib_x64.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY "$(RCNETDir)\APIs\ZstdNet\ZstdNet\bin\x64\Release\ZstdNet64.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY "$(BinariesFolder)\Google*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY "$(BinariesFolder)\grpc*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+
 # This includes System.ValueTuple in the install
 	@COPY "$(BinariesFolder)\System.ValueTuple.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY "$(BinariesFolder)\Newtonsoft.Json.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
