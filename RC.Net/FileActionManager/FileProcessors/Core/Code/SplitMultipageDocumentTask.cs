@@ -80,12 +80,6 @@ namespace Extract.FileActionManager.FileProcessors
             typeof(SplitMultipageDocumentTask).GUID.ToString("B");
 
         /// <summary>
-        /// A string representation of the GUID for <see cref="AttributeStorageManagerClass"/> 
-        /// </summary>
-        static readonly string _ATTRIBUTE_STORAGE_MANAGER_GUID =
-            typeof(AttributeStorageManagerClass).GUID.ToString("B");
-
-        /// <summary>
         /// The page number tag
         /// </summary>
         internal const string PageNumberTag = "<PageNumber>";
@@ -682,11 +676,10 @@ namespace Extract.FileActionManager.FileProcessors
             for (int pageNum = 1; pageNum <= pageCount; pageNum++)
             {
                 string outputFileName = GetOutputFileName(pathTags, pageNum);
+                var imagePage = new ImagePage(sourceDocName, pageNum, 0);
 
                 using (var tempFile = new TemporaryFile(true))
                 {
-                    var imagePage = new ImagePage(sourceDocName, pageNum, 0);
-
                     ImageMethods.StaplePagesAsNewDocument(new[] { imagePage }, tempFile.FileName);
 
                     int fileId = -1;
@@ -709,25 +702,7 @@ namespace Extract.FileActionManager.FileProcessors
                     File.Copy(tempFile.FileName, outputFileName, true);
                 }
 
-                // Create uss file.
-                var pageMap = new Dictionary<Tuple<string, int>, List<int>>()
-                {
-                    { new Tuple<string, int>(sourceDocName, pageNum), new List<int>() { 1 } }
-                };
-                var spatialPageInfoMap = AttributeMethods.CreateUSSForPaginatedDocument(
-                    outputFileName, pageMap, null);
-
-                // Create voa file
-                if (attributes != null)
-                {
-                    // Used a cloned attribute hierarchy since TranslateAttributesToNewDocument will
-                    // have page specific side-effects.
-                    var attributesCopy = (IUnknownVector)((ICopyableObject)attributes).Clone();
-
-                    AttributeMethods.TranslateAttributesToNewDocument(attributesCopy, outputFileName, pageMap, spatialPageInfoMap);
-                    string outputVoaFileName = GetVOAFileName(pFAMTM, outputFileName);
-                    attributesCopy.SaveTo(outputVoaFileName, false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
-                }
+                AttributeMethods.CreateUssAndVoaForPaginatedDocument(outputFileName, attributes, new[] { imagePage });
             }
         }
 

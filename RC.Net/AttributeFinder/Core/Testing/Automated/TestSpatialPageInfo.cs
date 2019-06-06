@@ -1,4 +1,5 @@
 ﻿using Extract.Imaging;
+using Extract.Imaging.Utilities;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
@@ -43,6 +44,8 @@ namespace Extract.AttributeFinder.Test
         [TestFixtureSetUp]
         public static void Setup()
         {
+            UnlockLeadtools.UnlockLeadToolsSupport();
+
             GeneralMethods.TestSetup();
             _testFiles = new TestFileManager<TestSpatialPageInfo>();
             _ocrManager = new SynchronousOcrManager();
@@ -98,16 +101,16 @@ namespace Extract.AttributeFinder.Test
             primaryString.LoadFrom(ussPath, false);
             Assert.AreEqual(EOrientation.kRotNone, primaryString.GetPageInfo(2).Orientation);
 
-            var pageMap = new Dictionary<Tuple<string, int>, List<int>>
+            var imagePages = new[]
             {
-                { Tuple.Create(imagePath, 1), new List<int> { 1 } },
-                { Tuple.Create(imagePath, 2), new List<int> { 2 } },
-                { Tuple.Create(imagePath, 3), new List<int> { 3 } }
+                new ImagePage(imagePath, 1, 0),
+                new ImagePage(imagePath, 2, 0),
+                new ImagePage(imagePath, 3, 0)
             };
             AttributeMethods.TranslateAttributesToNewDocument(
                 attrr,
                 "Dummy.tif",
-                pageMap,
+                imagePages,
                 primaryString.SpatialPageInfos);
 
             // Confirm that the attribute was modified
@@ -159,21 +162,17 @@ namespace Extract.AttributeFinder.Test
                 primaryString.LoadFrom(ussPath, false);
                 Assert.AreEqual(EOrientation.kRotNone, primaryString.GetPageInfo(2).Orientation);
 
-                var pageMap = new Dictionary<Tuple<string, int>, List<int>>
+                var imagePages = new[]
                 {
-                    { Tuple.Create(imagePath, 1), new List<int> { 1 } },
-                    { Tuple.Create(imagePath, 2), new List<int> { 2 } },
-                    { Tuple.Create(imagePath, 3), new List<int> { 3 } }
+                    new ImagePage(imagePath, 1, 0),
+                    new ImagePage(imagePath, 2, 270), // Simulate the original page 2 being rotated left
+                    new ImagePage(imagePath, 3, 0)
                 };
-
-                // Simulate the original page 2 being rotated left
-                var rotationInfo = Array.AsReadOnly(new[] { (imagePath, 2, 270) });
 
                 newImagePath = _testFiles.GetFile(_EXAMPLE05_WITH_ROTATED_PAGE_TIF_FILE);
                 var newInfoMap = AttributeMethods.CreateUSSForPaginatedDocument(
                     newImagePath,
-                    pageMap,
-                    rotationInfo);
+                    imagePages);
 
                 // Primary orientation is now Right because that is the rotation needed to correct
                 // the majority of text for the page being rotated left
@@ -182,8 +181,7 @@ namespace Extract.AttributeFinder.Test
                 AttributeMethods.TranslateAttributesToNewDocument(
                     attrr,
                     newImagePath,
-                    pageMap,
-                    rotationInfo,
+                    imagePages,
                     newInfoMap);
 
                 // Confirm that the attribute was modified

@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Extract.Imaging;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;  
 using System.Linq;
 
 namespace Extract.UtilityApplications.PaginationUtility
@@ -141,6 +142,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="documentData">Data that has been associated with the document.</param>
         /// <param name="rotatedPages">collection of original page number that has been rotated, AND associated 
         /// rotation amount in degrees from original orientation.
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public CreatingOutputDocumentEventArgs(IEnumerable<PageInfo> sourcePageInfo,
             int pageCount, long fileSize, bool? suggestedPaginationAccepted, int position,
             PaginationDocumentData documentData, ReadOnlyCollection<(string documentName, int page, int rotation)> rotatedPages,
@@ -231,6 +233,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Contains a read-only collection of pages that have been rotated (ImageOrientation != 0)
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public ReadOnlyCollection<(string documentName, int page, int rotation)> RotatedPages
         {
             get;
@@ -285,6 +288,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Whether the page is deleted
         /// </summary>
         public bool Deleted { get; set; }
+
+        /// <summary>
+        /// Gets or sets the orientation of the page from vertical in degrees. (0, 90, 180 or 270)
+        /// </summary>
+        public int Orientation { get; set; }
+
+        /// <summary>
+        /// Gets this instance represented as an <see cref="ImagePage"/>.
+        /// </summary>
+        public ImagePage ImagePage
+        {
+            get
+            {
+                return new ImagePage(DocumentName, Page, Orientation);
+            }
+        }
     }
 
     /// <summary>

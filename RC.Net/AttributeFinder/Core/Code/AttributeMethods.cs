@@ -3,8 +3,8 @@ using Extract.Interop.Zip;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Extract.Imaging;
@@ -142,68 +142,67 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Translates all spatial <see cref="IAttribute"/> values in <see paramref="attributes"/>
         /// to be associated with the <see paramref="newDocumentName"/> where
-        /// <see paramref="pageMap"/> relates each original page to a corresponding page number in
-        /// <see paramref="newDocumentName"/>.
+        /// <see paramref="imagePages"/> specifies the source <see cref="imagePage"/> info for each
+        /// successive page in <see paramref="newDocumentName"/>.
         /// </summary>
         /// <param name="attributes">The <see cref="IAttribute"/> hierarchy to update.</param>
         /// <param name="newDocumentName">The name of the file with which the attribute values
         /// should now be associated.</param>
-        /// <param name="pageMap">Each key represents a tuple of the old document name and page
-        /// number while the value represents the new page number(s) in 
-        /// <see paramref="newDocumentName"/> associated with that source page.</param>
+        /// <param name="imagePages">A sequence of <see cref="ImagePage"/>s representing the source
+        /// pages for each successive page in the new output document.</param>
         /// <param name="newSpatialPageInfos">The new spatial page infos to be associated with this string.</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public static void TranslateAttributesToNewDocument(IIUnknownVector attributes,
-            string newDocumentName, Dictionary<Tuple<string, int>, List<int>> pageMap,
+            string newDocumentName, IEnumerable<ImagePage> imagePages,
             LongToObjectMap newSpatialPageInfos)
         {
             try
             {
-                TranslateAttributesToNewDocument(attributes, newDocumentName, pageMap, null, newSpatialPageInfos);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39708");
-            }
-        }
-
-        /// <summary>
-        /// Translates all spatial <see cref="IAttribute"/> values in <see paramref="attributes"/>
-        /// to be associated with the <see paramref="newDocumentName"/> where
-        /// <see paramref="pageMap"/> relates each original page to a corresponding page number in
-        /// <see paramref="newDocumentName"/>.
-        /// </summary>
-        /// <param name="attributes">The <see cref="IAttribute"/> hierarchy to update.</param>
-        /// <param name="newDocumentName">The name of the file with which the attribute values
-        /// should now be associated.</param>
-        /// <param name="pageMap">Each key represents a tuple of the old document name and page
-        /// number while the value represents the new page number(s) in 
-        /// <see paramref="newDocumentName"/> associated with that source page.</param>
-        /// <param name="rotatedPages">Information about which pages have been rotated</param>
-        /// <param name="newSpatialPageInfos">The new spatial page infos to be associated with this string.</param>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public static void TranslateAttributesToNewDocument(IIUnknownVector attributes,
-            string newDocumentName, Dictionary<Tuple<string, int>, List<int>> pageMap,
-            ReadOnlyCollection<(string documentName, int page, int rotation)> rotatedPages,
-            LongToObjectMap newSpatialPageInfos)
-        {
-            try
-            {
-                foreach (IAttribute attribute in attributes.ToIEnumerable<IAttribute>())
+                int destPageNumber = 1;
+                var pageMap = new Dictionary<Tuple<string, int>, List<ImagePage>>();
+                foreach (var page in imagePages)
                 {
-                    TranslateAttributesToNewDocument(attribute.SubAttributes,
-                        newDocumentName, pageMap, rotatedPages, newSpatialPageInfos);
-
-                    if (attribute.Value.GetMode() != ESpatialStringMode.kNonSpatialMode)
+                    var sourcePage = new Tuple<string, int>(page.DocumentName, page.PageNumber);
+                    if (!pageMap.TryGetValue(sourcePage, out List<ImagePage> destPages))
                     {
-                        attribute.Value = TranslateSpatialStringToNewDocument(
-                            attribute.Value, newDocumentName, pageMap, rotatedPages, newSpatialPageInfos);
+                        destPages = new List<ImagePage>();
+                        pageMap[sourcePage] = destPages;
                     }
+
+                    destPages.Add(new ImagePage(newDocumentName, destPageNumber++, page.ImageOrientation));
                 }
+
+                TranslateAttributesToNewDocument(attributes, newDocumentName, pageMap, newSpatialPageInfos);
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI46451");
+            }
+        }
+
+        /// <summary>
+        /// Saves a USS and VOA file for the specifed <see paramref="outputFileName"/> with translated
+        /// spatial data based on the source document images in <see paramref="imagePages"/>.
+        /// </summary>
+        /// <param name="outputFileName">The name of the document to which the spatial needs to be
+        /// translated.</param>
+        /// <param name="attributes">The VOA data to be saved for <see paramref="outputFileName"/>.</param>
+        /// <param name="imagePages">The source <see cref="ImagePage"/> that corresponds to each successive
+        /// page in <see paramref="outputFileName"/>.</param>
+        public static void CreateUssAndVoaForPaginatedDocument(string outputFileName,
+            IIUnknownVector attributes, IEnumerable<ImagePage> imagePages)
+        {
+            try
+            {
+                var newSpatialPageInfos = CreateUSSForPaginatedDocument(outputFileName, imagePages);
+
+                TranslateAttributesToNewDocument(attributes, outputFileName, imagePages, newSpatialPageInfos);
+
+                attributes.SaveTo(outputFileName + ".voa", false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46878");
             }
         }
 
@@ -232,7 +231,7 @@ namespace Extract.AttributeFinder
         /// <param name="attributes">The <see cref="IIUnknownVector" /> to save</param>
         /// <param name="fileName">Full path of the file to be saved</param>
         [CLSCompliant(false)]
-        public static void SaveAttributes(this IUnknownVector attributes, string fileName)
+        public static void SaveAttributes(this IIUnknownVector attributes, string fileName)
         {
             try
             {
@@ -506,28 +505,26 @@ namespace Extract.AttributeFinder
 
         /// <summary>
         /// Creates a new uss file for the specified <see paramref="newDocumentName"/> based upon
-        /// the specified <see paramref="pageMap"/> that relates the source pages to the
-        /// corresponding pages in <see paramref="newDocumentName"/>.
+        /// the specified <see paramref="pageMap"/> that provides the source <see cref="ImagePage"/>
+        /// for each successive page in <see paramref="newDocumentName"/>.
         /// </summary>
         /// <param name="newDocumentName">The name of the document for which the uss file is being
         /// created.</param>
-        /// <param name="pageMap">Each key represents a tuple of the old document name and page
-        /// number while the value represents the new page number(s) in 
-        /// <see paramref="newDocumentName"/> associated with that source page.</param>
+        /// <param name="sourceImagePages">The source <see cref="ImagePage"/>s that correspond to
+        /// each successive page in <see paramref="newDocumentName"/>.</param>
         /// <param name="rotatedPages">collection of PageAndRotation; original page number, and
         /// rotation in degrees relative to the original page orientation (= 0 degrees,
         /// so any non-zero amount indicates a rotation)</param>
         /// <returns>The spatial page info map for the output document</returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "USS")]
-        public static LongToObjectMap CreateUSSForPaginatedDocument(string newDocumentName,
-            Dictionary<Tuple<string, int>, List<int>> pageMap, 
-            ReadOnlyCollection<(string documentName, int page, int rotation)> rotatedPages)
+        public static LongToObjectMap CreateUSSForPaginatedDocument(
+            string newDocumentName, IEnumerable<ImagePage> sourceImagePages)
         {
             try
             {
-                var sourceUSSData = pageMap.Keys
-                    .Select(sourcePage => sourcePage.Item1)
+                var sourceUSSData = sourceImagePages
+                    .Select(page => page.DocumentName)
                     .Distinct()
                     .Where(sourceFileName => File.Exists(sourceFileName + ".uss"))
                     .ToDictionary(sourceFileName => sourceFileName, sourceFileName =>
@@ -539,51 +536,40 @@ namespace Extract.AttributeFinder
                     });
                     
                 var newSpatialPageInfos = new LongToObjectMapClass();
-                int destPageCount = pageMap.Values.SelectMany(value => value).Count();
+                int destPageCount = sourceImagePages.Count();
                 var newPageDataArray = new SpatialString[destPageCount];
                 bool ussFileExists = false;
-                foreach (var pageInfo in pageMap)
+                int destPageNumber = 0;
+                foreach (var imagePage in sourceImagePages)
                 {
-                    string sourceDocName = pageInfo.Key.Item1;
+                    destPageNumber++;
 
                     SpatialString sourceDocData;
-                    if (sourceUSSData.TryGetValue(sourceDocName, out sourceDocData))
+                    if (sourceUSSData.TryGetValue(imagePage.DocumentName, out sourceDocData))
                     {
                         ussFileExists = true;
                         if (sourceDocData.HasSpatialInfo())
                         {
-                            foreach (int destPage in pageInfo.Value)
+                            var pageData = sourceDocData.GetSpecifiedPages(imagePage.PageNumber, imagePage.PageNumber);
+
+                            var oldPageInfos = sourceDocData.SpatialPageInfos;
+                            if (oldPageInfos.Contains(imagePage.PageNumber))
                             {
-                                int sourcePage = pageInfo.Key.Item2;
-                                var pageData = sourceDocData.GetSpecifiedPages(sourcePage, sourcePage);
+                                newSpatialPageInfos.Set(destPageNumber, oldPageInfos.GetValue(imagePage.PageNumber));
+                            }
 
-                                var oldPageInfos = sourceDocData.SpatialPageInfos;
-                                if (oldPageInfos.Contains(sourcePage))
+                            // CreateFromSpatialStrings won't accept non-spatial strings
+                            // UpdatePageNumber is only valid for spatial strings
+                            if (pageData.HasSpatialInfo())
+                            {
+                                var oldSpatialPageInfo = (SpatialPageInfo)oldPageInfos.GetValue(imagePage.PageNumber);
+                                newPageDataArray[destPageNumber - 1] = pageData;
+                                pageData.UpdatePageNumber(destPageNumber);
+
+                                if (imagePage.ImageOrientation != 0)
                                 {
-                                    newSpatialPageInfos.Set(destPage, oldPageInfos.GetValue(sourcePage));
-                                }
-
-                                // CreateFromSpatialStrings won't accept non-spatial strings
-                                // UpdatePageNumber is only valid for spatial strings
-                                if (pageData.HasSpatialInfo())
-                                {
-                                    var oldSpatialPageInfo = (SpatialPageInfo)oldPageInfos.GetValue(sourcePage);
-                                    newPageDataArray[destPage - 1] = pageData;
-                                    pageData.UpdatePageNumber(destPage);
-
-                                    if (rotatedPages != null)
-                                    {
-                                        var rotation = rotatedPages
-                                            .Where(info => info.page == sourcePage
-                                                           && info.documentName == pageData.SourceDocName)
-                                            .Select(info => info.rotation)
-                                            .FirstOrDefault();
-
-                                        if (rotation != 0)
-                                        {
-                                            PaginationMethods.RotatePage(destPage, rotation, newSpatialPageInfos, oldSpatialPageInfo);
-                                        }
-                                    }
+                                    PaginationMethods.RotatePage(
+                                        destPageNumber, imagePage.ImageOrientation, newSpatialPageInfos, oldSpatialPageInfo);
                                 }
                             }
                         }
@@ -618,6 +604,65 @@ namespace Extract.AttributeFinder
             }
         }
 
+        /// <summary>
+        /// Gets an <see cref="ImagePage"/> represented by <see paramref="attribute"/>.
+        /// </summary>
+        /// <param name="attribute">The attribute representation of and <see cref="ImagePage"/>.</param>
+        public static ImagePage GetAsImagePage(this IAttribute attribute)
+        {
+            try
+            {
+                ExtractException.Assert("ELI46867", "Not a page attribute",
+                        attribute.Name.Equals("Page", StringComparison.OrdinalIgnoreCase));
+
+                var imagePage = new ImagePage(
+                    documentName:
+                        AttributeMethods.GetSingleAttributeByName(attribute.SubAttributes, "SourceDocument").Value.String,
+                    pageNumber:
+                        int.Parse(AttributeMethods.GetSingleAttributeByName(attribute.SubAttributes, "SourcePage").Value.String,
+                            CultureInfo.InvariantCulture),
+                    imageOrientation:
+                        int.Parse(AttributeMethods.GetSingleAttributeByName(attribute.SubAttributes, "Orientation").Value.String,
+                        CultureInfo.InvariantCulture)
+                    );
+
+                return imagePage;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46868");
+            }
+        }
+
+        /// <summary>
+        /// Gets an <see cref="IAttribute"/> with sub-attributes representing the specified <see paramref="imagePage"/>.
+        /// </summary>
+        /// <param name="imagePage">The <see cref="ImagePage"/> to be stored as an <see cref="IAttribute."/></param>
+        /// <param name="pageNumber">If specified, stores the specified page number as a destination page number
+        /// in the value of the root attribute.</param>
+        public static IAttribute GetAsAttribute(this ImagePage imagePage, int pageNumber = 0)
+        {
+            try
+            {
+                var pageAttribute = new AttributeClass() { Name = "Page" };
+                if (pageNumber > 0)
+                {
+                    pageAttribute.Value.ReplaceAndDowngradeToNonSpatial(
+                        pageNumber.ToString(CultureInfo.InvariantCulture));
+                }
+
+                pageAttribute.AddSubAttribute("SourceDocument", imagePage.DocumentName);
+                pageAttribute.AddSubAttribute("SourcePage", imagePage.PageNumber.ToString(CultureInfo.InvariantCulture));
+                pageAttribute.AddSubAttribute("Orientation", imagePage.ImageOrientation.ToString(CultureInfo.InvariantCulture));
+
+                return pageAttribute;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46869");
+            }
+        }
+
         #endregion Public Methods
 
         #region Private Methods
@@ -625,21 +670,19 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Translates a <see cref="SpatialString"/> in <see cref="ESpatialStringMode.kSpatialMode"/>
         /// to be associated with the <see paramref="newDocumentName"/> where
-        /// <see paramref="pageMap"/> relates each original page to a corresponding page number in
-        /// <see paramref="newDocumentName"/>.
+        /// <see paramref="pageMap"/> relates each original page to a corresponding
+        /// <see cref="ImagePage"/> in <see paramref="newDocumentName"/>.
         /// </summary>
         /// <param name="value">The <see cref="SpatialString"/> value to translate.</param>
         /// <param name="newDocumentName">The name of the file with which the value should now be
         /// associated.</param>
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
-        /// number while the value represents the new page number(s) in 
+        /// number while the value represents the <see cref="ImagePage"/>s in 
         /// <see paramref="newDocumentName"/> associated with that source page.</param>
-        /// <param name="rotatedPages">Information about which pages have been rotated</param>
         /// <param name="newSpatialPageInfos">The new spatial page infos to be associated with this string.</param>
         /// <returns>The translated spatial string</returns>
         static SpatialString TranslateSpatialStringToNewDocument(SpatialString value,
-            string newDocumentName, Dictionary<Tuple<string, int>, List<int>> pageMap,
-            ReadOnlyCollection<(string documentName, int page, int rotation)> rotatedPages,
+            string newDocumentName, Dictionary<Tuple<string, int>, List<ImagePage>> pageMap,
             LongToObjectMap newSpatialPageInfos)
         {
             var spatialMode = value.GetMode();
@@ -669,27 +712,21 @@ namespace Extract.AttributeFinder
                 int oldPageNum = page.GetFirstPageNumber();
 
                 if (pageMap.TryGetValue(new Tuple<string, int>(sourceDocName, oldPageNum),
-                    out var newPageNums))
+                    out var destImagePages))
                 {
                     // If for some reason same source page is copied to multiple destination pages,
                     // only copy attribute value to the first of those pages.
-                    int newPageNum = newPageNums.Min();
+                    var destImagePage = destImagePages.OrderBy(p => p.PageNumber).First();
+                    var newPageNum = destImagePage.PageNumber;
 
                     bool updated = false;
-                    if (rotatedPages != null)
+                    if (destImagePage.ImageOrientation != 0)
                     {
-                        var pageInfoCollection = rotatedPages
-                            .Where(info => info.page == oldPageNum
-                                           && info.documentName == sourceDocName);
-                        var (_, _, rotation) = pageInfoCollection.FirstOrDefault();
-
-                        if (rotation != 0)
-                        {
-                            var newPageInfos = new LongToObjectMapClass();
-                            PaginationMethods.RotatePage(newPageNum, rotation, newPageInfos, page.GetPageInfo(oldPageNum));
-                            page.SpatialPageInfos = newPageInfos;
-                            updated = true;
-                        }
+                        var newPageInfos = new LongToObjectMapClass();
+                        PaginationMethods.RotatePage(
+                            newPageNum, destImagePage.ImageOrientation, newPageInfos, page.GetPageInfo(oldPageNum));
+                        page.SpatialPageInfos = newPageInfos;
+                        updated = true;
                     }
 
                     // UpdatePageNumber won't change the spatial page infos if there
@@ -765,6 +802,44 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
+        /// Translates all spatial <see cref="IAttribute"/> values in <see paramref="attributes"/>
+        /// to be associated with the <see paramref="newDocumentName"/> where
+        /// <see paramref="pageMap"/> relates each original page to a corresponding
+        /// <see cref="ImagePage"/> in <see paramref="newDocumentName"/>.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IAttribute"/> hierarchy to update.</param>
+        /// <param name="newDocumentName">The name of the file with which the attribute values
+        /// should now be associated.</param>
+        /// <param name="pageMap">Each key represents a tuple of the old document name and page
+        /// number while the value represents the new <see cref="ImagePage"/>s in 
+        /// <see paramref="newDocumentName"/> associated with that source page.</param>
+        /// <param name="newSpatialPageInfos">The new spatial page infos to be associated with this string.</param>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        static void TranslateAttributesToNewDocument(IIUnknownVector attributes,
+            string newDocumentName, Dictionary<Tuple<string, int>, List<ImagePage>> pageMap,
+            LongToObjectMap newSpatialPageInfos)
+        {
+            try
+            {
+                foreach (IAttribute attribute in attributes.ToIEnumerable<IAttribute>())
+                {
+                    TranslateAttributesToNewDocument(attribute.SubAttributes,
+                        newDocumentName, pageMap, newSpatialPageInfos);
+
+                    if (attribute.Value.GetMode() != ESpatialStringMode.kNonSpatialMode)
+                    {
+                        attribute.Value = TranslateSpatialStringToNewDocument(
+                            attribute.Value, newDocumentName, pageMap, newSpatialPageInfos);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46451");
+            }
+        }
+
+        /// <summary>
         /// Gets the SourceDocName property from <see paramref="value"/>. In order to account for
         /// files that have been moved from their original location, in the case that the
         /// SourceDocName does not appear in <see paramref="pageMap"/>, it will instead return the
@@ -774,10 +849,11 @@ namespace Extract.AttributeFinder
         /// <param name="value">The <see cref="SpatialString"/> for which the SourceDocName is
         /// needed.</param>
         /// <param name="pageMap">Each key represents a tuple of the old document name and page
-        /// number while the value represents the new page number(s) in 
+        /// number while the value represents the <see cref="ImagePage"/>s in 
         /// <see paramref="newDocumentName"/> associated with that source page.</param>
         /// <returns>The SourceDocName property from <see paramref="value"/>.</returns>
-        static string GetSourceDocName(SpatialString value, Dictionary<Tuple<string, int>, List<int>> pageMap)
+        static string GetSourceDocName(
+            SpatialString value, Dictionary<Tuple<string, int>, List<ImagePage>> pageMap)
         {
             string sourceDocName = value.SourceDocName;
             if (!pageMap.Keys.Any(key => key.Item1 == sourceDocName))

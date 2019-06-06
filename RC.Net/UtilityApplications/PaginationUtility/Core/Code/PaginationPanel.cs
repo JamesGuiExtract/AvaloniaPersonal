@@ -1062,48 +1062,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 bool result = SaveDocumentData(selectedDocumentsOnly: false, validateData: false);
 
-                var sourceToOutputMap = _pendingDocuments.ToDictionary(
-                    pendingDocument => pendingDocument
-                        .PageControls
-                        .Select(pageControl => pageControl.Page.SourceDocument)
-                        .Distinct(),
-                    pendingDocument => pendingDocument);
-
-                if (sourceToOutputMap.Keys.Any(key => key.Count() > 1))
+                if (result)
                 {
-                    UtilityMethods.ShowMessageBox("It is not possible to save progress when multiple " +
-                        "source documents have been combined into a single output document.",
-                        "Unable to save", true);
-                    return false;
-                }
-
-                var documentsToSave = new Dictionary<SourceDocument, List<OutputDocument>>();
-                foreach (var entry in sourceToOutputMap.Where(entry => entry.Key.Any()))
-                {
-                    var outputDocs = documentsToSave.GetOrAdd(entry.Key.Single(), _ => new List<OutputDocument>());
-                    outputDocs.Add(entry.Value);
-                }
-
-                var orderedDocuments = _primaryPageLayoutControl.Documents.ToList();
-
-                foreach (var sourceEntry in documentsToSave)
-                {
-                    var sourceDocName = sourceEntry.Key.FileName;
-                    var documentAttributes = new IUnknownVector();
-
-                    foreach (var outputDoc in sourceEntry.Value.OrderBy(doc => orderedDocuments.IndexOf(doc)))
-                    {
-                        var documentAttribute = GetDocumentAttribute(outputDoc, sourceDocName);
-                        documentAttributes.PushBack(documentAttribute);
-                    }
-
-                    if (documentAttributes.Size() > 0)
-                    {
-                        IUnknownVector saveFileData = new IUnknownVector();
-                        saveFileData.Append(documentAttributes);
-                        saveFileData.SaveTo(sourceEntry.Key.FileName + ".voa", false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
-                        saveFileData.ReportMemoryUsage();
-                    }
+                    result = OutputVoa();
                 }
 
                 return result;
@@ -1117,6 +1078,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 waitCursor.Dispose();
             }
         }
+
+        
 
         /// <summary>
         /// Commits changes (either for all document or just selected documents depending on the
@@ -1227,7 +1190,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         }
                         else
                         {
-                            // Even if aphysical document was not created, call ProcessOutputDocument
+                            // Even if a physical document was not created, call ProcessOutputDocument
                             // to assign the output document name, write pagination history and queue
                             // the output file.
                             ProcessOutputDocument(outputDocument);
@@ -1243,6 +1206,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
                     _pendingDocuments.Remove(outputDocument);
                 }
+
+                // Anytime output documents are created, store the source document voas to reflect
+                // the documents output.
+                OutputVoa();
 
                 LinkFilesWithRecordIDs(documentsToCommit);
 
@@ -1371,13 +1338,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// be recorded.</param>
         void WritePaginationHistory(OutputDocument outputDocument)
         {
-            var sourceFileName = outputDocument
+            var firstSourceFileName = outputDocument
                 .PageControls
                 .OrderBy(c => !c.Deleted) // Prefer (but not require) a non-deleted source document
                 .FirstOrDefault()
                 ?.Page.OriginalDocumentName;
 
-            var sourcePageInfo = (sourceFileName == null)
+            var sourcePageInfo = (firstSourceFileName == null)
                 ? null
                 : outputDocument
                     .PageControls
@@ -1399,8 +1366,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 })
                 .ToIUnknownVector();
 
-            int sourceFileId = FileProcessingDB.GetFileID(sourceFileName);
-            var sessionIdRequestArgs = new FileTaskSessionRequestEventArgs(sourceFileId);
+            int firstSourceFileId = FileProcessingDB.GetFileID(firstSourceFileName);
+            var sessionIdRequestArgs = new FileTaskSessionRequestEventArgs(firstSourceFileId);
             FileTaskSessionIdRequest?.Invoke(this, sessionIdRequestArgs);
 
             ExtractException.Assert("ELI45596", "Session not available",
@@ -2250,7 +2217,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     DocumentName = c.Page.OriginalDocumentName,
                     Page = c.Page.OriginalPageNumber,
-                    Deleted = c.Deleted
+                    Deleted = c.Deleted,
+                    Orientation = c.Page.ImageOrientation
                 });
 
             int pageCount = currentPages.Count();
@@ -2270,12 +2238,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                               page: c.Page.OriginalPageNumber,
                               rotation: c.Page.ImageOrientation));
             var rotatedPages = sourcePages
-                                .Where(page => page.rotation != 0)
-                                .Select(page =>
-                                    (page.documentName,
-                                     page.page,
-                                     page.rotation))
-                                .ToList().AsReadOnly();
+                .Where(page => page.rotation != 0)
+                .Select(page =>
+                    (page.documentName,
+                        page.page,
+                        page.rotation))
+                .ToList().AsReadOnly();
 
             bool pagesEqualButRotated = pagesEqual && rotatedPages.Count() > 0;
 
@@ -3011,7 +2979,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (outputDoc.DocumentData.PaginationRequest != null)
             {
                 documentAttribute.SubAttributes.PushBack(
-                    outputDoc.DocumentData.PaginationRequest.GetAsAttribute());
+                    outputDoc.DocumentData.PaginationRequest.GetAsAttribute(PaginationRequestType.Verified));
             }
 
             documentAttribute.SubAttributes.PushBack(outputDoc.DocumentData.DocumentDataAttribute);
@@ -3111,6 +3079,69 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Outputs the data pagination and index data for all source documents without
+        /// first updating the index data from each document.
+        /// NOTE: An exception will be thrown if the pages from multiple source documents
+        /// are currently combined into a single proposed output document.
+        /// </summary>
+        /// <returns><c>true</c> if the data was saved; otherwise, <c>false</c>.</returns>
+        bool OutputVoa()
+        {
+            try
+            {
+                var sourceToOutputMap = _pendingDocuments.ToDictionary(
+                    pendingDocument => pendingDocument
+                        .PageControls
+                        .Select(pageControl => pageControl.Page.SourceDocument)
+                        .Distinct(),
+                    pendingDocument => pendingDocument);
+
+                if (sourceToOutputMap.Keys.Any(key => key.Count() > 1))
+                {
+                    UtilityMethods.ShowMessageBox("It is not possible to save progress when multiple " +
+                        "source documents have been combined into a single output document.",
+                        "Unable to save", true);
+                    return false;
+                }
+
+                var documentsToSave = new Dictionary<SourceDocument, List<OutputDocument>>();
+                foreach (var entry in sourceToOutputMap.Where(entry => entry.Key.Any()))
+                {
+                    var outputDocs = documentsToSave.GetOrAdd(entry.Key.Single(), _ => new List<OutputDocument>());
+                    outputDocs.Add(entry.Value);
+                }
+
+                var orderedDocuments = _primaryPageLayoutControl.Documents.ToList();
+
+                foreach (var sourceEntry in documentsToSave)
+                {
+                    var sourceDocName = sourceEntry.Key.FileName;
+                    var documentAttributes = new IUnknownVector();
+
+                    foreach (var outputDoc in sourceEntry.Value.OrderBy(doc => orderedDocuments.IndexOf(doc)))
+                    {
+                        var documentAttribute = GetDocumentAttribute(outputDoc, sourceDocName);
+                        documentAttributes.PushBack(documentAttribute);
+                    }
+
+                    if (documentAttributes.Size() > 0)
+                    {
+                        IUnknownVector saveFileData = new IUnknownVector();
+                        saveFileData.Append(documentAttributes);
+                        saveFileData.SaveTo(sourceEntry.Key.FileName + ".voa", false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                        saveFileData.ReportMemoryUsage();
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45736");
+            }
         }
 
         /// <summary>

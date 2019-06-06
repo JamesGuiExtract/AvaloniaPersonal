@@ -124,6 +124,13 @@
     <Compile Include="CloudOCRTaskSettingsDialog.Designer.cs">
       <DependentUpon>CloudOCRTaskSettingsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="CreateFileTaskSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateFileTaskSettingsDialog.Designer.cs">
+      <DependentUpon>CreateFileTaskSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CreatePaginatedOutputTask.cs" />
     <Compile Include="SplitMultipageDocumentTask.cs" />
     <Compile Include="PaginationTaskForm.FormStateManager.cs">
       <DependentUpon>PaginationTaskForm.cs</DependentUpon>
@@ -176,12 +183,6 @@
       <DependentUpon>ViewImageTaskSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="CreateFileTask.cs" />
-    <Compile Include="CreateFileTaskSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="CreateFileTaskSettingsDialog.Designer.cs">
-      <DependentUpon>CreateFileTaskSettingsDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="DeleteEmptyFolderTask.cs" />
     <Compile Include="DeleteEmptyFolderTaskSettingsDialog.cs">
       <SubType>Form</SubType>
@@ -467,6 +468,9 @@
     <EmbeddedResource Include="CloudOCRTaskSettingsDialog.resx">
       <DependentUpon>CloudOCRTaskSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="CreateFileTaskSettingsDialog.resx">
+      <DependentUpon>CreateFileTaskSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="PaginationTaskSettingsDialog.resx">
       <DependentUpon>PaginationTaskSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -488,9 +492,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ViewImageTaskSettingsDialog.resx">
       <DependentUpon>ViewImageTaskSettingsDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="CreateFileTaskSettingsDialog.resx">
-      <DependentUpon>CreateFileTaskSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DeleteEmptyFolderTaskSettingsDialog.resx">
       <DependentUpon>DeleteEmptyFolderTaskSettingsDialog.cs</DependentUpon>

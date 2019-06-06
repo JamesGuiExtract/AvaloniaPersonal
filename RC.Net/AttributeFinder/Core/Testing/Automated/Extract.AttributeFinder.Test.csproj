@@ -125,6 +125,10 @@
       <Project>{b2d07de4-9192-4531-8854-de03ce9b0b57}</Project>
       <Name>Extract.Imaging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj">
+      <Project>{e610e652-0891-40d4-b5ca-a622b87c7979}</Project>
+      <Name>Extract.Imaging.Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
       <Name>Extract.Interop</Name>

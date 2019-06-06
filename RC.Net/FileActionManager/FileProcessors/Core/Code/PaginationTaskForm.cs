@@ -1186,7 +1186,13 @@ namespace Extract.FileActionManager.FileProcessors
                 ExtractException.Assert("ELI40090", "FileTaskSession was not started.",
                     _fileTaskSessionMap.TryGetValue(GetFileID(firstSourceFile), out var sessionData));
 
-                e.DocumentData.PaginationRequest = new PaginationRequest(sessionData.SessionID, fileId);
+                e.DocumentData.PaginationRequest = new PaginationRequest(
+                    sessionData.SessionID, fileId, 
+                    e.SourcePageInfo
+                        .Where(p => !p.Deleted)
+                        .Select(p => p.ImagePage)
+                        .ToList()
+                        .AsReadOnly());
             }
             catch (Exception ex)
             {
@@ -1942,6 +1948,13 @@ namespace Extract.FileActionManager.FileProcessors
                         // document as far as the _paginationPanel is concerned.
                         foreach (var documentAttribute in attributeArray)
                         {
+                            // Don't display documents for which pagination has already been requested.
+                            if (AttributeMethods.GetSingleAttributeByName(
+                                documentAttribute.SubAttributes, "PaginationRequest") != null)
+                            {
+                                continue;
+                            }
+
                             // There should be two attributes under the root Document attribute:
                             // Pages- The range/list specification of pages to be included.
                             // DocumentData- The data (redaction or indexing() the rules found for the

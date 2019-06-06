@@ -3193,26 +3193,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 FileProcessingDB.AddPaginationHistory(
                     e.FileID, sourcePageInfo, deletedSourcePageInfo, _fileTaskSessionID.Value);
 
-                // Produce a uss file for the paginated document using the uss data from the
-                // source documents
-                int pageCounter = 1;
-                var pageMap = new Dictionary<Tuple<string, int>, List<int>>();
-                var nonDeletedSourcePageInfo = e.SourcePageInfo.Where(info => !info.Deleted).ToList();
-                foreach (var pageInfo in nonDeletedSourcePageInfo)
-                {
-                    var sourcePage = new Tuple<string, int>(pageInfo.DocumentName, pageInfo.Page);
-                    var destPages = new List<int>();
-                    if (!pageMap.TryGetValue(sourcePage, out destPages))
-                    {
-                        destPages = new List<int>();
-                        pageMap[sourcePage] = destPages;
-                    }
+                var imagePages = e.SourcePageInfo
+                    .Where(p => !p.Deleted)
+                    .Select(p => new ImagePage(p.DocumentName, p.Page, p.Orientation));
 
-                    destPages.Add(pageCounter++);
-                }
-
-                var newSpatialPageInfos = AttributeMethods.CreateUSSForPaginatedDocument(
-                    e.OutputFileName, pageMap, e.RotatedPages);
+                var newSpatialPageInfos = AttributeMethods.CreateUSSForPaginatedDocument(e.OutputFileName, imagePages);
 
                 // Only grab the file back into the current verification session if suggested
                 // pagination boundaries were accepted (meaning the rules should have already found
@@ -3227,13 +3212,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         var attributesCopy = (IUnknownVector)copyThis.Clone();
                         attributesCopy.ReportMemoryUsage();
 
-                        if (nonDeletedSourcePageInfo.Any(pageInfo => pageInfo.DocumentName == _fileName))
+                        if (e.SourcePageInfo.Any(
+                            pageInfo => !pageInfo.Deleted && pageInfo.DocumentName == _fileName))
                         {
                             DataEntryMethods.PruneNonPersistingAttributes(attributesCopy);
                         }
 
                         AttributeMethods.TranslateAttributesToNewDocument(
-                            attributesCopy, e.OutputFileName, pageMap, e.RotatedPages, newSpatialPageInfos);
+                            attributesCopy, e.OutputFileName, imagePages, newSpatialPageInfos);
 
                         attributesCopy.SaveTo(e.OutputFileName + ".voa", false,
                             _ATTRIBUTE_STORAGE_MANAGER_GUID);
@@ -3242,7 +3228,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
                 else
                 {
-                    GrabDocumentForVerification(fileID, e, pageMap, newSpatialPageInfos);                    
+                    GrabDocumentForVerification(fileID, e, imagePages, newSpatialPageInfos);                    
                 }
             }
             catch (Exception ex)
@@ -5174,12 +5160,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance containing
         /// data about the <see cref="PaginationPanel.CreatingOutputDocument"/> event for which this
         /// call is being made.</param>
-        /// <param name="pageMap">Each key represents a tuple of the old document name and page
-        /// number while the value represents the new page number(s) in 
-        /// <see paramref="newDocumentName"/> associated with that source page.</param>
+        /// <param name="imagePages">Represents the <see cref="ImagePage"/>s of the old document for
+        /// each successive page of the <see paramref="newDocumentName"/>.</param>
         /// <param name="newSpatialPageInfos">The new spatial page infos to be associated with produced VOA.</param>
         void GrabDocumentForVerification(int fileID, CreatingOutputDocumentEventArgs e,
-            Dictionary<Tuple<string, int>, List<int>> pageMap, LongToObjectMap newSpatialPageInfos)
+            IEnumerable<ImagePage> imagePages, LongToObjectMap newSpatialPageInfos)
         {
             try
             {
@@ -5192,7 +5177,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     attributesCopy.ReportMemoryUsage();
 
                     AttributeMethods.TranslateAttributesToNewDocument(
-                        attributesCopy, e.OutputFileName, pageMap, e.RotatedPages, newSpatialPageInfos);
+                        attributesCopy, e.OutputFileName, imagePages, newSpatialPageInfos);
 
                     attributesCopy.SaveTo(e.OutputFileName + ".voa", false,
                         _ATTRIBUTE_STORAGE_MANAGER_GUID);
