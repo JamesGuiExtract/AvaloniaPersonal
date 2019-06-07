@@ -2886,7 +2886,7 @@ namespace Extract.Redaction.Verification
                 string activityTimeout = _fileDatabase.GetDBInfoSetting("InputActivityTimeout", false);
                 if (!string.IsNullOrWhiteSpace(activityTimeout))
                 {
-                    _intputActivityTimeout = int.Parse(activityTimeout);
+                    _intputActivityTimeout = int.Parse(activityTimeout, CultureInfo.InvariantCulture);
                 }
 
                 // Create the IDShield database wrapper
@@ -4359,7 +4359,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// This event is not implemented by <see cref="VerificationTaskForm"/>.
         /// </summary>
-        public void DelayFile(int fileID = -1)
+        public void DelayFile(int fileId = -1)
         {
             throw new ExtractException("ELI37503", "Method not implemented.");
         }

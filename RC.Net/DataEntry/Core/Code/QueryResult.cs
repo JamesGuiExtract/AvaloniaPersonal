@@ -134,28 +134,24 @@ namespace Extract.DataEntry
         /// in order to speed up the creation of auto suggest lists that use lots of data
         /// https://extract.atlassian.net/browse/ISSUE-15673
         /// </summary>
-        static Func<string, string[]> SplitCSVLine;
+        static Func<string, string[]> SplitCSVLine = new Func<string, string[]>(line =>
+        {
+
+            using (var sr = new StringReader(line))
+
+            using (var csvReader = new TextFieldParser(sr) { Delimiters = new[] { ", " } })
+
+            {
+
+                return csvReader.ReadFields();
+
+            }
+
+        }).Memoize(threadSafe: true);
 
         #endregion Fields
        
         #region Constructors
-
-        /// <summary>
-        /// Initialize the static variables
-        /// </summary>
-        static QueryResult()
-        {
-            Func<string, string[]> splitCSVLine = line =>
-            {
-                using (var sr = new StringReader(line))
-                using (var csvReader = new TextFieldParser(sr) {Delimiters = new[] {", "}})
-                {
-                    return csvReader.ReadFields();
-                }
-            };
-
-            SplitCSVLine = splitCSVLine.Memoize(threadSafe: true);
-        }
 
         /// <summary>
         /// Initializes a new, empty <see cref="QueryResult"/> instance.

@@ -363,7 +363,7 @@ namespace Extract.ETL
         /// Starts a FAMSession and ActiveFAM record for the DatabaseService 
         /// </summary>
         /// <returns><c>true</c> if the Schedule is active with activeFAMID. Otherwise <c>false</c></returns>
-        public bool StartActiveSchedule(int activeFamID)
+        public bool StartActiveSchedule(int activeFAMId)
         {
             try
             {
@@ -400,7 +400,7 @@ namespace Extract.ETL
                                       NextScheduledRunTime = @NextScheduledRunTime,
                                       ActiveServiceMachineID = @MachineID
                               WHERE ID = @DatabaseServiceID";
-                        cmd.Parameters.AddWithValue("@ActiveFAMID", activeFamID);
+                        cmd.Parameters.AddWithValue("@ActiveFAMID", activeFAMId);
                         cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
                         cmd.Parameters.Add("@MachineName", SqlDbType.NVarChar, 50).Value = Environment.MachineName;
                         if (Schedule?.GetNextOccurrence() is DateTime nextOccurrence)
@@ -412,7 +412,7 @@ namespace Extract.ETL
                             cmd.Parameters.AddWithValue("@NextScheduledRunTime", DBNull.Value);
                         }
                         cmd.ExecuteNonQuery();
-                        _activeFAMID = activeFamID;
+                        _activeFAMID = activeFAMId;
                     }
                     scope.Complete();
                 }

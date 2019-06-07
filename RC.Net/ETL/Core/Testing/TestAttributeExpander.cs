@@ -355,7 +355,7 @@ namespace Extract.ETL.Test
         [Category("Automated")]
         [Category("ETL")]
         [Description("This test the fix for https://extract.atlassian.net/browse/ISSUE-16038")]
-        public static void TestISSUE_16038()
+        public static void TestIssue_16038()
         {
             string testDBName = "TestISSUE_16038";
             try

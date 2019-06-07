@@ -3,6 +3,7 @@ using Extract.ETL;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -69,13 +70,29 @@ namespace Extract.UtilityApplications.TrainingCoordinator
         /// The list of contained services that are <see cref="TrainingDataCollector.TrainingDataCollector"/>s
         /// </summary>
         [DataMember]
-        public List<MachineLearningService> DataCollectors { get; set; } = new List<MachineLearningService>();
+        public Collection<MachineLearningService> DataCollectors { get; set; } = new Collection<MachineLearningService>();
 
         /// <summary>
         /// The list of contained services that are <see cref="MLModelTrainer.MLModelTrainer"/>s
         /// </summary>
         [DataMember]
-        public List<MachineLearningService> ModelTrainers { get; set; } = new List<MachineLearningService>();
+        public Collection<MachineLearningService> ModelTrainers { get;} = new Collection<MachineLearningService>();
+
+        public void SetModelTrainers(Collection<MachineLearningService> collection)
+        {
+            try
+            {
+                ModelTrainers.Clear();
+                foreach (var item in collection)
+                {
+                    ModelTrainers.Add(item);
+                }
+            }
+            catch(Exception e)
+            {
+                ExtractException.Log("ELI46864", e);
+            }
+        }
 
         /// <summary>
         /// An enumeration of both data collectors and model trainers (data collectors first)
@@ -116,7 +133,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
         /// (since these do not have their own records in the DB)
         /// </summary>
         [DataMember]
-        public Dictionary<Guid, DatabaseServiceStatus> ServiceStatuses { get; set; }
+        public Dictionary<Guid, DatabaseServiceStatus> ServiceStatuses { get; }
 
         #endregion Properties
 
@@ -146,6 +163,27 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45798");
+            }
+        }
+
+        /// <summary>
+        /// Allows the ServiceStatuses dictionary to be overwritten.
+        /// Was created in response to CA 2227: Microsoft.Usage.
+        /// </summary>
+        /// <param name="dictionary">A dictionary in which to replace ServiceStatuses</param>
+        public void SetServiceStatuses(Dictionary<Guid, DatabaseServiceStatus> dictionary)
+        {
+            try
+            {
+                ServiceStatuses.Clear();
+                foreach (var item in dictionary)
+                {
+                    ServiceStatuses.Add(item.Key, item.Value);
+                }
+            }
+            catch(Exception ex)
+            {
+                throw ex.AsExtract("ELI46865");
             }
         }
 
@@ -334,7 +372,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                     // Get status from DB or initialize an empty object
                     var coordinatorStatus = GetLastOrCreateStatus(() => new TrainingCoordinatorStatus());
 
-                    ServiceStatuses = coordinatorStatus.ServiceStatuses;
+                    SetServiceStatuses(coordinatorStatus.ServiceStatuses);
 
                     // Refresh each service from the status object
                     if (ServiceStatuses != null)

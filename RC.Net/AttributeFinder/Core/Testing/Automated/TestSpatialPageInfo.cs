@@ -321,7 +321,6 @@ namespace Extract.AttributeFinder.Test
         public static void GetPageInfoBlankPage()
         {
             string imagePath = _testFiles.GetFile(_BLANKPAGE_TIF_FILE);
-            string ussPath = _testFiles.GetFile(_BLANKPAGE_USS_FILE);
 
             // USS file only has two pages in it
             var infosFromImageMethods = ImageMethods.GetSpatialPageInfos(imagePath);

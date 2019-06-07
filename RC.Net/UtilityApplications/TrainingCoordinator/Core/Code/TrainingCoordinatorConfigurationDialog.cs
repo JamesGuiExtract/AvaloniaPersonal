@@ -104,7 +104,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             _settings.PropertyChanged += HandleSettings_PropertyChanged;
         }
 
-        private void InitializeDataGridView(DataGridView dataGridView)
+        private static void InitializeDataGridView(DataGridView dataGridView)
         {
             dataGridView.AutoGenerateColumns = false;
 
@@ -433,7 +433,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                     if (Process.GetCurrentProcess().MainModule.FileName.EndsWith("FAMDBAdmin.exe", StringComparison.OrdinalIgnoreCase))
                     {
                         var result = MessageBox.Show("There are known issues with running rules from the DB Admin. Are you sure?",
-                            "Confirm bad decision", MessageBoxButtons.YesNo);
+                            "Confirm bad decision", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
                         if (result == DialogResult.No)
                         {
                             return;
@@ -816,7 +816,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                         ApplyControlValues();
 
                         // Not sure how to do lists besides directly copying the references...
-                        _settings.ModelTrainers = newSettings.ModelTrainers;
+                        _settings.SetModelTrainers(newSettings.ModelTrainers);
                         _settings.DataCollectors = newSettings.DataCollectors;
                         foreach (var service in _settings.Services)
                         {
@@ -857,7 +857,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                 var result = MessageBox.Show(UtilityMethods.FormatCurrent(
                     $"The following ML Model Names do not exist. Add?",
                     $"\r\n{string.Join(Environment.NewLine, referencedModels)}"),
-                    "Add missing model names", MessageBoxButtons.YesNo);
+                    "Add missing model names", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
                 if (result == DialogResult.Yes)
                 {
                     _settings.AddModels(referencedModels);
@@ -886,7 +886,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                 var result = MessageBox.Show(UtilityMethods.FormatCurrent(
                     $"The following Attribute Sets do not exist. Add?",
                     $"\r\n{string.Join(Environment.NewLine, referencedAttributeSets)}"),
-                    "Add missing attribute sets", MessageBoxButtons.YesNo);
+                    "Add missing attribute sets", MessageBoxButtons.YesNo,MessageBoxIcon.Information,MessageBoxDefaultButton.Button1,MessageBoxOptions.ServiceNotification);
                 if (result == DialogResult.Yes)
                 {
                     foreach (var missingName in referencedAttributeSets)

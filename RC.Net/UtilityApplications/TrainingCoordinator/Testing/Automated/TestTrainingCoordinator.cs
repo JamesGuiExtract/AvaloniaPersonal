@@ -4,6 +4,7 @@ using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.SqlClient;
 using System.IO;
 
@@ -110,7 +111,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator.Test
                     Log = "Hello world!"
                 };
 
-                coordinator.DataCollectors = new List<ETL.MachineLearningService>
+                coordinator.DataCollectors = new Collection<ETL.MachineLearningService>
                 {
                     new TrainingDataCollector.TrainingDataCollector
                     {

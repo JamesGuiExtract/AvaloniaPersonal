@@ -675,8 +675,8 @@ namespace Extract.UtilityApplications.MLModelTrainer
                             lastIDProcessed = lastProcessedID;
                             MaximumTrainingRecords = maxToProcess;
                         }
-                        else if (errorMessage.ToLowerInvariant().Contains("memory")
-                            || outputMessage.ToLowerInvariant().Contains("memory"))
+                        else if (errorMessage.ToUpperInvariant().Contains("MEMORY")
+                            || outputMessage.ToUpperInvariant().Contains("MEMORY"))
                         {
                             var warning = new ExtractException("ELI45291", "Possible out-of-memory error encountered training ML model");
                             warning.AddDebugData("Error message", errorMessage, false);
@@ -860,7 +860,10 @@ namespace Extract.UtilityApplications.MLModelTrainer
                                         var f1String = ((YamlScalarNode)f1Node.Value).Value;
                                         AppendToLog(((YamlScalarNode)f1Node.Key).Value + ": " + f1String);
 
-                                        double.TryParse(f1String, out double f1);
+                                        if(!double.TryParse(f1String, out double f1))
+                                        {
+                                            // This was triggering a warning. I am not sure how you want to handle an error if this fails.
+                                        }
                                         double h = ULP(f1) / 2;
                                         appTrace.AddDebugData("F1", f1, false);
                                         criteriaMet = (f1 + h) >= MinimumF1Score && (f1 + h + AllowableAccuracyDrop) >= LastF1Score;

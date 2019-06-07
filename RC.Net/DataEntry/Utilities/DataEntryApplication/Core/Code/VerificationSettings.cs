@@ -180,7 +180,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 string configFileName = null;
-                bool inputEventTrackingEnabled = false;
                 bool countersEnabled = false;
                 bool allowTags = true;
                 var tagSettings = new FileTagSelectionSettings();
@@ -191,10 +190,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     configFileName = reader.ReadString();
                 }
-
                 if (reader.Version >= 3 && reader.Version <= 6)
                 {
-                    inputEventTrackingEnabled = reader.ReadBoolean();
+                    reader.ReadBoolean();
                 }
 
                 if (reader.Version >= 4)

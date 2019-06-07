@@ -412,7 +412,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                 int days = _settings.LimitProcessingToMostRecent.Days;
                 _limitProcessingByDateNumericUpDown.Value = days > 0 ? days : 30;
 
-                if (_settings.UseAttributeSetForExpecteds)
+                if (_settings.UseAttributeSetForExpectedValues)
                 {
                     _useAttributeSetForExpectedsRadioButton.Checked = true;
                 }
@@ -421,7 +421,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                     _useVoaFileForExpectedsRadioButton.Checked = true;
                 }
 
-                if (_settings.RunRulesetForCandidateOrFeatures)
+                if (_settings.RunRuleSetForCandidateOrFeatures)
                 {
                     _runRulesetForFeaturesRadioButton.Checked = true;
                 }
@@ -429,8 +429,8 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                 {
                     _useVoaFileForFeaturesRadioButton.Checked = true;
                 }
-                _featureRulesetTextBox.Text = _settings.FeatureRulesetPath;
-                _runRulesetIfVoaIsMissingCheckBox.Checked = _settings.RunRulesetIfVoaIsMissing;
+                _featureRulesetTextBox.Text = _settings.FeatureRuleSetPath;
+                _runRulesetIfVoaIsMissingCheckBox.Checked = _settings.RunRuleSetIfVoaIsMissing;
 
                 SetControlStates();
 
@@ -515,10 +515,10 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             _settings.OverrideTrainingTestingSplit = _overrideTrainingTestingSplitCheckBox.Checked;
             _settings.TrainingPercent = (int)_trainingPercentageNumericUpDown.Value;
             _settings.LimitProcessingToMostRecent = TimeSpan.FromDays((double)_limitProcessingByDateNumericUpDown.Value);
-            _settings.UseAttributeSetForExpecteds = _useAttributeSetForExpectedsRadioButton.Checked;
-            _settings.RunRulesetForCandidateOrFeatures = _runRulesetForFeaturesRadioButton.Checked;
-            _settings.FeatureRulesetPath = _featureRulesetTextBox.Text;
-            _settings.RunRulesetIfVoaIsMissing = _runRulesetIfVoaIsMissingCheckBox.Checked;
+            _settings.UseAttributeSetForExpectedValues = _useAttributeSetForExpectedsRadioButton.Checked;
+            _settings.RunRuleSetForCandidateOrFeatures = _runRulesetForFeaturesRadioButton.Checked;
+            _settings.FeatureRuleSetPath = _featureRulesetTextBox.Text;
+            _settings.RunRuleSetIfVoaIsMissing = _runRulesetIfVoaIsMissingCheckBox.Checked;
         }
 
         #endregion Private Methods

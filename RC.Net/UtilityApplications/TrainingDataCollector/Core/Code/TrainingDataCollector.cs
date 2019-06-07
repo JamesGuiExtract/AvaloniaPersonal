@@ -122,34 +122,34 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// for expected values rather than the configured VOA file path in the settings file
         /// </summary>
         [DataMember]
-        public bool UseAttributeSetForExpecteds { get; set; } = true;
+        public bool UseAttributeSetForExpectedValues { get; set; } = true;
 
         /// <summary>
         /// Whether to run a ruleset for candidate attributes or protofeature attributes rather than using
         /// the configured VOA file path in the settings file
         /// </summary>
         [DataMember]
-        public bool RunRulesetForCandidateOrFeatures { get; set; }
+        public bool RunRuleSetForCandidateOrFeatures { get; set; }
 
         /// <summary>
         /// Whether to run the ruleset in the case that the VOA doesn't exist
         /// </summary>
         [DataMember]
-        public bool RunRulesetIfVoaIsMissing { get; set; }
+        public bool RunRuleSetIfVoaIsMissing { get; set; }
 
         /// <summary>
         /// The path to a ruleset to use for generating candidate or protofeature attributes
         /// </summary>
         [DataMember]
-        public string FeatureRulesetPath { get; set; }
+        public string FeatureRuleSetPath { get; set; }
 
         /// <summary>
         /// The path to a ruleset to use for generating candidate or protofeature attributes, based on the <see cref="RootDir"/>
         /// </summary>
-        public string QualifiedFeatureRulesetPath =>
-            string.IsNullOrWhiteSpace(FeatureRulesetPath) || Path.IsPathRooted(FeatureRulesetPath) || string.IsNullOrWhiteSpace(RootDir)
-            ? FeatureRulesetPath
-            : Path.Combine(RootDir, FeatureRulesetPath);
+        public string QualifiedFeatureRuleSetPath =>
+            string.IsNullOrWhiteSpace(FeatureRuleSetPath) || Path.IsPathRooted(FeatureRuleSetPath) || string.IsNullOrWhiteSpace(RootDir)
+            ? FeatureRuleSetPath
+            : Path.Combine(RootDir, FeatureRuleSetPath);
 
         /// <summary>
         /// Limits the attribute set for files processed to the most recent only
@@ -217,7 +217,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                     settings.DatabaseName = DatabaseName;
                     settings.AttributeSetName = AttributeSetName;
                     settings.ModelName = QualifiedModelName;
-                    settings.UseAttributeSetForTypes = UseAttributeSetForExpecteds;
+                    settings.UseAttributeSetForTypes = UseAttributeSetForExpectedValues;
                     if (OverrideTrainingTestingSplit)
                     {
                         settings.PercentToUseForTestingSet = 100 - TrainingPercent;
@@ -252,9 +252,9 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                             {
                                 (trainingData, testingData) = machine.GetDataToWriteToDatabase(cancelToken,
                                     DatabaseServer, DatabaseName, AttributeSetName,
-                                    lowestIDToProcess, highestIDToProcess, UseAttributeSetForExpecteds,
-                                    RunRulesetForCandidateOrFeatures, RunRulesetIfVoaIsMissing,
-                                    QualifiedFeatureRulesetPath);
+                                    lowestIDToProcess, highestIDToProcess, UseAttributeSetForExpectedValues,
+                                    RunRuleSetForCandidateOrFeatures, RunRuleSetIfVoaIsMissing,
+                                    QualifiedFeatureRuleSetPath);
                             },
                             executeInTransaction: () =>
                             {
@@ -456,7 +456,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         {
             // Set default for new settings
             LimitProcessingToMostRecent = TimeSpan.FromDays(30);
-            UseAttributeSetForExpecteds = true;
+            UseAttributeSetForExpectedValues = true;
         }
 
         /// <summary>
@@ -501,7 +501,6 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             Action<long, long> executeBeforeTransaction, Action executeInTransaction,
             CancellationToken cancellationToken)
         {
-            Random rng = new Random();
             // Collect/add data in batches of 500 records at a time to mitigate memory issues
             int batchSize = 500;
             for (int i = 0; i < availableIDs.Count; i += batchSize)
