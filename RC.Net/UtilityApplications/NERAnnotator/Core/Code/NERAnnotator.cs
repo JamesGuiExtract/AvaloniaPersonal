@@ -971,11 +971,5 @@ namespace Extract.UtilityApplications.NERAnnotator
             endOfSentence = this.endOfSentence;
             endOfPage = this.endOfPage;
         }
-
-        public void Deconstruct(out string token, out string label)
-        {
-            token = this.token;
-            label = this.label;
-        }
     }
 }

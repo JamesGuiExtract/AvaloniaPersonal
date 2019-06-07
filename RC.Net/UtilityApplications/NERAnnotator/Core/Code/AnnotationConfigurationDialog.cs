@@ -1,6 +1,7 @@
 ﻿using Extract.AttributeFinder.Rules;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -818,33 +819,33 @@ namespace Extract.UtilityApplications.NERAnnotator
         public OpenNlpTokenizer TokenizerType { get; set; } = OpenNlpTokenizer.LearnableTokenizer;
         public string TokenizerModelPath { get; set; } = "<ComponentDataDir>\\NER\\tokenizer.nlp.etf";
 
-        public List<EntityDefinition> EntityDefinitions { get; set; } = new List<EntityDefinition>();
+        public Collection<EntityDefinition> EntityDefinitions { get; set; } = new Collection<EntityDefinition>();
         public long LastIDToProcess { get;  set; }
         public long FirstIDToProcess { get; set; }
         public bool UseAttributeSetForTypes { get; set; }
         public string FKBVersion { get; set; }
 
-        public static Settings LoadFrom(string filename)
+        public static Settings LoadFrom(string fileName)
         {
             var deserializer = new Deserializer();
-            using (var reader = new StreamReader(filename))
+            using (var reader = new StreamReader(fileName))
             {
                 var retVal = deserializer.Deserialize<Settings>(reader);
-                retVal.WorkingDir = Path.GetDirectoryName(Path.GetFullPath(filename));
+                retVal.WorkingDir = Path.GetDirectoryName(Path.GetFullPath(fileName));
                 return retVal;
             }
         }
 
-        public void SaveTo(string filename)
+        public void SaveTo(string fileName)
         {
             var sb = new SerializerBuilder();
             sb.EmitDefaults();
             var serializer = sb.Build();
-            using (var stream = new StreamWriter(filename))
+            using (var stream = new StreamWriter(fileName))
             {
                 serializer.Serialize(stream, this);
             }
-            WorkingDir = Path.GetDirectoryName(Path.GetFullPath(filename));
+            WorkingDir = Path.GetDirectoryName(Path.GetFullPath(fileName));
         }
     }
 }
