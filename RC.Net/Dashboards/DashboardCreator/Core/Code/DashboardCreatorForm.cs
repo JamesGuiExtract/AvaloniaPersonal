@@ -9,7 +9,7 @@ using Extract.Dashboard.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
@@ -61,12 +61,12 @@ namespace DashboardCreator
         /// <summary>
         /// Dictionary to track drill down level for Dashboard controls
         /// </summary>
-        public Dictionary<string, int> DrillDownLevelForItem { get; } = new Dictionary<string, int>();
+        public Dictionary<string, int> DrilldownLevelForItem { get; } = new Dictionary<string, int>();
 
         /// <summary>
         /// Tracks if the Drill down level has increased for the control
         /// </summary>
-        public Dictionary<string, bool> DrillDownLevelIncreased { get; } = new Dictionary<string, bool>();
+        public Dictionary<string, bool> DrilldownLevelIncreased { get; } = new Dictionary<string, bool>();
 
         /// <summary>
         /// The server name to use for the Dashboard
@@ -130,7 +130,7 @@ namespace DashboardCreator
         /// Since this instance is not a <see cref="DevExpress.DashboardWin.DashboardViewer"/> it should return null
         /// </summary>
         public DashboardViewer Viewer => null;
-        
+
         /// <summary>
         /// Since this instance has a <see cref="DevExpress.DashboardWin.DashboardDesigner"/> it should return the designer
         /// </summary>
@@ -203,14 +203,25 @@ namespace DashboardCreator
         #endregion
 
         #region Event Handlers
+        void HandleBarCreateDataExtractDatasourcesItem1_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            try
+            {
+                DashboardDataConverter.AddExtractDataSources(dashboardDesigner.Dashboard, Path.GetDirectoryName(_dashboardFileName));
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46849");
+            }
+        }
 
         void HandleDashboardCreatorForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             try
             {
-                e.Cancel = !_dashboardShared.RequestDashboardClose(); 
+                e.Cancel = !_dashboardShared.RequestDashboardClose();
             }
-            catch ( Exception ex)
+            catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI46219");
             }
@@ -234,8 +245,8 @@ namespace DashboardCreator
         {
             try
             {
-                DrillDownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
-                DrillDownLevelIncreased[e.DashboardItemName] = true;
+                DrilldownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
+                DrilldownLevelIncreased[e.DashboardItemName] = true;
             }
             catch (Exception ex)
             {
@@ -247,7 +258,7 @@ namespace DashboardCreator
         {
             try
             {
-                DrillDownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
+                DrilldownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
             }
             catch (Exception ex)
             {
@@ -424,7 +435,7 @@ namespace DashboardCreator
         {
             try
             {
-                _dashboardShared?.GridConfigurationsFromXML(Dashboard?.UserData);
+                _dashboardShared?.GridConfigurationsFromXml(Dashboard?.UserData);
 
                 UpdateTitle();
             }
@@ -438,10 +449,11 @@ namespace DashboardCreator
         {
             try
             {
-                string newFile;
-                if (DashboardHelper.SelectDashboardFile(out newFile))
+                FileBrowser fileBrowser = new FileBrowser();
+                string selectedFile = fileBrowser.BrowseForFile("ESDX|*.esdx|XML|*.xml|All|*.*", "");
+                if (!string.IsNullOrWhiteSpace(selectedFile) && File.Exists(selectedFile))
                 {
-                    _dashboardFileName = newFile;
+                    _dashboardFileName = selectedFile;
                     dashboardDesigner.LoadDashboard(_dashboardFileName);
                 }
             }
@@ -455,10 +467,11 @@ namespace DashboardCreator
         {
             try
             {
-                string newFile;
-                if (DashboardHelper.SelectDashboardFile(out newFile))
+                FileBrowser fileBrowser = new FileBrowser();
+                string selectedFile = fileBrowser.BrowseForFile("ESDX|*.esdx|XML|*.xml|All|*.*", "");
+                if (!string.IsNullOrWhiteSpace(selectedFile) && File.Exists(selectedFile))
                 {
-                    _dashboardFileName = newFile;
+                    _dashboardFileName = selectedFile;
                     dashboardDesigner.LoadDashboard(_dashboardFileName);
                 }
             }

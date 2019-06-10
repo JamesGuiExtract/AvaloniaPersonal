@@ -1,7 +1,10 @@
-﻿using Extract.Utilities;
+﻿using Extract.Interfaces;
+using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics.CodeAnalysis;
 using System.DirectoryServices.AccountManagement;
 using System.Globalization;
 using System.IO;
@@ -37,6 +40,13 @@ namespace Extract.Dashboard.Forms
                 DatabaseName = databaseName;
                 DatabaseServer = databaseServer;
                 FAMUserID = GetFAMUserID();
+                using (var connection = NewSqlDBConnection())
+                using (var cmd = connection.CreateCommand())
+                {
+                    connection.Open();
+                    cmd.CommandText = "SELECT Value FROM DBInfo WHERE [Name] = 'RootPathForDashboardExtractedData'";
+                    RootFolderForExtractedDataFiles = cmd.ExecuteScalar() as string;
+                }
             }
             catch (Exception ex)
             {
@@ -63,36 +73,101 @@ namespace Extract.Dashboard.Forms
         /// </summary>
         public int FAMUserID { get; set; }
 
+        /// <summary>
+        /// Root folder for extracted data files (this is for the cacheing of data
+        /// </summary>
+        public string RootFolderForExtractedDataFiles { get; set; }
+
         #endregion
 
         #region Event Handlers
 
-        void HandleExportDashboardButton_Click(object sender, EventArgs e)
-        {
-            if (dashboardDataGridView.CurrentRow != null)
-            {
-                string dashboardName = dashboardDataGridView.CurrentRow.Cells["DashboardName"].Value as string;
 
-                SaveFileDialog saveFileDialog = new SaveFileDialog();
-                saveFileDialog.Filter = "ESDX|*.esdx|All|*.*";
-                saveFileDialog.DefaultExt = "esdx";
-                saveFileDialog.FileName = dashboardName + ".esdx";
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+        void HandleDashboardDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                if (dashboardDataGridView.CurrentRow != null &&
+                        dashboardDataGridView.Columns[e.ColumnIndex].Name == "UseExtractedData" &&
+                        (int)dashboardDataGridView.CurrentRow.Cells["CanCache"].Value == 1)
                 {
-                    string fileName = saveFileDialog.FileName;
-                    if (File.Exists(fileName))
+                    var v = dashboardDataGridView.CurrentRow.Cells["UseExtractedData"].Value as bool?;
+
+                    using (var connection = NewSqlDBConnection())
                     {
-                        if (MessageBox.Show(
-                            string.Format(CultureInfo.InstalledUICulture, "{0} exists. Overwrite?", fileName), "File exists", MessageBoxButtons.YesNo) != DialogResult.Yes)
-                        {
-                            return;
-                        }
+                        connection.Open();
+                        var command = connection.CreateCommand();
+                        command.CommandText =
+                            "UPDATE Dashboard SET UseExtractedData = @NewUseExtractedDataValue WHERE DashboardName = @DashboardName";
+                        command.Parameters.AddWithValue("@DashboardName", dashboardDataGridView.CurrentRow.Cells["DashboardName"].Value as string);
+                        command.Parameters.Add("@NewUseExtractedDataValue", SqlDbType.Bit).Value = !v;
+                        command.ExecuteNonQuery();
+                        dashboardDataGridView.CurrentRow.Cells["UseExtractedData"].Value = !v;
                     }
 
-                    string dashboardDefinition = GetDashboardDefinition(dashboardName);
-                    XDocument document = XDocument.Parse(dashboardDefinition);
-                    document.Save(saveFileDialog.FileName, SaveOptions.None);
+                    return;
                 }
+                if (dashboardDataGridView.CurrentRow != null &&
+                    dashboardDataGridView.Columns[e.ColumnIndex].Name == "UseExtractedData" &&
+                    (int)dashboardDataGridView.CurrentRow.Cells["CanCache"].Value == 0)
+                {
+                    string message = string.Format(
+                        CultureInfo.CurrentCulture,
+                        "{0} dashboard cannot be used with caching. The dashboard either needs to be reimported or caching is not supported for the dashboard.",
+                        dashboardDataGridView.CurrentRow.Cells["DashboardName"].Value);
+                    MessageBox.Show(
+                        message,
+                        "Unable to cache",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information,
+                        MessageBoxDefaultButton.Button1,
+                        (MessageBoxOptions)0);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46995");
+            }
+        }
+
+        void HandleExportDashboardButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (dashboardDataGridView.CurrentRow != null)
+                {
+                    string dashboardName = dashboardDataGridView.CurrentRow.Cells["DashboardName"].Value as string;
+
+                    SaveFileDialog saveFileDialog = new SaveFileDialog();
+                    saveFileDialog.Filter = "ESDX|*.esdx|All|*.*";
+                    saveFileDialog.DefaultExt = "esdx";
+                    saveFileDialog.FileName = dashboardName + ".esdx";
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string fileName = saveFileDialog.FileName;
+                        if (File.Exists(fileName))
+                        {
+                            if (MessageBox.Show(
+                                string.Format(CultureInfo.CurrentCulture, "{0} exists. Overwrite?", fileName),
+                                "File exists",
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Exclamation,
+                                MessageBoxDefaultButton.Button1,
+                                (MessageBoxOptions)0) != DialogResult.Yes)
+                            {
+                                return;
+                            }
+                        }
+
+                        string dashboardDefinition = GetDashboardDefinition(dashboardName);
+                        XDocument document = XDocument.Parse(dashboardDefinition);
+                        document.Save(saveFileDialog.FileName, SaveOptions.None);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46996");
             }
         }
         void HandleReplaceDashboardButton_Click(object sender, EventArgs e)
@@ -105,22 +180,35 @@ namespace Extract.Dashboard.Forms
                     SelectDashboardToImportForm selectForm = new SelectDashboardToImportForm(true, dashboardName);
                     if (selectForm.ShowDialog() == DialogResult.OK)
                     {
-                        var xDoc = XDocument.Load(selectForm.DashboardFile, LoadOptions.PreserveWhitespace);
+                        GetDashboardDefinitions(selectForm.DashboardFile, out XDocument extractedDataDashboardDefinition,
+                            out XDocument dashboardDefinition);
+
                         using (var connect = NewSqlDBConnection())
                         {
                             connect.Open();
                             var command = connect.CreateCommand();
                             command.CommandText =
-                                @"UPDATE Dashboard 
-                                    SET [Definition] = @Definition,
-                                        [FAMUserID] = @FAMUserID,
-                                        [LastImportedDate] = GETDATE()
-                                    WHERE [DashboardName] = @DashboardName
+                                @"UPDATE [Dashboard]
+                                      SET 
+                                        [Definition] = @Definition, 
+                                        [FAMUserID] = @FAMUserID, 
+                                        [LastImportedDate] = GETDATE(), 
+                                        [ExtractedDataDefinition] = @ExtractedDataDefinition, 
+                                        [UseExtractedData] = CASE
+                                                                 WHEN
+                                        @ExtractedDataDefinition IS NULL
+                                                                 THEN 0
+                                                                 ELSE [UseExtractedData]
+                                                             END
+
+                                        WHERE [DashboardName] = @DashboardName
                                 ";
 
                             command.Parameters.Add("@DashboardName", SqlDbType.NVarChar, 100).Value = dashboardName;
                             command.Parameters.AddWithValue("@FAMUserID", FAMUserID);
-                            command.Parameters.Add("@Definition", SqlDbType.Xml).Value = xDoc.ToString(SaveOptions.None);
+                            command.Parameters.Add("@Definition", SqlDbType.Xml).Value = dashboardDefinition.ToString(SaveOptions.None);
+                            command.Parameters.Add("@ExtractedDataDefinition", SqlDbType.Xml).Value =
+                                (object)extractedDataDashboardDefinition?.ToString(SaveOptions.None) ?? DBNull.Value;
                             command.ExecuteScalar();
                         }
                         LoadDashboardGrid();
@@ -138,7 +226,7 @@ namespace Extract.Dashboard.Forms
             try
             {
                 // check to make sure the header wasn't double clicked
-                if (e.RowIndex >= 0)
+                if (e.RowIndex >= 0 && dashboardDataGridView?.Columns[e.ColumnIndex]?.Name != "UseExtractedData")
                 {
                     HandleViewButtonClick(sender, e);
                 }
@@ -222,7 +310,7 @@ namespace Extract.Dashboard.Forms
         {
             try
             {
-                if ( dashboardDataGridView.CurrentRow is null)
+                if (dashboardDataGridView.CurrentRow is null)
                 {
                     return;
                 }
@@ -242,8 +330,13 @@ namespace Extract.Dashboard.Forms
                 if (dashboardDataGridView.CurrentRow != null)
                 {
                     string dashboardName = dashboardDataGridView.CurrentRow.Cells["DashboardName"].Value as string;
-                    string message = string.Format(CultureInfo.InstalledUICulture, "Remove the {0} dashboard?", dashboardName);
-                    if (MessageBox.Show(message, "Remove dashboard from database", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    string message = string.Format(CultureInfo.CurrentCulture, "Remove the {0} dashboard?", dashboardName);
+                    if (MessageBox.Show(
+                        message,
+                        "Remove dashboard from database", MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Exclamation,
+                            MessageBoxDefaultButton.Button1,
+                            (MessageBoxOptions)0) == DialogResult.Yes)
                     {
                         using (var connection = NewSqlDBConnection())
                         {
@@ -273,19 +366,22 @@ namespace Extract.Dashboard.Forms
                 SelectDashboardToImportForm selectForm = new SelectDashboardToImportForm();
                 if (selectForm.ShowDialog() == DialogResult.OK)
                 {
-                    var xDoc = XDocument.Load(selectForm.DashboardFile, LoadOptions.PreserveWhitespace);
+                    GetDashboardDefinitions(selectForm.DashboardFile, out XDocument ExtractedDataDoc, out XDocument xDoc);
+
                     using (var connect = NewSqlDBConnection())
                     {
                         connect.Open();
                         var command = connect.CreateCommand();
 
                         command.CommandText =
-                            "INSERT INTO Dashboard ([DashboardName], [Definition], [FAMUserID], [LastImportedDate]) " +
-                            "VALUES ( @DashboardName, @Definition, @FAMUserID, GETDATE())";
+                            "INSERT INTO Dashboard ([DashboardName], [Definition], [FAMUserID], [LastImportedDate], [ExtractedDataDefinition]) " +
+                            "VALUES ( @DashboardName, @Definition, @FAMUserID, GETDATE(), @ExtractedDataDefinition)";
 
                         command.Parameters.Add("@DashboardName", SqlDbType.NVarChar, 100).Value = selectForm.DashboardName;
                         command.Parameters.AddWithValue("@FAMUserID", FAMUserID);
                         command.Parameters.Add("@Definition", SqlDbType.Xml).Value = xDoc.ToString(SaveOptions.None);
+                        command.Parameters.Add("@ExtractedDataDefinition", SqlDbType.Xml).Value =
+                            (object)ExtractedDataDoc?.ToString(SaveOptions.None) ?? DBNull.Value;
 
                         command.ExecuteScalar();
                     }
@@ -298,7 +394,6 @@ namespace Extract.Dashboard.Forms
                 ex.ExtractDisplay("ELI45768");
             }
         }
-
         void HandleManageDashboardsFormLoad(object sender, EventArgs e)
         {
             try
@@ -316,6 +411,51 @@ namespace Extract.Dashboard.Forms
         #region Helper Methods
 
         /// <summary>
+        /// Gets the dashboard definition and the extracted data version of the dashbaord definition
+        /// </summary>
+        /// <param name="dashboardName">Name of the Dashboard in the database.</param>
+        /// <param name="dashboardFile">Dashboard file to read definition from</param>
+        /// <param name="extractedDataDashboardDefinition">Extracted data version of the Dashbaord definition</param>
+        /// <param name="dashboardDefinition">The Dashboard definition as read from the file</param>
+        void GetDashboardDefinitions(string dashboardFile, out XDocument extractedDataDashboardDefinition, out XDocument dashboardDefinition)
+        {
+
+            if (string.IsNullOrEmpty(RootFolderForExtractedDataFiles))
+            {
+                var defaultFolder = Path.Combine(FileSystemMethods.CommonApplicationDataPath, "Dashboards", "CachedData");
+                if (!Directory.Exists(defaultFolder))
+                {
+                    Directory.CreateDirectory(defaultFolder);
+                }
+               
+                var newFolder = FormsMethods.BrowseForFolder("Folder for extracted data files.", defaultFolder);
+                if (string.IsNullOrEmpty(newFolder))
+                {
+                    ExtractException ee = new ExtractException("ELI46879", "Unable to get path for extracted data files.");
+                    throw ee;
+                }
+                using (var connection = NewSqlDBConnection())
+                using (var cmd = connection.CreateCommand())
+                {
+                    connection.Open();
+                    cmd.CommandText = "UPDATE DBInfo Set Value = @NewValue WHERE [Name] = 'RootPathForDashboardExtractedData'";
+                    cmd.Parameters.AddWithValue("@NewValue", newFolder);
+                    cmd.ExecuteNonQuery();
+                }
+                RootFolderForExtractedDataFiles = newFolder;
+            }
+            extractedDataDashboardDefinition = null;
+            dashboardDefinition = XDocument.Load(dashboardFile, LoadOptions.PreserveWhitespace);
+            var ddc = UtilityMethods.CreateTypeFromTypeName("Extract.Dashboard.Utilities.DashboardDataConverter")
+                as IDashboardDataConverter;
+            if (ddc != null)
+            {
+                extractedDataDashboardDefinition =
+                    ddc.ConvertDashboardDataSources(dashboardDefinition, DatabaseServer, DatabaseName, RootFolderForExtractedDataFiles);
+            }
+        }
+
+        /// <summary>
         /// Load the Dashboard grid from the configured database
         /// </summary>
         void LoadDashboardGrid()
@@ -327,14 +467,29 @@ namespace Extract.Dashboard.Forms
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandText =
-                        "SELECT DashboardName, IsNull(FullUserName, UserName) FullUserName, LastImportedDate FROM Dashboard " +
-                            "INNER JOIN FAMUser ON Dashboard.FAMUserID = FAMUser.ID";
+                        @"SELECT 
+                            DashboardName, 
+                            IsNull(FullUserName, UserName) FullUserName, 
+                            LastImportedDate, 
+                            UseExtractedData,
+                            CASE WHEN [ExtractedDataDefinition] IS NULL THEN 0 ELSE 1 END CanCache
+                        FROM Dashboard 
+                            INNER JOIN FAMUser ON Dashboard.FAMUserID = FAMUser.ID";
 
                     DataTable dataTable = new DataTable();
+                    dataTable.Locale = CultureInfo.CurrentCulture;
                     dataTable.Load(command.ExecuteReader());
                     dashboardDataGridView.DataSource = dataTable;
+                    dashboardDataGridView.Columns["DashboardName"].HeaderText = "Dashboard Name";
+                    dashboardDataGridView.Columns["DashboardName"].FillWeight = 400;
+                    dashboardDataGridView.Columns["DashboardName"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     dashboardDataGridView.Columns["FullUserName"].HeaderText = "User Imported";
                     dashboardDataGridView.Columns["LastImportedDate"].HeaderText = "Last Imported";
+                    dashboardDataGridView.Columns["LastImportedDate"].FillWeight = 150;
+                    dashboardDataGridView.Columns["UseExtractedData"].HeaderText = "Use Cached Data";
+                    dashboardDataGridView.Columns["UseExtractedData"].FillWeight = 50;
+                    dashboardDataGridView.Columns["CanCache"].Visible = false;
+
                     EnableButtons();
                 }
             }

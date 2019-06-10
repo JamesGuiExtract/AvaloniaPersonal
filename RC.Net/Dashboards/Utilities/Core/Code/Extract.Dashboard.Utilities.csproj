@@ -23,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -58,7 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DashboardHelper.cs" />
+    <Compile Include="DashboardDataConverter.cs" />
     <Compile Include="DashboardShared.cs" />
     <Compile Include="IExtractDashboardCommon.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -68,9 +69,17 @@
       <Project>{7c37b0fb-81b8-4aa2-bc14-b21028c7ab9f}</Project>
       <Name>Extract</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ExtractCodeAttributes\Core\Code\Extract.Code.Attributes.csproj">
+      <Project>{9ca28a56-27b0-4f3a-bd61-970b3de2a793}</Project>
+      <Name>Extract.Code.Attributes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
       <Project>{05449e7c-d300-4a2a-ad14-57ce9630b49b}</Project>
       <Name>Extract.FileActionManager.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
+      <Project>{8267221b-52c3-490b-a98f-7a51ebeb2a2b}</Project>
+      <Name>Extract.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
@@ -124,4 +133,7 @@
     </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

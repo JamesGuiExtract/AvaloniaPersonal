@@ -4,12 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Forms;
 
 namespace Extract.Dashboard.Utilities
 {
-    public interface IExtractDashboardCommon : IWin32Window, ISynchronizeInvoke
+    public interface IExtractDashboardCommon : IWin32Window, ISynchronizeInvoke, IDisposable
     {
         /// <summary>
         /// Gets the active dashboard from the underlying control
@@ -19,12 +20,12 @@ namespace Extract.Dashboard.Utilities
         /// <summary>
         /// Dictionary to track drill down level for Dashboard controls
         /// </summary>
-        Dictionary<string, int> DrillDownLevelForItem { get; }
+        Dictionary<string, int> DrilldownLevelForItem { get; }
 
         /// <summary>
         /// Tracks if the Drill down level has increased for the control
         /// </summary>
-        Dictionary<string, bool> DrillDownLevelIncreased { get; }
+        Dictionary<string, bool> DrilldownLevelIncreased { get; }
 
         /// <summary>
         /// The server name to use for the Dashboard

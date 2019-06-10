@@ -156,8 +156,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"
-editbin /largeaddressaware "$(TargetPath)"
+    <PostBuildEvent>call CommonDebugPostBuild.bat
+call "$(DevEnvDir)..\Tools\VsDevCmd.bat"
+editbin.exe /largeaddressaware "$(TargetPath)"
 sn -Ra "$(TargetPath)" "$(TargetDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

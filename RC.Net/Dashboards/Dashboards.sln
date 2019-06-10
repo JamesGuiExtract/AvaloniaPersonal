@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2010
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashboardCreator", "DashboardCreator\Core\Code\DashboardCreator.csproj", "{7B6002E2-E014-4698-8D8C-A9E4C90D61A9}"
 EndProject
@@ -52,6 +52,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.Forms", "..\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj", "{05449E7C-D300-4A2A-AD14-57CE9630B49B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.Ftp", "..\Utilities\Ftp\Core\Code\Extract.Utilities.Ftp.csproj", "{D2DD8D8F-E632-429E-8646-B9489D21295F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Dashboard.ETL", "ETL\Core\Code\Extract.Dashboard.ETL.csproj", "{9A6B9053-F351-47FC-8A0A-A984BD048B90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -334,6 +336,18 @@ Global
 		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Template|Any CPU.Build.0 = Release|Any CPU
 		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Template|x86.ActiveCfg = Release|Any CPU
 		{D2DD8D8F-E632-429E-8646-B9489D21295F}.Template|x86.Build.0 = Release|Any CPU
+		{9A6B9053-F351-47FC-8A0A-A984BD048B90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A6B9053-F351-47FC-8A0A-A984BD048B90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A6B9053-F351-47FC-8A0A-A984BD048B90}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9A6B9053-F351-47FC-8A0A-A984BD048B90}.Debug|x86.Build.0 = Debug|Any CPU
+		{9A6B9053-F351-47FC-8A0A-A984BD048B90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A6B9053-F351-47FC-8A0A-A984BD048B90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A6B9053-F351-47FC-8A0A-A984BD048B90}.Release|x86.ActiveCfg = Release|Any CPU
+		{9A6B9053-F351-47FC-8A0A-A984BD048B90}.Release|x86.Build.0 = Release|Any CPU
+		{9A6B9053-F351-47FC-8A0A-A984BD048B90}.Template|Any CPU.ActiveCfg = Release|Any CPU
+		{9A6B9053-F351-47FC-8A0A-A984BD048B90}.Template|Any CPU.Build.0 = Release|Any CPU
+		{9A6B9053-F351-47FC-8A0A-A984BD048B90}.Template|x86.ActiveCfg = Release|Any CPU
+		{9A6B9053-F351-47FC-8A0A-A984BD048B90}.Template|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

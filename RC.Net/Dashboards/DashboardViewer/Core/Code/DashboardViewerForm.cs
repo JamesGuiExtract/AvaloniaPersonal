@@ -7,13 +7,16 @@ using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Views.Grid;
 using Extract;
 using Extract.Dashboard.Utilities;
+using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -66,6 +69,20 @@ namespace DashboardViewer
 
         // Set that contains all of the items that are filtered
         HashSet<string> _filteredItems = new HashSet<string>();
+
+        // if true indicates that the dashboard is using definition that is using extracted data
+        bool _usingCachedDashboardDefinition = false;
+
+        /// <summary>
+        /// Manages the temporary files that are created for each extracted datasource file so that the original can be
+        /// updated without blocking.
+        /// </summary>
+        TemporaryFileCopyManager _temporaryDatasourceFileCopyManager = new TemporaryFileCopyManager();
+
+        /// <summary>
+        /// Dictionary to map the datasource with the Original filename that the extracted datasource uses
+        /// </summary>
+        Dictionary<object, string> _dictionaryDataSourceToFileName = new Dictionary<object, string>();
 
         #endregion
 
@@ -126,12 +143,12 @@ namespace DashboardViewer
         /// <summary>
         /// Dictionary to track drill down level for Dashboard controls
         /// </summary>
-        public Dictionary<string, int> DrillDownLevelForItem { get; } = new Dictionary<string, int>();
+        public Dictionary<string, int> DrilldownLevelForItem { get; } = new Dictionary<string, int>();
 
         /// <summary>
         /// Tracks if the Drill down level has increased for the control
         /// </summary>
-        public Dictionary<string, bool> DrillDownLevelIncreased { get; } = new Dictionary<string, bool>();
+        public Dictionary<string, bool> DrilldownLevelIncreased { get; } = new Dictionary<string, bool>();
 
         /// <summary>
         /// The server name to use for the Dashboard
@@ -230,6 +247,30 @@ namespace DashboardViewer
 
         #endregion
 
+        #region IDisposable implementation
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            if (disposing)
+            {
+                _temporaryDatasourceFileCopyManager?.Dispose();
+                _temporaryDatasourceFileCopyManager = null;
+                _dashboardShared?.Dispose();
+                _dashboardShared = null;
+            }
+            base.Dispose(disposing);
+        }
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -319,6 +360,14 @@ namespace DashboardViewer
             try
             {
                 e.Cancel = !_dashboardShared.RequestDashboardClose();
+                if (!e.Cancel && _dictionaryDataSourceToFileName.Count > 0)
+                {
+                    // Dispose of the dashboard so any extracted data sources will be closed
+                    dashboardViewerMain.Dashboard?.Dispose();
+                    dashboardViewerMain = null;
+
+                    DereferenceTempFiles();
+                }
             }
             catch (Exception ex)
             {
@@ -371,8 +420,26 @@ namespace DashboardViewer
             {
                 if (Dashboard != null)
                 {
-                    dashboardViewerMain.ReloadData(false);
-                    _toolStripTextBoxlastRefresh.Text = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    if (_usingCachedDashboardDefinition && _dictionaryDataSourceToFileName.Any(entry => _temporaryDatasourceFileCopyManager.HasFileBeenModified(entry.Value)))
+                    {
+                        LoadDashboardFromDatabase(_dashboardName);
+                    }
+                    else if (!_usingCachedDashboardDefinition)
+                    {
+                        dashboardViewerMain.ReloadData(false);
+                        _toolStripTextBoxlastRefresh.Text = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    }
+                    else if (MessageBox.Show("Cached data source needs to be updated from the database. Continue?",
+                            "Update Cached",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Exclamation,
+                            MessageBoxDefaultButton.Button1,
+                            (MessageBoxOptions)0) == DialogResult.Yes)
+                    {
+                        DashboardDataConverter.UpdateExtractedDataSources(Dashboard, CancellationToken.None);
+                        LoadDashboardFromDatabase(_dashboardName);
+                        this.Focus();
+                    }
                 }
             }
             catch (Exception ex)
@@ -428,6 +495,7 @@ namespace DashboardViewer
         {
             try
             {
+                // Clear the existing dashboard
                 _dashboardName = string.Empty;
                 dashboardViewerMain.DashboardSource = string.Empty;
                 _toolStripTextBoxlastRefresh.Text = string.Empty;
@@ -443,12 +511,14 @@ namespace DashboardViewer
         {
             try
             {
-                string filename;
-                if (DashboardHelper.SelectDashboardFile(out filename))
+                FileBrowser fileBrowser = new FileBrowser();
+                string selectedFile = fileBrowser.BrowseForFile("ESDX|*.esdx|XML|*.xml|All|*.*", string.Empty);
+                if (!string.IsNullOrWhiteSpace(selectedFile) && File.Exists(selectedFile))
                 {
+                    // Clear the existing dashboard
                     dashboardViewerMain.DashboardSource = string.Empty;
-                    dashboardViewerMain.DashboardSource = filename;
-                    _dashboardName = filename;
+                    dashboardViewerMain.DashboardSource = selectedFile;
+                    _dashboardName = selectedFile;
                     UpdateMainTitle();
                 }
             }
@@ -510,8 +580,8 @@ namespace DashboardViewer
         {
             try
             {
-                DrillDownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
-                DrillDownLevelIncreased[e.DashboardItemName] = true;
+                DrilldownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
+                DrilldownLevelIncreased[e.DashboardItemName] = true;
             }
             catch (Exception ex)
             {
@@ -522,7 +592,7 @@ namespace DashboardViewer
         {
             try
             {
-                DrillDownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
+                DrilldownLevelForItem[e.DashboardItemName] = e.DrillDownLevel;
             }
             catch (Exception ex)
             {
@@ -563,7 +633,7 @@ namespace DashboardViewer
                 _filteredItems.Clear();
 
                 UpdateMainTitle();
-                _dashboardShared.GridConfigurationsFromXML(Dashboard?.UserData);
+                _dashboardShared.GridConfigurationsFromXml(Dashboard?.UserData);
                 _toolStripTextBoxlastRefresh.Text = DateTime.Now.ToString(CultureInfo.CurrentCulture);
             }
             catch (Exception ex)
@@ -589,7 +659,12 @@ namespace DashboardViewer
                 {
                     if (!string.IsNullOrEmpty(_dashboardName))
                     {
-                        dashboardViewerMain.DashboardSource = _dashboardName;
+                        DereferenceTempFiles();
+                        var dashboard = new Dashboard();
+                        dashboard.LoadFromXml(_dashboardName);
+                        ReplaceExtractDataSourceFileWithTemporary(dashboard);
+
+                        dashboardViewerMain.Dashboard = dashboard;
                     }
                 }
 
@@ -602,6 +677,7 @@ namespace DashboardViewer
                     LoadDashboardList();
                     dashboardFlyoutPanel.ShowPopup();
                 }
+                this.Focus();
             }
             catch (Exception ex)
             {
@@ -631,20 +707,50 @@ namespace DashboardViewer
 
             _dashboardName = dashboardName;
 
+            if (_dictionaryDataSourceToFileName.Count > 0)
+            {
+                dashboardViewerMain.Dashboard?.Dispose();
+                dashboardViewerMain.Dashboard = null;
+                DereferenceTempFiles();
+            }
+
             using (var connection = NewSqlDBConnection())
             {
                 connection.Open();
 
                 using (var cmd = connection.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT Definition from Dashboard where DashboardName = @DashboardName";
+                    cmd.CommandText = @"
+                        SELECT 
+                               CASE
+                                   WHEN [UseExtractedData] = 0
+                                        OR [ExtractedDataDefinition] IS NULL
+                                   THEN [Definition]
+                                   ELSE [ExtractedDataDefinition]
+                               END
+                               AS [Definition],
+                               CASE
+                                   WHEN [UseExtractedData] = 0
+                                        OR [ExtractedDataDefinition] IS NULL
+                                   THEN 0
+                                   ELSE 1
+                               END
+                               AS UseExtractedData
+                        FROM [dbo].[Dashboard]
+                        WHERE [DashboardName] = @DashboardName";
                     cmd.Parameters.AddWithValue("@DashboardName", dashboardName);
                     var reader = cmd.ExecuteReader();
                     if (reader.Read())
                     {
+                        var getval = reader.GetInt32(reader.GetOrdinal("UseExtractedData"));
+                        _usingCachedDashboardDefinition = (getval == 1);
+                        UpdateMainTitle();
+
                         var xdoc = XDocument.Load(reader.GetXmlReader(0), LoadOptions.None);
-                        dashboardViewerMain.Dashboard = new Dashboard();
-                        dashboardViewerMain.Dashboard.LoadFromXDocument(xdoc);
+                        var dashboard = new Dashboard();
+                        dashboard.LoadFromXDocument(xdoc);
+                        ReplaceExtractDataSourceFileWithTemporary(dashboard);
+                        dashboardViewerMain.Dashboard = dashboard;
                     }
                 }
             }
@@ -678,7 +784,12 @@ namespace DashboardViewer
             else
             {
                 Text = string.Format(CultureInfo.InvariantCulture,
-                    "\"{0}\" - Using {1} on {2}{3}", _dashboardName, DatabaseName, ServerName, (filtered) ? "-Filtered" : string.Empty);
+                    "{4}\"{0}\" - Using {1} on {2}{3}",
+                    _dashboardName,
+                    DatabaseName,
+                    ServerName,
+                    (filtered) ? "-Filtered" : string.Empty,
+                    (_usingCachedDashboardDefinition) ? "Cached " : string.Empty);
             }
         }
 
@@ -727,6 +838,40 @@ namespace DashboardViewer
             sqlConnectionBuild.NetworkLibrary = "dbmssocn";
             sqlConnectionBuild.MultipleActiveResultSets = true;
             return new SqlConnection(sqlConnectionBuild.ConnectionString);
+        }
+
+
+        void ReplaceExtractDataSourceFileWithTemporary(Dashboard dashboard)
+        {
+            try
+            {
+                DereferenceTempFiles();
+
+                // Find the existing data sources
+                var existingExtractDataSources = dashboard.DataSources
+                    .OfType<DashboardExtractDataSource>();
+
+                foreach (var eds in existingExtractDataSources)
+                {
+                    _dictionaryDataSourceToFileName.Add(eds, eds.FileName);
+                    eds.FileName = _temporaryDatasourceFileCopyManager.GetCurrentTemporaryFileName(
+                        eds.FileName, eds, true, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46917");
+            }
+        }
+
+        void DereferenceTempFiles()
+        {
+            foreach (var entry in _dictionaryDataSourceToFileName)
+            {
+                _temporaryDatasourceFileCopyManager.Dereference(entry.Value, entry.Key);
+            }
+
+            _dictionaryDataSourceToFileName.Clear();
         }
 
         #endregion

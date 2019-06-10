@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -259,6 +260,7 @@ namespace Extract.Dashboard.Forms
                                 command.Parameters.AddWithValue("@" + kp.Key, kp.Value);
                             }
                             var gridDataTable = new DataTable();
+                            gridDataTable.Locale = CultureInfo.CurrentCulture;
                             gridDataTable.Load(command.ExecuteReader());
                             return gridDataTable;
                         }

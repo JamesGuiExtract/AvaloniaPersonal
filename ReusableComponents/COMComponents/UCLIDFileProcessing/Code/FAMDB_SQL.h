@@ -476,7 +476,9 @@ static const string gstrCREATE_DASHBOARD_TABLE =
 	"	[DashboardName] [nvarchar](100) NOT NULL CONSTRAINT [PK_Dashboard] PRIMARY KEY CLUSTERED, \r\n"
 	"	[Definition] [xml] NOT NULL, \r\n"
 	"   [FAMUserID] INT NOT NULL, \r\n"
-	"   [LastImportedDate] DATETIME NOT NULL "
+	"   [LastImportedDate] DATETIME NOT NULL, \r\n "
+	"   [UseExtractedData] BIT DEFAULT 0, \r\n"
+	"   [ExtractedDataDefinition] [xml] NULL"
 	")";
 
 static const string gstrADD_DASHBOARD_FAMUSER_FK =

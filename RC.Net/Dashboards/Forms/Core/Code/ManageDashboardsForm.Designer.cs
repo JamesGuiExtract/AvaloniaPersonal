@@ -57,16 +57,17 @@
             this.dashboardDataGridView.Name = "dashboardDataGridView";
             this.dashboardDataGridView.RowHeadersVisible = false;
             this.dashboardDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dashboardDataGridView.Size = new System.Drawing.Size(434, 426);
+            this.dashboardDataGridView.Size = new System.Drawing.Size(674, 426);
             this.dashboardDataGridView.TabIndex = 0;
             this.dashboardDataGridView.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.HandleDashboardGridViewCellBeginEdit);
+            this.dashboardDataGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDashboardDataGridView_CellClick);
             this.dashboardDataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDashboardDataGridView_CellDoubleClick);
             this.dashboardDataGridView.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDashboardGridViewCellEndEdit);
             // 
             // _importDashboardButton
             // 
             this._importDashboardButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._importDashboardButton.Location = new System.Drawing.Point(452, 129);
+            this._importDashboardButton.Location = new System.Drawing.Point(692, 129);
             this._importDashboardButton.Name = "_importDashboardButton";
             this._importDashboardButton.Size = new System.Drawing.Size(75, 23);
             this._importDashboardButton.TabIndex = 5;
@@ -77,7 +78,7 @@
             // _removeDashboardButton
             // 
             this._removeDashboardButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._removeDashboardButton.Location = new System.Drawing.Point(453, 71);
+            this._removeDashboardButton.Location = new System.Drawing.Point(693, 71);
             this._removeDashboardButton.Name = "_removeDashboardButton";
             this._removeDashboardButton.Size = new System.Drawing.Size(75, 23);
             this._removeDashboardButton.TabIndex = 3;
@@ -89,7 +90,7 @@
             // 
             this._closeButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._closeButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._closeButton.Location = new System.Drawing.Point(453, 414);
+            this._closeButton.Location = new System.Drawing.Point(693, 414);
             this._closeButton.Name = "_closeButton";
             this._closeButton.Size = new System.Drawing.Size(75, 23);
             this._closeButton.TabIndex = 7;
@@ -99,7 +100,7 @@
             // _renameDashboardButton
             // 
             this._renameDashboardButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._renameDashboardButton.Location = new System.Drawing.Point(453, 42);
+            this._renameDashboardButton.Location = new System.Drawing.Point(693, 42);
             this._renameDashboardButton.Name = "_renameDashboardButton";
             this._renameDashboardButton.Size = new System.Drawing.Size(75, 23);
             this._renameDashboardButton.TabIndex = 2;
@@ -110,7 +111,7 @@
             // _viewButton
             // 
             this._viewButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._viewButton.Location = new System.Drawing.Point(453, 13);
+            this._viewButton.Location = new System.Drawing.Point(693, 13);
             this._viewButton.Name = "_viewButton";
             this._viewButton.Size = new System.Drawing.Size(75, 23);
             this._viewButton.TabIndex = 1;
@@ -121,7 +122,7 @@
             // _exportDashboardButton
             // 
             this._exportDashboardButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._exportDashboardButton.Location = new System.Drawing.Point(453, 158);
+            this._exportDashboardButton.Location = new System.Drawing.Point(693, 158);
             this._exportDashboardButton.Name = "_exportDashboardButton";
             this._exportDashboardButton.Size = new System.Drawing.Size(75, 23);
             this._exportDashboardButton.TabIndex = 6;
@@ -132,7 +133,7 @@
             // _replaceDashboardButton
             // 
             this._replaceDashboardButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._replaceDashboardButton.Location = new System.Drawing.Point(453, 100);
+            this._replaceDashboardButton.Location = new System.Drawing.Point(693, 100);
             this._replaceDashboardButton.Name = "_replaceDashboardButton";
             this._replaceDashboardButton.Size = new System.Drawing.Size(75, 23);
             this._replaceDashboardButton.TabIndex = 4;
@@ -146,7 +147,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._closeButton;
-            this.ClientSize = new System.Drawing.Size(539, 450);
+            this.ClientSize = new System.Drawing.Size(779, 450);
             this.Controls.Add(this._viewButton);
             this.Controls.Add(this._renameDashboardButton);
             this.Controls.Add(this._closeButton);
@@ -157,7 +158,7 @@
             this.Controls.Add(this.dashboardDataGridView);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(555, 489);
+            this.MinimumSize = new System.Drawing.Size(795, 489);
             this.Name = "ManageDashboardsForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

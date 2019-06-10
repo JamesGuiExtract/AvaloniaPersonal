@@ -2248,6 +2248,8 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 		mapDefaultValues[gstrLAST_DB_INFO_CHANGE] = "";
 	}
 
+	mapDefaultValues[gstrROOT_PATH_FOR_DASHBOARD_EXTRACTED_DATA] = "";
+
 	return mapDefaultValues;
 }
 //-------------------------------------------------------------------------------------------------

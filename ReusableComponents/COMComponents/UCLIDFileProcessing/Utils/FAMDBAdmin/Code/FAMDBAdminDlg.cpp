@@ -95,10 +95,10 @@ CFAMDBAdminDlg::~CFAMDBAdminDlg()
 {
 	try
 	{
-		m_ipFAMDB = __nullptr;
-		m_ipMiscUtils = __nullptr;
-		m_ipCategoryManager = __nullptr;
-		m_ipFAMFileInspector = __nullptr;
+		m_ipFAMDB = (IFileProcessingDBPtr)__nullptr;
+		m_ipMiscUtils = (IMiscUtilsPtr)__nullptr;
+		m_ipCategoryManager = (ICategoryManagerPtr)__nullptr;
+		m_ipFAMFileInspector = (IFAMFileInspectorPtr)__nullptr;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18124")
 }
@@ -522,13 +522,13 @@ void CFAMDBAdminDlg::OnDatabaseUpdateSchema()
 		if (m_ipSchemaUpdateProgressStatusDialog != __nullptr)
 		{
 			m_ipSchemaUpdateProgressStatusDialog.Release();
-			m_ipSchemaUpdateProgressStatusDialog = __nullptr;
+			m_ipSchemaUpdateProgressStatusDialog = (IProgressStatusDialogPtr)__nullptr;
 		}
 
 		if (m_ipSchemaUpdateProgressStatus != __nullptr)
 		{
 			m_ipSchemaUpdateProgressStatus.Release();
-			m_ipSchemaUpdateProgressStatus = __nullptr;
+			m_ipSchemaUpdateProgressStatus = (IProgressStatusPtr)__nullptr;
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI31521");

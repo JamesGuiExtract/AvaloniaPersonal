@@ -39,6 +39,7 @@ static const string gstrLAST_DB_INFO_CHANGE = "LastDBInfoChange";
 static const string gstrSTORE_FTP_EVENT_HISTORY = "StoreFTPEventHistory";
 static const string gstrALTERNATE_COMPONENT_DATA_DIR = "AlternateComponentDataDir";
 static const string gstrENABLE_LOAD_BALANCING = "EnableLoadBalancing";
+static const string gstrROOT_PATH_FOR_DASHBOARD_EXTRACTED_DATA = "RootPathForDashboardExtractedData";
 
 static const string gstrEMAIL_ENABLE_SETTINGS = "EmailEnableSettings";
 static const string gstrEMAIL_SERVER = "EmailServer";
