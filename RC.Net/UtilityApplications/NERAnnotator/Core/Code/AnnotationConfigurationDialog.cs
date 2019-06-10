@@ -1,7 +1,6 @@
 ﻿using Extract.AttributeFinder.Rules;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -819,50 +818,33 @@ namespace Extract.UtilityApplications.NERAnnotator
         public OpenNlpTokenizer TokenizerType { get; set; } = OpenNlpTokenizer.LearnableTokenizer;
         public string TokenizerModelPath { get; set; } = "<ComponentDataDir>\\NER\\tokenizer.nlp.etf";
 
-        public Collection<EntityDefinition> EntityDefinitions { get;} = new Collection<EntityDefinition>();
+        public List<EntityDefinition> EntityDefinitions { get; set; } = new List<EntityDefinition>();
         public long LastIDToProcess { get;  set; }
         public long FirstIDToProcess { get; set; }
         public bool UseAttributeSetForTypes { get; set; }
         public string FKBVersion { get; set; }
 
-        public static Settings LoadFrom(string fileName)
+        public static Settings LoadFrom(string filename)
         {
             var deserializer = new Deserializer();
-            try
+            using (var reader = new StreamReader(filename))
             {
-                using (var reader = new StreamReader(fileName))
-                {
-                    var retVal = deserializer.Deserialize<Settings>(reader);
-                    retVal.WorkingDir = Path.GetDirectoryName(Path.GetFullPath(fileName));
-                    return retVal;
-                }
+                var retVal = deserializer.Deserialize<Settings>(reader);
+                retVal.WorkingDir = Path.GetDirectoryName(Path.GetFullPath(filename));
+                return retVal;
             }
-            catch(Exception ex)
-            {
-                ex.ExtractLog("ELI46853");
-                ex.ExtractDisplay("ELI46853");
-            }
-            return null;
         }
 
-        public void SaveTo(string fileName)
+        public void SaveTo(string filename)
         {
             var sb = new SerializerBuilder();
             sb.EmitDefaults();
             var serializer = sb.Build();
-            try
+            using (var stream = new StreamWriter(filename))
             {
-                using (var stream = new StreamWriter(fileName))
-                {
-                    serializer.Serialize(stream, this);
-                }
-                WorkingDir = Path.GetDirectoryName(Path.GetFullPath(fileName));
+                serializer.Serialize(stream, this);
             }
-            catch(Exception ex)
-            {
-                ex.ExtractLog("ELI46854");
-                ex.ExtractDisplay("ELI46854");
-            }
+            WorkingDir = Path.GetDirectoryName(Path.GetFullPath(filename));
         }
     }
 }
