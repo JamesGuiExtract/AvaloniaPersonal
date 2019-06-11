@@ -115,8 +115,11 @@ namespace Extract.AttributeFinder
                             {
                                 ThreadLocalMiscUtils.AutoEncryptFile(fullPath, _AUTO_ENCRYPT_KEY);
                             }
+                            var existingPaths = monitorPaths.Where(p => File.Exists(p)).ToList();
+                            ExtractException.Assert("ELI46876", "No file found", existingPaths.Count > 0,
+                                "Paths", string.Join(", ", paths));
                             CacheItemPolicy policy = new CacheItemPolicy();
-                            policy.ChangeMonitors.Add(new HostFileChangeMonitor(monitorPaths.Where(p => File.Exists(p)).ToList()));
+                            policy.ChangeMonitors.Add(new HostFileChangeMonitor(existingPaths));
 
                             if (slidingExpiration.HasValue)
                             {
