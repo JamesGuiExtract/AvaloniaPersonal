@@ -35,6 +35,11 @@ void UnlockLeadtools::UnlockLeadToolsSupport()
 {
 	try
 	{
+		if (LicenseInitialized)
+		{
+			return;
+		}
+
 		// Initialize license for C++
 		InitLeadToolsLicense();
 
@@ -64,6 +69,7 @@ void UnlockLeadtools::UnlockLeadToolsSupport()
 		}
 
 		RasterSupport::SetLicense(LicenseFileName, LicenseKey);
+		LicenseInitialized = true;
 	}
 	catch (Exception^ ex)
 	{

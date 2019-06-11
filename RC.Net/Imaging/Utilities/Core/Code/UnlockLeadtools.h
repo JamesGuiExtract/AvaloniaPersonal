@@ -14,6 +14,8 @@ namespace Extract
 				// Microsoft.Design::CA1053 - Static holder types should not have constructors
 				UnlockLeadtools(void) {};
 
+				static bool LicenseInitialized = false;
+
 			public:
 				// This loads the license file for Leadtools
 				static void UnlockLeadToolsSupport();

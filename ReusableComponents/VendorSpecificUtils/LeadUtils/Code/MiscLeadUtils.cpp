@@ -30,6 +30,19 @@
 #include <algorithm>
 #include <string>
 
+// Class created to initialize leadtools license before any application uses this dll
+// https://extract.atlassian.net/browse/ISSUE-16441
+class InitLicenseClass
+{
+public:
+	InitLicenseClass()
+	{
+		InitLeadToolsLicense();
+	}
+};
+
+static InitLicenseClass leadtoolLicense;
+
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
@@ -295,8 +308,16 @@ unsigned int PDFSecuritySettings::getLeadtoolsPermissions(long nPermissions)
 //-------------------------------------------------------------------------------------------------
 // Exported DLL Functions
 //-------------------------------------------------------------------------------------------------
+namespace
+{
+	static bool bLeadToolsLicenseHasBeenLoaded = false;
+}
 void InitLeadToolsLicense()
 {
+	if (bLeadToolsLicenseHasBeenLoaded)
+	{
+		return;
+	}
 	try
 	{
 		string leadtoolsLicensePath = getModuleDirectory("BaseUtils.dll");
@@ -328,6 +349,7 @@ void InitLeadToolsLicense()
 			);
 		}
 
+		bLeadToolsLicenseHasBeenLoaded = true;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41717")
 
