@@ -109,6 +109,9 @@
       <OutputFile>.\..\Debug/UCLIDExceptionMgmt.bsc</OutputFile>
       <PreserveSBR>true</PreserveSBR>
     </Bscmake>
+    <PostBuildEvent>
+      <Command>tlbimp $(TargetPath) /company: "Extract Systems" /copyright: "Copyright © Extract Systems LLC 2019" /namespace:UCLID_EXCEPTIONMGMTLib /out: $(OutDir)Interop.UCLID_EXCEPTIONMGMTLib.dll /keyfile: $(TargetPath)\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <CustomBuildStep>

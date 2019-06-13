@@ -136,7 +136,7 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL"/>
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="ZstdNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
@@ -231,6 +231,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_COMUTILSLib">
       <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
@@ -239,6 +240,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_INPUTFUNNELLib">
       <Guid>{775ACC91-32AC-11D6-8259-0050DAD4FF55}</Guid>

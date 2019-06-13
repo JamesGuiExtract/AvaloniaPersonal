@@ -147,6 +147,7 @@
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_COMUTILSLib">
       <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
@@ -156,6 +157,7 @@
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_AFCORELib">
       <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>

@@ -160,6 +160,7 @@
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_COMUTILSLib">
       <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
@@ -169,6 +170,7 @@
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_INPUTFUNNELLib">
       <Guid>{775ACC91-32AC-11D6-8259-0050DAD4FF55}</Guid>

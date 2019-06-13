@@ -176,6 +176,9 @@
     <ProjectReference>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
+    <PostBuildEvent>
+      <Command>tlbimp $(TargetPath) /company: "Extract Systems" /copyright: "Copyright © Extract Systems LLC 2019" /namespace:UCLID_AFCONDITIONSLib /out: $(OutDir)Interop.UCLID_AFCONDITIONSLib.dll /keyfile: $(TargetPath)\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AFConditions.cpp">

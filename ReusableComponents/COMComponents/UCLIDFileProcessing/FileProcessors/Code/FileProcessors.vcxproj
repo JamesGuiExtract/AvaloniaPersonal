@@ -115,6 +115,10 @@
       <OutputFile>.\..\Debug/FileProcessors.bsc</OutputFile>
       <PreserveSBR>true</PreserveSBR>
     </Bscmake>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <CustomBuildStep>

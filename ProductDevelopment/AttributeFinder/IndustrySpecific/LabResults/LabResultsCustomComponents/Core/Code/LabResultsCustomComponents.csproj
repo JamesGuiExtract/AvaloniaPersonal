@@ -48,7 +48,6 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>x86</PlatformTarget>
-   
     <RegisterForComInterop>true</RegisterForComInterop>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -61,7 +60,6 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-   
     <RegisterForComInterop>true</RegisterForComInterop>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -215,6 +213,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_COMUTILSLib">
       <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
@@ -223,6 +222,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_INPUTFUNNELLib">
       <Guid>{775ACC91-32AC-11D6-8259-0050DAD4FF55}</Guid>

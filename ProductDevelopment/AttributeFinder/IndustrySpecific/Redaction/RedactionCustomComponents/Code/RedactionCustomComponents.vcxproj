@@ -176,6 +176,10 @@
       <OutputFile>.\..\Debug/RedactionCustomComponents.bsc</OutputFile>
       <PreserveSBR>true</PreserveSBR>
     </Bscmake>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\FAMDBHelperFunctions.cpp" />

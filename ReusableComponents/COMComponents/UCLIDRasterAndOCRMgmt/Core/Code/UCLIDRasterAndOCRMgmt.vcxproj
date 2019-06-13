@@ -164,6 +164,9 @@
       <OutputFile>.\..\Debug/UCLIDRasterAndOCRMgmt.bsc</OutputFile>
       <PreserveSBR>true</PreserveSBR>
     </Bscmake>
+    <PostBuildEvent>
+      <Command>tlbimp $(TargetPath) /company: "Extract Systems" /copyright: "Copyright © Extract Systems LLC 2019" /namespace:UCLID_RASTERANDOCRMGMTLib /out: $(OutDir)Interop.UCLID_RASTERANDOCRMGMTLib.dll /keyfile: $(TargetPath)\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Letter.cpp">
