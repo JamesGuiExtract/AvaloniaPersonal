@@ -399,15 +399,18 @@ STDMETHODIMP CVariantVector::CopyFrom(IUnknown *pObject)
 
 				IUnknownPtr ipCopy = ipCopier->Clone();
 				ASSERT_RESOURCE_ALLOCATION("ELI26057", ipCopy != __nullptr);
-				vtTemp = ipCopy.Detach();
+
+				// _variant_t::operator=(IUnknown* pSrc) does an AddRef() so don't Detach() the copy or its ref count will never drop to zero
+				// https://extract.atlassian.net/browse/ISSUE-16444
+				vtTemp = (IUnknown*)ipCopy;
 			}
 			
 			m_vecVarCollection.push_back(vtTemp);
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08321");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CVariantVector::Clone(IUnknown* *pObject)
@@ -429,10 +432,10 @@ STDMETHODIMP CVariantVector::Clone(IUnknown* *pObject)
 
 		// return the new variant vector to the caller
 		*pObject = ipObjCopy.Detach();
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04443");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------
