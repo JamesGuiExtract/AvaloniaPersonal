@@ -165,6 +165,9 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\..\Release/SSOCR.bsc</OutputFile>
     </Bscmake>
+    <PostBuildEvent>
+      <Command>tlbimp $(TargetPath) /company: "Extract Systems" /copyright: "Copyright © Extract Systems LLC 2019" /namespace:UCLID_SSOCRLib /out: $(OutDir)Interop.UCLID_SSOCRLib.dll /keyfile: $(TargetPath)\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="PSUpdateThreadMgr.cpp" />
