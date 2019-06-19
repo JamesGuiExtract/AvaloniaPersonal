@@ -23,7 +23,7 @@ SET VB_DIR=%VISUAL_STUDIO%\VB
 SET VCPP_DIR=%VISUAL_STUDIO%\VC
 SET DevEnvDir=%VISUAL_STUDIO%\Common7\IDE
 SET VS_COMMON=%VISUAL_STUDIO%\Common7
-SET WINDOWS_SDK=C:\Program Files\Microsoft SDKs\Windows\v7.1
+SET WINDOWS_SDK=C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.6 Tools
 
 SET DEV_STUDIO_DIR=%PROGRAM_ROOT%\InstallShield\2013 SP1 SAB
 SET DOTFUSCATOR=%PROGRAM_ROOT%\PreEmptive Solutions\Dotfuscator Professional Edition 4.13.0
