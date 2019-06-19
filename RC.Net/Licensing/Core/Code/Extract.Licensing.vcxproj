@@ -187,6 +187,7 @@
     <ProjectReference Include="..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcxproj">
       <Project>{4a3a15dd-5c9d-4921-8d7e-3baf065fe984}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <Private>false</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">
       <Project>{7c37b0fb-81b8-4aa2-bc14-b21028c7ab9f}</Project>

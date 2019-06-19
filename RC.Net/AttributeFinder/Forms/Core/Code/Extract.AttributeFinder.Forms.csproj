@@ -136,6 +136,7 @@
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_COMLMLib">
       <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>

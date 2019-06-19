@@ -402,6 +402,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_AFOUTPUTHANDLERSLib">
       <Guid>{F8F1F33C-B4CE-4171-8855-7DE5AEC361B8}</Guid>
@@ -410,6 +411,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_AFUTILSLib">
       <Guid>{AC966E48-1A26-40C7-B61E-AC4C09C9D565}</Guid>
@@ -418,6 +420,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_COMLMLib">
       <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
@@ -454,6 +457,7 @@
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_INPUTFUNNELLib">
       <Guid>{775ACC91-32AC-11D6-8259-0050DAD4FF55}</Guid>
@@ -462,6 +466,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
       <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
@@ -470,6 +475,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
   </ItemGroup>
   <ItemGroup>

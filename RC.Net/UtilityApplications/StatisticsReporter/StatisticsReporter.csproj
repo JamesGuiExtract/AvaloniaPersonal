@@ -166,6 +166,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
       <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
@@ -174,6 +175,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

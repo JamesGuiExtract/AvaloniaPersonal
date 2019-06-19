@@ -120,6 +120,9 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\..\Release/RedactionCustomComponents.bsc</OutputFile>
     </Bscmake>
+    <PostBuildEvent>
+      <Command>tlbimp $(TargetPath) /company: "Extract Systems" /copyright: "Copyright © Extract Systems LLC 2019" /namespace:UCLID_REDACTIONCUSTOMCOMPONENTSLib /out: $(OutDir)Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll /keyfile: $(OutDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <CustomBuildStep>
@@ -177,8 +180,12 @@
       <PreserveSBR>true</PreserveSBR>
     </Bscmake>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>tlbimp $(TargetPath) /company: "Extract Systems" /copyright: "Copyright © Extract Systems LLC 2019" /namespace:UCLID_REDACTIONCUSTOMCOMPONENTSLib /out: $(OutDir)Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll /keyfile: $(OutDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <PostBuildEvent>
+      <Command>tlbimp $(TargetPath) /company: "Extract Systems" /copyright: "Copyright © Extract Systems LLC 2019" /namespace:UCLID_REDACTIONCUSTOMCOMPONENTSLib /out: $(OutDir)Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll /keyfile: $(OutDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

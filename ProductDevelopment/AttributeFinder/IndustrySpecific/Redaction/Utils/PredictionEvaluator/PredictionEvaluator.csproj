@@ -106,6 +106,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_COMLMLib">
       <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
@@ -123,6 +124,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_AFUTILSLib">
       <Guid>{AC966E48-1A26-40C7-B61E-AC4C09C9D565}</Guid>
@@ -131,6 +133,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

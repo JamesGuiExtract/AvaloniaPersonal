@@ -94,6 +94,7 @@
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>False</Private>
     </COMReference>
   </ItemGroup>
   <ItemGroup>

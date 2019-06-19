@@ -173,6 +173,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_COMUTILSLib">
       <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
@@ -181,6 +182,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
       <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
@@ -189,6 +191,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_SSOCRLib">
       <Guid>{C0F50AC4-62B2-4D15-A26F-404FEC1D58B2}</Guid>
@@ -197,6 +200,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
   </ItemGroup>
   <ItemGroup>

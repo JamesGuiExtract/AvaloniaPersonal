@@ -70,6 +70,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_COMLMLib">
       <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
@@ -96,6 +97,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
       <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
@@ -104,6 +106,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
     <COMReference Include="UCLID_TESTINGFRAMEWORKINTERFACESLib">
       <Guid>{B12E5F5E-6EC2-4D38-A57A-D55C4BE683C8}</Guid>
@@ -112,6 +115,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>False</Private>
     </COMReference>
   </ItemGroup>
   <ItemGroup>
