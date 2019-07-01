@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMLMLib;
@@ -156,6 +157,7 @@ namespace Extract.AttributeFinder.Rules
         bool _dirty;
 
         AFDocument _currentDocument;
+        static int _instanceCount;
 
         /// <summary>
         /// A cached set of <see cref="SpatialStringSearcher"/>s for each page of the current
@@ -181,43 +183,26 @@ namespace Extract.AttributeFinder.Rules
         /// Parser to use to filter non-qualified MICR lines from being returned from this rule.
         /// </summary>
         [ThreadStatic]
-        DotNetRegexParser _filterParser;
+        static DotNetRegexParser _filterParser;
 
         /// <summary>
         /// Parser to use to split MICR components into sub-attributes
         /// </summary>
         [ThreadStatic]
-        DotNetRegexParser _splitterParser;
+        static DotNetRegexParser _splitterParser;
 
         /// <summary>
         /// Parser to use to filter non-numeric characters for MICR components split from the full MICR line.
         /// </summary>
         [ThreadStatic]
-        DotNetRegexParser _charRemovalParser;
+        static DotNetRegexParser _charRemovalParser;
 
         [ThreadStatic]
-        MiscUtils _miscUtils;
+        static MiscUtils _miscUtils;
 
         #endregion Fields
 
         #region Constructors
-
-        /// <summary>
-        /// Static initializer to activate Nuance license.
-        /// </summary>
-        [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
-        static MicrFinder()
-        {
-            try
-            {
-                Engine.SetLicenseKey(null, "9d478fe171d5");
-                Engine.Init("Extract Systems", "Extract Systems");
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI46915");
-            }
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MicrFinder"/> class.
@@ -226,6 +211,11 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
+                if (Interlocked.Increment(ref _instanceCount) == 1)
+                {
+                    Engine.SetLicenseKey(null, "9d478fe171d5");
+                    Engine.Init("Extract Systems", "Extract Systems");
+                }
             }
             catch (Exception ex)
             {
