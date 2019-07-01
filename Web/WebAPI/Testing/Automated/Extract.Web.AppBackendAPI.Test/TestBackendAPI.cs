@@ -120,6 +120,50 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
+        public static void Test_LoginBlankUserName()
+        {
+            string dbName = "AppBackendAPI_Test_LoginBlankUserName";
+
+            try
+            {
+                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
+                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
+                        ("Resources.Demo_IDShield.bak", dbName, "", "123");
+
+                Assert.AreEqual(((ErrorResult)(((ObjectResult)controller.Login(user)).Value)).Error.Message, "Username is empty");
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void Test_LoginBlankPassword()
+        {
+            string dbName = "AppBackendAPI_Test_LoginBlankUserName";
+
+            try
+            {
+                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
+                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
+                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "");
+
+                Assert.AreEqual(((ErrorResult)(((ObjectResult)controller.Login(user)).Value)).Error.Message,"Password is empty");
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
         public static void Test_SessionLoginLogout()
         {
             string dbName = "AppBackendAPI_Test_SessionLoginLogout";
@@ -552,7 +596,7 @@ namespace Extract.Web.WebAPI.Test
                 result = controller.GetQueueStatus();
                 var beforeQueueStatus = result.AssertGoodResult<QueueStatusResult>();
 
-                result = controller.GetPageInfo(1);
+                result = controller.GetDocumentData(1);
 
                 // Simulate the web service being stopped.
                 controller.Dispose();
@@ -576,9 +620,9 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual(beforeQueueStatus.PendingDocuments, afterQueueStatus.PendingDocuments);
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
-                // Query that required access to the document session should resume the processing of the abandoned 
+                // Query that required access to the document session should resume the processing of the abandoned
                 // document session.
-                result = controller2.GetPageInfo(1);
+                result = controller2.GetDocumentData(1);
                 result.AssertResultCode(StatusCodes.Status200OK);
 
                 // Document should still be processing

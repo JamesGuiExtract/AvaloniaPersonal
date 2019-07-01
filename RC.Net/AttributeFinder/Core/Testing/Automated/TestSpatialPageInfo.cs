@@ -320,6 +320,9 @@ namespace Extract.AttributeFinder.Test
         {
             string imagePath = _testFiles.GetFile(_BLANKPAGE_TIF_FILE);
 
+            // add USS file to the file dictionary. This is required.
+            _testFiles.GetFile(_BLANKPAGE_USS_FILE);
+
             // USS file only has two pages in it
             var infosFromImageMethods = ImageMethods.GetSpatialPageInfos(imagePath);
             Assert.AreEqual(2, infosFromImageMethods.Size);

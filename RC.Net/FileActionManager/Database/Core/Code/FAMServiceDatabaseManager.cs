@@ -84,12 +84,12 @@ namespace Extract.FileActionManager.Database
         /// <summary>
         /// The setting key for the DatabaseServer that will be used for database specific operations for the ESFAMService
         /// </summary>
-        static readonly string DatabaseServerKey = "DatabaseServer";
+        public static readonly string DatabaseServerKey = "DatabaseServer";
 
         /// <summary>
         /// The setting key for the DatabaseName that will be used for database specific operations for the ESFAMService
         /// </summary>
-        static readonly string DatabaseNameKey = "DatabaseName";
+        public static readonly string DatabaseNameKey = "DatabaseName";
 
         #endregion Constants
 

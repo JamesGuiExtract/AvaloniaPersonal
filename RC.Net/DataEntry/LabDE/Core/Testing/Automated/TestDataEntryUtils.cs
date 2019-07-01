@@ -1,11 +1,8 @@
-﻿using Extract.DataEntry.LabDE;
-using Extract.Testing.Utilities;
+﻿using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
+using static System.FormattableString;
 
 using Util = Extract.DataEntry.LabDE.LabDEQueryUtilities;
 
@@ -43,41 +40,49 @@ namespace Extract.DataEntry.Test
 
         /// <summary>
         /// Tests the format date utility function.
+        /// Anything in the past 100 years should resolve to the most recent date
+        /// IE: if today is 1/1/2019, any short date ending in 19 should resolve to 2019
+        /// However if todays date is still 1/1/2019, ad we are given a short date of 20
+        /// It should resolve to 1/1/1920
         /// </summary>
         [Test, Category("FormatDateTest")]
         public static void TestFormatDate()
         {
             // single digit month
             CheckResult(expected: "02/14/2004", converted: Util.FormatDate("2/14/2004"));
+            
+            var currentTwoDigitYear = DateTime.Now.Year % 100;
+            var nextTwoDigitYear = currentTwoDigitYear + 1;
+            // If the year is currently 1/1/2019, this will return 1/1/1920, so add one to the year, then subtract 100.
+            string previousCenturyYear = Invariant($"{(DateTime.Now.Year / 100) - 1}{nextTwoDigitYear}");
 
             // single digit month and day, 2 digit year
-            CheckResult(expected: "02/04/1919", converted: Util.FormatDate("2/4/19"));
+            CheckResult(expected: "02/04/" + previousCenturyYear, converted: Util.FormatDate("2/4/" + nextTwoDigitYear));
+            CheckResult(expected: "02/01/" + DateTime.Now.Year.ToString(CultureInfo.InvariantCulture), converted: Util.FormatDate("2/1/" + currentTwoDigitYear)); 
 
-            CheckResult(expected: "12/15/1958", converted: Util.FormatDate("12/15/58"));
             CheckResult(expected: "02/01/2012", converted: Util.FormatDate("2/1/2012"));
-            CheckResult(expected: "02/01/2012", converted: Util.FormatDate("2/1/12"));
-
+            
             // invalid dates
             CheckResult(expected: "", converted: Util.FormatDate("13/14/2004"));  // invalid month
             CheckResult(expected: "", converted: Util.FormatDate("02/31/2004"));  // invalid day
 
             // 6 digit date test
-            CheckResult(expected: "12/15/1958", converted: Util.FormatDate("121558"));
+            CheckResult(expected: "12/15/" + previousCenturyYear, converted: Util.FormatDate("1215" + nextTwoDigitYear));
 
             // 8 digit date test
             CheckResult(expected: "12/15/1958", converted: Util.FormatDate("12151958"));
 
             // hyphen separators
-            CheckResult(expected: "02/04/1919", converted: Util.FormatDate("2-4-19"));
+            CheckResult(expected: "02/04/" + previousCenturyYear, converted: Util.FormatDate("2-4-" + nextTwoDigitYear));
             CheckResult(expected: "02/14/2004", converted: Util.FormatDate("2-14-2004"));
 
             // dot separators
             CheckResult(expected: "02/14/2004", converted: Util.FormatDate("02.14.2004"));
             CheckResult(expected: "02/14/2004", converted: Util.FormatDate("2.14.2004"));
-            CheckResult(expected: "02/14/2004", converted: Util.FormatDate("2.14.04"));
+            CheckResult(expected: "02/14/" + DateTime.Now.Year.ToString(CultureInfo.InvariantCulture), converted: Util.FormatDate("2.14." + currentTwoDigitYear));
 
             // Dates with time components
-            CheckResult(expected: "02/02/2016", converted: Util.FormatDateWithOptionalTime("2.2.16 1:45 AM"));
+            CheckResult(expected: "02/02/" + DateTime.Now.Year.ToString(CultureInfo.InvariantCulture), converted: Util.FormatDateWithOptionalTime("2.2." + currentTwoDigitYear + " 1:45 AM"));
             CheckResult(expected: "02/02/2016", converted: Util.FormatDateWithOptionalTime("2.2.2016 1:45 AM"));
         }
 
@@ -87,12 +92,13 @@ namespace Extract.DataEntry.Test
         [Test, Category("FormatDateTest")]
         public static void TestFormatDateTryParseMethod()
         {
+            var currentTwoDigitYear = DateTime.Now.Year % 100;
             // https://extract.atlassian.net/browse/ISSUE-14370
             CheckResult(expected: "08/07/2014", converted: Util.FormatDate("2014/08/07"));
-            CheckResult(expected: "08/07/2014", converted: Util.FormatDate("08-07-14"));
-            CheckResult(expected: "08/07/2014", converted: Util.FormatDate("08 07 14"));
-            CheckResult(expected: "08/07/2014", converted: Util.FormatDate("07 Aug 14"));
-            CheckResult(expected: "08/07/2014", converted: Util.FormatDate("07 August 14"));
+            CheckResult(expected: "08/07/" + DateTime.Now.Year, converted: Util.FormatDate("08-07-" + currentTwoDigitYear));
+            CheckResult(expected: "08/07/" + DateTime.Now.Year, converted: Util.FormatDate("08 07 " + currentTwoDigitYear));
+            CheckResult(expected: "08/07/" + DateTime.Now.Year, converted: Util.FormatDate("07 Aug " + currentTwoDigitYear));
+            CheckResult(expected: "08/07/" + DateTime.Now.Year, converted: Util.FormatDate("07 August " + currentTwoDigitYear));
             CheckResult(expected: "08/07/2014", converted: Util.FormatDate("Aug 7, 2014"));
             CheckResult(expected: "08/07/2014", converted: Util.FormatDate("August 7, 2014"));
 

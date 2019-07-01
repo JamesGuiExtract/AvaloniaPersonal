@@ -21,10 +21,52 @@ namespace Extract.FileActionManager.FileProcessors.Test
         #region Constants
 
         /// <summary>
-        /// This value should be the total of all the file processors when all items are licensed.
-        /// This should be updated if new File processors are created
+        /// A list of all the file processors, you can find your list at
+        /// C:\ProgramData\Extract Systems\CategoryFiles\UCLID File Processors.lst
         /// </summary>
-        const int _NUMBER_OF_FILE_PROCESSORS = 39;
+        private static readonly Dictionary<string,string> fileProcessors = new Dictionary<string, string>() {
+            { "Core: Send email","Extract.FileActionManager.FileProcessors.SendEmailTask" },
+            { "Core: Execute rules","AFFileProcessors.AFEngineFileProcessor.1" },
+            { "Core: Clean up image", "FileProcessors.CleanupImageFileProcessor.1" },
+            { "Redaction: Create redacted text", "Extract.Redaction.CreateRedactedTextTask" },
+            { "Core: Convert to searchable PDF", "FileProcessors.ConvertToPDFTask.1" },
+            { "Core: Convert VOA to XML", "AFFileProcessors.AFConvertVOAToXMLTask.1" },
+            { "Core: Set Metadata", "Extract.FileActionManager.FileProcessors.SetMetadataTask" },
+            { "Core: Validate XML", "Extract.FileActionManager.FileProcessors.ValidateXmlTask" },
+            { "Core: Launch application", "FileProcessors.LaunchAppFileProcessor.1" },
+            { "Core: Manage tags", "FileProcessors.ManageTagsTask.1" },
+            { "Redaction: Create redacted image", "RedactionCustomComponents.RedactionTask.1" },
+            { "Core: Set file priority", "Extract.FileActionManager.FileProcessors.SetFilePriorityTask" },
+            { "Core: Modify source document name in database", "Extract.FileActionManager.FileProcessors.ModifySourceDocNameInDB" },
+            { "Core: Create file", "Extract.FileActionManager.FileProcessors.CreateFileTask" },
+            { "Redaction: Extend redactions to surround context", "Extract.Redaction.SurroundContextTask" },
+            { "Redaction: Merge ID Shield data files", "Extract.Redaction.VOAFileMergeTask" },
+            { "Data Entry: Verify extracted data", "Extract.DataEntry.Utilities.DataEntryApplication" },
+            { "Core: OCR document with GCV", "Extract.FileActionManager.FileProcessors.CloudOCRTask" },
+            { "Core: Archive or restore associated file", "FileProcessors.ArchiveRestoreTask.1" },
+            { "Core: Modify PDF file", "Extract.FileActionManager.FileProcessors.ModifyPdfFileTask" },
+            { "Core: Extract image area", "Extract.FileActionManager.FileProcessors.ExtractImageAreaTask" },
+            { "Core: Encrypt/decrypt file", "Extract.FileActionManager.FileProcessors.EncryptDecryptFileTask" },
+            { "Redaction: Create metadata XML", "Extract.Redaction.MetadataTask" },
+            { "Redaction: Filter ID Shield data file", "RedactionCustomComponents.FilterIDShieldDataFileTask.1" },
+            { "Core: Apply Bates number", "Extract.FileActionManager.FileProcessors.ApplyBatesNumberTask" },
+            { "Core: Sleep", "FileProcessors.SleepTask.1" },
+            { "Core: Transfer, rename or delete via FTP/SFTP", "Extract.FileActionManager.FileProcessors.FtpTask" },
+            { "Core: Delete empty folder", "Extract.FileActionManager.FileProcessors.DeleteEmptyFolderTask" },
+            { "Redaction: Verify sensitive data", "Extract.Redaction.Verification.VerificationTask" },
+            { "Core: Store or retrieve attributes in database", "Extract.FileActionManager.FileProcessors.StoreAttributesInDbTask" },
+            { "Core: Pagination - Create output", "Extract.FileActionManager.CreatePaginatedOutputTask" },
+            { "Core: View image", "Extract.FileActionManager.ViewImageTask" },
+            { "Core: Rasterize PDF", "Extract.FileActionManager.FileProcessors.RasterizePdfTask" },
+            { "Core: Set file-action status in database", "FileProcessors.SetActionStatusFileProcessor.1" },
+            { "Core: Copy, move or delete file", "FileProcessors.CopyMoveDeleteFileProcessor.1" },
+            { "Core: Enhance OCR", "AFFileProcessors.EnhanceOCRTask.1" },
+            { "Core: Paginate files", "Extract.FileActionManager.PaginationTask" },
+            { "Core: Add watermark", "FileProcessors.AddWatermarkTask.1" },
+            { "Core: Split multi-page document", "Extract.FileActionManager.FileProcessors.SplitMultipageDocumentTask" },
+            { "Core: OCR document", "FileProcessors.OCRFileProcessor.1" },
+            { "Core: Conditionally execute task(s)", "FileProcessors.ConditionalTask.1" }
+        };
 
         /// <summary>
         /// This list contains the text that will only be contained in descriptions of tasks
@@ -67,12 +109,15 @@ namespace Extract.FileActionManager.FileProcessors.Test
         {
             CategoryManager categoryManager = new CategoryManager();
             var fileProcessorsProgIDs = categoryManager.GetDescriptionToProgIDMap1(ExtractCategories.FileProcessorsName);
-
-            // This is testing that all the file processor tasks we have are licensed, this number will need to be changed if
-            // other file processing tasks added
-            Assert.AreEqual(_NUMBER_OF_FILE_PROCESSORS, fileProcessorsProgIDs.Size, "Checking that all file processing tasks are registered and licensed");
-
             var processorsProgIDs = fileProcessorsProgIDs.ComToDictionary();
+
+            // Checks to see if any items are not licensed.
+            var licensedButNotInTest = fileProcessors.Where(m => !processorsProgIDs.Any(m2 => m2.Key == m.Key)).ToDictionary(x => x.Key, x=> x.Value);
+            Assert.IsTrue(licensedButNotInTest.Count == 0, "You Need to license this file: " + licensedButNotInTest.Keys.FirstOrDefault() + " " + licensedButNotInTest.Values.FirstOrDefault());
+
+            // Checks to see if any new licenses were created, if so it asks you to add them to this test.
+            var notlicensed = processorsProgIDs.Where(m => !fileProcessors.Any(m2 => m2.Key == m.Key)).ToDictionary(x => x.Key, x => x.Value);
+            Assert.IsTrue(notlicensed.Count == 0, "Please add the following item to the fileProcessors dictionary (in the test class) as its a new license: " + notlicensed.Keys.FirstOrDefault() + " " + notlicensed.Values.FirstOrDefault());
 
             // Test the Tasks that have a UI           
             var uiTasks = processorsProgIDs.Where(t => _UI_SELECTION_LIST.Any(w => t.Key.Contains(w)));

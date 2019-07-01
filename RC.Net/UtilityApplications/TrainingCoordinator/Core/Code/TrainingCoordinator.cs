@@ -133,7 +133,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
         /// (since these do not have their own records in the DB)
         /// </summary>
         [DataMember]
-        public Dictionary<Guid, DatabaseServiceStatus> ServiceStatuses { get; }
+        public Dictionary<Guid, DatabaseServiceStatus> ServiceStatuses { get; } = new Dictionary<Guid, DatabaseServiceStatus>();
 
         #endregion Properties
 
@@ -508,7 +508,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             public string Log { get; set; }
 
             [DataMember]
-            public Dictionary<Guid,DatabaseServiceStatus> ServiceStatuses { get; set; }
+            public Dictionary<Guid, DatabaseServiceStatus> ServiceStatuses { get; set; } = new Dictionary<Guid, DatabaseServiceStatus>();
 
             #endregion
 

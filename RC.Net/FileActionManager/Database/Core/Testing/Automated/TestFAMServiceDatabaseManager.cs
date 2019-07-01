@@ -697,6 +697,78 @@ namespace Extract.FileActionManager.Database.Test
         }
 
         /// <summary>
+        /// Test whether a V5 service database is correctly updated to the current schema.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void UpdateFromV6ToCurrent()
+        {
+            TemporaryFile tempV6 = null, tempBackup = null;
+            try
+            {
+                tempV6 = new TemporaryFile(".sdf", false);
+                CreateV6Database(tempV6.FileName);
+                var manager = new FAMServiceDatabaseManager(tempV6.FileName);
+                var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+                var backupFile = new FileInfo(task.Result);
+                tempBackup = new TemporaryFile(backupFile, false);
+
+                // Check that the database has been upgraded correctly
+                var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
+                Assert.That(fpsFileTable.Count == _fromV2FpsTable.Count);
+                foreach (var data in fpsFileTable)
+                {
+                    var expected = _fromV3ToV5FpsTable[data.FileName];
+                    Assert.That(expected.Item1 == data.NumberOfInstances
+                        && expected.Item2 == data.NumberOfFilesToProcess);
+                }
+            }
+            finally
+            {
+                if (tempV6 != null)
+                {
+                    tempV6.Dispose();
+                }
+                if (tempBackup != null)
+                {
+                    tempBackup.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the V5 database has been updated to the correct schema after an
+        /// update is performed.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void UpdateFromV6ToCurrentSchemaCorrect()
+        {
+            TemporaryFile tempV6 = null, tempBackup = null;
+            try
+            {
+                tempV6 = new TemporaryFile(".sdf", false);
+                CreateV6Database(tempV6.FileName);
+                var manager = new FAMServiceDatabaseManager(tempV6.FileName);
+                var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+                var backupFile = new FileInfo(task.Result);
+                tempBackup = new TemporaryFile(backupFile, false);
+                int schemaVersion = new FAMServiceDatabaseManager(tempV6.FileName).GetSchemaVersion();
+
+                Assert.That(schemaVersion == FAMServiceDatabaseManager.CurrentSchemaVersion);
+            }
+            finally
+            {
+                if (tempV6 != null)
+                {
+                    tempV6.Dispose();
+                }
+                if (tempBackup != null)
+                {
+                    tempBackup.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
         /// Test whether a V5 service database is correctly updated to the current schema
         /// when using the <see cref="IDatabaseSchemaManager"/> interface.
         /// </summary>
@@ -760,10 +832,10 @@ namespace Extract.FileActionManager.Database.Test
         [Test, Category("Automated")]
         public static void CorrectlyIndicatesNoUpdateRequiredCurrentVersion()
         {
-            using (var tempV6 = new TemporaryFile(".sdf", false))
+            using (var tempV7 = new TemporaryFile(".sdf", false))
             {
-                CreateV6Database(tempV6.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV6.FileName);
+                CreateV7Database(tempV7.FileName);
+                var manager = new FAMServiceDatabaseManager(tempV7.FileName);
                 Assert.That(!manager.IsUpdateRequired);
             }
         }
@@ -781,7 +853,7 @@ namespace Extract.FileActionManager.Database.Test
         /// <returns>A settings list for the specified db schema version.</returns>
         static Settings[] BuildSettingList(int version)
         {
-            var settings = new Settings[] {
+            List<Settings> settings = new List<Settings> {
                 new Settings() {
                     Name = FAMServiceDatabaseManager.SleepTimeOnStartupKey,
                     Value = FAMServiceDatabaseManager.DefaultSleepTimeOnStartup.ToString(CultureInfo.InvariantCulture) },
@@ -796,7 +868,21 @@ namespace Extract.FileActionManager.Database.Test
                     Value = version.ToString(CultureInfo.InvariantCulture) }
             };
 
-            return settings;
+            if(version >= 7)
+            {
+                settings.Add(new Settings()
+                {
+                    Name = FAMServiceDatabaseManager.DatabaseServerKey,
+                    Value = "(local)"
+                });
+                settings.Add(new Settings()
+                {
+                    Name = FAMServiceDatabaseManager.DatabaseNameKey,
+                    Value = "Demo_IDShield"
+                });
+            }
+
+            return settings.ToArray();
         }
 
         /// <summary>
@@ -950,6 +1036,38 @@ namespace Extract.FileActionManager.Database.Test
 
                 v6db.CreateDatabase();
                 v6db.Settings.InsertAllOnSubmit(BuildSettingList(6));
+                v6db.FpsFile.InsertAllOnSubmit(fpsFiles);
+                v6db.SubmitChanges(ConflictMode.FailOnFirstConflict);
+            }
+        }
+
+        /// <summary>
+        /// Creates a V7 schema service database.
+        /// </summary>
+        /// <param name="fileName">The file to write the database to.</param>
+        static void CreateV7Database(string fileName)
+        {
+            var fpsFiles = new List<FpsFileTableV6>();
+            foreach (var data in _fromV3ToV5FpsTable)
+            {
+                fpsFiles.Add(new FpsFileTableV6()
+                {
+                    FileName = data.Key,
+                    NumberOfInstances = data.Value.Item1,
+                    NumberOfFilesToProcess = data.Value.Item2
+                });
+            }
+
+            using (var v6db = new FAMServiceDatabaseV6(fileName))
+            {
+                // Create the fam database
+                if (File.Exists(fileName))
+                {
+                    File.Delete(fileName);
+                }
+
+                v6db.CreateDatabase();
+                v6db.Settings.InsertAllOnSubmit(BuildSettingList(7));
                 v6db.FpsFile.InsertAllOnSubmit(fpsFiles);
                 v6db.SubmitChanges(ConflictMode.FailOnFirstConflict);
             }
