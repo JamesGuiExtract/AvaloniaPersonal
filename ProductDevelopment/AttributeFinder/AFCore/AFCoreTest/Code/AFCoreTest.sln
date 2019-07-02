@@ -894,6 +894,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocumentAPI", "..\..\..\..\
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 		{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F} = {7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}
+		{CC01AE64-6B4C-4FEE-8A87-B13941098A6A} = {CC01AE64-6B4C-4FEE-8A87-B13941098A6A}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NERAnnotator", "..\..\..\..\..\RC.Net\UtilityApplications\NERAnnotator\Core\Code\NERAnnotator.csproj", "{36FBD81E-ACC8-4BED-9D8A-308BDD904092}"
@@ -1105,6 +1106,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.GoogleCloud", "..\.
 	EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Extract.Utilities.FSharp.CSharpInterop", "..\..\..\..\..\RC.Net\Utilities\FSharp\CSharpInterop\Extract.Utilities.FSharp.CSharpInterop.fsproj", "{504DCF5F-FD4E-4E5D-B1CE-2E27518FC0BC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Rules.FSharp", "..\..\..\..\..\RC.Net\AttributeFinder\Rules\FSharp\Extract.AttributeFinder.Rules.FSharp.csproj", "{F1D14AE3-CBC6-4515-8E81-6804D1245994}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -1142,6 +1146,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Rul
 	EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Extract.Utilities.FSharp.NERAnnotation", "..\..\..\..\..\RC.Net\Utilities\FSharp\NERAnnotation\Extract.Utilities.FSharp.NERAnnotation.fsproj", "{F18189D2-1BDD-4AE1-B4ED-3BC7BBA98168}"
+	ProjectSection(ProjectDependencies) = postProject
+		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
