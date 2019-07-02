@@ -1,0 +1,5 @@
+/.fake/
+buildAFCoreTest.fsx
+buildAFCoreTest.fsx.lock
+buildUtils.fsx
+buildUtils.fsx.lock
