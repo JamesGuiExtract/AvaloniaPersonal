@@ -121,6 +121,11 @@ namespace Extract.AttributeFinder.Rules
                 AFDocument afDocCopy = pDocument.PartialClone(true, false);
                 IAttribute attribute = afDocCopy.Attribute;
 
+                // Update source document of subattributes
+                foreach (var a in attribute.EnumerateDepthFirst())
+                {
+                    a.Value.SourceDocName = pDocument.Text.SourceDocName;
+                }
                 IUnknownVector result = new IUnknownVector();
                 result.PushBack(attribute);
 

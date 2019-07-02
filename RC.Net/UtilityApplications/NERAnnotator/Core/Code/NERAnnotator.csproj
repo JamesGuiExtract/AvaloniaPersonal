@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{36FBD81E-ACC8-4BED-9D8A-308BDD904092}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>NERAnnotator</RootNamespace>
+    <RootNamespace>Extract.UtilityApplications.NERAnnotation</RootNamespace>
     <AssemblyName>NERAnnotator</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -42,6 +42,7 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FSharp.Core, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="IKVM.AWT.WinForms, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.AWT.WinForms.dll</HintPath>
     </Reference>
@@ -157,16 +158,6 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
       <Private>False</Private>
     </COMReference>
-    <COMReference Include="UCLID_AFSELECTORSLib">
-      <Guid>{B2548FD4-6D38-4849-828E-FE0660B45935}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-      <Private>False</Private>
-    </COMReference>
     <COMReference Include="UCLID_AFUTILSLib">
       <Guid>{AC966E48-1A26-40C7-B61E-AC4C09C9D565}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -207,16 +198,6 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
       <Private>False</Private>
     </COMReference>
-    <COMReference Include="UCLID_INPUTFUNNELLib">
-      <Guid>{775ACC91-32AC-11D6-8259-0050DAD4FF55}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-      <Private>False</Private>
-    </COMReference>
     <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
       <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -227,21 +208,19 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
       <Private>False</Private>
     </COMReference>
-    <COMReference Include="UCLID_TESTINGFRAMEWORKINTERFACESLib">
-      <Guid>{B12E5F5E-6EC2-4D38-A57A-D55C4BE683C8}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-      <Private>False</Private>
-    </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
+      <Project>{6dd0855c-6031-49f4-874c-667f3a576345}</Project>
+      <Name>Extract.AttributeFinder</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\AttributeFinder\Rules\Core\Code\Extract.AttributeFinder.Rules.csproj">
       <Project>{52c53912-5790-4f68-ab57-6cbc3ef45a14}</Project>
       <Name>Extract.AttributeFinder.Rules</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\AttributeFinder\Rules\FSharp\Extract.AttributeFinder.Rules.FSharp.csproj">
+      <Project>{f1d14ae3-cbc6-4515-8e81-6804d1245994}</Project>
+      <Name>Extract.AttributeFinder.Rules.FSharp</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
       <Project>{7c37b0fb-81b8-4aa2-bc14-b21028c7ab9f}</Project>
@@ -255,13 +234,21 @@
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
-      <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
-      <Name>Extract.AttributeFinder</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781de2-21d2-470c-b41d-598dc0c2640b}</Project>
       <Name>Extract.Utilities.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\FSharp\CSharpInterop\Extract.Utilities.FSharp.CSharpInterop.fsproj">
+      <Project>{504dcf5f-fd4e-4e5d-b1ce-2e27518fc0bc}</Project>
+      <Name>Extract.Utilities.FSharp.CSharpInterop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\FSharp\NERAnnotation\Extract.Utilities.FSharp.NERAnnotation.fsproj">
+      <Project>{f18189d2-1bdd-4ae1-b4ed-3bc7bba98168}</Project>
+      <Name>Extract.Utilities.FSharp.NERAnnotation</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj">
+      <Project>{DC72C952-D6ED-42F6-893D-8262BC9D183E}</Project>
+      <Name>Extract.Utilities.Parsers</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -271,13 +258,19 @@
     <Compile Include="AnnotationConfigurationDialog.Designer.cs">
       <DependentUpon>AnnotationConfigurationDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="AnnotatonStatus.cs">
+    <Compile Include="AnnotationStatus.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AnnotatonStatus.Designer.cs">
-      <DependentUpon>AnnotatonStatus.cs</DependentUpon>
+    <Compile Include="AnnotationStatus.Designer.cs">
+      <DependentUpon>AnnotationStatus.cs</DependentUpon>
     </Compile>
     <Compile Include="EntityDefinition.cs" />
+    <Compile Include="FunctionConfigurationDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FunctionConfigurationDialog.Designer.cs">
+      <DependentUpon>FunctionConfigurationDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="NERAnnotator.cs" />
     <Compile Include="NERAnnotatorApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -292,8 +285,11 @@
     <EmbeddedResource Include="AnnotationConfigurationDialog.resx">
       <DependentUpon>AnnotationConfigurationDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="AnnotatonStatus.resx">
-      <DependentUpon>AnnotatonStatus.cs</DependentUpon>
+    <EmbeddedResource Include="AnnotationStatus.resx">
+      <DependentUpon>AnnotationStatus.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FunctionConfigurationDialog.resx">
+      <DependentUpon>FunctionConfigurationDialog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -252,7 +252,7 @@ namespace Extract.Dashboard.Forms
                 string dashboardViewer = FileSystemMethods.PathCombine(
                     FileSystemMethods.CommonComponentsPath, "DashboardViewer.exe");
 
-                SystemMethods.RunExecutable(dashboardViewer, parameters, 0, startAndReturnimmediately: true);
+                SystemMethods.RunExecutable(dashboardViewer, parameters, 0, startAndReturnImmediately: true);
             }
             catch (Exception ex)
             {

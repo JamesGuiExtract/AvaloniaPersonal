@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Extract.UtilityApplications.NERAnnotator.Test</RootNamespace>
+    <RootNamespace>Extract.UtilityApplications.NERAnnotation.Test</RootNamespace>
     <AssemblyName>Extract.UtilityApplications.NERAnnotator.Test</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -68,6 +68,7 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
+    <Reference Include="FSharp.Core, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="nunit.framework, Version=2.5.8.10295, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\APIs\NUnit_2.5\bin\nunit.framework.dll</HintPath>
@@ -114,6 +115,7 @@
     </COMReference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
@@ -148,6 +150,14 @@
       <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
       <Name>Extract.Utilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\FSharp\CSharpInterop\Extract.Utilities.FSharp.CSharpInterop.fsproj">
+      <Project>{504dcf5f-fd4e-4e5d-b1ce-2e27518fc0bc}</Project>
+      <Name>Extract.Utilities.FSharp.CSharpInterop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\FSharp\NERAnnotation\Extract.Utilities.FSharp.NERAnnotation.fsproj">
+      <Project>{f18189d2-1bdd-4ae1-b4ed-3bc7bba98168}</Project>
+      <Name>Extract.Utilities.FSharp.NERAnnotation</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Core\Code\NERAnnotator.csproj">
       <Project>{36fbd81e-acc8-4bed-9d8a-308bdd904092}</Project>
       <Name>NERAnnotator</Name>
@@ -161,6 +171,7 @@
     <EmbeddedResource Include="Resources\Example01.tif.uss" />
     <EmbeddedResource Include="Resources\Example02.tif" />
     <EmbeddedResource Include="Resources\Example02.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example02.tif.voa" />
     <EmbeddedResource Include="Resources\Example02.tif.uss" />
     <EmbeddedResource Include="Resources\Example03.tif" />
     <EmbeddedResource Include="Resources\Example03.tif.evoa" />
@@ -170,6 +181,7 @@
     <EmbeddedResource Include="Resources\Example04.tif.uss" />
     <EmbeddedResource Include="Resources\Example05.tif" />
     <EmbeddedResource Include="Resources\Example05.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example05.tif.voa" />
     <EmbeddedResource Include="Resources\Example05.tif.uss" />
     <EmbeddedResource Include="Resources\Example06.tif" />
     <EmbeddedResource Include="Resources\Example06.tif.evoa" />
@@ -177,9 +189,11 @@
     <EmbeddedResource Include="Resources\Example07.tif" />
     <EmbeddedResource Include="Resources\Example07.tif.evoa" />
     <EmbeddedResource Include="Resources\Example07.tif.uss" />
+    <EmbeddedResource Include="Resources\Example07.tif.voa" />
     <EmbeddedResource Include="Resources\Example08.tif" />
     <EmbeddedResource Include="Resources\Example08.tif.evoa" />
     <EmbeddedResource Include="Resources\Example08.tif.uss" />
+    <EmbeddedResource Include="Resources\Example08.tif.voa" />
     <EmbeddedResource Include="Resources\Example09.tif" />
     <EmbeddedResource Include="Resources\Example09.tif.evoa" />
     <EmbeddedResource Include="Resources\Example09.tif.uss" />
@@ -216,6 +230,7 @@
     <EmbeddedResource Include="Resources\opennlp.overlapping_expected.train.txt" />
     <EmbeddedResource Include="Resources\overlapping_expected.txt" />
     <EmbeddedResource Include="Resources\opennlp.flex.train.txt" />
+    <EmbeddedResource Include="Resources\NERUtils.fsx" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

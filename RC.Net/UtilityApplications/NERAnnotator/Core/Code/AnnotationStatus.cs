@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Extract.UtilityApplications.NERAnnotator
+namespace Extract.UtilityApplications.NERAnnotation
 {
     /// <summary>
     /// Progress status displayed while labeling attributes
@@ -19,7 +19,8 @@ namespace Extract.UtilityApplications.NERAnnotator
 
         CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         Task _mainTask;
-        Settings _settings;
+        NERAnnotatorSettings _settings;
+        bool _processPagesInParallel;
 
         #endregion Fields
 
@@ -28,11 +29,12 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// <summary>
         /// Annotates the input files and displays progress
         /// </summary>
-        public AnnotationStatus(Settings settings)
+        public AnnotationStatus(NERAnnotatorSettings settings, bool processPagesInParallel)
         {
             try
             {
                 _settings = settings;
+                _processPagesInParallel = processPagesInParallel;
 
                 InitializeComponent();
             }
@@ -56,7 +58,7 @@ namespace Extract.UtilityApplications.NERAnnotator
 
             try
             {
-                Annotate();
+                Annotate(_processPagesInParallel);
             }
             catch (Exception ex)
             {
@@ -96,7 +98,7 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// Starts the annotation process
         /// </summary>
         [SuppressMessage("Microsoft.Mobility", "CA1601:DoNotUseTimersThatPreventPowerStateChanges")]
-        private void Annotate()
+        private void Annotate(bool processPagesInParallel)
         {
             var cancellationToken = _cancellationTokenSource.Token;
             var statusUpdates = new ConcurrentQueue<StatusArgs>();
@@ -138,7 +140,7 @@ namespace Extract.UtilityApplications.NERAnnotator
 
             // Annotate
             _mainTask = Task.Factory.StartNew(() =>
-                NERAnnotator.Process(_settings, args => statusUpdates.Enqueue(args), cancellationToken), cancellationToken)
+                NERAnnotator.Process(_settings, args => statusUpdates.Enqueue(args), cancellationToken, processPagesInParallel), cancellationToken)
 
             // Clean-up
             .ContinueWith(task =>

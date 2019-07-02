@@ -1,12 +1,18 @@
 ﻿using Extract.AttributeFinder;
 using Extract.AttributeFinder.Rules;
 using Extract.Utilities;
+using Extract.Utilities.FSharp.NERAnnotation;
+using Extract.Utilities.FSharp;
+using Microsoft.FSharp.Collections;
+using Microsoft.FSharp.Core;
 using opennlp.tools.sentdetect;
 using opennlp.tools.tokenize;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,9 +22,15 @@ using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
 
-namespace Extract.UtilityApplications.NERAnnotator
+using GetCharIndexesFunc =
+    System.Func<Microsoft.FSharp.Collections.FSharpList<UCLID_RASTERANDOCRMGMTLib.RasterZone>,
+        UCLID_RASTERANDOCRMGMTLib.SpatialString,
+        bool,
+        System.Collections.Generic.HashSet<int>>;
+
+namespace Extract.UtilityApplications.NERAnnotation
 {
-    public class NERAnnotator
+    public class NERAnnotator : IDisposable
     {
         #region Constants
 
@@ -41,23 +53,51 @@ namespace Extract.UtilityApplications.NERAnnotator
                 AND FamFile.FileName = @FileName
             ORDER BY DateTimeStamp DESC";
 
+        // Use enum for easy renaming
+        enum _entityFilteringFunctionNames
+        {
+            setExpectedValuesFromDefinitions,
+            resolveToPage,
+            limitToFinishable
+        }
+
+        /// <summary>
+        /// These are the function names that this object looks for
+        /// </summary>
+        public static ReadOnlyCollection<string> EntityFilteringFunctionNames { get; }
+            = new ReadOnlyCollection<string>(new[]
+                {
+                    nameof(_entityFilteringFunctionNames.setExpectedValuesFromDefinitions),
+                    nameof(_entityFilteringFunctionNames.resolveToPage),
+                    nameof(_entityFilteringFunctionNames.limitToFinishable)
+                });
+
         #endregion Constants
 
         #region Fields
 
         Random _rng;
-        Tokenizer _tokenizer;
-        SentenceDetectorME _sentenceDetector;
-        SpatialStringSearcher _searcher = new SpatialStringSearcher();
+        ThreadLocal<Tokenizer> _tokenizer;
+        ThreadLocal<SentenceDetectorME> _sentenceDetector;
+        ThreadLocal<AttributeFinderPathTags> _pathTags;
+        ThreadLocal<SpatialStringSearcher> _searcher = new ThreadLocal<SpatialStringSearcher>(() =>
+        {
+            var searcher = new SpatialStringSearcher();
+            searcher.SetIncludeDataOnBoundary(true);
+            searcher.SetBoundaryResolution(ESpatialEntity.kCharacter);
+            return searcher;
+        });
 
-        // Function to return character indexes that an attribute's value overlaps
-        Func<IEnumerable<RasterZone>, SpatialString, bool, HashSet<int>> _getCharIndexesMemoized;
+        Dictionary<string, FSharpFunc<EntitiesAndPage, EntitiesAndPage>> _entityFilteringFunctions;
 
-        Settings _settings;
+        NERAnnotatorSettings _settings;
         string _trainingOutputFile;
         string _testingOutputFile;
         Action<StatusArgs> _updateStatus;
         CancellationToken _cancellationToken;
+        FSharpFunc<AFDocument, AFDocument> _preprocessingFunction;
+        FSharpFunc<string, string> _characterReplacingFunction;
+        string _entityFilteringScriptPath;
 
         #endregion Fields
 
@@ -66,10 +106,10 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// <summary>
         /// Create an instance. Private so that status updates and cancellationTokens are not reused.
         /// </summary>
-        /// <param name="settings">The <see cref="Settings"/> to be used.</param>
+        /// <param name="settings">The <see cref="NERAnnotatorSettings"/> to be used.</param>
         /// <param name="updateStatus">The action to call with status updates.</param>
         /// <param name="cancellationToken">The token to be checked for cancellation requests</param>
-        private NERAnnotator(Settings settings, Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        private NERAnnotator(NERAnnotatorSettings settings, Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
             _settings = settings;
             if (_settings.UseDatabase)
@@ -105,8 +145,8 @@ namespace Extract.UtilityApplications.NERAnnotator
 
             _updateStatus = updateStatus;
             _cancellationToken = cancellationToken;
-            _searcher.SetIncludeDataOnBoundary(true);
-            _searcher.SetBoundaryResolution(ESpatialEntity.kCharacter);
+
+            Init();
         }
 
         #endregion Constructors
@@ -120,11 +160,14 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// <param name="settings">The settings to use for annotation</param>
         /// <param name="updateStatus">Action to be used to pass status updates back to the caller</param>
         /// <param name="cancellationToken">Token to be used by the caller to cancel the processing</param>
-        public static void Process(Settings settings, Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
+        public static void Process(NERAnnotatorSettings settings, Action<StatusArgs> updateStatus, CancellationToken cancellationToken, bool processPagesInParallel = false)
         {
             try
             {
-                (new NERAnnotator(settings, updateStatus, cancellationToken)).Process();
+                using (var annotator = new NERAnnotator(settings, updateStatus, cancellationToken))
+                {
+                    annotator.Process(processPagesInParallel);
+                }
             }
             catch (Exception ex)
             {
@@ -132,23 +175,101 @@ namespace Extract.UtilityApplications.NERAnnotator
             }
         }
 
+        /// <summary>
+        /// Get annotated data for a single file
+        /// </summary>
+        /// <remarks>For testing purposes</remarks>
+        /// <param name="settings">The settings to use for annotation</param>
+        /// <param name="ussPath">The uss path to process</param>
+        /// <param name="pages">The pages to process. Use null for all pages</param>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public static FSharpOption<(string fileName, string data)> GetRecordsForPages(NERAnnotatorSettings settings, string ussPath, params int[] pages)
+        {
+            try
+            {
+                using (var annotator = new NERAnnotator(settings, _ => { }, CancellationToken.None))
+                {
+                    return annotator.GetRecordsForPages(ussPath, pages, null);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46970");
+            }
+        }
+
+        /// <summary>
+        /// Get labeled tokens using provided helper functions
+        /// </summary>
+        /// <remarks>For testing purposes</remarks>
+        /// <param name="settings">The settings to use for annotation. Helper functions are ignored</param>
+        /// <param name="uss">The spatial string to process</param>
+        /// <param name="pageNumber">The page number of the spatial string to use</param>
+        /// <param name="typesVOA">The expected VOA file to use for source of entities (labeled tokens)</param>
+        /// <param name="preprocess">The function to preprocess the page text before other work is done</param>
+        /// <param name="setExpectedValuesFromDefinitions">The function used to generate expected textual values for the entities</param>
+        /// <param name="resolveToPage">The function used to search for expected value matches on the page</param>
+        /// <param name="limitToFinishable">The function used to ensure that text extracted via the typesVOA spatial zones can be translated into correct values (not run on the results of the resolveToPage function)</param>
+        public static IEnumerable<LabeledToken> GetTokensForPageFSharp(NERAnnotatorSettings settings, SpatialString uss, int pageNumber, IUnknownVector typesVOA,
+            FSharpFunc<AFDocument, AFDocument> preprocess,
+            FSharpFunc<EntitiesAndPage, EntitiesAndPage> setExpectedValuesFromDefinitions,
+            FSharpFunc<EntitiesAndPage, EntitiesAndPage> resolveToPage,
+            FSharpFunc<EntitiesAndPage, EntitiesAndPage> limitToFinishable)
+        {
+            try
+            {
+                using (var annotator = new NERAnnotator(settings, _ => { }, CancellationToken.None))
+                {
+                    return annotator.GetTokensForPage(uss, pageNumber, typesVOA, preprocess, setExpectedValuesFromDefinitions, resolveToPage, limitToFinishable);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46970");
+            }
+        }
+
+        /// <summary>
+        /// Get labeled tokens using provided helper functions
+        /// </summary>
+        /// <remarks>For testing purposes</remarks>
+        /// <param name="settings">The settings to use for annotation. Helper functions are ignored</param>
+        /// <param name="uss">The spatial string to process</param>
+        /// <param name="pageNumber">The page number of the spatial string to use</param>
+        /// <param name="typesVOA">The expected VOA file to use for source of entities (labeled tokens)</param>
+        /// <param name="preprocess">The function to preprocess the page text before other work is done</param>
+        /// <param name="setExpectedValuesFromDefinitions">The function used to generate expected textual values for the entities</param>
+        /// <param name="resolveToPage">The function used to search for expected value matches on the page</param>
+        /// <param name="limitToFinishable">The function used to ensure that text extracted via the typesVOA spatial zones can be translated into correct values (not run on the results of the resolveToPage function)</param>
+        public static IEnumerable<LabeledToken> GetTokensForPage(NERAnnotatorSettings settings, SpatialString uss, int pageNumber, IUnknownVector typesVOA,
+            Func<AFDocument, AFDocument> preprocess,
+            Func<EntitiesAndPage, EntitiesAndPage> setExpectedValuesFromDefinitions,
+            Func<EntitiesAndPage, EntitiesAndPage> resolveToPage,
+            Func<EntitiesAndPage, EntitiesAndPage> limitToFinishable)
+        {
+            try
+            {
+                using (var annotator = new NERAnnotator(settings, _ => { }, CancellationToken.None))
+                {
+                    return annotator.GetTokensForPage(uss, pageNumber, typesVOA, preprocess.ToFSharpFunc(), setExpectedValuesFromDefinitions.ToFSharpFunc(), resolveToPage.ToFSharpFunc(), limitToFinishable.ToFSharpFunc());
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46970");
+            }
+        }
+
         #endregion Public Methods
 
         #region Private Methods
 
-        /// <summary>
-        /// Processes the files-to-be-annotated
-        /// </summary>
-        void Process()
+        void Init()
         {
             string previousDirectory = Directory.GetCurrentDirectory();
             try
             {
-                var afdoc = new AFDocument();
-                if (!string.IsNullOrWhiteSpace(_settings.FKBVersion))
-                {
-                    afdoc.FKBVersion = _settings.FKBVersion;
-                }
+                string alternateComponentDataDir = null;
                 if (_settings.UseDatabase)
                 {
                     // Get the alternate FKB dir from the DB
@@ -157,11 +278,31 @@ namespace Extract.UtilityApplications.NERAnnotator
                         DatabaseServer = _settings.DatabaseServer,
                         DatabaseName = _settings.DatabaseName
                     };
-                    afdoc.AlternateComponentDataDir =
+                    alternateComponentDataDir = 
                         fpdb.GetDBInfoSetting("AlternateComponentDataDir", false);
                     fpdb.CloseAllDBConnections();
                 }
-                var pathTags = new AttributeFinderPathTags { Document = afdoc };
+
+                // Make a path tags object in order to expand paths to sentence detector and tokenizer model
+                // This AFDocument will also be used for script functions, since it will enable them to access the
+                // correct component data dir
+                _pathTags = new ThreadLocal<AttributeFinderPathTags>(() =>
+                {
+                    var afdoc = new AFDocument();
+                    if (!string.IsNullOrWhiteSpace(_settings.FKBVersion))
+                    {
+                        afdoc.FKBVersion = _settings.FKBVersion;
+                    }
+                    if (!string.IsNullOrWhiteSpace(alternateComponentDataDir))
+                    {
+                        afdoc.AlternateComponentDataDir = alternateComponentDataDir;
+                    }
+
+                    // Allow internal RSD files to be run
+                    afdoc.PushRSDFileName("NERAnnotator");
+
+                    return new AttributeFinderPathTags { Document = afdoc };
+                });
 
                 // Update working dir to match the setting location
                 Directory.SetCurrentDirectory(_settings.WorkingDir);
@@ -169,6 +310,86 @@ namespace Extract.UtilityApplications.NERAnnotator
                 _rng = _settings.RandomSeedForPageInclusion.HasValue
                     ? new Random(_settings.RandomSeedForPageInclusion.Value)
                     : new Random();
+
+                // Get preprocessing function
+                if (_settings.RunPreprocessingFunction)
+                {
+                    var scriptPath = Path.GetFullPath(_pathTags.Value.Expand(_settings.PreprocessingScript));
+                    _preprocessingFunction =
+                        FunctionLoader.LoadFunction<AFDocument>(scriptPath, _settings.PreprocessingFunctionName);
+                }
+
+                // Load filter functions into the register
+                if (_settings.RunEntityFilteringFunctions)
+                {
+                    _entityFilteringFunctions = new Dictionary<string, FSharpFunc<EntitiesAndPage, EntitiesAndPage>>();
+                    _entityFilteringScriptPath = Path.GetFullPath(_pathTags.Value.Expand(_settings.EntityFilteringScript));
+                    var entityFilteringFunctions = FunctionLoader.LoadFunctions<EntitiesAndPage>(_entityFilteringScriptPath, EntityFilteringFunctionNames.ToArray());
+                    for (int i = 0; i < EntityFilteringFunctionNames.Count; i++)
+                    {
+                        _entityFilteringFunctions[EntityFilteringFunctionNames[i]] = entityFilteringFunctions[i];
+                    }
+                }
+
+                // Get char-replacing function
+                if (_settings.RunCharacterReplacingFunction)
+                {
+                    var scriptPath = Path.GetFullPath(_pathTags.Value.Expand(_settings.CharacterReplacingScript));
+                    _characterReplacingFunction =
+                        FunctionLoader.LoadFunction<string>(scriptPath, _settings.CharacterReplacingFunctionName);
+                }
+
+                if (_settings.Format == NamedEntityRecognizer.OpenNLP)
+                {
+                    if (_settings.TokenizerType == OpenNlpTokenizer.WhiteSpaceTokenizer)
+                    {
+                        _tokenizer = new ThreadLocal<Tokenizer>(() => WhitespaceTokenizer.INSTANCE);
+                    }
+                    else if (_settings.TokenizerType == OpenNlpTokenizer.SimpleTokenizer)
+                    {
+                        _tokenizer = new ThreadLocal<Tokenizer>(() => SimpleTokenizer.INSTANCE);
+                    }
+                    else
+                    {
+                        var path = Path.GetFullPath(_pathTags.Value.Expand(_settings.TokenizerModelPath));
+                        _tokenizer = new ThreadLocal<Tokenizer>(() => new TokenizerME(NERFinder.GetModel(
+                            path,
+                            modelIn => new TokenizerModel(modelIn))));
+                    }
+
+                    if (_settings.SplitIntoSentences)
+                    {
+                        var path = Path.GetFullPath(_pathTags.Value.Expand(_settings.SentenceDetectionModelPath));
+                        _sentenceDetector = new ThreadLocal<SentenceDetectorME>(() => new SentenceDetectorME(NERFinder.GetModel(
+                            path,
+                            modelIn => new SentenceModel(modelIn))));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46971");
+            }
+            finally
+            {
+                try
+                {
+                    Directory.SetCurrentDirectory(previousDirectory);
+                }
+                catch { }
+            }
+        }
+
+        /// <summary>
+        /// Processes the files-to-be-annotated
+        /// </summary>
+        void Process(bool processPagesInParallel)
+        {
+            string previousDirectory = Directory.GetCurrentDirectory();
+            try
+            {
+                // Update working dir to match the setting location
+                Directory.SetCurrentDirectory(_settings.WorkingDir);
 
                 CheckOutputFile(_trainingOutputFile);
 
@@ -215,36 +436,12 @@ namespace Extract.UtilityApplications.NERAnnotator
                     CheckOutputFile(_testingOutputFile);
                 }
 
-                if (_settings.Format == NamedEntityRecognizer.OpenNLP)
-                {
-                    if (_settings.TokenizerType == OpenNlpTokenizer.WhiteSpaceTokenizer)
-                    {
-                        _tokenizer = WhitespaceTokenizer.INSTANCE;
-                    }
-                    else if (_settings.TokenizerType == OpenNlpTokenizer.SimpleTokenizer)
-                    {
-                        _tokenizer = SimpleTokenizer.INSTANCE;
-                    }
-                    else
-                    {
-                        _tokenizer = new TokenizerME(NERFinder.GetModel(
-                            pathTags.Expand(_settings.TokenizerModelPath),
-                            modelIn => new TokenizerModel(modelIn)));
-                    }
-
-                    if (_settings.SplitIntoSentences)
-                    {
-                        _sentenceDetector = new SentenceDetectorME(NERFinder.GetModel(
-                            pathTags.Expand(_settings.SentenceDetectionModelPath),
-                            modelIn => new SentenceModel(modelIn)));
-                    }
-                }
-
-                ProcessInput(trainingFiles, true);
+                ProcessInput(trainingFiles, appendToTrainingSet: true, processPagesInParallel: processPagesInParallel);
 
                 if (testingFiles != null)
-                    ProcessInput(testingFiles, false);
-
+                {
+                    ProcessInput(testingFiles, appendToTrainingSet: false, processPagesInParallel: processPagesInParallel);
+                }
             }
             catch (Exception ex)
             {
@@ -346,7 +543,7 @@ namespace Extract.UtilityApplications.NERAnnotator
 
                 if (getPages)
                 {
-                    SpatialStringClass uss = new SpatialStringClass();
+                    SpatialString uss = new SpatialStringClass();
                     return files.SelectMany(ussPath =>
                         {
                             if (_cancellationToken.IsCancellationRequested)
@@ -389,32 +586,28 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// </summary>
         /// <param name="files">The filename/page number pairs to process</param>
         /// <param name="appendToTrainingSet">Whether to append to the training output file (if true) or the testing output file (if false)</param>
-        void ProcessInput((string ussPath, int page)[] files, bool appendToTrainingSet)
+        void ProcessInput((string ussPath, int page)[] files, bool appendToTrainingSet, bool processPagesInParallel)
         {
             try
             {
-                var pathTags = new AttributeFinderPathTags();
+                _cancellationToken.ThrowIfCancellationRequested();
+
                 var outputFile = appendToTrainingSet ? _trainingOutputFile : _testingOutputFile;
-                var uss = new SpatialStringClass();
-                IUnknownVector typesVoa = new IUnknownVectorClass();
                 var statusMessage = appendToTrainingSet
                     ? "Files processed/skipped for training set: {0:N0} / {1:N0}"
                     : "Files processed/skipped for testing set:  {0:N0} / {1:N0}";
 
-                var records = GetRecordsForInput(files, uss, typesVoa, pathTags, statusMessage);
-
+                var records = processPagesInParallel ? GetRecordsForInputParallel(files, statusMessage) : GetRecordsForInput(files, statusMessage);
                 if (_settings.UseDatabase)
                 {
-                    // Create all records in memory before writing anything
-                    // so that the transaction time is shorter
-                    records = records.ToList();
+                    var recordsList = records.ToList();
+
                     using (var connection = NewSqlDBConnection())
                     {
                         connection.Open();
-
                         try
                         {
-                            foreach (var (ussPath, data) in records)
+                            foreach (var (ussPath, data) in recordsList)
                             {
                                 using (var cmd = connection.CreateCommand())
                                 {
@@ -435,10 +628,26 @@ namespace Extract.UtilityApplications.NERAnnotator
                         }
                     }
                 }
-                else
+                else if (processPagesInParallel)
                 {
                     // Write extra line as a document separator
                     File.AppendAllLines(outputFile, records.Select(t => t.data));
+
+                    // Write out again with filename as separator for debugging purposes
+                    File.AppendAllLines(outputFile + ".WithFileNames.txt", records.Select(t => t.data.TrimEnd() + Environment.NewLine + t.fileName));
+                }
+                else
+                {
+                    // Write out results as they are available and save for second file
+                    List<(string fileName, string data)> cached = new List<(string fileName, string data)>();
+                    File.AppendAllLines(outputFile, records.Select(t =>
+                    {
+                        cached.Add(t);
+                        return t.data;
+                    }));
+
+                    // Write out again with filename as separator for debugging purposes
+                    File.AppendAllLines(outputFile + ".WithFileNames.txt", cached.Select(t => t.data.TrimEnd() + Environment.NewLine + t.fileName));
                 }
             }
             catch (OperationCanceledException)
@@ -447,113 +656,139 @@ namespace Extract.UtilityApplications.NERAnnotator
             }
         }
 
-        IEnumerable<(string fileName, string data)> GetRecordsForInput(
-            (string ussPath, int page)[] files,
-            SpatialStringClass uss,
-            IUnknownVector typesVoa,
-            AttributeFinderPathTags pathTags,
-            string statusMessage)
+        IEnumerable<(string fileName, string data)> GetRecordsForInput((string ussPath, int page)[] files, string statusMessage)
         {
-            foreach (var g in files.GroupBy(t => t.ussPath).OrderBy(g => g.Key))
+            return files.GroupBy(t => t.ussPath)
+            .OrderBy(g => g.Key)
+            .Select(g => GetRecordsForGroup(g, statusMessage))
+            .Where(maybe => FSharpOption<(string fileName, string data)>.get_IsSome(maybe))
+            .Select(maybe => (fileName: maybe.Value.fileName, data: maybe.Value.data));
+        }
+
+        List<(string fileName, string data)> GetRecordsForInputParallel((string ussPath, int page)[] files, string statusMessage)
+        {
+            return files.GroupBy(t => t.ussPath).AsParallel()
+            .Select(g => GetRecordsForGroup(g, statusMessage))
+            .Where(maybe => FSharpOption<(string fileName, string data)>.get_IsSome(maybe))
+            .Select(maybe => (fileName: maybe.Value.fileName, data: maybe.Value.data))
+            .OrderBy(t => t.fileName)
+            .ToList();
+        }
+
+        FSharpOption<(string fileName, string data)> GetRecordsForGroup(IGrouping<string, (string ussPath, int page)> g, string statusMessage)
+        {
+            var ussPath = g.Key;
+            if (!File.Exists(ussPath))
             {
-                _cancellationToken.ThrowIfCancellationRequested();
+                // Report a skipped file to the caller
+                _updateStatus(new StatusArgs { StatusMessage = statusMessage, DoubleValues = new double[] { 0, 1 } });
+                return null;
+            }
+            // If a file is specified with 0 as the page number that means all pages should be processed.
+            // Pass null to GetTokens for this case
+            IEnumerable<int> pages = g.Count() == 1 && g.All(t => t.page == 0)
+                ? null
+                : g.Select(t => t.page).OrderBy(p => p).ToList();
 
-                var ussPath = g.Key;
-                if (!File.Exists(ussPath))
+            return GetRecordsForPages(ussPath, pages, statusMessage);
+        }
+
+        FSharpOption<(string fileName, string data)> GetRecordsForPages(string ussPath, IEnumerable<int> pages, string statusMessage)
+        {
+            _cancellationToken.ThrowIfCancellationRequested();
+
+            StringBuilder sb = new StringBuilder();
+
+            if (!File.Exists(ussPath))
+            {
+                // Report a skipped file to the caller
+                _updateStatus(new StatusArgs { StatusMessage = statusMessage, DoubleValues = new double[] { 0, 1 } });
+                return FSharpOption<(string, string)>.None;
+            }
+
+            SpatialString uss = new SpatialStringClass();
+            uss.LoadFrom(ussPath, false);
+            uss.ReportMemoryUsage();
+
+            // Update the AFDocument in the thread-local path tags object so that tags in the types VOA file can be expanded
+            _pathTags.Value.Document.Text = uss;
+
+            IUnknownVector typesVoa = new IUnknownVectorClass();
+            if (_settings.UseDatabase && _settings.UseAttributeSetForTypes)
+            {
+                typesVoa = GetTypesVoaFromDB(ussPath.Substring(0, ussPath.Length - 4)) ?? typesVoa;
+            }
+            else
+            {
+                var typesVoaFile = _pathTags.Value.Expand(_settings.TypesVoaFunction);
+
+                if (!File.Exists(typesVoaFile))
                 {
                     // Report a skipped file to the caller
                     _updateStatus(new StatusArgs { StatusMessage = statusMessage, DoubleValues = new double[] { 0, 1 } });
-                    continue;
-                }
-
-                StringBuilder sb = new StringBuilder();
-
-                // If a file is specified with 0 as the page number that means all pages should be processed.
-                // Pass null to GetTokens for this case
-                IEnumerable<int> pages = g.Count() == 1 && g.All(t => t.page == 0)
-                    ? null
-                    : g.Select(t => t.page).OrderBy(p => p).ToList();
-
-                if (!File.Exists(ussPath))
-                {
-                    // Report a skipped file to the caller
-                    _updateStatus(new StatusArgs { StatusMessage = statusMessage, DoubleValues = new double[] { 0, 1 } });
-                    continue;
-                }
-
-                uss.LoadFrom(ussPath, false);
-                uss.ReportMemoryUsage();
-
-                if (_settings.UseDatabase && _settings.UseAttributeSetForTypes)
-                {
-                    typesVoa = GetTypesVoaFromDB(ussPath.Substring(0, ussPath.Length - 4)) ?? typesVoa;
+                    return FSharpOption<(string, string)>.None;
                 }
                 else
                 {
-                    pathTags.Document = new AFDocumentClass { Text = uss };
-                    var typesVoaFile = pathTags.Expand(_settings.TypesVoaFunction);
+                    typesVoa.LoadFrom(typesVoaFile, false);
+                    typesVoa.ReportMemoryUsage();
+                }
+            }
 
-                    if (!File.Exists(typesVoaFile))
+            var tokens = GetLabeledTokens(uss, pages, typesVoa);
+
+            // Open NLP format: <START:EntityName> tok1 <END> tok2
+            if (_settings.Format == NamedEntityRecognizer.OpenNLP)
+            {
+                bool startOfSentence = true;
+                foreach (var labeledToken in tokens)
+                {
+                    if (!startOfSentence)
                     {
-                        // Report a skipped file to the caller
-                        _updateStatus(new StatusArgs { StatusMessage = statusMessage, DoubleValues = new double[] { 0, 1 } });
-                        continue;
+                        sb.Append(" ");
+                    }
+                    if (labeledToken.StartOfEntity)
+                    {
+                        sb.Append(UtilityMethods.FormatInvariant($"<START:{labeledToken.Label}> "));
+                    }
+                    sb.Append(labeledToken.Token);
+                    if (labeledToken.EndOfEntity)
+                    {
+                        sb.Append(" <END>");
+                    }
+                    if (labeledToken.EndOfSentence)
+                    {
+                        sb.AppendLine();
+                        startOfSentence = true;
                     }
                     else
                     {
-                        typesVoa.LoadFrom(typesVoaFile, false);
-                        typesVoa.ReportMemoryUsage();
+                        startOfSentence = false;
                     }
                 }
-
-                var tokens = GetTokens(uss, pages, typesVoa);
-
-                // Open NLP format: <START:EntityName> tok1 <END> tok2
-                if (_settings.Format == NamedEntityRecognizer.OpenNLP)
-                {
-                    bool startOfSentence = true;
-                    foreach (var (token, label, startOfEntity, endOfEntity, endOfSentence, endOfPage) in tokens)
-                    {
-                        if (!startOfSentence)
-                        {
-                            sb.Append(" ");
-                        }
-                        if (startOfEntity)
-                        {
-                            sb.Append(UtilityMethods.FormatInvariant($"<START:{label}> "));
-                        }
-                        sb.Append(token);
-                        if (endOfEntity)
-                        {
-                            sb.Append(" <END>");
-                        }
-                        if (endOfSentence)
-                        {
-                            sb.AppendLine();
-                            startOfSentence = true;
-                        }
-                        else
-                        {
-                            startOfSentence = false;
-                        }
-                    }
-                }
-                // Stanford format: tok1 EntityName
-                //                  tok2 O
-                //                  ...
-                else
-                {
-                    throw new ExtractException("ELI45543", "Unsupported NER format: " + _settings.Format.ToString());
-                }
-                _updateStatus(new StatusArgs { StatusMessage = statusMessage, DoubleValues = new double[] { 1, 0 } });
-
-                if (sb.Length == 0)
-                {
-                    continue;
-                }
-
-                yield return (ussPath, sb.ToString());
             }
+            // Stanford format: tok1 EntityName
+            //                  tok2 O
+            //                  ...
+            else
+            {
+                throw new ExtractException("ELI45543", "Unsupported NER format: " + _settings.Format.ToString());
+            }
+            _updateStatus(new StatusArgs { StatusMessage = statusMessage, DoubleValues = new double[] { 1, 0 } });
+
+            if (sb.Length == 0)
+            {
+                return FSharpOption<(string, string)>.None;
+            }
+
+            var annotatedText = sb.ToString();
+
+            if (_settings.RunCharacterReplacingFunction)
+            {
+                annotatedText = _characterReplacingFunction.Invoke(annotatedText);
+            }
+
+            return (ussPath, annotatedText);
         }
 
         /// <summary>
@@ -563,9 +798,8 @@ namespace Extract.UtilityApplications.NERAnnotator
         /// <param name="pages">The pages to be processed (null for all pages)</param>
         /// <param name="typesVoa">The attributes to be used to annotate the input</param>
         /// <returns>A list of tuples representing each token</returns>
-        IEnumerable<AnnotationToken> GetTokens(SpatialStringClass uss, IEnumerable<int> pages, IUnknownVector typesVoa)
+        IEnumerable<LabeledToken> GetLabeledTokens(SpatialString uss, IEnumerable<int> pages, IUnknownVector typesVoa)
         {
-            var tokensAndLabels = new List<AnnotationToken>();
             if (pages == null)
             {
                 pages = uss.HasSpatialInfo()
@@ -573,174 +807,334 @@ namespace Extract.UtilityApplications.NERAnnotator
                         .Select(page => page.GetFirstPageNumber())
                     : Enumerable.Empty<int>();
             }
-            foreach (var pageNum in pages)
+
+            var preprocess = _settings.RunPreprocessingFunction
+               ? _preprocessingFunction
+               : (FSharpFunc<AFDocument, AFDocument>) Operators.Identity;
+
+            var setExpectedValuesFromDefinitions = GetRegisteredEntityFilteringFunction(nameof(_entityFilteringFunctionNames.setExpectedValuesFromDefinitions));
+            var resolveToPage = GetRegisteredEntityFilteringFunction(nameof(_entityFilteringFunctionNames.resolveToPage));
+            var limitToFinishable = GetRegisteredEntityFilteringFunction(nameof(_entityFilteringFunctionNames.limitToFinishable));
+
+            List<LabeledToken> tokensAndLabels =
+                pages
+                .SelectMany(pageNum => GetTokensForPage(uss, pageNum, typesVoa,
+                   preprocess,
+                   setExpectedValuesFromDefinitions,
+                   resolveToPage,
+                   limitToFinishable))
+                .ToList();
+
+            return tokensAndLabels;
+        }
+
+        IEnumerable<LabeledToken> GetTokensForPage(SpatialString uss, int pageNumber, IUnknownVector typesVoa,
+            FSharpFunc<AFDocument, AFDocument> preprocess,
+            FSharpFunc<EntitiesAndPage, EntitiesAndPage> setExpectedValuesFromDefinitions,
+            FSharpFunc<EntitiesAndPage, EntitiesAndPage> resolveToPage,
+            FSharpFunc<EntitiesAndPage, EntitiesAndPage> limitToFinishable
+            )
+        {
+            // Clone the AFDocument that has its FKB value set and update the Attribute to have only this page
+            var page = _pathTags.Value.Document.PartialClone(false, false);
+            page.Attribute = new AttributeClass { Value = uss.GetSpecifiedPages(pageNumber, pageNumber) };
+
+            // Preprocess the page before doing anything with indexes
+            page.Text = preprocess.Invoke(page).Text;
+
+            _searcher.Value.InitSpatialStringSearcher(page.Text, false);
+            var getCharIndexesMemoized = ((GetCharIndexesFunc)GetCharIndexes).Memoize();
+
+            var entitiesAndPage = GetEntitiesFromDefinition(typesVoa, page);
+
+            entitiesAndPage = setExpectedValuesFromDefinitions.Invoke(entitiesAndPage);
+
+            // Augment and filter out non-spatial
+            var expanded = resolveToPage.Invoke(entitiesAndPage).Entities
+                .Where(e => e.Zones.Any()).ToList();
+
+            var original = entitiesAndPage.Entities.Where(e => e.Zones.Any()).ToList();
+
+            // Skip this page, depending on uninteresting-page-inclusion settings
+            if (original.Count == 0 && expanded.Count == 0 && RandomlyDecide())
             {
-                var page = uss.GetSpecifiedPages(pageNum, pageNum);
-                _searcher.InitSpatialStringSearcher(page, false);
-                _getCharIndexesMemoized = ((Func<IEnumerable<RasterZone>, SpatialString, bool, HashSet<int>>)GetCharIndexes).Memoize();
+                return Enumerable.Empty<LabeledToken>();
+            }
 
-                // Collect all candidate attributes for this page
-                var attributesOnThisPage = typesVoa
-                    .ToIEnumerable<IAttribute>()
-                    .Where(a => a.EnumerateDepthFirst().Any(c =>
-                        c.Value.HasSpatialInfo()
-                        && c.Value.GetSpecifiedPages(pageNum, pageNum).HasSpatialInfo()))
-                    .ToIUnknownVector();
+            // Filter entities based on whether they can be converted into valid data from the OCR
+            // Expanded are assumed to be correctly-findable so don't process these
+            var tokenSpanLists = GetTokens(page.Text.String);
+            var spatialStringEntities = original
+                .Select(e => TryMakeSpatialEntity(e, tokenSpanLists, page.Text, getCharIndexesMemoized))
+                .Where(e => e != null)
+                .ToFSharpList();
 
-                var sourceOfLabels = new XPathContext(attributesOnThisPage);
-                var entities = _settings.EntityDefinitions.SelectMany(pair =>
-                    sourceOfLabels.FindAllOfType<IAttribute>(pair.RootQuery)
-                        .Select(a =>
-                        {
-                            var category = pair.Category;
-                            if (pair.CategoryIsXPath)
-                            {
-                                category = sourceOfLabels
-                                    .FindAllAsStrings(category, a)
-                                    .FirstOrDefault();
-                            }
-                            IEnumerable<RasterZone> value = null;
-                            if (string.Equals(pair.ValueQuery, ".", StringComparison.Ordinal))
-                            {
-                                value = GetZonesTranslatedToPage(a.Value, page);
-                            }
-                            else
-                            {
-                                value = sourceOfLabels
-                                    .FindAllOfType<IAttribute>(pair.ValueQuery, a)
-                                    .SelectMany(subattr => GetZonesTranslatedToPage(subattr.Value, page))
-                                    .ToList();
-                            }
-                            return (entityZones: value, category: category);
-                        }))
-                        .ToList();
+            var limited = limitToFinishable.Invoke(new EntitiesAndPage(spatialStringEntities, page)).Entities;
 
-                // Skip this page, depending on uninteresting-page-inclusion settings
-                if (_settings.PercentUninterestingPagesToInclude < 100
-                    && !entities.Any(p => p.entityZones.Any())
-                    && _rng.Next(1, 101) > _settings.PercentUninterestingPagesToInclude)
+            var combined = limited.Concat(expanded).ToList();
+
+            // Skip this page, depending on uninteresting-page-inclusion settings
+            if (combined.Count == 0 && RandomlyDecide())
+            {
+                return Enumerable.Empty<LabeledToken>();
+            }
+
+            return GetTokensFromEntities(combined, page, tokenSpanLists, getCharIndexesMemoized);
+        }
+
+        // Get tokens and match them with candidate attributes
+        // Prefer longer matches (more tokens)
+        IEnumerable<LabeledToken> GetTokensFromEntities(List<Entity> entities, IAFDocument page, List<List<Token>> tokenSpanLists, GetCharIndexesFunc getCharIndexesMemoized)
+        {
+            bool isLabelOnPage = false;
+            var tokensAndLabelsOnPage = new List<LabeledToken>();
+
+
+            int currentSentenceSpan = 0;
+            foreach (var tokenSpanList in tokenSpanLists)
+            {
+                currentSentenceSpan++;
+
+                // Iterate through the tokens. In order to pick the longest match, this algorithm will continue to track overlapping matches until all
+                // open 'tags' (entities) have been closed, even if the index has reached the end of the tokens.
+                Dictionary<Entity, List<int>> openTags = new Dictionary<Entity, List<int>>();
+                int finalizedTokenCount = 0;
+                for (int i = 0; i <= tokenSpanList.Count; i++)
                 {
-                    continue;
-                }
-
-                //-----------------------------------------------------------------------------------------------------
-                // Get tokens and match them with candidate attributes
-                // Prefer longer matches (more tokens)
-                //-----------------------------------------------------------------------------------------------------
-                var input = page.String;
-                var sentenceSpans = _sentenceDetector != null
-                    ? _sentenceDetector.sentPosDetect(input)
-                    : Enumerable.Repeat(new opennlp.tools.util.Span(0, input.Length), 1);
-
-                int currentSentenceSpan = 0;
-                foreach (var sentenceSpan in sentenceSpans)
-                {
-                    currentSentenceSpan++;
-                    List<(int tokenStart, int tokenEndExclusive, string value)> tokenSpans = null;
-                    if (_settings.Format == NamedEntityRecognizer.OpenNLP)
+                    if (openTags.Any())
                     {
-                        var substring = input.Substring(sentenceSpan.getStart(), sentenceSpan.getEnd() - sentenceSpan.getStart());
-                        tokenSpans =
-                            _tokenizer.tokenizePos(substring)
-                            .Select(tok =>
-                            {
-                                var tokenStart = tok.getStart() + sentenceSpan.getStart();
-                                var tokenEndExclusive = tok.getEnd() + sentenceSpan.getStart();
-                                return (tokenStart: tokenStart, tokenEndExclusive: tokenEndExclusive,
-                                        value: input.Substring(tokenStart, tokenEndExclusive - tokenStart));
-                            }).ToList();
-                    }
-                    else
-                    {
-                        throw new ExtractException("ELI45542", "Unsupported NER format: " + _settings.Format.ToString());
-                    }
+                        var (matched, _) = FindMatchesForToken(page.Text, tokenSpanList, i, entities, getCharIndexesMemoized, true);
+                        var matchedEntities = matched.Select(t => t.Zones);
+                        var openAttributes = openTags.Keys.Select(t => t.Zones);
+                        var intersection = matchedEntities.Intersect(openAttributes);
 
-                    // Iterate through the tokens. In order to pick the longest match, this algorithm will continue to track overlapping matches until all
-                    // open 'tags' (entities) have been closed, even if the index has reached the end of the tokens.
-                    Dictionary<(IEnumerable<RasterZone> entityZones, string category), List<int>> openTags = new Dictionary<(IEnumerable<RasterZone>, string), List<int>>();
-                    int finalizedTokenCount = 0;
-                    for (int i = 0; i <= tokenSpans.Count; i++)
-                    {
-                        if (openTags.Any())
+                        // If no currently open entities overlap with attributes matching the current token
+                        // (or if there are no matching attributes for the current token)
+                        // then select the longest match and add all the tokens up to and including the tokens that overlap the
+                        // longest matching attribute.
+                        if (!intersection.Any())
                         {
-                            var (matched, _) = FindMatchesForToken(page, tokenSpans, i, entities, false, onGoing: true);
-                            var matchedEntities = matched.Select(t => t.entityZones);
-                            var openAttributes = openTags.Keys.Select(t => t.entityZones);
-                            var intersection = matchedEntities.Intersect(openAttributes);
+                            List<LabeledToken> finalizedTokens =
+                                FinalizeEntities(openTags, tokenSpanList, finalizedTokenCount, currentSentenceSpan, tokenSpanLists.Count(), page.Text);
 
-                            // If no currently open entities overlap with attributes matching the current token
-                            // (or if there are no matching attributes for the current token)
-                            // then select the longest match and add all the tokens up to and including the tokens that overlap the
-                            // longest matching attribute.
-                            if (!intersection.Any())
+                            if (finalizedTokens.Where(t => t.Label != null).Count() > 0)
                             {
-                                IEnumerable<AnnotationToken> finalizedTokens = FinalizeEntities(openTags, tokenSpans, finalizedTokenCount, currentSentenceSpan, sentenceSpans.Count());
-
-                                tokensAndLabels.AddRange(finalizedTokens);
-                                finalizedTokenCount += finalizedTokens.Count();
-
-                                // Reset to begin processing from after the last finalized token
-                                i = finalizedTokenCount - 1;
-                                openTags = new Dictionary<(IEnumerable<RasterZone> entityZones, string category), List<int>>();
+                                isLabelOnPage = true;
                             }
-                            // Else there are on-going entities so just add this token to the
-                            // currently open tags collection and continue the loop
-                            else
+                            tokensAndLabelsOnPage.AddRange(finalizedTokens);
+                            finalizedTokenCount += finalizedTokens.Count();
+
+                            // Reset to begin processing from after the last finalized token
+                            i = finalizedTokenCount - 1;
+                            openTags = new Dictionary<Entity, List<int>>();
+                        }
+                        // Else there are on-going entities so just add this token to the
+                        // currently open tags collection and continue the loop
+                        else
+                        {
+                            foreach (var m in matched)
                             {
-                                foreach(var m in matched)
-                                {
-                                    openTags.GetOrAdd(m, _ => new List<int>()).Add(i);
-                                }
+                                openTags.GetOrAdd(m, _ => new List<int>()).Add(i);
                             }
                         }
-                        // If there are no currently open tags then add any matching attributes to the open tags collection or
-                        // add the token to the result collection if there are no matches
-                        else if (i < tokenSpans.Count)
-                        {
-                            // Since there is not an ongoing match, use the midpoints of zones to determine overlap. This gives better results for attributes
-                            // that slightly overlap tokens. E.g., if an expected redaction includes the top of a number that is on the next line.
-                            var (matched, value) = FindMatchesForToken(page, tokenSpans, i, entities, useMidpointToDetermineOverlap: true, onGoing: false);
+                    }
+                    // If there are no currently open tags then add any matching attributes to the open tags collection or
+                    // add the token to the result collection if there are no matches
+                    else if (i < tokenSpanList.Count)
+                    {
+                        var (matched, value) = FindMatchesForToken(page.Text, tokenSpanList, i, entities, getCharIndexesMemoized, false);
 
-                            if (matched.Any())
+                        if (matched.Any())
+                        {
+                            foreach (var m in matched)
                             {
-                                foreach(var m in matched)
-                                {
-                                    openTags[m] = new List<int> { i };
-                                }
+                                openTags[m] = new List<int> { i };
                             }
-                            else
-                            {
-                                var endOfSentence = i == tokenSpans.Count - 1;
-                                var endOfPage = endOfSentence && currentSentenceSpan == sentenceSpans.Count();
-                                tokensAndLabels.Add(
-                                        new AnnotationToken
-                                        {
-                                            token = value,
-                                            label = null,
-                                            startOfEntity = false,
-                                            endOfEntity = false,
-                                            endOfSentence = endOfSentence,
-                                            endOfPage = endOfPage
-                                        });
-                                finalizedTokenCount++;
-                            }
+                        }
+                        else
+                        {
+                            var endOfSentence = i == tokenSpanList.Count - 1;
+                            var endOfPage = endOfSentence && currentSentenceSpan == tokenSpanLists.Count();
+                            tokensAndLabelsOnPage.Add(
+                                    new LabeledToken
+                                    (
+                                        token: value,
+                                        label: null,
+                                        startOfEntity: false,
+                                        endOfEntity: false,
+                                        endOfSentence: endOfSentence,
+                                        endOfPage: endOfPage
+                                    ));
+                            finalizedTokenCount++;
                         }
                     }
                 }
             }
-            return tokensAndLabels;
+
+            // Skip page if no label...
+            if (!isLabelOnPage && RandomlyDecide())
+            {
+                return Enumerable.Empty<LabeledToken>();
+            }
+
+            return tokensAndLabelsOnPage;
         }
 
-        private IEnumerable<AnnotationToken> FinalizeEntities(
-            Dictionary<(IEnumerable<RasterZone> entityZones, string category), List<int>> openTags,
-            List<(int tokenStart, int tokenEndExclusive, string value)> tokenSpans,
-            int finalizedTokenCount, int currentSentenceSpan, int totalSentences)
+        private FSharpFunc<EntitiesAndPage, EntitiesAndPage> GetRegisteredEntityFilteringFunction(string functionName)
         {
-            var tokensAndLabels = new List<AnnotationToken>();
+            if (_entityFilteringFunctions != null
+                && _entityFilteringFunctions.TryGetValue(functionName, out var fun))
+            {
+                return fun;
+            }
+
+            // Return a function that returns an empty collection for the 'expand' function
+            if (functionName == nameof(_entityFilteringFunctionNames.resolveToPage))
+            {
+                return FSharpFunc<EntitiesAndPage, EntitiesAndPage>.FromConverter(x =>
+                    new EntitiesAndPage(entities: ListModule.Empty<Entity>(), page: x.Page));
+            }
+
+            return (FSharpFunc<EntitiesAndPage, EntitiesAndPage>) Operators.Identity;
+        }
+
+        private bool RandomlyDecide()
+        {
+            return _settings.PercentUninterestingPagesToInclude < 100
+                && _rng.Next(1, 101) > _settings.PercentUninterestingPagesToInclude;
+        }
+
+        private EntitiesAndPage GetEntitiesFromDefinition(IUnknownVector attributesOnThisPage, AFDocument page)
+        {
+            var sourceOfLabels = new XPathContext(attributesOnThisPage);
+            var entities = _settings.EntityDefinitions.SelectMany(pair =>
+                sourceOfLabels.FindAllOfType<IAttribute>(pair.RootQuery)
+                    .Select(a =>
+                    {
+                        var category = pair.Category;
+                        if (pair.CategoryIsXPath)
+                        {
+                            category = sourceOfLabels
+                                .FindAllAsStrings(category, a)
+                                .FirstOrDefault();
+                        }
+                        if (string.Equals(pair.ValueQuery, ".", StringComparison.Ordinal))
+                        {
+                            return new Entity
+                            (
+                                expectedValue: FSharpOption<string>.None,
+                                valueComponents: FSharpList<IAttribute>.Cons(a, FSharpList<IAttribute>.Empty),
+                                zones: GetZonesTranslatedToPage(a.Value, page.Text).ToFSharpList(),
+                                spatialString: FSharpOption<SpatialString>.None,
+                                category: category
+                            );
+                        }
+                        else
+                        {
+                            var valueComponents = sourceOfLabels.FindAllOfType<IAttribute>(pair.ValueQuery, a).ToFSharpList();
+                            var zones = valueComponents.SelectMany(subattr => GetZonesTranslatedToPage(subattr.Value, page.Text)).ToFSharpList();
+
+                            return new Entity
+                            (
+                                expectedValue: FSharpOption<string>.None,
+                                valueComponents: valueComponents,
+                                zones: zones,
+                                spatialString: FSharpOption<SpatialString>.None,
+                                category: category
+                            );
+                        }
+                    }));
+
+            return new EntitiesAndPage(entities.ToFSharpList(), page);
+        }
+
+        // Returns list of sentences, which are made up of token spans
+        private List<List<Token>> GetTokens(string input)
+        {
+            var sentenceSpans = _sentenceDetector != null
+                ? _sentenceDetector.Value.sentPosDetect(input)
+                : Enumerable.Repeat(new opennlp.tools.util.Span(0, input.Length), 1);
+
+            return sentenceSpans.Select(sentenceSpan =>
+            {
+                if (_settings.Format == NamedEntityRecognizer.OpenNLP)
+                {
+                    var substring = input.Substring(sentenceSpan.getStart(), sentenceSpan.getEnd() - sentenceSpan.getStart());
+                    return _tokenizer.Value.tokenizePos(substring)
+                        .Select(tok =>
+                        {
+                            var tokenStart = tok.getStart() + sentenceSpan.getStart();
+                            var tokenEndExclusive = tok.getEnd() + sentenceSpan.getStart();
+                            return new Token
+                            {
+                                Start = tokenStart,
+                                EndExclusive = tokenEndExclusive,
+                                Value = input.Substring(tokenStart, tokenEndExclusive - tokenStart)
+                            };
+                        }).ToList();
+                }
+                else
+                {
+                    throw new ExtractException("ELI45542", "Unsupported NER format: " + _settings.Format.ToString());
+                }
+            }).ToList();
+        }
+
+        static Entity TryMakeSpatialEntity(Entity entity,
+            List<List<Token>> tokenSpans,
+            SpatialString page,
+            GetCharIndexesFunc getCharIndexesMemoized)
+        {
+            var overlappingTokens = tokenSpans.SelectMany(tokens =>
+                {
+                    bool onGoing = false;
+                    return tokens.Where(t => onGoing = DoesEntityOverlapToken(entity, t, page, getCharIndexesMemoized, !onGoing, onGoing));
+                })
+                .ToList();
+
+            if (overlappingTokens.Count == 0)
+            {
+                return null;
+            }
+
+            var strings = overlappingTokens.Select(token =>
+            {
+                var startOfEntity = token.Start;
+                var endOfEntity = token.EndExclusive - 1;
+                if (startOfEntity <= endOfEntity)
+                {
+                    return page.GetSubString(startOfEntity, endOfEntity);
+                }
+                return null;
+            })
+            .Where(s => s != null)
+            .ToIUnknownVector();
+
+            if (strings.Size() > 0)
+            {
+                SpatialString val = new SpatialStringClass();
+                val.CreateFromSpatialStrings(strings, false);
+                var spatialValue = FSharpOption<SpatialString>.Some(val);
+                var zones = val.GetOCRImageRasterZones()
+                    .ToIEnumerable<RasterZone>()
+                    .ToFSharpList();
+                return new Entity(entity.ExpectedValue, zones, entity.ValueComponents, spatialValue, entity.Category);
+            }
+
+            return null;
+        }
+
+
+        private List<LabeledToken> FinalizeEntities(
+            Dictionary<Entity, List<int>> openTags,
+            List<Token> tokenSpans,
+            int finalizedTokenCount, int currentSentenceSpan, int totalSentences, SpatialString page)
+        {
+            var tokensAndLabels = new List<LabeledToken>();
 
             var longestMatchSize = openTags.Max(kv => kv.Value.Count);
             var longestMatch = openTags.First(kv => kv.Value.Count == longestMatchSize);
-            var category = longestMatch.Key.category;
+            var category = longestMatch.Key.Category;
             var endOfEntity = longestMatch.Value.Last();
             var startOfEntity = longestMatch.Value[0];
 
@@ -748,7 +1142,7 @@ namespace Extract.UtilityApplications.NERAnnotator
             if (entitiesTotallyBeforeLongest.Any())
             {
                 var prefix = FinalizeEntities(entitiesTotallyBeforeLongest.ToDictionary(kv => kv.Key, kv => kv.Value),
-                    tokenSpans, finalizedTokenCount, currentSentenceSpan, totalSentences);
+                    tokenSpans, finalizedTokenCount, currentSentenceSpan, totalSentences, page);
                 tokensAndLabels.AddRange(prefix);
                 finalizedTokenCount += prefix.Count();
             }
@@ -760,15 +1154,15 @@ namespace Extract.UtilityApplications.NERAnnotator
                 var endOfSentence = i == tokenSpans.Count - 1;
                 var endOfPage = endOfSentence && currentSentenceSpan == totalSentences;
                 tokensAndLabels.Add(
-                    new AnnotationToken
-                    {
-                        token = tok.value,
-                        label = null,
-                        startOfEntity = false,
-                        endOfEntity = false,
-                        endOfSentence = endOfSentence,
-                        endOfPage = endOfPage
-                    });
+                    new LabeledToken
+                    (
+                        token: tok.Value,
+                        label: null,
+                        startOfEntity: false,
+                        endOfEntity: false,
+                        endOfSentence: endOfSentence,
+                        endOfPage: endOfPage
+                    ));
                 finalizedTokenCount++;
             }
 
@@ -779,15 +1173,15 @@ namespace Extract.UtilityApplications.NERAnnotator
                 var endOfSentence = i == tokenSpans.Count - 1;
                 var endOfPage = endOfSentence && currentSentenceSpan == totalSentences;
                 tokensAndLabels.Add(
-                    new AnnotationToken
-                    {
-                        token = tok.value,
-                        label = category,
-                        startOfEntity = i == startOfEntity,
-                        endOfEntity = i == endOfEntity,
-                        endOfSentence = endOfSentence,
-                        endOfPage = endOfPage
-                    });
+                    new LabeledToken
+                    (
+                        token: tok.Value,
+                        label: category,
+                        startOfEntity: i == startOfEntity,
+                        endOfEntity: i == endOfEntity,
+                        endOfSentence: endOfSentence,
+                        endOfPage: endOfPage
+                    ));
                 finalizedTokenCount++;
             }
 
@@ -795,7 +1189,7 @@ namespace Extract.UtilityApplications.NERAnnotator
             if (entitiesTotallyAfterLongest.Any())
             {
                 var prefix = FinalizeEntities(entitiesTotallyAfterLongest.ToDictionary(kv => kv.Key, kv => kv.Value),
-                    tokenSpans, finalizedTokenCount, currentSentenceSpan, totalSentences);
+                    tokenSpans, finalizedTokenCount, currentSentenceSpan, totalSentences, page);
                 tokensAndLabels.AddRange(prefix);
                 finalizedTokenCount += prefix.Count();
             }
@@ -803,50 +1197,80 @@ namespace Extract.UtilityApplications.NERAnnotator
             return tokensAndLabels;
         }
 
-        // Method to return matching attributes and token text given a collection of token spans and an index.
-        // Returns an empty collection and null token text if there are no matches
-        (IEnumerable<(IEnumerable<RasterZone> entityZones, string category)> matched, string value)
-        FindMatchesForToken(
+        // Return matching entities and token text given a token index
+        // Returns an empty collection and null token text if there are no matches for this index
+        // Assumes that the entity's zones are built by including boundary chars
+        static (IEnumerable<Entity> matched, string value) FindMatchesForToken(
                     SpatialString page,
-                    List<(int tokenStart, int tokenEndExclusive, string value)> tokensSpans,
+                    List<Token> tokensSpans,
                     int i,
-                    List<(IEnumerable<RasterZone> entityZones, string category)> attributes,
-                    bool useMidpointToDetermineOverlap,
-                    bool onGoing)
+                    List<Entity> attributes,
+                    GetCharIndexesFunc getCharIndexesMemoized,
+                    bool onGoing
+                    )
         {
-            var matched = Enumerable.Empty<(IEnumerable<RasterZone> entityZones, string category)>();
+            var matched = Enumerable.Empty<Entity>();
             string value = null;
             if (i < tokensSpans.Count)
             {
                 var t = tokensSpans[i];
-                value = t.value;
-                matched = attributes.FindAll(pair =>
-                {
-                    var indexes = _getCharIndexesMemoized(pair.entityZones, page, useMidpointToDetermineOverlap);
-
-                    if (indexes.Any() && onGoing)
-                    {
-                        int min = indexes.Min();
-                        int max = indexes.Max();
-                        if (t.tokenStart >= min && (t.tokenEndExclusive - 1) <= max)
-                        {
-                            return true;
-                        }
-                    }
-
-                    for (int j = t.tokenStart; j < t.tokenEndExclusive; j++)
-                    {
-                        if (indexes.Contains(j))
-                        {
-                            return true;
-                        }
-                    }
-                    return false;
-                });
+                value = t.Value;
+                matched = attributes.FindAll(entity => DoesEntityOverlapToken(entity, t, page, getCharIndexesMemoized, false, onGoing));
             }
             return (matched, value);
         }
 
+        static bool DoesEntityOverlapToken(
+            Entity entity,
+            Token token,
+            SpatialString page,
+            GetCharIndexesFunc getCharIndexesMemoized,
+            bool includeIntersecting,
+            bool onGoing)
+        {
+            var indexes = getCharIndexesMemoized(entity.Zones, page, includeIntersecting);
+
+            var tokenLength = token.EndExclusive - token.Start;
+            var indexesThisToken = Enumerable.Range(token.Start, tokenLength)
+                .Where(i => indexes.Contains(i))
+                .ToList();
+
+            // Return true if this token has chars that overlap the entity zones
+            if (tokenLength == 1
+                && indexesThisToken.Count == 1
+                || indexesThisToken.Count > 1)
+            {
+                return true;
+            }
+
+            // Return true if this token is surrounded by overlapping tokens and is close to one of them
+            if (indexes.Any() && onGoing)
+            {
+                int min = indexes.Min();
+                int max = indexes.Max();
+                if (token.Start >= min && (token.EndExclusive - 1) <= max)
+                {
+                    var indexesBefore = indexes
+                        .Where(i => i < token.Start)
+                        .ToList();
+                    indexesBefore.Sort();
+                    var indexesAfter = indexes
+                        .Where(i => i >= token.EndExclusive)
+                        .ToList();
+                    indexesAfter.Sort();
+                    if (indexesBefore.Count > 1 && indexesAfter.Count > 1)
+                    {
+                        var isTokenCloseToOverlappingTokens =
+                            indexesBefore[indexesBefore.Count - 1] >= token.Start - 4
+                            || indexesAfter[0] < token.EndExclusive + 4;
+
+                        return isTokenCloseToOverlappingTokens;
+                    }
+                }
+            }
+
+            return false;
+        }
 
         static IEnumerable<RasterZone> GetZonesTranslatedToPage(SpatialString spatialString,
             SpatialString translateToPage)
@@ -876,9 +1300,10 @@ namespace Extract.UtilityApplications.NERAnnotator
         }
 
         // A to-be-memoized function to return character indexes that an attribute's value overlaps
-        HashSet<int> GetCharIndexes(IEnumerable<RasterZone> entityZones, SpatialString sourceString, bool useMidpoint)
+        HashSet<int> GetCharIndexes(FSharpList<RasterZone> entityZones, SpatialString sourceString, bool includeIntersecting)
         {
-            _searcher.SetUseMidpointsOnly(useMidpoint);
+            _searcher.Value.SetUseMidpointsOnly(true);
+            _searcher.Value.SetIncludeDataOnBoundary(includeIntersecting);
             var indexes = new HashSet<int>();
             foreach (RasterZone rasterZone in entityZones)
             {
@@ -886,11 +1311,11 @@ namespace Extract.UtilityApplications.NERAnnotator
                 LongRectangle bounds = rasterZone.GetRectangularBounds(
                     sourceString.GetOCRImagePageBounds(page));
 
-                var zoneIndexes = _searcher.GetCharacterIndexesInRegion(bounds);
+                var zoneIndexes = _searcher.Value.GetCharacterIndexesInRegion(bounds);
                 // Result will be null if there is no OCR result for the region, e.g., handwriting
                 if (zoneIndexes != null)
                 {
-                    foreach (var index in zoneIndexes.ToIEnumerable<int>().OrderBy(i => i).Skip(1))
+                    foreach (var index in zoneIndexes.ToIEnumerable<int>().OrderBy(i => i))
                     {
                         indexes.Add(index);
                     }
@@ -950,32 +1375,54 @@ namespace Extract.UtilityApplications.NERAnnotator
             return new SqlConnection( sqlConnectionBuild.ConnectionString);
         }
 
+        #region IDisposable Support
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_tokenizer != null)
+                {
+                    _tokenizer.Dispose();
+                    _tokenizer = null;
+                }
+
+                if (_sentenceDetector != null)
+                {
+                    _sentenceDetector.Dispose();
+                    _sentenceDetector = null;
+                }
+
+                if (_searcher != null)
+                {
+                    _searcher.Dispose();
+                    _searcher = null;
+                }
+
+                if (_pathTags != null)
+                {
+                    _pathTags.Dispose();
+                    _pathTags = null;
+                }
+            }
+        }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
+
         #endregion Private Methods
     }
 
-    class AnnotationToken
+    internal class Token
     {
-        public string token;
-        public string label;
-        public bool startOfEntity;
-        public bool endOfEntity;
-        public bool endOfSentence;
-        public bool endOfPage;
-
-        public void Deconstruct(out string token, out string label, out bool startOfEntity, out bool endOfEntity, out bool endOfSentence, out bool endOfPage)
-        {
-            token = this.token;
-            label = this.label;
-            startOfEntity = this.startOfEntity;
-            endOfEntity = this.endOfEntity;
-            endOfSentence = this.endOfSentence;
-            endOfPage = this.endOfPage;
-        }
-
-        public void Deconstruct(out string token, out string label)
-        {
-            token = this.token;
-            label = this.label;
-        }
+        public int Start { get; set; }
+        public int EndExclusive { get; set; }
+        public string Value { get; set; }
     }
 }

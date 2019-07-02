@@ -165,6 +165,31 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Creates a memoized version of a quaternary function
+        /// </summary>
+        /// <typeparam name="T1">The type of the first function parameter</typeparam>
+        /// <typeparam name="T2">The type of the second function parameter</typeparam>
+        /// <typeparam name="T3">The type of the third function parameter</typeparam>
+        /// <typeparam name="T4">The type of the fourth function parameter</typeparam>
+        /// <typeparam name="TResult">The return type of the function</typeparam>
+        /// <param name="fun">The non-memoized function</param>
+        /// <returns>A memoized version of the function</returns>
+        public static Func<T1, T2, T3, T4, TResult> Memoize<T1, T2, T3, T4, TResult>
+            (this Func<T1, T2, T3, T4, TResult> fun)
+        {
+            try
+            {
+                var map = new Dictionary<Tuple<T1, T2, T3, T4>, TResult>();
+                return (a, b, c, d) => map.GetOrAdd(Tuple.Create(a, b, c, d), _ => fun(a, b, c, d));
+            }
+            catch (Exception ex)
+            {
+                var ee = ex.AsExtract("ELI46994");
+                throw ee;
+            }
+        }
+
+        /// <summary>
         /// Method to deconstruct a <see cref="KeyValuePair{TKey, TValue}"/>.
         /// This enables more concise iteration over a <see cref="Dictionary{TKey, TValue}"/>,
         /// e.g., foreach(var (key, value) in dictionary)
@@ -207,6 +232,7 @@ namespace Extract.Utilities
         /// <param name="collection">The collection to return batches from</param>
         /// <param name="batchSize">The Size of each batch - last batch will just be the remaining</param>
         /// <returns>The current batch as a List</returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public static IEnumerable<List<T>> Batch<T>(this IEnumerable<T> collection, int batchSize)
         {
             List<T> nextBatch = new List<T>(batchSize);

@@ -107,6 +107,7 @@ namespace Extract.Utilities
         /// <param name="searchPhrase">The substring or related phrase to search with</param>
         /// <param name="maxSuggestions">The maximim number of suggestions to return</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
         public List<Tuple<string, double>> GetSuggestionsAndScores(string searchPhrase, int maxSuggestions = 1)
         {
             try

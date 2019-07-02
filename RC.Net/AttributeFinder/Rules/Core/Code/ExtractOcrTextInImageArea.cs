@@ -712,16 +712,14 @@ namespace Extract.AttributeFinder.Rules
         /// <returns>A <see cref="SpatialStringSearcher"/> for the <see paramref="page"/>.</returns>
         SpatialStringSearcher GetSearcherForPage(int page, SpatialString sourceString)
         {
-            SpatialStringSearcher searcher;
-            if (!_searchers.TryGetValue(page, out searcher))
+            return _searchers.GetOrAdd(page, _ =>
             {
-                searcher = new SpatialStringSearcher();
+                var searcher = new SpatialStringSearcher();
                 searcher.InitSpatialStringSearcher(sourceString.GetSpecifiedPages(page, page), false);
                 searcher.SetIncludeDataOnBoundary(IncludeTextOnBoundary);
                 searcher.SetBoundaryResolution(SpatialEntityType);
-            }
-
-            return searcher;
+                return searcher;
+            });
         }
 
         #endregion Private Members

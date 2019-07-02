@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 using Extract.Licensing;
 using Extract.Utilities;
 
-namespace Extract.UtilityApplications.NERAnnotator
+namespace Extract.UtilityApplications.NERAnnotation
 {
     public static class NERAnnotatorApp
     {
@@ -14,6 +15,7 @@ namespace Extract.UtilityApplications.NERAnnotator
         static int Main(string[] args)
         {
             bool silent = false;
+            bool multiThreaded = false;
             bool saveErrors = false;
             string uexName = null;
             string cancelTokenName = null;
@@ -23,7 +25,8 @@ namespace Extract.UtilityApplications.NERAnnotator
                 {
                     UtilityMethods.ShowMessageBox("Usage:" +
                         "\r\n  To open the editor:\r\n    NERAnnotator" +
-                        "\r\n  To create a labeled tokens file:\r\n    NERAnnotator <settingsFile> /p [/s] [/ef <exceptionFile>] [--<propertyName> <propertyValue> ...]" +
+                        "\r\n  To create a labeled tokens file:\r\n    NERAnnotator <settingsFile> /p [/m] [/s] [/ef <exceptionFile>] [--<propertyName> <propertyValue> ...]" +
+                        "\r\n    /m = multi-threaded processing" +
                         "\r\n    /s = silent = no progress bar or exceptions displayed" +
                         "\r\n    /ef <exceptionFile> log exceptions to file" +
                         "\r\n       (supports propagate errors to FAM option)" +
@@ -44,7 +47,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                     string action = null;
                     string settingsFile = null;
                     List<(PropertyInfo property, object value)> propertiesToSet = new List<(PropertyInfo, object)>();
-                    Type settingsType = typeof(Settings);
+                    Type settingsType = typeof(NERAnnotatorSettings);
                     for (int argNum = 0; argNum < args.Length; argNum++)
                     {
                         var arg = args[argNum];
@@ -59,7 +62,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                                     try
                                     {
                                         var type = prop.PropertyType;
-                                        var value = Convert.ChangeType(args[argNum], type);
+                                        var value = Convert.ChangeType(args[argNum], type, CultureInfo.InvariantCulture);
                                         propertiesToSet.Add((prop, value));
                                         continue;
                                     }
@@ -94,6 +97,10 @@ namespace Extract.UtilityApplications.NERAnnotator
                             if (val.Equals("s", StringComparison.OrdinalIgnoreCase))
                             {
                                 silent = true;
+                            }
+                            else if (val.Equals("m", StringComparison.OrdinalIgnoreCase))
+                            {
+                                multiThreaded = true;
                             }
                             else if (val.Equals("ef", StringComparison.OrdinalIgnoreCase))
                             {
@@ -148,7 +155,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                     else if (string.Equals(action, "p", StringComparison.OrdinalIgnoreCase)
                         && !string.IsNullOrEmpty(settingsFile))
                     {
-                        var settings = Settings.LoadFrom(settingsFile);
+                        var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
                         foreach(var (property, value) in propertiesToSet)
                         {
                             property.SetValue(settings, value);
@@ -162,11 +169,11 @@ namespace Extract.UtilityApplications.NERAnnotator
                                 namedTokenSource = new NamedTokenSource(cancelTokenName);
                                 cancelToken = namedTokenSource.Token;
                             }
-                            NERAnnotator.Process(settings, _ => { }, cancelToken);
+                            NERAnnotator.Process(settings, _ => { }, cancelToken, multiThreaded);
                         }
                         else
                         {
-                            using (var win = new AnnotationStatus(settings))
+                            using (var win = new AnnotationStatus(settings, multiThreaded))
                                 win.ShowDialog();
                         }
                     }

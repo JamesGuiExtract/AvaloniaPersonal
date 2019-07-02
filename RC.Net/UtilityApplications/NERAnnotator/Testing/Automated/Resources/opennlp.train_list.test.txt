@@ -1,9 +1,9 @@
 100000123456 Filed for Record in DEARBORN COUNTY ?
-INDIANA <START:Name> BARBARA J. KAFFENBERGER 01-09-2009 <END> At 04 :03:07 pm .
+INDIANA <START:Name> BARBARA J. KAFFENBERGER <END> 01-09-2009 At 04 :03:07 pm .
 WARE' DEED 18.00 OR Book 123 Page 1234 IN WITNESS WHEREOF , the said grantors have hereunto set their hands and seal this 30 day of December , 2008 .
 <START:Name> JOHN D. DOE <END> AND <START:Name> JANE DOE <END> FAMILY TRUST By : <START:Name> D. DOE <END> , Trustee <START:Name> JANE DOE <END> , Trustee STATE OF INDIANA , COUNTY OF DEARBORN , SS : Before me , a Notary Public residing in Dearborn County , Indiana , personally appeared <START:Name> John D. Doe <END> and <START:Name> Jane Doe <END> , Trustees , Grantors in the above conveyance , and acknowledged the execution of the same to be their voluntary act and deed , for the uses and purposes herein mentioned .
 IN WITNESS WHEREOF , I have hereunto subscribed my name ,' , ;' ; \. ) and affixed my official seal this 30 day of December , 2008 .
-... pet c" . " Notary Public D <START:Name> CA CA <END> My Commission Expires : /I - /4 , -ao/e .40
+... pet c" . " Notary Public <START:Name> D CA CA <END> My Commission Expires : /I - /4 , -ao/e .40
 fffIft54 ; Printed I AFFIRM , UNDER PENALTIES FOR PERJURY , THAT I HAVE TAKEN REASONABLE CARE TO REDACT EACH SOCIAL SECURITY NUMBER IN THIS DOCUMENT , UNLESS REQUIRED BY LAW.
 <START:Name> Frank G. Kramer <END> This instrument prepared by : <START:Name> FRANK G. KRAMER <END> , Attorney at Law EWBANK & KRAMER <START:Address> 114 West High Street Lawrenceburg , IN 47025-4200 <END> Telephone : ( <START:Phone> 812 ) 537-2522 <END>
 
@@ -31,7 +31,7 @@ Name of Taxpayer <START:Name> John <END> & <START:Name> Jane D. Doe <END> Reside
 Place of Filing -- - -, , Register of Deeds <START:Address> Ingham County Total Mason , MI 48854 <END> $ 1030.12
 This notice was prepared and signed at <START:Address> 229 Federal Building . <END>
 <START:Address> Lansing . <END>
-<START:Address> MI 48933 <END> , on this , the 14.5th day of August ,19 _AG Title Signature ( <START:Name> Z-?t <END> , <START:Name> William R. Fleck <END> Revenue Officer ( Nets Certificate of officer authorized by law to take acknowledgments Is not essential to the validity of Notice of Federal Tax Lion O.C.M. 28419.1950-1 ,
+<START:Address> MI 48933 <END> , on this , the 14.5th day of August ,19 _AG Title Signature <START:Name> ( Z-?t <END> , <START:Name> William R. Fleck <END> Revenue Officer ( Nets Certificate of officer authorized by law to take acknowledgments Is not essential to the validity of Notice of Federal Tax Lion O.C.M. 28419.1950-1 ,
 C.O. 126. ) Pan 1,-To be kept bi recording office Form 688 ( Rev.
 9-78 )
 

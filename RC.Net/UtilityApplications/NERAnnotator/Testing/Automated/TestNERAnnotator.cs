@@ -1,9 +1,15 @@
 ﻿using AttributeDbMgrComponentsLib;
+using Extract.AttributeFinder;
 using Extract.FileActionManager.Database.Test;
 using Extract.FileActionManager.FileProcessors;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
+using Extract.Utilities.FSharp;
+using Extract.Utilities.FSharp.NERAnnotation;
+using Microsoft.FSharp.Collections;
+using Microsoft.FSharp.Core;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Globalization;
@@ -11,10 +17,12 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using UCLID_AFCORELib;
+using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
 
-namespace Extract.UtilityApplications.NERAnnotator.Test
+namespace Extract.UtilityApplications.NERAnnotation.Test
 {
     /// <summary>
     /// Unit tests for NERAnnotator class
@@ -90,6 +98,9 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
                 _testDbManager = null;
             }
         }
+        #endregion Overhead
+
+        #region Helper Functions
 
         // Helper function to put resource test files into folders
         // These images are from Demo_FlexIndex
@@ -110,6 +121,8 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             _testFiles.GetFile("Resources.test.txt", testList);
             var overlappingExpectedList = Path.Combine(_inputFolder.Last(), "overlapping_expected.txt");
             _testFiles.GetFile("Resources.overlapping_expected.txt", overlappingExpectedList);
+            var scriptFile = Path.Combine(_inputFolder.Last(), "NERUtils.fsx");
+            _testFiles.GetFile("Resources.NERUtils.fsx", scriptFile);
 
             for (int i = 1; i <= 10; i++)
             {
@@ -131,14 +144,17 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
                 path = Path.Combine(_inputFolder.Last(), (i <= 5 ? "Test" : "Train"), fileName);
                 _testFiles.GetFile(resourceName, path);
 
-                if (i == 1)
+                resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, ".overlapping.evoa");
+                if (_testFiles.ResourceExists(resourceName))
                 {
-                    resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, ".overlapping.evoa");
                     fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, ".overlapping.evoa");
                     path = Path.Combine(_inputFolder.Last(), (i <= 5 ? "Test" : "Train"), fileName);
                     _testFiles.GetFile(resourceName, path);
+                }
 
-                    resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, ".voa");
+                resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, ".voa");
+                if (_testFiles.ResourceExists(resourceName))
+                {
                     fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, ".voa");
                     path = Path.Combine(_inputFolder.Last(), (i <= 5 ? "Test" : "Train"), fileName);
                     _testFiles.GetFile(resourceName, path);
@@ -175,7 +191,19 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             fileProcessingDB.CloseAllDBConnections();
         }
 
-        #endregion Overhead
+        private static void CompareExpectedFileToFoundText(string expectedFile, string output)
+        {
+            var expected = File.ReadAllText(expectedFile);
+            Assert.AreEqual(expected, output);
+        }
+
+        private static void CompareExpectedFileToFoundFile(string expectedFile, string outputFile)
+        {
+            var output = File.ReadAllText(outputFile);
+            CompareExpectedFileToFoundText(expectedFile, output);
+        }
+
+        #endregion Helper Functions
 
         #region Tests
 
@@ -186,21 +214,17 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.no_sent.learnable_tok.annotator");
             _testFiles.GetFile("Resources.opennlp.no_sent.learnable_tok.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
             Directory.SetCurrentDirectory(settings.WorkingDir);
 
             var expectedFile = _testFiles.GetFile("Resources.opennlp.no_sent.learnable_tok.train.txt");
-            var expected = File.ReadAllText(expectedFile);
             var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
-            var trainingOutput = File.ReadAllText(trainingOutputFile);
-            Assert.AreEqual(expected, trainingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, trainingOutputFile);
 
             expectedFile = _testFiles.GetFile("Resources.opennlp.no_sent.learnable_tok.test.txt");
-            expected = File.ReadAllText(expectedFile);
             var testingOutputFile = settings.OutputFileBaseName + ".test.txt";
-            var testingOutput = File.ReadAllText(testingOutputFile);
-            Assert.AreEqual(expected, testingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, testingOutputFile);
         }
 
         // OpenNLP format with sentence detection and learnable tokenizer
@@ -210,21 +234,17 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.sent.learnable_tok.annotator");
             _testFiles.GetFile("Resources.opennlp.sent.learnable_tok.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
             Directory.SetCurrentDirectory(settings.WorkingDir);
 
             var expectedFile = _testFiles.GetFile("Resources.opennlp.sent.learnable_tok.train.txt");
-            var expected = File.ReadAllText(expectedFile);
             var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
-            var trainingOutput = File.ReadAllText(trainingOutputFile);
-            Assert.AreEqual(expected, trainingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, trainingOutputFile);
 
             expectedFile = _testFiles.GetFile("Resources.opennlp.sent.learnable_tok.test.txt");
-            expected = File.ReadAllText(expectedFile);
             var testingOutputFile = settings.OutputFileBaseName + ".test.txt";
-            var testingOutput = File.ReadAllText(testingOutputFile);
-            Assert.AreEqual(expected, testingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, testingOutputFile);
         }
 
         // OpenNLP format with sentence detection and simple tokenizer
@@ -234,21 +254,17 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.sent.simple_tok.annotator");
             _testFiles.GetFile("Resources.opennlp.sent.simple_tok.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
             Directory.SetCurrentDirectory(settings.WorkingDir);
 
             var expectedFile = _testFiles.GetFile("Resources.opennlp.sent.simple_tok.train.txt");
-            var expected = File.ReadAllText(expectedFile);
             var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
-            var trainingOutput = File.ReadAllText(trainingOutputFile);
-            Assert.AreEqual(expected, trainingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, trainingOutputFile);
 
             expectedFile = _testFiles.GetFile("Resources.opennlp.sent.simple_tok.test.txt");
-            expected = File.ReadAllText(expectedFile);
             var testingOutputFile = settings.OutputFileBaseName + ".test.txt";
-            var testingOutput = File.ReadAllText(testingOutputFile);
-            Assert.AreEqual(expected, testingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, testingOutputFile);
         }
 
         // OpenNLP format with whitespace tokenizer
@@ -258,21 +274,17 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.sent.whitespace_tok.annotator");
             _testFiles.GetFile("Resources.opennlp.sent.whitespace_tok.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
             Directory.SetCurrentDirectory(settings.WorkingDir);
 
             var expectedFile = _testFiles.GetFile("Resources.opennlp.sent.whitespace_tok.train.txt");
-            var expected = File.ReadAllText(expectedFile);
             var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
-            var trainingOutput = File.ReadAllText(trainingOutputFile);
-            Assert.AreEqual(expected, trainingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, trainingOutputFile);
 
             expectedFile = _testFiles.GetFile("Resources.opennlp.sent.whitespace_tok.test.txt");
-            expected = File.ReadAllText(expectedFile);
             var testingOutputFile = settings.OutputFileBaseName + ".test.txt";
-            var testingOutput = File.ReadAllText(testingOutputFile);
-            Assert.AreEqual(expected, testingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, testingOutputFile);
         }
 
         // Verify that all text is in the output
@@ -282,7 +294,7 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.sent.whitespace_tok.annotator");
             _testFiles.GetFile("Resources.opennlp.sent.whitespace_tok.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             settings.PercentToUseForTestingSet = 0;
             settings.PercentUninterestingPagesToInclude = 100;
             settings.SplitIntoSentences = false;
@@ -311,7 +323,7 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.sent.whitespace_tok.annotator");
             _testFiles.GetFile("Resources.opennlp.sent.whitespace_tok.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             settings.RandomSeedForSetDivision = 1;
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
             Directory.SetCurrentDirectory(settings.WorkingDir);
@@ -338,7 +350,7 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
                     SetFiles();
                     var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.sent.whitespace_tok.annotator");
                     _testFiles.GetFile("Resources.opennlp.sent.whitespace_tok.annotator", settingsFile);
-                    var settings = Settings.LoadFrom(settingsFile);
+                    var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
                     settings.RandomSeedForSetDivision = null;
                     NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
                     Directory.SetCurrentDirectory(settings.WorkingDir);
@@ -368,21 +380,17 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.train_list.annotator");
             _testFiles.GetFile("Resources.opennlp.train_list.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
             Directory.SetCurrentDirectory(settings.WorkingDir);
 
             var expectedFile = _testFiles.GetFile("Resources.opennlp.train_list.train.txt");
-            var expected = File.ReadAllText(expectedFile);
             var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
-            var trainingOutput = File.ReadAllText(trainingOutputFile);
-            Assert.AreEqual(expected, trainingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, trainingOutputFile);
 
             expectedFile = _testFiles.GetFile("Resources.opennlp.train_list.test.txt");
-            expected = File.ReadAllText(expectedFile);
             var testingOutputFile = settings.OutputFileBaseName + ".test.txt";
-            var testingOutput = File.ReadAllText(testingOutputFile);
-            Assert.AreEqual(expected, testingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, testingOutputFile);
         }
 
         // With both a training list and a testing list specified
@@ -392,21 +400,17 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.both_lists.annotator");
             _testFiles.GetFile("Resources.opennlp.both_lists.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
             Directory.SetCurrentDirectory(settings.WorkingDir);
 
             var expectedFile = _testFiles.GetFile("Resources.opennlp.both_lists.train.txt");
-            var expected = File.ReadAllText(expectedFile);
             var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
-            var trainingOutput = File.ReadAllText(trainingOutputFile);
-            Assert.AreEqual(expected, trainingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, trainingOutputFile);
 
             expectedFile = _testFiles.GetFile("Resources.opennlp.both_lists.test.txt");
-            expected = File.ReadAllText(expectedFile);
             var testingOutputFile = settings.OutputFileBaseName + ".test.txt";
-            var testingOutput = File.ReadAllText(testingOutputFile);
-            Assert.AreEqual(expected, testingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, testingOutputFile);
         }
 
         // Both training and testing dirs are specified (results will be the same as previous test, where both lists are specified)
@@ -416,21 +420,17 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.both_dirs.annotator");
             _testFiles.GetFile("Resources.opennlp.both_dirs.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
             Directory.SetCurrentDirectory(settings.WorkingDir);
 
             var expectedFile = _testFiles.GetFile("Resources.opennlp.both_lists.train.txt");
-            var expected = File.ReadAllText(expectedFile);
             var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
-            var trainingOutput = File.ReadAllText(trainingOutputFile);
-            Assert.AreEqual(expected, trainingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, trainingOutputFile);
 
             expectedFile = _testFiles.GetFile("Resources.opennlp.both_lists.test.txt");
-            expected = File.ReadAllText(expectedFile);
             var testingOutputFile = settings.OutputFileBaseName + ".test.txt";
-            var testingOutput = File.ReadAllText(testingOutputFile);
-            Assert.AreEqual(expected, testingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, testingOutputFile);
         }
 
         // Specify each category explicitly with a different query that matches only one type
@@ -440,21 +440,17 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.explicit_categories.annotator");
             _testFiles.GetFile("Resources.opennlp.explicit_categories.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
             Directory.SetCurrentDirectory(settings.WorkingDir);
 
             var expectedFile = _testFiles.GetFile("Resources.opennlp.sent.learnable_tok.train.txt");
-            var expected = File.ReadAllText(expectedFile);
             var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
-            var trainingOutput = File.ReadAllText(trainingOutputFile);
-            Assert.AreEqual(expected, trainingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, trainingOutputFile);
 
             expectedFile = _testFiles.GetFile("Resources.opennlp.sent.learnable_tok.test.txt");
-            expected = File.ReadAllText(expectedFile);
             var testingOutputFile = settings.OutputFileBaseName + ".test.txt";
-            var testingOutput = File.ReadAllText(testingOutputFile);
-            Assert.AreEqual(expected, testingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, testingOutputFile);
         }
 
         // Test that an exception is generated when an output file already exists
@@ -464,7 +460,7 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.explicit_categories.annotator");
             _testFiles.GetFile("Resources.opennlp.explicit_categories.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
 
             // Now that the training and testing output files exist, the process will not run
@@ -500,17 +496,15 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.explicit_categories.annotator");
             _testFiles.GetFile("Resources.opennlp.explicit_categories.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             settings.TestingSet = TestingSetType.Specified;
             settings.TestingInput = "";
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
             Directory.SetCurrentDirectory(settings.WorkingDir);
 
             var expectedFile = _testFiles.GetFile("Resources.opennlp.single_output_file.train.txt");
-            var expected = File.ReadAllText(expectedFile);
             var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
-            var trainingOutput = File.ReadAllText(trainingOutputFile);
-            Assert.AreEqual(expected, trainingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, trainingOutputFile);
 
             var testingOutputFile = settings.OutputFileBaseName + ".test.txt";
             Assert.IsFalse(File.Exists(testingOutputFile));
@@ -523,16 +517,14 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.explicit_categories.annotator");
             _testFiles.GetFile("Resources.opennlp.explicit_categories.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             settings.PercentToUseForTestingSet = 0;
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
             Directory.SetCurrentDirectory(settings.WorkingDir);
 
             var expectedFile = _testFiles.GetFile("Resources.opennlp.single_output_file.train.txt");
-            var expected = File.ReadAllText(expectedFile);
             var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
-            var trainingOutput = File.ReadAllText(trainingOutputFile);
-            Assert.AreEqual(expected, trainingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, trainingOutputFile);
 
             var testingOutputFile = settings.OutputFileBaseName + ".test.txt";
             Assert.IsFalse(File.Exists(testingOutputFile));
@@ -545,7 +537,7 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.explicit_categories.annotator");
             _testFiles.GetFile("Resources.opennlp.explicit_categories.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             settings.PercentToUseForTestingSet = 0;
             settings.PercentUninterestingPagesToInclude = 100;
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
@@ -556,7 +548,7 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
             var trainingOutput = File.ReadAllText(trainingOutputFile);
             Assert.Greater(trainingOutput.Length, expected.Length);
-            Assert.AreEqual(113920, trainingOutput.Length);
+            Assert.AreEqual(113939, trainingOutput.Length);
         }
 
         // Verify that output changes for different page-inclusion random seed values
@@ -566,7 +558,7 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.explicit_categories.annotator");
             _testFiles.GetFile("Resources.opennlp.explicit_categories.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             settings.PercentToUseForTestingSet = 0;
             settings.PercentUninterestingPagesToInclude = 50;
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
@@ -622,28 +614,26 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.overlapping_expected.annotator");
             _testFiles.GetFile("Resources.opennlp.overlapping_expected.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
 
             // Verify tags
             Directory.SetCurrentDirectory(settings.WorkingDir);
             var expectedFile = _testFiles.GetFile("Resources.opennlp.overlapping_expected.train.txt");
-            var expected = File.ReadAllText(expectedFile);
             var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
-            var trainingOutput = File.ReadAllText(trainingOutputFile);
-            Assert.AreEqual(expected, trainingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, trainingOutputFile);
 
             // Confirm that no (non-whitespace) text is lost
             var uss = new SpatialStringClass();
             var ussPath = Path.GetFullPath(@"Test\Example01.tif.uss");
             uss.LoadFrom(ussPath, false);
-            expected = string.Join("", uss.GetPages(false, "")
+            var expected = string.Join("", uss.GetPages(false, "")
                                 .ToIEnumerable<SpatialString>()
                                 // Remove whitespace so that the raw input can be compared to the tokenized input
                                 .Select(page => Regex.Replace(page.String, @"\s+", "")));
 
             // Remove tags and whitespace so that the tokenized output (which has extra whitespace) matches the expected, which has all whitespace removed
-            trainingOutput = Regex.Replace(trainingOutput, @"<START:\w+>|<END>|\s+", "");
+            var trainingOutput = Regex.Replace(File.ReadAllText(trainingOutputFile), @"<START:\w+>|<END>|\s+", "");
             Assert.AreEqual(expected, trainingOutput);
         }
 
@@ -654,16 +644,14 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
             SetFiles();
             var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.flex.annotator");
             _testFiles.GetFile("Resources.opennlp.flex.annotator", settingsFile);
-            var settings = Settings.LoadFrom(settingsFile);
+            var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
             NERAnnotator.Process(settings, _ => { }, CancellationToken.None);
 
             // Verify tags
             Directory.SetCurrentDirectory(settings.WorkingDir);
             var expectedFile = _testFiles.GetFile("Resources.opennlp.flex.train.txt");
-            var expected = File.ReadAllText(expectedFile);
             var trainingOutputFile = settings.OutputFileBaseName + ".train.txt";
-            var trainingOutput = File.ReadAllText(trainingOutputFile);
-            Assert.AreEqual(expected, trainingOutput);
+            CompareExpectedFileToFoundFile(expectedFile, trainingOutputFile);
         }
 
         // Test Database mode
@@ -676,7 +664,7 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
                 CreateDatabase();
                 var settingsFile = Path.Combine(_inputFolder.Last(), "opennlp.train_list.annotator");
                 _testFiles.GetFile("Resources.opennlp.train_list.annotator", settingsFile);
-                var settings = Settings.LoadFrom(settingsFile);
+                var settings = NERAnnotatorSettings.LoadFrom(settingsFile);
                 settings.UseDatabase = true;
                 settings.DatabaseServer = "(local)";
                 settings.DatabaseName = _DB_NAME;
@@ -688,8 +676,6 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
 
                 // Verify tags
                 var expectedFile = _testFiles.GetFile("Resources.opennlp.train_list.train.txt");
-                var expected = File.ReadAllText(expectedFile);
-
 
                 // Build the connection string from the settings
                 SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
@@ -724,13 +710,423 @@ namespace Extract.UtilityApplications.NERAnnotator.Test
                     }
                     connection.Close();
                 }
-
-                Assert.AreEqual(expected, trainingOutput);
+                CompareExpectedFileToFoundText(expectedFile, trainingOutput);
             }
             finally
             {
                 _testDbManager.RemoveDatabase(_DB_NAME);
             }
+        }
+
+        // While tweaking the code that determines token inclusion I accidentally caused this name to get truncated
+        // so I've added a test to make sure it is found correctly (first + middle initial--last name doesn't OCR)
+        [Test, Category("NERAnnotator")]
+        public static void IncludeAllOfEntity()
+        {
+            SetFiles();
+            var serializedSettings = @"
+TypesVoaFunction: <SourceDocName>.voa
+PercentUninterestingPagesToInclude: 0
+RandomSeedForPageInclusion: 0
+Format: OpenNLP
+SplitIntoSentences: true
+SentenceDetectionModelPath: en-sent.nlp.etf
+TokenizerType: WhitespaceTokenizer
+EntityDefinitions:
+- Category: '@Type'
+  CategoryIsXPath: true
+  RootQuery: /*/HCData|/*/MCData|/*/LCData|/*/Manual
+";
+            var settings = NERAnnotatorSettings.Load(serializedSettings);
+            settings.WorkingDir = _inputFolder.Last();
+
+            var ussFile = Path.Combine(_inputFolder.Last(), "Test", "Example02.tif.uss");
+            var uss = new SpatialStringClass();
+            uss.LoadFrom(ussFile, false);
+
+            var voaFile = Path.Combine(_inputFolder.Last(), "Test", "Example02.tif.voa");
+            var voa = new IUnknownVectorClass();
+            voa.LoadFrom(voaFile, false);
+
+            EntitiesAndPage empty(EntitiesAndPage x) => new EntitiesAndPage(entities: ListModule.Empty<Entity>(), page: x.Page);
+            var labeled = NERAnnotator.GetTokensForPage(settings, uss, 7, voa, _=>_, _=>_, empty, _=>_)
+                .Where(t => !String.IsNullOrWhiteSpace(t.Label))
+                .ToList();
+            Assert.AreEqual(2, labeled.Count);
+            Assert.AreEqual("John", labeled[0].Token);
+            Assert.AreEqual("D", labeled[1].Token);
+        }
+
+        // There was a mistake in the code that was causing single-character tokens to be dropped
+        // Fixing this caused extra garbage lines to get included sometimes. This tests that at least some
+        // extra lines are avoided by other means now
+        [Test, Category("NERAnnotator")]
+        public static void AvoidExtraEntities()
+        {
+            SetFiles();
+            var serializedSettings = @"
+TypesVoaFunction: <SourceDocName>.voa
+PercentUninterestingPagesToInclude: 0
+RandomSeedForPageInclusion: 0
+Format: OpenNLP
+SplitIntoSentences: true
+SentenceDetectionModelPath: en-sent.nlp.etf
+TokenizerType: WhitespaceTokenizer
+EntityDefinitions:
+- Category: '@Type'
+  CategoryIsXPath: true
+  RootQuery: /*/HCData|/*/MCData|/*/LCData|/*/Manual
+";
+            var settings = NERAnnotatorSettings.Load(serializedSettings);
+            settings.WorkingDir = _inputFolder.Last();
+
+            var ussFile = Path.Combine(_inputFolder.Last(), "Test", "Example05.tif.uss");
+            var uss = new SpatialStringClass();
+            uss.LoadFrom(ussFile, false);
+
+            var voaFile = Path.Combine(_inputFolder.Last(), "Test", "Example05.tif.voa");
+            var voa = new IUnknownVectorClass();
+            voa.LoadFrom(voaFile, false);
+
+            EntitiesAndPage empty(EntitiesAndPage x) =>
+                new EntitiesAndPage(entities: ListModule.Empty<Entity>(), page: x.Page);
+            var labeled = NERAnnotator.GetTokensForPage(settings, uss, 2, voa, _=>_, _=>_, empty, _=>_)
+                .Where(t => !String.IsNullOrWhiteSpace(t.Label))
+                .ToList();
+            Assert.AreEqual(3, labeled.Count);
+            Assert.AreEqual("i", labeled[0].Token);
+            Assert.AreEqual("--Kityc-e,(jese,", labeled[1].Token);
+            Assert.AreEqual("4,4-0,:ez,", labeled[2].Token);
+        }
+
+        // There was a mistake in the code that was causing single-character tokens to be dropped
+        // Fixing this caused extra garbage lines to get included sometimes. This tests that at least some
+        // extra lines are avoided by other means now
+        [Test, Category("NERAnnotator")]
+        public static void AvoidExtraEntities2()
+        {
+            SetFiles();
+            var serializedSettings = @"
+TypesVoaFunction: <SourceDocName>.voa
+PercentUninterestingPagesToInclude: 0
+RandomSeedForPageInclusion: 0
+Format: OpenNLP
+SplitIntoSentences: true
+SentenceDetectionModelPath: en-sent.nlp.etf
+TokenizerType: WhitespaceTokenizer
+EntityDefinitions:
+- Category: '@Type'
+  CategoryIsXPath: true
+  RootQuery: /*/HCData|/*/MCData|/*/LCData|/*/Manual
+";
+            var settings = NERAnnotatorSettings.Load(serializedSettings);
+            settings.WorkingDir = _inputFolder.Last();
+
+            var ussFile = Path.Combine(_inputFolder.Last(), "Train", "Example08.tif.uss");
+            var uss = new SpatialStringClass();
+            uss.LoadFrom(ussFile, false);
+
+            var voaFile = Path.Combine(_inputFolder.Last(), "Train", "Example08.tif.voa");
+            var voa = new IUnknownVectorClass();
+            voa.LoadFrom(voaFile, false);
+
+            EntitiesAndPage empty(EntitiesAndPage x) =>
+                new EntitiesAndPage(entities: ListModule.Empty<Entity>(), page: x.Page);
+
+            var labeled = NERAnnotator.GetTokensForPage(settings, uss, 1, voa, _=>_, _=>_, empty, _=>_)
+                .Where(t => !String.IsNullOrWhiteSpace(t.Label))
+                .ToList();
+
+            // After fixing mistake, part of the "WITNESS" text above this signature was being included
+            Assert.AreEqual(2, labeled.Count);
+            Assert.AreEqual("1.-74-.,4.Li", labeled[0].Token);
+            Assert.AreEqual("7-jf-,0-71-1", labeled[1].Token);
+        }
+
+        // Tests that the 'limit to finishable' function could be used to adjust the zones to avoid garbage lines
+        [Test, Category("NERAnnotator")]
+        public static void AvoidExtraEntitiesWithFunctions()
+        {
+            SetFiles();
+            var serializedSettings = @"
+TypesVoaFunction: <SourceDocName>.voa
+PercentUninterestingPagesToInclude: 0
+RandomSeedForPageInclusion: 0
+Format: OpenNLP
+SplitIntoSentences: true
+SentenceDetectionModelPath: en-sent.nlp.etf
+TokenizerType: WhitespaceTokenizer
+EntityDefinitions:
+- Category: '@Type'
+  CategoryIsXPath: true
+  RootQuery: /*/HCData|/*/MCData|/*/LCData|/*/Manual
+";
+            var settings = NERAnnotatorSettings.Load(serializedSettings);
+            settings.WorkingDir = _inputFolder.Last();
+
+            var ussFile = Path.Combine(_inputFolder.Last(), "Test", "Example05.tif.uss");
+            var uss = new SpatialStringClass();
+            uss.LoadFrom(ussFile, false);
+
+            var voaFile = Path.Combine(_inputFolder.Last(), "Test", "Example05.tif.voa");
+            var voa = new IUnknownVectorClass();
+            voa.LoadFrom(voaFile, false);
+
+            EntitiesAndPage empty(EntitiesAndPage x) =>
+                new EntitiesAndPage(entities: ListModule.Empty<Entity>(), page: x.Page);
+
+            var labeled = NERAnnotator.GetTokensForPage(settings, uss, 2, voa,
+                preprocess: _=>_,
+                setExpectedValuesFromDefinitions: _=>_,
+                resolveToPage: empty,
+                limitToFinishable: _=>_)
+                .Where(t => !String.IsNullOrWhiteSpace(t.Label))
+                .ToList();
+            Assert.Greater(labeled.Count, 2);
+
+            // Function to filter and modify entities to only have high confidence (or at least several chars-long) zones
+            EntitiesAndPage highConf(EntitiesAndPage x) =>
+                new EntitiesAndPage(
+                    entities: x.Entities
+                    .Where(e => e.SpatialString.Value != null)
+                    .Select(e =>
+                    {
+                        var s = e.SpatialString.Value;
+                        var lines = s.GetLines()
+                        .ToIEnumerable<SpatialString>()
+                        .Where(line =>
+                        {
+                            var str = line.String;
+                            if (str.Where(c => !Char.IsWhiteSpace(c)).Count() > 4)
+                            {
+                                return true;
+                            }
+
+                            int _ = 0, avg = 0;
+                            line.GetCharConfidence(ref _, ref _, ref avg);
+                            return avg > 60;
+                        })
+                        .ToList();
+                        if (lines.Count == 0)
+                        {
+                            return null;
+                        }
+
+                        s.CreateFromSpatialStrings(lines.ToIUnknownVector(), false);
+
+                        return new Entity(expectedValue: e.ExpectedValue,
+                            zones: s.GetOCRImageRasterZones().ToIEnumerable<RasterZone>().ToFSharpList(),
+                            valueComponents: e.ValueComponents,
+                            spatialString: FSharpOption<SpatialString>.None,
+                            category: e.Category);
+                    })
+                    .Where(e => e != null)
+                    .ToFSharpList()
+                    , page: x.Page);
+
+            labeled = NERAnnotator.GetTokensForPage(settings, uss, 2, voa,
+                preprocess: _=>_,
+                setExpectedValuesFromDefinitions: _=>_,
+                resolveToPage: empty,
+                limitToFinishable: highConf)
+                .Where(t => !String.IsNullOrWhiteSpace(t.Label))
+                .ToList();
+            Assert.AreEqual(2, labeled.Count);
+            Assert.AreEqual("--Kityc-e,(jese,", labeled[0].Token);
+            Assert.AreEqual("4,4-0,:ez,", labeled[1].Token);
+        }
+
+        // Tests that the preprocess function is applied
+        [Test, Category("NERAnnotator")]
+        public static void Preprocess()
+        {
+            SetFiles();
+            var serializedSettings = @"
+TypesVoaFunction: <SourceDocName>.voa
+PercentUninterestingPagesToInclude: 100
+RandomSeedForPageInclusion: 0
+Format: OpenNLP
+SplitIntoSentences: true
+SentenceDetectionModelPath: en-sent.nlp.etf
+TokenizerType: WhitespaceTokenizer
+EntityDefinitions:
+- Category: '@Type'
+  CategoryIsXPath: true
+  RootQuery: /*/HCData|/*/MCData|/*/LCData|/*/Manual
+";
+            var settings = NERAnnotatorSettings.Load(serializedSettings);
+            settings.WorkingDir = _inputFolder.Last();
+
+            var ussFile = Path.Combine(_inputFolder.Last(), "Train", "Example06.tif.uss");
+            var uss = new SpatialStringClass();
+            uss.LoadFrom(ussFile, false);
+
+            var voa = new IUnknownVectorClass();
+
+            AFDocument sortText(AFDocument doc)
+            {
+                var lines = doc.Text.GetLines();
+                if (lines.Size() > 0)
+                {
+                    var sorter = new SpatiallyCompareStringsClass();
+                    lines.Sort(sorter);
+                    doc.Text.CreateFromSpatialStrings(lines, true);
+                }
+                return doc;
+            }
+
+            EntitiesAndPage empty(EntitiesAndPage x) =>
+                new EntitiesAndPage(entities: ListModule.Empty<Entity>(), page: x.Page);
+
+            var tokensWithoutSort = NERAnnotator.GetTokensForPage(settings, uss, 2, voa,
+                preprocess: _ => _,
+                setExpectedValuesFromDefinitions: _ => _,
+                resolveToPage: empty,
+                limitToFinishable: _ => _)
+                .ToList();
+
+            var tokensWithSort = NERAnnotator.GetTokensForPage(settings, uss, 2, voa,
+                preprocess: sortText,
+                setExpectedValuesFromDefinitions: _ => _,
+                resolveToPage: empty,
+                limitToFinishable: _ => _)
+                .ToList();
+
+            Assert.AreEqual(tokensWithSort.Count, tokensWithoutSort.Count);
+
+            int differentAt = -1;
+            for (int i = 0; i < tokensWithoutSort.Count; i++)
+            {
+                if (!tokensWithoutSort[i].Equals(tokensWithSort[i]))
+                {
+                    differentAt = i;
+                    break;
+                }
+            }
+            Assert.Greater(differentAt, 0);
+
+            var sortedTokensText = String.Join(" ", tokensWithSort.Select(t => t.Token));
+            var unsortedTokensText = String.Join(" ", tokensWithoutSort.Select(t => t.Token));
+
+            Assert.That(Regex.IsMatch(sortedTokensText, "My Commission Expires.*Notary Public"));
+            Assert.That(Regex.IsMatch(unsortedTokensText, "Notary Public.*My Commission Expires"));
+        }
+
+        // Tests that the preprocess function specified in the settings is applied
+        [Test, Category("NERAnnotator")]
+        public static void PreprocessFromScript()
+        {
+            SetFiles();
+            var serializedSettings = @"
+TypesVoaFunction: <SourceDocName>.evoa
+PercentUninterestingPagesToInclude: 100
+RandomSeedForPageInclusion: 0
+Format: OpenNLP
+SplitIntoSentences: true
+SentenceDetectionModelPath: en-sent.nlp.etf
+TokenizerType: WhitespaceTokenizer
+EntityDefinitions:
+- Category: '@Type'
+  CategoryIsXPath: true
+  RootQuery: /*/HCData|/*/MCData|/*/LCData|/*/Manual
+RunPreprocessingFunction: false
+PreprocessingScript: NERUtils.fsx
+PreprocessingFunctionName: AFDoc.sortText
+";
+            var settings = NERAnnotatorSettings.Load(serializedSettings);
+            settings.WorkingDir = _inputFolder.Last();
+
+            var ussFile = Path.Combine(_inputFolder.Last(), "Train", "Example06.tif.uss");
+
+            var recordsWithoutSortOption = NERAnnotator.GetRecordsForPages(settings, ussFile, 2);
+            Assert.That(FSharpOption<(string, string)>.get_IsSome(recordsWithoutSortOption));
+            var recordsWithoutSort = recordsWithoutSortOption.Value.data;
+
+            settings.RunPreprocessingFunction = true;
+            var recordsWithSortOption = NERAnnotator.GetRecordsForPages(settings, ussFile, 2);
+            Assert.That(FSharpOption<(string, string)>.get_IsSome(recordsWithSortOption));
+            var recordsWithSort = recordsWithSortOption.Value.data;
+
+            Assert.That(Regex.IsMatch(recordsWithSort, "My Commission Expires.*Notary Public"));
+            Assert.That(Regex.IsMatch(recordsWithoutSort, "Notary Public.*My Commission Expires"));
+        }
+
+        // Tests that the character replace function is applied
+        [Test, Category("NERAnnotator")]
+        public static void CharacterReplace()
+        {
+            SetFiles();
+            var serializedSettings = @"
+TypesVoaFunction: <SourceDocName>.evoa
+PercentUninterestingPagesToInclude: 100
+RandomSeedForPageInclusion: 0
+Format: OpenNLP
+SplitIntoSentences: true
+SentenceDetectionModelPath: en-sent.nlp.etf
+TokenizerType: WhitespaceTokenizer
+EntityDefinitions:
+- Category: '@Type'
+  CategoryIsXPath: true
+  RootQuery: /*/HCData|/*/MCData|/*/LCData|/*/Manual
+RunCharacterReplacingFunction: false
+CharacterReplacingScript: NERUtils.fsx
+CharacterReplacingFunctionName: CharReplacement.makeDatesGeneric
+";
+            var settings = NERAnnotatorSettings.Load(serializedSettings);
+            settings.WorkingDir = _inputFolder.Last();
+
+            var ussFile = Path.Combine(_inputFolder.Last(), "Train", "Example06.tif.uss");
+
+            // Check for numbers
+            var records = NERAnnotator.GetRecordsForPages(settings, ussFile, 1, 2);
+            Assert.That(FSharpOption<(string, string)>.get_IsSome(records));
+            Assert.That(Regex.IsMatch(records.Value.data, "[0-8]"));
+            Assert.AreEqual(13, Regex.Matches(records.Value.data, "9").Count);
+
+            // Check that numbers have been replaced with 9s
+            settings.RunCharacterReplacingFunction = true;
+            records = NERAnnotator.GetRecordsForPages(settings, ussFile, 1, 2);
+            Assert.That(FSharpOption<(string, string)>.get_IsSome(records));
+            Assert.That(!Regex.IsMatch(records.Value.data, "[0-8]"));
+            Assert.AreEqual(231, Regex.Matches(records.Value.data, "9").Count);
+        }
+
+        // Tests that non-spatial entities are found
+        [Test, Category("NERAnnotator")]
+        public static void NonSpatialExpected()
+        {
+            SetFiles();
+            var serializedSettings = @"
+TypesVoaFunction: <SourceDocName>.voa
+PercentUninterestingPagesToInclude: 100
+RandomSeedForPageInclusion: 0
+Format: OpenNLP
+SplitIntoSentences: true
+SentenceDetectionModelPath: en-sent.nlp.etf
+TokenizerType: WhitespaceTokenizer
+EntityDefinitions:
+- Category: PatientName
+  CategoryIsXPath: false
+  RootQuery: /*/HCData|/*/MCData|/*/LCData|/*/Manual
+  ValueQuery: First|Middle|Last
+RunEntityFilteringFunctions: true
+EntityFilteringScript: NERUtils.fsx
+";
+            var settings = NERAnnotatorSettings.Load(serializedSettings);
+            settings.WorkingDir = _inputFolder.Last();
+
+            var ussFile = Path.Combine(_inputFolder.Last(), "Train", "Example07.tif.uss");
+            var voaFile = Path.Combine(_inputFolder.Last(), "Train", "Example07.tif.voa");
+
+            // Ensure preconditions--expected file has no spatial attributes
+            var voa = new IUnknownVectorClass();
+            voa.LoadFrom(voaFile, false);
+            Assert.That(voa.Size() == 1 && !((IAttribute)voa.At(0)).EnumerateDepthFirst().Any(a => a.Value.HasSpatialInfo()));
+
+            // Check for numbers
+            var records = NERAnnotator.GetRecordsForPages(settings, ussFile, 1);
+            Assert.That(FSharpOption<(string, string)>.get_IsSome(records));
+            Assert.That(Regex.IsMatch(records.Value.data, "<START:PatientName> JOHN D DOE <END>"));
         }
 
         #endregion Tests

@@ -256,11 +256,14 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.ETL.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.ETL.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.ETL.Management.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.ETL.Management.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Dashboard.Utilities.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Dashboard.Utilities.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
-	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Dashboard.Forms.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Dashboard.Forms.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
-	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract64.Core.dll" /mapout:"$(BinariesFolder)\Map\mapExtract64.Cores.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
-	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Code.Attributes.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Code.Attributes.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
-	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Database.Logger.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Database.Logger.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
-	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.GoogleCloud.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.GoogleCloud.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml    
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Dashboard.Forms.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Dashboard.Forms.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract64.Core.dll" /mapout:"$(BinariesFolder)\Map\mapExtract64.Cores.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Code.Attributes.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Code.Attributes.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Database.Logger.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Database.Logger.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.GoogleCloud.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.GoogleCloud.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.AttributeFinder.Rules.FSharp.dll" /mapout:"$(BinariesFolder)\Map\Extract.AttributeFinder.Rules.FSharp.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Utilities.FSharp.CSharpInterop.dll" /mapout:"$(BinariesFolder)\Map\Extract.Utilities.FSharp.CSharpInterop.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Utilities.FSharp.NERAnnotation.dll" /mapout:"$(BinariesFolder)\Map\Extract.Utilities.FSharp.NERAnnotation.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 
 	@ECHO.
     @DATE /T
@@ -356,6 +359,8 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@COPY "$(RCNETDir)\APIs\ZstdNet\ZstdNet\bin\x64\Release\ZstdNet64.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY "$(BinariesFolder)\Google*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY "$(BinariesFolder)\grpc*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY "$(BinariesFolder)\FSharp.*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY "$(BinariesFolder)\fsi.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 
 # This includes System.ValueTuple in the install
 	@COPY "$(BinariesFolder)\System.ValueTuple.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
@@ -432,6 +437,9 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.ETL.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V "$(PDUtilsRootDir)\DetectAndReportFailure\Misc\DetectAndReportFailure.ini" "$(AFCoreInstallFilesRootDir)\ProgramDataFiles"
 	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.GoogleCloud.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.AttributeFinder.Rules.FSharp.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.Utilities.FSharp.CSharpInterop.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.Utilities.FSharp.NERAnnotation.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 
 # Copy Web files
 	@XCOPY "$(WebAPI)\*.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y

@@ -3,7 +3,7 @@ using Extract.FileActionManager.Database.Test;
 using Extract.FileActionManager.FileProcessors;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
-using Extract.UtilityApplications.NERAnnotator;
+using Extract.UtilityApplications.NERAnnotation;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
@@ -424,7 +424,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
                 _testFiles.GetFile("Resources.opennlp.annotator", annotatorSettingsPath);
 
                 // Update settings to change code-path used to handle missing uss file
-                var annotatorSettings = Settings.LoadFrom(annotatorSettingsPath);
+                var annotatorSettings = NERAnnotatorSettings.LoadFrom(annotatorSettingsPath);
                 annotatorSettings.PercentToUseForTestingSet = 0;
                 annotatorSettings.SaveTo(annotatorSettingsPath);
 

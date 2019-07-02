@@ -357,12 +357,12 @@ namespace Extract.Utilities
         /// <param name="timeToWait">The time to wait.</param>
         /// <param name="createNoWindow">Whether to eschew shell execution to avoid showing a cmd window</param>
         /// <param name="cancelToken"><see cref="CancellationToken"/> that can be used to cancel the execution</param>
-        /// <param name="startAndReturnimmediately">Runs the exeFile and return without waiting for app to complete"/></param>
+        /// <param name="startAndReturnImmediately">Runs the exeFile and return without waiting for app to complete"/></param>
         /// <returns>The exit code of the process or <see cref="OperationTimeoutExitCode"/> ("This operation returned because the
         /// timeout period expired.") if timeToWait has expired. 
         /// If canceled by cancelToken returns <see cref="OperationCanceledExitCode"/></returns>
         public static int RunExecutable(string exeFile, string arguments, int timeToWait, bool createNoWindow = false,
-            CancellationToken cancelToken = default(CancellationToken), bool startAndReturnimmediately = false)
+            CancellationToken cancelToken = default(CancellationToken), bool startAndReturnImmediately = false)
         {
             try
             {
@@ -384,7 +384,7 @@ namespace Extract.Utilities
                         CreateNoWindow = createNoWindow
                     };
                     process.Start();
-                    if (startAndReturnimmediately)
+                    if (startAndReturnImmediately)
                     {
                         return 0;
                     }

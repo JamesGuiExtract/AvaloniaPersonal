@@ -599,6 +599,7 @@ namespace Extract.Utilities
         /// <param name="ocrParameters">The <see cref="IOCRParameters"/> to convert.</param>
         /// <returns>An <see cref="IEnumerable"/> of type <see cref="OCRParam"/>.</returns>
         [CLSCompliant(false)]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public static IEnumerable<OCRParam> ToIEnumerable(this IOCRParameters ocrParameters)
         {
             var variantVector = (IVariantVector)ocrParameters;
@@ -654,6 +655,7 @@ namespace Extract.Utilities
         /// <param name="ocrParameters">The <see cref="IOCRParameters"/> to convert.</param>
         /// <returns>An <see cref="IEnumerable"/> of type <see cref="OCRParam"/>.</returns>
         [CLSCompliant(false)]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public static IOCRParameters ToOCRParameters(this IEnumerable<OCRParam> ocrParameters)
         {
             try

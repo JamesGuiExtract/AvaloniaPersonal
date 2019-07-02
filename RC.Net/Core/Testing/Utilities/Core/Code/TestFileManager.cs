@@ -190,6 +190,15 @@ namespace Extract.Testing.Utilities
             }
         }
 
+        /// <summary>
+        /// Check whether the specified resource name (scoped by type param's namespace) exists
+        /// </summary>
+        /// <param name="resource">The resource name to check</param>
+        public bool ResourceExists(string resource)
+        {
+            return _assembly.GetManifestResourceStream(typeof(T), resource) != null;
+        }
+
         #endregion TestFileManager Methods
 
         #region IDisposable Members

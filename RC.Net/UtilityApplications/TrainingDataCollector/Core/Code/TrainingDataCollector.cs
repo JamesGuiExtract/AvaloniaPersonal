@@ -211,7 +211,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
 
                 if (ModelType == ModelType.NamedEntityRecognition)
                 {
-                    var settings = NERAnnotator.Settings.LoadFrom(QualifiedDataGeneratorPath);
+                    var settings = NERAnnotation.NERAnnotatorSettings.LoadFrom(QualifiedDataGeneratorPath);
                     settings.UseDatabase = true;
                     settings.DatabaseServer = DatabaseServer;
                     settings.DatabaseName = DatabaseName;
@@ -231,7 +231,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                         },
                         executeInTransaction: () =>
                         {
-                            NERAnnotator.NERAnnotator.Process(settings, _ => { }, cancelToken);
+                            NERAnnotation.NERAnnotator.Process(settings, _ => { }, cancelToken, false);
                         },
                         cancellationToken: cancelToken);
                 }

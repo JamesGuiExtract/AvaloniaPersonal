@@ -1,4 +1,4 @@
-﻿namespace Extract.UtilityApplications.NERAnnotator
+﻿namespace Extract.UtilityApplications.NERAnnotation
 {
     partial class AnnotationStatus
     {

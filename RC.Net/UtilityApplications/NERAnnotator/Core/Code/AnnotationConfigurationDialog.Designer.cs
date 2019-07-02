@@ -1,4 +1,4 @@
-﻿namespace Extract.UtilityApplications.NERAnnotator
+﻿namespace Extract.UtilityApplications.NERAnnotation
 {
     partial class AnnotationConfigurationDialog
     {
@@ -77,24 +77,25 @@
             this.label1 = new System.Windows.Forms.Label();
             this._workingDirTextBox = new System.Windows.Forms.TextBox();
             this._failIfOutputFileExistsCheckBox = new System.Windows.Forms.CheckBox();
-            this._fkbVersionGroupBox = new System.Windows.Forms.GroupBox();
+            this.label3 = new System.Windows.Forms.Label();
             this._fkbVersionTextBox = new System.Windows.Forms.TextBox();
+            this._configurePreprocessingFunctionButton = new System.Windows.Forms.Button();
+            this._processParallelButton = new System.Windows.Forms.Button();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._entityDefinitionDataGridView)).BeginInit();
             this.groupBox1.SuspendLayout();
             this._sentenceDetectorGroupBox.SuspendLayout();
             this._tokenizerGroupBox.SuspendLayout();
-            this._fkbVersionGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // _processButton
             // 
             this._processButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this._processButton.Location = new System.Drawing.Point(7, 636);
+            this._processButton.Location = new System.Drawing.Point(7, 638);
             this._processButton.Name = "_processButton";
-            this._processButton.Size = new System.Drawing.Size(87, 23);
-            this._processButton.TabIndex = 18;
-            this._processButton.Text = "Process";
+            this._processButton.Size = new System.Drawing.Size(150, 23);
+            this._processButton.TabIndex = 13;
+            this._processButton.Text = "Process pages serially";
             this._processButton.UseVisualStyleBackColor = true;
             this._processButton.Click += new System.EventHandler(this.HandleProcessButton_Click);
             // 
@@ -109,10 +110,10 @@
             this.groupBox2.Controls.Add(this._entityDefinitionDataGridView);
             this.groupBox2.Controls.Add(this._removeButton);
             this.groupBox2.Controls.Add(this._addButton);
-            this.groupBox2.Location = new System.Drawing.Point(7, 471);
+            this.groupBox2.Location = new System.Drawing.Point(7, 462);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(602, 159);
-            this.groupBox2.TabIndex = 17;
+            this.groupBox2.Size = new System.Drawing.Size(602, 170);
+            this.groupBox2.TabIndex = 12;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Label each token with a definition where the matching attribute overlaps it spati" +
     "ally";
@@ -168,7 +169,7 @@
             this._entityDefinitionDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             this._entityDefinitionDataGridView.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._entityDefinitionDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this._entityDefinitionDataGridView.Size = new System.Drawing.Size(470, 121);
+            this._entityDefinitionDataGridView.Size = new System.Drawing.Size(470, 132);
             this._entityDefinitionDataGridView.TabIndex = 0;
             this._entityDefinitionDataGridView.TabStop = false;
             this._entityDefinitionDataGridView.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleEntityDefinitionDataGridView_RowEnter);
@@ -244,7 +245,7 @@
             this._randomSeedForSetDivisionTextBox.Location = new System.Drawing.Point(547, 77);
             this._randomSeedForSetDivisionTextBox.Name = "_randomSeedForSetDivisionTextBox";
             this._randomSeedForSetDivisionTextBox.Size = new System.Drawing.Size(41, 20);
-            this._randomSeedForSetDivisionTextBox.TabIndex = 7;
+            this._randomSeedForSetDivisionTextBox.TabIndex = 3;
             this._randomSeedForSetDivisionTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label4
@@ -261,7 +262,7 @@
             this._percentToUseForTestingSetTextBox.Location = new System.Drawing.Point(111, 77);
             this._percentToUseForTestingSetTextBox.Name = "_percentToUseForTestingSetTextBox";
             this._percentToUseForTestingSetTextBox.Size = new System.Drawing.Size(41, 20);
-            this._percentToUseForTestingSetTextBox.TabIndex = 5;
+            this._percentToUseForTestingSetTextBox.TabIndex = 2;
             this._percentToUseForTestingSetTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // _testingInputTextBox
@@ -271,7 +272,7 @@
             this._testingInputTextBox.Location = new System.Drawing.Point(92, 49);
             this._testingInputTextBox.Name = "_testingInputTextBox";
             this._testingInputTextBox.Size = new System.Drawing.Size(496, 20);
-            this._testingInputTextBox.TabIndex = 3;
+            this._testingInputTextBox.TabIndex = 1;
             this._testingInputTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label2
@@ -290,7 +291,7 @@
             this._trainingInputTextBox.Location = new System.Drawing.Point(74, 21);
             this._trainingInputTextBox.Name = "_trainingInputTextBox";
             this._trainingInputTextBox.Size = new System.Drawing.Size(514, 20);
-            this._trainingInputTextBox.TabIndex = 1;
+            this._trainingInputTextBox.TabIndex = 0;
             this._trainingInputTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // _sentenceDetectorGroupBox
@@ -302,10 +303,10 @@
             this._sentenceDetectorGroupBox.Controls.Add(this._splitIntoSentencesCheckBox);
             this._sentenceDetectorGroupBox.Controls.Add(this._sentenceDetectorPathTextBox);
             this._sentenceDetectorGroupBox.Controls.Add(this.label9);
-            this._sentenceDetectorGroupBox.Location = new System.Drawing.Point(7, 314);
+            this._sentenceDetectorGroupBox.Location = new System.Drawing.Point(7, 305);
             this._sentenceDetectorGroupBox.Name = "_sentenceDetectorGroupBox";
             this._sentenceDetectorGroupBox.Size = new System.Drawing.Size(602, 69);
-            this._sentenceDetectorGroupBox.TabIndex = 15;
+            this._sentenceDetectorGroupBox.TabIndex = 10;
             this._sentenceDetectorGroupBox.TabStop = false;
             this._sentenceDetectorGroupBox.Text = "Sentence detector";
             // 
@@ -385,10 +386,10 @@
             this._tokenizerGroupBox.Controls.Add(this._tokenizerPathTextBox);
             this._tokenizerGroupBox.Controls.Add(this._tokenizerPathTagsButton);
             this._tokenizerGroupBox.Controls.Add(this.label10);
-            this._tokenizerGroupBox.Location = new System.Drawing.Point(7, 389);
+            this._tokenizerGroupBox.Location = new System.Drawing.Point(7, 380);
             this._tokenizerGroupBox.Name = "_tokenizerGroupBox";
             this._tokenizerGroupBox.Size = new System.Drawing.Size(602, 76);
-            this._tokenizerGroupBox.TabIndex = 16;
+            this._tokenizerGroupBox.TabIndex = 11;
             this._tokenizerGroupBox.TabStop = false;
             this._tokenizerGroupBox.Text = "Tokenizer";
             // 
@@ -465,10 +466,10 @@
             // newMachineButton
             // 
             this.newMachineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.newMachineButton.Location = new System.Drawing.Point(351, 636);
+            this.newMachineButton.Location = new System.Drawing.Point(351, 638);
             this.newMachineButton.Name = "newMachineButton";
             this.newMachineButton.Size = new System.Drawing.Size(60, 23);
-            this.newMachineButton.TabIndex = 19;
+            this.newMachineButton.TabIndex = 15;
             this.newMachineButton.Text = "New";
             this.newMachineButton.UseVisualStyleBackColor = true;
             this.newMachineButton.Click += new System.EventHandler(this.HandleNewButton_Click);
@@ -476,10 +477,10 @@
             // saveMachineButton
             // 
             this.saveMachineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.saveMachineButton.Location = new System.Drawing.Point(483, 636);
+            this.saveMachineButton.Location = new System.Drawing.Point(483, 638);
             this.saveMachineButton.Name = "saveMachineButton";
             this.saveMachineButton.Size = new System.Drawing.Size(60, 23);
-            this.saveMachineButton.TabIndex = 21;
+            this.saveMachineButton.TabIndex = 17;
             this.saveMachineButton.Text = "Save";
             this.saveMachineButton.UseVisualStyleBackColor = true;
             this.saveMachineButton.Click += new System.EventHandler(this.HandleSaveButton_Click);
@@ -487,10 +488,10 @@
             // saveMachineAsButton
             // 
             this.saveMachineAsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.saveMachineAsButton.Location = new System.Drawing.Point(549, 636);
+            this.saveMachineAsButton.Location = new System.Drawing.Point(549, 638);
             this.saveMachineAsButton.Name = "saveMachineAsButton";
             this.saveMachineAsButton.Size = new System.Drawing.Size(60, 23);
-            this.saveMachineAsButton.TabIndex = 22;
+            this.saveMachineAsButton.TabIndex = 18;
             this.saveMachineAsButton.Text = "Save As";
             this.saveMachineAsButton.UseVisualStyleBackColor = true;
             this.saveMachineAsButton.Click += new System.EventHandler(this.HandleSaveAsButton_Click);
@@ -498,10 +499,10 @@
             // openMachineButton
             // 
             this.openMachineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.openMachineButton.Location = new System.Drawing.Point(417, 636);
+            this.openMachineButton.Location = new System.Drawing.Point(417, 638);
             this.openMachineButton.Name = "openMachineButton";
             this.openMachineButton.Size = new System.Drawing.Size(60, 23);
-            this.openMachineButton.TabIndex = 20;
+            this.openMachineButton.TabIndex = 16;
             this.openMachineButton.Text = "Open";
             this.openMachineButton.UseVisualStyleBackColor = true;
             this.openMachineButton.Click += new System.EventHandler(this.HandleOpenButton_Click);
@@ -513,7 +514,7 @@
             this._outputSeparateFileForEachCategoryCheckBox.Location = new System.Drawing.Point(15, 237);
             this._outputSeparateFileForEachCategoryCheckBox.Name = "_outputSeparateFileForEachCategoryCheckBox";
             this._outputSeparateFileForEachCategoryCheckBox.Size = new System.Drawing.Size(209, 17);
-            this._outputSeparateFileForEachCategoryCheckBox.TabIndex = 12;
+            this._outputSeparateFileForEachCategoryCheckBox.TabIndex = 6;
             this._outputSeparateFileForEachCategoryCheckBox.Text = "Output separate files for each category";
             this._outputSeparateFileForEachCategoryCheckBox.UseVisualStyleBackColor = true;
             this._outputSeparateFileForEachCategoryCheckBox.CheckedChanged += new System.EventHandler(this.HandleValueChanged);
@@ -532,7 +533,7 @@
             this._randomSeedForPageInclusionTextBox.Location = new System.Drawing.Point(532, 206);
             this._randomSeedForPageInclusionTextBox.Name = "_randomSeedForPageInclusionTextBox";
             this._randomSeedForPageInclusionTextBox.Size = new System.Drawing.Size(41, 20);
-            this._randomSeedForPageInclusionTextBox.TabIndex = 11;
+            this._randomSeedForPageInclusionTextBox.TabIndex = 5;
             this._randomSeedForPageInclusionTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label7
@@ -550,7 +551,7 @@
             this._percentNonInterestingPagesToIncludeTextBox.Location = new System.Drawing.Point(60, 206);
             this._percentNonInterestingPagesToIncludeTextBox.Name = "_percentNonInterestingPagesToIncludeTextBox";
             this._percentNonInterestingPagesToIncludeTextBox.Size = new System.Drawing.Size(41, 20);
-            this._percentNonInterestingPagesToIncludeTextBox.TabIndex = 9;
+            this._percentNonInterestingPagesToIncludeTextBox.TabIndex = 4;
             this._percentNonInterestingPagesToIncludeTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label6
@@ -569,7 +570,7 @@
             this._outputFileBaseNameTextBox.Location = new System.Drawing.Point(318, 177);
             this._outputFileBaseNameTextBox.Name = "_outputFileBaseNameTextBox";
             this._outputFileBaseNameTextBox.Size = new System.Drawing.Size(284, 20);
-            this._outputFileBaseNameTextBox.TabIndex = 7;
+            this._outputFileBaseNameTextBox.TabIndex = 3;
             this._outputFileBaseNameTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // label5
@@ -588,7 +589,7 @@
             this._typesVoaFunctionTextBox.Location = new System.Drawing.Point(209, 149);
             this._typesVoaFunctionTextBox.Name = "_typesVoaFunctionTextBox";
             this._typesVoaFunctionTextBox.Size = new System.Drawing.Size(369, 20);
-            this._typesVoaFunctionTextBox.TabIndex = 4;
+            this._typesVoaFunctionTextBox.TabIndex = 1;
             this._typesVoaFunctionTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 
             // _typesVoaFunctionTagButton
@@ -599,7 +600,7 @@
             this._typesVoaFunctionTagButton.Name = "_typesVoaFunctionTagButton";
             this._typesVoaFunctionTagButton.PathTags = new Extract.Utilities.SourceDocumentPathTags();
             this._typesVoaFunctionTagButton.Size = new System.Drawing.Size(18, 22);
-            this._typesVoaFunctionTagButton.TabIndex = 5;
+            this._typesVoaFunctionTagButton.TabIndex = 2;
             this._typesVoaFunctionTagButton.TextControl = this._typesVoaFunctionTextBox;
             this._typesVoaFunctionTagButton.UseVisualStyleBackColor = true;
             // 
@@ -620,7 +621,7 @@
             this._workingDirTextBox.Name = "_workingDirTextBox";
             this._workingDirTextBox.ReadOnly = true;
             this._workingDirTextBox.Size = new System.Drawing.Size(519, 20);
-            this._workingDirTextBox.TabIndex = 1;
+            this._workingDirTextBox.TabIndex = 0;
             // 
             // _failIfOutputFileExistsCheckBox
             // 
@@ -628,36 +629,59 @@
             this._failIfOutputFileExistsCheckBox.Location = new System.Drawing.Point(263, 237);
             this._failIfOutputFileExistsCheckBox.Name = "_failIfOutputFileExistsCheckBox";
             this._failIfOutputFileExistsCheckBox.Size = new System.Drawing.Size(165, 17);
-            this._failIfOutputFileExistsCheckBox.TabIndex = 13;
+            this._failIfOutputFileExistsCheckBox.TabIndex = 7;
             this._failIfOutputFileExistsCheckBox.Text = "Fail if output file already exists";
             this._failIfOutputFileExistsCheckBox.UseVisualStyleBackColor = true;
             this._failIfOutputFileExistsCheckBox.CheckedChanged += new System.EventHandler(this.HandleValueChanged);
             // 
-            // _fkbVersionGroupBox
+            // label3
             // 
-            this._fkbVersionGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this._fkbVersionGroupBox.Controls.Add(this._fkbVersionTextBox);
-            this._fkbVersionGroupBox.Location = new System.Drawing.Point(7, 263);
-            this._fkbVersionGroupBox.Name = "_fkbVersionGroupBox";
-            this._fkbVersionGroupBox.Size = new System.Drawing.Size(602, 45);
-            this._fkbVersionGroupBox.TabIndex = 14;
-            this._fkbVersionGroupBox.TabStop = false;
-            this._fkbVersionGroupBox.Text = "FKB Version";
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(13, 275);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(65, 13);
+            this.label3.TabIndex = 1;
+            this.label3.Text = "FKB Version";
             // 
             // _fkbVersionTextBox
             // 
-            this._fkbVersionTextBox.Location = new System.Drawing.Point(6, 19);
+            this._fkbVersionTextBox.Location = new System.Drawing.Point(86, 271);
             this._fkbVersionTextBox.Name = "_fkbVersionTextBox";
             this._fkbVersionTextBox.Size = new System.Drawing.Size(144, 20);
-            this._fkbVersionTextBox.TabIndex = 0;
+            this._fkbVersionTextBox.TabIndex = 8;
             this._fkbVersionTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
+            // 
+            // _configurePreprocessingFunctionButton
+            // 
+            this._configurePreprocessingFunctionButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._configurePreprocessingFunctionButton.Location = new System.Drawing.Point(440, 270);
+            this._configurePreprocessingFunctionButton.Name = "_configurePreprocessingFunctionButton";
+            this._configurePreprocessingFunctionButton.Size = new System.Drawing.Size(164, 23);
+            this._configurePreprocessingFunctionButton.TabIndex = 9;
+            this._configurePreprocessingFunctionButton.Text = "Configure helper functions...";
+            this._configurePreprocessingFunctionButton.UseVisualStyleBackColor = true;
+            this._configurePreprocessingFunctionButton.Click += new System.EventHandler(this.HandleConfigureFunctionsButton_Click);
+            // 
+            // _processParallelButton
+            // 
+            this._processParallelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this._processParallelButton.Location = new System.Drawing.Point(163, 638);
+            this._processParallelButton.Name = "_processParallelButton";
+            this._processParallelButton.Size = new System.Drawing.Size(163, 23);
+            this._processParallelButton.TabIndex = 14;
+            this._processParallelButton.Text = "Process pages in parallel";
+            this._processParallelButton.UseVisualStyleBackColor = true;
+            this._processParallelButton.Click += new System.EventHandler(this.HandleProcessParallelButton_Click);
             // 
             // AnnotationConfigurationDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(616, 666);
+            this.ClientSize = new System.Drawing.Size(616, 668);
+            this.Controls.Add(this._processParallelButton);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this._fkbVersionTextBox);
+            this.Controls.Add(this._configurePreprocessingFunctionButton);
             this.Controls.Add(this._failIfOutputFileExistsCheckBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this._workingDirTextBox);
@@ -675,14 +699,13 @@
             this.Controls.Add(this.saveMachineButton);
             this.Controls.Add(this.saveMachineAsButton);
             this.Controls.Add(this.openMachineButton);
-            this.Controls.Add(this._fkbVersionGroupBox);
             this.Controls.Add(this._sentenceDetectorGroupBox);
             this.Controls.Add(this._tokenizerGroupBox);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this._processButton);
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(632, 705);
+            this.MinimumSize = new System.Drawing.Size(632, 707);
             this.Name = "AnnotationConfigurationDialog";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -695,8 +718,6 @@
             this._sentenceDetectorGroupBox.PerformLayout();
             this._tokenizerGroupBox.ResumeLayout(false);
             this._tokenizerGroupBox.PerformLayout();
-            this._fkbVersionGroupBox.ResumeLayout(false);
-            this._fkbVersionGroupBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -752,7 +773,9 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox _workingDirTextBox;
         private System.Windows.Forms.CheckBox _failIfOutputFileExistsCheckBox;
-        private System.Windows.Forms.GroupBox _fkbVersionGroupBox;
         private System.Windows.Forms.TextBox _fkbVersionTextBox;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button _configurePreprocessingFunctionButton;
+        private System.Windows.Forms.Button _processParallelButton;
     }
 }

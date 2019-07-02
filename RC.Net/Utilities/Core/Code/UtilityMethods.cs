@@ -1002,6 +1002,7 @@ namespace Extract.Utilities
         /// <param name="createNew">if <see langword="true"/> any existing ExtractCategoriesWithDescription.json file will be deleted and new one
         /// will be created. if <see langword="false"/> then if ExtractCategoriesWithDescription.json exists it will be used.</param>
         /// <returns>Dictionary of Extract categories with the registered types</returns>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public static Dictionary<string, HashSet<ExtractCategoryType>> GetExtractCategoriesJson(bool createNew = false)
         {
             try

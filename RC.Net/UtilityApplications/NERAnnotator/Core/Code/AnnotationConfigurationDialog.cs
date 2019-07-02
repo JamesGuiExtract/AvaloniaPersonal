@@ -1,13 +1,15 @@
 ﻿using Extract.AttributeFinder.Rules;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
 using YamlDotNet.Serialization;
 
-namespace Extract.UtilityApplications.NERAnnotator
+namespace Extract.UtilityApplications.NERAnnotation
 {
     /// <summary>
     /// Dialog to configure and run NER data annotation
@@ -20,7 +22,7 @@ namespace Extract.UtilityApplications.NERAnnotator
         // Don't update the settings object if in the process of initializing them from the settings object
         private bool _suspendUpdatesToSettingsObject;
 
-        private Settings _settings;
+        private NERAnnotatorSettings _settings;
         private string _fileName;
         private BindingList<EntityDefinition> _entityDefinitions;
         private bool _dirty;
@@ -70,20 +72,20 @@ namespace Extract.UtilityApplications.NERAnnotator
                 {
                     try
                     {
-                        _settings = Settings.LoadFrom(settingsFilePath);
+                        _settings = NERAnnotatorSettings.LoadFrom(settingsFilePath);
                         _fileName = settingsFilePath;
                     }
                     catch (Exception ex)
                     {
                         _fileName = _NEW_FILE_NAME;
-                        _settings = new Settings();
+                        _settings = new NERAnnotatorSettings();
                         ex.ExtractDisplay("ELI44905");
                     }
                 }
                 else
                 {
                     _fileName = _NEW_FILE_NAME;
-                    _settings = new Settings();
+                    _settings = new NERAnnotatorSettings();
                 }
 
                 InitializeComponent();
@@ -370,7 +372,27 @@ namespace Extract.UtilityApplications.NERAnnotator
         {
             try
             {
-                using (var win = new AnnotationStatus(_settings))
+                using (var win = new AnnotationStatus(_settings, false))
+                {
+                    win.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI44881");
+            }
+        }
+
+        /// <summary>
+        /// Opens a dialog and starts processing attributes using multiple threads
+        /// </summary>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        private void HandleProcessParallelButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (var win = new AnnotationStatus(_settings, true))
                 {
                     win.ShowDialog();
                 }
@@ -473,7 +495,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                 }
 
                 _fileName = _NEW_FILE_NAME;
-                _settings = new Settings();
+                _settings = new NERAnnotatorSettings();
                 SetControlValues();
             }
             catch (Exception ex)
@@ -506,7 +528,7 @@ namespace Extract.UtilityApplications.NERAnnotator
                     if (openDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
                         Cursor.Current = Cursors.WaitCursor;
-                        _settings = Settings.LoadFrom(_fileName);
+                        _settings = NERAnnotatorSettings.LoadFrom(_fileName);
                         _fileName = openDialog.FileName;
                         SetControlValues();
                     }
@@ -600,6 +622,14 @@ namespace Extract.UtilityApplications.NERAnnotator
                 {
                     _settings.TokenizerType = OpenNlpTokenizer.LearnableTokenizer;
                 }
+                if (_whitespaceTokenizerRadioButton.Checked)
+                {
+                    _settings.TokenizerType = OpenNlpTokenizer.WhiteSpaceTokenizer;
+                }
+                else if (_simpleTokenizerRadioButton.Checked)
+                {
+                    _settings.TokenizerType = OpenNlpTokenizer.SimpleTokenizer;
+                }
 
                 _settings.TokenizerModelPath = _tokenizerPathTextBox.Text;
                 _settings.FKBVersion = _fkbVersionTextBox.Text;
@@ -609,6 +639,27 @@ namespace Extract.UtilityApplications.NERAnnotator
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI44886");
+            }
+        }
+
+
+        private void HandleConfigureFunctionsButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                NERAnnotatorSettings cloneOfSettings = _settings.ShallowClone();
+                using (FunctionConfigurationDialog dlg
+                    = new FunctionConfigurationDialog(cloneOfSettings))
+                {
+                    if (dlg.ShowDialog() == DialogResult.OK)
+                    {
+                        _settings = dlg.Settings;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI46962");
             }
         }
 
@@ -754,7 +805,7 @@ namespace Extract.UtilityApplications.NERAnnotator
         Specified = 1
     }
 
-    public class Settings
+    public class NERAnnotatorSettings
     {
         private bool _outputSeparateFileForEachCategory;
 
@@ -767,6 +818,7 @@ namespace Extract.UtilityApplications.NERAnnotator
         public int PercentToUseForTestingSet { get; set; }
         public int? RandomSeedForSetDivision { get; set; }
 
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Voa")]
         public string TypesVoaFunction { get; set; }
 
         /// <summary>
@@ -818,33 +870,78 @@ namespace Extract.UtilityApplications.NERAnnotator
         public OpenNlpTokenizer TokenizerType { get; set; } = OpenNlpTokenizer.LearnableTokenizer;
         public string TokenizerModelPath { get; set; } = "<ComponentDataDir>\\NER\\tokenizer.nlp.etf";
 
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
         public List<EntityDefinition> EntityDefinitions { get; set; } = new List<EntityDefinition>();
         public long LastIDToProcess { get;  set; }
         public long FirstIDToProcess { get; set; }
         public bool UseAttributeSetForTypes { get; set; }
         public string FKBVersion { get; set; }
+        public bool RunPreprocessingFunction { get; set; }
+        public string PreprocessingScript { get; set; }
+        public string PreprocessingFunctionName { get; set; }
+        public bool RunEntityFilteringFunctions { get; set; }
+        public string EntityFilteringScript { get; set; }
+        public bool RunCharacterReplacingFunction { get; set; }
+        public string CharacterReplacingScript { get; set; }
+        public string CharacterReplacingFunctionName { get; set; }
 
-        public static Settings LoadFrom(string filename)
+        public static NERAnnotatorSettings LoadFrom(string fileName)
         {
-            var deserializer = new Deserializer();
-            using (var reader = new StreamReader(filename))
+            try
             {
-                var retVal = deserializer.Deserialize<Settings>(reader);
-                retVal.WorkingDir = Path.GetDirectoryName(Path.GetFullPath(filename));
-                return retVal;
+                var deserializer = new Deserializer();
+                using (var reader = new StreamReader(fileName))
+                {
+                    var retVal = deserializer.Deserialize<NERAnnotatorSettings>(reader);
+                    retVal.WorkingDir = Path.GetDirectoryName(Path.GetFullPath(fileName));
+                    return retVal;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46923");
             }
         }
 
-        public void SaveTo(string filename)
+        public static NERAnnotatorSettings Load(string settings)
         {
-            var sb = new SerializerBuilder();
-            sb.EmitDefaults();
-            var serializer = sb.Build();
-            using (var stream = new StreamWriter(filename))
+            try
             {
-                serializer.Serialize(stream, this);
+                var deserializer = new Deserializer();
+                using (var reader = new StringReader(settings))
+                {
+                    return deserializer.Deserialize<NERAnnotatorSettings>(reader);
+                }
             }
-            WorkingDir = Path.GetDirectoryName(Path.GetFullPath(filename));
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46986");
+            }
+        }
+
+        public NERAnnotatorSettings ShallowClone()
+        {
+            return (NERAnnotatorSettings)MemberwiseClone();
+        }
+
+        public void SaveTo(string fileName)
+        {
+            try
+            {
+                var sb = new SerializerBuilder();
+                sb.EmitDefaults();
+                var serializer = sb.Build();
+                using (var stream = new StreamWriter(fileName))
+                {
+                    serializer.Serialize(stream, this);
+                }
+                WorkingDir = Path.GetDirectoryName(Path.GetFullPath(fileName));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI46924");
+            }
         }
     }
 }

@@ -39,8 +39,8 @@ fc 002004152269 IIR-SA(0R ) ( 0510 ) Initials : Form 3038 1/01 CitiMortgage 3.2.
 
 A.P.N. : 123-123-12 File No. : 1004-1075450 ( RK) STATE OF Ar } ss .
 COUNTY OF (a - /4.1)a .e/ref
-before On t i # e,cot_4( 4-.
-j 9-03 , me , <START:Name> --Kityc-e , (jese , 4,4-0, :ez , personally appeared d( i/rti ,aefre <END> <START:Name> . <END>
+before On t <START:Name> i <END> # e,cot_4( 4-.
+j 9-03 , me , <START:Name> --Kityc-e , (jese , 4,4-0, :ez , <END> personally appeared <START:Name> d( i/rti ,aefre . <END>
 , -personally knownto_mP ( or proved to me on the basis of satisfactory evidence ) to be the person4 whose name ( is/are subscribed to the within instrument and acknowledged to me that ,he/she/Iney executed tj-ie same injais/her/their authorized capacity( ies ) and that-his/her/their signature( K on the instrument the person( s ) or the entity upon behalf of which the person( s ) acted , executed the instrument .
 This area for official notarial seal WITNESS my hand and official seal .
 Signature <START:Name> (-64d- hi/ DtUL <END> AA/ /7 ) 2106 My Commission Expires : <START:Name> TERESA ROSE MARTINEZ <END> Commission # 1384821 Notary Public - California t Los Angeles County My Comm .
@@ -56,11 +56,11 @@ NO EVIDENCE OF TITLE REQUESTED OR FURNISHED.
 Grantees assume and agree to pay the taxes and assessments against the real estate , due and payable in November , 2009 and thereafter , against which Grantors herein do not warrant .
 v. :7h 1HE COUNTY DATE :
 100000123456 Filed for Record in DEARBORN COUNTY ?
-INDIANA <START:Name> BARBARA J. KAFFENBERGER 01-09-2009 <END> At 04 :03:07 pm .
+INDIANA <START:Name> BARBARA J. KAFFENBERGER <END> 01-09-2009 At 04 :03:07 pm .
 WARE' DEED 18.00 OR Book 123 Page 1234 IN WITNESS WHEREOF , the said grantors have hereunto set their hands and seal this 30 day of December , 2008 .
 <START:Name> JOHN D. DOE <END> AND <START:Name> JANE DOE <END> FAMILY TRUST By : <START:Name> D. DOE <END> , Trustee <START:Name> JANE DOE <END> , Trustee STATE OF INDIANA , COUNTY OF DEARBORN , SS : Before me , a Notary Public residing in Dearborn County , Indiana , personally appeared <START:Name> John D. Doe <END> and <START:Name> Jane Doe <END> , Trustees , Grantors in the above conveyance , and acknowledged the execution of the same to be their voluntary act and deed , for the uses and purposes herein mentioned .
 IN WITNESS WHEREOF , I have hereunto subscribed my name ,' , ;' ; \. ) and affixed my official seal this 30 day of December , 2008 .
-... pet c" . " Notary Public D <START:Name> CA CA <END> My Commission Expires : /I - /4 , -ao/e .40
+... pet c" . " Notary Public <START:Name> D CA CA <END> My Commission Expires : /I - /4 , -ao/e .40
 fffIft54 ; Printed I AFFIRM , UNDER PENALTIES FOR PERJURY , THAT I HAVE TAKEN REASONABLE CARE TO REDACT EACH SOCIAL SECURITY NUMBER IN THIS DOCUMENT , UNLESS REQUIRED BY LAW.
 <START:Name> Frank G. Kramer <END> This instrument prepared by : <START:Name> FRANK G. KRAMER <END> , Attorney at Law EWBANK & KRAMER <START:Address> 114 West High Street Lawrenceburg , IN 47025-4200 <END> Telephone : ( <START:Phone> 812 ) 537-2522 <END>
 

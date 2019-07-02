@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Extract.UtilityApplications.NERAnnotator
+namespace Extract.UtilityApplications.NERAnnotation
 {
     public class EntityDefinition : INotifyPropertyChanged
     {
