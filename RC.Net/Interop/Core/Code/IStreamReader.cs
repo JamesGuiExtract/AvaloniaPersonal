@@ -247,6 +247,40 @@ namespace Extract.Interop
         }
 
         /// <summary>
+        /// Reads an array of ints from the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
+        /// </summary>
+        /// <returns>An array of ints.</returns>
+        public Int32[] ReadInt32Array()
+        {
+            try
+            {
+                // Check if the value is null
+                bool hasValue = (bool)_formatter.Deserialize(_stream);
+                if (!hasValue)
+                {
+                    return null;
+                }
+
+                // Get the number of items in the array
+                int count = (int)_formatter.Deserialize(_stream);
+
+                // Read each value
+                var result = new Int32[count];
+                for (int i = 0; i < count; i++)
+                {
+                    result[i] = ReadInt32();
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI46981",
+                    "Unable to read Int32 array.", ex);
+            }
+        }
+
+        /// <summary>
         /// Reads an array of <typeparamref name="T"/> from the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <returns>An array of <typeparamref name="T"/></returns>

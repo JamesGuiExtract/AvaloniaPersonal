@@ -240,6 +240,9 @@ const unsigned int gnLEADTOOLS_2_EXTRA_CORES			= gnBASE_OFFSET + 89;
 // Adds +4 core license to base leadtools license
 const unsigned int gnLEADTOOLS_4_EXTRA_CORES			= gnBASE_OFFSET + 90;
 
+// Barcode search via Nuance.
+const unsigned int gnBARCODES							= gnBASE_OFFSET + 91;
+
 //-------------------------------------------------------------------------------------------------
 // Constants for items licensed for FLEX Index / ID Shield integration
 //-------------------------------------------------------------------------------------------------

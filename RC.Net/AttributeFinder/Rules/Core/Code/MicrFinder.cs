@@ -129,6 +129,11 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         const char _UNRECOGNIZED_CHAR = (char)0xFFFD;
 
+        /// <summary>
+        /// Nuance mask to retrieve only confidence from character error level (and exclude the suspect word flag).
+        /// </summary>
+        const int RE_ERROR_LEVEL_MASK = ~0x80;
+
         const string _AUTO_ENCRYPT_KEY = @"Software\Extract Systems\AttributeFinder\Settings\AutoEncrypt";
 
         #endregion Constants
@@ -768,7 +773,7 @@ namespace Extract.AttributeFinder.Rules
                     { _TRANSIT_CHAR, _AMOUNT_CHAR, _ON_US_CHAR, _DASH_CHAR });
                 settings.DTXTOutputformat = DTXTOUTPUTFORMATS.DTXT_TXTS;
 
-                var pagesToSearch = pDocument.Text.GetPages(false, "")
+                var pagesToSearch = pDocument.Text.GetPages(true, "[BLANK]")
                     .ToIEnumerable<SpatialString>()
                     .Select(p => p.GetFirstPageNumber());
 
@@ -993,7 +998,7 @@ namespace Extract.AttributeFinder.Rules
 
             var confidence = (int)zoneLetters
                 .Where(l => !char.IsWhiteSpace(l.code))
-                .Select(l => (l.err > 127) ? 0 : (100 - l.err))
+                .Select(l => 100 - Math.Min(99, l.err & RE_ERROR_LEVEL_MASK))
                 .Average();
 
             if (FilterRegexInstance != null)

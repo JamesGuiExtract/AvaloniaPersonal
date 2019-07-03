@@ -196,6 +196,36 @@ namespace Extract.Interop
         }
 
         /// <summary>
+        /// Writes an array of ints to the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
+        /// </summary>
+        /// <param name="value">The array of ints to write.</param>
+        public void Write(Int32[] value)
+        {
+            try
+            {
+                // First stream whether the value is null
+                bool hasValue = value != null;
+                _formatter.Serialize(_stream, hasValue);
+                if (hasValue)
+                {
+                    // Stream the number of values in the array
+                    _formatter.Serialize(_stream, value.Length);
+
+                    // Stream each values
+                    for (int i = 0; i < value.Length; i++)
+                    {
+                        Write(value[i]);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI46982",
+                    "Unable to write int array.", ex);
+            }
+        }
+
+        /// <summary>
         /// Writes an array of <typeparamref name="T"/> to the <see cref="System.Runtime.InteropServices.ComTypes.IStream"/> object.
         /// </summary>
         /// <param name="value">The array of <typeparamref name="T"/> to write.</param>
