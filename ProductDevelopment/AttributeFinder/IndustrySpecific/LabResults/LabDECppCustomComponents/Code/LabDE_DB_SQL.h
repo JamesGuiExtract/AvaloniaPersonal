@@ -41,6 +41,52 @@ static const string gstrCREATE_PATIENT_FIRSTNAME_INDEX =
     "CREATE NONCLUSTERED INDEX [IX_Patient_FirstName] "
     "	ON [LabDEPatient]([FirstName], [LastName], [DOB])";
 
+static const string gstrCREATE_LABDE_PROVIDER_TABLE =
+"IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'LabDEProvider') "
+"BEGIN "
+"CREATE TABLE [dbo].[LabDEProvider]( "
+"[ID][nvarchar](64) NOT NULL, "
+"[FirstName][nvarchar](64) NOT NULL, "
+"[MiddleName][nvarchar](64) NULL, "
+"[LastName][nvarchar](64) NOT NULL, "
+"[ProviderType][nvarchar](32) NULL, "
+"[Title][nvarchar](12) NULL, "
+"[Degree][nvarchar](12) NULL, "
+"[Departments][nvarchar](64) NOT NULL, "
+"[Specialties][nvarchar](200) NULL, "
+"[Phone][nvarchar](32) NULL, "
+"[Fax][nvarchar](32) NULL, "
+"[Address][nvarchar](1000) NULL, "
+"[OtherProviderID][nvarchar](64) NULL, "
+"[Inactive][bit] NULL, "
+"[MFNMessage][xml] NULL) "
+"END ";
+
+static const string gstrCREATE_LABDE_PROVIDER_INDEX_FIRSTLAST =
+"IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'IX_FirstLast' AND object_id = OBJECT_ID('dbo.LabDEProvider')) "
+"BEGIN "
+"CREATE NONCLUSTERED INDEX [IX_FirstLast] ON [dbo].[LabDEProvider] "
+"([LastName] ASC, "
+" [FirstName] ASC "
+")WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 90) ON[PRIMARY] "
+"END ";
+
+static const string gstrCREATE_LABDE_PROVIDER_INDEX_FIRST =
+"IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'IX_FirstName' AND object_id = OBJECT_ID('dbo.LabDEProvider')) "
+"BEGIN "
+"CREATE NONCLUSTERED INDEX [IX_FirstName] ON [dbo].[LabDEProvider]( "
+"[FirstName] ASC "
+")WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 90) ON[PRIMARY] "
+"END ";
+
+static const string gstrCREATE_LABDE_PROVIDER_INDEX_LAST =
+"IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'IX_LastName' AND object_id = OBJECT_ID('dbo.LabDEProvider')) "
+"BEGIN "
+"CREATE NONCLUSTERED INDEX [IX_LastName] ON [dbo].[LabDEProvider]( "
+"[LastName] ASC "
+")WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 90) ON[PRIMARY] "
+"END ";
+
 static const string gstrCREATE_PATIENT_LASTNAME_INDEX =
     "CREATE NONCLUSTERED INDEX [IX_Patient_LastName] "
     "	ON [LabDEPatient]([LastName], [FirstName], [DOB])";

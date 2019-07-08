@@ -89,6 +89,7 @@
     <Compile Include="TestAFUtils.cs" />
     <Compile Include="TestFKB.cs" />
     <Compile Include="TestClassWeights.cs" />
+    <Compile Include="TestMICRFinder.cs" />
     <Compile Include="TestSpatialString.cs" />
     <Compile Include="TestSpatialPageInfo.cs" />
     <Compile Include="TestOCRParameters.cs" />
@@ -578,6 +579,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Resources\MICRFinderTest1.tiff.uss" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\MICRFinderTest1.tiff" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

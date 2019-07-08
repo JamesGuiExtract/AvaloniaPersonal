@@ -14,27 +14,33 @@ vector<string> getTableNamesFromCreationQueries(vector<string> vecCreationQuerie
 
 	for (int i = 0; i < count; i++)
 	{
-		// Assuming the first two words in the query are "Create" and "Table", the 3rd word will be
-		// the table name.
 		vector<string> vecTokens;
 		StringTokenizer::sGetTokens(vecCreationQueries[i], " )(", vecTokens, true);
-		if (vecTokens.size() < 3 ||
-			_stricmp(vecTokens[0].c_str(), "CREATE") != 0 ||
-			_stricmp(vecTokens[1].c_str(), "TABLE") != 0)
+		bool foundCreateStatement = false;
+		for (int j = 0; j < vecTokens.size(); j++)
+		{
+			if (vecTokens.size() - j > 3 && vecTokens[j] == "CREATE" && vecTokens[j+1] == "TABLE")
+			{
+				// Trim enclosing braces as well as any "dbo." prefix.
+				string strTableName = trim(vecTokens[j + 2], "[", "]");
+				if (strTableName.length() > 3 && _stricmp(strTableName.substr(0, 3).c_str(), "dbo") == 0)
+				{
+					strTableName = trim(strTableName.substr(3), "][.", "]");
+				}
+
+				vecTableNames[i] = strTableName;
+
+				foundCreateStatement = true;
+				break;
+			}
+		}
+
+		if (!foundCreateStatement)
 		{
 			UCLIDException ue("ELI31406", "Expected table create query.");
 			ue.addDebugInfo("Query", vecCreationQueries[i], true);
 			throw ue;
 		}
-		
-		// Trim enclosing braces as well as any "dbo." prefix.
-		string strTableName = trim(vecTokens[2], "[", "]");
-		if (strTableName.length() > 3 && _stricmp(strTableName.substr(0, 3).c_str(), "dbo") == 0)
-		{
-			strTableName = trim(strTableName.substr(3), "][.", "]");
-		}
-
-		vecTableNames[i] = strTableName;
 	}
 
 	return vecTableNames;

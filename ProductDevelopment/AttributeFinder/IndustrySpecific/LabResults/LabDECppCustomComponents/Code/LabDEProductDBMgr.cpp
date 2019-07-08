@@ -54,11 +54,11 @@ using namespace std;
 // Version 16:https://extract.atlassian.net/browse/ISSUE-15225
 //			  This just drops and recreates the LabDEAddOrUpdateOrderWithEncounterAndIPDates stored procedure
 // WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
-static const long glLABDE_DB_SCHEMA_VERSION = 16;
+static const long glLABDE_DB_SCHEMA_VERSION = 17;
 static const string gstrLABDE_SCHEMA_VERSION_NAME = "LabDESchemaVersion";
 static const string gstrDESCRIPTION = "LabDE database manager";
 
-//-------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------- 
 // Schema update functions
 //-------------------------------------------------------------------------------------------------
 int UpdateToSchemaVersion1(_ConnectionPtr ipConnection, long* pnNumSteps, 
@@ -648,6 +648,56 @@ int UpdateToSchemaVersion16(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45538");
 }
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion17(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		const int nNewSchemaVersion = 17;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		vecQueries.push_back(
+		"DECLARE @sql NVARCHAR(MAX) = N''; "
+		"	SELECT @sql += N'DROP INDEX ' "
+		"	+ QUOTENAME(SCHEMA_NAME(sys.tables.[schema_id])) "
+		"	+ '.' + QUOTENAME(sys.tables.[name]) "
+		"	+ '.' + QUOTENAME(sys.indexes.[name]) + ';' "
+		"	FROM "
+		"		sys.indexes "
+		"			INNER JOIN sys.tables "
+		"				ON sys.indexes.[object_id] = sys.tables.[object_id] "
+		"	WHERE "
+		"		sys.indexes.is_primary_key = 0 "
+		"		AND "
+		"		sys.indexes.index_id < > 0 "
+		"		AND "
+		"		sys.tables.is_ms_shipped = 0 "
+		"		AND "
+		"		sys.tables.[name] = 'LabDEProvider'; "
+
+		" EXEC sp_executesql @sql; " );
+		vecQueries.push_back(gstrCREATE_LABDE_PROVIDER_TABLE);
+		vecQueries.push_back(gstrCREATE_LABDE_PROVIDER_INDEX_FIRST);
+		vecQueries.push_back(gstrCREATE_LABDE_PROVIDER_INDEX_LAST);
+		vecQueries.push_back(gstrCREATE_LABDE_PROVIDER_INDEX_FIRSTLAST);
+		vecQueries.push_back("UPDATE [DBInfo] SET [Value] = '" + asString(nNewSchemaVersion) +
+			"' WHERE [Name] = '" + gstrLABDE_SCHEMA_VERSION_NAME + "'");
+
+		// Execute the queries
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46997");
+}
 
 //-------------------------------------------------------------------------------------------------
 // CLabDEProductDBMgr
@@ -812,6 +862,9 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB 
 		vecCreateQueries.push_back(gstrCREATE_PATIENTFILE_PATIENT_INDEX);
 		vecCreateQueries.push_back(gstrCREATE_PATIENTFILE_FAMFILE_INDEX);
 		vecCreateQueries.push_back(gstrCREATE_ENCOUNTER_PATIENT_MRN_INDEX);
+		vecCreateQueries.push_back(gstrCREATE_LABDE_PROVIDER_INDEX_FIRST);
+		vecCreateQueries.push_back(gstrCREATE_LABDE_PROVIDER_INDEX_LAST);
+		vecCreateQueries.push_back(gstrCREATE_LABDE_PROVIDER_INDEX_FIRSTLAST);
 
         if (!asCppBool(bOnlyTables))
         {
@@ -1169,8 +1222,15 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 					{
 						*pnProdSchemaVersion = UpdateToSchemaVersion16(ipConnection, pnNumSteps, NULL);
 					}
-			case 16: // current schema
-				break;
+					break;
+			case 16: 
+					// The schema update from 15 to 16 needs to take place using FAM DB schema version 172
+					if (nFAMDBSchemaVersion == 172)
+					{
+						*pnProdSchemaVersion = UpdateToSchemaVersion17(ipConnection, pnNumSteps, NULL);
+					}
+					break;
+			case 17:
 
             default:
             {
@@ -1276,6 +1336,7 @@ void CLabDEProductDBMgr::getLabDETables(vector<string>& rvecTables)
 	rvecTables.push_back(gstrLABDE_ENCOUNTER_TABLE);
 	rvecTables.push_back(gstrLABDE_ENCOUNTER_FILE_TABLE);
 	rvecTables.push_back(gstrLABDE_PATIENT_FILE_TABLE);
+	rvecTables.push_back(gstrCREATE_LABDE_PROVIDER_TABLE);
 }
 //-------------------------------------------------------------------------------------------------
 void CLabDEProductDBMgr::validateLabDESchemaVersion(bool bThrowIfMissing)
@@ -1313,6 +1374,7 @@ const vector<string> CLabDEProductDBMgr::getTableCreationQueries(bool bAddUserTa
 	vecQueries.push_back(gstrCREATE_ENCOUNTER_TABLE);
 	vecQueries.push_back(gstrCREATE_ENCOUNTER_FILE_TABLE);
 	vecQueries.push_back(gstrCREATE_PATIENT_FILE_TABLE);
+	vecQueries.push_back(gstrCREATE_LABDE_PROVIDER_TABLE);
 
     return vecQueries;
 }

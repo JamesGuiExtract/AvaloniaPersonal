@@ -1226,7 +1226,7 @@ namespace Extract.AttributeFinder.Rules
             if (SplitAccountNumber)
             {
                 ExtractException.Assert("ELI46958",
-                    "Failed to account number due to missing regular expression group",
+                    "Failed to get amount because regex group is missing",
                     groupNames.Any(name => name == "Account"));
 
                 componentNames.Add("Account");

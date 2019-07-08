@@ -11,9 +11,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Net;
+using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
+using WebAPI;
 using WebAPI.Controllers;
 using WebAPI.Models;
 
@@ -695,6 +697,61 @@ namespace Extract.Web.WebAPI.Test
                 _testDbManager.RemoveDatabase(dbName);
 
                 _testFiles.RemoveFile(_TEST_FILE1);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void Test_ProcessAnnotation()
+        {
+            string dbName = "AppBackendAPI_Test_ProcessAnnotation";
+
+            try
+            {
+                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
+                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
+                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+
+                string testFileName = _testFiles.GetFile(_TEST_FILE1);
+                _testFiles.GetFile(_TEST_FILE1_USS);
+
+                var fileRecord = fileProcessingDb.AddFile(
+                    testFileName, _VERIFY_ACTION, 1, EFilePriority.kPriorityHigh, false, false,
+                    EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
+                int fileId = fileRecord.FileID;
+
+                var result = controller.Login(user);
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
+
+                var sessionResult = controller.SessionLogin();
+                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
+
+                result = controller.OpenDocument();
+                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+                Assert.AreEqual(fileId, openDocumentResult.Id);
+
+                string voaFile = _testFiles.GetFile(_TEST_FILE1_VOA);
+                var voa = new IUnknownVectorClass();
+                voa.LoadFrom(voaFile, false);
+                var mapper = new AttributeMapper(voa, EWorkflowType.kExtraction);
+                var documentAttribute = mapper.MapAttribute((IAttribute)voa.At(1), true);
+
+                var processAnnotationResult = controller.ProcessAnnotation(openDocumentResult.Id, 1, new ProcessAnnotationParameters() { Annotation = documentAttribute, Definition = "{ AutoShrinkRedactionZones: {} }", OperationType = "modify" });//WebApi.Models.ProcessAnnotationParameters
+                processAnnotationResult.AssertResultCode(200, "ProcessAnnotation is failing");
+
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+
+                _testFiles.RemoveFile(_TEST_FILE1);
+                _testFiles.RemoveFile(_TEST_FILE1_USS);
             }
         }
 

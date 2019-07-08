@@ -94,7 +94,6 @@ static const string gstrDATABASE_SERVICE = "DatabaseService";
 static const string gstrREPORTING_VERIFICATION_RATES = "ReportingVerificationRates";
 static const string gstrDASHBOARD = "Dashboard";
 
-
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
 //-------------------------------------------------------------------------------------------------
