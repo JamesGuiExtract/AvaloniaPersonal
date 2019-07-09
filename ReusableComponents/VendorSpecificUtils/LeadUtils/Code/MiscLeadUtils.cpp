@@ -30,6 +30,10 @@
 #include <algorithm>
 #include <string>
 
+
+// add license management password function
+DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
+
 // Class created to initialize leadtools license before any application uses this dll
 // https://extract.atlassian.net/browse/ISSUE-16441
 class InitLicenseClass
@@ -320,6 +324,7 @@ void InitLeadToolsLicense()
 	}
 	try
 	{
+		LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
 		string leadtoolsLicensePath = getModuleDirectory("BaseUtils.dll");
 		if (LicenseManagement::isPDFLicensed())
 		{
