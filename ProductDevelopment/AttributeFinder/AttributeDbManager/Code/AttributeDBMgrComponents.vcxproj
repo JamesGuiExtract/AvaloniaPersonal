@@ -123,7 +123,7 @@
       <OutputFile>.\..\Release/AttributeDBMgrComponents.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>tlbimp $(TargetPath) /company: "Extract Systems" /copyright: "Copyright © Extract Systems LLC 2019" /namespace:AttributeDbMgrComponentsLib /out: $(OutDir)Interop.AttributeDbMgrComponentsLib.dll /keyfile: $(TargetPath)\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</Command>
+      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -184,7 +184,7 @@
       <PreserveSBR>true</PreserveSBR>
     </Bscmake>
     <PostBuildEvent>
-      <Command>tlbimp $(TargetPath) /company: "Extract Systems" /copyright: "Copyright © Extract Systems LLC 2019" /namespace:AttributeDbMgrComponentsLib /out: $(OutDir)Interop.AttributeDbMgrComponentsLib.dll /keyfile: $(TargetPath)\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</Command>
+      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">

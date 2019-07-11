@@ -107,7 +107,7 @@
       <PreserveSBR>true</PreserveSBR>
     </Bscmake>
     <PostBuildEvent>
-      <Command>tlbimp $(TargetPath) /company: "Extract Systems" /copyright: "Copyright © Extract Systems LLC 2019" /namespace:EXTRACTREDACTIONTESTERLib /out: $(OutDir)Interop.EXTRACTREDACTIONTESTERLib.dll /keyfile: $(OutDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk</Command>
+      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -156,7 +156,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>tlbimp $(TargetPath) /company: "Extract Systems" /copyright: "Copyright © Extract Systems LLC 2019" /namespace:EXTRACTREDACTIONTESTERLib /out: $(OutDir)Interop.EXTRACTREDACTIONTESTERLib.dll /keyfile: $(OutDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk</Command>
+      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -112,7 +112,7 @@
     <PostBuildEvent>
       <Message>
       </Message>
-      <Command>tlbimp $(TargetPath) /company: "Extract Systems" /copyright: "Copyright © Extract Systems LLC 2019" /namespace:UCLID_INPUTFUNNELLib /out: $(OutDir)Interop.UCLID_INPUTFUNNELLib.dll /keyfile: $(TargetPath)\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</Command>
+      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -166,7 +166,7 @@
       <OutputFile>.\..\Release/IFCore.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>tlbimp $(TargetPath) /company: "Extract Systems" /copyright: "Copyright © Extract Systems LLC 2019" /namespace:UCLID_INPUTFUNNELLib /out: $(OutDir)Interop.UCLID_INPUTFUNNELLib.dll /keyfile: $(TargetPath)\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</Command>
+      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
