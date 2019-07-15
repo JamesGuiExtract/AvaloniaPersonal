@@ -273,6 +273,13 @@
     <Compile Include="ModifySpatialModeSettingsDialog.Designer.cs">
       <DependentUpon>ModifySpatialModeSettingsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="MoveCopyAttributes.cs" />
+    <Compile Include="MoveCopyAttributesSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MoveCopyAttributesSettingsDialog.Designer.cs">
+      <DependentUpon>MoveCopyAttributesSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="MultipleCriteriaSelector.cs" />
     <Compile Include="MultipleCriteriaSelectorSettingsDialog.cs">
       <SubType>Form</SubType>
@@ -548,6 +555,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ModifySpatialModeSettingsDialog.resx">
       <DependentUpon>ModifySpatialModeSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MoveCopyAttributesSettingsDialog.resx">
+      <DependentUpon>MoveCopyAttributesSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MultipleCriteriaSelectorSettingsDialog.resx">
       <DependentUpon>MultipleCriteriaSelectorSettingsDialog.cs</DependentUpon>

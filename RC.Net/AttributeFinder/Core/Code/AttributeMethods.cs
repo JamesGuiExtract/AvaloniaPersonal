@@ -1,3 +1,4 @@
+using Extract.Imaging;
 using Extract.Interop;
 using Extract.Interop.Zip;
 using Extract.Utilities;
@@ -7,7 +8,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Extract.Imaging;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -106,12 +106,12 @@ namespace Extract.AttributeFinder
             {
                 ExtractException ee = new ExtractException("ELI28540",
                     "Unable to get attribute by name.", ex);
-                string nameList = "";
+                string nameList = string.Empty;
                 try
                 {
                     nameList = string.Join(", ", names);
                 }
-                catch (Exception){}
+                catch (Exception) { }
                 ee.AddDebugData("Attribute names", nameList, false);
                 throw ee;
             }
@@ -262,7 +262,7 @@ namespace Extract.AttributeFinder
         public static IEnumerable<IAttribute> EnumerateDepthFirst(this IAttribute attribute)
         {
             yield return attribute;
-            foreach(var descendant in attribute.SubAttributes
+            foreach (var descendant in attribute.SubAttributes
                 .ToIEnumerable<ComAttribute>()
                 .SelectMany(EnumerateDepthFirst))
             {
@@ -402,9 +402,9 @@ namespace Extract.AttributeFinder
                     .Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries)
                     .Select<string, Func<ComAttribute, bool>>(q =>
                     {
-                    // Query is Name[@Type]
-                    // '*@' = type must be empty so don't remove empty entries from split
-                    var queryParts = q.Split('@');
+                        // Query is Name[@Type]
+                        // '*@' = type must be empty so don't remove empty entries from split
+                        var queryParts = q.Split('@');
                         var name = queryParts[0].Trim();
                         var checkName = !string.Equals(name, "*", StringComparison.Ordinal);
                         var checkType = queryParts.Length > 1;
@@ -534,7 +534,7 @@ namespace Extract.AttributeFinder
                         ussData.ReportMemoryUsage();
                         return ussData;
                     });
-                    
+
                 var newSpatialPageInfos = new LongToObjectMapClass();
                 int destPageCount = sourceImagePages.Count();
                 var newPageDataArray = new SpatialString[destPageCount];
@@ -644,7 +644,7 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                var pageAttribute = new AttributeClass() { Name = "Page" };
+                var pageAttribute = new AttributeClass { Name = "Page" };
                 if (pageNumber > 0)
                 {
                     pageAttribute.Value.ReplaceAndDowngradeToNonSpatial(
@@ -660,6 +660,32 @@ namespace Extract.AttributeFinder
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI46869");
+            }
+        }
+
+        /// <summary>
+        /// Removes all values in the attributesToRemove from the unknownVector of attributes including those in
+        /// SubAttributes
+        /// </summary>
+        /// <param name="unknownVector">The IUknownVector to remove the attributes from</param>
+        /// <param name="attributesToRemove">The attributes to remove</param>
+        public static void RemoveAttributes(this IIUnknownVector unknownVector, IList<IAttribute> attributesToRemove)
+        {
+            try
+            {
+                var attributeList = unknownVector.ToIEnumerable<IAttribute>().ToList();
+
+                var removeFromVector = attributeList.Where(a => attributesToRemove.Contains(a)).ToList();
+                var subAttributesToCheck = attributeList.Except(removeFromVector).ToList();
+
+                subAttributesToCheck
+                    .ForEach(a => a.SubAttributes.RemoveAttributes(attributesToRemove.Except(removeFromVector).ToList()));
+
+                removeFromVector.ForEach(a => unknownVector.RemoveValue(a));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47000");
             }
         }
 
@@ -698,7 +724,7 @@ namespace Extract.AttributeFinder
                 && value.GetFirstPageNumber() != value.GetLastPageNumber())
             {
                 // Copy the value so as not to mutate the input
-                value = (SpatialString)((ICopyableObject) value).Clone();
+                value = (SpatialString)((ICopyableObject)value).Clone();
                 value.DowngradeToHybridMode();
                 spatialMode = ESpatialStringMode.kHybridMode;
             }
@@ -706,7 +732,7 @@ namespace Extract.AttributeFinder
             string sourceDocName = GetSourceDocName(value, pageMap);
 
             var updatedPages = new List<SpatialString>();
-            foreach (SpatialString page in value.GetPages(false, "")
+            foreach (SpatialString page in value.GetPages(false, string.Empty)
                 .ToIEnumerable<SpatialString>())
             {
                 int oldPageNum = page.GetFirstPageNumber();
