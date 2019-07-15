@@ -207,7 +207,8 @@ namespace DashboardCreator
         {
             try
             {
-                DashboardDataConverter.AddExtractDataSources(dashboardDesigner.Dashboard, Path.GetDirectoryName(_dashboardFileName));
+                DashboardDataConverter.AddExtractDataSources(
+                    Path.GetFileName(_dashboardFileName), dashboardDesigner.Dashboard, Path.GetDirectoryName(_dashboardFileName));
             }
             catch (Exception ex)
             {

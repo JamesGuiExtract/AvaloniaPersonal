@@ -180,7 +180,7 @@ namespace Extract.Dashboard.Forms
                     SelectDashboardToImportForm selectForm = new SelectDashboardToImportForm(true, dashboardName);
                     if (selectForm.ShowDialog() == DialogResult.OK)
                     {
-                        GetDashboardDefinitions(selectForm.DashboardFile, out XDocument extractedDataDashboardDefinition,
+                        GetDashboardDefinitions(dashboardName, selectForm.DashboardFile, out XDocument extractedDataDashboardDefinition,
                             out XDocument dashboardDefinition);
 
                         using (var connect = NewSqlDBConnection())
@@ -366,7 +366,7 @@ namespace Extract.Dashboard.Forms
                 SelectDashboardToImportForm selectForm = new SelectDashboardToImportForm();
                 if (selectForm.ShowDialog() == DialogResult.OK)
                 {
-                    GetDashboardDefinitions(selectForm.DashboardFile, out XDocument ExtractedDataDoc, out XDocument xDoc);
+                    GetDashboardDefinitions(selectForm.DashboardName, selectForm.DashboardFile, out XDocument ExtractedDataDoc, out XDocument xDoc);
 
                     using (var connect = NewSqlDBConnection())
                     {
@@ -417,7 +417,7 @@ namespace Extract.Dashboard.Forms
         /// <param name="dashboardFile">Dashboard file to read definition from</param>
         /// <param name="extractedDataDashboardDefinition">Extracted data version of the Dashbaord definition</param>
         /// <param name="dashboardDefinition">The Dashboard definition as read from the file</param>
-        void GetDashboardDefinitions(string dashboardFile, out XDocument extractedDataDashboardDefinition, out XDocument dashboardDefinition)
+        void GetDashboardDefinitions(string dashboardName, string dashboardFile, out XDocument extractedDataDashboardDefinition, out XDocument dashboardDefinition)
         {
 
             if (string.IsNullOrEmpty(RootFolderForExtractedDataFiles))
@@ -451,7 +451,7 @@ namespace Extract.Dashboard.Forms
             if (ddc != null)
             {
                 extractedDataDashboardDefinition =
-                    ddc.ConvertDashboardDataSources(dashboardDefinition, DatabaseServer, DatabaseName, RootFolderForExtractedDataFiles);
+                    ddc.ConvertDashboardDataSources(dashboardName, dashboardDefinition, DatabaseServer, DatabaseName, RootFolderForExtractedDataFiles);
             }
         }
 
