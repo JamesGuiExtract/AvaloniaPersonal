@@ -315,8 +315,8 @@ namespace StatisticsReporter
             {
                 ex.AsExtract("ELI41525").Log();
                 Console.Error.WriteLine(ex.Message);
+                Environment.ExitCode = 1;
             }
-            Environment.ExitCode = 1;
         }
 
         static void WriteVOAs(IEnumerable<(string fileName, IEnumerable<AccuracyDetail> pathAndAttribute)> collections, 
