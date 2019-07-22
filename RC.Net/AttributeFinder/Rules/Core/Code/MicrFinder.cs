@@ -114,7 +114,7 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// The license id to validate in licensing calls
         /// </summary>
-        const LicenseIdName _LICENSE_ID = LicenseIdName.FlexIndexIDShieldCoreObjects;
+        const LicenseIdName _LICENSE_ID = LicenseIdName.MicrFindingEngineFeature;
 
         /// <summary>
         /// Special MICR chars
