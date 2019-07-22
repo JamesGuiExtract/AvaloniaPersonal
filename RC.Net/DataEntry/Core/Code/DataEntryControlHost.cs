@@ -1955,7 +1955,7 @@ namespace Extract.DataEntry
                     _mostRecentlySaveAttributes = (IUnknownVector)copyThis.CloneIdentifiableObject();
                     _mostRecentlySaveAttributes.ReportMemoryUsage();
 
-                    DataEntryMethods.PruneNonPersistingAttributes(_mostRecentlySaveAttributes, pruneUnmappedAttributes);
+                    DataEntryMethods.PruneNonPersistingAttributes(_mostRecentlySaveAttributes, pruneUnmappedAttributes: pruneUnmappedAttributes);
 
                     return _mostRecentlySaveAttributes;
                 }

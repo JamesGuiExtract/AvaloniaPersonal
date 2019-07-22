@@ -628,7 +628,7 @@ namespace Extract.DataEntry
                     }
                     else
                     {
-                        PruneNonPersistingAttributes(attribute.SubAttributes, pruneUnmappedAttributes, false);
+                        PruneNonPersistingAttributes(attribute.SubAttributes, pruneUnmappedAttributes: pruneUnmappedAttributes, root: false);
                     }
                 }
             }

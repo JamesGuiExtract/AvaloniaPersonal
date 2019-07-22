@@ -812,7 +812,7 @@ namespace Extract.DataEntry
                         return true;
                     }
                 }
-
+                
                 DataEntryMethods.PruneNonPersistingAttributes(attributes);
 
                 return true;

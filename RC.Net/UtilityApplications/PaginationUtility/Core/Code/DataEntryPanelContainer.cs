@@ -583,7 +583,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var documentData = ActiveDataEntryPanel.GetDocumentData(attributes, sourceDocName);
-                UpdateDocumentStatus(documentData, saveData: false, validateData: false);
+                UpdateDocumentStatus(documentData, saveData: false, displayValidationErrors: false);
 
                 return documentData;
             }
@@ -613,7 +613,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var documentData = ActiveDataEntryPanel.GetDocumentData(documentDataAttribute, sourceDocName);
-                UpdateDocumentStatus(documentData, saveData: false, validateData: false);
+                UpdateDocumentStatus(documentData, saveData: false, displayValidationErrors: false);
 
                 return documentData;
             }
@@ -631,14 +631,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="saveData"><c>true</c> if the result of the data load (including auto-update
         /// queries that manipulate the data) should be saved or <c>false</c> to update the status
         /// bar.</param>
-        /// <param name="validateData"><c>true</c> if the data should be validated before being saved;
-        /// <c>false</c> if the data should be saved even if not valid.</param>
-        public void UpdateDocumentDataStatus(PaginationDocumentData data, bool saveData, bool validateData)
+        /// <param name = "displayValidationErrors" >< c > true </ c > if you want to display validation errors;
+        /// <c>false</c> if you do not want to display validation errors.</param>
+        public void UpdateDocumentDataStatus(PaginationDocumentData data, bool saveData, bool displayValidationErrors)
         {
             try
             {
                 var dataEntryData = data as DataEntryPaginationDocumentData;
-                UpdateDocumentStatus(dataEntryData, saveData, validateData);
+                UpdateDocumentStatus(dataEntryData, saveData, displayValidationErrors);
             }
             catch (Exception ex)
             {
@@ -1178,9 +1178,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="saveData"><c>true</c> if the result of the data load (including auto-update
         /// queries that manipulate the data) should be saved or <c>false</c> to update the status
         /// bar.</param>
-        /// <param name = "validateData" >< c > true </ c > if the data should be validated before being saved;
-        /// <c>false</c> if the data should be saved even if not valid.</param>
-        void UpdateDocumentStatus(DataEntryPaginationDocumentData documentData, bool saveData, bool validateData)
+        /// <param name = "displayValidationErrors" >< c > true </ c > if you want to display validation errors;
+        /// <c>false</c> if you do not want to display validation errors.</param>
+        void UpdateDocumentStatus(DataEntryPaginationDocumentData documentData, bool saveData, bool displayValidationErrors)
         {
             if (!_pendingDocumentStatusUpdate.TryAdd(documentData, 0))
             {
@@ -1199,7 +1199,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 try
                 {
                     UpdateDocumentStatusThread(backgroundConfigManager, documentData,
-                        serializedAttributes, saveData, validateData);
+                        serializedAttributes, saveData, displayValidationErrors);
                 }
                 catch (Exception ex)
                 {
@@ -1239,10 +1239,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="saveData"><c>true</c> if the result of the data load (including auto-update
         /// queries that manipulate the data) should be saved or <c>false</c> to update the status
         /// bar.</param>
-        /// <param name="validateData"><c>true</c> if the data should be validated before being saved;
+        /// <param name="displayValidationErrors"><c>true</c> if the data should be validated before being saved;
         /// <c>false</c> if the data should be saved even if not valid.</param>
         void UpdateDocumentStatusThread(DataEntryConfigurationManager<Properties.Settings> backgroundConfigManager,
-            DataEntryPaginationDocumentData documentData, string serializedAttributes, bool saveData, bool validateData)
+            DataEntryPaginationDocumentData documentData, string serializedAttributes, bool saveData, bool displayValidationErrors)
         {
             bool registeredThread = false;
             bool gotSemaphore = false;
@@ -1352,7 +1352,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             var miscUtils = new MiscUtils();
 
-                            if (validateData && documentData.DataError)
+                            if (displayValidationErrors && documentData.DataError)
                             {
                                 // Reset to contain only this document to prevent any subsequent document data
                                 // errors from being displayed. (If not fixed subsequent errors on the next

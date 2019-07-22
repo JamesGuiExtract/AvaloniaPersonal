@@ -1458,7 +1458,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 if (_documentDataPanel != null)
                                 {
                                     _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData,
-                                        saveData: false, validateData: false);
+                                        saveData: false, displayValidationErrors: false);
                                 }
                             }
                             _pendingDocuments.Add(outputDocument);
@@ -1508,7 +1508,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             if (_documentDataPanel != null)
                             {
                                 _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData,
-                                    saveData: false, validateData: false);
+                                    saveData: false, displayValidationErrors: false);
                             }
                         }
                     }

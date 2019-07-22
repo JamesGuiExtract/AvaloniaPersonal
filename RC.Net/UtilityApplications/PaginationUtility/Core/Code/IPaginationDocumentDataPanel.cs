@@ -171,9 +171,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="saveData"><c>true</c> if the result of the data load (including auto-update
         /// queries that manipulate the data) should be saved or <c>false</c> to update the status
         /// bar.</param>
-        /// <param name="validateData"><see langword="true"/> if the <see paramref="data"/> should
-        /// be validated for errors when saving; otherwise, <see langwor="false"/>.</param>
-        void UpdateDocumentDataStatus(PaginationDocumentData data, bool saveData, bool validateData);
+        /// <param name = "displayValidationErrors" >< c > true </ c > if you want to display validation errors;
+        /// <c>false</c> if you do not want to display validation errors.</param>
+        void UpdateDocumentDataStatus(PaginationDocumentData data, bool saveData, bool displayValidationErrors);
 
         /// <summary>
         /// Waits for all documents status updates (started via <see cref="UpdateDocumentDataStatus"/>)
