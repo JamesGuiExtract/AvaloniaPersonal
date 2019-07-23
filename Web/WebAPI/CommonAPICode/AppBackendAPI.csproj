@@ -19,9 +19,6 @@
     <DefineConstants>TRACE;DEBUG;Add_Test_Controller;NET46</DefineConstants>
     <OutputPath>..\..\..\Binaries\Debug\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>..\..\..\Binaries\Release\</OutputPath>
-  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="DocumentAPIFiles\**" />
     <Compile Remove="DocumentControllers\**" />
