@@ -95,7 +95,7 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
-      <Private>False</Private>
+      <Private>True</Private>
     </COMReference>
   </ItemGroup>
   <ItemGroup>
