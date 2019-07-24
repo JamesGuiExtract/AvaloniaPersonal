@@ -4467,7 +4467,12 @@ void CSpatialString::loadFromArchive(const string& strFileName)
 		ASSERT_RESOURCE_ALLOCATION("ELI46773", pages != __nullptr);
 		for (auto& p : *pageMap)
 		{
-			pages->PushBack(p.second);
+			// Skip empty (or non-spatial) pages
+			// https://extract.atlassian.net/browse/ISSUE-16436
+			if (p.second->HasSpatialInfo())
+			{
+				pages->PushBack(p.second);
+			}
 		}
 
 		// Combine the pages

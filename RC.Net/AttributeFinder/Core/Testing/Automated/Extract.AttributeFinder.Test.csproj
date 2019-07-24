@@ -561,6 +561,7 @@
     <EmbeddedResource Include="Resources\LearningMachine\CandidateAttributeGenerator\CreateTrainingData.rsd" />
     <EmbeddedResource Include="Resources\LearningMachine\CandidateAttributeGenerator\date.dat" />
     <EmbeddedResource Include="Resources\BlankPage.tif" />
+    <EmbeddedResource Include="Resources\BlankPage.tif.gcv.uss" />
     <EmbeddedResource Include="Resources\BlankPage.tif.uss" />
   </ItemGroup>
   <ItemGroup>

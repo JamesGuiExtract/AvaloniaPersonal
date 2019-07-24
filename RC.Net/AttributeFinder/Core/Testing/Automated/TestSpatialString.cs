@@ -20,6 +20,7 @@ namespace Extract.AttributeFinder.Test
         static TestFileManager<TestSpatialPageInfo> _testFiles;
 
         const string _EXAMPLE05_TIF_FILE = "Resources.Example05.tif";
+        const string _BLANK_PAGE_GCV_FILE = "Resources.BlankPage.tif.gcv.uss";
 
         #endregion Fields
 
@@ -66,6 +67,23 @@ namespace Extract.AttributeFinder.Test
 
             // Confirm that there are the expected number of pages
             Assert.AreEqual(3, pages.Size());
+        }
+
+        /// <summary>
+        /// GCV OCR - All Strings Should be Spatial error when processing certain pdf
+        /// https://extract.atlassian.net/browse/ISSUE-16436
+        /// </summary>
+        [Test, Category("SpatialString")]        
+        public static void LoadFromArchiveWithBlankPages()
+        {
+            string ussPath = _testFiles.GetFile(_BLANK_PAGE_GCV_FILE);
+            var ss = new SpatialStringClass();
+
+            // Confirm that LoadFrom doesn't throw an exception
+            var pages = ss.LoadFrom(ussPath, false);
+
+            // Confirm that there are the expected number of pages
+            Assert.AreEqual(2, ss.GetPages(false, "").Size());
         }
 
         #endregion Public Test Functions
