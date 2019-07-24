@@ -1,13 +1,10 @@
 ﻿using DevExpress.DashboardCommon;
 using DevExpress.DashboardCommon.ViewerData;
 using DevExpress.DashboardWin;
-using DevExpress.DashboardWin.Native;
 using DevExpress.DataAccess.ConnectionParameters;
 using DevExpress.DataAccess.Sql;
 using DevExpress.Utils.Extensions;
 using DevExpress.XtraBars;
-using DevExpress.XtraGrid;
-using DevExpress.XtraGrid.Views.Grid;
 using Extract.Dashboard.Forms;
 using Extract.FileActionManager.Forms;
 using Extract.Utilities;
@@ -19,7 +16,6 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -35,7 +31,7 @@ namespace Extract.Dashboard.Utilities
     /// Class used to share code between DashboardCreator and DashboardViewer
     /// </summary>
     /// <typeparam name="T">Type that Implements <see cref="IExtractDashboardCommon"/></typeparam>
-    public class DashboardShared<T> : IDisposable where T : IExtractDashboardCommon 
+    public class DashboardShared<T> : IDisposable where T : IExtractDashboardCommon
     {
         #region Constants
 
@@ -237,7 +233,6 @@ namespace Extract.Dashboard.Utilities
 
         #region Handlers for Designer and Viewer
 
-
         public void HandleConfigureDataConnection(object sender, ConfigureDataConnectionEventArgs e)
         {
             try
@@ -347,13 +342,8 @@ namespace Extract.Dashboard.Utilities
 
                 // Clear the current filtered files
                 _dashboardForm.CurrentFilteredFiles.Clear();
-                var allaxis = _dashboardForm.GetCurrentFilterValues(e.DashboardItemName);
-                // Get the filenames from the grid control
-                var axisPointTuples = allaxis.Where(ap => ap.GetAxisPoint().Dimension.DataMember == "FileName");
 
-                List<string> files = new List<string>();
-                files = axisPointTuples.Select(a => (string)a.GetAxisPoint().Value).ToList();
-
+                var files = GetSelectedFiles(e.DashboardItemName).ToList();
 
                 int numberOfFiles = files.Count();
                 if (numberOfFiles > 0)
@@ -369,7 +359,7 @@ namespace Extract.Dashboard.Utilities
                 }
                 files.ForEach(f => _dashboardForm.CurrentFilteredFiles.Add(f));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 // Throw so the calling Event handler in Viewer or Creator can handle
                 throw ex.AsExtract("ELI46967");
@@ -438,11 +428,12 @@ namespace Extract.Dashboard.Utilities
                         CustomGridValues[e.Attribute("Name").Value] = new GridDetailConfiguration
                         {
                             RowQuery = e.Element("RowQuery").Value,
+                            DataMemberUsedForFileName = e.Element("DataMemberUsedForFileName")?.Value ?? string.Empty
                         };
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex.AsExtract("ELI46968");
             }
@@ -1159,6 +1150,68 @@ namespace Extract.Dashboard.Utilities
             }
         }
 
+        /// <summary>
+        /// Gets the currently selected files using the configured <see cref="GridDetailConfiguration.DataMemberUsedForFileName"/>
+        /// as the column containing the filenames
+        /// </summary>
+        /// <param name="gridName">The ComponentName of the grid to get the selected files</param>
+        /// <returns><see cref="IEnumerable{String}"/> that containsthe selected files</returns>
+        IEnumerable<string> GetSelectedFiles(string gridName)
+        {
+            var axisPointTuples = _dashboardForm.GetCurrentFilterValues(gridName);
+
+            GridDetailConfiguration configuration;
+
+            if (CustomGridValues.TryGetValue(gridName, out configuration))
+            {
+                string dimensionName = configuration.DataMemberUsedForFileName;
+
+                return axisPointTuples.Select(at => FindDimension(dimensionName, at.GetAxisPoint())?.Value as string)
+                    .Where(v => v != null);
+            }
+            return new List<string>();
+        }
+
+        /// <summary>
+        /// Finds the given <paramref name="dimensionName"/> using the <paramref name="ap"/>
+        /// </summary>
+        /// <param name="dimensionName">The name of the dimension to find</param>
+        /// <param name="ap">The <see cref="AxisPoint"/> to use as a starting point for the search</param>
+        /// <returns>The <see cref="AxisPoint"/> for the given <paramref name="dimensionName"/>, 
+        /// if not found returns <c>null</c>"/></returns>
+        static AxisPoint FindDimension(string dimensionName, AxisPoint ap)
+        {
+            // If no starting point return null
+            if (ap is null)
+            {
+                return null;
+            }
+
+            // To get the correct dimension, find the first child
+            var axisPoint = ap;
+            while (axisPoint.Parent?.Parent != null) axisPoint = axisPoint.Parent;
+            if (axisPoint.Dimension.DataMember == dimensionName)
+            {
+                return axisPoint;
+            }
+
+            // Check the children until it is found
+            foreach (var childAxisPoint in ap.ChildItems)
+            {
+                if (childAxisPoint.Dimension.DataMember == dimensionName)
+                {
+                    return childAxisPoint;
+                }
+            }
+
+            // if it is not found return null
+            return null;
+        }
+
+        #endregion
+
+        #endregion
+
         #region IDisposable Support
 
         protected virtual void Dispose(bool disposing)
@@ -1179,10 +1232,6 @@ namespace Extract.Dashboard.Utilities
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        #endregion
-
-        #endregion
-
 
         #endregion
     }

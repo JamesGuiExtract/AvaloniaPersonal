@@ -194,6 +194,12 @@
       <DependentUpon>PleaseWaitForm.cs</DependentUpon>
     </Compile>
     <Compile Include="OverlayText.cs" />
+    <Compile Include="SelectFromListInputBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelectFromListInputBox.Designer.cs">
+      <DependentUpon>SelectFromListInputBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="SelectTypeByExtractCategoryForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -341,6 +347,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SchedulerControl.resx">
       <DependentUpon>SchedulerControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectFromListInputBox.resx">
+      <DependentUpon>SelectFromListInputBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SelectTypeByExtractCategoryForm.resx">
       <DependentUpon>SelectTypeByExtractCategoryForm.cs</DependentUpon>

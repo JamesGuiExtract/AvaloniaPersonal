@@ -151,6 +151,8 @@
   <ItemGroup>
     <None Include="Resources\spreadsheet_info_64.png" />
     <None Include="Resources\spreadsheet_info_128.png" />
+    <Content Include="Resources\ConfigureExtract.ImageOptions.Image.png" />
+    <Content Include="Resources\ConfigureExtract.ImageOptions.LargeImage.png" />
     <Content Include="Resources\system_config_48.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

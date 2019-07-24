@@ -99,10 +99,10 @@ namespace Extract.Dashboard.Forms
             try
             {
                 InitializeComponent();
-                if (columnValues.ContainsKey("FileName"))
+                if (columnValues.ContainsKey(_gridDetailConfiguration.DataMemberUsedForFileName))
                 {
-                    _imageViewer.OpenImage((string)columnValues["FileName"], false);
-                    Text = "Data for " + (string)columnValues["FileName"];
+                    _imageViewer.OpenImage((string)columnValues[_gridDetailConfiguration.DataMemberUsedForFileName], false);
+                    Text = "Data for " + (string)columnValues[_gridDetailConfiguration.DataMemberUsedForFileName];
                 }
 
                 ServerName = serverName;

@@ -8,5 +8,7 @@
         public string DashboardGridName { get; set; }
 
         public string RowQuery { get; set; }
+
+        public string DataMemberUsedForFileName { get; set; }
     }
 }

@@ -43,6 +43,11 @@ namespace DashboardCreator
         /// </summary>
         DashboardShared<DashboardCreatorForm> _dashboardShared;
 
+        /// <summary>
+        /// Flag to indicate if there are custom changes that need to be saved
+        /// </summary>
+        bool _dirty;
+
         #endregion
 
         #region IExtractDashboardCommon Implementation
@@ -193,6 +198,7 @@ namespace DashboardCreator
                 {
                     dashboardDesigner.Dashboard.LoadFromXml(_dashboardFileName);
                 }
+                _dirty = false;
             }
             catch (Exception ex)
             {
@@ -203,12 +209,69 @@ namespace DashboardCreator
         #endregion
 
         #region Event Handlers
+
+        void HandleDashboardDesigner_DashboardClosing(object sender, DashboardClosingEventArgs e)
+        {
+            try
+            {
+                e.IsDashboardModified = e.IsDashboardModified || _dirty;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI47015");
+            }
+        }
+
+        void HandleBarButtonItemConfigureFileNameColumn_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            try
+            {
+                string component = dashboardDesigner.SelectedDashboardItem.ComponentName;
+                var grid = dashboardDesigner.Dashboard.Items[component] as GridDashboardItem;
+
+                if (grid is null)
+                {
+                    return;
+                }
+
+                GridDetailConfiguration configurationData = GetDetailConfigurationData(component);
+                string selectedField = configurationData.DataMemberUsedForFileName;
+
+                IList<string> fieldNames = grid.GetDataMembers();
+                // Add empty string at top of list
+                fieldNames.Insert(0, string.Empty);
+
+                using (var listForm = new SelectFromListInputBox
+                {
+                    Title = "Select file name field",
+                    Prompt = "Data field for file name",
+                    SelectionStrings = fieldNames,
+                    DefaultResponse = selectedField
+                })
+                {
+                    if (listForm.ShowDialog() == DialogResult.OK)
+                    {
+                        if (selectedField != listForm.ReturnValue)
+                        {
+                            _dirty = true;
+                            configurationData.DataMemberUsedForFileName = listForm.ReturnValue;
+                            _dashboardShared.CustomGridValues[component] = configurationData;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI47007");
+            }
+        }
         void HandleBarCreateDataExtractDatasourcesItem1_ItemClick(object sender, ItemClickEventArgs e)
         {
             try
             {
                 DashboardDataConverter.AddExtractDataSources(
                     Path.GetFileName(_dashboardFileName), dashboardDesigner.Dashboard, Path.GetDirectoryName(_dashboardFileName));
+                _dirty = true;
             }
             catch (Exception ex)
             {
@@ -220,7 +283,11 @@ namespace DashboardCreator
         {
             try
             {
-                e.Cancel = !_dashboardShared.RequestDashboardClose();
+                // May already be canceled so don't do anything if it is
+                if (!e.Cancel)
+                {
+                    e.Cancel = !_dashboardShared.RequestDashboardClose();
+                }
             }
             catch (Exception ex)
             {
@@ -276,6 +343,7 @@ namespace DashboardCreator
                     _dashboardFileName = e.FilePath;
                     dashboardDesigner.Dashboard.LoadFromXml(_dashboardFileName);
                     e.Handled = true;
+                    _dirty = false;
                 }
                 else if (!string.IsNullOrWhiteSpace(e.DirectoryPath))
                 {
@@ -287,6 +355,7 @@ namespace DashboardCreator
                     {
                         _dashboardFileName = openFileDialog.FileName;
                         dashboardDesigner.Dashboard.LoadFromXml(_dashboardFileName);
+                        _dirty = false;
                     }
                     e.Handled = true;
                 }
@@ -297,27 +366,13 @@ namespace DashboardCreator
             }
         }
 
-        void HandleConfigureExtractItemClick(object sender, ItemClickEventArgs e)
+        void HandleConfigureRowQueryItemClick(object sender, ItemClickEventArgs e)
         {
             try
             {
                 string component = dashboardDesigner.SelectedDashboardItem.ComponentName;
 
-                // get any existing configuration data for the control
-                GridDetailConfiguration configurationData;
-                if (!_dashboardShared.CustomGridValues.ContainsKey(component))
-                {
-                    configurationData =
-                        new GridDetailConfiguration
-                        {
-                            DashboardGridName = component,
-                            RowQuery = string.Empty
-                        };
-                }
-                else
-                {
-                    configurationData = _dashboardShared.CustomGridValues[component];
-                }
+                GridDetailConfiguration configurationData = GetDetailConfigurationData(component);
 
                 // Display the configuration
                 DashboardFileDetailConfigurationForm configurationForm = new DashboardFileDetailConfigurationForm
@@ -325,16 +380,20 @@ namespace DashboardCreator
 
                 if (configurationForm.ShowDialog() == DialogResult.OK)
                 {
-                    configurationData.RowQuery = configurationForm.RowQuery;
-                    if (string.IsNullOrWhiteSpace(configurationData.RowQuery))
+                    if (configurationData.RowQuery != configurationForm.RowQuery)
                     {
-                        // if updated configuration data has been cleared remove it from the dictionary
-                        _dashboardShared.CustomGridValues.Remove(component);
-                    }
-                    else
-                    {
-                        // Save the updated configuration data in the dictionary
-                        _dashboardShared.CustomGridValues[component] = configurationData;
+                        _dirty = true;
+                        configurationData.RowQuery = configurationForm.RowQuery;
+                        if (string.IsNullOrWhiteSpace(configurationData.RowQuery))
+                        {
+                            // if updated configuration data has been cleared remove it from the dictionary
+                            _dashboardShared.CustomGridValues.Remove(component);
+                        }
+                        else
+                        {
+                            // Save the updated configuration data in the dictionary
+                            _dashboardShared.CustomGridValues[component] = configurationData;
+                        }
                     }
                 }
             }
@@ -385,7 +444,9 @@ namespace DashboardCreator
                         .Where(kvp => Dashboard.Items.Select(di => di.ComponentName).Contains(kvp.Key))
                         .Select(kv =>
                             new XElement("Component", new XAttribute("Name", kv.Key),
-                            new XElement("RowQuery", kv.Value.RowQuery))));
+                            new XElement("RowQuery", kv.Value.RowQuery),
+                            new XElement("DataMemberUsedForFileName", kv.Value.DataMemberUsedForFileName)))
+                        );
                     Dashboard.UserData = userData;
                 }
                 else
@@ -412,6 +473,7 @@ namespace DashboardCreator
                     Dashboard.SaveToXml(_dashboardFileName);
                 }
                 e.Handled = true;
+                _dirty = false;
             }
             catch (Exception ex)
             {
@@ -424,6 +486,7 @@ namespace DashboardCreator
             try
             {
                 _dashboardFileName = null;
+                _dirty = false;
                 UpdateTitle();
             }
             catch (Exception ex)
@@ -438,6 +501,7 @@ namespace DashboardCreator
             {
                 _dashboardShared?.GridConfigurationsFromXml(Dashboard?.UserData);
 
+                _dirty = false;
                 UpdateTitle();
             }
             catch (Exception ex)
@@ -451,11 +515,12 @@ namespace DashboardCreator
             try
             {
                 FileBrowser fileBrowser = new FileBrowser();
-                string selectedFile = fileBrowser.BrowseForFile("ESDX|*.esdx|XML|*.xml|All|*.*", "");
+                string selectedFile = fileBrowser.BrowseForFile("ESDX|*.esdx|XML|*.xml|All|*.*", string.Empty);
                 if (!string.IsNullOrWhiteSpace(selectedFile) && File.Exists(selectedFile))
                 {
                     _dashboardFileName = selectedFile;
                     dashboardDesigner.LoadDashboard(_dashboardFileName);
+                    _dirty = false;
                 }
             }
             catch (Exception ex)
@@ -469,11 +534,12 @@ namespace DashboardCreator
             try
             {
                 FileBrowser fileBrowser = new FileBrowser();
-                string selectedFile = fileBrowser.BrowseForFile("ESDX|*.esdx|XML|*.xml|All|*.*", "");
+                string selectedFile = fileBrowser.BrowseForFile("ESDX|*.esdx|XML|*.xml|All|*.*", string.Empty);
                 if (!string.IsNullOrWhiteSpace(selectedFile) && File.Exists(selectedFile))
                 {
                     _dashboardFileName = selectedFile;
                     dashboardDesigner.LoadDashboard(_dashboardFileName);
+                    _dirty = false;
                 }
             }
             catch (Exception ex)
@@ -485,6 +551,33 @@ namespace DashboardCreator
         #endregion
 
         #region Private methods
+
+        /// <summary>
+        /// Finds or creates the <see cref="GridDetailConfiguration"/> object for the given component
+        /// </summary>
+        /// <param name="component">The name of the component to get the <see cref="GridDetailConfiguration"/> object for</param>
+        /// <returns>The <see cref="GridDetailConfiguration"/> for the component</returns>
+        GridDetailConfiguration GetDetailConfigurationData(string component)
+        {
+            // get any existing configuration data for the control
+            GridDetailConfiguration configurationData;
+            if (!_dashboardShared.CustomGridValues.ContainsKey(component))
+            {
+                configurationData =
+                    new GridDetailConfiguration
+                    {
+                        DashboardGridName = component,
+                        RowQuery = string.Empty,
+                        DataMemberUsedForFileName = string.Empty
+                    };
+            }
+            else
+            {
+                configurationData = _dashboardShared.CustomGridValues[component];
+            }
+
+            return configurationData;
+        }
 
         /// <summary>
         /// Update the title with the currently loaded dashboard file name
