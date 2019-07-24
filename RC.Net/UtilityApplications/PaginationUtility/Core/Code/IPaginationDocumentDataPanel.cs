@@ -164,19 +164,33 @@ namespace Extract.UtilityApplications.PaginationUtility
             FileProcessingDB fileProcessingDB, ImageViewer imageViewer);
 
         /// <summary>
-        /// Updates the document data status.
+        /// Updates the document data.
         /// </summary>
-        /// <param name="data">The <see cref="PaginationDocumentData"/> whose status will be checked.
+        /// <param name="data">The <see cref="PaginationDocumentData"/> to be updated.
         /// </param>
-        /// <param name="saveData"><c>true</c> if the result of the data load (including auto-update
-        /// queries that manipulate the data) should be saved or <c>false</c> to update the status
-        /// bar.</param>
-        /// <param name = "displayValidationErrors" >< c > true </ c > if you want to display validation errors;
+        /// <param name="statusOnly"><c>true</c> to retrieve into <paramref name="data"/> only the high-level
+        /// status such as the the summary string and other status flags; <c>false</c> to udpate
+        /// <paramref name="data"/> with the complete voa data.</param>
+        /// <param name="displayValidationErrors"><c>true</c> if you want to display validation errors;
         /// <c>false</c> if you do not want to display validation errors.</param>
-        void UpdateDocumentDataStatus(PaginationDocumentData data, bool saveData, bool displayValidationErrors);
+        void UpdateDocumentData(PaginationDocumentData data, bool statusOnly, bool displayValidationErrors);
 
         /// <summary>
-        /// Waits for all documents status updates (started via <see cref="UpdateDocumentDataStatus"/>)
+        /// Updates the <see cref="Summary"/>, <see cref="DataModified"/> and  <see cref="DataError"/>
+        /// properties of <see paramref="documentData"/> by loading the data into a background panel.
+        /// </summary>
+        /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData"/> for which
+        /// document status should be updated.</param>
+        /// <param name="statusOnly"><c>true</c> to retrieve into documentData only the high-level
+        /// status such as the the summary string and other status flags; <c>false</c> to udpate
+        /// documentData with the complete voa data.</param>
+        /// <param name = "displayValidationErrors" >< c > true </ c > if you want to display validation errors;
+        /// <c>false</c> if you do not want to display validation errors.</param>
+        void UpdateDocumentStatus(DataEntryPaginationDocumentData documentData,
+            bool statusOnly, bool applyUpdateToUI, bool displayValidationErrors);
+
+        /// <summary>
+        /// Waits for all documents status updates (started via <see cref="UpdateDocumentData"/>)
         /// to complete.
         /// </summary>
         void WaitForDocumentStatusUpdates();

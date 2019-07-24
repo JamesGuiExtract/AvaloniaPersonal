@@ -108,7 +108,8 @@ namespace Extract.FileActionManager.Conditions
     [ComVisible(true)]
     [Guid("A79E1B0F-BF34-4F90-98B8-CA2D52551342")]
     public interface IDatabaseContentsCondition : ICategorizedComponent, IConfigurableObject,
-        IMustBeConfiguredObject, ICopyableObject, IFAMCondition, ILicensedComponent,
+        IMustBeConfiguredObject, ICopyableObject, IFAMCondition, IPaginationCondition,
+        ILicensedComponent,
         IPersistStream
     {
         /// <summary>
@@ -1137,87 +1138,13 @@ namespace Extract.FileActionManager.Conditions
         public bool FileMatchesFAMCondition(FileRecord pFileRecord, FileProcessingDB pFPDB,
             int lActionID, FAMTagManager pFAMTagManager)
         {
-            DataTable queryResults = null;
-
             try
             {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI36945",
-                    _COMPONENT_DESCRIPTION);
-
-                // Resets values relating to caching for DataEntryQueries that may be used in the
-                // query.
-                _queryDataInitialized = false;
-                _dataFileLoaded = false;
-
-                // Create the pathTags instance to be used to expand any path tags/functions.
-                FileActionManagerPathTags pathTags =
-                    new FileActionManagerPathTags(pFAMTagManager, pFileRecord.Name);
-                pathTags.AlwaysShowDatabaseTags = true;
-
-                queryResults = GetTableOrQueryResults(pFileRecord, pathTags, pFPDB);
-
-                if (CheckFields)
-                {
-                    return CheckQueryResultFields(queryResults, pFileRecord, pathTags, pFPDB);
-                }
-                else
-                {
-                    // If not checking field values, the condition's result depends only upon
-                    // queryResults.Rows.Count. 
-                    switch (RowCountCondition)
-                    {
-                        case DatabaseContentsConditionRowCount.Zero:
-                            return queryResults.Rows.Count == 0;
-
-                        case DatabaseContentsConditionRowCount.AtLeastOne:
-                            return queryResults.Rows.Count > 0;
-
-                        case DatabaseContentsConditionRowCount.ExactlyOne:
-                            return queryResults.Rows.Count == 1;
-
-                        default:
-                            throw new ExtractException("ELI37085", "Internal logic error.");
-                    }
-                }
+                return FileMatchesCondition(pFileRecord, pFPDB, pFAMTagManager);
             }
             catch (Exception ex)
             {
-                if (ErrorBehavior == DatabaseContentsConditionErrorBehavior.Ignore)
-                {
-                    return false;
-                }
-                else
-                {
-                    var ee = ExtractException.CreateComVisible("ELI36946",
-                        "Error occured in '" + _COMPONENT_DESCRIPTION + "'", ex);
-                    if (ErrorBehavior == DatabaseContentsConditionErrorBehavior.Log)
-                    {
-                        ee.Log();
-                        return false;
-                    }
-
-                    // DatabaseContentsConditionErrorBehavior.Abort
-                    throw ee;
-                }
-            }
-            finally
-            {
-                if (queryResults != null)
-                {
-                    queryResults.Dispose();
-                }
-
-                // https://extract.atlassian.net/browse/ISSUE-12198
-                // For the time being, use new connections for every file to avoid the risk of
-                // keeping connections open indefinitely since there is no way for the condition to
-                // know if processing is stopped.
-                _databaseConnectionInfo.CloseManagedDbConnection();
-                if (_dbConnection != null)
-                {
-                    _dbConnection.Dispose();
-                    _dbConnection = null;
-                }
+                throw ex.CreateComVisible("ELI47079", "Error occured in '" + _COMPONENT_DESCRIPTION + "'");
             }
         }
 
@@ -1232,6 +1159,51 @@ namespace Extract.FileActionManager.Conditions
         }
 
         #endregion IFAMCondition Members
+
+        #region IPaginationCondition Members
+
+        /// <summary>
+        /// Used to allow PaginationTask to inform IPaginationCondition implementers when they are
+        /// being used in the context of the IPaginationCondition interface.
+        /// NOTE: While it is not necessary for implementers to persist this setting, this setting
+        /// does need to be copied in the context of the ICopyableObject interface (CopyFrom)
+        /// </summary>
+        public bool IsPaginationCondition { get; set; }
+
+        /// <summary>
+        /// Tests proposed pagination output <see paramref="pFileRecord"/> to determine if it is
+        /// qualified to be automatically generated.
+        /// </summary>
+        /// <param name="pSourceFileRecord">A <see cref="FileRecord"/> specifing the source document
+        /// for the proposed output document tested here.
+        /// </param>
+        /// <param name="bstrProposedFileName">The filename planned to be assigned to the document.</param>
+        /// <param name="bstrDocumentStatus">A json representation of the pagination DocumentStatus
+        /// for the proposed output document.</param>
+        /// <param name="bstrSerializedDocumentAttributes">A searialized copy of all attributes that fall
+        /// under a root-level "Document" attribute including Pages, DeletedPages and DocumentData (the
+        /// content of which would become the output document's voa)</param>
+        /// <param name="pFPDB">The <see cref="FileProcessingDB"/> currently in use.</param>
+        /// <param name="lActionID">The ID of the database action in use.</param>
+        /// <param name="pFAMTagManager">A <see cref="FAMTagManager"/> to be used to evaluate any
+        /// FAM tags used by the condition.</param>
+        /// <returns><see langword="true"/> if the condition was met, <see langword="false"/> if it
+        /// was not.</returns>
+        public bool FileMatchesPaginationCondition(FileRecord pSourceFileRecord, string bstrProposedFileName,
+            string bstrDocumentStatus, string bstrSerializedDocumentAttributes,
+            FileProcessingDB pFPDB, int lActionID, FAMTagManager pFAMTagManager)
+        {
+            try
+            {
+                return FileMatchesCondition(pSourceFileRecord, pFPDB, pFAMTagManager);
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI47080", "Error occured in '" + _COMPONENT_DESCRIPTION + "'");
+            }
+        }
+
+        #endregion IPaginationCondition Members
 
         #region IConfigurableObject Members
 
@@ -1572,6 +1544,7 @@ namespace Extract.FileActionManager.Conditions
         static void RegisterFunction(Type type)
         {
             ComMethods.RegisterTypeInCategory(type, ExtractCategories.FileActionManagerConditionsGuid);
+            ComMethods.RegisterTypeInCategory(type, ExtractCategories.PaginationConditionsGuid);
         }
 
         /// <summary>
@@ -1584,6 +1557,7 @@ namespace Extract.FileActionManager.Conditions
         static void UnregisterFunction(Type type)
         {
             ComMethods.UnregisterTypeInCategory(type, ExtractCategories.FileActionManagerConditionsGuid);
+            ComMethods.UnregisterTypeInCategory(type, ExtractCategories.PaginationConditionsGuid);
         }
 
         /// <summary>
@@ -1616,6 +1590,7 @@ namespace Extract.FileActionManager.Conditions
                 SearchFields = new IUnknownVector();
             }
             ErrorBehavior = source.ErrorBehavior;
+            IsPaginationCondition = source.IsPaginationCondition;
         }
 
         /// <summary>
@@ -1637,6 +1612,95 @@ namespace Extract.FileActionManager.Conditions
                 }
 
                 return _fieldDefinitions;
+            }
+        }
+
+        /// <summary>
+        /// Tests whether the configured condition is met for the specified <paramref name="fileRecord"/>.
+        /// </summary>
+        bool FileMatchesCondition(FileRecord fileRecord, FileProcessingDB fileProcessingDB, FAMTagManager famTagManager)
+        {
+            DataTable queryResults = null;
+
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI36945",
+                    _COMPONENT_DESCRIPTION);
+
+                // Resets values relating to caching for DataEntryQueries that may be used in the
+                // query.
+                _queryDataInitialized = false;
+                _dataFileLoaded = false;
+
+                // Create the pathTags instance to be used to expand any path tags/functions.
+                FileActionManagerPathTags pathTags =
+                    new FileActionManagerPathTags(famTagManager, fileRecord.Name);
+                pathTags.AlwaysShowDatabaseTags = true;
+
+                queryResults = GetTableOrQueryResults(fileRecord, pathTags, fileProcessingDB);
+
+                if (CheckFields)
+                {
+                    return CheckQueryResultFields(queryResults, fileRecord, pathTags, fileProcessingDB);
+                }
+                else
+                {
+                    // If not checking field values, the condition's result depends only upon
+                    // queryResults.Rows.Count. 
+                    switch (RowCountCondition)
+                    {
+                        case DatabaseContentsConditionRowCount.Zero:
+                            return queryResults.Rows.Count == 0;
+
+                        case DatabaseContentsConditionRowCount.AtLeastOne:
+                            return queryResults.Rows.Count > 0;
+
+                        case DatabaseContentsConditionRowCount.ExactlyOne:
+                            return queryResults.Rows.Count == 1;
+
+                        default:
+                            throw new ExtractException("ELI37085", "Internal logic error.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ErrorBehavior == DatabaseContentsConditionErrorBehavior.Ignore)
+                {
+                    return false;
+                }
+                else
+                {
+                    var ee = ExtractException.CreateComVisible("ELI36946",
+                        "Error occured in '" + _COMPONENT_DESCRIPTION + "'", ex);
+                    if (ErrorBehavior == DatabaseContentsConditionErrorBehavior.Log)
+                    {
+                        ee.Log();
+                        return false;
+                    }
+
+                    // DatabaseContentsConditionErrorBehavior.Abort
+                    throw ee;
+                }
+            }
+            finally
+            {
+                if (queryResults != null)
+                {
+                    queryResults.Dispose();
+                }
+
+                // https://extract.atlassian.net/browse/ISSUE-12198
+                // For the time being, use new connections for every file to avoid the risk of
+                // keeping connections open indefinitely since there is no way for the condition to
+                // know if processing is stopped.
+                _databaseConnectionInfo.CloseManagedDbConnection();
+                if (_dbConnection != null)
+                {
+                    _dbConnection.Dispose();
+                    _dbConnection = null;
+                }
             }
         }
 

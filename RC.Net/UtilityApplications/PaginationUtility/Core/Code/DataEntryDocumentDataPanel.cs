@@ -261,8 +261,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                ExtractException.Assert("ELI41360", "Panel not properly initialized.", _imageViewer != null);
-
                 base.ImageViewer = _imageViewer;
 
                 // Prevent cached query values from overriding differing data in the document being loaded.
@@ -272,7 +270,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 LoadData(_documentData.WorkingAttributes, _documentData.SourceDocName, forDisplay);
 
-                if (_imageViewer.Visible)
+                if (_imageViewer != null && _imageViewer.Visible)
                 {
                     _documentData.SetSummary(SummaryDataEntryQuery?.Evaluate().ToString());
                     _documentData.SetSendForReprocessing(SendForReprocessingFunc(_documentData));
@@ -285,7 +283,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _documentData.SetInitialized();
                 }
 
-                UpdateSwipingState();
+                if (InPaginationPanel)
+                {
+                    UpdateSwipingState();
+                }
 
                 if (_documentData.UndoState != null)
                 {
@@ -294,8 +295,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     OnRedoAvailabilityChanged();
                 }
 
-                _imageViewer.ImageFileChanged += HandleImageViewer_ImageFileChanged;
-                _imageViewer.ImageFileClosing += HandleImageViewer_ImageFileClosing;
+                if (_imageViewer != null)
+                {
+                    _imageViewer.ImageFileChanged += HandleImageViewer_ImageFileChanged;
+                    _imageViewer.ImageFileClosing += HandleImageViewer_ImageFileClosing;
+                }
 
                 Active = true;
             }
@@ -321,8 +325,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                ExtractException.Assert("ELI41361", "Panel not properly initialized.", _imageViewer != null);
-
                 if (validateData && !DataCanBeSaved())
                 {
                     return false;
@@ -448,7 +450,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return _primaryPageIsForActiveDocument;
+                return _primaryPageIsForActiveDocument && _imageViewer != null;
             }
 
             set
@@ -1090,8 +1092,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _imageViewer.AllowHighlight = SwipingEnabled;
                 if (!SwipingEnabled &&
                     (_imageViewer.CursorTool == CursorTool.AngularHighlight ||
-                     _imageViewer.CursorTool == CursorTool.RectangularHighlight ||
-                     _imageViewer.CursorTool == CursorTool.WordHighlight))
+                        _imageViewer.CursorTool == CursorTool.RectangularHighlight ||
+                        _imageViewer.CursorTool == CursorTool.WordHighlight))
                 {
                     _imageViewer.CursorTool = CursorTool.None;
                 }

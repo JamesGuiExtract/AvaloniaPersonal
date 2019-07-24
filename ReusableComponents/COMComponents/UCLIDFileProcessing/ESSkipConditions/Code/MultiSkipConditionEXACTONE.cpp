@@ -20,6 +20,7 @@ const unsigned long gnCurrentVersion = 1;
 //-------------------------------------------------------------------------------------------------
 CMultiFAMConditionEXACTONE::CMultiFAMConditionEXACTONE()
 : m_bDirty(false)
+, m_bIsPaginationCondition(false)
 {
 	m_ipGenericMultiFAMCondition = __nullptr;
 	m_ipMultiFAMConditions = __nullptr;
@@ -41,6 +42,7 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::InterfaceSupportsErrorInfo(REFIID riid)
 	static const IID* arr[] = 
 	{
 		&IID_IFAMCondition,
+		&IID_IPaginationCondition,
 		&IID_IFAMCancelable,
 		&IID_IInitClose,
 		&IID_IParallelizableTask,
@@ -75,11 +77,60 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::raw_FileMatchesFAMCondition(IFileRecord
 
 		// call FileMatchesFAMCondition inside GenericMultiFAMCondition class
 		*pRetVal = getGenericMultiFAMCondition()->FileMatchesFAMCondition(m_ipMultiFAMConditions, 
-			EXTRACT_FAMCONDITIONSLib::kEXACTONEOperator, pFileRecord, pFPDB, lActionID, pFAMTM);
+			EXTRACT_FAMCONDITIONSLib::kEXACTONEOperator, false, pFileRecord,
+			_bstr_t(""), _bstr_t(""), _bstr_t(""), pFPDB, lActionID, pFAMTM);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13802")
 
 	return S_OK;
+}
+
+//-------------------------------------------------------------------------------------------------
+// IPaginationCondition
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionEXACTONE::get_IsPaginationCondition(VARIANT_BOOL* pbIsPaginationCondition)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI47164", pbIsPaginationCondition != __nullptr);
+
+		*pbIsPaginationCondition = asVariantBool(m_bIsPaginationCondition);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI47165");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionEXACTONE::put_IsPaginationCondition(VARIANT_BOOL pbIsPaginationCondition)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_bIsPaginationCondition = asCppBool(pbIsPaginationCondition);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI47166");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CMultiFAMConditionEXACTONE::raw_FileMatchesPaginationCondition(IFileRecord* pSourceFileRecord,
+	BSTR bstrProposedFileName, BSTR bstrDocumentStatus, BSTR bstrSerializedDocumentAttributes,
+	IFileProcessingDB* pFPDB, long lActionID, IFAMTagManager* pFAMTagManager,
+	VARIANT_BOOL* pRetVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+		try
+	{
+		// call FileMatchesFAMCondition inside GenericMultiFAMCondition class
+		*pRetVal = getGenericMultiFAMCondition()->FileMatchesFAMCondition(m_ipMultiFAMConditions,
+			EXTRACT_FAMCONDITIONSLib::kEXACTONEOperator, true, pSourceFileRecord, bstrProposedFileName,
+			bstrDocumentStatus, bstrSerializedDocumentAttributes, pFPDB, lActionID, pFAMTagManager);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI47167")
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -226,6 +277,10 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::raw_CopyFrom(IUnknown *pObject)
 		IIUnknownVectorPtr ipMultiFAMCond = ipObj->ObjectsVector;
 		ASSERT_RESOURCE_ALLOCATION("ELI13811", ipMultiFAMCond != __nullptr);
 
+		IPaginationConditionPtr ipPaginationCondition(pObject);
+		ASSERT_RESOURCE_ALLOCATION("ELI47154", ipPaginationCondition != __nullptr);
+		m_bIsPaginationCondition = asVariantBool(ipPaginationCondition->IsPaginationCondition);
+
 		// copy the vector of FAM conditions
 		m_ipMultiFAMConditions = ipMultiFAMCond->Clone();
 		ASSERT_RESOURCE_ALLOCATION("ELI13812", m_ipMultiFAMConditions != __nullptr);
@@ -271,9 +326,18 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::raw_GetObjectCategoryName(BSTR *pstrCat
 
 	try
 	{
-		// Get the category name for FAM condition
-		_bstr_t _bstrCategoryName = FP_FAM_CONDITIONS_CATEGORYNAME.c_str();
-		*pstrCategoryName = _bstrCategoryName.Detach();
+		if (m_bIsPaginationCondition)
+		{
+			// Get the category name for FAM condition
+			_bstr_t _bstrCategoryName = FP_PAGINATION_CONDITION_CATEGORYNAME.c_str();
+			*pstrCategoryName = _bstrCategoryName.Detach();
+		}
+		else
+		{
+			// Get the category name for FAM condition
+			_bstr_t _bstrCategoryName = FP_FAM_CONDITIONS_CATEGORYNAME.c_str();
+			*pstrCategoryName = _bstrCategoryName.Detach();
+		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13816")
 
@@ -286,7 +350,14 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::raw_GetObjectType(BSTR *pstrObjectType)
 
 	try
 	{
-		*pstrObjectType = _bstr_t("FAM Condition").Detach();
+		if (m_bIsPaginationCondition)
+		{
+			*pstrObjectType = _bstr_t("Pagination Condition").Detach();
+		}
+		else
+		{
+			*pstrObjectType = _bstr_t("FAM Condition").Detach();
+		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13817")
 
@@ -344,12 +415,25 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::put_ObjectsVector(IIUnknownVector *newV
 				throw ue;
 			}
 
-			IFAMConditionPtr ipFAMCondition = ipObj->Object;
-			if (ipFAMCondition == __nullptr)
+			if (m_bIsPaginationCondition)
 			{
-				UCLIDException ue("ELI13836", "Invalid object in ObjectWithDescription - expecting IFAMCondition object!");
-				ue.addDebugInfo("index", i);
-				throw ue;
+				IPaginationConditionPtr ipPaginationCondition = ipObj->Object;
+				if (ipPaginationCondition == __nullptr)
+				{
+					UCLIDException ue("ELI47176", "Invalid object in ObjectWithDescription - expecting IPaginationCondition object!");
+					ue.addDebugInfo("index", i);
+					throw ue;
+				}
+			}
+			else
+			{
+				IFAMConditionPtr ipFAMCondition = ipObj->Object;
+				if (ipFAMCondition == __nullptr)
+				{
+					UCLIDException ue("ELI13836", "Invalid object in ObjectWithDescription - expecting IFAMCondition object!");
+					ue.addDebugInfo("index", i);
+					throw ue;
+				}
 			}
 		}
 
@@ -371,7 +455,14 @@ STDMETHODIMP CMultiFAMConditionEXACTONE::raw_GetRequiredIID(IID *riid)
 		// validate license
 		validateLicense();
 
-		*riid = IID_IFAMCondition;
+		if (m_bIsPaginationCondition)
+		{
+			*riid = IID_IPaginationCondition;
+		}
+		else
+		{
+			*riid = IID_IFAMCondition;
+		}
 
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13856")

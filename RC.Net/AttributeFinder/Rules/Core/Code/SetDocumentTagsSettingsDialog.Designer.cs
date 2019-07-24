@@ -36,7 +36,7 @@
             this._okButton = new System.Windows.Forms.Button();
             this._configureToSetDocType = new System.Windows.Forms.Button();
             this._setStringTagCheckBox = new System.Windows.Forms.CheckBox();
-            this._stringTagAttributeSelector = new Extract.AttributeFinder.Rules.ConfigurableObjectControl();
+            this._stringTagAttributeSelector = new Utilities.Forms.ConfigurableObjectControl();
             this._stringTagName = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -58,7 +58,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this._objectTagName = new System.Windows.Forms.TextBox();
-            this._objectTagAttributeSelector = new Extract.AttributeFinder.Rules.ConfigurableObjectControl();
+            this._objectTagAttributeSelector = new Utilities.Forms.ConfigurableObjectControl();
             this._noTagsIfEmptyCheckBox = new System.Windows.Forms.CheckBox();
             this._generateSourceAttributesWithRSDCheckBox = new System.Windows.Forms.CheckBox();
             _rsdFileGroupBox = new System.Windows.Forms.GroupBox();
@@ -477,7 +477,7 @@
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _configureToSetDocType;
         private System.Windows.Forms.CheckBox _setStringTagCheckBox;
-        private ConfigurableObjectControl _stringTagAttributeSelector;
+        private Utilities.Forms.ConfigurableObjectControl _stringTagAttributeSelector;
         private System.Windows.Forms.TextBox _stringTagName;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.GroupBox groupBox2;
@@ -497,7 +497,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox _objectTagName;
-        private ConfigurableObjectControl _objectTagAttributeSelector;
+        private Utilities.Forms.ConfigurableObjectControl _objectTagAttributeSelector;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox _delimiter;
         private System.Windows.Forms.CheckBox _noTagsIfEmptyCheckBox;

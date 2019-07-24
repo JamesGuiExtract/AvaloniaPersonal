@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows.Forms;
 using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Conditions
 {
@@ -97,8 +98,19 @@ namespace Extract.FileActionManager.Conditions
                 // Apply Settings values to the UI.
                 if (Settings != null)
                 {
+                    if (((IPaginationCondition)Settings).IsPaginationCondition)
+                    {
+                        _voaFileTextBox.Text = "Not applicable for proposed pagination output yet to be created.";
+                        _voaFileTextBox.Enabled = false;
+                        _voaFileBrowse.Enabled = false;
+                        _voaFilePathTags.Enabled = false;
+                    }
+                    else
+                    {
+                        _voaFileTextBox.Text = Settings.VOAFileName;
+                    }
+
                     _metComboBox.Text = Settings.MetIfTrue ? "met" : "not met";
-                    _voaFileTextBox.Text = Settings.VOAFileName;
                     _documentTypeListBox.Items.AddRange(Settings.DocumentTypes);
                     _documentClassifiersPath = Settings.DocumentClassifiersPath;
                     _industry = Settings.Industry;

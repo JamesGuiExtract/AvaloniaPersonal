@@ -1,11 +1,15 @@
 ﻿using Extract.Imaging;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using UCLID_AFCORELib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -63,8 +67,7 @@ namespace Extract.FileActionManager.Conditions
     [Guid("9C3781D9-01A3-4406-808C-2416E0C81EF5")]
     [CLSCompliant(false)]
     public interface IPageCountCondition : ICategorizedComponent, IConfigurableObject,
-        IMustBeConfiguredObject, ICopyableObject, IFAMCondition, ILicensedComponent,
-        IPersistStream
+        IMustBeConfiguredObject, ICopyableObject, IFAMCondition, ILicensedComponent, IPersistStream
     {
         /// <summary>
         /// Specifies the <see cref="PageCountComparisonOperator"/> to use when comparing a
@@ -334,93 +337,9 @@ namespace Extract.FileActionManager.Conditions
                     _COMPONENT_DESCRIPTION);
 
                 ValidateSettings();
+                int documentPageCount = SourceFilePageCount(pFileRecord);
 
-                int documentPageCount = UseDBPageCount ? pFileRecord.Pages : 0;
-
-                // https://extract.atlassian.net/browse/ISSUE-12030
-                // When the condition is being used during queuing or the page count check was
-                // skipped during queuing we will need to manually check for the number of pages.
-                if (documentPageCount == 0)
-                {
-                    string sourceDocName = pFileRecord.Name;
-
-                    if (!File.Exists(sourceDocName))
-                    {
-                        var ee = new ExtractException("ELI36706",
-                            "Cannot check page count of non-existent document.");
-                        ee.AddDebugData("SourceDocName", sourceDocName, false);
-                        throw ee;
-                    }
-
-                    if (_codecs == null)
-                    {
-                        _codecs = new ImageCodecs();
-                    }
-
-                    try
-                    {
-                        using (var imageReader = _codecs.CreateReader(pFileRecord.Name))
-                        {
-                            documentPageCount = imageReader.PageCount;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        if (_miscUtils == null)
-                        {
-                            _miscUtils = new MiscUtils();
-                        }
-
-                        // https://extract.atlassian.net/browse/ISSUE-12044
-                        // If the document has an image or numeric extension, throw an exception
-                        // because we should be able to get a page count. But if the document does
-                        // not appear to be an image, ignore this error and let the page count be
-                        // zero.
-                        if (_miscUtils.HasImageFileExtension(sourceDocName) ||
-                            _miscUtils.HasNumericFileExtension(sourceDocName))
-                        {
-                            var ee = new ExtractException("ELI36712",
-                                "Unable to get page count of document.", ex);
-                            ee.AddDebugData("SourceDocName", sourceDocName, false);
-                            throw ee;
-                        }
-                    }
-                }
-
-                bool conditionMet = false;
-
-                switch (PageCountComparisonOperator)
-                {
-                    case PageCountComparisonOperator.Equal:
-                        conditionMet = documentPageCount == PageCount;
-                        break;
-
-                    case PageCountComparisonOperator.NotEqual:
-                        conditionMet = documentPageCount != PageCount;
-                        break;
-
-                    case PageCountComparisonOperator.LessThan:
-                        conditionMet = documentPageCount < PageCount;
-                        break;
-
-                    case PageCountComparisonOperator.LessThanOrEqual:
-                        conditionMet = documentPageCount <= PageCount;
-                        break;
-
-                    case PageCountComparisonOperator.GreaterThan:
-                        conditionMet = documentPageCount > PageCount;
-                        break;
-
-                    case PageCountComparisonOperator.GreaterThanOrEqual:
-                        conditionMet = documentPageCount >= PageCount;
-                        break;
-
-                    default:
-                        ExtractException.ThrowLogicException("ELI36704");
-                        break;
-                }
-
-                return conditionMet;
+                return IsConditionMet(documentPageCount);
             }
             catch (Exception ex)
             {
@@ -428,7 +347,7 @@ namespace Extract.FileActionManager.Conditions
                     "Error occured in '" + _COMPONENT_DESCRIPTION + "'", ex);
             }
         }
-        
+
         /// <summary>
         /// Returns bool value indicating if the condition requires admin access
         /// </summary>
@@ -756,7 +675,102 @@ namespace Extract.FileActionManager.Conditions
 
             _dirty = true;
         }
-        
+
+        bool IsConditionMet(int documentPageCount)
+        {
+            bool conditionMet = false;
+
+            switch (PageCountComparisonOperator)
+            {
+                case PageCountComparisonOperator.Equal:
+                    conditionMet = documentPageCount == PageCount;
+                    break;
+
+                case PageCountComparisonOperator.NotEqual:
+                    conditionMet = documentPageCount != PageCount;
+                    break;
+
+                case PageCountComparisonOperator.LessThan:
+                    conditionMet = documentPageCount < PageCount;
+                    break;
+
+                case PageCountComparisonOperator.LessThanOrEqual:
+                    conditionMet = documentPageCount <= PageCount;
+                    break;
+
+                case PageCountComparisonOperator.GreaterThan:
+                    conditionMet = documentPageCount > PageCount;
+                    break;
+
+                case PageCountComparisonOperator.GreaterThanOrEqual:
+                    conditionMet = documentPageCount >= PageCount;
+                    break;
+
+                default:
+                    ExtractException.ThrowLogicException("ELI36704");
+                    break;
+            }
+
+            return conditionMet;
+        }
+
+        int SourceFilePageCount(FileRecord pFileRecord)
+        {
+            int documentPageCount = UseDBPageCount ? pFileRecord.Pages : 0;
+
+            // https://extract.atlassian.net/browse/ISSUE-12030
+            // When the condition is being used during queuing or the page count check was
+            // skipped during queuing we will need to manually check for the number of pages.
+            if (documentPageCount == 0)
+            {
+                string sourceDocName = pFileRecord.Name;
+
+                if (!File.Exists(sourceDocName))
+                {
+                    var ee = new ExtractException("ELI36706",
+                        "Cannot check page count of non-existent document.");
+                    ee.AddDebugData("SourceDocName", sourceDocName, false);
+                    throw ee;
+                }
+
+                if (_codecs == null)
+                {
+                    _codecs = new ImageCodecs();
+                }
+
+                try
+                {
+                    using (var imageReader = _codecs.CreateReader(pFileRecord.Name))
+                    {
+                        documentPageCount = imageReader.PageCount;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (_miscUtils == null)
+                    {
+                        _miscUtils = new MiscUtils();
+                    }
+
+                    // https://extract.atlassian.net/browse/ISSUE-12044
+                    // If the document has an image or numeric extension, throw an exception
+                    // because we should be able to get a page count. But if the document does
+                    // not appear to be an image, ignore this error and let the page count be
+                    // zero.
+                    if (_miscUtils.HasImageFileExtension(sourceDocName) ||
+                        _miscUtils.HasNumericFileExtension(sourceDocName))
+                    {
+                        var ee = new ExtractException("ELI36712",
+                            "Unable to get page count of document.", ex);
+                        ee.AddDebugData("SourceDocName", sourceDocName, false);
+                        throw ee;
+                    }
+                }
+            }
+
+            return documentPageCount;
+        }
+
         #endregion Private Members
     }
 }

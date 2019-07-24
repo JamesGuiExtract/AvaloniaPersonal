@@ -1231,6 +1231,7 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
 					}
 					break;
 			case 17:
+					break;
 
             default:
             {

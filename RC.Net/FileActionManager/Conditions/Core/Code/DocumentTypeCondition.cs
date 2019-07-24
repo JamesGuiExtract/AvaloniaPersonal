@@ -1,4 +1,5 @@
-﻿using Extract.Interop;
+﻿using Extract.AttributeFinder;
+using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
@@ -7,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
@@ -23,8 +25,8 @@ namespace Extract.FileActionManager.Conditions
     [Guid("926A1AE4-0258-4504-BDF6-4A5C2648919E")]
     [ProgId("Extract.FileActionManager.Conditions.DocumentTypeCondition")]
     public class DocumentTypeCondition : ICategorizedComponent, IConfigurableObject,
-        IMustBeConfiguredObject, ICopyableObject, IFAMCondition, ILicensedComponent,
-        IPersistStream
+        IMustBeConfiguredObject, ICopyableObject, IFAMCondition, IPaginationCondition,
+        ILicensedComponent, IPersistStream
     {
         #region Constants
 
@@ -73,6 +75,11 @@ namespace Extract.FileActionManager.Conditions
         /// An <see cref="AFUtility"/> used to evaluate attribute queries.
         /// </summary>
         AFUtility _afUtility;
+
+        /// <summary>
+        /// For converting attribute to/from stringized bytestreams
+        /// </summary>
+        static ThreadLocal<MiscUtils> _miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtils());
 
         /// <summary>
         /// <see langword="true"/> if changes have been made to
@@ -264,7 +271,7 @@ namespace Extract.FileActionManager.Conditions
                 }
             }
         }
-        
+
         #endregion Properties
 
         #region IFAMCondition Members
@@ -305,34 +312,7 @@ namespace Extract.FileActionManager.Conditions
                 IUnknownVector attributes = new IUnknownVector();
                 attributes.LoadFrom(voaFileName, false);
 
-                // Find all document types that have been applied to the document.
-                IEnumerable<string> docTypes =
-                    AFUtility.QueryAttributes(attributes, "/DocumentType", false)
-                    .ToIEnumerable<IAttribute>()
-                    .Select(attribute => attribute.Value.String);
-
-                int docTypeCount = docTypes.Count();
-
-                if (docTypeCount == 1 && DocumentTypes.Contains("Any Unique"))
-                {
-                    return MetIfTrue;
-                }
-                else if (docTypeCount > 1 && DocumentTypes.Contains("Multiply Classified"))
-                {
-                    return MetIfTrue;
-                }
-                else if (docTypeCount == 0 && DocumentTypes.Contains("Unknown"))
-                {
-                    return MetIfTrue;
-                }
-                else if (docTypes
-                    .Where(docType => DocumentTypes.Contains(docType))
-                    .Any())
-                {
-                    return MetIfTrue;
-                }
-
-                return !MetIfTrue;
+                return FileMatchesCondition(attributes);
             }
             catch (Exception ex)
             {
@@ -352,6 +332,59 @@ namespace Extract.FileActionManager.Conditions
         }
 
         #endregion IFAMCondition Members
+
+        #region IPaginationCondition Members
+
+        /// <summary>
+        /// Used to allow PaginationTask to inform IPaginationCondition implementers when they are
+        /// being used in the context of the IPaginationCondition interface.
+        /// NOTE: While it is not necessary for implementers to persist this setting, this setting
+        /// does need to be copied in the context of the ICopyableObject interface (CopyFrom)
+        /// </summary>
+        public bool IsPaginationCondition { get; set; }
+
+        /// <summary>
+        /// Tests proposed pagination output <see paramref="pFileRecord"/> to determine if it is
+        /// qualified to be automatically generated.
+        /// </summary>
+        /// <param name="pSourceFileRecord">A <see cref="FileRecord"/> specifing the source document
+        /// for the proposed output document tested here.
+        /// </param>
+        /// <param name="bstrProposedFileName">The filename planned to be assigned to the document.</param>
+        /// <param name="bstrDocumentStatus">A json representation of the pagination DocumentStatus
+        /// for the proposed output document.</param>
+        /// /// <param name="bstrSerializedDocumentAttributes">A searialized copy of all attributes that fall
+        /// under a root-level "Document" attribute including Pages, DeletedPages and DocumentData (the
+        /// content of which would become the output document's voa)</param>
+        /// <param name="pFPDB">The <see cref="FileProcessingDB"/> currently in use.</param>
+        /// <param name="lActionID">The ID of the database action in use.</param>
+        /// <param name="pFAMTagManager">A <see cref="FAMTagManager"/> to be used to evaluate any
+        /// FAM tags used by the condition.</param>
+        /// <returns><see langword="true"/> if the condition was met, <see langword="false"/> if it
+        /// was not.</returns>
+        public bool FileMatchesPaginationCondition(FileRecord pSourceFileRecord, string bstrProposedFileName,
+            string bstrDocumentStatus, string bstrSerializedDocumentAttributes,
+            FileProcessingDB pFPDB, int lActionID, FAMTagManager pFAMTagManager)
+        {
+            try
+            {
+                var documentAttributes = (IUnknownVector)_miscUtils.Value.GetObjectFromStringizedByteStream(bstrSerializedDocumentAttributes);
+                documentAttributes.ReportMemoryUsage();
+
+                var documentDataAttribute = AttributeMethods.GetSingleAttributeByName(documentAttributes, "DocumentData");
+                var documentData = (documentDataAttribute == null)
+                    ? new IUnknownVector()
+                    : documentDataAttribute.SubAttributes;
+
+                return FileMatchesCondition(documentData);
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI47081", "Error occured in '" + _COMPONENT_DESCRIPTION + "'");
+            }
+        }
+
+        #endregion IPaginationCondition Members
 
         #region IConfigurableObject Members
 
@@ -603,6 +636,7 @@ namespace Extract.FileActionManager.Conditions
         static void RegisterFunction(Type type)
         {
             ComMethods.RegisterTypeInCategory(type, ExtractCategories.FileActionManagerConditionsGuid);
+            ComMethods.RegisterTypeInCategory(type, ExtractCategories.PaginationConditionsGuid);
         }
 
         /// <summary>
@@ -615,6 +649,8 @@ namespace Extract.FileActionManager.Conditions
         static void UnregisterFunction(Type type)
         {
             ComMethods.UnregisterTypeInCategory(type, ExtractCategories.FileActionManagerConditionsGuid);
+            ComMethods.UnregisterTypeInCategory(type, ExtractCategories.PaginationConditionsGuid);
+
         }
 
         /// <summary>
@@ -629,6 +665,7 @@ namespace Extract.FileActionManager.Conditions
             DocumentTypes = source.DocumentTypes;
             Industry = source.Industry;
             DocumentClassifiersPath = source.DocumentClassifiersPath;
+            IsPaginationCondition = source.IsPaginationCondition;
 
             _dirty = true;
         }
@@ -647,6 +684,41 @@ namespace Extract.FileActionManager.Conditions
 
                 return _afUtility;
             }
+        }
+
+        /// <summary>
+        /// Tests whether the configured condition is met for the specified <paramref name="attributes"/>.
+        /// </summary>
+        bool FileMatchesCondition(IUnknownVector attributes)
+        {
+            // Find all document types that have been applied to the document.
+            IEnumerable<string> docTypes =
+                AFUtility.QueryAttributes(attributes, "/DocumentType", false)
+                .ToIEnumerable<IAttribute>()
+                .Select(attribute => attribute.Value.String);
+
+            int docTypeCount = docTypes.Count();
+
+            if (docTypeCount == 1 && DocumentTypes.Contains("Any Unique"))
+            {
+                return MetIfTrue;
+            }
+            else if (docTypeCount > 1 && DocumentTypes.Contains("Multiply Classified"))
+            {
+                return MetIfTrue;
+            }
+            else if (docTypeCount == 0 && DocumentTypes.Contains("Unknown"))
+            {
+                return MetIfTrue;
+            }
+            else if (docTypes
+                .Where(docType => DocumentTypes.Contains(docType))
+                .Any())
+            {
+                return MetIfTrue;
+            }
+
+            return !MetIfTrue;
         }
 
         #endregion Private Members

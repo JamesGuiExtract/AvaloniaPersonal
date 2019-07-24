@@ -1,6 +1,8 @@
 ﻿using Extract.AttributeFinder;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 
@@ -41,6 +43,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _dataError;
 
         /// <summary>
+        /// Indicates whether the data currently contains a validation warning.
+        /// </summary>
+        bool _dataWarning;
+
+        /// <summary>
         /// If specified, the tooltip text that should be associated with the document validation error.
         /// </summary>
         string _dataErrorMessage;
@@ -61,6 +68,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// the server for reprocessing.
         /// </summary>
         bool? _sendForReprocessing = null;
+
+        /// <summary>
+        /// To read attributes to bytestreams.
+        /// </summary>
+        static ThreadLocal<MiscUtils> _miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtils());
 
         #endregion Fields
 
@@ -150,6 +162,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// A <see cref="DocumentStatus"/> update that has been retrieved, but not yet applied to this instance.
+        /// </summary>
+        public DocumentStatus PendingDocumentStatus { get; set; }
+
         #endregion Properties
 
         #region Methods
@@ -172,6 +189,99 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45611");
+            }
+        }
+
+        /// <summary>
+        /// Applies the <see cref="ApplyPendingStatusUpdate"/> to this instance.
+        /// </summary>
+        /// <param name="statusOnly"><c>true</c> if only the status metadata should be updated; 
+        /// <c>false</c> to update the document data attributes.</param>
+        /// <returns></returns>
+        public ExtractException ApplyPendingStatusUpdate(bool statusOnly)
+        {
+            bool dirty = false;
+
+            try
+            {
+                ExtractException.Assert("ELI47128", "No status update pending",
+                    PendingDocumentStatus != null);
+
+                if (PendingDocumentStatus.DataError != _dataError)
+                {
+                    _dataError = PendingDocumentStatus.DataError;
+                    if (!PendingDocumentStatus.DataError)
+                    {
+                        _dataErrorMessage = null;
+                    }
+                    dirty = true;
+                }
+
+                if (PendingDocumentStatus.DataWarning != _dataWarning)
+                {
+                    _dataWarning = PendingDocumentStatus.DataWarning;
+                    dirty = true;
+                }
+
+                if (statusOnly)
+                {
+                    if (PendingDocumentStatus.DataModified != _modified)
+                    {
+                        _modified = PendingDocumentStatus.DataModified;
+                        dirty = true;
+                    }
+
+                    if (PendingDocumentStatus.Summary != _summary)
+                    {
+                        _summary = PendingDocumentStatus.Summary;
+                        dirty = true;
+                    }
+
+                    if (PendingDocumentStatus.Reprocess != _sendForReprocessing)
+                    {
+                        _sendForReprocessing = PendingDocumentStatus.Reprocess;
+                        dirty = true;
+                    }
+
+                    if (!_initialized)
+                    {
+                        _initialized = true;
+                        dirty = true;
+                    }
+                }
+                else
+                {
+                    // This section is concerned with gathering data preparing for output;
+                    // No need to raise DocumentDataStateChanged for any changed properties here.
+                    if (DataError)
+                    {
+                        return ExtractException.FromStringizedByteStream("ELI45581", PendingDocumentStatus.StringizedError);
+                    }
+                    else
+                    {
+                        Orders = PendingDocumentStatus.Orders;
+                        PromptForDuplicateOrders = PendingDocumentStatus.PromptForDuplicateOrders;
+                        Encounters = PendingDocumentStatus.Encounters;
+                        PromptForDuplicateEncounters = PendingDocumentStatus.PromptForDuplicateEncounters;
+                        Attributes =
+                            (IUnknownVector)_miscUtils.Value.GetObjectFromStringizedByteStream(PendingDocumentStatus.StringizedData);
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47125");
+            }
+            finally
+            {
+                PendingDocumentStatus = null;
+
+                if (dirty)
+                {
+                    OnDocumentDataStateChanged();
+                }
             }
         }
 
@@ -234,6 +344,17 @@ namespace Extract.UtilityApplications.PaginationUtility
             get
             {
                 return _dataError;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the data currently contains a validation warning.
+        /// </summary>
+        public override bool DataWarning
+        {
+            get
+            {
+                return _dataWarning;
             }
         }
 

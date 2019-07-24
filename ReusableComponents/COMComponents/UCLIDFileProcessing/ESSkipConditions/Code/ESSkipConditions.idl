@@ -169,8 +169,10 @@ library EXTRACT_FAMCONDITIONSLib
 		// Generic FileMatchesFAMCondition which will called by multi FAM condition
 		// with different logical operators
 		[id(1), helpstring("method FileMatchesFAMCondition")] HRESULT FileMatchesFAMCondition(
-			[in] IIUnknownVector* pFAMConditions, [in] ELogicalOperator eLogicalOperator, 
-			[in] IFileRecord* pFileRecord, [in] IFileProcessingDB* pFPDB,
+			[in] IIUnknownVector* pFAMConditions, [in] ELogicalOperator eLogicalOperator,
+			[in] VARIANT_BOOL bPaginationCondition, [in] IFileRecord* pFileRecord, 
+			[in] BSTR bstrProposedFileName, [in] BSTR bstrDocumentStatus,
+			[in] BSTR bstrSerializedDocumentAttributes, [in] IFileProcessingDB* pFPDB,
 			[in] long lActionID, [in] IFAMTagManager* pFAMTM, [out, retval] VARIANT_BOOL* pRetVal);
 		[id(2), helpstring("method Parallelize")] HRESULT Parallelize([in] IIUnknownVector* pFAMConditions,
 			[out, retval] VARIANT_BOOL *pvbParallelize);
@@ -352,6 +354,7 @@ library EXTRACT_FAMCONDITIONSLib
 	coclass MultiFAMConditionAND
 	{
 		[default] interface IFAMCondition;
+		interface IPaginationCondition;
 		interface IFAMCancelable;
 		interface IInitClose;
 		interface IParallelizableTask;
@@ -370,6 +373,7 @@ library EXTRACT_FAMCONDITIONSLib
 	coclass MultiFAMConditionOR
 	{
 		[default] interface IFAMCondition;
+		interface IPaginationCondition;
 		interface IFAMCancelable;
 		interface IInitClose;
 		interface IParallelizableTask;
@@ -388,6 +392,7 @@ library EXTRACT_FAMCONDITIONSLib
 	coclass MultiFAMConditionEXACTONE
 	{
 		[default] interface IFAMCondition;
+		interface IPaginationCondition;
 		interface IFAMCancelable;
 		interface IInitClose;
 		interface IParallelizableTask;
@@ -406,6 +411,7 @@ library EXTRACT_FAMCONDITIONSLib
 	coclass MultiFAMConditionNONE
 	{
 		[default] interface IFAMCondition;
+		interface IPaginationCondition;
 		interface IFAMCancelable;
 		interface IInitClose;
 		interface IParallelizableTask;

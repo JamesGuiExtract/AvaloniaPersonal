@@ -1,4 +1,6 @@
-﻿using Nuance.OmniPage.CSDK;
+﻿using Nuance.OmniPage.CSDK.ArgTypes;
+using Nuance.OmniPage.CSDK.CAPI;
+using Nuance.OmniPage.CSDK.Objects;
 using System;
 using System.Collections.Generic;
 
@@ -11,8 +13,8 @@ namespace Extract.Imaging
         {
             try
             {
-                RecAPI.kRecInit(null, null)
-                    .ThrowOnError("ELI46860", "Unable to initialize Nuance engine");
+                Engine.SetLicenseKey(null, "9d478fe171d5");
+                Engine.Init("Extract Systems", "Extract Systems");
             }
             catch (Exception ex)
             {

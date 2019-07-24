@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.Label label1;
             System.Windows.Forms.GroupBox groupBox1;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DatabaseContentsConditionAdvancedDialog));
+            this._dataFileLabel = new System.Windows.Forms.Label();
             this._abortOnErrorRadioButton = new System.Windows.Forms.RadioButton();
             this._logErrorRadioButton = new System.Windows.Forms.RadioButton();
             this._ignoreErrorRadioButton = new System.Windows.Forms.RadioButton();
@@ -39,19 +39,18 @@
             this._pathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
-            label1 = new System.Windows.Forms.Label();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // label1
+            // _dataFileLabel
             // 
-            label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(12, 9);
-            label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(71, 13);
-            label1.TabIndex = 0;
-            label1.Text = "VOA filename";
+            this._dataFileLabel.AutoSize = true;
+            this._dataFileLabel.Location = new System.Drawing.Point(12, 9);
+            this._dataFileLabel.Name = "_dataFileLabel";
+            this._dataFileLabel.Size = new System.Drawing.Size(71, 13);
+            this._dataFileLabel.TabIndex = 0;
+            this._dataFileLabel.Text = "VOA filename";
             // 
             // groupBox1
             // 
@@ -103,6 +102,8 @@
             // _browseButton
             // 
             this._browseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._browseButton.EnsureFileExists = false;
+            this._browseButton.EnsurePathExists = false;
             this._browseButton.Location = new System.Drawing.Point(408, 24);
             this._browseButton.Name = "_browseButton";
             this._browseButton.Size = new System.Drawing.Size(27, 23);
@@ -164,7 +165,7 @@
             this.Controls.Add(groupBox1);
             this.Controls.Add(this._pathTagsButton);
             this.Controls.Add(this._okButton);
-            this.Controls.Add(label1);
+            this.Controls.Add(this._dataFileLabel);
             this.Controls.Add(this._dataFileTextBox);
             this.Controls.Add(this._cancelButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -193,6 +194,6 @@
         private System.Windows.Forms.RadioButton _abortOnErrorRadioButton;
         private System.Windows.Forms.RadioButton _logErrorRadioButton;
         private System.Windows.Forms.RadioButton _ignoreErrorRadioButton;
-
+        private System.Windows.Forms.Label _dataFileLabel;
     }
 }

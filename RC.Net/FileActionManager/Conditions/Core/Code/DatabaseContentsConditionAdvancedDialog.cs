@@ -2,6 +2,7 @@
 using Extract.Utilities;
 using System;
 using System.Windows.Forms;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Conditions
 {
@@ -84,7 +85,18 @@ namespace Extract.FileActionManager.Conditions
                 // Apply Settings values to the UI.
                 if (Settings != null)
                 {
-                    _dataFileTextBox.Text = Settings.DataFileName;
+                    if (((IPaginationCondition)Settings).IsPaginationCondition)
+                    {
+                        _dataFileTextBox.Text = "Not applicable for proposed pagination output yet to be created.";
+                        _dataFileTextBox.Enabled = false;
+                        _browseButton.Enabled = false;
+                        _pathTagsButton.Enabled = false;
+                    }
+                    else
+                    {
+                        _dataFileTextBox.Text = Settings.DataFileName;
+                    }
+
                     switch (Settings.ErrorBehavior)
                     {
                         case DatabaseContentsConditionErrorBehavior.Ignore:

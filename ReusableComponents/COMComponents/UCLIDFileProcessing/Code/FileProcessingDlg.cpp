@@ -1413,6 +1413,7 @@ void FileProcessingDlg::OnToolsCheckfornewcomponents()
 		ipCategoryNames->PushBack(get_bstr_t(FP_FILE_PROC_CATEGORYNAME.c_str()));
 		ipCategoryNames->PushBack(get_bstr_t(FP_FILE_SUPP_CATEGORYNAME.c_str()));
 		ipCategoryNames->PushBack(get_bstr_t(FP_FAM_CONDITIONS_CATEGORYNAME.c_str()));
+		ipCategoryNames->PushBack(get_bstr_t(FP_PAGINATION_CONDITION_CATEGORYNAME.c_str()));
 		ipCategoryNames->PushBack(get_bstr_t(FP_FAM_REPORTS_CATEGORYNAME.c_str()));
 		ipCategoryNames->PushBack(get_bstr_t(INPUTFUNNEL_IR_CATEGORYNAME.c_str()));
 

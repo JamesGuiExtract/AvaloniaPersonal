@@ -1468,8 +1468,8 @@ namespace Extract.Imaging
         public static void RotatePage(
             int newPageNumber,
             int rotation,
-            LongToObjectMap newPageInfos,
-            SpatialPageInfo oldSpatialPageInfo)
+            ILongToObjectMap newPageInfos,
+            ISpatialPageInfo oldSpatialPageInfo)
         {
             try
             {

@@ -206,12 +206,6 @@
     </Compile>
     <Compile Include="BarcodeFinder.cs" />
     <Compile Include="MicrFinder.cs" />
-    <Compile Include="ConfigurableObjectControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="ConfigurableObjectControl.Designer.cs">
-      <DependentUpon>ConfigurableObjectControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="BarcodeFinderSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -523,9 +517,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ConfigurableObjectControl.resx">
-      <DependentUpon>ConfigurableObjectControl.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="CreateAttributeSettingsDialog.resx">
       <DependentUpon>CreateAttributeSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>

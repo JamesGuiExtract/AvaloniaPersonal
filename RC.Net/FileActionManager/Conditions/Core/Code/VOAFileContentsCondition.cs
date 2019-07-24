@@ -1,4 +1,5 @@
-﻿using Extract.Interop;
+﻿using Extract.AttributeFinder;
+using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Parsers;
@@ -9,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
@@ -146,8 +148,8 @@ namespace Extract.FileActionManager.Conditions
     [Guid("19531D71-4DC8-4819-A151-E0B4DC38133F")]
     [ProgId("Extract.FileActionManager.Conditions.VOAFileContentsCondition")]
     public class VOAFileContentsCondition : ICategorizedComponent, IConfigurableObject,
-        IMustBeConfiguredObject, ICopyableObject, IFAMCondition, ILicensedComponent,
-        IPersistStream
+        IMustBeConfiguredObject, ICopyableObject, IFAMCondition, IPaginationCondition,
+        ILicensedComponent, IPersistStream
     {
         #region Constants
 
@@ -295,6 +297,11 @@ namespace Extract.FileActionManager.Conditions
         /// <see langword="false"/> if no changes have been made since it was created.
         /// </summary>
         bool _dirty;
+
+        /// <summary>
+        /// For converting attribute to/from stringized bytestreams
+        /// </summary>
+        static ThreadLocal<MiscUtils> _miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtils());
 
         #endregion Fields
 
@@ -828,6 +835,14 @@ namespace Extract.FileActionManager.Conditions
             }
         }
 
+        /// <summary>
+        /// Used to allow PaginationTask to inform IPaginationCondition implementers when they are
+        /// being used in the context of the IPaginationCondition interface.
+        /// NOTE: While it is not necessary for implementers to persist this setting, this setting
+        /// does need to be copied in the context of the ICopyableObject interface (CopyFrom)
+        /// </summary>
+        public bool IsPaginationCondition { get; set; }
+
         #endregion Properties
 
         #region Public Methods
@@ -909,46 +924,7 @@ namespace Extract.FileActionManager.Conditions
                 IUnknownVector attributes = new IUnknownVector();
                 attributes.LoadFrom(voaFileName, false);
 
-                // Allow for query to be a simple comma delimited list of attribute names.
-                string attributeQuery = AttributeQuery.Replace(',', '|');
-                attributeQuery = attributeQuery.Replace(" ", "");
-                attributes = AFUtility.QueryAttributes(attributes, attributeQuery, false);
-
-                // Retrieves the AttributeField for each attribute.
-                IEnumerable<string> comparisonValues = GetComparisonValues(attributes);
-
-                // Get the number of these values that qualify.
-                int qualifyingCount = comparisonValues
-                    .Where(value => QualifyValue(value))
-                    .Count();
-
-                // Determine if this count makes the condition true.
-                bool comparisonResult;
-                switch (Requirement)
-                {
-                    case VOAContentsConditionRequirement.ContainsExactly:
-                        comparisonResult = (qualifyingCount == AttributeCount);
-                        break;
-
-                    case VOAContentsConditionRequirement.ContainsAtLeast:
-                        comparisonResult = (qualifyingCount >= AttributeCount);
-                        break;
-
-                    case VOAContentsConditionRequirement.ContainsAtMost:
-                        comparisonResult = (qualifyingCount <= AttributeCount);
-                        break;
-
-                    case VOAContentsConditionRequirement.DoesNotContainExactly:
-                        comparisonResult = (qualifyingCount != AttributeCount);
-                        break;
-
-                    default:
-                        throw new ExtractException("ELI32681",
-                            "Unexpected VOA file contents condition requirement.");
-                }
-
-                // Determine if the condition is met.
-                return comparisonResult == MetIfTrue;
+                return FileMatchesCondition(attributes);
             }
             catch (Exception ex)
             {
@@ -968,6 +944,52 @@ namespace Extract.FileActionManager.Conditions
         }
 
         #endregion IFAMCondition Members
+
+        #region IPaginationCondition Members
+
+        /// <summary>
+        /// Tests proposed pagination output <see paramref="pFileRecord"/> to determine if it is
+        /// qualified to be automatically generated.
+        /// </summary>
+        /// <param name="pSourceFileRecord">A <see cref="FileRecord"/> specifing the source document
+        /// for the proposed output document tested here.
+        /// </param>
+        /// <param name="bstrProposedFileName">The filename planned to be assigned to the document.</param>
+        /// <param name="bstrDocumentStatus">A json representation of the pagination DocumentStatus
+        /// for the proposed output document.</param>
+        /// <param name="bstrSerializedDocumentAttributes">A searialized copy of all attributes that fall
+        /// under a root-level "Document" attribute including Pages, DeletedPages and DocumentData (the
+        /// content of which would become the output document's voa)</param>
+        /// <param name="pFPDB">The <see cref="FileProcessingDB"/> currently in use.</param>
+        /// <param name="lActionID">The ID of the database action in use.</param>
+        /// <param name="pFAMTagManager">A <see cref="FAMTagManager"/> to be used to evaluate any
+        /// FAM tags used by the condition.</param>
+        /// <returns><see langword="true"/> if the condition was met, <see langword="false"/> if it
+        /// was not.</returns>
+        public bool FileMatchesPaginationCondition(FileRecord pSourceFileRecord, string bstrProposedFileName,
+            string bstrDocumentStatus, string bstrSerializedDocumentAttributes,
+            FileProcessingDB pFPDB, int lActionID, FAMTagManager pFAMTagManager)
+        {
+            try
+            {
+                var documentAttributes = (IUnknownVector)_miscUtils.Value.GetObjectFromStringizedByteStream(bstrSerializedDocumentAttributes);
+                documentAttributes.ReportMemoryUsage();
+
+                var docDataAttribute = AttributeMethods.GetSingleAttributeByName(documentAttributes, "DocumentData");
+                var docDataAttributes = (docDataAttribute == null)
+                    ? new IUnknownVector()
+                    : docDataAttribute.SubAttributes;
+
+                return FileMatchesCondition(docDataAttributes);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI47078",
+                    "Error occured in '" + _COMPONENT_DESCRIPTION + "'", ex);
+            }
+        }
+
+        #endregion IPaginationCondition Members
 
         #region IConfigurableObject Members
 
@@ -1249,6 +1271,7 @@ namespace Extract.FileActionManager.Conditions
         static void RegisterFunction(Type type)
         {
             ComMethods.RegisterTypeInCategory(type, ExtractCategories.FileActionManagerConditionsGuid);
+            ComMethods.RegisterTypeInCategory(type, ExtractCategories.PaginationConditionsGuid);
         }
 
         /// <summary>
@@ -1261,6 +1284,8 @@ namespace Extract.FileActionManager.Conditions
         static void UnregisterFunction(Type type)
         {
             ComMethods.UnregisterTypeInCategory(type, ExtractCategories.FileActionManagerConditionsGuid);
+            ComMethods.UnregisterTypeInCategory(type, ExtractCategories.PaginationConditionsGuid);
+
         }
 
         /// <summary>
@@ -1362,7 +1387,6 @@ namespace Extract.FileActionManager.Conditions
                 _regexParser = null;
             }
         }
-
         /// <summary>
         /// Validates the attribute query.
         /// </summary>
@@ -1485,6 +1509,53 @@ namespace Extract.FileActionManager.Conditions
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Tests the <paramref name="attributes"/> against the specified settings to determine if the condition is met.
+        /// </summary>
+        bool FileMatchesCondition(IUnknownVector attributes)
+        {
+            // Allow for query to be a simple comma delimited list of attribute names.
+            string attributeQuery = AttributeQuery.Replace(',', '|');
+            attributeQuery = attributeQuery.Replace(" ", "");
+            attributes = AFUtility.QueryAttributes(attributes, attributeQuery, false);
+
+            // Retrieves the AttributeField for each attribute.
+            var comparisonValues = GetComparisonValues(attributes).ToList();
+
+            // Get the number of these values that qualify.
+            int qualifyingCount = comparisonValues
+                .Where(value => QualifyValue(value))
+                .Count();
+
+            // Determine if this count makes the condition true.
+            bool comparisonResult;
+            switch (Requirement)
+            {
+                case VOAContentsConditionRequirement.ContainsExactly:
+                    comparisonResult = (qualifyingCount == AttributeCount);
+                    break;
+
+                case VOAContentsConditionRequirement.ContainsAtLeast:
+                    comparisonResult = (qualifyingCount >= AttributeCount);
+                    break;
+
+                case VOAContentsConditionRequirement.ContainsAtMost:
+                    comparisonResult = (qualifyingCount <= AttributeCount);
+                    break;
+
+                case VOAContentsConditionRequirement.DoesNotContainExactly:
+                    comparisonResult = (qualifyingCount != AttributeCount);
+                    break;
+
+                default:
+                    throw new ExtractException("ELI32681",
+                        "Unexpected VOA file contents condition requirement.");
+            }
+
+            // Determine if the condition is met.
+            return comparisonResult == MetIfTrue;
         }
 
         /// <summary>

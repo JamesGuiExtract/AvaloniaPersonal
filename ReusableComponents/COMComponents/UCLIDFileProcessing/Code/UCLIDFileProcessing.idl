@@ -615,6 +615,34 @@ library UCLID_FILEPROCESSINGLib
 
 	[
 		object,
+		uuid(FC25A9BB-5F7D-42B0-8ABB-7610A4C6CFA7),
+		dual,
+		helpstring("IPaginationCondition Interface"),
+		pointer_default(unique)
+	]
+	interface IPaginationCondition : IDispatch
+	{
+		// Used to allow PaginationTask to inform IPaginationCondition implementers when they are
+		// being used in the context of the IPaginationCondition interface.
+		// NOTE: While it is not necessary for implementers to persist this setting, this setting
+		// does need to be copied in the context of the ICopyableObject interface (CopyFrom)
+		[propget, id(1), helpstring("property IsPaginationCondition")] HRESULT IsPaginationCondition([out, retval] VARIANT_BOOL* pbIsPaginationCondition);
+		[propput, id(1), helpstring("property IsPaginationCondition ")] HRESULT IsPaginationCondition([in] VARIANT_BOOL bIsPaginationCondition);
+		// Tests whether a specific proposed pagination output document matches on the specified condition
+		// pSourceFileRecord:		Represents the source document which may have multiple other proposed output documents
+		// bstrProposedFileName:	The filename this document would assume if created.
+		// bstrSerializedDocumentAttributes: A searialized copy of all attributes that fall under a root-level "Document"
+		//							attribute including Pages, DeletedPages and DocumentData
+		//							(the content of which would become the output document's voa)
+		[id(2), helpstring("method FileMatchesPaginationCondition")] HRESULT FileMatchesPaginationCondition(
+			[in] IFileRecord* pSourceFileRecord, [in] BSTR bstrProposedFileName, 
+			[in] BSTR bstrDocumentStatus, [in] BSTR bstrSerializedDocumentAttributes,
+			[in] IFileProcessingDB* pFPDB, [in] long lActionID, [in] IFAMTagManager* pFAMTagManager,
+			[out, retval] VARIANT_BOOL* pRetVal);
+	};
+
+	[
+		object,
 		uuid(57735366-4759-4177-899A-EE79EE2FF007),
 		dual,
 		helpstring("IFAMCancelable Interface"),

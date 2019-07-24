@@ -51,7 +51,9 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 // IGenericMultiFAMCondition
 	STDMETHOD(FileMatchesFAMCondition)(IIUnknownVector* pFAMConditions, ELogicalOperator eLogicalOperator, 
-		IFileRecord* pFileRecord, IFileProcessingDB* pFPDB, long lActionID, 
+		VARIANT_BOOL bPaginationCondition, IFileRecord* pFileRecord, BSTR bstrProposedFileName,
+		BSTR bstrDocumentStatus, BSTR bstrSerializedDocumentAttributes,
+		IFileProcessingDB* pFPDB, long lActionID,
 		IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal);
 	STDMETHOD(Parallelize)(IIUnknownVector* pFAMConditions, VARIANT_BOOL *pvbParallelize);
 	STDMETHOD(Init)(IIUnknownVector* pFAMConditions, long nActionID, IFAMTagManager* pFAMTM, IFileProcessingDB* pDB,
@@ -83,7 +85,7 @@ private:
 	bool m_bCancelRequested;
 
 	// Used to hold the currently processing condition
-	IFAMConditionPtr m_ipCurrentCondition;
+	IUnknownPtr m_ipCurrentCondition;
 
 	// Result of the processFile call for the on the task
 	EFileProcessingResult m_eTaskResult;

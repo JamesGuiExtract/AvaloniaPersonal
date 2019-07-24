@@ -146,7 +146,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The description of this task
         /// </summary>
-        const string _COMPONENT_DESCRIPTION = "Core: Paginate files";
+        const string _COMPONENT_DESCRIPTION = "Pagination: Verify";
 
         /// <summary>
         /// Current task version.
@@ -188,7 +188,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// The path tag expression defining the filename that should be given to a pagination
         /// output document.
         /// </summary>
-        string _outputPath = "$InsertBeforeExtension(<SourceDocName>,_Paginated_<SubDocIndex>)";
+        string _outputPath = "$InsertBeforeExtension(<SourceDocName>,_User_Paginated_<SubDocIndex>)";
 
         /// <summary>
         /// The action into which paginated output documents should be moved to pending.

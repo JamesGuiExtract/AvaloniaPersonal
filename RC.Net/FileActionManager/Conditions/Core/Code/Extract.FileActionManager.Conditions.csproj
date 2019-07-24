@@ -80,7 +80,21 @@
       <DependentUpon>DatabaseContentsConditionSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="DatabaseContentsCondition.cs" />
+    <Compile Include="PaginationDataValidityCondition.cs" />
+    <Compile Include="PaginationPageCountCondition.cs" />
     <Compile Include="PageCountCondition.cs" />
+    <Compile Include="PaginationDataValidityConditionSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PaginationDataValidityConditionSettingsDialog.Designer.cs">
+      <DependentUpon>PaginationDataValidityConditionSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PaginationPageCountConditionSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PaginationPageCountConditionSettingsDialog.Designer.cs">
+      <DependentUpon>PaginationPageCountConditionSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="PageCountConditionSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -188,6 +202,10 @@
       <Project>{DC72C952-D6ED-42F6-893D-8262BC9D183E}</Project>
       <Name>Extract.Utilities.Parsers</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\UtilityApplications\PaginationUtility\Core\Code\PaginationUtility.csproj">
+      <Project>{a6cec41c-8703-4687-9395-8b067ac03098}</Project>
+      <Name>PaginationUtility</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Database\Core\Code\Extract.FileActionManager.Database.csproj">
       <Project>{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}</Project>
       <Name>Extract.FileActionManager.Database</Name>
@@ -203,6 +221,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DatabaseContentsConditionSettingsDialog.resx">
       <DependentUpon>DatabaseContentsConditionSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PaginationDataValidityConditionSettingsDialog.resx">
+      <DependentUpon>PaginationDataValidityConditionSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PaginationPageCountConditionSettingsDialog.resx">
+      <DependentUpon>PaginationPageCountConditionSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PageCountConditionSettingsDialog.resx">
       <DependentUpon>PageCountConditionSettingsDialog.cs</DependentUpon>

@@ -249,7 +249,7 @@ namespace Extract.DataEntry
                     _listBoxChild.Show();
 
                     int totalItemHeight = _listBoxChild.ItemHeight * (_listBoxChild.Items.Count + 1);
-                    if ((FormsMethods.GetVisibleScrollbars(_listBoxChild) & ScrollBars.Horizontal) != 0)
+                    if ((FormsMethods.GetVisibleScrollBars(_listBoxChild) & ScrollBars.Horizontal) != 0)
                     {
                         totalItemHeight += SystemInformation.HorizontalScrollBarHeight;
                     }

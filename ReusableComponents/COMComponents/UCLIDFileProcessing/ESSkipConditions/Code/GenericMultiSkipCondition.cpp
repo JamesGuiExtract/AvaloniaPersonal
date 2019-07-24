@@ -79,8 +79,9 @@ STDMETHODIMP CGenericMultiFAMCondition::raw_IsLicensed(VARIANT_BOOL * pbValue)
 // IGenericMultiFAMCondition
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CGenericMultiFAMCondition::FileMatchesFAMCondition(IIUnknownVector* pFAMConditions, 
-	ELogicalOperator eLogicalOperator, IFileRecord* pFileRecord, IFileProcessingDB* pFPDB, 
-	long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal)
+	ELogicalOperator eLogicalOperator, VARIANT_BOOL bPaginationCondition, IFileRecord* pFileRecord,
+	BSTR bstrProposedFileName, BSTR bstrDocumentStatus, BSTR bstrSerializedDocumentAttributes,
+	IFileProcessingDB* pFPDB, long lActionID, IFAMTagManager* pFAMTM, VARIANT_BOOL* pRetVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -149,9 +150,8 @@ STDMETHODIMP CGenericMultiFAMCondition::FileMatchesFAMCondition(IIUnknownVector*
 			// If the current FAM condition is enabled
 			if (ipObj->Enabled == VARIANT_TRUE)
 			{
-				// Get the FAM condition inside the object-with-description
+				// Get the condition inside the object-with-description
 				m_ipCurrentCondition = ipObj->Object;
-				ASSERT_RESOURCE_ALLOCATION("ELI13825", m_ipCurrentCondition != __nullptr);
 
 				// If cancel was requested call cancel before calling the FileMatchesFAMCondition
 				IFAMCancelablePtr ipCancelable = m_ipCurrentCondition;
@@ -160,10 +160,25 @@ STDMETHODIMP CGenericMultiFAMCondition::FileMatchesFAMCondition(IIUnknownVector*
 					ipCancelable->Cancel();
 				}
 
-				// check if file matches FAM condition
-				VARIANT_BOOL bVal = m_ipCurrentCondition->FileMatchesFAMCondition(
-					pFileRecord, pFPDB, lActionID, pFAMTM);
-				
+				VARIANT_BOOL bVal;
+				if (bPaginationCondition)
+				{
+					IPaginationConditionPtr ipPaginationCondition = ipObj->Object;
+					ASSERT_RESOURCE_ALLOCATION("ELI47169", ipPaginationCondition != __nullptr);
+
+					bVal = ipPaginationCondition->FileMatchesPaginationCondition(
+						pFileRecord, bstrProposedFileName, bstrDocumentStatus, bstrSerializedDocumentAttributes,
+						pFPDB, lActionID, pFAMTM);
+				}
+				else
+				{
+					IFAMConditionPtr ipFAMCondition = ipObj->Object;
+					ASSERT_RESOURCE_ALLOCATION("ELI47170", ipFAMCondition != __nullptr);
+
+					bVal = ipFAMCondition->FileMatchesFAMCondition(
+						pFileRecord, pFPDB, lActionID, pFAMTM);
+				}
+
 				// Check if canceled to set flag
 				if (ipCancelable != __nullptr)
 				{

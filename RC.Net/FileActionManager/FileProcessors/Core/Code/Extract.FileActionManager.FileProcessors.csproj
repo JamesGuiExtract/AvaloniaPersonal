@@ -131,6 +131,13 @@
       <DependentUpon>CreateFileTaskSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="CreatePaginatedOutputTask.cs" />
+    <Compile Include="AutoPaginateTask.cs" />
+    <Compile Include="AutoPaginateTaskSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AutoPaginateTaskSettingsDialog.Designer.cs">
+      <DependentUpon>AutoPaginateTaskSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="SplitMultipageDocumentTask.cs" />
     <Compile Include="PaginationTaskForm.FormStateManager.cs">
       <DependentUpon>PaginationTaskForm.cs</DependentUpon>
@@ -350,6 +357,10 @@
       <Project>{A6CEC41C-8703-4687-9395-8B067AC03098}</Project>
       <Name>PaginationUtility</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Conditions\Core\Code\Extract.FileActionManager.Conditions.csproj">
+      <Project>{30DC6A86-CB73-48E6-B4C3-520772284BFE}</Project>
+      <Name>Extract.FileActionManager.Conditions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Database\Core\Code\Extract.FileActionManager.Database.csproj">
       <Project>{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}</Project>
       <Name>Extract.FileActionManager.Database</Name>
@@ -462,6 +473,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CreateFileTaskSettingsDialog.resx">
       <DependentUpon>CreateFileTaskSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AutoPaginateTaskSettingsDialog.resx">
+      <DependentUpon>AutoPaginateTaskSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PaginationTaskSettingsDialog.resx">
       <DependentUpon>PaginationTaskSettingsDialog.cs</DependentUpon>

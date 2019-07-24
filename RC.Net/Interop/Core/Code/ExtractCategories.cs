@@ -148,5 +148,15 @@ namespace Extract.Interop
         /// Name for value modifiers
         /// </summary>
         public static readonly string ValueModifiersName = "UCLID AF-API Value Modifiers";
+
+        /// <summary>
+        /// GUID for pagination conditions
+        /// </summary>
+        public static readonly string PaginationConditionsGuid = "{FC25A9BB-5F7D-42B0-8ABB-7610A4C6CFA7}";
+
+        /// <summary>
+        /// Name for pagination conditions
+        /// </summary>
+        public static readonly string PaginationConditionsName = "Extract Pagination Conditions";
     }
 }

@@ -244,7 +244,11 @@ namespace Extract.GoogleCloud
 
             var response = await operation.PollUntilCompletedAsync(new Google.Api.Gax.PollSettings(Google.Api.Gax.Expiration.FromTimeout(TimeSpan.FromMinutes(10)), TimeSpan.FromSeconds(1)));
 
-            ExtractException.Assert("ELI46813", "Operation failed", !response.IsFaulted);
+            if (response.IsFaulted)
+            {
+                throw new ExtractException("ELI46813", "Operation failed", response.Exception);
+            }
+
             var blobList = _storageClient.ListObjects(_outputBucketName, imageName);
 
             return (from blob in blobList

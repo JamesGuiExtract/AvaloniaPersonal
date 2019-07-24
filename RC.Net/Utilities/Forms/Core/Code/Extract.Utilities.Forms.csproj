@@ -162,6 +162,12 @@
     <Compile Include="BetterSplitContainer.Designer.cs">
       <DependentUpon>BetterSplitContainer.cs</DependentUpon>
     </Compile>
+    <Compile Include="ConfigurableObjectControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ConfigurableObjectControl.Designer.cs">
+      <DependentUpon>ConfigurableObjectControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="InvisibleForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -333,6 +339,9 @@
   <ItemGroup>
     <EmbeddedResource Include="AutoHideScreenTab.resx">
       <DependentUpon>AutoHideScreenTab.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigurableObjectControl.resx">
+      <DependentUpon>ConfigurableObjectControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="CustomizableMessageBoxForm.resx">
       <DependentUpon>CustomizableMessageBoxForm.cs</DependentUpon>

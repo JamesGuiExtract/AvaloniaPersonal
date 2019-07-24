@@ -257,7 +257,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         public int FileID
         {
             get;
-            internal set;
+            set;
         }
     }
 

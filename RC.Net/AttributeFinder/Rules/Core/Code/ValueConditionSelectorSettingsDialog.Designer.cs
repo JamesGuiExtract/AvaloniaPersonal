@@ -32,7 +32,7 @@
             System.Windows.Forms.Label label1;
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
-            this._configureConditionControl = new Extract.AttributeFinder.Rules.ConfigurableObjectControl();
+            this._configureConditionControl = new Utilities.Forms.ConfigurableObjectControl();
             groupBox1 = new System.Windows.Forms.GroupBox();
             label1 = new System.Windows.Forms.Label();
             groupBox1.SuspendLayout();
@@ -120,6 +120,6 @@
 
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.Button _cancelButton;
-        private ConfigurableObjectControl _configureConditionControl;
+        private Utilities.Forms.ConfigurableObjectControl _configureConditionControl;
     }
 }

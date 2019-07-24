@@ -189,6 +189,7 @@ namespace Extract.AttributeFinder
         /// <param name="attributes">The VOA data to be saved for <see paramref="outputFileName"/>.</param>
         /// <param name="imagePages">The source <see cref="ImagePage"/> that corresponds to each successive
         /// page in <see paramref="outputFileName"/>.</param>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Voa")]
         public static void CreateUssAndVoaForPaginatedDocument(string outputFileName,
             IIUnknownVector attributes, IEnumerable<ImagePage> imagePages)
         {
@@ -196,9 +197,12 @@ namespace Extract.AttributeFinder
             {
                 var newSpatialPageInfos = CreateUSSForPaginatedDocument(outputFileName, imagePages);
 
-                TranslateAttributesToNewDocument(attributes, outputFileName, imagePages, newSpatialPageInfos);
+                if (attributes != null)
+                {
+                    TranslateAttributesToNewDocument(attributes, outputFileName, imagePages, newSpatialPageInfos);
 
-                attributes.SaveTo(outputFileName + ".voa", false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                    attributes.SaveTo(outputFileName + ".voa", false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                }
             }
             catch (Exception ex)
             {
@@ -861,7 +865,7 @@ namespace Extract.AttributeFinder
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI46451");
+                throw ex.AsExtract("ELI47063");
             }
         }
 

@@ -31,9 +31,9 @@
             System.Windows.Forms.Label label1;
             System.Windows.Forms.GroupBox groupBox1;
             this._runOutputHandlerCheckBox = new System.Windows.Forms.CheckBox();
-            this._outputHandlerControl = new Extract.AttributeFinder.Rules.ConfigurableObjectControl();
+            this._outputHandlerControl = new Utilities.Forms.ConfigurableObjectControl();
             this._dividingAttributeTextBox = new System.Windows.Forms.TextBox();
-            this._attributeSelectorControl = new Extract.AttributeFinder.Rules.ConfigurableObjectControl();
+            this._attributeSelectorControl = new Utilities.Forms.ConfigurableObjectControl();
             this.label2 = new System.Windows.Forms.Label();
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
@@ -164,10 +164,10 @@
 
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Button _okButton;
-        private ConfigurableObjectControl _attributeSelectorControl;
+        private Utilities.Forms.ConfigurableObjectControl _attributeSelectorControl;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox _dividingAttributeTextBox;
-        private ConfigurableObjectControl _outputHandlerControl;
+        private Utilities.Forms.ConfigurableObjectControl _outputHandlerControl;
         private System.Windows.Forms.CheckBox _runOutputHandlerCheckBox;
     }
 }

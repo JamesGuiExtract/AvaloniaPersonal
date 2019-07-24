@@ -5,13 +5,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
-using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 
-// NOTE:
-// If there are other reusable controls that are created, we should consider breaking them out into
-// a separate assembly (perhaps Extract.AttributeFinder.Forms).
-namespace Extract.AttributeFinder.Rules
+namespace Extract.Utilities.Forms
 {
     /// <summary>
     /// A control that allows selection and configuration of an <see cref="ICategorizedComponent"/>
@@ -28,6 +24,11 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(ConfigurableObjectControl).ToString();
 
+        /// <summary>
+        /// Option that, when selected, clears the previously configured object.
+        /// </summary>
+        const string _NONE = "<None>";
+
         #endregion Constants
 
         #region Fields
@@ -41,6 +42,11 @@ namespace Extract.AttributeFinder.Rules
         /// The COM category from which objects may be selected.
         /// </summary>
         string _categoryName;
+
+        /// <summary>
+        /// Indicates whether the "<NONE>" option should be available to clear the configured object.
+        /// </summary>
+        bool _showNoneOption;
 
         /// <summary>
         /// The currently selected configurable object.
@@ -98,6 +104,15 @@ namespace Extract.AttributeFinder.Rules
 
         #endregion Constructors
 
+        #region Events
+
+        /// <summary>
+        /// Raised when the selected object has changed.
+        /// </summary>
+        public event EventHandler SelectObjectTypeChanged;
+
+        #endregion Events
+
         #region Properties
 
         /// <summary>
@@ -144,11 +159,51 @@ namespace Extract.AttributeFinder.Rules
         }
 
         /// <summary>
+        /// Indicates whether the "<NONE>" option should be available to clear the configured object.
+        /// </summary>
+        [DefaultValue(false)]
+        public bool ShowNoneOption
+        {
+            get
+            {
+                return _showNoneOption;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _showNoneOption)
+                    {
+                        _showNoneOption = value;
+
+                        if (_showNoneOption)
+                        {
+                            _namesToProgIds[_NONE] = "";
+                        }
+                        else
+                        {
+                            _namesToProgIds.Remove(_NONE);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI47039");
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Gets or sets the currently selected configurable object.
         /// </summary>
         /// <value>
         /// The currently selected configurable object.
         /// </value>
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ICategorizedComponent ConfigurableObject
         {
             get
@@ -164,15 +219,24 @@ namespace Extract.AttributeFinder.Rules
                     {
                         _configurableObject = value;
 
-                        // Cache this object instance in case the user chooses a different type
-                        // but decides to come back to this one.
-                        string name = _configurableObject.GetComponentDescription();
-                        _cachedObjects[name] = _configurableObject;
-
-                        // If the form is loaded, indicate the selection in the combo box.
-                        if (_isLoaded)
+                        if (_configurableObject == null)
                         {
-                            _objectSelectionComboBox.SelectedItem = name;
+                            _objectSelectionComboBox.SelectedItem = ShowNoneOption
+                                ? _NONE
+                                : "";
+                        }
+                        else
+                        {
+                            // Cache this object instance in case the user chooses a different type
+                            // but decides to come back to this one.
+                            string name = _configurableObject.GetComponentDescription();
+                            _cachedObjects[name] = _configurableObject;
+
+                            // If the form is loaded, indicate the selection in the combo box.
+                            if (_isLoaded)
+                            {
+                                _objectSelectionComboBox.SelectedItem = name;
+                            }
                         }
                     }
                 }
@@ -189,6 +253,9 @@ namespace Extract.AttributeFinder.Rules
         /// <value>
         /// <see langword="true"/> if this instance is configured; otherwise, <see langword="false"/>.
         /// </value>
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool IsConfigured
         {
             get
@@ -239,6 +306,10 @@ namespace Extract.AttributeFinder.Rules
                         (ICategorizedComponent)ConfigurableObject;
                     _objectSelectionComboBox.SelectedItem = categorizedComponent.GetComponentDescription();
                 }
+                else if (ShowNoneOption)
+                {
+                    _objectSelectionComboBox.SelectedItem = _NONE;
+                }
 
                 // Update button and configuration reminder based on ConfigurableObject.
                 UpdateButtonAndReminder();
@@ -276,24 +347,33 @@ namespace Extract.AttributeFinder.Rules
                     string progId = null;
                     _namesToProgIds.TryGetValue(selectedName, out progId);
 
-                    Type objectType = Type.GetTypeFromProgID(progId);
-                    if (objectType == null)
+                    if (string.IsNullOrWhiteSpace(progId))
                     {
-                        ExtractException ee = new ExtractException("ELI33486",
-                            "Failed to find registered configurable object type.");
-                        ee.AddDebugData("Object name", selectedName, false);
-                        ee.AddDebugData("Object type", progId, false);
-                        throw ee;
+                        configurableObject = null;
                     }
+                    else
+                    {
+                        Type objectType = Type.GetTypeFromProgID(progId);
+                        if (objectType == null)
+                        {
+                            ExtractException ee = new ExtractException("ELI33486",
+                                "Failed to find registered configurable object type.");
+                            ee.AddDebugData("Object name", selectedName, false);
+                            ee.AddDebugData("Object type", progId, false);
+                            throw ee;
+                        }
 
-                    configurableObject = (ICategorizedComponent)Activator.CreateInstance(objectType);
-                    _cachedObjects[selectedName] = configurableObject;
+                        configurableObject = (ICategorizedComponent)Activator.CreateInstance(objectType);
+                        _cachedObjects[selectedName] = configurableObject;
+                    }
                 }
 
                 ConfigurableObject = configurableObject;
                 
                 // Update button and configuration reminder based on the new selection.
                 UpdateButtonAndReminder();
+
+                SelectObjectTypeChanged?.Invoke(this, new EventArgs());
             }
             catch (Exception ex)
             {

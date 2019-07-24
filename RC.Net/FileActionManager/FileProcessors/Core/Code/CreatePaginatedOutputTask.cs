@@ -6,10 +6,8 @@ using Extract.Licensing;
 using Extract.UtilityApplications.PaginationUtility;
 using System;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -41,7 +39,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The description of this task
         /// </summary>
-        const string _COMPONENT_DESCRIPTION = "Core: Pagination - Create output";
+        const string _COMPONENT_DESCRIPTION = "Pagination: Create output";
 
         /// <summary>
         /// Current task version.
@@ -450,15 +448,6 @@ namespace Extract.FileActionManager.FileProcessors
         static void UnregisterFunction(Type type)
         {
             ComMethods.UnregisterTypeInCategory(type, ExtractCategories.FileProcessorsGuid);
-        }
-
-        /// <summary>
-        /// Copies the specified <see cref="CreatePaginatedOutputTask"/> instance into this one.
-        /// </summary>
-        /// <param name="task">The <see cref="CreatePaginatedOutputTask"/> from which to copy.</param>
-        void CopyFrom(CreatePaginatedOutputTask task)
-        {
-            //_dirty = true;
         }
 
         #endregion Private Members

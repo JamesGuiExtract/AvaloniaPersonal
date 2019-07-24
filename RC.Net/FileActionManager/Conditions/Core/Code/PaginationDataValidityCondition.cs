@@ -1,10 +1,7 @@
 ﻿using Extract.Interop;
 using Extract.Licensing;
-using Extract.Utilities;
+using Extract.UtilityApplications.PaginationUtility;
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
@@ -14,59 +11,39 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.FileActionManager.Conditions
 {
     /// <summary>
-    /// A <see cref="IFAMCondition"/> based on a file's workflow. Used to add special conditions to
-    /// FPS files processing all workflows.
+    /// Interface definition for the pagination data validity condition.
     /// </summary>
     [ComVisible(true)]
-    [Guid("CAD27F57-45E7-48BB-987F-9B8395D20D52")]
+    [Guid("56DC67B8-134D-41E8-992E-0E4E86FFF8F0")]
     [CLSCompliant(false)]
-    public interface IWorkflowCondition : ICategorizedComponent, IConfigurableObject,
-        IMustBeConfiguredObject, ICopyableObject, IFAMCondition, IPaginationCondition,
-        ILicensedComponent, IPersistStream
+    public interface IPaginationDataValidityCondition : ICategorizedComponent, IConfigurableObject,
+        IMustBeConfiguredObject, ICopyableObject, IPaginationCondition, ILicensedComponent, IPersistStream
     {
         /// <summary>
-        /// Gets or sets a value indicating whether the <see cref="SelectedWorkflows"/> should be
-        /// inclusive as those that satisfy the condition.
+        /// Condition can only evaluate as true if there are no errors in the data.
         /// </summary>
-        /// <value><c>true</c> if the selected workflows are the ones that should satisfy the
-        /// condition; <c>false</c> if <see cref="SelectedWorkflows"/> are those that should cause
-        /// the condition to not be met.
-        /// </value>
-        bool Inclusive
-        {
-            get;
-            set;
-        }
+        bool IfNoErrors { get; set; }
 
         /// <summary>
-        /// Gets or sets an <see cref="IUnknownVector"/> of workflow names to test against a file's
-        /// workflow.
+        /// Condition can only evaluate as true if there are no warnings in the data.
         /// </summary>
-        /// <value>
-        /// An <see cref="IUnknownVector"/> of workflow names to test against a file's workflow.
-        /// </value>
-        IVariantVector SelectedWorkflows
-        {
-            get;
-            set;
-        }
+        bool IfNoWarnings { get; set; }
     }
 
     /// <summary>
-    /// A <see cref="IFAMCondition"/> based on a file's workflow. Used to add special conditions to
-    /// FPS files processing all workflows.
+    /// A <see cref="IFAMCondition"/> based on the page count of a file.
     /// </summary>
     [ComVisible(true)]
-    [Guid("3F6D3012-076F-4835-A0E6-3BF7C0336BD9")]
-    [ProgId("Extract.FileActionManager.Conditions.WorkflowCondition")]
-    public class WorkflowCondition : IWorkflowCondition
+    [Guid("4D02F01A-E7A8-47FE-95B0-1B9FDE5AF7E8")]
+    [ProgId("Extract.FileActionManager.Conditions.PaginationDataValidityCondition")]
+    public class PaginationDataValidityCondition : IPaginationDataValidityCondition
     {
         #region Constants
 
         /// <summary>
         /// The object name.
         /// </summary>
-        const string _COMPONENT_DESCRIPTION = "Workflow condition";
+        const string _COMPONENT_DESCRIPTION = "Data validity condition (pagination)";
 
         /// <summary>
         /// Current task version.
@@ -78,26 +55,17 @@ namespace Extract.FileActionManager.Conditions
         #region Fields
 
         /// <summary>
-        /// Indicates whether the <see cref="SelectedWorkflows"/> should be inclusive as those that
-        /// satisfy the condition.
+        /// If true, condition can only evaluate as true if there are no errors in the data.
         /// </summary>
-        bool _inclusive = true;
+        bool _ifNoErrors = true;
 
         /// <summary>
-        /// The workflow names to test against a file's workflow.
+        /// If true, condition can only evaluate as true if there are no warnings in the data.
         /// </summary>
-        IVariantVector _selectedWorkflows = new VariantVector();
+        bool _ifNoWarnings = true;
 
         /// <summary>
-        /// A cached map of workflow IDs to workflow names to prevent having to repeatedly look up
-        /// workflows at runtime.
-        /// </summary>
-        Dictionary<int, string> _cachedWorkflowNames;
-
-        /// <summary>
-        /// <see langword="true"/> if changes have been made to
-        /// <see cref="WorkflowCondition"/> since it was created;
-        /// <see langword="false"/> if no changes have been made since it was created.
+        /// Indicates if changes have been made to this instance since creation/loading.
         /// </summary>
         bool _dirty;
 
@@ -106,26 +74,26 @@ namespace Extract.FileActionManager.Conditions
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WorkflowCondition"/> class.
+        /// Initializes a new instance of the <see cref="PaginationDataValidityCondition"/> class.
         /// </summary>
-        public WorkflowCondition()
+        public PaginationDataValidityCondition()
         {
             try
             {
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI43453");
+                throw ex.AsExtract("ELI47131");
             }
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WorkflowCondition"/> class as a copy
+        /// Initializes a new instance of the <see cref="PaginationDataValidityCondition"/> class as a copy
         /// of the specified <see paramref="task"/>.
         /// </summary>
-        /// <param name="task">The <see cref="WorkflowCondition"/> from which settings should be
+        /// <param name="task">The <see cref="PaginationDataValidityCondition"/> from which settings should be
         /// copied.</param>
-        public WorkflowCondition(WorkflowCondition task)
+        public PaginationDataValidityCondition(PaginationDataValidityCondition task)
         {
             try
             {
@@ -133,7 +101,7 @@ namespace Extract.FileActionManager.Conditions
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI43454");
+                throw ex.AsExtract("ELI47132");
             }
         }
 
@@ -142,73 +110,58 @@ namespace Extract.FileActionManager.Conditions
         #region Properties
 
         /// <summary>
-        /// Gets or sets a value indicating whether the <see cref="SelectedWorkflows"/> should be
-        /// inclusive as those that satisfy the condition.
+        /// If true, condition can only evaluate as true if there are no errors in the data.
         /// </summary>
-        /// <value><c>true</c> if the selected workflows are the ones that should satisfy the
-        /// condition; <c>false</c> if <see cref="SelectedWorkflows"/> are those that should cause
-        /// the condition to not be met.
-        /// </value>
-        public bool Inclusive
+        public bool IfNoErrors
         {
             get
             {
-                return _inclusive;
+                return _ifNoErrors;
             }
 
             set
             {
                 try
                 {
-                    if (value != _inclusive)
+                    if (value != _ifNoErrors)
                     {
-                        _inclusive = value;
+                        _ifNoErrors = value;
                         _dirty = true;
                     }
                 }
                 catch (Exception ex)
                 {
-                    throw ex.AsExtract("ELI43455");
+                    throw ex.AsExtract("ELI47133");
                 }
             }
         }
 
         /// <summary>
-        /// Gets or sets an <see cref="IUnknownVector"/> of workflow names to test against a file's
-        /// workflow.
+        /// If true, condition can only evaluate as true if there are no warning in the data.
         /// </summary>
-        /// <value>
-        /// An <see cref="IUnknownVector"/> of workflow names to test against a file's workflow.
-        /// </value>
-        public IVariantVector SelectedWorkflows
+        public bool IfNoWarnings
         {
             get
             {
-                return _selectedWorkflows;
+                return _ifNoWarnings;
             }
 
             set
             {
                 try
                 {
-
-                    _selectedWorkflows = (IVariantVector)value.Clone();
-                    _dirty = true;
+                    if (value != _ifNoWarnings)
+                    {
+                        _ifNoWarnings = value;
+                        _dirty = true;
+                    }
                 }
                 catch (Exception ex)
                 {
-                    throw ex.AsExtract("ELI43456");
+                    throw ex.AsExtract("ELI47134");
                 }
             }
         }
-
-        /// <summary>
-        /// Used to allow PaginationTask to inform IPaginationCondition implementers when they are
-        /// being used in the context of the IPaginationCondition interface.
-        /// NOTE: While it is not necessary for implementers to persist this setting, this setting
-        /// does need to be copied in the context of the ICopyableObject interface (CopyFrom)
-        /// </summary>
-        public bool IsPaginationCondition { get; set; }
 
         #endregion Properties
 
@@ -217,59 +170,27 @@ namespace Extract.FileActionManager.Conditions
         /// <summary>
         /// Validates the instance's current settings.
         /// </summary>
+        /// <throws><see cref="ExtractException"/> if the instance's settings are not valid.</throws>
         public void ValidateSettings()
         {
             try
             {
-                var fileProcessingDb = new FileProcessingDB();
-                fileProcessingDb.ConnectLastUsedDBThisProcess();
-
-                if (!fileProcessingDb.UsingWorkflows)
+                // At least one of the restrictions must be selected.
+                if (!IfNoErrors && !IfNoWarnings)
                 {
-                    throw new ExtractException("ELI43475", "The workflow condition requires workflows in the database.");
-                }
-
-                if (SelectedWorkflows.Size == 0)
-                {
-                    throw new ExtractException("ELI43457", _COMPONENT_DESCRIPTION + 
-                        " must have at least one workflow specified.");
+                    throw new ExtractException("ELI47135", _COMPONENT_DESCRIPTION + 
+                        " has not been configured.");
                 }
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI43458", ex.Message);
+                throw ex.CreateComVisible("ELI47136", ex.Message);
             }
         }
 
         #endregion Public Methods
 
-        #region IFAMCondition Members
-
-        /// <summary>
-        /// Compares the workflow the document represented by <see paramref="pFileRecord"/> belongs
-        /// to determine if the condition is met.
-        /// </summary>
-        /// <param name="pFileRecord">A <see cref="FileRecord"/> specifying the file to be tested.
-        /// </param>
-        /// <param name="pFPDB">The <see cref="FileProcessingDB"/> currently in use.</param>
-        /// <param name="lActionID">The ID of the database action in use.</param>
-        /// <param name="pFAMTagManager">A <see cref="FAMTagManager"/> to be used to evaluate any
-        /// FAM tags used by the condition.</param>
-        /// <returns><see langword="true"/> if the condition was met, <see langword="false"/> if it
-        /// was not.</returns>
-        public bool FileMatchesFAMCondition(FileRecord pFileRecord, FileProcessingDB pFPDB,
-            int lActionID, FAMTagManager pFAMTagManager)
-        {
-            try
-            {
-                return FileMatchesCondition(pFileRecord, pFPDB);
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.CreateComVisible("ELI43460",
-                    "Error occurred in '" + _COMPONENT_DESCRIPTION + "'", ex);
-            }
-        }
+        #region IPaginationCondition Members
 
         /// <summary>
         /// Returns bool value indicating if the condition requires admin access
@@ -281,9 +202,13 @@ namespace Extract.FileActionManager.Conditions
             return false;
         }
 
-        #endregion IFAMCondition Members
-
-        #region IPaginationCondition Members
+        /// <summary>
+        /// Used to allow PaginationTask to inform IPaginationCondition implementers when they are
+        /// being used in the context of the IPaginationCondition interface.
+        /// NOTE: While it is not necessary for implementers to persist this setting, this setting
+        /// does need to be copied in the context of the ICopyableObject interface (CopyFrom)
+        /// </summary>
+        public bool IsPaginationCondition { get; set; }
 
         /// <summary>
         /// Tests proposed pagination output <see paramref="pFileRecord"/> to determine if it is
@@ -310,12 +235,29 @@ namespace Extract.FileActionManager.Conditions
         {
             try
             {
-                return FileMatchesCondition(pSourceFileRecord, pFPDB);
+                if (string.IsNullOrWhiteSpace(bstrDocumentStatus))
+                {
+                    return true;
+                }
+                else
+                {
+                    var documentStatus = DocumentStatus.FromJson(bstrDocumentStatus);
+                    if (IfNoErrors && documentStatus.DataError)
+                    {
+                        return false;
+                    }
+
+                    if (IfNoWarnings && documentStatus.DataWarning)
+                    {
+                        return false;
+                    }
+
+                    return true;
+                }
             }
             catch (Exception ex)
             {
-                throw ExtractException.CreateComVisible("ELI47083",
-                    "Error occured in '" + _COMPONENT_DESCRIPTION + "'", ex);
+                throw ex.CreateComVisible("ELI47137", "Error occured in '" + _COMPONENT_DESCRIPTION + "'");
             }
         }
 
@@ -324,7 +266,7 @@ namespace Extract.FileActionManager.Conditions
         #region IConfigurableObject Members
 
         /// <summary>
-        /// Performs configuration needed to create a valid <see cref="WorkflowCondition"/>.
+        /// Performs configuration needed to create a valid <see cref="PaginationDataValidityCondition"/>.
         /// </summary>
         /// <returns><see langword="true"/> if the configuration was successfully updated or
         /// <see langword="false"/> if configuration was unsuccessful.</returns>
@@ -333,14 +275,14 @@ namespace Extract.FileActionManager.Conditions
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI43464",
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI47138",
                     _COMPONENT_DESCRIPTION);
 
                 // Make a clone to update settings and only copy if ok
-                WorkflowCondition cloneOfThis = (WorkflowCondition)Clone();
+                PaginationDataValidityCondition cloneOfThis = (PaginationDataValidityCondition)Clone();
 
-                using (WorkflowConditionSettingsDialog dlg
-                    = new WorkflowConditionSettingsDialog(cloneOfThis))
+                using (PaginationDataValidityConditionSettingsDialog dlg
+                    = new PaginationDataValidityConditionSettingsDialog(cloneOfThis))
                 {
                     if (dlg.ShowDialog() == DialogResult.OK)
                     {
@@ -348,12 +290,12 @@ namespace Extract.FileActionManager.Conditions
                         return true;
                     }
                 }
-                
+
                 return false;
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI43463", "Error running configuration.");
+                throw ex.CreateComVisible("ELI47139", "Error running configuration.");
             }
         }
 
@@ -387,7 +329,7 @@ namespace Extract.FileActionManager.Conditions
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI43462",
+                throw ex.CreateComVisible("ELI47140",
                     "Failed to check '" + _COMPONENT_DESCRIPTION + "' configuration.");
             }
         }
@@ -397,25 +339,25 @@ namespace Extract.FileActionManager.Conditions
         #region ICopyableObject Members
 
         /// <summary>
-        /// Creates a copy of the <see cref="WorkflowCondition"/> instance.
+        /// Creates a copy of the <see cref="PaginationDataValidityCondition"/> instance.
         /// </summary>
-        /// <returns>A copy of the <see cref="WorkflowCondition"/> instance.
+        /// <returns>A copy of the <see cref="PaginationDataValidityCondition"/> instance.
         /// </returns>
         public object Clone()
         {
             try
             {
-                return new WorkflowCondition(this);
+                return new PaginationDataValidityCondition(this);
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI43461",
+                throw ex.CreateComVisible("ELI47141",
                     "Failed to clone '" + _COMPONENT_DESCRIPTION + "' object.");
             }
         }
 
         /// <summary>
-        /// Copies the specified <see cref="WorkflowCondition"/> instance into
+        /// Copies the specified <see cref="PaginationDataValidityCondition"/> instance into
         /// this one.
         /// </summary>
         /// <param name="pObject">The object from which to copy.</param>
@@ -423,16 +365,16 @@ namespace Extract.FileActionManager.Conditions
         {
             try
             {
-                var source = pObject as WorkflowCondition;
+                var source = pObject as PaginationDataValidityCondition;
                 if (source == null)
                 {
-                    throw new InvalidCastException("Invalid cast to WorkflowCondition");
+                    throw new InvalidCastException("Invalid cast to PaginationDataValidityCondition");
                 }
                 CopyFrom(source);
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI43465",
+                throw ex.CreateComVisible("ELI47142",
                     "Failed to copy '" + _COMPONENT_DESCRIPTION + "' object.");
             }
         }
@@ -500,8 +442,8 @@ namespace Extract.FileActionManager.Conditions
             {
                 using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
                 {
-                    Inclusive = reader.ReadBoolean();
-                    SelectedWorkflows = reader.ReadStringArray().ToVariantVector();
+                    IfNoErrors = reader.ReadBoolean();
+                    IfNoWarnings = reader.ReadBoolean();
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -509,7 +451,7 @@ namespace Extract.FileActionManager.Conditions
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI43466",
+                throw ex.CreateComVisible("ELI47143",
                     "Failed to load '" + _COMPONENT_DESCRIPTION + "'.");
             }
         }
@@ -530,8 +472,8 @@ namespace Extract.FileActionManager.Conditions
 
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
-                    writer.Write(Inclusive);
-                    writer.Write(SelectedWorkflows.ToIEnumerable<string>().ToArray());
+                    writer.Write(IfNoErrors);
+                    writer.Write(IfNoWarnings);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -544,7 +486,7 @@ namespace Extract.FileActionManager.Conditions
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI43467",
+                throw ex.CreateComVisible("ELI47144",
                     "Failed to save '" + _COMPONENT_DESCRIPTION + "'.");
             }
         }
@@ -564,27 +506,6 @@ namespace Extract.FileActionManager.Conditions
         #region Private Members
 
         /// <summary>
-        /// Gets the name of the workflow with the specified <see paramref="workflowId"/>.
-        /// </summary>
-        /// <param name="fileProcessingDb">The <see cref="FileProcessingDB"/> in use.</param>
-        /// <param name="workflowID">The ID of the workflow for which the name is needed.</param>
-        /// <returns>The name of the workflow.</returns>
-        string GetWorkflowName(FileProcessingDB fileProcessingDb, int workflowId)
-        {
-            // Cache the workflow names if we haven't already.
-            if (_cachedWorkflowNames == null)
-            {
-                _cachedWorkflowNames = fileProcessingDb.GetWorkflows()
-                    .ComToDictionary()
-                    .ToDictionary(
-                        entry => int.Parse(entry.Value, CultureInfo.InvariantCulture),
-                        entry => entry.Key);
-            }
-
-            return _cachedWorkflowNames[workflowId];
-        }
-
-        /// <summary>
         /// Code to be executed upon registration in order to add this class to the
         /// "Extract FAM Conditions" COM category.
         /// </summary>
@@ -593,7 +514,6 @@ namespace Extract.FileActionManager.Conditions
         [ComVisible(false)]
         static void RegisterFunction(Type type)
         {
-            ComMethods.RegisterTypeInCategory(type, ExtractCategories.FileActionManagerConditionsGuid);
             ComMethods.RegisterTypeInCategory(type, ExtractCategories.PaginationConditionsGuid);
         }
 
@@ -606,43 +526,20 @@ namespace Extract.FileActionManager.Conditions
         [ComVisible(false)]
         static void UnregisterFunction(Type type)
         {
-            ComMethods.UnregisterTypeInCategory(type, ExtractCategories.FileActionManagerConditionsGuid);
             ComMethods.UnregisterTypeInCategory(type, ExtractCategories.PaginationConditionsGuid);
         }
 
         /// <summary>
-        /// Copies the specified <see cref="WorkflowCondition"/> instance into this one.
+        /// Copies the specified <see cref="PaginationDataValidityCondition"/> instance into this one.
         /// </summary>
-        /// <param name="source">The <see cref="WorkflowCondition"/> from which to copy.
+        /// <param name="source">The <see cref="PaginationDataValidityCondition"/> from which to copy.
         /// </param>
-        void CopyFrom(WorkflowCondition source)
+        void CopyFrom(PaginationDataValidityCondition source)
         {
-            Inclusive = source.Inclusive;
-            SelectedWorkflows = (IVariantVector)source.SelectedWorkflows;
+            IfNoErrors = source.IfNoErrors;
+            IfNoWarnings = source.IfNoWarnings;
 
             _dirty = true;
-        }
-
-        /// <summary>
-        /// Indicates whether the specified <paramref name="pFileRecord"/> satisifies the condition.
-        /// </summary>
-        /// <param name="pFileRecord">The <see cref="FileRecord"/> representing the file to be tested.</param>
-        /// <param name="pFPDB">The database being used.</param>
-        /// <returns><c>true</c> if the condition is met; <c>false</c> if the condition is not met.</returns>
-        bool FileMatchesCondition(FileRecord pFileRecord, FileProcessingDB pFPDB)
-        {
-            // Validate the license
-            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI43459",
-                _COMPONENT_DESCRIPTION);
-
-            ValidateSettings();
-
-            ExtractException.Assert("ELI43473", "Workflow condition: workflows expected",
-                pFileRecord.WorkflowID > 0);
-
-            string workflowName = GetWorkflowName(pFPDB, pFileRecord.WorkflowID);
-
-            return SelectedWorkflows.Contains(workflowName) == Inclusive;
         }
 
         #endregion Private Members

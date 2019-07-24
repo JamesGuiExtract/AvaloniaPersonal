@@ -1196,11 +1196,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                             ProcessOutputDocument(outputDocument);
                         }
                     }
-                    else
+                    else if (outputDocument.PageControls.Any())
                     {
                         // Even if the document is not output, pagination still needs to be written
                         // to record the pages deleted from the source.
-                        WritePaginationHistory(outputDocument);
+                        WriteDeletedPageHistory(outputDocument);
                     }
 
                     _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
@@ -1336,29 +1336,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="outputDocument">The <see cref="OutputDocument"/> for which history should
         /// be recorded.</param>
-        void WritePaginationHistory(OutputDocument outputDocument)
+        void WriteDeletedPageHistory(OutputDocument outputDocument)
         {
+            ExtractException.Assert("ELI47060", "Unexpected non-deleted page",
+                outputDocument.PageControls.Any(c => !c.Deleted));
+
             var firstSourceFileName = outputDocument
                 .PageControls
-                .OrderBy(c => !c.Deleted) // Prefer (but not require) a non-deleted source document
                 .FirstOrDefault()
                 ?.Page.OriginalDocumentName;
 
-            var sourcePageInfo = (firstSourceFileName == null)
-                ? null
-                : outputDocument
-                    .PageControls
-                    .Where(c => !c.Deleted)
-                    .Select(c => new StringPairClass
-                    {
-                        StringKey = c.Page.OriginalDocumentName,
-                        StringValue = c.Page.OriginalPageNumber.ToString(CultureInfo.InvariantCulture)
-                    })
-                    .ToIUnknownVector();
-
             var deletedSourcePageInfo = outputDocument
                 .PageControls
-                .Where(c => c.Deleted)
                 .Select(c => new StringPairClass
                 {
                     StringKey = c.Page.OriginalDocumentName,
@@ -1373,7 +1362,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             ExtractException.Assert("ELI45596", "Session not available",
                 sessionIdRequestArgs.FileTaskSessionID.HasValue);
 
-            FileProcessingDB.AddPaginationHistory(outputDocument.FileID, sourcePageInfo, deletedSourcePageInfo,
+            FileProcessingDB.AddPaginationHistory(outputDocument.FileID, 
+                null, // No undeleted pages
+                deletedSourcePageInfo,
                 sessionIdRequestArgs.FileTaskSessionID.Value);
         }
 
@@ -1457,8 +1448,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 outputDocument.DocumentData.Revert();
                                 if (_documentDataPanel != null)
                                 {
-                                    _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData,
-                                        saveData: false, displayValidationErrors: false);
+                                    _documentDataPanel.UpdateDocumentData(outputDocument.DocumentData,
+                                        statusOnly: true, displayValidationErrors: false);
                                 }
                             }
                             _pendingDocuments.Add(outputDocument);
@@ -1507,8 +1498,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                             outputDocument.DocumentData.Revert();
                             if (_documentDataPanel != null)
                             {
-                                _documentDataPanel.UpdateDocumentDataStatus(outputDocument.DocumentData,
-                                    saveData: false, displayValidationErrors: false);
+                                _documentDataPanel.UpdateDocumentData(outputDocument.DocumentData,
+                                    statusOnly: true, displayValidationErrors: false);
                             }
                         }
                     }
@@ -1719,65 +1710,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
-        /// <summary>
-        /// Resolves name conflicts and then adds the filename associated with argument <see paramref="e"/>
-        /// to the FAM DB with the FileProcessingDB AddFileNoQueue method.</summary>
-        /// <remarks>If the filename already exists on the file system or if the DB add fails because
-        /// the file already exists in the DB, it will add 6 random chars before the extension and
-        /// try to add that filename.</remarks>
-        /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance relating to
-        /// the <see cref="PaginationPanel.CreatingOutputDocument"/> event for which this call is
-        /// being made.</param>
-        /// <param name="priority">The <see cref="EFilePriority"/> that should be assigned for the
-        /// file.</param>
-        /// <returns>The ID of the newly added filename in the FAMFile table.</returns>
-        public int AddFileWithNameConflictResolve(CreatingOutputDocumentEventArgs e, EFilePriority priority)
-        {
-            // First resolve conflict with file system
-            if (File.Exists(e.OutputFileName))
-            {
-                var pathTags = new SourceDocumentPathTags(e.OutputFileName);
-                e.OutputFileName = pathTags.Expand(
-                    "$InsertBeforeExt(<SourceDocName>,_$RandomAlphaNumeric(6))");
-            }
-
-            int fileID = -1;
-            const int nCurrentWorkflow = -1;
-            try
-            {
-                fileID = FileProcessingDB.AddFileNoQueue(
-                    e.OutputFileName, e.FileSize, e.PageCount, priority, nCurrentWorkflow);
-            }
-            catch (Exception ex)
-            {
-                // Query to see if the e.OutputFileName can be found in the database.
-                string query = string.Format(CultureInfo.InvariantCulture,
-                    "SELECT [ID] FROM [FAMFile] WHERE [FileName] = '{0}'",
-                    e.OutputFileName.Replace("'", "''"));
-
-                var recordset = FileProcessingDB.GetResultsForQuery(query);
-                bool fileExistsInDB = !recordset.EOF;
-                recordset.Close();
-                if (fileExistsInDB)
-                {
-                    var pathTags = new SourceDocumentPathTags(e.OutputFileName);
-                    e.OutputFileName = pathTags.Expand(
-                        "$InsertBeforeExt(<SourceDocName>,_$RandomAlphaNumeric(6))");
-
-                    fileID = FileProcessingDB.AddFileNoQueue(
-                        e.OutputFileName, e.FileSize, e.PageCount, priority, nCurrentWorkflow);
-                }
-                else
-                {
-                    // The file was not in the database, the call failed for another reason.
-                    throw ex.AsExtract("ELI40107");
-                }
-            }
-
-            e.FileID = fileID;
-
-            return fileID;
-        }
         #endregion Methods
 
         #region IPaginationUtility
@@ -2251,14 +2183,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 sourcePageInfo, pageCount, fileSize, suggestedPaginationAccepted, position,
                 outputDocument.DocumentData, rotatedPages, pagesEqualButRotated);
 
+            // CreatingOutputDocument will trigger the ouput document ID and pagination history to
+            // be added to the DB (and prevent it from being queued from a watching supplier)
+            // https://extract.atlassian.net/browse/ISSUE-13760
             OnCreatingOutputDocument(eventArgs);
             outputDocument.FileID = eventArgs.FileID;
             string outputFileName = eventArgs.OutputFileName;
-
-            // Add pagination history before the image is created so that it does not
-            // get queued by a watching supplier
-            // https://extract.atlassian.net/browse/ISSUE-13760
-            WritePaginationHistory(outputDocument);
 
             if (CreateDocumentOnOutput)
             {
@@ -3027,7 +2957,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     sourceFileName = document.PageControls.First().Page.SourceDocument.FileName;
                     SavingData?.Invoke(this, new SavingDataEventArgs(sourceFileName));
-                    _documentDataPanel.UpdateDocumentDataStatus(document.DocumentData, true, validateData);
+                    _documentDataPanel.UpdateDocumentData(document.DocumentData, statusOnly: false, 
+                        displayValidationErrors: validateData);
                 }
 
                 _documentDataPanel.WaitForDocumentStatusUpdates();

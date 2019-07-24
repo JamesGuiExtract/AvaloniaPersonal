@@ -30,7 +30,7 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this._attributeSelectorControl = new Extract.AttributeFinder.Rules.ConfigurableObjectControl();
+            this._attributeSelectorControl = new Utilities.Forms.ConfigurableObjectControl();
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
@@ -116,7 +116,7 @@
 
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Button _okButton;
-        private ConfigurableObjectControl _attributeSelectorControl;
+        private Utilities.Forms.ConfigurableObjectControl _attributeSelectorControl;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox groupBox1;
     }

@@ -1911,8 +1911,12 @@ static const string gstrSPLIT_MULTI_PAGE_DOCUMENT_TASK_CLASS =
 	"	('EF1279E8-4EC2-4CBF-9DE5-E107D97916C0', 'Core: Split multi-page document') \r\n";
 
 static const string gstrINSERT_TASKCLASS_WEB_VERIFICATION =
-"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
+	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
 	"	('FD7867BD-815B-47B5-BAF4-243B8C44AABB', 'Core: Web verification') \r\n";
+
+static const string gstrINSERT_AUTO_PAGINATE_TASK_CLASS =
+	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
+	"	('8ECBCC95-7371-459F-8A84-A2AFF7769800', 'Pagination: Auto-Paginate') \r\n";
 
 static const string gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE = 
 	"	SELECT [sc].[ID] "

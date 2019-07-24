@@ -12,6 +12,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -49,7 +50,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// file to be recorded in the LabDEOrderFile table.
             /// </summary>
             public string OrderNumberQuery;
-            
+
             /// <summary>
             /// The data entry query text that should be used to identify the date for each order.
             /// Any attribute queries should be relative to an order number attribute.
@@ -77,65 +78,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// Gets whether to prompt about encounter numbers for which a document has already been filed.
             /// </summary>
             public bool PromptForDuplicateEncounters;
-        }
-
-        /// <summary>
-        /// Struct that encapsulates document status meta-data to be displayed in a pagination
-        /// document header.
-        /// </summary>
-        struct DocumentStatus
-        {
-            /// <summary>
-            /// Indicates whether data for the document has been modified in the DEP.
-            /// </summary>
-            public bool DataModified;
-
-            /// <summary>
-            /// Indicates whether there is an active data validation error for the document's data.
-            /// </summary>
-            public bool DataError;
-
-            /// <summary>
-            /// Indicates whether this document is to be sent for reprocessing (or <c>null</c> to
-            /// make the determination based on whether pagination has been changed or pages have
-            /// been rotated.
-            /// </summary>
-            public bool? Reprocess;
-
-            /// <summary>
-            /// The summary text to display for the document.
-            /// </summary>
-            public string Summary;
-
-            /// <summary>
-            /// The order numbers for the current document along with the order collection date (if known)
-            /// </summary>
-            public ReadOnlyCollection<(string OrderNumber, DateTime? CollectionDate)> Orders;
-
-            /// <summary>
-            /// Gets whether to prompt about order numbers for which a document has already been filed.
-            /// </summary>
-            public bool PromptForDuplicateOrders;
-
-            /// <summary>
-            /// The encounter numbers for the current document along with the encounter date (if known)
-            /// </summary>
-            public ReadOnlyCollection<(string EncounterNumber, DateTime? EncounterDate)> Encounters;
-
-            /// <summary>
-            /// Gets whether to prompt about encounter numbers for which a document has already been filed.
-            /// </summary>
-            public bool PromptForDuplicateEncounters;
-
-            /// <summary>
-            /// A stringized representation of either the document data.
-            /// </summary>
-            public string StringizedData;
-
-            /// <summary>
-            /// A stringized representation of a validation error in the document data (when DataError = true).
-            /// </summary>
-            public string StringizedError;
         }
 
         #region Fields
@@ -583,7 +525,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var documentData = ActiveDataEntryPanel.GetDocumentData(attributes, sourceDocName);
-                UpdateDocumentStatus(documentData, saveData: false, displayValidationErrors: false);
+                UpdateDocumentStatus(documentData, statusOnly: true, applyUpdateToUI: true, displayValidationErrors: false);
 
                 return documentData;
             }
@@ -613,7 +555,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var documentData = ActiveDataEntryPanel.GetDocumentData(documentDataAttribute, sourceDocName);
-                UpdateDocumentStatus(documentData, saveData: false, displayValidationErrors: false);
+                UpdateDocumentStatus(documentData, statusOnly: true, applyUpdateToUI: true, displayValidationErrors: false);
 
                 return documentData;
             }
@@ -624,21 +566,21 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Updates the document data status.
+        /// Updates the document data.
         /// </summary>
-        /// <param name="data">The <see cref="PaginationDocumentData"/> whose status will be checked.
+        /// <param name="data">The <see cref="PaginationDocumentData"/> to be updated.
         /// </param>
-        /// <param name="saveData"><c>true</c> if the result of the data load (including auto-update
-        /// queries that manipulate the data) should be saved or <c>false</c> to update the status
-        /// bar.</param>
-        /// <param name = "displayValidationErrors" >< c > true </ c > if you want to display validation errors;
+        /// <param name="statusOnly"><c>true</c> to retrieve into <paramref name="data"/> only the high-level
+        /// status such as the the summary string and other status flags; <c>false</c> to udpate
+        /// <paramref name="data"/> with the complete voa data.</param>
+        /// <param name="displayValidationErrors"><c>true</c> if you want to display validation errors;
         /// <c>false</c> if you do not want to display validation errors.</param>
-        public void UpdateDocumentDataStatus(PaginationDocumentData data, bool saveData, bool displayValidationErrors)
+        public void UpdateDocumentData(PaginationDocumentData data, bool statusOnly, bool displayValidationErrors)
         {
             try
             {
                 var dataEntryData = data as DataEntryPaginationDocumentData;
-                UpdateDocumentStatus(dataEntryData, saveData, displayValidationErrors);
+                UpdateDocumentStatus(dataEntryData, statusOnly, applyUpdateToUI: true, displayValidationErrors: displayValidationErrors);
             }
             catch (Exception ex)
             {
@@ -647,7 +589,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Waits for all documents status updates (started via <see cref="UpdateDocumentDataStatus"/>)
+        /// Waits for all documents status updates (started via <see cref="UpdateDocumentData"/>)
         /// to complete.
         /// </summary>
         public void WaitForDocumentStatusUpdates()
@@ -1082,17 +1024,17 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
-    #endregion Event Handlers
+        #endregion Event Handlers
 
-    #region Private Members
+        #region Private Members
 
-    /// <summary>
-    /// Gets the active data entry panel.
-    /// </summary>
-    /// <value>
-    /// The active data entry panel.
-    /// </value>
-    internal DataEntryDocumentDataPanel ActiveDataEntryPanel
+        /// <summary>
+        /// Gets the active data entry panel.
+        /// </summary>
+        /// <value>
+        /// The active data entry panel.
+        /// </value>
+        internal DataEntryDocumentDataPanel ActiveDataEntryPanel
         {
             get
             {
@@ -1175,58 +1117,72 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData"/> for which
         /// document status should be updated.</param>
-        /// <param name="saveData"><c>true</c> if the result of the data load (including auto-update
-        /// queries that manipulate the data) should be saved or <c>false</c> to update the status
-        /// bar.</param>
-        /// <param name = "displayValidationErrors" >< c > true </ c > if you want to display validation errors;
+        /// <param name="statusOnly"><c>true</c> to retrieve into documentData only the high-level
+        /// status such as the the summary string and other status flags; <c>false</c> to udpate
+        /// documentData with the complete voa data.</param>
+        /// <param name="applyUpdateToUI"><c>true</c> if the new status should be applied to the UI;
+        /// <c>false</c> if the status is going to be used programmatically (without a UI).</param>
+        /// <param name = "displayValidationErrors"><c>true</c> if you want to display validation errors;
         /// <c>false</c> if you do not want to display validation errors.</param>
-        void UpdateDocumentStatus(DataEntryPaginationDocumentData documentData, bool saveData, bool displayValidationErrors)
+        public async void UpdateDocumentStatus(DataEntryPaginationDocumentData documentData,
+            bool statusOnly, bool applyUpdateToUI, bool displayValidationErrors)
         {
-            if (!_pendingDocumentStatusUpdate.TryAdd(documentData, 0))
+            try
             {
-                // Document status is already being updated.
-                return;
-            }
-
-            _documentStatusesUpdated.Reset();
-
-            string serializedAttributes = _miscUtils.GetObjectAsStringizedByteStream(documentData.WorkingAttributes);
-
-            var backgroundConfigManager = _configManager.CreateBackgroundManager();
-
-            var thread = new Thread(new ThreadStart(() =>
-            {
-                try
+                if (!_pendingDocumentStatusUpdate.TryAdd(documentData, 0))
                 {
-                    UpdateDocumentStatusThread(backgroundConfigManager, documentData,
-                        serializedAttributes, saveData, displayValidationErrors);
+                    // Document status is already being updated.
+                    return;
                 }
-                catch (Exception ex)
+
+                _documentStatusesUpdated.Reset();
+
+                string serializedAttributes = _miscUtils.GetObjectAsStringizedByteStream(documentData.WorkingAttributes);
+
+                var backgroundConfigManager = _configManager.CreateBackgroundManager();
+
+                var thread = new Thread(new ThreadStart(() =>
                 {
+                    try
+                    {
+                        UpdateDocumentStatusThread(backgroundConfigManager, documentData,
+                            serializedAttributes, statusOnly, applyUpdateToUI, displayValidationErrors);
+                    }
+                    catch (Exception ex)
+                    {
                     // Exceptions will be thrown if the FAM task has been stopped while a
                     // UpdateDocumentStatusThread was still running, but we don't care to know about
                     // the exceptions in this case.
                     if (IsHandleCreated)
-                    {
-                        ex.ExtractLog("ELI41494");
+                        {
+                            ex.ExtractLog("ELI41494");
+                        }
                     }
-                }
-                finally
+                    finally
+                    {
+                        backgroundConfigManager.Dispose();
+
+                        AttributeStatusInfo.DisposeThread();
+
+                        // https://extract.atlassian.net/browse/ISSUE-14246
+                        // Without this call the Application.ThreadContext may hold references to
+                        // controls created in this thread not unlike the situation described here:
+                        // http://blogs.msmvps.com/senthil/2008/05/29/the-case-of-the-leaking-thread-handles/
+                        Application.ExitThread();
+                    }
+                }));
+
+                await Task.Run(() =>
                 {
-                    backgroundConfigManager.Dispose();
-
-                    AttributeStatusInfo.DisposeThread();
-
-                    // https://extract.atlassian.net/browse/ISSUE-14246
-                    // Without this call the Application.ThreadContext may hold references to
-                    // controls created in this thread not unlike the situation described here:
-                    // http://blogs.msmvps.com/senthil/2008/05/29/the-case-of-the-leaking-thread-handles/
-                    Application.ExitThread();
-                }
-            }));
-
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start();
+                    thread.Join();
+                });
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47172");
+            }
         }
 
         /// <summary>
@@ -1236,19 +1192,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData" /> for which
         /// data validity should be checked.</param>
         /// <param name="serializedAttributes">The serialized attributes that represent the document's current data.</param>
-        /// <param name="saveData"><c>true</c> if the result of the data load (including auto-update
-        /// queries that manipulate the data) should be saved or <c>false</c> to update the status
-        /// bar.</param>
+        /// <param name="statusOnly"><c>true</c> to retrieve into documentData only the high-level
+        /// status such as the the summary string and other status flags; <c>false</c> to udpate
+        /// documentData with the complete voa data.</param>
+        /// <param name="applyUpdateToUI"><c>true</c> if the new status should be applied to the UI;
+        /// <c>false</c> if the status is going to be used programmatically (without a UI).</param>
         /// <param name="displayValidationErrors"><c>true</c> if the data should be validated before being saved;
         /// <c>false</c> if the data should be saved even if not valid.</param>
         void UpdateDocumentStatusThread(DataEntryConfigurationManager<Properties.Settings> backgroundConfigManager,
-            DataEntryPaginationDocumentData documentData, string serializedAttributes, bool saveData, bool displayValidationErrors)
+            DataEntryPaginationDocumentData documentData, string serializedAttributes,
+            bool statusOnly, bool applyUpdateToUI, bool displayValidationErrors)
         {
             bool registeredThread = false;
             bool gotSemaphore = false;
             ExtractException ee = null;
-
-            var documentStatus = new DocumentStatus() { Reprocess = false };
 
             try
             {
@@ -1295,11 +1252,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                     AttributeStatusInfo.ProcessWideDataCache = true;
                     if (backgroundConfigManager.ExecuteNoUILoad(tempData.Attributes, documentData.SourceDocName))
                     {
-                        documentStatus = GetDocumentStatusFromNoUILoad(backgroundConfigManager, tempData, saveData);
+                        documentData.PendingDocumentStatus =
+                            GetDocumentStatusFromNoUILoad(backgroundConfigManager, tempData, statusOnly,
+                                verboseWarningCheck: !applyUpdateToUI); // If not running in a UI (auto-pagination) rather
+                                                                        // than focus on efficiency, focus on getting full
+                                                                        // data for PaginationConditions
                     }
                     else
                     {
-                        documentStatus = GetDocumentDataFromUILoad(backgroundConfigManager, tempData, saveData);
+                        documentData.PendingDocumentStatus =
+                            GetDocumentDataFromUILoad(backgroundConfigManager, tempData, statusOnly,
+                                verboseWarningCheck: !applyUpdateToUI); // If not running in a UI (auto-pagination) rather
+                                                                        // than focus on efficiency, focus on getting full
+                                                                        // data for PaginationConditions
                     }
 
                     backgroundConfigManager.Dispose();
@@ -1336,23 +1301,25 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return;
             }
 
-            _imageViewer.SafeBeginInvoke("ELI41465", () =>
+            if (applyUpdateToUI)
             {
-                try
+                ExtractException.Assert("ELI47127",
+                    "Unable to apply status update withou UI", _imageViewer != null);
+
+                _imageViewer.SafeBeginInvoke("ELI41465", () =>
                 {
-                    if (ee != null)
+                    try
                     {
-                        ee.ExtractDisplay("ELI41464");
-                    }
-
-                    if (_pendingDocumentStatusUpdate.ContainsKey(documentData))
-                    {
-                        documentData.SetDataError(documentStatus.DataError);
-                        if (saveData)
+                        if (ee != null)
                         {
-                            var miscUtils = new MiscUtils();
+                            ee.ExtractDisplay("ELI41464");
+                        }
 
-                            if (displayValidationErrors && documentData.DataError)
+                        if (_pendingDocumentStatusUpdate.ContainsKey(documentData))
+                        {
+                            var dataError = documentData.ApplyPendingStatusUpdate(statusOnly);
+
+                            if (dataError != null && displayValidationErrors)
                             {
                                 // Reset to contain only this document to prevent any subsequent document data
                                 // errors from being displayed. (If not fixed subsequent errors on the next
@@ -1360,40 +1327,34 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 _pendingDocumentStatusUpdate.Clear();
                                 _pendingDocumentStatusUpdate.TryAdd(documentData, 0);
 
-                                ee = ExtractException.FromStringizedByteStream("ELI45581", documentStatus.StringizedError);
-                                ee.Display();
+                                dataError.Display();
                             }
-                            else
-                            {
-                                documentData.Orders = documentStatus.Orders;
-                                documentData.PromptForDuplicateOrders = documentStatus.PromptForDuplicateOrders;
-                                documentData.Encounters = documentStatus.Encounters;
-                                documentData.PromptForDuplicateEncounters = documentStatus.PromptForDuplicateEncounters;
-                                documentData.Attributes =
-                                    (IUnknownVector)miscUtils.GetObjectFromStringizedByteStream(documentStatus.StringizedData);
-                            }
-                        }
-                        else
-                        {
-                            documentData.SetModified(documentStatus.DataModified);
-                            documentData.SetSummary(documentStatus.Summary);
-                            documentData.SetSendForReprocessing(documentStatus.Reprocess);
-                            documentData.SetInitialized();
                         }
                     }
-                }
-                finally
-                {
-                    if (_pendingDocumentStatusUpdate.TryRemove(documentData, out int _)
-                        && _pendingDocumentStatusUpdate.Count == 0)
+                    finally
                     {
-                        // Once any active batch of status updates is complete, clear shared cache data.
-                        AttributeStatusInfo.ClearProcessWideCache();
+                        if (_pendingDocumentStatusUpdate.TryRemove(documentData, out int _)
+                            && _pendingDocumentStatusUpdate.Count == 0)
+                        {
+                            // Once any active batch of status updates is complete, clear shared cache data.
+                            AttributeStatusInfo.ClearProcessWideCache();
 
-                        _documentStatusesUpdated.Set();
+                            _documentStatusesUpdated.Set();
+                        }
                     }
+                });
+            }
+            else
+            {
+                if (_pendingDocumentStatusUpdate.TryRemove(documentData, out int _)
+                    && _pendingDocumentStatusUpdate.Count == 0)
+                {
+                    // Once any active batch of status updates is complete, clear shared cache data.
+                    AttributeStatusInfo.ClearProcessWideCache();
+
+                    _documentStatusesUpdated.Set();
                 }
-            });
+            }
         }
 
         /// <summary>
@@ -1403,28 +1364,52 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="backgroundConfigManager">The configuration manager to use.</param>
         /// <param name="documentData"><see cref="DataEntryPaginationDocumentData"/> representing
         /// the document's data.</param>
-        /// <param name="saveData"><c>true</c> if the result of the data load (including auto-update
-        /// queries that manipulate the data) should be saved or <c>false</c> to update the status
-        /// bar.</param>
+        /// <param name="statusOnly"><c>true</c> to retrieve only the high-level status such as the
+        /// the summary string and other status flags; <c>false</c> to retrieve the complete voa data
+        /// and exception details.</param>
+        /// <param name="verboseWarningCheck"><c>true</c> to calculate check for warnings regardless of
+        /// errors; <c>false</c> to check for warning only if there are no errors (generally faster).</param>
         /// <returns>The <see cref="DocumentStatus"/>.</returns>
         static DocumentStatus GetDocumentStatusFromNoUILoad(DataEntryConfigurationManager<Properties.Settings> backgroundConfigManager,
-            DataEntryPaginationDocumentData documentData, bool saveData)
+            DataEntryPaginationDocumentData documentData, bool statusOnly, bool verboseWarningCheck)
         {
             var documentStatus = new DocumentStatus();
 
             IAttribute invalidAttribute = null;
             if (!backgroundConfigManager.ActiveDataEntryConfiguration.Config.Settings.PerformanceTesting)
             {
-                invalidAttribute =
-                    AttributeStatusInfo.FindNextInvalidAttribute(documentData.Attributes, false, null, true, false)
+                invalidAttribute = AttributeStatusInfo.FindNextInvalidAttribute(
+                    documentData.Attributes, false, null, true, false)
                         ?.LastOrDefault();
 
                 documentStatus.DataError = invalidAttribute != null;
+
+                if (verboseWarningCheck || !documentStatus.DataError)
+                {
+                    invalidAttribute = AttributeStatusInfo.FindNextInvalidAttribute(
+                        documentData.Attributes, true, null, true, false)
+                            ?.LastOrDefault();
+
+                    documentStatus.DataWarning = invalidAttribute != null;
+                }
             }
 
             var customData = backgroundConfigManager.ActiveDataEntryConfiguration.CustomBackgroundLoadSettings as PaginationCustomSettings;
 
-            if (saveData)
+            if (statusOnly)
+            {
+                documentStatus.DataModified = AttributeStatusInfo.UndoManager.UndoOperationAvailable;
+                if (!string.IsNullOrWhiteSpace(customData?.SummaryQuery))
+                {
+                    var query = DataEntryQuery.Create(
+                        customData?.SummaryQuery,
+                        null,
+                        backgroundConfigManager.ActiveDataEntryConfiguration.GetDatabaseConnections());
+                    documentStatus.Summary = query.Evaluate().ToString();
+                }
+                documentStatus.Reprocess = customData?.SendForReprocessingFunc?.Invoke(documentData);
+            }
+            else
             {
                 var dbConnections = backgroundConfigManager.ActiveDataEntryConfiguration.GetDatabaseConnections();
                 documentStatus.Orders = QueryRecordNumbers(
@@ -1443,7 +1428,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         AttributeStatusInfo.Validate(invalidAttribute, true);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         var ee = ex.AsExtract("ELI45580");
                         documentStatus.StringizedError = ee.AsStringizedByteStream();
@@ -1451,19 +1436,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     return documentStatus;
                 }
-            }
-            else
-            {
-                documentStatus.DataModified = AttributeStatusInfo.UndoManager.UndoOperationAvailable;
-                if (!string.IsNullOrWhiteSpace(customData?.SummaryQuery))
-                {
-                    var query = DataEntryQuery.Create(
-                        customData?.SummaryQuery,
-                        null,
-                        backgroundConfigManager.ActiveDataEntryConfiguration.GetDatabaseConnections());
-                    documentStatus.Summary = query.Evaluate().ToString();
-                }
-                documentStatus.Reprocess = customData?.SendForReprocessingFunc?.Invoke(documentData);
             }
 
             return documentStatus;
@@ -1477,7 +1449,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="dateQuery">The data entry query text to select the date associated with any order/encounter number.</param>
         /// <param name="dbConnections">The database connections to use for the query.</param>
         /// <returns></returns>
-        static ReadOnlyCollection<(string, DateTime?)> QueryRecordNumbers(string recordNumQuery, string dateQuery, 
+        static ReadOnlyCollection<(string, DateTime?)> QueryRecordNumbers(string recordNumQuery, string dateQuery,
             Dictionary<string, System.Data.Common.DbConnection> dbConnections)
         {
             ReadOnlyCollection<(string, DateTime?)> recordCollection = null;
@@ -1523,12 +1495,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="backgroundConfigManager">The configuration manager to use.</param>
         /// <param name="documentData"><see cref="DataEntryPaginationDocumentData"/> representing
         /// the document's data.</param>
-        /// <param name="saveData"><c>true</c> if the result of the data load (including auto-update
-        /// queries that manipulate the data) should be saved or <c>false</c> to update the status
-        /// bar.</param>
+        /// <param name="statusOnly"><c>true</c> to retrieve into documentData only the high-level
+        /// status such as the the summary string and other status flags; <c>false</c> to udpate
+        /// documentData with the complete voa data.</param>
+        /// <param name="verboseWarningCheck"><c>true</c> to calculate check for warnings regardless of
+        /// errors; <c>false</c> to check for warning only if there are no errors (generally faster).</param>
         /// <returns>The <see cref="DocumentStatus"/>.</returns>
         DocumentStatus GetDocumentDataFromUILoad(DataEntryConfigurationManager<Properties.Settings> configManager,
-            DataEntryPaginationDocumentData tempData, bool saveData)
+            DataEntryPaginationDocumentData tempData, bool statusOnly, bool verboseWarningCheck)
         {
             var documentStatus = new DocumentStatus();
 
@@ -1546,14 +1520,29 @@ namespace Extract.UtilityApplications.PaginationUtility
                 IAttribute invalidAttribute = null;
                 if (!tempPanel.ActiveDataEntryPanel.Config.Settings.PerformanceTesting)
                 {
-                    invalidAttribute =
-                    AttributeStatusInfo.FindNextInvalidAttribute(tempData.Attributes, false, null, true, false)
-                        ?.LastOrDefault();
+                    invalidAttribute = AttributeStatusInfo.FindNextInvalidAttribute(
+                        tempData.Attributes, false, null, true, false)
+                            ?.LastOrDefault();
 
                     documentStatus.DataError = invalidAttribute != null;
+
+                    if (verboseWarningCheck || !documentStatus.DataError)
+                    {
+                        invalidAttribute = AttributeStatusInfo.FindNextInvalidAttribute(
+                            tempData.Attributes, true, null, true, false)
+                                ?.LastOrDefault();
+
+                        documentStatus.DataWarning = invalidAttribute != null;
+                    }
                 }
 
-                if (saveData)
+                if (statusOnly)
+                {
+                    documentStatus.DataModified = tempPanel.UndoOperationAvailable;
+                    documentStatus.Reprocess = tempData.SendForReprocessing;
+                    documentStatus.Summary = tempPanel.ActiveDataEntryPanel.SummaryDataEntryQuery?.Evaluate().ToString();
+                }
+                else
                 {
                     var dbConnections = tempPanel.ActiveDataEntryPanel.DatabaseConnections;
                     documentStatus.Orders = QueryRecordNumbers(
@@ -1582,12 +1571,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         return documentStatus;
                     }
-                }
-                else
-                {
-                    documentStatus.DataModified = tempPanel.UndoOperationAvailable;
-                    documentStatus.Reprocess = tempData.SendForReprocessing;
-                    documentStatus.Summary = tempPanel.ActiveDataEntryPanel.SummaryDataEntryQuery?.Evaluate().ToString();
                 }
             }
 

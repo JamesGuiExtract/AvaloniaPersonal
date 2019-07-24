@@ -1,4 +1,4 @@
-﻿namespace Extract.AttributeFinder.Rules
+﻿namespace Extract.Utilities.Forms
 {
     partial class ConfigurableObjectControl
     {

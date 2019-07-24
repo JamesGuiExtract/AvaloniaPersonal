@@ -7,7 +7,7 @@ namespace Extract.UtilityApplications.PaginationUtility
     public partial class DataEntryPanelContainer
     {
         /// <summary>
-        /// Manages the threads spawned for <see cref="DataEntryPanelContainer.UpdateDocumentDataStatus"/>
+        /// Manages the threads spawned for <see cref="DataEntryPanelContainer.UpdateDocumentData"/>
         /// in order to ensure the threads all cleanly exit when the form is closed.
         /// </summary>
         class ThreadManager : IDisposable

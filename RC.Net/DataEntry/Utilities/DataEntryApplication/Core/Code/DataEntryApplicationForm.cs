@@ -417,6 +417,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         int _inputActivityTimeout = 30;
 
+        /// <summary>
+        /// Utility methods to generalte new paginated output files and record them into in the FAM database.
+        /// </summary>
+        PaginatedOutputCreationUtility _paginatedOutputCreationUtility;
+
         #endregion Fields
 
         #region Constructors
@@ -1091,6 +1096,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 UserConfigChecker.EnsureValidUserConfigFile();
 
                 base.OnLoad(e);
+
+                _paginatedOutputCreationUtility = new PaginatedOutputCreationUtility(
+                    _settings.PaginationSettings.PaginationOutputPath, FileProcessingDB, _actionId);
 
                 // Set the application name
                 if (string.IsNullOrEmpty(_actionName))
@@ -3138,11 +3146,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Keep the processing queue paused until the Paginated event.
                 FileRequestHandler.PauseProcessingQueue();
 
-                e.OutputFileName = GetPaginatedDocumentFileName(e);
-
-                // Create directory if it doesn't exist
-                Directory.CreateDirectory(Path.GetDirectoryName(e.OutputFileName));
-
                 bool sendForReprocessing = false;
                 if (e.DocumentData != null && !e.DocumentData.SendForReprocessing != null)
                 {
@@ -3158,13 +3161,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                                           !e.SuggestedPaginationAccepted.Value;
                 }
 
-                EFilePriority priority = GetPriorityForFile(e);
+                ExtractException.Assert("ELI41280", "FileTaskSession was not started.",
+                    _fileTaskSessionID.HasValue);
 
                 // Add the file to the DB and check it out for this process before actually writing
                 // it to outputPath to prevent a running file supplier from grabbing it and another
                 // process from getting it.
-                int fileID = _paginationPanel.AddFileWithNameConflictResolve(e, priority);
-
+                var newFileInfo = _paginatedOutputCreationUtility.AddFileWithNameConflictResolve(
+                    e.SourcePageInfo, (FAMTagManager)_tagUtility, _fileTaskSessionID.Value);
+                
                 // Add pagination history before the image is created so that it does not
                 // get queued by a watching supplier
                 // https://extract.atlassian.net/browse/ISSUE-13760
@@ -3186,9 +3191,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         StringValue = info.Page.ToString(CultureInfo.InvariantCulture)
                     })
                     .ToIUnknownVector();
-
-                ExtractException.Assert("ELI41280", "FileTaskSession was not started.",
-                    _fileTaskSessionID.HasValue);
 
                 FileProcessingDB.AddPaginationHistory(
                     e.FileID, sourcePageInfo, deletedSourcePageInfo, _fileTaskSessionID.Value);
@@ -3228,7 +3230,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
                 else
                 {
-                    GrabDocumentForVerification(fileID, e, imagePages, newSpatialPageInfos);                    
+                    GrabDocumentForVerification(newFileInfo.FileID, e, imagePages, newSpatialPageInfos);                    
                 }
             }
             catch (Exception ex)
@@ -5065,103 +5067,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
 
             return attributes;
-        }
-
-        /// <summary>
-        /// Generates the filename for pagination output based on the current pagination settings
-        /// for the specified argument <see paramref="e"/>.
-        /// </summary>
-        /// <param name="e">A <see cref="CreatingOutputDocumentEventArgs"/> relating to the
-        /// pagination output that is being generated.</param>
-        /// <returns>The filename that should be used for this pagination output.</returns>
-        string GetPaginatedDocumentFileName(CreatingOutputDocumentEventArgs e)
-        {
-            try
-            {
-                string outputDocPath = _settings.PaginationSettings.PaginationOutputPath;
-                var sourcePageInfo = e.SourcePageInfo.Where(info => !info.Deleted).ToList();
-                string sourceDocName = sourcePageInfo.First().DocumentName;
-                var pathTags = new FileActionManagerPathTags((FAMTagManager)_tagUtility, sourceDocName);
-                if (outputDocPath.Contains(PaginationSettings.SubDocIndexTag))
-                {
-                    string query = string.Format(CultureInfo.InvariantCulture,
-                        "SELECT COUNT(DISTINCT([DestFileID])) + 1 AS [SubDocIndex] " +
-                        "   FROM [Pagination] " +
-                        "   INNER JOIN [FAMFile] ON [Pagination].[SourceFileID] = [FAMFile].[ID] " +
-                        "   WHERE [FileName] = '{0}'",
-                        sourceDocName.Replace("'", "''"));
-
-                    var recordset = FileProcessingDB.GetResultsForQuery(query);
-                    int subDocIndex = (int)recordset.Fields["SubDocIndex"].Value;
-                    recordset.Close();
-
-                    pathTags.AddTag(PaginationSettings.SubDocIndexTag,
-                        subDocIndex.ToString(CultureInfo.InvariantCulture));
-                }
-                if (outputDocPath.Contains(PaginationSettings.FirstPageTag))
-                {
-                    int firstPageNum = sourcePageInfo
-                        .Where(page => page.DocumentName == sourceDocName)
-                        .Min(page => page.Page);
-
-                    pathTags.AddTag(PaginationSettings.FirstPageTag,
-                        firstPageNum.ToString(CultureInfo.InvariantCulture));
-                }
-                if (outputDocPath.Contains(PaginationSettings.LastPageTag))
-                {
-                    int lastPageNum = sourcePageInfo
-                        .Where(page => page.DocumentName == sourceDocName)
-                        .Max(page => page.Page);
-
-                    pathTags.AddTag(PaginationSettings.LastPageTag,
-                        lastPageNum.ToString(CultureInfo.InvariantCulture));
-                }
-
-                return Path.GetFullPath(pathTags.Expand(_settings.PaginationSettings.PaginationOutputPath));
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39891");
-            }
-        }
-
-        /// <summary>
-        /// Gets the priority to assign a paginated output file that needs to be sent back for
-        /// processing.
-        /// </summary>
-        /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance relating to
-        /// the <see cref="PaginationPanel.CreatingOutputDocument"/> event for which this call is
-        /// being made.</param>
-        EFilePriority GetPriorityForFile(CreatingOutputDocumentEventArgs e)
-        {
-            try
-            {
-                var sourcePageInfo = e.SourcePageInfo.Where(info => !info.Deleted).ToList();
-                var sourceDocNames = string.Join(", ",
-                        sourcePageInfo
-                            .Select(page => "'" + page.DocumentName.Replace("'", "''") + "'")
-                            .Distinct());
-
-                string query = string.Format(CultureInfo.InvariantCulture,
-                    "SELECT MAX([FAMFile].[Priority]) AS [MaxPriority] FROM [FileActionStatus]" +
-                    "   INNER JOIN [FAMFile] ON [FileID] = [FAMFile].[ID]" +
-                    "   WHERE [ActionID] = {0}" +
-                    "   AND [FileName] IN ({1})", _actionId, sourceDocNames);
-
-                var recordset = FileProcessingDB.GetResultsForQuery(query);
-                var priority = (EFilePriority)recordset.Fields["MaxPriority"].Value;
-                recordset.Close();
-
-                priority = (EFilePriority)
-                    Math.Max((int)priority,
-                        (int)_settings.PaginationSettings.PaginatedOutputPriority);
-
-                return priority;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI39892");
-            }
         }
 
         /// <summary>

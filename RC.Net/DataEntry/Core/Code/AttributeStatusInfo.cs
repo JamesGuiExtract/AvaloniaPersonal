@@ -3819,6 +3819,8 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Raised to notify listeners that a request to clear all process-wide cache data.
+        /// NOTE: Handlers of this event should be thread safe by taking into account some threads
+        /// may be adding data to the cache as this is called on another.
         /// </summary>
         public static event EventHandler<EventArgs> ClearedProcessWideCache;
 

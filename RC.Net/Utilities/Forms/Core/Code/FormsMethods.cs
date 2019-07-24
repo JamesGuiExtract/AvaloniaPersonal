@@ -167,7 +167,7 @@ namespace Extract.Utilities.Forms
         /// Gets which scrollbars are visible on a control
         /// </summary>
         /// <param name="control">The control to examine</param>
-        public static ScrollBars GetVisibleScrollbars(Control control)
+        public static ScrollBars GetVisibleScrollBars(Control control)
         {
             try
             {

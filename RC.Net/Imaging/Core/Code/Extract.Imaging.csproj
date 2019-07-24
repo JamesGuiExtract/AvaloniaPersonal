@@ -81,6 +81,18 @@
     <Reference Include="Leadtools.Drawing, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\DotNet\Leadtools.Drawing.dll</HintPath>
     </Reference>
+    <Reference Include="Nuance.OmniPage.CSDK.ArgTypes, Version=20.30.0.0, Culture=neutral, PublicKeyToken=d277acbc760e5eaf, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Nuance_20\Bin\Nuance.OmniPage.CSDK.ArgTypes.dll</HintPath>
+    </Reference>
+    <Reference Include="Nuance.OmniPage.CSDK.CAPI, Version=20.30.0.0, Culture=neutral, PublicKeyToken=d277acbc760e5eaf, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Nuance_20\Bin\Nuance.OmniPage.CSDK.CAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="Nuance.OmniPage.CSDK.Objects, Version=20.30.0.0, Culture=neutral, PublicKeyToken=d277acbc760e5eaf, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\Nuance_20\Bin\Nuance.OmniPage.CSDK.Objects.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -113,6 +125,7 @@
     <Compile Include="ImageMethods.cs" />
     <Compile Include="AsynchronousOcrManager.cs" />
     <Compile Include="ImageWriter.cs" />
+    <Compile Include="NuanceImageMethods.cs" />
     <Compile Include="PdfPasswordSettings.cs" />
     <Compile Include="PdfPasswordSettingsDialog.cs">
       <SubType>Form</SubType>

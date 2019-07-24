@@ -235,13 +235,25 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets whether this instances data has been modified.
+        /// Gets whether this instances data has at least one error.
         /// </summary>
         public virtual bool DataError
         {
             get
             {
                 // Unless overridden, the data is never considered to have an error.
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether this instances data has at least one warning.
+        /// </summary>
+        public virtual bool DataWarning
+        {
+            get
+            {
+                // Unless overridden, the data is never considered to have a warning.
                 return false;
             }
         }

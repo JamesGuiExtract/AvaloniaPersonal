@@ -8,6 +8,7 @@ const std::string FP_FAM_CONDITIONS_CATEGORYNAME = "Extract FAM Conditions";
 const std::string FP_FAM_REPORTS_CATEGORYNAME = "Extract FAM Reports";
 const std::string FP_FAM_PRODUCT_SPECIFIC_DB_MGRS = "Extract FAM Product Specific DB Managers";
 const std::string FP_NET_FAM_PRODUCT_SPECIFIC_DB_MGRS = "Extract NET FAM Product Specific DB Managers";
+const std::string FP_PAGINATION_CONDITION_CATEGORYNAME = "Extract Pagination Conditions";
 
 // {6A3E6046-2BA3-458f-A74F-DE219860DEBE}
 static const GUID CATID_FP_FILE_PROCESSORS = 
@@ -32,4 +33,8 @@ static const GUID CATID_FP_FAM_PRODUCT_SPECIFIC_DB_MGRS =
 // {194A6EA4-8676-46AE-BFAD-3C9AED12E92D}
 static const GUID CATID_FP_NET_FAM_PRODUCT_SPECIFIC_DB_MGRS = 
 { 0x194a6ea4, 0x8676, 0x46ae, { 0xbf, 0xad, 0x3c, 0x9a, 0xed, 0x12, 0xe9, 0x2d } };
+
+// {FC25A9BB-5F7D-42B0-8ABB-7610A4C6CFA7}
+static const GUID CATID_FP_PAGINATION_CONDITIONS =
+{ 0xfc25a9bb, 0x5F7d, 0x42b0, { 0x8a, 0xbb, 0x76, 0x10, 0xa4, 0xc6, 0xcf, 0xa7 } };
 
