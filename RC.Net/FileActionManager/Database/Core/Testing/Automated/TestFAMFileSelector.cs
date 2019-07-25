@@ -285,17 +285,17 @@ namespace Extract.FileActionManager.Database.Test
 
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddActionStatusCondition(fileProcessingDb, _LABDE_ACTION1, EActionStatus.kActionPending);
-                fileSelector.LimitToSubset(bRandomSubset: true, bTopSubset: false, bUsePercentage: true, nSubsetSize: 66);
+                fileSelector.LimitToSubset(bRandomSubset: true, bTopSubset: false, bUsePercentage: true, nSubsetSize: 66, nOffset: -1);
 
                 Assert.AreEqual(2, fileSelector.GetResults(fileProcessingDb).Count());
 
-                fileSelector.LimitToSubset(bRandomSubset: false, bTopSubset: true, bUsePercentage: false, nSubsetSize: 2);
+                fileSelector.LimitToSubset(bRandomSubset: false, bTopSubset: true, bUsePercentage: false, nSubsetSize: 2, nOffset: -1);
 
                 Assert.AreEqual(
                     Invariant($"{fileIDs[1]},{fileIDs[2]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
 
-                fileSelector.LimitToSubset(bRandomSubset: false, bTopSubset: false, bUsePercentage: false, nSubsetSize: 1);
+                fileSelector.LimitToSubset(bRandomSubset: false, bTopSubset: false, bUsePercentage: false, nSubsetSize: 1, nOffset: -1);
 
                 Assert.AreEqual(
                     Invariant($"{fileIDs[5]}"),
@@ -353,7 +353,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddActionStatusCondition(fileProcessingDb, _LABDE_ACTION1, EActionStatus.kActionPending);
-                fileSelector.LimitToSubset(bRandomSubset: true, bTopSubset: false, bUsePercentage: true, nSubsetSize: 66);
+                fileSelector.LimitToSubset(bRandomSubset: true, bTopSubset: false, bUsePercentage: true, nSubsetSize: 66, nOffset: -1);
 
                 fileProcessingDb.ActiveWorkflow = "";
                 Assert.AreEqual(2, fileSelector.GetResults(fileProcessingDb).Count());
@@ -362,7 +362,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
                 Assert.AreEqual(1, fileSelector.GetResults(fileProcessingDb).Count());
 
-                fileSelector.LimitToSubset(bRandomSubset: false, bTopSubset: true, bUsePercentage: false, nSubsetSize: 2);
+                fileSelector.LimitToSubset(bRandomSubset: false, bTopSubset: true, bUsePercentage: false, nSubsetSize: 2, nOffset: -1);
 
                 fileProcessingDb.ActiveWorkflow = "";
                 Assert.AreEqual(
@@ -377,7 +377,7 @@ namespace Extract.FileActionManager.Database.Test
                     Invariant($"{fileIDs[5]}"),
                     string.Join(",", fileSelector.GetResults(fileProcessingDb)));
 
-                fileSelector.LimitToSubset(bRandomSubset: false, bTopSubset: false, bUsePercentage: false, nSubsetSize: 1);
+                fileSelector.LimitToSubset(bRandomSubset: false, bTopSubset: false, bUsePercentage: false, nSubsetSize: 1, nOffset: -1);
 
                 fileProcessingDb.ActiveWorkflow = "";
                 Assert.AreEqual(

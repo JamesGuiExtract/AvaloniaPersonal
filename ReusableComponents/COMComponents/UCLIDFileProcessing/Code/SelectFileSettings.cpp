@@ -260,7 +260,19 @@ string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDB
 		}
 	}
 
-	if (m_bLimitToSubset && m_bSubsetIsRandom)
+	// Use simple query if possible. This allows subqueries in the select, col = (select...), which don't work in the
+	// version below that uses the temp table.
+	if (m_bLimitToSubset
+		&& m_nOffset >= 0
+		&& m_bTopSubset
+		&& !m_bSubsetIsRandom
+		&& !m_bSubsetUsePercentage
+		&& m_nSubsetSize > 0)
+	{
+		string strOffset = Util::Format(" \r\n    OFFSET %d ROWS FETCH NEXT %d ROWS ONLY", m_nOffset, m_nSubsetSize);
+		return strQuery + strOrderByClause + strOffset;
+	}
+	else if (m_bLimitToSubset && m_bSubsetIsRandom)
 	{
 		// If choosing a random subset by specifying the number of files to select, use the query
 		// parts generated thus far to create a procedure which will randomly select the specified

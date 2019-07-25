@@ -2778,9 +2778,16 @@ library UCLID_FILEPROCESSINGLib
 		//				if it is the record count.
 		//			nSubsetSize- The size the subset should be (percentage or count per
 		//				bUsePercentage).
+		//			nOffset- the number of rows to skip before returning the subset.
+		//					 if nOffset is >= 0 then a codepath is used which supports 'subselect' queries
+		//					 if nOffset is < 0 then the OFFSET...FETCH feature (SQLServer 2012) will not be used.
+		// REQUIRES: if nOffset is >= 0
+		//			 then bTopSubset == VARIANT_TRUE,
+		//				  bRandomSubset == VARIANT_FALSE, and
+		//				  bUsePercentage == VARIANT_FALSE
 		[id(7), helpstring("method LimitToSubset")] HRESULT LimitToSubset(
 			 [in] VARIANT_BOOL bRandomSubset, [in] VARIANT_BOOL bTopSubset,
-			 [in] VARIANT_BOOL bUsePercentage, [in] LONG nSubsetSize);
+			 [in] VARIANT_BOOL bUsePercentage, [in] LONG nSubsetSize, [in] LONG nOffset);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: Adds a query condition to the current settings.
 		// ARGS:	bstrQuery- The query to use as a condition.

@@ -200,6 +200,66 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
+        /// Gets a list of queued files
+        /// </summary>
+        /// <param name="filter">A string that must be present in one of the <see cref="QueuedFileDetails"/> string fields</param>
+        /// <param name="fromBeginning">Sort file IDs in ascending order before selecting the subset</param>
+        /// <param name="pageIndex">Skip pageIndex * pageSize records from the beginning/end</param>
+        /// <param name="pageSize">The maximum records to return</param>
+        [HttpGet("QueuedFiles")]
+        [Authorize]
+        [ProducesResponseType(200, Type = typeof(QueuedFilesResult))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        public IActionResult GetQueuedFiles(string filter, bool fromBeginning = true, int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                using (var data = new DocumentData(User, requireSession: false))
+                {
+                    var userName = this.User.GetUsername();
+                    var result = data.GetQueuedFiles(userName, false, filter, fromBeginning, pageIndex, pageSize);
+
+                    return Ok(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI47043");
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of skipped files for the current user
+        /// </summary>
+        /// <param name="filter">A string that must be present in one of the <see cref="QueuedFileDetails"/> string fields</param>
+        /// <param name="fromBeginning">Sort file IDs in ascending order before selecting the subset</param>
+        /// <param name="pageIndex">Skip pageIndex * pageSize records from the beginning/end</param>
+        /// <param name="pageSize">The maximum records to return</param>
+        [HttpGet("SkippedFiles")]
+        [Authorize]
+        [ProducesResponseType(200, Type = typeof(QueuedFilesResult))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        public IActionResult GetSkippedFiles(string filter, bool fromBeginning = true, int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                using (var data = new DocumentData(User, requireSession: false))
+                {
+                    var userName = this.User.GetUsername();
+                    var result = data.GetQueuedFiles(userName, true, filter, fromBeginning, pageIndex, pageSize);
+
+                    return Ok(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI47044");
+            }
+        }
+
+        /// <summary>
         /// Reserves a document. The document will not be accessible by others
         /// until CloseDocument is called.
         /// </summary>

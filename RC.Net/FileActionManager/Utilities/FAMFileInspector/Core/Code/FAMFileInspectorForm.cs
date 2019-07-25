@@ -1053,7 +1053,7 @@ namespace Extract.FileActionManager.Utilities
             {
                 FileSelector.Reset();
                 FileSelector.LimitToSubset(SubsetType == SubsetType.Random,
-                    SubsetType == SubsetType.Top, false, MaxFilesToDisplay);
+                    SubsetType == SubsetType.Top, false, MaxFilesToDisplay, -1);
             }
             catch (Exception ex)
             {

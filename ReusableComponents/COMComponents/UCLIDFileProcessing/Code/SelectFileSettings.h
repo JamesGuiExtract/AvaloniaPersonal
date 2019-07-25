@@ -31,6 +31,7 @@ private:
 					   // last). Used only when m_bSubsetIsRandom is false.
 	bool m_bSubsetUsePercentage; // Whether to narrow by percentage or file count
 	int m_nSubsetSize; // The size of the subset (percentage or filecount)
+	int m_nOffset; // The number of rows to skip before the subset is started
 
 public:
 	// Default the setting to all files
@@ -68,6 +69,12 @@ public:
 		m_nSubsetSize = nSubsetSize;
 	}
 	int getSubsetSize() { return m_nSubsetSize; }
+
+	void setOffset(int nOffset)
+	{
+		m_nOffset = nOffset;
+	}
+	int getOffset() { return m_nOffset; }
 
 	bool selectingAllFiles() { return m_vecConditions.empty() && !m_bLimitToSubset; }
 

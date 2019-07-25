@@ -232,6 +232,100 @@ namespace WebAPI.Models
         }
 
         /// <summary>
+        /// Gets a page of queued/skipped files for the workflow's Edit action
+        /// </summary>
+        /// <param name="userName">The currently logged in user's name</param>
+        /// <param name="skippedFiles">Whether to return files skipped for this user rather than pending files</param>
+        /// <param name="fromBeginning">Sort file IDs in ascending order before selecting the subset</param>
+        /// <param name="pageIndex">Skip pageIndex * pageSize records from the beginning/end</param>
+        /// <param name="pageSize">The maximum records to return</param>
+        public QueuedFilesResult GetQueuedFiles(string userName, bool skippedFiles, string filter, bool fromBeginning, int pageIndex, int pageSize)
+        {
+            try
+            {
+                string action = FileApi.Workflow.EditAction;
+                var selector = new FAMFileSelectorClass();
+                if (skippedFiles)
+                {
+                    selector.AddActionStatusCondition(FileApi.FileProcessingDB, action, EActionStatus.kActionSkipped);
+                    selector.AddQueryCondition(Inv(
+                        $"SELECT FAMFile.ID FROM FAMFile JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID WHERE SkippedFile.UserName = '{userName.Replace("'", "''")}'"
+                    ));
+                }
+                else
+                {
+                    selector.AddActionStatusCondition(FileApi.FileProcessingDB, action, EActionStatus.kActionPending);
+                }
+
+                if (pageIndex >= 0 && pageSize > 0)
+                {
+                    selector.LimitToSubset(false, fromBeginning, false, pageSize, pageIndex * pageSize);
+                }
+
+                if (!string.IsNullOrWhiteSpace(filter))
+                {
+                    var searchPattern = Inv($"%{filter.Replace("'", "''")}%");
+                    selector.AddQueryCondition(Inv($@"
+SELECT FAMFile.ID FROM FAMFile
+    JOIN WorkflowFile ON FAMFile.ID = WorkflowFile.FileID
+    LEFT JOIN FileMetadataFieldValue ON FileMetadataFieldValue.FileID = FAMFile.ID
+    LEFT JOIN MetadataField ON MetadataField.ID = FileMetadataFieldValue.MetadataFieldID
+    WHERE MetadataField.Name IN ('OriginalFileName', 'SubmittedByUser', 'DocumentType')
+    AND FileMetadataFieldValue.Value LIKE '{searchPattern}'
+    OR CONVERT(VARCHAR(10), WorkflowFile.AddedDateTime, 23) LIKE '{searchPattern}'
+" ));
+                }
+
+                string select =
+                    @"FAMFile.ID,
+FAMFile.Pages,
+DateSubmitted = (SELECT CONVERT(VARCHAR(10), WorkflowFile.AddedDateTime, 23) FROM WorkflowFile WHERE FAMFile.ID = WorkflowFile.FileID),
+OriginalFileName = COALESCE((SELECT Value FROM FileMetadataFieldValue JOIN MetadataField ON MetadataField.ID = FileMetadataFieldValue.MetadataFieldID
+                    WHERE FAMFile.ID = FileMetadataFieldValue.FileID
+                    AND MetadataField.Name = 'OriginalFileName'), ''),
+SubmittedByUser = COALESCE((SELECT Value FROM FileMetadataFieldValue JOIN MetadataField ON MetadataField.ID = FileMetadataFieldValue.MetadataFieldID
+                    WHERE FAMFile.ID = FileMetadataFieldValue.FileID
+                    AND MetadataField.Name = 'SubmittedByUser'), ''),
+DocumentType = COALESCE((SELECT Value FROM FileMetadataFieldValue JOIN MetadataField ON MetadataField.ID = FileMetadataFieldValue.MetadataFieldID
+                    WHERE FAMFile.ID = FileMetadataFieldValue.FileID
+                    AND MetadataField.Name = 'DocumentType'), '')";
+
+                string order = " ORDER BY [FAMFile].[ID] " + (fromBeginning ? "ASC" : "DESC");
+
+                string query = selector.BuildQuery(FileApi.FileProcessingDB, select, order, false);
+
+                var rs = FileApi.FileProcessingDB.GetResultsForQuery(query);
+                var results = new List<QueuedFileDetails>();
+                if (!rs.BOF && !rs.EOF)
+                {
+                    rs.MoveFirst();
+                    while (!rs.EOF)
+                    {
+                        var record = new QueuedFileDetails();
+                        record.FileID = (int)rs.Fields["ID"].Value;
+                        record.NumberOfPages = (int)rs.Fields["Pages"].Value;
+                        record.DateSubmitted = (string)rs.Fields["DateSubmitted"].Value;
+                        record.OriginalFileName = (string)rs.Fields["OriginalFileName"].Value;
+                        record.SubmittedByUser = (string)rs.Fields["SubmittedByUser"].Value;
+                        record.DocumentType = (string)rs.Fields["DocumentType"].Value;
+
+                        //record.MetadataXML = (string)rs.Fields["Metadata"].Value;
+
+                        results.Add(record);
+                        rs.MoveNext();
+                    }
+                }
+
+                return new QueuedFilesResult { QueuedFiles = results };
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47048");
+            }
+        }
+
+
+        /// <summary>
         /// Checkouts the document.
         /// </summary>
         /// <param name="id">The identifier.</param>
@@ -711,6 +805,18 @@ namespace WebAPI.Models
                         false,                                                    // skip page count
                         out bool bAlreadyExists,                                  // returns whether file already existed
                         out EActionStatus previousActionStatus);                  // returns the previous action status (if file already existed)
+
+                //try
+                //{
+                //    FileApi.FileProcessingDB.SetMetadataFieldValue(fileRecord.FileID, "UploadedFromPath", fullPath);
+                //}
+                //catch { }
+
+                //try
+                //{
+                //    FileApi.FileProcessingDB.SetMetadataFieldValue(fileRecord.FileID, "Uploader", _user.GetUsername());
+                //}
+                //catch { }
 
                 DocumentIdResult result = new DocumentIdResult()
                 {

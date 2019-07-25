@@ -2,7 +2,7 @@
 namespace WebAPI.Models
 {
     /// <summary>
-    /// Result the represent the number of documents and pages pending in a queue as well as the
+    /// Result that represents the number of documents and pages pending in a queue as well as the
     /// number of users active in that queue.
     /// </summary>
     public class QueueStatusResult

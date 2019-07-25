@@ -142,7 +142,7 @@ namespace Extract.FileActionManager.Utilities
                                 {
                                     _fileInspectorForm.FileSelector = fileSelector;
                                     _fileInspectorForm.FileSelector.LimitToSubset(false, true,
-                                        false, FAMFileInspectorForm.DefaultMaxFilesToDisplay);
+                                        false, FAMFileInspectorForm.DefaultMaxFilesToDisplay, -1);
                                 }
 
                                 _fileInspectorForm.Restore();
@@ -202,7 +202,7 @@ namespace Extract.FileActionManager.Utilities
                             {
                                 _fileInspectorForm.FileSelector = fileSelector;
                                 _fileInspectorForm.FileSelector.LimitToSubset(false, true, false,
-                                    FAMFileInspectorForm.DefaultMaxFilesToDisplay);
+                                    FAMFileInspectorForm.DefaultMaxFilesToDisplay, -1);
                             }
 
                             _fileInspectorForm.LockFileSelector = lockFileSelector;

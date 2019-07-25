@@ -163,7 +163,7 @@ STDMETHODIMP CFAMFileSelector::AddFileSetCondition(BSTR bstrFileSet)
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFAMFileSelector::LimitToSubset(VARIANT_BOOL bRandomSubset, VARIANT_BOOL bTopSubset,
-											 VARIANT_BOOL bUsePercentage, LONG nSubsetSize)
+											 VARIANT_BOOL bUsePercentage, LONG nSubsetSize, LONG nOffset)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -171,11 +171,16 @@ STDMETHODIMP CFAMFileSelector::LimitToSubset(VARIANT_BOOL bRandomSubset, VARIANT
 	{
 		validateLicense();
 
+		// I don't want to mess with the giant query to support offsets for all these conditions so assert a simple subset if offset >= 0
+		ASSERT_RUNTIME_CONDITION("ELI47046", nOffset < 0 || !bRandomSubset && bTopSubset && !bUsePercentage,
+			"Offset not supported with random, reverse or percentage subsets");
+
 		m_settings.setLimitToSubset(true);
 		m_settings.setSubsetIsRandom(asCppBool(bRandomSubset));
 		m_settings.setSubsetIsTop(asCppBool(bTopSubset));
 		m_settings.setSubsetUsePercentage(asCppBool(bUsePercentage));
 		m_settings.setSubsetSize(nSubsetSize);
+		m_settings.setOffset(nOffset);
 
 		return S_OK;
 	}
