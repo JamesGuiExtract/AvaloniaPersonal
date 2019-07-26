@@ -1702,6 +1702,28 @@ namespace Extract.FileActionManager.Utilities
                         _fileHandlerCountdownEvent.Dispose();
                         _fileHandlerCountdownEvent = null;
                     }
+
+                    if (_queryCanceler != null)
+                    {
+                        _queryCanceler.Dispose();
+                        _queryCanceler = null;
+                    }
+
+                    if (_fileHandlerSeparator != null)
+                    {
+                        _fileHandlerSeparator.Dispose();
+                        _fileHandlerSeparator = null;
+                    }
+                    if (_overlayTextCanceler != null)
+                    {
+                        _overlayTextCanceler.Dispose();
+                        _overlayTextCanceler = null;
+                    }
+                    if (_fileHandlerCanceler != null)
+                    {
+                        _fileHandlerCanceler.Dispose();
+                        _fileHandlerCanceler = null;
+                    }
                 }
                 catch { }
             }

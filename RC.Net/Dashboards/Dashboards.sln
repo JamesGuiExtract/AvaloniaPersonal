@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashboardCreator", "DashboardCreator\Core\Code\DashboardCreator.csproj", "{7B6002E2-E014-4698-8D8C-A9E4C90D61A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashboardViewer", "DashboardViewer\Core\Code\DashboardViewer.csproj", "{0F57183A-2B8F-4C7E-8613-EA88B33F65A8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DashboardViewer", "DashboardViewer\Core\Code\Extract.DashboardViewer.csproj", "{0F57183A-2B8F-4C7E-8613-EA88B33F65A8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{134F692E-EA89-4C72-883E-C2727EAE1ACF}"
 EndProject

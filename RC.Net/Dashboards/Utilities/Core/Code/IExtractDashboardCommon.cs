@@ -2,9 +2,7 @@
 using DevExpress.DashboardWin;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -15,7 +13,7 @@ namespace Extract.Dashboard.Utilities
         /// <summary>
         /// Gets the active dashboard from the underlying control
         /// </summary>
-        DevExpress.DashboardCommon.Dashboard Dashboard { get; }
+        DevExpress.DashboardCommon.Dashboard CurrentDashboard { get; }
 
         /// <summary>
         /// Dictionary to track drill down level for Dashboard controls
@@ -59,6 +57,11 @@ namespace Extract.Dashboard.Utilities
         HashSet<string> CurrentFilteredFiles { get; }
 
         /// <summary>
+        /// The key value pairs for the currently filter dimension selected in the grid
+        /// </summary>
+        Dictionary<string, object> CurrentFilteredDimensions { get; }
+
+        /// <summary>
         /// If the control that is implementing this interface has a <see cref="DevExpress.DashboardWin.DashboardViewer"/>
         /// instance then this returns that instance otherwise this should return null
         /// </summary>
@@ -89,5 +92,12 @@ namespace Extract.Dashboard.Utilities
         /// exception an exception in <see paramref="action"/>.</param>
         void SafeBeginInvokeForShared(string eliCode, Action action,
                     bool displayExceptions = true, Action<Exception> exceptionAction = null);
+
+        /// <summary>
+        /// Opens a dashboard viewer with the given dashboard name and the filter data
+        /// </summary>
+        /// <param name="dashboardName">This will be assumed another dashboard in the current database for the open dashboard </param>
+        /// <param name="filterData">The dictionary contains the filter data</param>
+        void OpenDashboardForm(string dashboardName, Dictionary<string, object> filterData);
     }
 }

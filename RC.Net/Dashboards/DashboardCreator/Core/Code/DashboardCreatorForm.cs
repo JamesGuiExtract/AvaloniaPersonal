@@ -6,6 +6,8 @@ using DevExpress.XtraBars.Ribbon;
 using Extract;
 using Extract.Dashboard.Forms;
 using Extract.Dashboard.Utilities;
+using Extract.DashboardViewer;
+using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
@@ -55,7 +57,7 @@ namespace DashboardCreator
         /// <summary>
         /// Gets the active dashboard from the underlying control
         /// </summary>
-        public Dashboard Dashboard
+        public Dashboard CurrentDashboard
         {
             get
             {
@@ -134,12 +136,17 @@ namespace DashboardCreator
         /// <summary>
         /// Since this instance is not a <see cref="DevExpress.DashboardWin.DashboardViewer"/> it should return null
         /// </summary>
-        public DashboardViewer Viewer => null;
+        public DevExpress.DashboardWin.DashboardViewer Viewer { get; } = null;
 
         /// <summary>
         /// Since this instance has a <see cref="DevExpress.DashboardWin.DashboardDesigner"/> it should return the designer
         /// </summary>
         public DashboardDesigner Designer => dashboardDesigner;
+
+        /// <summary>
+        /// The key value pairs for the currently filter dimension selected in the grid
+        /// </summary>
+        public Dictionary<string, object> CurrentFilteredDimensions { get; } = new Dictionary<string, object>();
 
         /// <summary>
         /// Gets the current filtered values for the named dashboard item
@@ -166,6 +173,25 @@ namespace DashboardCreator
             bool displayExceptions = true, Action<Exception> exceptionAction = null)
         {
             this.SafeBeginInvoke(eliCode, action, displayExceptions, exceptionAction);
+        }
+
+        /// <summary>
+        /// Opens a dashboard viewer with the given dashboard name and the filter data
+        /// </summary>
+        /// <param name="dashboardName">This will be assumed another dashboard in the current database for the open dashboard </param>
+        /// <param name="filterData">The dictionary contains the filter data</param>
+        public void OpenDashboardForm(string dashboardName, Dictionary<string, object> filterData)
+        {
+            try
+            {
+                DashboardViewerForm form = new DashboardViewerForm(dashboardName, true, ServerName, DatabaseName);
+                form.ParameterValues.AddRange(filterData);
+                form.Show();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI47067");
+            }
         }
 
         #endregion
@@ -210,6 +236,36 @@ namespace DashboardCreator
 
         #region Event Handlers
 
+        void HandleBarButtonItemConfigureDashboardLinks_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            try
+            {
+                string component = dashboardDesigner.SelectedDashboardItem.ComponentName;
+                var grid = dashboardDesigner.Dashboard.Items[component] as GridDashboardItem;
+
+                if (grid is null)
+                {
+                    return;
+                }
+
+                GridDetailConfiguration configurationData = GetDetailConfigurationData(component);
+
+                ConfigureDashboardLinksForm linksForm = new ConfigureDashboardLinksForm(configurationData.DashboardLinks);
+                linksForm.ShowDialog();
+                if (!configurationData.DashboardLinks.SetEquals(linksForm.DashboardLinks))
+                {
+                    _dirty = true;
+                    configurationData.DashboardLinks.Clear();
+                    configurationData.DashboardLinks.UnionWith(linksForm.DashboardLinks);
+                    _dashboardShared.CustomGridValues[component] = configurationData;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI47087");
+            }
+        }
+
         void HandleDashboardDesigner_DashboardClosing(object sender, DashboardClosingEventArgs e)
         {
             try
@@ -237,7 +293,11 @@ namespace DashboardCreator
                 GridDetailConfiguration configurationData = GetDetailConfigurationData(component);
                 string selectedField = configurationData.DataMemberUsedForFileName;
 
-                IList<string> fieldNames = grid.GetDataMembers();
+                // Only need to look at the Dimensions
+                IList<string> fieldNames = grid.GetDimensions()
+                    .Where(d => d.DataSourceFieldType == typeof(string))
+                    .Select(d => d.DataMember).ToList();
+
                 // Add empty string at top of list
                 fieldNames.Insert(0, string.Empty);
 
@@ -441,17 +501,19 @@ namespace DashboardCreator
                     XElement userData = new XElement(
                     "ExtractConfiguredGrids",
                         _dashboardShared.CustomGridValues
-                        .Where(kvp => Dashboard.Items.Select(di => di.ComponentName).Contains(kvp.Key))
+                        .Where(kvp => CurrentDashboard.Items.Select(di => di.ComponentName).Contains(kvp.Key))
                         .Select(kv =>
                             new XElement("Component", new XAttribute("Name", kv.Key),
                             new XElement("RowQuery", kv.Value.RowQuery),
-                            new XElement("DataMemberUsedForFileName", kv.Value.DataMemberUsedForFileName)))
+                            new XElement("DataMemberUsedForFileName",
+                                string.IsNullOrWhiteSpace(kv.Value.DataMemberUsedForFileName) ? "FileName" : kv.Value.DataMemberUsedForFileName),
+                            new XElement("DashboardLinks", string.Join(",", kv.Value.DashboardLinks))))
                         );
-                    Dashboard.UserData = userData;
+                    CurrentDashboard.UserData = userData;
                 }
                 else
                 {
-                    Dashboard.UserData = null;
+                    CurrentDashboard.UserData = null;
                 }
 
                 SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -464,13 +526,13 @@ namespace DashboardCreator
                     if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         _dashboardFileName = saveFileDialog.FileName;
-                        Dashboard.SaveToXml(_dashboardFileName);
+                        CurrentDashboard.SaveToXml(_dashboardFileName);
                         UpdateTitle();
                     }
                 }
                 else
                 {
-                    Dashboard.SaveToXml(_dashboardFileName);
+                    CurrentDashboard.SaveToXml(_dashboardFileName);
                 }
                 e.Handled = true;
                 _dirty = false;
@@ -499,7 +561,7 @@ namespace DashboardCreator
         {
             try
             {
-                _dashboardShared?.GridConfigurationsFromXml(Dashboard?.UserData);
+                _dashboardShared?.GridConfigurationsFromXml(CurrentDashboard?.UserData);
 
                 _dirty = false;
                 UpdateTitle();
@@ -568,7 +630,8 @@ namespace DashboardCreator
                     {
                         DashboardGridName = component,
                         RowQuery = string.Empty,
-                        DataMemberUsedForFileName = string.Empty
+                        DataMemberUsedForFileName = "FileName",
+                        DashboardLinks = new HashSet<string>()
                     };
             }
             else
@@ -614,6 +677,7 @@ namespace DashboardCreator
                 }
             }
         }
+
 
         #endregion
     }

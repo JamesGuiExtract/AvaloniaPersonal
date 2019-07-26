@@ -1,10 +1,8 @@
-﻿using DevExpress.DashboardCommon;
-using Extract.Code.Attributes;
+﻿using Extract.Code.Attributes;
 using Extract.Dashboard.Utilities;
 using Extract.ETL;
 using Extract.Utilities;
 using System;
-using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -123,12 +121,12 @@ namespace Extract.Dashboard.ETL
                         dashboard.LoadFromXDocument(xdoc);
 
                         string dashboardName = reader.GetString(1);
-                        
+
                         try
                         {
                             DashboardDataConverter.UpdateExtractedDataSources(dashboard, _cancelToken);
                         }
-                        catch(ExtractException ee)
+                        catch (ExtractException ee)
                         {
                             ee.AddDebugData("DashboardName", dashboardName);
                             ee.Log();

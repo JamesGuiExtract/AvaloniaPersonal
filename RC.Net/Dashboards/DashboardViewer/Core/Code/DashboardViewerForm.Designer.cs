@@ -1,4 +1,4 @@
-﻿namespace DashboardViewer
+﻿namespace Extract.DashboardViewer
 {
     partial class DashboardViewerForm
     {
@@ -191,11 +191,12 @@
             // 
             this._toolStripTextBoxlastRefresh.BackColor = System.Drawing.SystemColors.Info;
             this._toolStripTextBoxlastRefresh.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this._toolStripTextBoxlastRefresh.Font = new System.Drawing.Font("Segoe UI", 9F);
             this._toolStripTextBoxlastRefresh.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this._toolStripTextBoxlastRefresh.Name = "_toolStripTextBoxlastRefresh";
             this._toolStripTextBoxlastRefresh.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this._toolStripTextBoxlastRefresh.ReadOnly = true;
-            this._toolStripTextBoxlastRefresh.Size = new System.Drawing.Size(142, 25);
+            this._toolStripTextBoxlastRefresh.Size = new System.Drawing.Size(134, 25);
             // 
             // toolStripButtonClearMasterFilter
             // 
@@ -218,6 +219,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStripMain;
             this.Name = "DashboardViewerForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Dashboard";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DashboardViewerForm_FormClosing);

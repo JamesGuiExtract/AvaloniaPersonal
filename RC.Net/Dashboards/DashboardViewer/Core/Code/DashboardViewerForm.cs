@@ -5,7 +5,6 @@ using DevExpress.DashboardWin.Native;
 using DevExpress.XtraEditors;
 using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Views.Grid;
-using Extract;
 using Extract.Dashboard.Utilities;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
@@ -20,7 +19,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
-namespace DashboardViewer
+namespace Extract.DashboardViewer
 {
     public partial class DashboardViewerForm : XtraForm, IExtractDashboardCommon
     {
@@ -132,7 +131,7 @@ namespace DashboardViewer
         /// <summary>
         /// Gets the active dashboard from the underlying control
         /// </summary>
-        public Dashboard Dashboard
+        public DevExpress.DashboardCommon.Dashboard CurrentDashboard
         {
             get
             {
@@ -216,7 +215,12 @@ namespace DashboardViewer
         /// <summary>
         /// Since this does not have <see cref="DevExpress.DashboardWin.DashboardDesigner"/> return null
         /// </summary>
-        public DashboardDesigner Designer => null;
+        public DashboardDesigner Designer { get; } = null;
+
+        /// <summary>
+        /// The key value pairs for the currently filter dimension selected in the grid
+        /// </summary>
+        public Dictionary<string, object> CurrentFilteredDimensions { get; } = new Dictionary<string, object>();
 
         /// <summary>
         /// Gets the current filtered values for the named dashboard item
@@ -245,6 +249,25 @@ namespace DashboardViewer
             this.SafeBeginInvoke(eliCode, action, displayExceptions, exceptionAction);
         }
 
+        /// <summary>
+        /// Opens a dashboard viewer with the given dashboard name and the filter data
+        /// </summary>
+        /// <param name="dashboardName">This will be assumed another dashboard in the current database for the open dashboard </param>
+        /// <param name="filterData">The dictionary contains the filter data</param>
+        public void OpenDashboardForm(string dashboardName, Dictionary<string, object> filterData)
+        {
+            try
+            {
+                DashboardViewerForm form = new DashboardViewerForm(dashboardName, true, ServerName, DatabaseName);
+                form.ParameterValues.AddRange(filterData);
+                form.Show();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI47066");
+            }
+        }
+
         #endregion
 
         #region IDisposable implementation
@@ -268,6 +291,15 @@ namespace DashboardViewer
             }
             base.Dispose(disposing);
         }
+
+        #endregion
+
+        #region Public properties
+
+        /// <summary>
+        /// Parameter values that will be assigned to parameters that are setup in a dashboard being opened
+        /// </summary>
+        public Dictionary<string, object> ParameterValues { get; } = new Dictionary<string, object>();
 
         #endregion
 
@@ -418,7 +450,7 @@ namespace DashboardViewer
         {
             try
             {
-                if (Dashboard != null)
+                if (CurrentDashboard != null)
                 {
                     if (_usingCachedDashboardDefinition && _dictionaryDataSourceToFileName.Any(entry => _temporaryDatasourceFileCopyManager.HasFileBeenModified(entry.Value)))
                     {
@@ -436,7 +468,7 @@ namespace DashboardViewer
                             MessageBoxDefaultButton.Button1,
                             (MessageBoxOptions)0) == DialogResult.Yes)
                     {
-                        DashboardDataConverter.UpdateExtractedDataSources(Dashboard, CancellationToken.None);
+                        DashboardDataConverter.UpdateExtractedDataSources(CurrentDashboard, CancellationToken.None);
                         LoadDashboardFromDatabase(_dashboardName);
                         this.Focus();
                     }
@@ -633,7 +665,7 @@ namespace DashboardViewer
                 _filteredItems.Clear();
 
                 UpdateMainTitle();
-                _dashboardShared.GridConfigurationsFromXml(Dashboard?.UserData);
+                _dashboardShared.GridConfigurationsFromXml(CurrentDashboard?.UserData);
                 _toolStripTextBoxlastRefresh.Text = DateTime.Now.ToString(CultureInfo.CurrentCulture);
             }
             catch (Exception ex)
@@ -660,7 +692,7 @@ namespace DashboardViewer
                     if (!string.IsNullOrEmpty(_dashboardName))
                     {
                         DereferenceTempFiles();
-                        var dashboard = new Dashboard();
+                        var dashboard = new DevExpress.DashboardCommon.Dashboard();
                         dashboard.LoadFromXml(_dashboardName);
                         ReplaceExtractDataSourceFileWithTemporary(dashboard);
 
@@ -747,8 +779,9 @@ namespace DashboardViewer
                         UpdateMainTitle();
 
                         var xdoc = XDocument.Load(reader.GetXmlReader(0), LoadOptions.None);
-                        var dashboard = new Dashboard();
+                        var dashboard = new DevExpress.DashboardCommon.Dashboard();
                         dashboard.LoadFromXDocument(xdoc);
+                        ApplyParameterValues(dashboard);
                         ReplaceExtractDataSourceFileWithTemporary(dashboard);
                         dashboardViewerMain.Dashboard = dashboard;
                     }
@@ -758,13 +791,32 @@ namespace DashboardViewer
         }
 
         /// <summary>
+        /// Sets the Dashboard parameter values to the values in the ParameterValues dictionary
+        /// </summary>
+        /// <param name="dashboard"></param>
+        void ApplyParameterValues(DevExpress.DashboardCommon.Dashboard dashboard)
+        {
+            if (ParameterValues.Count == 0)
+            {
+                return;
+            }
+            foreach (var parameter in dashboard.Parameters)
+            {
+                if (ParameterValues.TryGetValue(parameter.Name, out object value))
+                {
+                    parameter.Value = value;
+                }
+            }
+        }
+
+        /// <summary>
         /// Update the main title to show the loaded dashboard and database and server 
         /// </summary>
         void UpdateMainTitle()
         {
             bool filtered = _filteredItems.Count > 0;
-            toolStripButtonClearMasterFilter.Enabled = Dashboard != null;
-            if (Dashboard is null)
+            toolStripButtonClearMasterFilter.Enabled = CurrentDashboard != null;
+            if (CurrentDashboard is null)
             {
                 if (!IsDatabaseOverridden)
                 {
@@ -841,7 +893,7 @@ namespace DashboardViewer
         }
 
 
-        void ReplaceExtractDataSourceFileWithTemporary(Dashboard dashboard)
+        void ReplaceExtractDataSourceFileWithTemporary(DevExpress.DashboardCommon.Dashboard dashboard)
         {
             try
             {

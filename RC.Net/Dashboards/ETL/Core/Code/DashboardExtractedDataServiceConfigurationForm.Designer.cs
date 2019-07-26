@@ -53,7 +53,7 @@ namespace Extract.Dashboard.ETL
             this.groupBox1.Controls.Add(this._schedulerControl);
             this.groupBox1.Location = new System.Drawing.Point(15, 31);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(466, 72);
+            this.groupBox1.Size = new System.Drawing.Size(466, 49);
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Schedule";
@@ -95,7 +95,7 @@ namespace Extract.Dashboard.ETL
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.CausesValidation = false;
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(403, 109);
+            this.cancelButton.Location = new System.Drawing.Point(403, 86);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 17;
@@ -106,7 +106,7 @@ namespace Extract.Dashboard.ETL
             // 
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.okButton.Location = new System.Drawing.Point(322, 109);
+            this.okButton.Location = new System.Drawing.Point(322, 86);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 16;

@@ -139,6 +139,10 @@
       <Project>{76781de2-21d2-470c-b41d-598dc0c2640b}</Project>
       <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\DashboardViewer\Core\Code\Extract.DashboardViewer.csproj">
+      <Project>{0f57183a-2b8f-4c7e-8613-ea88b33f65a8}</Project>
+      <Name>Extract.DashboardViewer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Forms\Core\Code\Extract.Dashboard.Forms.csproj">
       <Project>{D53A71CF-51A4-45F3-9644-FED8FAF49D3C}</Project>
       <Name>Extract.Dashboard.Forms</Name>

@@ -59,6 +59,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigureDashboardLinksForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfigureDashboardLinksForm.Designer.cs">
+      <DependentUpon>ConfigureDashboardLinksForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DashboardFileDetailForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -133,6 +139,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ConfigureDashboardLinksForm.resx">
+      <DependentUpon>ConfigureDashboardLinksForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DashboardFileDetailForm.resx">
       <DependentUpon>DashboardFileDetailForm.cs</DependentUpon>
     </EmbeddedResource>

@@ -1,5 +1,4 @@
 ﻿using DevExpress.DashboardCommon;
-using DevExpress.DashboardCommon.ViewerData;
 using DevExpress.DashboardWin;
 using DevExpress.DataAccess.ConnectionParameters;
 using DevExpress.DataAccess.Sql;
@@ -154,7 +153,12 @@ namespace Extract.Dashboard.Utilities
         /// <summary>
         /// List of menu items to add to the context menu
         /// </summary>
-        Collection<BarButtonItem> _menuItems;
+        Collection<BarItem> _menuItems;
+
+        /// <summary>
+        /// Menu that the configured dashboard open items will be placed on
+        /// </summary>
+        BarSubItem _dashboardOpenSubMenu;
 
         /// <summary>
         /// Flag indicating that existing <see cref="_menuItems"/> need to be removed and replaced with updated menu 
@@ -185,7 +189,7 @@ namespace Extract.Dashboard.Utilities
         /// <summary>
         /// Property for the list of context menu items. Uses <see cref="_menuItems"/> to store the list
         /// </summary>
-        public Collection<BarButtonItem> ContextFileMenuActions
+        public Collection<BarItem> ContextFileMenuActions
         {
             get
             {
@@ -212,6 +216,7 @@ namespace Extract.Dashboard.Utilities
         {
             _dashboardForm = dashboardForm;
             _withExportMenu = false;
+            _dashboardOpenSubMenu = CreateOpenDashboardSubMenu();
         }
 
         /// <summary> 
@@ -225,6 +230,8 @@ namespace Extract.Dashboard.Utilities
             _dashboardForm = dashboardForm;
 
             _withExportMenu = withExportMenu;
+
+            _dashboardOpenSubMenu = CreateOpenDashboardSubMenu();
         }
 
         #endregion
@@ -252,7 +259,7 @@ namespace Extract.Dashboard.Utilities
                 _dashboardForm.ConfiguredDatabaseName = sqlParameters.DatabaseName;
 
                 // Set timeout to 0 (infinite) for all DataSources
-                foreach (var ds in _dashboardForm.Dashboard.DataSources)
+                foreach (var ds in _dashboardForm.CurrentDashboard.DataSources)
                 {
                     var sqlDataSource = ds as DashboardSqlDataSource;
                     if (sqlDataSource != null)
@@ -280,7 +287,10 @@ namespace Extract.Dashboard.Utilities
         {
             try
             {
-                var grid = _dashboardForm.Dashboard.Items[e.DashboardItemName] as GridDashboardItem;
+                // Clear the current filtered files
+                _dashboardForm.CurrentFilteredFiles.Clear();
+
+                var grid = _dashboardForm.CurrentDashboard.Items[e.DashboardItemName] as GridDashboardItem;
 
                 // check if the context menu needs to be updated
                 if (_menuNeedsUpdating)
@@ -290,74 +300,33 @@ namespace Extract.Dashboard.Utilities
                     _menuNeedsUpdating = false;
                 }
 
-                // get the extract menu item links
-                var extractMenuLinks = e.Menu.ItemLinks.Where(link => IsExtractMenuItem(link));
-
-                // If none were found add them and this is for a grid control add the menus
-                if (extractMenuLinks.Count() == 0 && grid != null)
-                {
-                    // Add the defined context menu items
-                    e.Menu.ItemLinks.AddRange(ContextFileMenuActions);
-
-                    // Get the links of the added menu items
-                    extractMenuLinks = e.Menu.ItemLinks.Where(link => IsExtractMenuItem(link));
-
-                    // Define the start of groups
-                    var startOfGroups = extractMenuLinks.Where(link =>
-                    {
-                        Dictionary<string, object> menuItemData = link.Item.Tag as Dictionary<string, object>;
-                        if (menuItemData != null)
-                        {
-                            return true == menuItemData[_BEGIN_GROUP] as bool?;
-                        }
-                        return false;
-                    }).ToList();
-                    startOfGroups.ForEach(l => l.BeginGroup = true);
-                }
-
-                // if menu items exists hide them - the should only be visible if this is a grid
-                foreach (var item in extractMenuLinks)
-                {
-                    item.Visible = false;
-                }
-
                 // if menu is not for a grid control there is nothing else to do
                 if (grid is null)
                 {
-                    // Reset the file list
-                    _dashboardForm.CurrentFilteredFiles.Clear();
                     return;
                 }
 
-                var exportMenus = e.Menu.ItemLinks.Where(link => link.Caption.Contains(_EXPORT_TO));
-                foreach (var link in exportMenus)
+                IEnumerable<BarItemLink> extractMenuLinks = PreprareExtractMenu(e.Menu, grid);
+
+                SetupExportMenus(e.Menu, e.DashboardItemName);
+
+                // Add the selected files
+                _dashboardForm.CurrentFilteredFiles.AddRange(GetSelectedFiles(e.DashboardItemName));
+
+                _dashboardForm.CurrentFilteredDimensions.Clear();
+
+                // For now only one row should be selected
+                var selectRowsDimensions = GetSelectedRowsDimensions(e.DashboardItemName);
+                if (selectRowsDimensions.Count() == 1)
                 {
-                    Dictionary<string, object> menuItemData = link.Item.Tag as Dictionary<string, object>;
-                    if (menuItemData != null)
+                    var dimensions = selectRowsDimensions?.FirstOrDefault();
+                    if (dimensions != null)
                     {
-                        menuItemData["DashboardItemName"] = e.DashboardItemName;
+                        _dashboardForm.CurrentFilteredDimensions.AddRange(dimensions);
                     }
-                    link.Visible = true;
                 }
 
-                // Clear the current filtered files
-                _dashboardForm.CurrentFilteredFiles.Clear();
-
-                var files = GetSelectedFiles(e.DashboardItemName).ToList();
-
-                int numberOfFiles = files.Count();
-                if (numberOfFiles > 0)
-                {
-                    extractMenuLinks.First().BeginGroup = true;
-
-                    foreach (var item in extractMenuLinks)
-                    {
-                        item.Item.Enabled = SupportsMultipleFiles(item) || numberOfFiles == 1;
-                        item.Visible = true;
-                    }
-
-                }
-                files.ForEach(f => _dashboardForm.CurrentFilteredFiles.Add(f));
+                MakeMenusVisible(extractMenuLinks);
             }
             catch (Exception ex)
             {
@@ -372,7 +341,7 @@ namespace Extract.Dashboard.Utilities
             {
                 if (CustomGridValues.ContainsKey(e.DashboardItemName))
                 {
-                    GridDashboardItem gridItem = _dashboardForm.Dashboard.Items[e.DashboardItemName] as GridDashboardItem;
+                    GridDashboardItem gridItem = _dashboardForm.CurrentDashboard.Items[e.DashboardItemName] as GridDashboardItem;
 
                     if (gridItem is null)
                     {
@@ -422,13 +391,16 @@ namespace Extract.Dashboard.Utilities
 
                 foreach (var e in extractGrids)
                 {
-                    var dashboardItem = _dashboardForm.Dashboard.Items.Contains(i => i.ComponentName == e.Attribute("Name").Value);
+                    var dashboardItem = _dashboardForm.CurrentDashboard.Items.Contains(i => i.ComponentName == e.Attribute("Name").Value);
                     if (dashboardItem)
                     {
                         CustomGridValues[e.Attribute("Name").Value] = new GridDetailConfiguration
                         {
                             RowQuery = e.Element("RowQuery").Value,
-                            DataMemberUsedForFileName = e.Element("DataMemberUsedForFileName")?.Value ?? string.Empty
+                            DataMemberUsedForFileName = e.Element("DataMemberUsedForFileName")?.Value ?? "FileName",
+                            DashboardLinks = e.Element("DashboardLinks")?.Value.Split(',')
+                                .Where(s => !string.IsNullOrWhiteSpace(s))
+                                .ToArray().ToHashSet() ?? new HashSet<string>()
                         };
                     }
                 }
@@ -485,7 +457,7 @@ namespace Extract.Dashboard.Utilities
         void CreateContextFileMenuActionsList()
         {
             // Add the common File Menu actions
-            Collection<BarButtonItem> items = new Collection<BarButtonItem>();
+            Collection<BarItem> items = new Collection<BarItem>();
             FileHandlerItem handlerItem = new FileHandlerItem { AllowMultipleFiles = true };
             Dictionary<string, object> menuItemData = new Dictionary<string, object>
             {
@@ -533,6 +505,8 @@ namespace Extract.Dashboard.Utilities
             newItem.ItemClick += HandleOpenFileLocationItemClick;
             items.Add(newItem);
 
+            items.Add(_dashboardOpenSubMenu);
+
             if (_withExportMenu)
             {
 
@@ -555,10 +529,100 @@ namespace Extract.Dashboard.Utilities
         }
 
         /// <summary>
+        /// Creates the menu item that will contain the dashboards that are configured to be opened from the context menu
+        /// </summary>
+        /// <returns></returns>
+        BarSubItem CreateOpenDashboardSubMenu()
+        {
+            var dashboardSubItems = new BarSubItem();
+            dashboardSubItems.Tag = new Dictionary<string, object>
+            {
+                {"DashboardItems", true },
+                { _BEGIN_GROUP, true }
+            };
+            dashboardSubItems.Caption = "Open Dashboard";
+            dashboardSubItems.Enabled = true;
+            dashboardSubItems.HideWhenEmpty = true;
+            return dashboardSubItems;
+        }
+
+        /// <summary>
+        /// Adds the configured dashboard menu items to the dashboardSubItems menu used to open dashboard menu links
+        /// </summary>
+        /// <param name="dashboardLinks"></param>
+        void AddConfiguredDashboardOpenMenus(HashSet<string> dashboardLinks)
+        {
+            try
+            {
+                _dashboardOpenSubMenu.ClearLinks();
+                var singleItemDict = new Dictionary<string, object>
+                {
+                    { "DashboardMenuItem", true } ,
+                    { _BEGIN_GROUP, false }
+                };
+                var missingDashboards = GetMissingDashboardsInDatabase(dashboardLinks);
+                foreach (var link in dashboardLinks.Except(missingDashboards, StringComparer.OrdinalIgnoreCase))
+                {
+                    var newItem = new BarButtonItem();
+                    newItem.Caption = link;
+                    newItem.Tag = singleItemDict;
+                    newItem.ItemClick += HandleOpenDashboardMenuClick;
+                    _dashboardOpenSubMenu.AddItem(newItem);
+                }
+                
+                // Handle the missing dashboards
+                if (missingDashboards.Count > 0)
+                {
+                    var staticItem = new BarHeaderItem();
+                    staticItem.Caption = "Missing dashboards";
+                    _dashboardOpenSubMenu.AddItem(staticItem);
+                    foreach (var missing in missingDashboards)
+                    {
+                        var missingItem = new BarButtonItem();
+                        missingItem.Caption = missing;
+                        _dashboardOpenSubMenu.AddItem(missingItem);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47183");
+            }
+        }
+
+        /// <summary>
+        /// Returns a list of the dashboards in the <paramref name="dashboardLinks"/> that are not
+        /// currently saved in the database.
+        /// </summary>
+        /// <param name="dashboardLinks">Set of dashboards</param>
+        /// <returns>A list of dashboards that are not in the database that were in the <paramref name="dashboardLinks"/></returns>
+        IList<string> GetMissingDashboardsInDatabase(HashSet<string> dashboardLinks)
+        {
+            try
+            {
+                using (var connection = NewSqlDBConnection())
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "Select DashboardName FROM dbo.Dashboard";
+                    connection.Open();
+                    var dashboardsInDatabase = cmd.ExecuteReader()
+                        .Cast<IDataRecord>()
+                        .Select(r => r.GetString(0));
+                    return dashboardLinks.Except(dashboardsInDatabase, StringComparer.OrdinalIgnoreCase).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47190");
+            }
+
+        }
+
+        /// <summary>
         /// Adds menuItems from the current configured Database FileHandler table to the items parameter"/>
         /// </summary>
         /// <param name="items">List of menu items to add the new menus</param>
-        void AddItemsFromDB(Collection<BarButtonItem> items)
+        void AddItemsFromDB(Collection<BarItem> items)
         {
             try
             {
@@ -631,6 +695,18 @@ namespace Extract.Dashboard.Utilities
         #endregion
 
         #region Handlers for Custom menu items
+
+        void HandleOpenDashboardMenuClick(object sender, ItemClickEventArgs e)
+        {
+            try
+            {
+                _dashboardForm.OpenDashboardForm(e.Item.Caption, _dashboardForm.CurrentFilteredDimensions);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47064");
+            }
+        }
 
         void HandleCustomFileHanderClick(object sender, ItemClickEventArgs e)
         {
@@ -884,6 +960,115 @@ namespace Extract.Dashboard.Utilities
 
         #region Private Helper functions
 
+        void MakeMenusVisible(IEnumerable<BarItemLink> extractMenuLinks)
+        {
+            int numberOfFiles = _dashboardForm.CurrentFilteredFiles.Count;
+            if (numberOfFiles > 0)
+            {
+                extractMenuLinks.First().BeginGroup = true;
+
+                foreach (var item in extractMenuLinks)
+                {
+                    SetMenuVisiblity(numberOfFiles, item);
+                }
+            }
+
+            // Make the configured open dashboard menu items available
+            if (_dashboardForm.CurrentFilteredDimensions.Count != 0)
+            {
+                // Find the link for dashboardOpenSubMenu
+                var menuLink = extractMenuLinks
+                    .Where(l => l.Item == _dashboardOpenSubMenu as BarItem).Single();
+                menuLink.Visible = true;
+                SetMenuVisiblity(1, menuLink);
+            }
+        }
+
+        static void SetMenuVisiblity(int numberOfItems, BarItemLink item)
+        {
+            var subMenu = item.Item as BarSubItem;
+            if (subMenu != null)
+            {
+                foreach (BarItemLink subItem in subMenu.ItemLinks)
+                {
+                    subItem.Item.Manager = subMenu.Manager;
+                    subItem.Item.Enabled = subItem.Item.Tag != null && (SupportsMultipleItems(subItem) || numberOfItems == 1);
+                    subItem.Visible = true;
+
+                    if (subItem.Item is BarSubItem)
+                    {
+                        SetMenuVisiblity(numberOfItems, subItem);
+                    }
+                }
+            }
+
+            item.Item.Enabled = SupportsMultipleItems(item) || numberOfItems == 1;
+            item.Visible = true;
+        }
+
+        void SetupExportMenus(PopupMenu menu, string dashboardItemName)
+        {
+            var exportMenus = menu.ItemLinks.Where(link => link.Caption.Contains(_EXPORT_TO));
+            foreach (var link in exportMenus)
+            {
+                Dictionary<string, object> menuItemData = link.Item.Tag as Dictionary<string, object>;
+                if (menuItemData != null)
+                {
+                    menuItemData["DashboardItemName"] = dashboardItemName;
+                }
+                link.Visible = true;
+            }
+        }
+
+        IEnumerable<BarItemLink> PreprareExtractMenu(PopupMenu menu, GridDashboardItem grid)
+        {
+            // get the extract menu item links
+            var extractMenuLinks = menu.ItemLinks.Where(link => IsExtractMenuItem(link));
+
+            // If none were found add them and this is for a grid control add the menus
+            if (extractMenuLinks.Count() == 0 && grid != null)
+            {
+                // Add the defined context menu items
+                menu.AddItems(ContextFileMenuActions.ToArray());
+
+                // Get the links of the added menu items
+                extractMenuLinks = menu.ItemLinks.Where(link => IsExtractMenuItem(link));
+
+                // Define the start of groups
+                var startOfGroups = extractMenuLinks.Where(link =>
+                {
+                    Dictionary<string, object> menuItemData = link.Item.Tag as Dictionary<string, object>;
+                    if (menuItemData != null)
+                    {
+                        return true == menuItemData[_BEGIN_GROUP] as bool?;
+                    }
+                    return false;
+                }).ToList();
+                startOfGroups.ForEach(l => l.BeginGroup = true);
+            }
+
+            if (CustomGridValues.TryGetValue(grid.ComponentName, out var gridDetail) && gridDetail.DashboardLinks.Count > 0)
+            {
+                AddConfiguredDashboardOpenMenus(gridDetail.DashboardLinks);
+            }
+
+            // if menu items exists hide them - the should only be visible if this is a grid
+            foreach (var item in extractMenuLinks)
+            {
+                var subMenu = item.Item as BarSubItem;
+                if (subMenu != null)
+                {
+                    foreach (BarItemLink subItem in subMenu.ItemLinks)
+                    {
+                        subItem.Visible = false;
+                    }
+                }
+                item.Visible = false;
+            }
+
+            return extractMenuLinks;
+        }
+
         /// <summary>
         /// Display the DashboardDetailForm 
         /// </summary>
@@ -904,11 +1089,15 @@ namespace Extract.Dashboard.Utilities
                         var columnNames = data.GetColumnNames();
                         Dictionary<string, object> columnValues = columnNames.ToDictionary(c => c, c => data[0][c]);
 
+                        var customValues = CustomGridValues[e.DashboardItemName];
+
                         // the form will only be displayed if there is a FileName specified and the datasource is SQL database
-                        if (columnValues.Count > 0 && columnValues.ContainsKey("FileName") && !string.IsNullOrWhiteSpace(_dashboardForm.ServerName)
+                        if (columnValues.Count > 0
+                            && columnValues.ContainsKey(customValues.DataMemberUsedForFileName)
+                            && !string.IsNullOrWhiteSpace(_dashboardForm.ServerName)
                             && !string.IsNullOrWhiteSpace(_dashboardForm.DatabaseName))
                         {
-                            if (File.Exists(((string)columnValues["FileName"])))
+                            if (File.Exists(((string)columnValues[customValues.DataMemberUsedForFileName])))
                             {
                                 DashboardFileDetailForm detailForm = new DashboardFileDetailForm(
                                     columnValues, _dashboardForm.ServerName, _dashboardForm.DatabaseName, CustomGridValues[e.DashboardItemName]);
@@ -917,7 +1106,10 @@ namespace Extract.Dashboard.Utilities
                             else
                             {
                                 ExtractException ee = new ExtractException("ELI46114", "File does not exist.");
-                                ee.AddDebugData("FileName", (string)columnValues["FileName"], false);
+                                if (customValues != null)
+                                {
+                                    ee.AddDebugData(customValues.DataMemberUsedForFileName, (string)columnValues[customValues.DataMemberUsedForFileName], false);
+                                }
                                 throw ee;
                             }
                         }
@@ -947,19 +1139,24 @@ namespace Extract.Dashboard.Utilities
         }
 
         /// <summary>
-        /// Tests if <see cref="BarItemLink"/> argument supports multiple files
+        /// Tests if <see cref="BarItemLink"/> argument supports multiple items
         /// </summary>
         /// <param name="link">The <see cref="BarItemLink"/> to check</param>
-        /// <returns>returns true if it is not Extract menu object or it supports multiple files otherwise returns false</returns>
-        static bool SupportsMultipleFiles(BarItemLink link)
+        /// <returns>returns true if it is not Extract menu object or it supports multiple items otherwise returns false</returns>
+        static bool SupportsMultipleItems(BarItemLink link)
         {
             Dictionary<string, object> itemMenuData = link.Item.Tag as Dictionary<string, object>;
             if (itemMenuData is null)
             {
                 return true;
             }
-            FileHandlerItem? fileHandlerItem = itemMenuData["FileHanderRecord"] as FileHandlerItem?;
-            return fileHandlerItem?.AllowMultipleFiles != false;
+            if (itemMenuData.TryGetValue("FileHanderRecord", out var fileHandler))
+            {
+                FileHandlerItem? fileHandlerItem = fileHandler as FileHandlerItem?;
+                return fileHandlerItem?.AllowMultipleFiles != false;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -1158,54 +1355,30 @@ namespace Extract.Dashboard.Utilities
         /// <returns><see cref="IEnumerable{String}"/> that containsthe selected files</returns>
         IEnumerable<string> GetSelectedFiles(string gridName)
         {
-            var axisPointTuples = _dashboardForm.GetCurrentFilterValues(gridName);
-
             GridDetailConfiguration configuration;
 
-            if (CustomGridValues.TryGetValue(gridName, out configuration))
+            if (CustomGridValues.TryGetValue(gridName, out configuration)
+                && !string.IsNullOrWhiteSpace(configuration.DataMemberUsedForFileName))
             {
-                string dimensionName = configuration.DataMemberUsedForFileName;
-
-                return axisPointTuples.Select(at => FindDimension(dimensionName, at.GetAxisPoint())?.Value as string)
-                    .Where(v => v != null);
+                return GetSelectedRowsDimensions(gridName)
+                    .Where(row => row.ContainsKey(configuration.DataMemberUsedForFileName))
+                    .Select(row => row[configuration.DataMemberUsedForFileName].ToString());
             }
+
             return new List<string>();
         }
 
         /// <summary>
-        /// Finds the given <paramref name="dimensionName"/> using the <paramref name="ap"/>
+        /// Get Selected rows as IEnumerable of dictionaries that has all the dimensions and values for those dimensions
         /// </summary>
-        /// <param name="dimensionName">The name of the dimension to find</param>
-        /// <param name="ap">The <see cref="AxisPoint"/> to use as a starting point for the search</param>
-        /// <returns>The <see cref="AxisPoint"/> for the given <paramref name="dimensionName"/>, 
-        /// if not found returns <c>null</c>"/></returns>
-        static AxisPoint FindDimension(string dimensionName, AxisPoint ap)
+        /// <param name="gridName">The ComponentName of the grid to get the selected files</param>
+        /// <returns></returns>
+        IEnumerable<Dictionary<string, object>> GetSelectedRowsDimensions(string gridName)
         {
-            // If no starting point return null
-            if (ap is null)
-            {
-                return null;
-            }
+            var axisPointTuples = _dashboardForm.GetCurrentFilterValues(gridName);
 
-            // To get the correct dimension, find the first child
-            var axisPoint = ap;
-            while (axisPoint.Parent?.Parent != null) axisPoint = axisPoint.Parent;
-            if (axisPoint.Dimension.DataMember == dimensionName)
-            {
-                return axisPoint;
-            }
-
-            // Check the children until it is found
-            foreach (var childAxisPoint in ap.ChildItems)
-            {
-                if (childAxisPoint.Dimension.DataMember == dimensionName)
-                {
-                    return childAxisPoint;
-                }
-            }
-
-            // if it is not found return null
-            return null;
+            return axisPointTuples.Select(at => at.ToDictionary())?
+                .Where(v => v != null);
         }
 
         #endregion

@@ -251,6 +251,66 @@ namespace Extract.Utilities
             }
         }
 
+        /// <summary>
+        /// Adds the contents of one Dictionary to another
+        /// </summary>
+        /// <typeparam name="TKeyType">The Key type</typeparam>
+        /// <typeparam name="TValueType">The Value type</typeparam>
+        /// <param name="source">The Source dictionary that will be added to</param>
+        /// <param name="collection">The dictionary that is being added to the source</param>
+        public static void AddRange<TKeyType, TValueType>(
+            this Dictionary<TKeyType, TValueType> source, 
+            Dictionary<TKeyType, TValueType> collection)
+        {
+            try
+            {
+                if (collection is null)
+                {
+                    throw new ArgumentNullException(nameof(collection),"Collection is null");
+                }
+                foreach (var item in collection)
+                {
+                    if (!source.ContainsKey(item.Key))
+                    {
+                        source.Add(item.Key, item.Value);
+                    }
+                    else
+                    {
+                        ExtractException ee = new ExtractException("ELI47069", "Key exists in source.");
+                        ee.AddDebugData("Key", item.Key.ToString(), false);
+                        ee.AddDebugData("ValueToAdd", item.Value.ToString(), false);
+                        throw ee;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47068");
+            }
+        }
+
+        /// <summary>
+        /// Converts an array of type to a HashSet of that type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static HashSet<T> ToHashSet<T>(this T[] source)
+        {
+            try
+            {
+                var returnValue = new HashSet<T>();
+                foreach (var s in source)
+                {
+                    returnValue.Add(s);
+                }
+                return returnValue;
+            }
+            catch(Exception ex)
+            {
+                throw ex.AsExtract("ELI47092");
+            }
+        }
 
         #endregion Methods
 

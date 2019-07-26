@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DashboardDataConverter.cs" />
+    <Compile Include="DashboardExtensionMethods.cs" />
     <Compile Include="DashboardShared.cs" />
     <Compile Include="IExtractDashboardCommon.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
