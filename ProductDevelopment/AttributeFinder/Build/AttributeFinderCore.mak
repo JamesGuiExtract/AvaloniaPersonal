@@ -437,7 +437,6 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.ETL.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V "$(PDUtilsRootDir)\DetectAndReportFailure\Misc\DetectAndReportFailure.ini" "$(AFCoreInstallFilesRootDir)\ProgramDataFiles"
 	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.GoogleCloud.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.AttributeFinder.Rules.FSharp.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.Utilities.FSharp.CSharpInterop.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(BinariesFolder)\Obfuscated\Extract.Utilities.FSharp.NERAnnotation.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 
@@ -484,6 +483,7 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.FileActionManager.FAMFileInspector.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Utilities.ContextTags.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
 	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.Database.Logger.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
+	@DIR "$(AFCoreInstallFilesRootDir)\DotNetGAC\Extract.AttributeFinder.Rules.FSharp.dll" /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\AFCore.nl"
 
 #    @COPY /V "$(BinariesFolder)\sit_grammar.xml" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
     @COPY /V "$(BinariesFolder)\ImageViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
