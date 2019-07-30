@@ -1223,7 +1223,7 @@ namespace Extract.AttributeFinder.Rules
             if (SplitRoutingNumber)
             {
                 ExtractException.Assert("ELI46957",
-                    "Failed to routing number due to missing regular expression group",
+                    "Failed to get routing number because regex group is missing",
                     groupNames.Any(name => name == "Routing"));
 
                 componentNames.Add("Routing");
@@ -1231,7 +1231,7 @@ namespace Extract.AttributeFinder.Rules
             if (SplitAccountNumber)
             {
                 ExtractException.Assert("ELI46958",
-                    "Failed to get amount because regex group is missing",
+                    "Failed to get account number because regex group is missing",
                     groupNames.Any(name => name == "Account"));
 
                 componentNames.Add("Account");
@@ -1239,7 +1239,7 @@ namespace Extract.AttributeFinder.Rules
             if (SplitCheckNumber)
             {
                 ExtractException.Assert("ELI46959",
-                    "Failed to check number due to missing regular expression group",
+                    "Failed to get check number because regex group is missing",
                     groupNames.Any(name => name == "CheckNumber"));
 
                 componentNames.Add("CheckNumber");
@@ -1247,7 +1247,7 @@ namespace Extract.AttributeFinder.Rules
             if (SplitAmount)
             {
                 ExtractException.Assert("ELI46960",
-                    "Failed to amount due to missing regular expression group",
+                    "Failed to get amount because regex group is missing",
                     groupNames.Any(name => name == "Amount"));
 
                 componentNames.Add("Amount");
