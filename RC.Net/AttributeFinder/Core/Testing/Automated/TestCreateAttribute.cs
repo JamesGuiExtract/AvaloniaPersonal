@@ -1,6 +1,8 @@
 ﻿using Extract.Testing.Utilities;
+using Extract.Utilities;
 using NUnit.Framework;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 
@@ -186,9 +188,12 @@ namespace Extract.AttributeFinder.Test
             var filename = _testFiles.GetFile(voaFilename);
             attributes.LoadFrom(filename, bSetDirtyFlagToTrue: false);
 
-            if (!string.IsNullOrWhiteSpace(filenameToApply) && attributes.Size() == 1)
+            if (!string.IsNullOrWhiteSpace(filenameToApply))
             {
-                ((IAttribute)attributes.At(0)).Value.SourceDocName = filenameToApply;
+                foreach(var attr in attributes.ToIEnumerable<IAttribute>().SelectMany(a => a.EnumerateDepthFirst()))
+                {
+                    attr.Value.SourceDocName = filenameToApply;
+                }
             }
 
             return attributes;
@@ -228,14 +233,14 @@ namespace Extract.AttributeFinder.Test
                            string expectedVoaFilename,
                            string originalTifFilename)
         {
+            // Need the original .tif file as well, or FindAttributes() throws an error.
+            var tifFilename = _testFiles.GetFile(originalTifFilename);
+
             // load the source voa file
-            IUnknownVector attributesFromSourceVoa = LoadVoaFile(sourceVoaFilename);
+            IUnknownVector attributesFromSourceVoa = LoadVoaFile(sourceVoaFilename, filenameToApply: tifFilename);
 
             AFDocument doc = new AFDocument();
             doc.Attribute.SubAttributes.Append(attributesFromSourceVoa);
-
-            // Need the original .tif file as well, or FindAttributes() throws an error.
-            var tifFilename = _testFiles.GetFile(originalTifFilename);
 
             SpatialString ssText = LoadUssFile(sourceUssFilename, filenameToApply: tifFilename);
 

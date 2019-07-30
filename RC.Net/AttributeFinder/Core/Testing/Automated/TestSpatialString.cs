@@ -80,7 +80,7 @@ namespace Extract.AttributeFinder.Test
             var ss = new SpatialStringClass();
 
             // Confirm that LoadFrom doesn't throw an exception
-            var pages = ss.LoadFrom(ussPath, false);
+            ss.LoadFrom(ussPath, false);
 
             // Confirm that there are the expected number of pages
             Assert.AreEqual(2, ss.GetPages(false, "").Size());
