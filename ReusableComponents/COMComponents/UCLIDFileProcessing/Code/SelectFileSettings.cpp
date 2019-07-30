@@ -269,6 +269,8 @@ string SelectFileSettings::buildQuery(UCLID_FILEPROCESSINGLib::IFileProcessingDB
 		&& !m_bSubsetUsePercentage
 		&& m_nSubsetSize > 0)
 	{
+		ASSERT_ARGUMENT("ELI47085", !strOrderByClause.empty());
+
 		string strOffset = Util::Format(" \r\n    OFFSET %d ROWS FETCH NEXT %d ROWS ONLY", m_nOffset, m_nSubsetSize);
 		return strQuery + strOrderByClause + strOffset;
 	}

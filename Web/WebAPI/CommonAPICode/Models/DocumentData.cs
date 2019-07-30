@@ -259,7 +259,7 @@ namespace WebAPI.Models
 
                 if (pageIndex >= 0 && pageSize > 0)
                 {
-                    selector.LimitToSubset(false, fromBeginning, false, pageSize, pageIndex * pageSize);
+                    selector.LimitToSubset(false, true, false, pageSize, pageIndex * pageSize);
                 }
 
                 if (!string.IsNullOrWhiteSpace(filter))
@@ -308,8 +308,6 @@ DocumentType = COALESCE((SELECT Value FROM FileMetadataFieldValue JOIN MetadataF
                         record.OriginalFileName = (string)rs.Fields["OriginalFileName"].Value;
                         record.SubmittedByUser = (string)rs.Fields["SubmittedByUser"].Value;
                         record.DocumentType = (string)rs.Fields["DocumentType"].Value;
-
-                        //record.MetadataXML = (string)rs.Fields["Metadata"].Value;
 
                         results.Add(record);
                         rs.MoveNext();
