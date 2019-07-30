@@ -37,6 +37,11 @@ namespace WebAPI.Models
         /// The document type
         /// </summary>
         public string DocumentType;
+
+        /// <summary>
+        /// The user comment applied to this document
+        /// </summary>
+        public string Comment;
     }
 
     /// <summary>

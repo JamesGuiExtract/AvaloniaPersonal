@@ -270,9 +270,11 @@ SELECT FAMFile.ID FROM FAMFile
     JOIN WorkflowFile ON FAMFile.ID = WorkflowFile.FileID
     LEFT JOIN FileMetadataFieldValue ON FileMetadataFieldValue.FileID = FAMFile.ID
     LEFT JOIN MetadataField ON MetadataField.ID = FileMetadataFieldValue.MetadataFieldID
+    LEFT JOIN FileActionComment ON FileActionComment.FileID = FAMFile.ID
     WHERE MetadataField.Name IN ('OriginalFileName', 'SubmittedByUser', 'DocumentType')
     AND FileMetadataFieldValue.Value LIKE '{searchPattern}'
     OR CONVERT(VARCHAR(10), WorkflowFile.AddedDateTime, 23) LIKE '{searchPattern}'
+    OR Comment LIKE '{searchPattern}'
 " ));
                 }
 
@@ -280,6 +282,7 @@ SELECT FAMFile.ID FROM FAMFile
                     @"FAMFile.ID,
 FAMFile.Pages,
 DateSubmitted = (SELECT CONVERT(VARCHAR(10), WorkflowFile.AddedDateTime, 23) FROM WorkflowFile WHERE FAMFile.ID = WorkflowFile.FileID),
+Comment = COALESCE(CONVERT(VARCHAR(MAX), (SELECT Comment FROM FileActionComment WHERE FAMFile.ID = FileActionComment.FileID)), ''),
 OriginalFileName = COALESCE((SELECT Value FROM FileMetadataFieldValue JOIN MetadataField ON MetadataField.ID = FileMetadataFieldValue.MetadataFieldID
                     WHERE FAMFile.ID = FileMetadataFieldValue.FileID
                     AND MetadataField.Name = 'OriginalFileName'), ''),
@@ -308,6 +311,7 @@ DocumentType = COALESCE((SELECT Value FROM FileMetadataFieldValue JOIN MetadataF
                         record.OriginalFileName = (string)rs.Fields["OriginalFileName"].Value;
                         record.SubmittedByUser = (string)rs.Fields["SubmittedByUser"].Value;
                         record.DocumentType = (string)rs.Fields["DocumentType"].Value;
+                        record.Comment = (string)rs.Fields["Comment"].Value;
 
                         results.Add(record);
                         rs.MoveNext();
