@@ -10,8 +10,9 @@ using Extract.Code.Attributes;
 using System.Transactions;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 
-namespace Extract.UtilityApplications.TrainingDataCollector
+namespace Extract.UtilityApplications.MachineLearning
 {
     /// <summary>
     /// The type of model to collect data for
@@ -134,6 +135,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// <summary>
         /// Whether to run the ruleset in the case that the VOA doesn't exist
         /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Voa")]
         [DataMember]
         public bool RunRuleSetIfVoaIsMissing { get; set; }
 
@@ -612,6 +614,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
         /// <summary>
         /// Class for the TrainingDataCollectorStatus stored in the DatabaseService record
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         [DataContract]
         public class TrainingDataCollectorStatus : DatabaseServiceStatus
         {
@@ -663,6 +666,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
             /// Updates a <see cref="TrainingDataCollector"/> with settings from this status object
             /// </summary>
             /// <param name="dataCollector">The <see cref="TrainingDataCollector"/> to update</param>
+            [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
             public void UpdateTrainingDataCollector(TrainingDataCollector dataCollector)
             {
                 try

@@ -3,12 +3,11 @@ using Extract.FileActionManager.Forms;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.UtilityApplications.MLModelTrainer
+namespace Extract.UtilityApplications.MachineLearning
 {
     /// <summary>
     /// Dialog to configure and run NER training
@@ -402,8 +401,8 @@ namespace Extract.UtilityApplications.MLModelTrainer
             {
                 _suspendUpdatesToSettingsObject = true;
 
-                _nerModelTypeRadioButton.Checked = _settings.ModelType == TrainingDataCollector.ModelType.NamedEntityRecognition;
-                _lmModelTypeRadioButton.Checked = _settings.ModelType == TrainingDataCollector.ModelType.LearningMachine;
+                _nerModelTypeRadioButton.Checked = _settings.ModelType == ModelType.NamedEntityRecognition;
+                _lmModelTypeRadioButton.Checked = _settings.ModelType == ModelType.LearningMachine;
                 _modelNameComboBox.Text = _settings.QualifiedModelName;
                 _trainingCommandTextBox.Text = _settings.TrainingCommand;
                 _testingCommandTextBox.Text = _settings.TestingCommand;
@@ -447,8 +446,8 @@ namespace Extract.UtilityApplications.MLModelTrainer
         private void ApplySettings()
         {
             _settings.ModelType = _nerModelTypeRadioButton.Checked
-                ? TrainingDataCollector.ModelType.NamedEntityRecognition
-                : TrainingDataCollector.ModelType.LearningMachine;
+                ? ModelType.NamedEntityRecognition
+                : ModelType.LearningMachine;
 
             _settings.QualifiedModelName = _modelNameComboBox.Text;
             _settings.Description = _descriptionTextBox.Text;

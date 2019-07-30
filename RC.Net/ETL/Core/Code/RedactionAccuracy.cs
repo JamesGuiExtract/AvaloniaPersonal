@@ -33,6 +33,7 @@ namespace Extract.ETL
         /// <summary>
         /// Class for the DocumentVerificationTimes status stored in the DatabaseService record
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         [DataContract]
         public class RedactionAccuracyStatus : DatabaseServiceStatus, IFileTaskSessionServiceStatus
         {

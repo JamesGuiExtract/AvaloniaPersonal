@@ -2,10 +2,10 @@
 using Extract.Code.Attributes;
 using Extract.ETL;
 using Extract.Utilities;
-using Extract.UtilityApplications.TrainingDataCollector;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -14,7 +14,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using YamlDotNet.RepresentationModel;
 
-namespace Extract.UtilityApplications.MLModelTrainer
+namespace Extract.UtilityApplications.MachineLearning
 {
     [ExtractCategory("DatabaseService", "ML Model Trainer")]
     public class MLModelTrainer : MachineLearningService, IConfigSettings, IHasConfigurableDatabaseServiceStatus
@@ -421,10 +421,12 @@ namespace Extract.UtilityApplications.MLModelTrainer
                                 }
                             }
                         }
-                        finally
+                        catch (Exception ex)
                         {
-                            throw warning;
+                            throw ex.AsExtract("ELI47071");
                         }
+
+                        throw warning;
                     }
                 }
             }
@@ -1129,6 +1131,7 @@ namespace Extract.UtilityApplications.MLModelTrainer
         /// <summary>
         /// Class for the MLModelTrainerStatus stored in the DatabaseService record
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         [DataContract]
         public class MLModelTrainerStatus : DatabaseServiceStatus
         {

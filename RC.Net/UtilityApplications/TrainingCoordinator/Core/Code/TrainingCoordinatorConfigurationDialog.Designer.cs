@@ -1,6 +1,4 @@
-﻿using Extract.FileActionManager.Forms;
-
-namespace Extract.UtilityApplications.TrainingCoordinator
+﻿namespace Extract.UtilityApplications.MachineLearning
 {
     partial class TrainingCoordinatorConfigurationDialog
     {
@@ -15,9 +13,22 @@ namespace Extract.UtilityApplications.TrainingCoordinator
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
+            if (disposing)
             {
-                components.Dispose();
+                if (components != null)
+                {
+                    components.Dispose();
+                }
+
+                if (_cancellationTokenSource != null)
+                {
+                    _cancellationTokenSource.Dispose();
+                }
+
+                if (_settings != null)
+                {
+                    _settings.Dispose();
+                }
             }
 
             try

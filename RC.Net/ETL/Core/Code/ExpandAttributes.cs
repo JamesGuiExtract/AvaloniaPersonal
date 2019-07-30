@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -34,6 +35,7 @@ namespace Extract.ETL
         /// <summary>
         /// Class that contains the definition of the fields for the dashboard attribute
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         public class DashboardAttributeField : INotifyPropertyChanged
         {
             #region DashboardAttributeField Fields
@@ -375,7 +377,7 @@ namespace Extract.ETL
                 ExtractException.Assert("ELI46585", "Status cannot be null", _status != null);
 
                 int maxFileTaskSession = MaxReportableFileTaskSessionId(true);
-                int currentLastProcessed = _status.LastFileTaskSessionIdProcessed();
+                int currentLastProcessed = _status.CalculateLastFileTaskSessionIDFullyProcessed();
 
                 // check if there is anything to do
                 if (currentLastProcessed >= maxFileTaskSession)
@@ -896,6 +898,7 @@ namespace Extract.ETL
         /// <summary>
         /// Class for the ExpandAttributesStatus stored in the DatabaseService record
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         [DataContract]
         public class ExpandAttributesStatus : DatabaseServiceStatus, IFileTaskSessionServiceStatus
         {
@@ -938,7 +941,7 @@ namespace Extract.ETL
             /// Method to return the last fully processed FileTaskSession ID.
             /// </summary>
             /// <returns>The last FileTaskSessionID that has been completely processed</returns>
-            public Int32 LastFileTaskSessionIdProcessed()
+            public int CalculateLastFileTaskSessionIDFullyProcessed()
             {
                 try
                 {

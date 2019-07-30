@@ -4,12 +4,12 @@ using System;
 using System.IO;
 using System.Windows.Forms;
 
-namespace Extract.UtilityApplications.TrainingCoordinator
+namespace Extract.UtilityApplications.MachineLearning
 {
     /// <summary>
     /// Application to be used to test the TrainingCoordinator, which is to be a ServiceProcess
     /// </summary>
-    public class TrainingCoordinatorApp
+    public static class TrainingCoordinatorApp
     {
         [STAThread]
         static int Main(string[] args)

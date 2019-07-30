@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.UtilityApplications.TrainingCoordinator
+namespace Extract.UtilityApplications.MachineLearning
 {
     /// <summary>
     /// Dialog to configure and run a training coordinator
@@ -355,7 +355,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                     // Short-circuit for log value changed
                     if (e.PropertyName.Equals("Log", StringComparison.Ordinal))
                     {
-                        if (_settings.Log.StartsWith(_logTextBox.Text))
+                        if (_settings.Log.StartsWith(_logTextBox.Text, StringComparison.Ordinal))
                         {
                             if (_settings.Log.Length > _logTextBox.Text.Length)
                             {
@@ -506,12 +506,12 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                 if (sender == _addCollectorButton)
                 {
                     dgv = _dataCollectorsDataGridView;
-                    service = new TrainingDataCollector.TrainingDataCollector();
+                    service = new TrainingDataCollector();
                 }
                 else
                 {
                     dgv = _modelTrainersDataGridView;
-                    service = new MLModelTrainer.MLModelTrainer();
+                    service = new MLModelTrainer();
                 }
                 var dataSource = (BindingList<MachineLearningService>)dgv.DataSource;
                 int currentRow = dgv.CurrentCell?.RowIndex ?? -1;
@@ -876,7 +876,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             };
             var existingAttributeSets = new HashSet<string>(attributeDBMgr.GetAllAttributeSetNames().GetKeys().ToIEnumerable<string>());
             var referencedAttributeSets = new HashSet<string>(_settings.DataCollectors
-                .OfType<TrainingDataCollector.TrainingDataCollector>()
+                .OfType<TrainingDataCollector>()
                 .Select(s => s.AttributeSetName)
                 .Where(n => !string.IsNullOrWhiteSpace(n)));
 

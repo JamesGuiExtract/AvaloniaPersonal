@@ -3,8 +3,6 @@ using Extract.AttributeFinder.Rules;
 using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
-using Extract.UtilityApplications.TrainingDataCollector;
-using Extract.UtilityApplications.TrainingDataCollector.Test;
 using LearningMachineTrainer;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -22,7 +20,7 @@ using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_RASTERANDOCRMGMTLib;
 
-namespace Extract.UtilityApplications.MLModelTrainer.Test
+namespace Extract.UtilityApplications.MachineLearning.Test
 {
     /// <summary>
     /// Unit tests for MLModelTrainer class
@@ -454,7 +452,7 @@ namespace Extract.UtilityApplications.MLModelTrainer.Test
                     trainer.Process(CancellationToken.None);
 
                     var trainingOutput = File.ReadAllText(dest.FileName);
-                    Assert.AreEqual(18305, trainingOutput.Length);
+                    Assert.AreEqual(18324, trainingOutput.Length);
                     Assert.AreEqual("Washington County , Oregon 1 000 123456 ", trainingOutput.Substring(0, 40));
                 }
             }

@@ -91,7 +91,9 @@ namespace Extract.ETL
         /// <param name="xPathOfSensitiveAttributes">XPath to select the attributes to compare</param>
         /// <returns>Dictionary that contains a List of AccuracyDetail for each page</returns>
         [CLSCompliant(false)]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "x")]
+        [SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional")]
         public static Dictionary<Int32, List<AccuracyDetail>> CompareAttributes(IUnknownVector expected, IUnknownVector found,
             string xPathOfSensitiveAttributes, CancellationToken cancelToken)
         {
@@ -100,7 +102,7 @@ namespace Extract.ETL
                 // if XPathOfSensitiveAttributes is empty throw an exception
                 if (string.IsNullOrWhiteSpace(xPathOfSensitiveAttributes))
                 {
-                    ExtractException ee = new ExtractException("ELI45396", "XPathOfSensitiveAttributes must be set.");
+                    ExtractException ee = new ExtractException("ELI45396", "xPathOfSensitiveAttributes must be set.");
                     throw ee;
                 }
 
@@ -442,6 +444,7 @@ namespace Extract.ETL
         /// <param name="foundIndex">Index of found match</param>
         /// <param name="totalExpected">The total number of expected found</param>
         /// <returns>true if over redaction, false otherwise</returns>
+        [SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional")]
         static bool IsOverredaction(MatchInfo[,] matchInfos, int foundIndex, int totalExpected)
         {
             // Iterate through all expected redactions to determine the total area of overlap with the

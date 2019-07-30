@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ namespace Extract.ETL
         /// <summary>
         /// Class for the DocumentVerificationTimes status stored in the DatabaseService record
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         [DataContract]
         public class DocumentVerificationStatus : DatabaseServiceStatus, IFileTaskSessionServiceStatus
         {

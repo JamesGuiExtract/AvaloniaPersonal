@@ -1,5 +1,4 @@
 ﻿using Extract.FileActionManager.Database.Test;
-using Extract.FileActionManager.FileProcessors;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
@@ -8,7 +7,7 @@ using System.Collections.ObjectModel;
 using System.Data.SqlClient;
 using System.IO;
 
-namespace Extract.UtilityApplications.TrainingCoordinator.Test
+namespace Extract.UtilityApplications.MachineLearning.Test
 {
     /// <summary>
     /// Unit tests for TrainingCoordinator class
@@ -113,7 +112,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator.Test
 
                 coordinator.DataCollectors = new Collection<ETL.MachineLearningService>
                 {
-                    new TrainingDataCollector.TrainingDataCollector
+                    new TrainingDataCollector
                     {
                         LastIDProcessed = 5
                     }

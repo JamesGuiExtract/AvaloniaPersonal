@@ -4,11 +4,12 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 
-namespace Extract.UtilityApplications.TrainingCoordinator
+namespace Extract.UtilityApplications.MachineLearning
 {
     [DataContract]
     [ExtractCategory("DatabaseService", "Training coordinator")]
@@ -69,6 +70,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
         /// <summary>
         /// The list of contained services that are <see cref="TrainingDataCollector.TrainingDataCollector"/>s
         /// </summary>
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         [DataMember]
         public Collection<MachineLearningService> DataCollectors { get; set; } = new Collection<MachineLearningService>();
 
@@ -200,7 +202,11 @@ namespace Extract.UtilityApplications.TrainingCoordinator
                 {
                     cancelToken.ThrowIfCancellationRequested();
 
-                    string type = service is TrainingDataCollector.TrainingDataCollector
+                    var collector = service as TrainingDataCollector;
+                    var trainer = collector == null
+                        ? service as MLModelTrainer
+                        : null;
+                    string type = collector != null
                         ? "data collector"
                         : "model trainer";
 
@@ -214,9 +220,9 @@ namespace Extract.UtilityApplications.TrainingCoordinator
 
                     int newDataCount = service.CalculateUnprocessedRecordCount();
                     if (newDataCount == 0
-                        && service is TrainingDataCollector.TrainingDataCollector
+                        && collector != null
                         || newDataCount < MinimumNewRecordsRequiredForTraining
-                        && service is MLModelTrainer.MLModelTrainer)
+                        && trainer != null)
                     {
                         var unit = newDataCount == 1 ? "record" : "records";
                         Log += UtilityMethods.FormatCurrent($"{DateTime.Now}\r\n",
@@ -490,6 +496,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
         /// <summary>
         /// Class for the TrainingDataCoordinatorStatus stored in the DatabaseService record
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         [DataContract]
         public class TrainingCoordinatorStatus : DatabaseServiceStatus
         {
@@ -507,6 +514,7 @@ namespace Extract.UtilityApplications.TrainingCoordinator
             [DataMember]
             public string Log { get; set; }
 
+            [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
             [DataMember]
             public Dictionary<Guid, DatabaseServiceStatus> ServiceStatuses { get; set; } = new Dictionary<Guid, DatabaseServiceStatus>();
 

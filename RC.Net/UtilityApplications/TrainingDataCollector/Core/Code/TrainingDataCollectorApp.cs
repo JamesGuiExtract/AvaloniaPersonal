@@ -3,11 +3,12 @@ using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace Extract.UtilityApplications.TrainingDataCollector
+namespace Extract.UtilityApplications.MachineLearning
 {
     /// <summary>
     /// Application to be used to test the TrainingDataCollector, which is to be a ServiceProcess
@@ -65,7 +66,7 @@ namespace Extract.UtilityApplications.TrainingDataCollector
                                     try
                                     {
                                         var type = prop.PropertyType;
-                                        var value = Convert.ChangeType(args[argNum], type);
+                                        var value = Convert.ChangeType(args[argNum], type, CultureInfo.InvariantCulture);
                                         propertiesToSet.Add((prop, value));
                                         continue;
                                     }

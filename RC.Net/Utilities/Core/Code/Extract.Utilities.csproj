@@ -116,6 +116,7 @@
     <Compile Include="LuceneSuggestionProvider.cs" />
     <Compile Include="LuceneSuggestionAnalyzer.cs" />
     <Compile Include="NamedTokenSource.cs" />
+    <Compile Include="NamespaceMappingSerializationBinder.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>

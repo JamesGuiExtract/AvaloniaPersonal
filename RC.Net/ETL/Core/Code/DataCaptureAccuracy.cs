@@ -166,7 +166,7 @@ namespace Extract.ETL
         /// <summary>
         /// The ID of the last file task session row processed by this service.
         /// </summary>
-        int lastFileTaskSessionIDProcessed = -1;
+        int _lastFileTaskSessionIDProcessed = -1;
 
         /// <summary>
         /// The current status info for this service.
@@ -669,7 +669,7 @@ namespace Extract.ETL
                 }
                 else
                 {
-                    return lastFileTaskSessionIDProcessed;
+                    return _lastFileTaskSessionIDProcessed;
                 }
             }
             set
@@ -680,7 +680,7 @@ namespace Extract.ETL
                 }
                 else
                 {
-                    lastFileTaskSessionIDProcessed = value;
+                    _lastFileTaskSessionIDProcessed = value;
                 }
             }
         }
@@ -780,6 +780,7 @@ namespace Extract.ETL
         /// <summary>
         /// Class for the DataCaptureAccuracyStatus stored in the DatabaseService record
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         [DataContract]
         public class DataCaptureAccuracyStatus : DatabaseServiceStatus, IFileTaskSessionServiceStatus
         {

@@ -15,7 +15,7 @@ using System.IO;
 using System.Linq;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.UtilityApplications.TrainingDataCollector.Test
+namespace Extract.UtilityApplications.MachineLearning.Test
 {
     /// <summary>
     /// Unit tests for TrainingDataCollector class
@@ -304,6 +304,12 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
             }
         }
 
+        private static void CompareExpectedFileToFoundText(string expectedFile, string output)
+        {
+            var expected = File.ReadAllText(expectedFile);
+            Assert.AreEqual(expected, output);
+        }
+
         #endregion Helper Methods
 
         #region Tests
@@ -320,15 +326,13 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
 
                 // Verify tags
                 var expectedFile = _testFiles.GetFile("Resources.opennlp.train.txt");
-                var expected = File.ReadAllText(expectedFile);
 
                 string trainingOutput = GetDataFromDB(trainingData: true);
-                Assert.AreEqual(expected, trainingOutput);
+                CompareExpectedFileToFoundText(expectedFile, trainingOutput);
 
                 expectedFile = _testFiles.GetFile("Resources.opennlp.test.txt");
-                expected = File.ReadAllText(expectedFile);
                 var testingOutput = GetDataFromDB(trainingData: false);
-                Assert.AreEqual(expected, testingOutput);
+                CompareExpectedFileToFoundText(expectedFile, testingOutput);
             }
             finally
             {
@@ -352,15 +356,13 @@ namespace Extract.UtilityApplications.TrainingDataCollector.Test
 
                 // Verify tags
                 var expectedFile = _testFiles.GetFile("Resources.opennlp.train.txt");
-                var expected = File.ReadAllText(expectedFile);
 
                 string trainingOutput = GetDataFromDB(trainingData: true);
-                Assert.AreEqual(expected, trainingOutput);
+                CompareExpectedFileToFoundText(expectedFile, trainingOutput);
 
                 expectedFile = _testFiles.GetFile("Resources.opennlp.test.txt");
-                expected = File.ReadAllText(expectedFile);
                 var testingOutput = GetDataFromDB(trainingData: false);
-                Assert.AreEqual(expected, testingOutput);
+                CompareExpectedFileToFoundText(expectedFile, testingOutput);
             }
             finally
             {

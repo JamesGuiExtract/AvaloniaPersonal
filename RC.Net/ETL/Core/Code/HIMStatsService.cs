@@ -1,7 +1,7 @@
 ﻿using Extract.Code.Attributes;
 using Extract.Utilities;
 using System;
-using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Transactions;
@@ -19,6 +19,7 @@ namespace Extract.ETL
         /// <summary>
         /// Class for the HIMStats status stored in the DatabaseService record
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         [DataContract]
         public class HIMStatsStatus : DatabaseServiceStatus, IFileTaskSessionServiceStatus
         {

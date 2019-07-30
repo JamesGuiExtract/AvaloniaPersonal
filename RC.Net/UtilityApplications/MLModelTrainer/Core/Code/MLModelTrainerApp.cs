@@ -9,7 +9,7 @@ using Extract.ETL;
 using Extract.Licensing;
 using Extract.Utilities;
 
-namespace Extract.UtilityApplications.MLModelTrainer
+namespace Extract.UtilityApplications.MachineLearning
 {
     /// <summary>
     /// Application to be used to test the MLModelTrainer, which is to be a ServiceProcess

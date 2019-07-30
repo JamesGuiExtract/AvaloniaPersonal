@@ -4,12 +4,11 @@ using Extract.FileActionManager.Forms;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 
-namespace Extract.UtilityApplications.TrainingDataCollector
+namespace Extract.UtilityApplications.MachineLearning
 {
     /// <summary>
     /// Dialog to configure and run training data collection

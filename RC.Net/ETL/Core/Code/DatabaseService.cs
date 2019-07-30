@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.ComponentModel;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Runtime.CompilerServices;
@@ -235,8 +236,21 @@ namespace Extract.ETL
         {
             try
             {
-                return (DatabaseService)JsonConvert.DeserializeObject(settings,
-                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects });
+                JsonSerializerSettings serialSettings = new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Objects,
+                    SerializationBinder = new NamespaceMappingSerializationBinder(
+                        new List<KeyValuePair<string, string>>
+                        {
+                            new KeyValuePair<string, string>(
+                                "Extract.UtilityApplications.TrainingCoordinator", "Extract.UtilityApplications.MachineLearning"),
+                            new KeyValuePair<string, string>(
+                                "Extract.UtilityApplications.TrainingDataCollector", "Extract.UtilityApplications.MachineLearning"),
+                            new KeyValuePair<string, string>(
+                                "Extract.UtilityApplications.MLModelTrainer", "Extract.UtilityApplications.MachineLearning")
+                        })
+                };
+                return (DatabaseService)JsonConvert.DeserializeObject(settings, serialSettings);
             }
             catch (Exception ex)
             {
