@@ -542,7 +542,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     string activityTimeout = _fileProcessingDb.GetDBInfoSetting("InputActivityTimeout", false);
                     if (!string.IsNullOrWhiteSpace(activityTimeout))
                     {
-                        _inputActivityTimeout = int.Parse(activityTimeout);
+                        _inputActivityTimeout = int.Parse(activityTimeout, CultureInfo.InvariantCulture);
                     }
                 }
 

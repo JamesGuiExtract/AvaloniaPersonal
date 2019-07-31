@@ -230,14 +230,14 @@ namespace Extract.AttributeFinder.Rules
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MicrFinder"/> class as a copy of
-        /// the specified <see paramref="MicrFinder"/>.
+        /// the specified <see paramref="micrFinder"/>.
         /// </summary>
-        /// <param name="MicrFinder">The <see cref="MicrFinder"/> from which settings should be copied.</param>
-        public MicrFinder(MicrFinder MicrFinder)
+        /// <param name="micrFinder">The <see cref="MicrFinder"/> from which settings should be copied.</param>
+        public MicrFinder(MicrFinder micrFinder)
         {
             try
             {
-                CopyFrom(MicrFinder);
+                CopyFrom(micrFinder);
             }
             catch (Exception ex)
             {
@@ -1291,7 +1291,7 @@ namespace Extract.AttributeFinder.Rules
         /// <param name="regexSpecification"></param>
         /// <param name="document"></param>
         /// <returns></returns>
-        string GetRegex(string regexSpecification, AFDocument document)
+        static string GetRegex(string regexSpecification, AFDocument document)
         {
             if (regexSpecification.StartsWith("file://", StringComparison.OrdinalIgnoreCase))
             {
@@ -1356,7 +1356,7 @@ namespace Extract.AttributeFinder.Rules
         /// <see cref="DotNetRegexParser"/> to use to filter non-numeric characters for MICR
         /// components split from the full MICR line.
         /// </summary>
-        DotNetRegexParser CharRemovalParser
+        static DotNetRegexParser CharRemovalParser
         {
             get
             {
@@ -1370,7 +1370,7 @@ namespace Extract.AttributeFinder.Rules
             }
         }
 
-        MiscUtils MiscUtils
+        static MiscUtils MiscUtils
         {
             get
             {

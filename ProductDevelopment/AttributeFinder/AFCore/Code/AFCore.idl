@@ -598,8 +598,8 @@ library UCLID_AFCORELib
 	interface IAnnotationProcessor : IDispatch
 	{
 		[id(1), helpstring("method ProcessAttribute")] HRESULT ProcessAttribute(
-			[in] BSTR fileName, long pageNumber, IAttribute* attribute, BSTR operationType, BSTR definition,
-			[out, retval] IAttribute* *updatedAttribute);
+			[in] BSTR bstrFileName, long nPageNumber, IAttribute* pAttribute, BSTR bstrOperationType, BSTR bstrDefinition,
+			[out, retval] IAttribute* *pUpdatedAttribute);
 	}
 
 	[

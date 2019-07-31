@@ -220,15 +220,15 @@ namespace Extract.AttributeFinder.Rules
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BarcodeFinder"/> class as a copy of
-        /// the specified <see paramref="BarcodeFinder"/>.
+        /// the specified <see paramref="barcodeFinder"/>.
         /// </summary>
-        /// <param name="BarcodeFinder">The <see cref="BarcodeFinder"/> from which
+        /// <param name="barcodeFinder">The <see cref="BarcodeFinder"/> from which
         /// settings should be copied.</param>
-        public BarcodeFinder(BarcodeFinder BarcodeFinder)
+        public BarcodeFinder(BarcodeFinder barcodeFinder)
         {
             try
             {
-                CopyFrom(BarcodeFinder);
+                CopyFrom(barcodeFinder);
             }
             catch (Exception ex)
             {

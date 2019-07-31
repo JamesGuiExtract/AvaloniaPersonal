@@ -3,12 +3,8 @@ using Extract.Utilities;
 using Nuance.OmniPage.CSDK.ArgTypes;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using UCLID_AFCORELib;
-using UCLID_COMUTILSLib;
 
 using static System.FormattableString;
 
@@ -28,12 +24,6 @@ namespace Extract.AttributeFinder.Rules
         static readonly string _OBJECT_NAME = typeof(BarcodeFinderSettingsDialog).ToString();
 
         #endregion Constants
-
-        #region Fields
-
-        MiscUtils _miscUtils = new MiscUtils();
-
-        #endregion Fields
 
         #region Constructors
 

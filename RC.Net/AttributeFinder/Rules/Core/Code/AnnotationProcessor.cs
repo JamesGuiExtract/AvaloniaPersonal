@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using UCLID_AFCORELib;
@@ -15,18 +16,36 @@ namespace Extract.AttributeFinder.Rules
     [Obfuscation(Feature = "renaming", Exclude = true)]
     public class AnnotationProcessor: IAnnotationProcessor
     {
-        public ComAttribute ProcessAttribute(string fileName, int pageNum, ComAttribute attribute, string operationType, string definition)
+        /// <summary>
+        /// Processes an attribute according to a json definition (e.g., a rule object)
+        /// </summary>
+        /// <param name="bstrFileName">The path to the source image to be used, if needed</param>
+        /// <param name="nPageNumber">The page number of the image to use</param>
+        /// <param name="pAttribute">The <see cref="ComAttribute"/> to be processed</param>
+        /// <param name="bstrOperationType">The type of operation (e.g., "modify")</param>
+        /// <param name="bstrDefinition">The operation's definition as JSON</param>
+        /// <returns>A modified <see cref="ComAttribute"/></returns>
+        public ComAttribute ProcessAttribute(string bstrFileName, int nPageNumber, ComAttribute pAttribute, string bstrOperationType, string bstrDefinition)
         {
-            switch (operationType.ToUpperInvariant())
+            try
             {
-                case OperationType.ModifyOperation:
-                    return Modify(fileName, pageNum, attribute, definition);
-                default:
-                    throw new ExtractException("ELI46746", "Unknown operation type: " + operationType);
+                switch (bstrOperationType.ToUpperInvariant())
+                {
+                    case OperationType.ModifyOperation:
+                        return Modify(bstrFileName, nPageNumber, pAttribute, bstrDefinition);
+                    default:
+                        throw new ExtractException("ELI46746", "Unknown operation type: " + bstrOperationType);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.CreateComVisible("ELI47072", "Failed to process attribute");
             }
         }
 
-        private static ComAttribute Modify(string fileName, int pageNum, ComAttribute attribute, string operation)
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="fileName")]
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="pageNumber")]
+        private static ComAttribute Modify(string fileName, int pageNumber, ComAttribute attribute, string operation)
         {
             dynamic model = JObject.Parse(operation);
             if (model.AutoShrinkRedactionZones != null)
@@ -60,13 +79,20 @@ namespace Extract.AttributeFinder.Rules
 
         public Context ClosestAncestor(Func<Context, bool> test)
         {
-            if (test(ParentContext))
+            try
             {
-                return ParentContext;
+                if (test(ParentContext))
+                {
+                    return ParentContext;
+                }
+                else
+                {
+                    return ParentContext?.ClosestAncestor(test);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return ParentContext?.ClosestAncestor(test);
+                throw ex.AsExtract("ELI47076");
             }
         }
     }
@@ -80,16 +106,17 @@ namespace Extract.AttributeFinder.Rules
         private class ModifyType : OperationType
         {
             private ModifyType() { }
-            public static ModifyType INSTANCE { get; set; } = new ModifyType();
+            public static ModifyType INSTANCE => new ModifyType();
         }
     }
 
     [Obfuscation(Feature = "renaming", Exclude = true)]
     public abstract class RuleObjectModel : Context
     {
-        public RuleObjectModel(Context context) { }
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="context")]
+        protected RuleObjectModel(Context context) { }
 
-        public abstract dynamic Build(dynamic obj);
+        public abstract dynamic Build(dynamic expando);
     }
 
     [CLSCompliant(false)]
@@ -98,34 +125,48 @@ namespace Extract.AttributeFinder.Rules
     {
         public AutoShrinkRedactionZonesModel(Context context) : base(context) { }
 
-        override public dynamic Build(dynamic obj)
+        override public dynamic Build(dynamic expando)
         {
-            var x = new AutoShrinkRedactionZones();
-            if (obj != null)
+            try
             {
-                x.AttributeSelector = AttributeSelectorModel
-                    .Resolve(this, obj.AttributeSelector)
-                    .Build(obj);
+                var x = new AutoShrinkRedactionZones();
+                if (expando != null)
+                {
+                    x.AttributeSelector = AttributeSelectorModel
+                        .Resolve(this, expando.AttributeSelector)
+                        .Build(expando);
+                }
+                return x;
             }
-            return x;
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47073");
+            }
         }
     }
     [Obfuscation(Feature = "renaming", Exclude = true)]
     public abstract class AttributeSelectorModel: RuleObjectModel
     {
-        public AttributeSelectorModel(Context context) : base(context) { }
+        protected AttributeSelectorModel(Context context) : base(context) { }
 
-        public static AttributeSelectorModel Resolve(Context context, dynamic obj)
+        public static AttributeSelectorModel Resolve(Context context, dynamic expando)
         {
-            if (obj == null)
+            try
             {
-                return new QueryBasedASModel(context);
+                if (expando == null)
+                {
+                    return new QueryBasedASModel(context);
+                }
+                else if (expando.AFQuerySelector != null)
+                {
+                    return new QueryBasedASModel(context);
+                }
+                throw new ExtractException("ELI46748", "Unknown AttributeSelector type. Path: " + ((JObject)expando).Path);
             }
-            else if (obj.AFQuerySelector != null)
+            catch (Exception ex)
             {
-                return new QueryBasedASModel(context);
+                throw ex.AsExtract("ELI47074");
             }
-            throw new ExtractException("ELI46748", "Unknown AttributeSelector type. Path: " + ((JObject)obj).Path);
         }
     }
 
@@ -135,28 +176,35 @@ namespace Extract.AttributeFinder.Rules
     {
         public QueryBasedASModel(Context context) : base(context) { }
 
-        override public dynamic Build(dynamic obj)
+        override public dynamic Build(dynamic expando)
         {
-            var x = new QueryBasedASClass();
+            try
+            {
+                var x = new QueryBasedASClass();
 
-            if (obj?.QueryText is string query)
-            {
-                x.QueryText = query;
-            }
-            else
-            {
-                var operationType = ClosestAncestor(c => c is OperationType);
-                if (operationType == OperationType.Modify)
+                if (expando?.QueryText is string query)
                 {
-                    x.QueryText = "*";
+                    x.QueryText = query;
                 }
                 else
                 {
-                    x.QueryText = "HCData|MCData|LCData";
+                    var operationType = ClosestAncestor(c => c is OperationType);
+                    if (operationType == OperationType.Modify)
+                    {
+                        x.QueryText = "*";
+                    }
+                    else
+                    {
+                        x.QueryText = "HCData|MCData|LCData";
+                    }
                 }
-            }
 
-            return x;
+                return x;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47075");
+            }
         }
     }
 }
