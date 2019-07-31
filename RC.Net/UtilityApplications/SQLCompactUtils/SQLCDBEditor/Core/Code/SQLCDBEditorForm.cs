@@ -166,6 +166,11 @@ namespace Extract.SQLCDBEditor
         bool _standAlone;
 
         /// <summary>
+        /// Indicates whether or not a customerSchemaUpdateIsOccuring
+        /// </summary>
+        bool _customerSchemaUpdating = false;
+
+        /// <summary>
         /// A custom value to display in the title bar.
         /// </summary>
         string _customTitle;
@@ -2071,6 +2076,15 @@ namespace Extract.SQLCDBEditor
                 }
 
                 CheckSchemaVersionAndPromptForUpdate();
+                
+                if(!_customerSchemaUpdating)
+                {
+                    _customerSchemaUpdating = true;
+                    CheckCustomerSchemaVersionAndPromtForUpdate(databaseToOpen);
+                    OpenDatabase(databaseToOpen);
+                    _customerSchemaUpdating = false;
+                    return;
+                }                
 
                 UsingUIReplacement =
                     _schemaManager != null &&
@@ -2127,6 +2141,170 @@ namespace Extract.SQLCDBEditor
             {
                 // Make sure the commands are enabled/disabled appropriately
                 EnableCommands();
+            }
+        }
+
+        /// <summary>
+        /// This always assumes the settings table exists based on other code checks!
+        /// </summary>
+        /// <returns>Returns the current schema version.</returns>
+        int GetCustomerSchemaVersion(string databaseFileName)
+        {
+            int customerSchemaVersion = 0;
+
+            using (var connection = new SqlCeConnection("Data Source = " + databaseFileName))
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "SELECT Value FROM Settings WHERE Name = 'CustomerSchemaVersion'";
+                    var dataReader = command.ExecuteReader();
+                    if (dataReader.Read())
+                    {
+                        bool success = int.TryParse(dataReader.GetString(0), out customerSchemaVersion);
+                        if (!success)
+                        {
+                            customerSchemaVersion = 0;
+                        }
+                    }
+                    else
+                    {
+                        command.CommandText = "INSERT INTO Settings(Name, Value) VALUES('CustomerSchemaVersion', 0)";
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+
+            return customerSchemaVersion;
+        }
+
+        /// <summary>
+        /// Updates the customers schema based on the schema files passed, and creates a backup.
+        /// </summary>
+        /// <param name="updateFiles">The files to run</param>
+        void updateCustomerSchema(string databaseFile, string[] updateFiles)
+        {
+            File.Copy(databaseFile, databaseFile + $"{DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss", CultureInfo.InvariantCulture)}.backup");
+            using (var connection = new SqlCeConnection("Data Source = " + databaseFile))
+            {
+                connection.Open();
+                try
+                {
+                    foreach (string file in updateFiles)
+                    {
+                        using (var command = connection.CreateCommand())
+                        {
+                            command.CommandText = File.ReadAllText(file);
+                            command.ExecuteNonQuery();
+                        }
+                        using (var command = connection.CreateCommand())
+                        {
+                            command.CommandText = $"UPDATE Settings SET Value = {GetNumberFromFileName(file).ToString(CultureInfo.InvariantCulture)} WHERE Name = 'CustomerSchemaVersion'";
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                }
+                catch(Exception e)
+                {
+                    throw new ExtractException("ELI47070", "Query execution failed.", e);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the first number from a FilePath.
+        /// </summary>
+        /// <param name="toParse">The file path to get the number out of the file name.</param>
+        /// <returns></returns>
+        static int GetNumberFromFileName(string toParse)
+        {
+            return int.Parse(Regex.Match(Path.GetFileName(toParse), @"\d+").Value, CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Compares two strings.
+        /// </summary>
+        /// <param name="s1">The first string to compare</param>
+        /// <param name="s2">The second string to compare</param>
+        /// <returns>Returns an int representing the larger of the strings for sorting.</returns>
+        static int CompareStrings(string s1, string s2)
+        {
+            return GetNumberFromFileName(s1) > GetNumberFromFileName(s2) ? 1 : GetNumberFromFileName(s1) < GetNumberFromFileName(s2) ? -1 : 0;
+        }
+
+        /// <summary>
+        /// Checks to see if an integer array is sequential.
+        /// </summary>
+        /// <param name="array">The array to check</param>
+        /// <returns>Returns true if the array is sequential, otherwise false.</returns>
+        bool IsSequential(int[] array)
+        {
+            return array.Zip(array.Skip(1), (a, b) => (a + 1) == b).All(x => x);
+        }
+
+        /// <summary>
+        /// Checks the customer schema version, and updates the schema if files are present for an update.
+        /// </summary>
+        /// <param name="databaseFile">The database file to check for updates.</param>
+        void CheckCustomerSchemaVersionAndPromtForUpdate(string databaseFile)
+        {
+            string directory = Path.GetDirectoryName(databaseFile) + "\\" + Path.GetFileNameWithoutExtension(databaseFile) + "_CustomerSchemaUpdates";
+            if (!Directory.Exists(directory))
+            {
+                return;
+            }
+
+            checkForSettingsTable();
+            CloseDatabase();
+            int customerSchemaVersion = GetCustomerSchemaVersion(databaseFile);
+            var regex = new Regex(@"([0-9])+.*\.sql(ce)?");
+            string[] updateCustomerSchemaFiles = Directory.GetFiles(directory, "*.sql*")
+                                                          .Where(m => regex.IsMatch(m) && GetNumberFromFileName(m) > customerSchemaVersion)
+                                                          .ToArray<string>();
+            Array.Sort(updateCustomerSchemaFiles, CompareStrings);
+            int maxSchemaVersionFile = updateCustomerSchemaFiles.Length > 0 ? GetNumberFromFileName(updateCustomerSchemaFiles[updateCustomerSchemaFiles.Length - 1]) : 0;
+            
+            if (customerSchemaVersion < maxSchemaVersionFile)
+            {
+                var result = MessageBox.Show("Database schema has an update, would you like to update now?"
+                                            , "Customer Schema out of date"
+                                            , MessageBoxButtons.YesNo
+                                            , MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, 0);
+                if (result == DialogResult.Yes)
+                {
+                    if (!IsSequential(new[] { customerSchemaVersion }.Concat(updateCustomerSchemaFiles.Select(m => GetNumberFromFileName(m))).ToArray()))
+                    {
+                        MessageBox.Show($"You must have sequential update files. Ensure you have the update files {customerSchemaVersion + 1} - {maxSchemaVersionFile}");
+                        return;
+                    }
+
+                    updateCustomerSchema(databaseFile, updateCustomerSchemaFiles);
+                }
+            }
+        }
+
+        private void checkForSettingsTable()
+        {
+            if(!TableNames.Contains("Settings"))
+            {
+                File.Copy(_databaseFileName, _databaseFileName + $"{DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss", CultureInfo.InvariantCulture)}.backup");
+                using (var connection = new SqlCeConnection("Data Source = " + _databaseFileName))
+                {
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = @"CREATE TABLE [Settings] (
+                                                  [Name] nvarchar(100) NOT NULL
+                                                , [Value] nvarchar(512) NULL
+                                                )";
+                        command.ExecuteNonQuery();
+                    }
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = "ALTER TABLE[Settings] ADD CONSTRAINT[PK__Settings__00000000000000D9] PRIMARY KEY([Name])";
+                        command.ExecuteNonQuery();
+                    }
+                }
             }
         }
 
