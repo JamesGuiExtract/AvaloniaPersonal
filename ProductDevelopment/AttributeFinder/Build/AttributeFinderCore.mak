@@ -264,6 +264,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.AttributeFinder.Rules.FSharp.dll" /mapout:"$(BinariesFolder)\Map\Extract.AttributeFinder.Rules.FSharp.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Utilities.FSharp.CSharpInterop.dll" /mapout:"$(BinariesFolder)\Map\Extract.Utilities.FSharp.CSharpInterop.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Utilities.FSharp.NERAnnotation.dll" /mapout:"$(BinariesFolder)\Map\Extract.Utilities.FSharp.NERAnnotation.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Dashboard.ETL.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Dashboard.ETL.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 
 	@ECHO.
     @DATE /T
