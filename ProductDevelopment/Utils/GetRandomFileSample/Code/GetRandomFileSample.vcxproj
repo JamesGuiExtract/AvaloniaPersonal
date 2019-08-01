@@ -68,9 +68,9 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeaderOutputFile>.\..\..\..\..\Binaries\Release/GetRandomFileSample.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\..\..\..\..\Binaries\Release/</AssemblerListingLocation>
-      <ObjectFileName>.\..\..\..\..\Binaries\Release/</ObjectFileName>
-      <ProgramDataBaseFileName>.\..\..\..\..\Binaries\Release/</ProgramDataBaseFileName>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
@@ -105,13 +105,12 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>.\..\..\..\..\Binaries\Debug/GetRandomFileSample.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\..\..\..\..\Binaries\Debug/</AssemblerListingLocation>
-      <ObjectFileName>.\..\..\..\..\Binaries\Debug/</ObjectFileName>
-      <ProgramDataBaseFileName>.\..\..\..\..\Binaries\Debug/</ProgramDataBaseFileName>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
