@@ -18,5 +18,15 @@ namespace WebAPI.Models
         /// automatically closed because of inactivity.
         /// </summary>
         public int InactivityTimeout = 5;
+
+        /// <summary>
+        /// A filepath to the document types.
+        /// </summary>
+        public string DocumentTypes;
+
+        /// <summary>
+        /// An array of all of the document types from the document types file.
+        /// </summary>
+        public string[] ParsedDocumentTypes;
     }
 }

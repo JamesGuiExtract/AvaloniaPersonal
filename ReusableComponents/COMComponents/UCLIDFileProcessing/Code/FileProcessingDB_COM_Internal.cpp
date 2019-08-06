@@ -9419,7 +9419,10 @@ bool CFileProcessingDB::GetMetadataFieldValue_Internal(bool bDBLocked, long nFil
 					"WHERE [FileID] = <FileID> AND [Name] = '<MetadataFieldName>'";
 
 			replaceVariable(strQuery, "<FileID>", asString(nFileID));
-			replaceVariable(strQuery, "<MetadataFieldName>", asString(bstrMetadataFieldName));
+
+			string name = asString(bstrMetadataFieldName);
+			replaceVariable(name, "'", "''");
+			replaceVariable(strQuery, "<MetadataFieldName>", name);
 
 			BEGIN_CONNECTION_RETRY();
 

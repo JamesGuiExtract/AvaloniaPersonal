@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Globalization;
 using System.Net;
@@ -576,6 +578,75 @@ namespace WebAPI.Controllers
             catch (Exception ex)
             {
                 return this.GetAsHttpError(ex, "ELI45279");
+            }
+        }
+
+        /// <summary>
+        /// Gets the metadata field for a document.
+        /// </summary>
+        /// <param name="docID">The document to obtain the metadatafield for</param>
+        /// <param name="metadataField">The metadatafield to obtain</param>
+        /// <returns>The json result of the metadata field</returns>
+        [HttpGet("MetadataField/{docID}/{metadataField}")]
+        [Authorize]
+        [ProducesResponseType(200, Type = typeof(MetadataFieldResult))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404, Type = typeof(ErrorResult))]
+        public IActionResult GetMetadataField(int docID, string metadataField)
+        {
+            try
+            {
+                ExtractException.Assert("ELI47202", "GetMetadataField requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
+                using (var data = new DocumentData(User, requireSession: true))
+                {
+                    ExtractException.Assert("ELI47192", "The supplied document ID doesn't match the open session's document ID",
+                        docID == data.DocumentSessionFileId);
+
+                    return Ok(data.GetMetadataField(metadataField));
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI47197");
+            }
+        }
+
+        /// <summary>
+        /// Sets a metadata field in the database
+        /// </summary>
+        /// <param name="docID">The document id to set the metadata field for</param>
+        /// <param name="metadataField">The metadata field to assign to</param>
+        /// <param name="metadataFieldValue">The value you want to assign the metadata field to.</param>
+        /// <returns></returns>
+        [HttpPut("MetadataField/{docID}/{metadataField}")]
+        [Authorize]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404, Type = typeof(ErrorResult))]
+        public IActionResult SetMetadataField(int docID, string metadataField, string metadataFieldValue = "")
+        {
+            try
+            {
+                ExtractException.Assert("ELI47199", "SetMetadataField requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
+                using (var data = new DocumentData(User, requireSession: true))
+                {
+                    ExtractException.Assert("ELI47195", "The supplied document ID doesn't match the open session's document ID",
+                        docID == data.DocumentSessionFileId);
+
+                    data.SetMetadataField(metadataField, metadataFieldValue);
+
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI47198");
             }
         }
 

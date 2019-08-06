@@ -7260,6 +7260,7 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 void CFileProcessingDB::setMetadataFieldValue(_ConnectionPtr connection, long nFileID,
 	string strMetadataFieldName, string strMetadataFieldValue)
 {
+	replaceVariable(strMetadataFieldName, "'", "''");
 	replaceVariable(strMetadataFieldValue, "'", "''");
 	string strFileID = asString(nFileID);
 	string strQuery =

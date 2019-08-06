@@ -196,6 +196,8 @@ namespace WebAPI.Models
 
                 var result = JsonConvert.DeserializeObject<WebAppSettingsResult>(json);
 
+                result.ParsedDocumentTypes = File.ReadAllLines(result.DocumentTypes);
+
                 return result;
             }
             catch (Exception ex)
@@ -268,14 +270,22 @@ namespace WebAPI.Models
 
                 string sortDirection = fromBeginning ? "ASC" : "DESC";
                 string query = Inv($@"
-                   SELECT * FROM
+                   SELECT
+                     ID,
+                     Pages,
+                     DateSubmitted,
+                     Comment,
+                     COALESCE(OriginalFileName, '') AS OriginalFileName,
+                     COALESCE(SubmittedByUser, '') AS SubmittedByUser,
+                     COALESCE(DocumentType, '') AS DocumentType
+                   FROM
                    (SELECT
                      FAMFile.ID,
                      FAMFile.Pages,
                      CONVERT(VARCHAR(10), WorkflowFile.AddedDateTime, 23) As DateSubmitted,
                      COALESCE(CONVERT(VARCHAR(MAX), Comment), '') AS Comment,
                      MetadataField.Name AS MetadataName,
-                     COALESCE(FileMetadataFieldValue.Value, '') AS MetadataValue
+                     FileMetadataFieldValue.Value AS MetadataValue
                     FROM FAMFile
                       JOIN WorkflowFile ON WorkflowFile.FileID = FAMFile.ID
                       JOIN Action ON Action.WorkflowID = WorkflowFile.WorkflowID
@@ -560,6 +570,53 @@ namespace WebAPI.Models
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI44889");
+            }
+        }
+
+        /// <summary>
+        /// Returns the metadata field value from the open document.
+        /// </summary>
+        /// <param name="metaDataField">The field to obtain the value from</param>
+        /// <returns></returns>
+        public MetadataFieldResult GetMetadataField(string metaDataField)
+        {
+            try
+            {
+                string metadataValue = FileApi.FileProcessingDB.GetMetadataFieldValue(this.DocumentSessionFileId, metaDataField);
+                return new MetadataFieldResult { Value = metadataValue };
+            }
+            catch(Exception ex)
+            {
+                throw ex.AsExtract("ELI47181");
+            }
+        }
+
+        /// <summary>
+        /// Sets the metadatafield value in the database.
+        /// </summary>
+        /// <param name="metadataField">The metadata field to assign</param>
+        /// <param name="metadataFieldValue">The metadatafield value</param>
+        public void SetMetadataField(string metadataField, string metadataFieldValue)
+        {
+            try
+            {
+
+                try
+                {
+                    FileApi.FileProcessingDB.SetMetadataFieldValue(this.DocumentSessionFileId, metadataField, metadataFieldValue);
+                }
+                catch
+                {
+                    HTTPError.Assert("ELI47203", StatusCodes.Status404NotFound,
+                        GetMetadataField(metadataField).Value != null,
+                        Inv($"The metadata field: {metadataField} is not present in the database"));
+
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47201");
             }
         }
 
@@ -1308,6 +1365,19 @@ namespace WebAPI.Models
         }
 
         /// <summary>
+        /// The document session file identifier
+        /// </summary>
+        public int DocumentSessionFileId
+        {
+            get
+            {
+                AssertDocumentSession("ELI45270");
+
+                return FileApi.DocumentSession.FileId;
+            }
+        }
+
+        /// <summary>
         /// Gets the workflow type
         /// </summary>
         public EWorkflowType WorkflowType => FileApi.Workflow.Type;
@@ -1429,19 +1499,6 @@ namespace WebAPI.Models
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI42121");
-            }
-        }
-
-        /// <summary>
-        /// The document session file identifier
-        /// </summary>
-        public int DocumentSessionFileId
-        {
-            get
-            {
-                AssertDocumentSession("ELI45270");
-
-                return FileApi.DocumentSession.FileId;
             }
         }
 
