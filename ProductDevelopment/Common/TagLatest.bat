@@ -118,8 +118,11 @@ SET FKBBuildNeeded=False
 
 SET PATH=%PATH%;;C:\Program Files\Git\bin\
 
-FOR /F "tokens=*" %%F IN ('git log -n 1 --format^=format:"True" "%LAST_FKB_TAG%"..HEAD -- ..\ComponentData') DO (
-	SET FKBBuildNeeded=%%F
+:: Only Build FKB if the is master
+IF "%Branch%" == "master" (
+    FOR /F "tokens=*" %%F IN ('git log -n 1 --format^=format:"True" "%LAST_FKB_TAG%"..HEAD -- ..\ComponentData') DO (
+    	SET FKBBuildNeeded=%%F
+    )
 )
 
 IF "%FKBBuildNeeded%"=="True" (
@@ -131,7 +134,7 @@ IF "%FKBBuildNeeded%"=="True" (
 	)
     FOR /F "tokens=2 delims==" %%F IN ('findstr FKBVersion FKBVersion.mak') DO SET FKBVersionToBuild=%%F
 
-    %GitPath% commit -a -m "%FKBVersionToBuild%" 2>&1 | tee "%TAGLOGFILE%" -Append
+    %GitPath% commit -a -m "Updated FKB Version %FKBVersionToBuild%" 2>&1 | tee "%TAGLOGFILE%" -Append
 )
 
 cd %BUILD_VSS_ROOT%\Engineering\ProductDevelopment\Common
