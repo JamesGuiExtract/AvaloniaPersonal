@@ -117,19 +117,21 @@ namespace Extract.Dashboard.ETL
                     while (reader.Read() && !_cancelToken.IsCancellationRequested)
                     {
                         var xdoc = XDocument.Load(reader.GetXmlReader(0), LoadOptions.None);
-                        var dashboard = new DevExpress.DashboardCommon.Dashboard();
-                        dashboard.LoadFromXDocument(xdoc);
-
-                        string dashboardName = reader.GetString(1);
-
-                        try
+                        using (var dashboard = new DevExpress.DashboardCommon.Dashboard())
                         {
-                            DashboardDataConverter.UpdateExtractedDataSources(dashboard, _cancelToken);
-                        }
-                        catch (ExtractException ee)
-                        {
-                            ee.AddDebugData("DashboardName", dashboardName);
-                            ee.Log();
+                            dashboard.LoadFromXDocument(xdoc);
+
+                            string dashboardName = reader.GetString(1);
+
+                            try
+                            {
+                                DashboardDataConverter.UpdateExtractedDataSources(dashboard, _cancelToken);
+                            }
+                            catch (ExtractException ee)
+                            {
+                                ee.AddDebugData("DashboardName", dashboardName);
+                                ee.Log();
+                            }
                         }
                     }
                 }

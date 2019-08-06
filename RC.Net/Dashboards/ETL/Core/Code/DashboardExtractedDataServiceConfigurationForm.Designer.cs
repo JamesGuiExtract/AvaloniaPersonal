@@ -35,7 +35,7 @@ namespace Extract.Dashboard.ETL
         /// </summary>
         void InitializeComponent()
         {
-            Extract.Utilities.ScheduledEvent scheduledEvent1 = new Extract.Utilities.ScheduledEvent();
+            Extract.Utilities.ScheduledEvent scheduledEvent2 = new Extract.Utilities.ScheduledEvent();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._schedulerControl = new Extract.Utilities.Forms.SchedulerControl();
             this._descriptionTextBox = new System.Windows.Forms.TextBox();
@@ -47,13 +47,10 @@ namespace Extract.Dashboard.ETL
             // 
             // groupBox1
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this._schedulerControl);
             this.groupBox1.Location = new System.Drawing.Point(15, 31);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(466, 49);
+            this.groupBox1.Size = new System.Drawing.Size(466, 174);
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Schedule";
@@ -66,13 +63,13 @@ namespace Extract.Dashboard.ETL
             this._schedulerControl.Name = "_schedulerControl";
             this._schedulerControl.Size = new System.Drawing.Size(385, 153);
             this._schedulerControl.TabIndex = 4;
-            scheduledEvent1.Duration = null;
-            scheduledEvent1.Enabled = true;
-            scheduledEvent1.End = null;
-            scheduledEvent1.Exclusions = new Extract.Utilities.ScheduledEvent[0];
-            scheduledEvent1.RecurrenceUnit = null;
-            scheduledEvent1.Start = new System.DateTime(2018, 3, 16, 9, 38, 23, 0);
-            this._schedulerControl.Value = scheduledEvent1;
+            scheduledEvent2.Duration = null;
+            scheduledEvent2.Enabled = true;
+            scheduledEvent2.End = null;
+            scheduledEvent2.Exclusions = new Extract.Utilities.ScheduledEvent[0];
+            scheduledEvent2.RecurrenceUnit = null;
+            scheduledEvent2.Start = new System.DateTime(2018, 3, 16, 9, 38, 23, 0);
+            this._schedulerControl.Value = scheduledEvent2;
             // 
             // _descriptionTextBox
             // 
@@ -95,7 +92,7 @@ namespace Extract.Dashboard.ETL
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cancelButton.CausesValidation = false;
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(403, 86);
+            this.cancelButton.Location = new System.Drawing.Point(412, 213);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 17;
@@ -106,7 +103,7 @@ namespace Extract.Dashboard.ETL
             // 
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.okButton.Location = new System.Drawing.Point(322, 86);
+            this.okButton.Location = new System.Drawing.Point(331, 213);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 16;
@@ -119,15 +116,14 @@ namespace Extract.Dashboard.ETL
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(490, 259);
+            this.ClientSize = new System.Drawing.Size(490, 248);
             this.ControlBox = false;
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this._descriptionTextBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.okButton);
-            this.MaximumSize = new System.Drawing.Size(506, 298);
-            this.MinimumSize = new System.Drawing.Size(506, 298);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "DashboardExtractedDataServiceConfigurationForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Dashboard Extracted Data Database Service Configuration";

@@ -394,14 +394,19 @@ namespace Extract.Dashboard.Utilities
                     var dashboardItem = _dashboardForm.CurrentDashboard.Items.Contains(i => i.ComponentName == e.Attribute("Name").Value);
                     if (dashboardItem)
                     {
-                        CustomGridValues[e.Attribute("Name").Value] = new GridDetailConfiguration
+                        var gridDetailConfig = new GridDetailConfiguration
                         {
                             RowQuery = e.Element("RowQuery").Value,
-                            DataMemberUsedForFileName = e.Element("DataMemberUsedForFileName")?.Value ?? "FileName",
-                            DashboardLinks = e.Element("DashboardLinks")?.Value.Split(',')
-                                .Where(s => !string.IsNullOrWhiteSpace(s))
-                                .ToArray().ToHashSet() ?? new HashSet<string>()
+                            DataMemberUsedForFileName = e.Element("DataMemberUsedForFileName")?.Value ?? "FileName"
                         };
+                        var links = e.Element("DashboardLinks")?.Value.Split(',')?
+                                .Where(s => !string.IsNullOrWhiteSpace(s));
+                        if (links != null && links.Count() > 0)
+                        {
+                            gridDetailConfig.DashboardLinks.AddRange(links);
+                        }
+
+                        CustomGridValues[e.Attribute("Name").Value] = gridDetailConfig;
                     }
                 }
             }

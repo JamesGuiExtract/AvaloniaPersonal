@@ -630,8 +630,7 @@ namespace DashboardCreator
                     {
                         DashboardGridName = component,
                         RowQuery = string.Empty,
-                        DataMemberUsedForFileName = "FileName",
-                        DashboardLinks = new HashSet<string>()
+                        DataMemberUsedForFileName = "FileName"
                     };
             }
             else

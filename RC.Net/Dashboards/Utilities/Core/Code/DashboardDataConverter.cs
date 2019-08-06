@@ -1,6 +1,5 @@
 ﻿using DevExpress.DashboardCommon;
 using DevExpress.DataAccess.ConnectionParameters;
-using DevExpress.DataAccess.Sql;
 using Extract.Interfaces;
 using Extract.Utilities;
 using System;
@@ -122,6 +121,7 @@ namespace Extract.Dashboard.Utilities
                         {
                             ds.FileName = tempFileName;
                             ds.UpdateExtractFile(cancelToken);
+                            ds.FileName = existingDataFile;
                         }
 
                         // Copy the newly extracted file to extracted file
@@ -181,7 +181,7 @@ namespace Extract.Dashboard.Utilities
             }
         }
 
-        static void ReplaceDataSourcesWithNew(DevExpress.DashboardCommon.Dashboard dashboard, 
+        static void ReplaceDataSourcesWithNew(DevExpress.DashboardCommon.Dashboard dashboard,
             DashboardSqlDataSource ds, string queryName, DashboardExtractDataSource extractDataSource)
         {
             // Check all current items in the dashboard that use the ds and query and change them to the
@@ -197,7 +197,7 @@ namespace Extract.Dashboard.Utilities
             }
         }
 
-        static DashboardExtractDataSource CreateExtractedDataSource(string extractDataSourceDir, 
+        static DashboardExtractDataSource CreateExtractedDataSource(string extractDataSourceDir,
             DashboardSqlDataSource ds, string queryName, string extractDataSourceName)
         {
             DashboardExtractDataSource extractDataSource = new DashboardExtractDataSource
@@ -212,7 +212,7 @@ namespace Extract.Dashboard.Utilities
             extractDataSource.CalculatedFields.AddRange(ds.CalculatedFields);
             return extractDataSource;
         }
-        
+
         #endregion
     }
 }

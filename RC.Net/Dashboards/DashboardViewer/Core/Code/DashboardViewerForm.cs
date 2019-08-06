@@ -70,7 +70,7 @@ namespace Extract.DashboardViewer
         HashSet<string> _filteredItems = new HashSet<string>();
 
         // if true indicates that the dashboard is using definition that is using extracted data
-        bool _usingCachedDashboardDefinition = false;
+        bool _usingCachedData = false;
 
         /// <summary>
         /// Manages the temporary files that are created for each extracted datasource file so that the original can be
@@ -82,6 +82,11 @@ namespace Extract.DashboardViewer
         /// Dictionary to map the datasource with the Original filename that the extracted datasource uses
         /// </summary>
         Dictionary<object, string> _dictionaryDataSourceToFileName = new Dictionary<object, string>();
+
+        /// <summary>
+        /// This will contain a copy of the dashboard as saved in the database. It will be null if not using cached data
+        /// </summary>
+        DevExpress.DashboardCommon.Dashboard _dashboardForExtractedFileUpdate;
 
         #endregion
 
@@ -288,6 +293,8 @@ namespace Extract.DashboardViewer
                 _temporaryDatasourceFileCopyManager = null;
                 _dashboardShared?.Dispose();
                 _dashboardShared = null;
+                _dashboardForExtractedFileUpdate?.Dispose();
+                _dashboardForExtractedFileUpdate = null;
             }
             base.Dispose(disposing);
         }
@@ -395,10 +402,7 @@ namespace Extract.DashboardViewer
                 if (!e.Cancel && _dictionaryDataSourceToFileName.Count > 0)
                 {
                     // Dispose of the dashboard so any extracted data sources will be closed
-                    dashboardViewerMain.Dashboard?.Dispose();
-                    dashboardViewerMain = null;
-
-                    DereferenceTempFiles();
+                    DisposeOfDashboardsAndDereferenceTempFiles();
                 }
             }
             catch (Exception ex)
@@ -452,26 +456,27 @@ namespace Extract.DashboardViewer
             {
                 if (CurrentDashboard != null)
                 {
-                    if (_usingCachedDashboardDefinition && _dictionaryDataSourceToFileName.Any(entry => _temporaryDatasourceFileCopyManager.HasFileBeenModified(entry.Value)))
+                    bool reloadData = !_usingCachedData || _dictionaryDataSourceToFileName
+                        .Any(entry => _temporaryDatasourceFileCopyManager.HasFileBeenModified(entry.Value));
+
+                    if (_usingCachedData && !reloadData)
                     {
-                        LoadDashboardFromDatabase(_dashboardName);
-                    }
-                    else if (!_usingCachedDashboardDefinition)
-                    {
-                        dashboardViewerMain.ReloadData(false);
-                        _toolStripTextBoxlastRefresh.Text = DateTime.Now.ToString(CultureInfo.CurrentCulture);
-                    }
-                    else if (MessageBox.Show("Cached data source needs to be updated from the database. Continue?",
-                            "Update Cached",
-                            MessageBoxButtons.YesNo,
-                            MessageBoxIcon.Exclamation,
-                            MessageBoxDefaultButton.Button1,
-                            (MessageBoxOptions)0) == DialogResult.Yes)
-                    {
-                        DashboardDataConverter.UpdateExtractedDataSources(CurrentDashboard, CancellationToken.None);
-                        LoadDashboardFromDatabase(_dashboardName);
+                        if (MessageBox.Show("Cached data source needs to be updated from the database. Continue?",
+                                "Update Cached",
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Exclamation,
+                                MessageBoxDefaultButton.Button1,
+                                (MessageBoxOptions)0) != DialogResult.Yes)
+                        {
+                            return;
+                        }
+                        
+                        DashboardDataConverter.UpdateExtractedDataSources(_dashboardForExtractedFileUpdate, CancellationToken.None);
                         this.Focus();
                     }
+
+                    ReloadExtractedData();
+                    _toolStripTextBoxlastRefresh.Text = DateTime.Now.ToString(CultureInfo.CurrentCulture);
                 }
             }
             catch (Exception ex)
@@ -549,8 +554,9 @@ namespace Extract.DashboardViewer
                 {
                     // Clear the existing dashboard
                     dashboardViewerMain.DashboardSource = string.Empty;
-                    dashboardViewerMain.DashboardSource = selectedFile;
                     _dashboardName = selectedFile;
+                    var xdoc = XDocument.Load(_dashboardName);
+                    dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(xdoc);
                     UpdateMainTitle();
                 }
             }
@@ -691,12 +697,11 @@ namespace Extract.DashboardViewer
                 {
                     if (!string.IsNullOrEmpty(_dashboardName))
                     {
-                        DereferenceTempFiles();
-                        var dashboard = new DevExpress.DashboardCommon.Dashboard();
-                        dashboard.LoadFromXml(_dashboardName);
-                        ReplaceExtractDataSourceFileWithTemporary(dashboard);
+                        DisposeOfDashboardsAndDereferenceTempFiles();
 
-                        dashboardViewerMain.Dashboard = dashboard;
+                        var xdoc = XDocument.Load(_dashboardName);
+
+                        dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(xdoc);
                     }
                 }
 
@@ -741,9 +746,7 @@ namespace Extract.DashboardViewer
 
             if (_dictionaryDataSourceToFileName.Count > 0)
             {
-                dashboardViewerMain.Dashboard?.Dispose();
-                dashboardViewerMain.Dashboard = null;
-                DereferenceTempFiles();
+                DisposeOfDashboardsAndDereferenceTempFiles();
             }
 
             using (var connection = NewSqlDBConnection())
@@ -774,20 +777,32 @@ namespace Extract.DashboardViewer
                     var reader = cmd.ExecuteReader();
                     if (reader.Read())
                     {
-                        var getval = reader.GetInt32(reader.GetOrdinal("UseExtractedData"));
-                        _usingCachedDashboardDefinition = (getval == 1);
                         UpdateMainTitle();
 
                         var xdoc = XDocument.Load(reader.GetXmlReader(0), LoadOptions.None);
-                        var dashboard = new DevExpress.DashboardCommon.Dashboard();
-                        dashboard.LoadFromXDocument(xdoc);
-                        ApplyParameterValues(dashboard);
-                        ReplaceExtractDataSourceFileWithTemporary(dashboard);
-                        dashboardViewerMain.Dashboard = dashboard;
+                        dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(xdoc);
                     }
                 }
             }
             UpdateMainTitle();
+        }
+
+        DevExpress.DashboardCommon.Dashboard LoadDashboardFromXDocument(XDocument xdoc)
+        {
+            DisposeOfDashboardsAndDereferenceTempFiles();
+
+            var dashboard = new DevExpress.DashboardCommon.Dashboard();
+            dashboard.LoadFromXDocument(xdoc);
+
+            ApplyParameterValues(dashboard);
+            ReplaceExtractDataSourceFileWithTemporary(dashboard);
+            if (_dictionaryDataSourceToFileName.Count > 0)
+            {
+                _dashboardForExtractedFileUpdate = new DevExpress.DashboardCommon.Dashboard();
+                _dashboardForExtractedFileUpdate.LoadFromXDocument(xdoc);
+                _usingCachedData = true;
+            }
+            return dashboard;
         }
 
         /// <summary>
@@ -841,7 +856,7 @@ namespace Extract.DashboardViewer
                     DatabaseName,
                     ServerName,
                     (filtered) ? "-Filtered" : string.Empty,
-                    (_usingCachedDashboardDefinition) ? "Cached " : string.Empty);
+                    (_usingCachedData) ? "Cached " : string.Empty);
             }
         }
 
@@ -897,8 +912,6 @@ namespace Extract.DashboardViewer
         {
             try
             {
-                DereferenceTempFiles();
-
                 // Find the existing data sources
                 var existingExtractDataSources = dashboard.DataSources
                     .OfType<DashboardExtractDataSource>();
@@ -916,8 +929,31 @@ namespace Extract.DashboardViewer
             }
         }
 
-        void DereferenceTempFiles()
+        void ReloadExtractedData()
         {
+            try
+            {
+                foreach (var pair in _dictionaryDataSourceToFileName)
+                {
+                    var eds = pair.Key as DashboardExtractDataSource;
+                    eds.FileName = _temporaryDatasourceFileCopyManager.GetCurrentTemporaryFileName(
+                        pair.Value, eds, true, false);
+                }
+                dashboardViewerMain.ReloadData(false);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47187");
+            }
+        }
+
+        void DisposeOfDashboardsAndDereferenceTempFiles()
+        {
+            dashboardViewerMain.Dashboard?.Dispose();
+            dashboardViewerMain.Dashboard = null;
+            _dashboardForExtractedFileUpdate?.Dispose();
+            _dashboardForExtractedFileUpdate = null;
+
             foreach (var entry in _dictionaryDataSourceToFileName)
             {
                 _temporaryDatasourceFileCopyManager.Dereference(entry.Value, entry.Key);
