@@ -1832,7 +1832,7 @@ void CTestSpatialString::runTestCase21()
 	// Word Counter
 	int iWordCount = 0;
 
-	unsigned short usWidth = 1000 / strTestStr.size();
+	unsigned short usWidth = 1000 / (unsigned short)strTestStr.size();
 	unsigned short usNextCharPos = 10;
 
 	// make each char into a letter object
@@ -2798,17 +2798,11 @@ void CTestSpatialString::runTestCase26()
 	bSuccess = true;
 	try
 	{
-		try
-		{
-			IIUnknownVectorPtr ipPages = m_ipSpatialString->GetPages(VARIANT_TRUE, "");
-			bSuccess = false;
-			m_ipResultLogger->AddTestCaseNote("Exception should have been thrown.");
-		}
-		catch(...)
-		{
-			bSuccess = true;
-			m_ipResultLogger->AddTestCaseNote("Exception was thrown as expected.");
-		}
+		IIUnknownVectorPtr ipPages = m_ipSpatialString->GetPages(VARIANT_TRUE, "");
+
+		string strExpectedPagesFile = m_strTestFilesFolder + "TestImageWithBlanks_NoBlanks_EmptyString.tif.vpss";
+
+		bSuccess = testCase26Helper(strExpectedPagesFile, ipPages);
 
 		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
@@ -2965,6 +2959,11 @@ bool CTestSpatialString::compareSpatialStrings(ISpatialStringPtr ipSS1, ISpatial
 	{
 		return false;
 	}
+	if (!ipSS1->HasSpatialInfo() && !ipSS2->HasSpatialInfo())
+	{
+		return true;
+	}
+
 	// Compare the spatial info
 	ILongToObjectMapPtr ipPageInfo1 = ipSS1->SpatialPageInfos;
 	ILongToObjectMapPtr ipPageInfo2 = ipSS2->SpatialPageInfos;
