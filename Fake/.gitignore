@@ -3,3 +3,5 @@ buildAFCoreTest.fsx
 buildAFCoreTest.fsx.lock
 buildUtils.fsx
 buildUtils.fsx.lock
+/builddashboards.fsx.lock
+/buildDashboards.fsx

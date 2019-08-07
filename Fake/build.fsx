@@ -352,6 +352,14 @@ Target.create "UtilsBuild.Build" (fun _ ->
   buildScript slnFile outputName
 )
 
+Target.create "DashboardsBuild.Build" (fun _ ->
+  Shell.chdir __SOURCE_DIRECTORY__
+  let slnFile = @"C:\Engineering\RC.Net\Dashboards\Dashboards.sln"
+
+  let outputName = Path.getFullName "buildDashboards.fsx"
+  buildScript slnFile outputName
+)
+
 Target.create "All.Build" ignore
 
 open Fake.Core.TargetOperators
@@ -363,6 +371,9 @@ open Fake.Core.TargetOperators
   ==> "All.Build"
 
 "UtilsBuild.Build"
+  ==> "All.Build"
+
+"DashboardsBuild.Build"
   ==> "All.Build"
 
 Target.runOrDefaultWithArguments "ListTargets"
