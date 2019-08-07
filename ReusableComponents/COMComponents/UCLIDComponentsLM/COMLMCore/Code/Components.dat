@@ -19,63 +19,64 @@
 //   FLEX Index & ID Shield 8.0             5000
 //   FLEX Index & ID Shield & LabDE 9.0     6000
 //   FLEX Index & ID Shield & LabDE 10.0	6000
+// - FLEX Index & ID Shield & LabDE 11.3	7000
 //
 
 // IDs for core objects and collections
-6000,Unused object
-6001,Extract_Systems_Core_Objects
-6002,Input_Funnel_Core_Objects
-6003,FlexIndex_IDShield_Core_Objects
-6004,FlexIndex_Core_Objects
-6005,IDShield_Core_Objects
-6006,Rule_Development_Toolkit_Objects
-6010,Redaction_Core_Objects
+7000,Unused object
+7001,Extract_Systems_Core_Objects
+7002,Input_Funnel_Core_Objects
+7003,FlexIndex_IDShield_Core_Objects
+7004,FlexIndex_Core_Objects
+7005,IDShield_Core_Objects
+7006,Rule_Development_Toolkit_Objects
+7010,Redaction_Core_Objects
 
 // IDs for core features
-6021,OCR_On_Server_Feature
-6022,OCR_On_Client_Feature
-6023,FlexIndex_Server_Objects
-6024,Rule_Writing_Core_Objects
-6025,FlexIndex_IDShield_Server_Core
-6026,IDShield_Rule_Writing_Objects
-6027,FlexIndex_Rule_Writing_Objects
-6028,LabDE_Core_Objects
-6029,DataEntry_Core_Components
+7021,OCR_On_Server_Feature
+7022,OCR_On_Client_Feature
+7023,FlexIndex_Server_Objects
+7024,Rule_Writing_Core_Objects
+7025,FlexIndex_IDShield_Server_Core
+7026,IDShield_Rule_Writing_Objects
+7027,FlexIndex_Rule_Writing_Objects
+7028,LabDE_Core_Objects
+7029,DataEntry_Core_Components
 
 // IDs for special individual components
-6043,Pagination_FileProcessor_Object
-6044,IDShield_AutoRedaction_Object
-6045,IDShield_Verification_Object
-6046,RuleSet_Editor_UI_Object
-6047,File_Action_Manager_Object
-6048,Run_Rules_Object
-6049,IDShield_Office_Object
-6050,LabDE_Verification_UI_Object
-6051,Pagination_UI_Object
-6052,Enhance_OCR_Object
+7043,Pagination_FileProcessor_Object
+7044,IDShield_AutoRedaction_Object
+7045,IDShield_Verification_Object
+7046,RuleSet_Editor_UI_Object
+7047,File_Action_Manager_Object
+7048,Run_Rules_Object
+7049,IDShield_Office_Object
+7050,LabDE_Verification_UI_Object
+7051,Pagination_UI_Object
+7052,Enhance_OCR_Object
 
 // IDs for individually licensed features
-6070,Anti_Aliasing_Feature
-6072,Ignore_RuleExecutionCounter_Decrements
-6073,PDF_ReadWrite_Feature
-6076,RotatedImages_And_Annotation_Feature
-6077,Image_Cleanup_Engine_Feature
-6078,Handwriting_Recognition_Feature
-6079,Create_Searchable_PDF_Feature
-6080,Scansoft_OEM_OCR_Feature
-6081,MICR_Finding_Engine_Feature
-6082,Modify_PDF
-6083,FTP_SFTP_File_Transfer
-6084,FileInspectorSearch
-6085,RemoveImagePages
-6086,DataEntryVerification_Logging
-6087,PDF_ReadOnly
-6088,LeadtoolsAllCores
-6089,Leadtools2ExtraCores
-6090,Leadtools4ExtraCores
+7070,Anti_Aliasing_Feature
+7072,Ignore_RuleExecutionCounter_Decrements
+7073,PDF_ReadWrite_Feature
+7076,RotatedImages_And_Annotation_Feature
+7077,Image_Cleanup_Engine_Feature
+7078,Handwriting_Recognition_Feature
+7079,Create_Searchable_PDF_Feature
+7080,Scansoft_OEM_OCR_Feature
+7081,MICR_Finding_Engine_Feature
+7082,Modify_PDF
+7083,FTP_SFTP_File_Transfer
+7084,FileInspectorSearch
+7085,RemoveImagePages
+7086,DataEntryVerification_Logging
+7087,PDF_ReadOnly
+7088,LeadtoolsAllCores
+7089,Leadtools2ExtraCores
+7090,Leadtools4ExtraCores
 
 // IDs for FLEX Index / ID Shield integration efforts
-6101,Laserfiche_Integration_Verification
-6102,Laserfiche_Integration_Desktop
-6103,Laserfiche_Integration_Server
-6110,NetDMS_Components
+7101,Laserfiche_Integration_Verification
+7102,Laserfiche_Integration_Desktop
+7103,Laserfiche_Integration_Server
+7110,NetDMS_Components

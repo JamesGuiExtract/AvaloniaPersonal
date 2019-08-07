@@ -27,6 +27,7 @@
 //   FLEX Index & ID Shield 8.0             5000
 //   FLEX Index & ID Shield & LabDE 9.0     6000
 //   FLEX Index & ID Shield & LabDE 10.0    6000
+//   FLEX Index & ID Shield & LabDE 11.3	7000
 //
 // TODO: remove private license for ObjSelectorUI and ObjPropertiesDlg
 // and implemented standard ID based licensing.
@@ -39,74 +40,72 @@
 ///////////
 // Core IDs
 ///////////
-!ExtractCore,6001
-!InputFunnelCore,6002:6070:$ExtractCore
-!FlexIndexAndIDShieldCore,6003:6052:6076:$RuleWritingCore:$DataEntryCore
-!FlexIndex,6004:$FlexIndexAndIDShieldCore
-!RedactionCore,6010
-!IDShield,6005:$FlexIndexAndIDShieldCore:$RedactionCore
+!ExtractCore,7001
+!InputFunnelCore,7002:7070:$ExtractCore
+!FlexIndexAndIDShieldCore,7003:7052:7076:$RuleWritingCore:$DataEntryCore
+!FlexIndex,7004:$FlexIndexAndIDShieldCore
+!RedactionCore,7010
+!IDShield,7005:$FlexIndexAndIDShieldCore:$RedactionCore
 
 // RDT = special components + FlexServer + IDShieldServer + IDShieldClient + RuleSetEditor
-!RuleDevelopmentToolkit,6006:$FlexServer:$IDShield:6026:6027:6044:6045:6046:6077:6081:6086
+!RuleDevelopmentToolkit,7006:$FlexServer:$IDShield:7026:7027:7044:7045:7046:7077:7081:7086
 
 // Laserfiche = IDShieldServer + IDShieldClient + Laserfiche_Integration
-!LaserficheVerification,$IDShield:6044:6045:6101
-!LaserficheDesktop,$IDShield:6044:6045:$LaserficheVerification:6102
-!LaserficheServer,$IDShield:6044:6045:$LaserficheVerification:$LaserficheDesktop:6103
+!LaserficheVerification,$IDShield:7044:7045:7101
+!LaserficheDesktop,$IDShield:7044:7045:$LaserficheVerification:7102
+!LaserficheServer,$IDShield:7044:7045:$LaserficheVerification:$LaserficheDesktop:7103
 
 // ID Shield Office = IDShieldOffice + OCROnClient + ExtractCore
 // plus built-in support for AntiAliasing + PDF Read/Write + Annotations
-!IDShieldOffice,$ExtractCore:$RedactionCore:6022:6049:6070:6073:6076
+!IDShieldOffice,$ExtractCore:$RedactionCore:7022:7049:7070:7073:7076
 
 ////////////////////
 // Functionality IDs
 ////////////////////
-!OCROnServer,6021
-!OCROnClient,6022
-// NOTE: 6073 is being included as a fix for issues in 11.2  - this should be removed in 11.3 and up
-!FlexShieldServerCore,6025:6047:6048:6073:6087:$OCROnServer:$FlexIndexAndIDShieldCore:$OCROnClient
-!FlexServer,6023:$FlexShieldServerCore:$FlexIndex
-!RuleWritingCore,6024:$InputFunnelCore
-!DataEntryCore,6029
-!LabDECore,6028:$DataEntryCore:$FlexIndexAndIDShieldCore
-!LabDEServer,6050:$LabDECore:$FlexServer
-!LabDEClient,6050:$LabDECore:$FlexIndex:$OCROnClient
+!OCROnServer,7021
+!OCROnClient,7022
+!FlexShieldServerCore,7025:7047:7048:7087:$OCROnServer:$FlexIndexAndIDShieldCore:$OCROnClient
+!FlexServer,7023:$FlexShieldServerCore:$FlexIndex
+!RuleWritingCore,7024:$InputFunnelCore
+!DataEntryCore,7029
+!LabDECore,7028:$DataEntryCore:$FlexIndexAndIDShieldCore
+!LabDEServer,7050:$LabDECore:$FlexServer
+!LabDEClient,7050:$LabDECore:$FlexIndex:$OCROnClient
 
 
 FLEX Index,0
--    Client (swiping) ,$FlexIndex:$OCROnClient:6047
+-    Client (swiping) ,$FlexIndex:$OCROnClient:7047
 -    FLEX Server Standard (2 LeadTools threads),$FlexServer
--    FLEX Server Full PDF R/W (4 LeadTools threads),6073:$FlexServer
+-    FLEX Server Full PDF R/W (4 LeadTools threads),7073:$FlexServer
 
 ID Shield,0
--    Client (verification UI) ,$IDShield:$OCROnClient:6045:6047
--    ID Shield Server Standard (2 LeadTools threads),$IDShield:6044:6045:$FlexShieldServerCore
--    ID Shield Server Full PDF R/W (4 LeadTools threads),$IDShield:6044:6045:6073:$FlexShieldServerCore
+-    Client (verification UI) ,$IDShield:$OCROnClient:7045:7047
+-    ID Shield Server Standard (2 LeadTools threads),$IDShield:7044:7045:$FlexShieldServerCore
+-    ID Shield Server Full PDF R/W (4 LeadTools threads),$IDShield:7044:7045:7073:$FlexShieldServerCore
 
 LabDE,0
--    Client (Verify data),$LabDEClient:6047
+-    Client (Verify data),$LabDEClient:7047
 -    LabDE Server Standard (2 LeadTools threads),$LabDEServer
--    LabDEServer Full PDF R/W (4 LeadTools threads),6073:$LabDEServer
+-    LabDEServer Full PDF R/W (4 LeadTools threads),7073:$LabDEServer
 
 FLEX Index / ID Shield Utilities,0
--    Create Searchable PDF,6079
--    Data Entry Verification Logging,6086
--    Disable Rule Execution Counters,6072
--    File Inspector Search,6084
--    FTP/SFTP file transfer,6083
--    Handwriting Recognition,6078
--    Image Cleanup Engine,6077
--    MICR Finding Engine,6081
--    Modify PDF <DevOnly>,6082:6073:6087
--    Pagination Utility,6051
-// NOTE: 6073 is being included as a fix for issues in 11.2  - this should be removed in 11.3 and up
--    PDF Read only,6073:6087
--    PDF Read+Write <DevOnly>,6073:6087
--    Remove Image Pages,6085
--    Leadtools all cores(Requires License fee for all cores),6088
--    Leadtools 2 extra cores,6089
--    Leadtools 4 extra cores,6090
--    Barcodes,6091
+-    Create Searchable PDF,7079
+-    Data Entry Verification Logging,7086
+-    Disable Rule Execution Counters,7072
+-    File Inspector Search,7084
+-    FTP/SFTP file transfer,7083
+-    Handwriting Recognition,7078
+-    Image Cleanup Engine,7077
+-    MICR Finding Engine,7081
+-    Modify PDF <DevOnly>,7082:7073:7087
+-    Pagination Utility,7051
+-    PDF Read only,7087
+-    PDF Read+Write <DevOnly>,7073:7087
+-    Remove Image Pages,7085
+-    Leadtools all cores(Requires License fee for all cores),7088
+-    Leadtools 2 extra cores,7089
+-    Leadtools 4 extra cores,7090
+-    Barcodes,7091
 
 ID Shield Office 1.0,0
 -    ID Shield Office,$IDShieldOffice
@@ -117,10 +116,10 @@ ID Shield for Laserfiche,0
 -    Server Redaction (includes desktop redaction),$LaserficheServer
 
 NetDMS Integration,0
--    NetDMS Components,6110
+-    NetDMS Components,7110
 
 Other<RWOnly>,0
--    FLEX Index Rule Writing (Simple Rules passwords!) <DevOnly>,$RuleWritingCore:6027:6046:$OCROnClient
--    ID Shield Rule Writing (Simple Rules passwords!) <DevOnly>,$RuleWritingCore:6026:6046:$IDShield:$OCROnClient
--    Rule Development Toolkit <RWOnly>,$RuleDevelopmentToolkit:6078:$LabDEServer
--    Scansoft OEM OCR <DevOnly>,6080
+-    FLEX Index Rule Writing (Simple Rules passwords!) <DevOnly>,$RuleWritingCore:7027:7046:$OCROnClient
+-    ID Shield Rule Writing (Simple Rules passwords!) <DevOnly>,$RuleWritingCore:7026:7046:$IDShield:$OCROnClient
+-    Rule Development Toolkit <RWOnly>,$RuleDevelopmentToolkit:7078:$LabDEServer
+-    Scansoft OEM OCR <DevOnly>,7080
