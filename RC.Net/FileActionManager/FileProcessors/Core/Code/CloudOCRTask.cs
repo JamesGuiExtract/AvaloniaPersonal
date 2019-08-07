@@ -1,5 +1,7 @@
 ﻿using Extract.FileActionManager.Forms;
 using Extract.GoogleCloud;
+using Extract.Imaging;
+using Extract.Imaging.Utilities;
 using Extract.Interop;
 using Extract.Licensing;
 using System;
@@ -321,6 +323,8 @@ namespace Extract.FileActionManager.FileProcessors
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects, "ELI46805", _COMPONENT_DESCRIPTION);
 
+                UnlockLeadtools.UnlockLeadToolsSupport();
+
                 FileActionManagerPathTags pathTags = new FileActionManagerPathTags(pFAMTM);
 
                 string credentialsFile = pathTags.Expand(ProjectCredentialsFile);
@@ -372,6 +376,11 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 string inputPath = pFileRecord.Name;
+
+                ExtractException.Assert("ELI47189", "Cannot OCR image page with non-standard view perspective. " +
+                "use ImageFormatConverter <strInput> <strOutput> <out_type> /vp to set the view " +
+                "perspective to the standard setting.", !ImageMethods.DoesImageHavePageWithNonstandardViewPerspective(inputPath));
+
                 string outputPath = inputPath + ".uss";
                 GoogleCloudOCR.ProcessFile(inputPath, outputPath, pFileRecord.FileID, pProgressStatus);
 

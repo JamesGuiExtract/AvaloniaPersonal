@@ -58,13 +58,14 @@ namespace Extract.Imaging
         /// Creates a <see cref="ImageReader"/> to read the specified file.
         /// </summary>
         /// <param name="fileName">The name of the file to read.</param>
+        /// <param name="ignoreViewPerspective">Whether to ignore view perspective (orientation) when loading TIFFs</param>
         /// <returns>An <see cref="ImageReader"/> to read <paramref name="fileName"/>.</returns>
-        public ImageReader CreateReader(string fileName)
+        public ImageReader CreateReader(string fileName, bool ignoreViewPerspective = true)
         {
             RasterCodecs codecs = null;
             try
             {
-                codecs = GetCodecs();
+                codecs = GetCodecs(ignoreViewPerspective);
 
                 return new ImageReader(fileName, codecs);
             }
@@ -116,13 +117,14 @@ namespace Extract.Imaging
         /// <summary>
         /// Creates the codecs used to encode or decode an image.
         /// </summary>
+        /// <param name="ignoreViewPerspective">Whether to ignore view perspective (orientation) when loading TIFFs</param>
         /// <returns>Codecs used to encode or decode an image.</returns>
-        RasterCodecs GetCodecs()
+        RasterCodecs GetCodecs(bool ignoreViewPerspective = true)
         {
             ExtractException.Assert("ELI30000", "Codecs has been disposed.", !_disposed);
 
             RasterCodecs codecs = new RasterCodecs();
-            SetOptions(codecs.Options);
+            SetOptions(codecs.Options, ignoreViewPerspective);
 
             return codecs;
         }
@@ -130,10 +132,11 @@ namespace Extract.Imaging
         /// <summary>
         /// Sets the options used when loading or saving image files.
         /// </summary>
-        static void SetOptions(CodecsOptions options)
+        /// <param name="ignoreViewPerspective">Whether to ignore view perspective (orientation) when loading TIFFs</param>
+        static void SetOptions(CodecsOptions options, bool ignoreViewPerspective = true)
         {
             options.Pdf.Save.UseImageResolution = true;
-            options.Tiff.Load.IgnoreViewPerspective = true;
+            options.Tiff.Load.IgnoreViewPerspective = ignoreViewPerspective;
 
             // Use default DPI and display depth
             options.Pdf.Load.DisplayDepth = _DEFAULT_PDF_DISPLAY_DEPTH;

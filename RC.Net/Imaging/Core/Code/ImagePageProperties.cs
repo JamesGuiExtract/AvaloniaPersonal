@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using Leadtools;
 using Leadtools.Codecs;
 
 namespace Extract.Imaging
@@ -20,6 +21,7 @@ namespace Extract.Imaging
             Height = imageInfo.Height;
             XResolution = imageInfo.XResolution;
             YResolution = imageInfo.YResolution;
+            ViewPerspective = imageInfo.ViewPerspective;
         }
 
         #endregion Constructors
@@ -65,6 +67,11 @@ namespace Extract.Imaging
             get;
             private set;
         }
+
+        /// <summary>
+        /// The view perspective of the image
+        /// </summary>
+        public RasterViewPerspective ViewPerspective { get; }
 
         #endregion Properties
 

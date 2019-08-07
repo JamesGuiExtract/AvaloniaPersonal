@@ -1363,6 +1363,44 @@ namespace Extract.Imaging
                 throw ex.AsExtract("ELI44680");
             }
         }
+
+        /// <summary>
+        /// Return true if any page has a non-standard (not TopLeft nor BottomLeft) view perspective
+        /// </summary>
+        /// <remarks>
+        /// Since we don't ignore the orientation flag when showing and redacting images we must either translate OCR results
+        /// or fail to OCR images with non-standard view perspectives
+        /// </remarks>
+        /// <param name="imagePath">The path to the image file</param>
+        public static bool DoesImageHavePageWithNonstandardViewPerspective(string imagePath)
+        {
+            try
+            {
+                using (var codecs = new ImageCodecs())
+                using (var imageReader = codecs.CreateReader(imagePath, ignoreViewPerspective: false))
+                {
+                    if (imageReader.IsPdf)
+                    {
+                        return false;
+                    }
+
+                    for (int i = 1; i <= imageReader.PageCount; i++)
+                    {
+                        var vp = imageReader.ReadPageProperties(i).ViewPerspective;
+                        if (vp != RasterViewPerspective.TopLeft && vp != RasterViewPerspective.BottomLeft)
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47188");
+            }
+        }
     }
 
     /// <summary>
@@ -1465,6 +1503,7 @@ namespace Extract.Imaging
         /// <param name="rotation">The rotation, in degrees, that has been applied to the image page</param>
         /// <param name="newPageInfos">the spatial page info map for the new document (spatial string)</param>
         [CLSCompliant(false)]
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
         public static void RotatePage(
             int newPageNumber,
             int rotation,
