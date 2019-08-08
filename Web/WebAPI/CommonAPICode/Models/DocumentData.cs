@@ -243,59 +243,55 @@ namespace WebAPI.Models
         {
             try
             {
+                int wfID = FileApi.Workflow.Id;
                 string action = FileApi.Workflow.EditAction;
-                var selector = new FAMFileSelectorClass();
-                if (skippedFiles)
-                {
-                    selector.AddActionStatusCondition(FileApi.FileProcessingDB, action, EActionStatus.kActionSkipped);
-                    selector.AddQueryCondition(Inv(
-                        $"SELECT FAMFile.ID FROM FAMFile JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID WHERE SkippedFile.UserName = '{userName.Replace("'", "''")}'"
-                    ));
-                }
-                else
-                {
-                    selector.AddActionStatusCondition(FileApi.FileProcessingDB, action, EActionStatus.kActionPending);
-                }
-
-                if (pageIndex >= 0 && pageSize > 0)
-                {
-                    selector.LimitToSubset(false, true, false, pageSize, pageIndex * pageSize);
-                }
-
+                string joinSkipped = skippedFiles
+                    ? Inv($"JOIN SkippedFile ON SkippedFile.FileID = FAMFile.ID")
+                    : "";
+                string skippedOrPendingClause = skippedFiles
+                    ? Inv($"WHERE SkippedFile.UserName = '{userName.Replace("'", "''")}'")
+                    : "FileActionStatus.ActionStatus = 'P'";
+                string offset = pageIndex >= 0 && pageSize > 0
+                    ? Inv($"OFFSET {pageIndex * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY")
+                    : "";
+                string filterClause = "";
                 if (!string.IsNullOrWhiteSpace(filter))
                 {
                     var searchPattern = Inv($"%{filter.Replace("'", "''")}%");
-                    selector.AddQueryCondition(Inv($@"
-SELECT FAMFile.ID FROM FAMFile
-    JOIN WorkflowFile ON FAMFile.ID = WorkflowFile.FileID
-    LEFT JOIN FileMetadataFieldValue ON FileMetadataFieldValue.FileID = FAMFile.ID
-    LEFT JOIN MetadataField ON MetadataField.ID = FileMetadataFieldValue.MetadataFieldID
-    LEFT JOIN FileActionComment ON FileActionComment.FileID = FAMFile.ID
-    WHERE MetadataField.Name IN ('OriginalFileName', 'SubmittedByUser', 'DocumentType')
-    AND FileMetadataFieldValue.Value LIKE '{searchPattern}'
-    OR CONVERT(VARCHAR(10), WorkflowFile.AddedDateTime, 23) LIKE '{searchPattern}'
-    OR Comment LIKE '{searchPattern}'
-" ));
+                    filterClause = Inv($@"WHERE
+                        OriginalFileName LIKE '{searchPattern}'
+                        OR SubmittedByUser LIKE '{searchPattern}'
+                        OR DocumentType LIKE '{searchPattern}'
+                        OR DateSubmitted LIKE '{searchPattern}'
+                        OR Comment LIKE '{searchPattern}'");
                 }
 
-                string select =
-                    @"FAMFile.ID,
-FAMFile.Pages,
-DateSubmitted = (SELECT CONVERT(VARCHAR(10), WorkflowFile.AddedDateTime, 23) FROM WorkflowFile WHERE FAMFile.ID = WorkflowFile.FileID),
-Comment = COALESCE(CONVERT(VARCHAR(MAX), (SELECT Comment FROM FileActionComment WHERE FAMFile.ID = FileActionComment.FileID)), ''),
-OriginalFileName = COALESCE((SELECT Value FROM FileMetadataFieldValue JOIN MetadataField ON MetadataField.ID = FileMetadataFieldValue.MetadataFieldID
-                    WHERE FAMFile.ID = FileMetadataFieldValue.FileID
-                    AND MetadataField.Name = 'OriginalFileName'), ''),
-SubmittedByUser = COALESCE((SELECT Value FROM FileMetadataFieldValue JOIN MetadataField ON MetadataField.ID = FileMetadataFieldValue.MetadataFieldID
-                    WHERE FAMFile.ID = FileMetadataFieldValue.FileID
-                    AND MetadataField.Name = 'SubmittedByUser'), ''),
-DocumentType = COALESCE((SELECT Value FROM FileMetadataFieldValue JOIN MetadataField ON MetadataField.ID = FileMetadataFieldValue.MetadataFieldID
-                    WHERE FAMFile.ID = FileMetadataFieldValue.FileID
-                    AND MetadataField.Name = 'DocumentType'), '')";
-
-                string order = " ORDER BY [FAMFile].[ID] " + (fromBeginning ? "ASC" : "DESC");
-
-                string query = selector.BuildQuery(FileApi.FileProcessingDB, select, order, false);
+                string sortDirection = fromBeginning ? "ASC" : "DESC";
+                string query = Inv($@"
+                   SELECT * FROM
+                   (SELECT
+                     FAMFile.ID,
+                     FAMFile.Pages,
+                     CONVERT(VARCHAR(10), WorkflowFile.AddedDateTime, 23) As DateSubmitted,
+                     COALESCE(CONVERT(VARCHAR(MAX), Comment), '') AS Comment,
+                     MetadataField.Name AS MetadataName,
+                     COALESCE(FileMetadataFieldValue.Value, '') AS MetadataValue
+                    FROM FAMFile
+                      JOIN WorkflowFile ON WorkflowFile.FileID = FAMFile.ID
+                      JOIN Action ON Action.WorkflowID = WorkflowFile.WorkflowID
+                      JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID AND FileActionStatus.ActionID = Action.ID
+                      {joinSkipped}
+                      LEFT JOIN FileActionComment ON FileActionComment.FileID = FAMFile.ID
+                      LEFT JOIN FileMetadataFieldValue ON FileMetadataFieldValue.FileID = FAMFile.ID
+                      LEFT JOIN MetadataField ON MetadataField.ID = FileMetadataFieldValue.MetaDataFieldID
+                      WHERE ASCName = '{action.Replace("'", "''")}'
+                      AND WorkflowFile.WorkflowID = {wfID}
+                      AND {skippedOrPendingClause}
+                    ) AS SourceTable PIVOT(MIN(MetadataValue) FOR MetadataName IN ([OriginalFileName], [SubmittedByUser], [DocumentType])) AS PivotTable
+                    {filterClause}
+                    ORDER BY ID {sortDirection}
+                    {offset}
+                    ");
 
                 var rs = FileApi.FileProcessingDB.GetResultsForQuery(query);
                 var results = new List<QueuedFileDetails>();
