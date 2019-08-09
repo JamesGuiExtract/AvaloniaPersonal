@@ -249,7 +249,7 @@ namespace WebAPI.Models
                     ? Inv($"JOIN SkippedFile ON SkippedFile.FileID = FAMFile.ID")
                     : "";
                 string skippedOrPendingClause = skippedFiles
-                    ? Inv($"WHERE SkippedFile.UserName = '{userName.Replace("'", "''")}'")
+                    ? Inv($"FileActionStatus.ActionStatus = 'S' AND SkippedFile.UserName = '{userName.Replace("'", "''")}'")
                     : "FileActionStatus.ActionStatus = 'P'";
                 string offset = pageIndex >= 0 && pageSize > 0
                     ? Inv($"OFFSET {pageIndex * pageSize} ROWS FETCH NEXT {pageSize} ROWS ONLY")
@@ -313,6 +313,7 @@ namespace WebAPI.Models
                         rs.MoveNext();
                     }
                 }
+                rs.Close();
 
                 return new QueuedFilesResult { QueuedFiles = results };
             }
