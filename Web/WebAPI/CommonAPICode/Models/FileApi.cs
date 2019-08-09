@@ -397,11 +397,13 @@ namespace WebAPI.Models
                 {
                     Id = FileProcessingDB.GetWorkflowID(workflowName);
                 }
-                // Assume any excption retrieving the workflow is because the workflow name is invalid
-                catch { }
-
-                HTTPError.AssertRequest("ELI46387", Id > 0, "Invalid workflow name",
-                    ("Workflow", workflowName, false));
+                catch(Exception e)
+                {
+                    // This could be an invalid workflow name, or the schema is out of date.
+                    ExtractException exception = e.AsExtract("ELI47204");
+                    exception.AddDebugData("WorkflowName", workflowName);
+                    throw exception;
+                }
 
                 var definition = FileProcessingDB.GetWorkflowDefinition(Id);
                 HTTPError.Assert("ELI46388", definition != null,
