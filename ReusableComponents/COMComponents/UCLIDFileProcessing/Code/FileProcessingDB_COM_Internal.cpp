@@ -11794,9 +11794,15 @@ bool CFileProcessingDB::GetAttributeValue_Internal(bool bDBLocked, BSTR bstrSour
 			ASSERT_RESOURCE_ALLOCATION("ELI43521", ipResult != __nullptr);
 
 			string strQuery = gstrGET_ATTRIBUTE_VALUE;
-			replaceVariable(strQuery, "<SourceDocName>", asString(bstrSourceDocName));
-			replaceVariable(strQuery, "<AttributeSetName>", asString(bstrAttributeSetName));
-			replaceVariable(strQuery, "<AttributePath>", asString(bstrAttributePath));
+			string sdn = asString(bstrSourceDocName);
+			string asn = asString(bstrAttributeSetName);
+			string pth = asString(bstrAttributePath);
+			replaceVariable(sdn, "'", "''");
+			replaceVariable(asn, "'", "''");
+			replaceVariable(pth, "'", "''");
+			replaceVariable(strQuery, "<SourceDocName>", sdn);
+			replaceVariable(strQuery, "<AttributeSetName>", asn);
+			replaceVariable(strQuery, "<AttributePath>", pth);
 
 			ipResult->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenStatic,
 				adLockReadOnly, adCmdText);
