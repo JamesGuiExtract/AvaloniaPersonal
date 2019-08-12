@@ -8,6 +8,8 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
@@ -72,6 +74,7 @@ namespace Extract.FileActionManager.FileProcessors
         bool _dirty;
 
         static ConcurrentDictionary<(string, string), GoogleCloudOCR> _googleCloudOCRInstances = new ConcurrentDictionary<(string, string), GoogleCloudOCR>();
+        static ThreadLocal<MiscUtils> _miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtilsClass());
 
         GoogleCloudOCR GoogleCloudOCR => _googleCloudOCRInstances[(ProjectCredentialsFile, BucketBaseName)];
 
@@ -327,10 +330,12 @@ namespace Extract.FileActionManager.FileProcessors
 
                 FileActionManagerPathTags pathTags = new FileActionManagerPathTags(pFAMTM);
 
-                string credentialsFile = pathTags.Expand(ProjectCredentialsFile);
+                string credentialsFile = Path.GetFullPath(pathTags.Expand(ProjectCredentialsFile));
 
-                //TODO: Allow etf file
-                string json = File.ReadAllText(credentialsFile);
+                // This will load from an etf or plain text file
+                string encoded = _miscUtils.Value.GetBase64StringFromFile(credentialsFile);
+                byte[] bytes = Convert.FromBase64String(encoded);
+                string json = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
 
                 // Create static cloud OCR task with this json
                 if (!_googleCloudOCRInstances.ContainsKey((ProjectCredentialsFile, BucketBaseName)))
