@@ -65,7 +65,7 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// Current version.
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -181,6 +181,16 @@ namespace Extract.AttributeFinder.Rules
                 }
             }
         }
+
+        /// <summary>
+        /// Whether to first expand each edge until row/column of white pixels before shrinking down to black pixels
+        /// </summary>
+        public bool AutoExpandBeforeAutoShrink { get; set; } = true;
+
+        /// <summary>
+        /// The maximum number of pixels allowed for expansion
+        /// </summary>
+        public float MaxPixelsToExpand { get; set; } = 10;
 
         #endregion Properties
 
@@ -423,6 +433,16 @@ namespace Extract.AttributeFinder.Rules
                 {
                     AttributeSelector = reader.ReadIPersistStream() as IAttributeSelector;
 
+                    if (reader.Version >= 2)
+                    {
+                        AutoExpandBeforeAutoShrink = reader.ReadBoolean();
+                        MaxPixelsToExpand = reader.ReadSingle();
+                    }
+                    else
+                    {
+                        AutoExpandBeforeAutoShrink = false;
+                    }
+
                     // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
                 }
@@ -452,6 +472,8 @@ namespace Extract.AttributeFinder.Rules
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
                     writer.Write((IPersistStream)AttributeSelector, clearDirty);
+                    writer.Write(AutoExpandBeforeAutoShrink);
+                    writer.Write(MaxPixelsToExpand);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -526,6 +548,9 @@ namespace Extract.AttributeFinder.Rules
                 AttributeSelector = (IAttributeSelector)copyThis.Clone();
             }
 
+            AutoExpandBeforeAutoShrink = source.AutoExpandBeforeAutoShrink;
+            MaxPixelsToExpand = source.MaxPixelsToExpand;
+
             _dirty = true;
         }
 
@@ -548,11 +573,20 @@ namespace Extract.AttributeFinder.Rules
                         {
                             ZoneGeometry data = new ZoneGeometry(zone);
 
+                            if (AutoExpandBeforeAutoShrink)
+                            {
+                                float max = Math.Max(1, MaxPixelsToExpand);
+                                data.FitEdge(Side.Left, probe, false, false, null, 0, 0, 0, max);
+                                data.FitEdge(Side.Top, probe, false, false, null, 0, 0, 0, max);
+                                data.FitEdge(Side.Right, probe, false, false, null, 0, 0, 0, max);
+                                data.FitEdge(Side.Bottom, probe, false, false, null, 0, 0, 0, max);
+                            }
+
                             // Shrink each side of the zone. Use no padding here because zones will be
                             // inflated next.
-                            data.FitEdge(Side.Left, probe, true, true, null, 0, 0);
-                            data.FitEdge(Side.Top, probe, true, true, null, 0, 0);
-                            data.FitEdge(Side.Right, probe, true, true, null, 0, 0);
+                            data.FitEdge(Side.Left, probe, true, true, null, 0);
+                            data.FitEdge(Side.Top, probe, true, true, null, 0);
+                            data.FitEdge(Side.Right, probe, true, true, null, 0);
                             data.FitEdge(Side.Bottom, probe, true, true, null, 0, 0);
 
                             // Inflate each side of the zone to be sure that all text is covered.

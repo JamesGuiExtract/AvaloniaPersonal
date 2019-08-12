@@ -517,6 +517,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="AutoShrinkRedactionZonesSettingsDialog.resx">
+      <DependentUpon>AutoShrinkRedactionZonesSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="CreateAttributeSettingsDialog.resx">
       <DependentUpon>CreateAttributeSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>

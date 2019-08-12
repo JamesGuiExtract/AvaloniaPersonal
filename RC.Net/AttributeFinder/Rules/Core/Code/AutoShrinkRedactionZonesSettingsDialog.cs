@@ -81,6 +81,10 @@ namespace Extract.AttributeFinder.Rules
                 {
                     _attributeSelectorControl.ConfigurableObject =
                         (ICategorizedComponent)Settings.AttributeSelector;
+                    _autoExpandBeforeAutoShrinkCheckBox.Checked =
+                        _maxPixelsToExpandNumericUpDown.Enabled =
+                            Settings.AutoExpandBeforeAutoShrink;
+                    _maxPixelsToExpandNumericUpDown.Value = (decimal)Settings.MaxPixelsToExpand;
                 }
             }
             catch (Exception ex)
@@ -112,6 +116,9 @@ namespace Extract.AttributeFinder.Rules
 
                 Settings.AttributeSelector =
                     (IAttributeSelector)_attributeSelectorControl.ConfigurableObject;
+
+                Settings.AutoExpandBeforeAutoShrink = _autoExpandBeforeAutoShrinkCheckBox.Checked;
+                Settings.MaxPixelsToExpand = (float)_maxPixelsToExpandNumericUpDown.Value;
 
                 DialogResult = DialogResult.OK;
             }
@@ -155,5 +162,21 @@ namespace Extract.AttributeFinder.Rules
         }
 
         #endregion Private Members
+
+        #region Event Handlers
+
+        private void _autoExpandBeforeAutoShrinkCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _maxPixelsToExpandNumericUpDown.Enabled = _autoExpandBeforeAutoShrinkCheckBox.Checked;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI47211");
+            }
+        }
+
+        #endregion Event Handlers
     }
 }
