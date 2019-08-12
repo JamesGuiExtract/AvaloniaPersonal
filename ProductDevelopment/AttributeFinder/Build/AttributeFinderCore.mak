@@ -448,8 +448,6 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@XCOPY "$(WebAPI)\*.xml" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y
 	@XCOPY "$(WebAPI)\*.config" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y
 	@XCOPY "$(WebAPI)\*.json" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y
-# There should be no Interop files in NonSelfRegFiles, they are included elsewhere
-	@DeleteFiles "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\Interop.*"
 	
 	@COPY /V "$(RCNETDir)\APIs\LogicNP\EZShellExtensions.Net\2011\*.*" "$(RequiredInstallsDir)\LogicNP"
 	@COPY /V "$(RCNETDir)\APIs\LogicNP\EZShellExtensions.Net\2011\RegisterExtensionDotNet40_x*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" 
