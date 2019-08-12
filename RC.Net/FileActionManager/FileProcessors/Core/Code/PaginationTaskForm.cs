@@ -750,7 +750,6 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 _paginationPanel.LoadNextDocument += HandlePaginationPanel_LoadNextDocument;
-                _paginationPanel.FileTaskSessionIdRequest += HandlePaginationPanel_FileTaskSessionRequest;
 
                 // May be null if the an IPaginationDocumentDataPanel is not specified to be used in
                 // this workflow.
@@ -920,7 +919,6 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 if (_settings.SingleSourceDocumentMode)
                 {
-                    _paginationPanel.CommitOnlySelection = false;
                     _paginationPanel.LoadNextDocumentVisible = false;
                 }
             }
@@ -1229,6 +1227,33 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
+        /// Handles the <see cref="PaginationPanel.OutputDocumentDeleted"/> of the <see cref="_paginationPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="OutputDocumentDeletedEventArgs"/> instance containing the event data.</param>
+        void HandlePaginationPanel_OutputDocumentDeleted(object sender, OutputDocumentDeletedEventArgs e)
+        {
+            try
+            {
+                var firstSourceFile = e.DeletePageInfo
+                    .Select(pageInfo => pageInfo.DocumentName)
+                    .First();
+
+                ExtractException.Assert("ELI47212", "FileTaskSession was not started.",
+                    _fileTaskSessionMap.TryGetValue(GetFileID(firstSourceFile), out var sessionData));
+
+                _paginatedOutputCreationUtility.WritePaginationHistory(
+                    e.DeletePageInfo, -1, sessionData.SessionID);
+
+                e.DocumentData.PaginationRequest = new PaginationRequest(sessionData.SessionID, -1, null);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47213");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="PaginationPanel.Paginated"/> event of the
         /// <see cref="_paginationPanel"/>.
         /// </summary>
@@ -1239,6 +1264,10 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
+                // Anytime output documents are created, store the source document voas to reflect
+                // the documents output.
+                _paginationPanel.OutputSourceVoas();
+
                 // HandlePaginationPanel_CreatingOutputDocument will have already paused the
                 // queue in most cases, but not if the applied pagination matched source doc form.
                 FileRequestHandler.PauseProcessingQueue();
@@ -1952,13 +1981,6 @@ namespace Extract.FileActionManager.FileProcessors
                         // document as far as the _paginationPanel is concerned.
                         foreach (var documentAttribute in attributeArray)
                         {
-                            // Don't display documents for which pagination has already been requested.
-                            if (AttributeMethods.GetSingleAttributeByName(
-                                documentAttribute.SubAttributes, "PaginationRequest") != null)
-                            {
-                                continue;
-                            }
-
                             // There should be two attributes under the root Document attribute:
                             // Pages- The range/list specification of pages to be included.
                             // DocumentData- The data (redaction or indexing() the rules found for the
@@ -2009,6 +2031,13 @@ namespace Extract.FileActionManager.FileProcessors
                                 {
                                     suggestedPagination = true;
                                 }
+                            }
+
+                            var paginationRequestAttribute = AttributeMethods.GetSingleAttributeByName(
+                                documentAttribute.SubAttributes, "PaginationRequest");
+                            if (paginationRequestAttribute != null)
+                            {
+                                documentData.PaginationRequest = new PaginationRequest(paginationRequestAttribute);
                             }
 
                             _paginationPanel.LoadFile(fileName, fileId, -1, pages, deletedPages,

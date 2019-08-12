@@ -18,6 +18,7 @@ namespace Extract
 		{
 			RedactionTypes = gcnew List<String^>();
 			InactivityTimeout = 5;
+			DocumentTypes = gcnew String("");
 		}
 
 		void RedactionVerificationSettings::OnDeserializing(StreamingContext context)

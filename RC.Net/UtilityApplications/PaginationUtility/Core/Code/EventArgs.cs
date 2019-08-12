@@ -116,7 +116,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
     }
 
-
     /// <summary>
     /// Event args for <see cref="PaginationPanel.CreatingOutputDocument"/>
     /// and <see cref="PaginationPanel.OutputDocumentCreated"/> events.
@@ -258,6 +257,46 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get;
             set;
+        }
+    }
+
+    /// <summary>
+    /// Event args for <see cref="PaginationPanel.OutputDocumentDeleted"/>.
+    /// </summary>
+    public class OutputDocumentDeletedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new <see cref="OutputDocumentDeletedEventArgs"/> instance.
+        /// </summary>
+        /// <param name="deletedPageInfo"><see cref="PageInfo"/>s that indicate the source document
+        /// page for each respective page in the output document being deleted.</param>
+        /// <param name="documentData">The <see cref="PaginationDocumentData"/> that has been associated
+        /// with the deleted document.</param>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public OutputDocumentDeletedEventArgs(IEnumerable<PageInfo> deletedPageInfo, PaginationDocumentData documentData)
+            : base()
+        {
+            DeletePageInfo = deletedPageInfo.ToList().AsReadOnly();
+            DocumentData = documentData;
+        }
+
+        /// <summary>
+        /// The <see cref="PageInfo"/>s that indicate the source document page for each respective page
+        /// in the output document being deleted.
+        /// </summary>
+        public ReadOnlyCollection<PageInfo> DeletePageInfo
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="PaginationDocumentData"/> that has been associated with the deleted document.
+        /// </summary>
+        public PaginationDocumentData DocumentData
+        {
+            get;
+            private set;
         }
     }
 

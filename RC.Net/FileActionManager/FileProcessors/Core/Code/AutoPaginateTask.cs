@@ -142,7 +142,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// <summary>
         /// The license id to validate in licensing calls
         /// </summary>
-        const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
+        const LicenseIdName _LICENSE_ID = LicenseIdName.PaginationUIObject;
 
         /// <summary>
         /// The default path for expected pagination attributes file
@@ -865,7 +865,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     foreach (var docData in docDataDictionary.Values)
                     {
-                        _depPanel.UpdateDocumentStatus(docData, statusOnly: false, applyUpdateToUI: false, displayValidationErrors: false);
+                        _depPanel.StartUpdateDocumentStatus(docData, statusOnly: false, applyUpdateToUI: false, displayValidationErrors: false);
                     }
 
                     _depPanel.WaitForDocumentStatusUpdates();
@@ -878,6 +878,9 @@ namespace Extract.FileActionManager.FileProcessors
 
                     if (sourcePageInfos.All(page => page.Deleted))
                     {
+                        _paginatedOutputCreationUtility.WritePaginationHistory(
+                            sourcePageInfos, -1, fileTaskSessionID);
+
                         // Does not count against fullyPaginated.
                         continue;
                     }
@@ -888,7 +891,7 @@ namespace Extract.FileActionManager.FileProcessors
                     if (AutoPaginateQualifier != null)
                     {
                         string proposedDocumentName = _paginatedOutputCreationUtility.GetPaginatedDocumentFileName(sourcePageInfos, pFAMTM);
-                        var documentStatusJson = outputData.PendingDocumentStatus.ToJson();
+                        var documentStatusJson = outputData?.PendingDocumentStatus?.ToJson();
                         var serializedAttributes = _miscUtils.Value.GetObjectAsStringizedByteStream(docAttribute.SubAttributes);
 
                         if (!AutoPaginateQualifier.FileMatchesPaginationCondition(pFileRecord, proposedDocumentName,
@@ -898,6 +901,7 @@ namespace Extract.FileActionManager.FileProcessors
                             continue;
                         }
                     }
+                    
 
                     // The document qualifies to be output; create it.
                     CreatePaginatedOutput(docAttribute, sourcePageInfos, outputData, pFileRecord, fileProcessingDB, pFAMTM, fileTaskSessionID);

@@ -701,12 +701,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void SetColor()
         {
-            // Determine what the separator color should be base on whether the current document
-            // has a page displayed in the image viewer.
-            var newColor = (Document?.PageControls.Any(pageControl =>
-                                pageControl.PageIsDisplayed && pageControl.Highlighted) == true)
-                ? ExtractColors.LightOrange
-                : ExtractColors.White;
+            // Determine what the separator color should be based on whether the current document
+            // has a page displayed in the image viewer and whether the document has already been applied.
+            var newColor = (Document?.OutputProcessed == true)
+                ? Color.Gray
+                : (Document?.PageControls.Any(pageControl =>
+                        pageControl.PageIsDisplayed && pageControl.Highlighted) == true)
+                    ? ExtractColors.LightOrange
+                    : ExtractColors.White;
             
             // Update the BackColor of the separator itself, as well as any controls except the edit button.
             if (newColor != _currentColor)
@@ -1030,14 +1032,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _controlUpdatePending = false;
 
                 _hasAppliedStatus = true;
-                _selectedCheckBox.Visible = _showSelectionCheckBox;
+                _selectedCheckBox.Visible = _showSelectionCheckBox && !Document.OutputProcessed;
                 _selectedCheckBox.Checked = _showSelectionCheckBox && Document.Selected;
                 _collapseDocumentButton.Visible = true;
                 _collapseDocumentButton.Image = Document.Collapsed
                     ? Properties.Resources.Expand
                     : Properties.Resources.Collapse;
                 _editDocumentDataButton.Visible =
-                    Document.DocumentData != null && Document.DocumentData.AllowDataEdit;
+                    !Document.OutputProcessed
+                    && Document.DocumentData != null
+                    && Document.DocumentData.AllowDataEdit;
                 _summaryLabel.Visible = true;
                 _summaryLabel.Text = Document.Summary;
                 _pagesLabel.Visible = true;
@@ -1050,13 +1054,20 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // To fix cases where the width has no updated properly
                     _pagesLabel.PerformLayout();
                 }
-                _newDocumentGlyph.Visible = !Document.InSourceDocForm;
-                _editedPaginationGlyph.Visible = !Document.InOriginalForm;
-                _reprocessDocumentPictureBox.Visible = Document.SendForReprocessing && pageCount > 0;
-                _editedDataPictureBox.Visible = Document.DataModified;
-                _dataErrorPictureBox.Visible = Document.DataError;
-                _toolTip.SetToolTip(_dataErrorPictureBox,
-                    Document?.DocumentData?.DataErrorMessage ?? "The data for this document has error(s)");
+                _newDocumentGlyph.Visible = !Document.InSourceDocForm && !Document.OutputProcessed;
+                _editedPaginationGlyph.Visible = !Document.InOriginalForm && !Document.OutputProcessed;
+                _reprocessDocumentPictureBox.Visible = Document.SendForReprocessing && pageCount > 0 && !Document.OutputProcessed;
+                _editedDataPictureBox.Visible = Document.DataModified && !Document.OutputProcessed;
+                _dataErrorPictureBox.Visible = Document.DataError && !Document.OutputProcessed;
+                if (Document.OutputProcessed)
+                {
+                    _toolTip.SetToolTip(_dataErrorPictureBox, null);
+                }
+                else
+                {
+                    _toolTip.SetToolTip(_dataErrorPictureBox,
+                        Document?.DocumentData?.DataErrorMessage ?? "The data for this document has error(s)");
+                }
 
                 SetColor();
 

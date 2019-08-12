@@ -13,7 +13,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         class ThreadManager : IDisposable
         {
             /// <summary>
-            /// Signals that all <see cref="UpdateDocumentStatus"/> threads should be stopped.
+            /// Signals that all <see cref="StartUpdateDocumentStatus"/> threads should be stopped.
             /// </summary>
             ManualResetEvent _stopSignaledEvent = new ManualResetEvent(false);
 

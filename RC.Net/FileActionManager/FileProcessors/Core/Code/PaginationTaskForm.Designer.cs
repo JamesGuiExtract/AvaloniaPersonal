@@ -195,6 +195,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._paginationPanel.ToolBarVisible = true;
             this._paginationPanel.DocumentDataRequest += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.DocumentDataRequestEventArgs>(this.HandlePaginationPanel_DocumentDataRequest);
             this._paginationPanel.CreatingOutputDocument += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CreatingOutputDocumentEventArgs>(this.HandlePaginationPanel_CreatingOutputDocument);
+            this._paginationPanel.OutputDocumentDeleted += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.OutputDocumentDeletedEventArgs>(this.HandlePaginationPanel_OutputDocumentDeleted);
             this._paginationPanel.Paginated += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.PaginatedEventArgs>(this.HandlePaginationPanel_Paginated);
             this._paginationPanel.PaginationError += new System.EventHandler<Extract.ExtractExceptionEventArgs>(this.HandlePaginationPanel_PaginationError);
             this._paginationPanel.StateChanged += new System.EventHandler<System.EventArgs>(this.HandlePaginationPanel_StateChanged);

@@ -257,6 +257,65 @@ namespace Extract.UtilityApplications.PaginationUtility
     }
 
     /// <summary>
+    /// A <see cref="PageStylist"/> that overlays the word "PROCESSED" on any
+    /// <see cref="PageThumbnailControl"/> instances that has already been output/deleted.
+    /// </summary>
+    internal class ProcessedPageStylist : OverlayTextStylist
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProcessedPageStylist"/> class.
+        /// </summary>
+        /// <param name="pageControl">The <see cref="PageThumbnailControl"/> for which this stylist
+        /// is responsible.</param>
+        public ProcessedPageStylist(PageThumbnailControl pageControl)
+            : base(pageControl, "PROCESSED", Color.FromArgb(99, Color.Black))
+        {
+        }
+
+        /// <summary>
+        /// Gets whether the stylist is visible.
+        /// </summary>
+        /// <returns><see langword="true"/> if visible.
+        /// </returns>
+        protected override bool IsVisible
+        {
+            get
+            {
+                return PageControl?.Document.OutputProcessed == true;
+            }
+        }
+
+        /// <summary>
+        /// Allows foreground of the PageControl to be painted.
+        /// </summary>
+        /// <param name="paintingControl">The specific <see cref="Control"/> within
+        /// PageControl being painted.</param>
+        /// <param name="e">The <see cref="PaintEventArgs"/> being used for the painting of the
+        /// PageControl.</param>
+        public override void PaintForeground(Control paintingControl, PaintEventArgs e)
+        {
+            try
+            {
+                if (IsVisible)
+                {
+                    var brush = ExtractBrushes.GetSolidBrush(Color.FromArgb(99, Color.Black));
+                    Rectangle drawRectangle = GetDrawRectangle(paintingControl);
+                    e.Graphics.FillRectangle(brush, drawRectangle);
+
+                    var pen = ExtractPens.GetThickPen(Color.Black);
+                    e.Graphics.DrawRectangle(pen, drawRectangle);
+
+                    base.PaintForeground(paintingControl, e);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47214");
+            }
+        }
+    }
+
+    /// <summary>
     /// A <see cref="PageStylist"/> that overlays an "X" on any
     /// <see cref="PageThumbnailControl"/> instances that have been deleted and will not appear in
     /// any pagination output document.

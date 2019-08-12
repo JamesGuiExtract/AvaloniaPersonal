@@ -176,8 +176,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         void UpdateDocumentData(PaginationDocumentData data, bool statusOnly, bool displayValidationErrors);
 
         /// <summary>
-        /// Updates the <see cref="Summary"/>, <see cref="DataModified"/> and  <see cref="DataError"/>
-        /// properties of <see paramref="documentData"/> by loading the data into a background panel.
+        /// Triggers an update to the <see cref="Summary"/>, <see cref="DataModified"/> and
+        /// <see cref="DataError"/> properties of <see paramref="documentData"/> by processing the
+        /// data in a background thread. If the results of status updates are needed
+        /// programmatically rather than to update the UI, <see cref="WaitForDocumentStatusUpdates"/>
+        /// should be used before checking the updated status.
         /// </summary>
         /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData"/> for which
         /// document status should be updated.</param>
@@ -186,7 +189,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// documentData with the complete voa data.</param>
         /// <param name = "displayValidationErrors" >< c > true </ c > if you want to display validation errors;
         /// <c>false</c> if you do not want to display validation errors.</param>
-        void UpdateDocumentStatus(DataEntryPaginationDocumentData documentData,
+        void StartUpdateDocumentStatus(DataEntryPaginationDocumentData documentData,
             bool statusOnly, bool applyUpdateToUI, bool displayValidationErrors);
 
         /// <summary>

@@ -36,7 +36,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             FileTaskSessionId = fileTaskSessionId;
             OutputFileId = outputFileId;
-            ImagePages = imagePages;
+            ImagePages = imagePages ?? new ImagePage[0].ToList().AsReadOnly();
         }
 
         /// <summary>

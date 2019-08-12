@@ -1,12 +1,10 @@
-﻿using Extract.AttributeFinder;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
-using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -27,6 +25,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// document data as a whole.
         /// </summary>
         IAttribute _documentDataAttribute;
+
+        /// <summary>
+        /// Any <see cref="PaginationRequest"/> that has been recorded for this document.
+        /// (to be executed by a server-side task)
+        /// </summary>
+        PaginationRequest _paginationRequest;
 
         /// <summary>
         /// Indicates whether this instance was modified as of the last time the
@@ -128,8 +132,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public PaginationRequest PaginationRequest
         {
-            get;
-            set;
+            get
+            {
+                return _paginationRequest;
+            }
+
+            set
+            {
+                if (value != _paginationRequest)
+                {
+                    _paginationRequest = value;
+                    OnDocumentDataStateChanged();
+                }
+            }
         }
 
         /// <summary>

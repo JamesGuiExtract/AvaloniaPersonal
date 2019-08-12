@@ -5,6 +5,7 @@ using Extract.Interop;
 using Extract.Licensing;
 using Extract.UtilityApplications.PaginationUtility;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
@@ -448,6 +449,17 @@ namespace Extract.FileActionManager.FileProcessors
         static void UnregisterFunction(Type type)
         {
             ComMethods.UnregisterTypeInCategory(type, ExtractCategories.FileProcessorsGuid);
+        }
+
+        /// <summary>
+        /// Copies the specified <see cref="CreatePaginatedOutputTask"/> instance into this one.
+        /// </summary>
+        /// <param name="task">The <see cref="CreatePaginatedOutputTask"/> from which to copy.</param>
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "task")]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
+        void CopyFrom(CreatePaginatedOutputTask task)
+        {
+            //_dirty = true;
         }
 
         #endregion Private Members

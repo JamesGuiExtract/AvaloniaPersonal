@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Extract.UtilityApplications.PaginationUtility
@@ -180,6 +181,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             if (_activeImageViewer == null)
                             {
                                 imageViewer.OrientationChanged += HandleActiveImageViewer_OrientationChanged;
+                                imageViewer.Paint += HandleActiveImageViewer_Paint;
                                 imageViewer.ImageChanged += HandleImageViewer_ImageChanged;
                                 imageViewer.PageChanged += HandleImageViewer_PageChanged;
 
@@ -228,6 +230,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (_activeImageViewer != null)
             {
                 _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
+                _activeImageViewer.Paint -= HandleActiveImageViewer_Paint;
                 _activeImageViewer.ImageChanged -= HandleImageViewer_ImageChanged;
                 _activeImageViewer.PageChanged -= HandleImageViewer_PageChanged;
                 _activeImageViewer = null;
@@ -292,6 +295,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         public void OnDeletedStateChanged()
         {
             Invalidate();
+            _activeImageViewer?.Invalidate();
         }
 
         #endregion Methods
@@ -387,6 +391,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (_activeImageViewer != null)
                     {
                         _activeImageViewer.OrientationChanged -= HandleActiveImageViewer_OrientationChanged;
+                        _activeImageViewer.Paint -= HandleActiveImageViewer_Paint;
                         _activeImageViewer = null;
                     }
 
@@ -533,6 +538,61 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI43386");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Paint"/> event of the <see cref="_activeImageViewer"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="PaintEventArgs"/> instance containing the event data.</param>
+        void HandleActiveImageViewer_Paint(object sender, PaintEventArgs e)
+        {
+            try
+            {
+                // If the selected page is deleted/processed, gray out the page and place a red X
+                // and/or "PROCESSED" to match the appearance of the thumbnail control.
+                // (DeletePageStylist/ProcessedPageStylist)
+                var pageDeleted = _pageControl?.Deleted == true;
+                var pageDisabled = _pageControl?.Document.OutputProcessed == true;
+                
+                if (_activeImageViewer != null && (pageDeleted || pageDisabled))
+                {
+                    var pageRect = _activeImageViewer.PhysicalViewRectangle;
+                    var stringFormat = new StringFormat();
+                    stringFormat.Alignment = StringAlignment.Center;
+                    stringFormat.LineAlignment = StringAlignment.Center;
+
+                    var brush = ExtractBrushes.GetSolidBrush(Color.FromArgb(99, Color.Black));
+                    e.Graphics.FillRectangle(brush, pageRect);
+
+                    var pen = ExtractPens.GetThickPen(Color.Black);
+                    e.Graphics.DrawRectangle(pen, pageRect);
+
+                    if (pageDeleted)
+                    {
+                        brush = ExtractBrushes.GetSolidBrush(Color.FromArgb(100, Color.Red));
+                        using (var font = FontMethods.GetFontThatFits("X", e.Graphics,
+                            pageRect.Size, Font.FontFamily, Font.Style))
+                        {
+                            e.Graphics.DrawString("X", font, brush, pageRect, stringFormat);
+                        }
+                    }
+
+                    if (pageDisabled)
+                    {
+                        brush = ExtractBrushes.GetSolidBrush(Color.FromArgb(100, Color.Black));
+                        using (var font = FontMethods.GetFontThatFits("PROCESSED", e.Graphics,
+                            pageRect.Size, Font.FontFamily, Font.Style))
+                        {
+                            e.Graphics.DrawString("PROCESSED", font, brush, pageRect, stringFormat);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI47210");
             }
         }
 

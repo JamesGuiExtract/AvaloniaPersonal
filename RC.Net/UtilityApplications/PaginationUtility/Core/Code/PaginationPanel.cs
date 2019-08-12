@@ -71,9 +71,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         object _sourceDocumentLock = new object();
 
         /// <summary>
-        /// The set of all <see cref="OutputDocument"/>s currently active in the UI.
+        /// The set of all <see cref="OutputDocument"/>s currently displayed in the UI.
         /// </summary>
-        ObservableCollection<OutputDocument> _pendingDocuments =
+        ObservableCollection<OutputDocument> _displayedDocuments =
             new ObservableCollection<OutputDocument>();
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 InitializeComponent();
 
-                _pendingDocuments.CollectionChanged += HandlePendingDocuments_CollectionChanged;
+                _displayedDocuments.CollectionChanged += HandleDisplayedDocuments_CollectionChanged;
             }
             catch (Exception ex)
             {
@@ -227,6 +227,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<CreatingOutputDocumentEventArgs> OutputDocumentCreated;
 
         /// <summary>
+        /// Raised when a proposed output document is deleted (applied with all pages deleted).
+        /// </summary>
+        public event EventHandler<OutputDocumentDeletedEventArgs> OutputDocumentDeleted;
+
+        /// <summary>
         /// Raised when a pagination operation is complete. May follow multiple
         /// <see cref="CreatingOutputDocument"/> events if a single pagination event produced
         /// multiple documents.
@@ -258,11 +263,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// pagination).
         /// </summary>
         public event EventHandler<EventArgs> RevertedChanges;
-
-        /// <summary>
-        /// Occurs when [file task session identifier request].
-        /// </summary>
-        public event EventHandler<FileTaskSessionRequestEventArgs> FileTaskSessionIdRequest;
 
         #endregion Events
 
@@ -456,8 +456,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                     else
                     {
-                        return (_pendingDocuments != null) &&
-                            _pendingDocuments.Any(document => !document.InOriginalForm ||
+                        return (PendingDocuments != null) &&
+                            PendingDocuments.Any(document => !document.InOriginalForm ||
                                 (document.DocumentData != null && document.DocumentData.Modified));
                     }
                 }
@@ -1015,7 +1015,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 _pendingChangesOverride = null;
 
-                foreach (var document in _pendingDocuments)
+                foreach (var document in PendingDocuments)
                 {
                     document.SetOriginalForm();
                 }
@@ -1037,9 +1037,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try 
             {	        
-                paginationModified = _pendingDocuments.Any(document =>
-                        !document.InOriginalForm);
-                dataModified = _pendingDocuments.Any(document =>
+                paginationModified = PendingDocuments.Any(document =>
+                    !document.InOriginalForm);
+                dataModified = PendingDocuments.Any(document =>
                     document.DataModified && !document.DocumentData.DataSharedInVerification);
             }
             catch (Exception ex)
@@ -1064,7 +1064,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (result)
                 {
-                    result = OutputVoa();
+                    result = OutputSourceVoas();
                 }
 
                 return result;
@@ -1079,7 +1079,72 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
-        
+        /// <summary>
+        /// Outputs the data pagination and index data for all source documents without
+        /// first updating the index data from each document.
+        /// NOTE: A message will be displayed if the pages from multiple source documents
+        /// are currently combined into a single proposed output document and the method will return false.
+        /// </summary>
+        /// <returns><c>true</c> if the data was saved; otherwise, <c>false</c>.</returns>
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Voas")]
+        public bool OutputSourceVoas()
+        {
+            try
+            {
+                var sourcesToOutputList = _displayedDocuments.Select(pendingDocument =>
+                    (sourceDocs:
+                        pendingDocument
+                            .PageControls
+                            .Select(pageControl => pageControl.Page.SourceDocument)
+                            .Distinct()
+                            .ToList(),
+                    pendingDocument: pendingDocument)
+                ).ToList();
+
+                if (sourcesToOutputList.Any(x => x.sourceDocs.Count() > 1))
+                {
+                    UtilityMethods.ShowMessageBox("It is not possible to save progress when multiple " +
+                        "source documents have been combined into a single output document.",
+                        "Unable to save", true);
+                    return false;
+                }
+
+                var documentsToSave = new Dictionary<SourceDocument, List<OutputDocument>>();
+                foreach (var (sourceDocs, pendingDocument) in sourcesToOutputList.Where(entry => entry.sourceDocs.Any()))
+                {
+                    var outputDocs = documentsToSave.GetOrAdd(sourceDocs.Single(), _ => new List<OutputDocument>());
+                    outputDocs.Add(pendingDocument);
+                }
+
+                var orderedDocuments = _primaryPageLayoutControl.Documents.ToList();
+
+                foreach (var sourceEntry in documentsToSave)
+                {
+                    var sourceDocName = sourceEntry.Key.FileName;
+                    var documentAttributes = new IUnknownVector();
+
+                    foreach (var outputDoc in sourceEntry.Value.OrderBy(doc => orderedDocuments.IndexOf(doc)))
+                    {
+                        var documentAttribute = GetDocumentAttribute(outputDoc, sourceDocName);
+                        documentAttributes.PushBack(documentAttribute);
+                    }
+
+                    if (documentAttributes.Size() > 0)
+                    {
+                        IUnknownVector saveFileData = new IUnknownVector();
+                        saveFileData.Append(documentAttributes);
+                        saveFileData.SaveTo(sourceEntry.Key.FileName + ".voa", false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                        saveFileData.ReportMemoryUsage();
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45736");
+            }
+        }
 
         /// <summary>
         /// Commits changes (either for all document or just selected documents depending on the
@@ -1109,17 +1174,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // operation is taking place.
                 _primaryPageLayoutControl.ClearSelection();
 
-                // Depending upon the manipulations that occurred, there may be some pending
+                // Depending upon the manipulations that occurred, there may be some displayed
                 // documents that have been left without any pages. Disregard these.
-                var documentsToRemove = _pendingDocuments
+                var documentsToRemove = _displayedDocuments
                     .Where(doc => !doc.PageControls.Any())
                     .ToArray();
                 foreach (var document in documentsToRemove)
                 {
-                    _pendingDocuments.Remove(document);
+                    _displayedDocuments.Remove(document);
                 }
 
-                var documentsToCommit = new HashSet<OutputDocument>(_pendingDocuments
+                var documentsToCommit = new HashSet<OutputDocument>(PendingDocuments
                     .Where(document => !CommitOnlySelection || document.Selected));
                 var documentsInSourceForm = new HashSet<OutputDocument>(documentsToCommit
                     .Where(document => document.InSourceDocForm));
@@ -1148,10 +1213,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Compile any source documents that will not present in the UI anymore after this
                 // call. This may include documents from documentsToRemove for which pages haven't
                 // been copied to any other document.
-                var documentsToRemain = _pendingDocuments.Except(documentsToCommit);
+                var documentsToRemain = PendingDocuments.Except(documentsToCommit);
                 var sourcesOfDocumentsToRemain = documentsToRemain
                     .SelectMany(outputDoc => outputDoc.PageControls)
-                    .Select(pageControl => pageControl.Page.SourceDocument);
+                    .Select(pageControl => pageControl.Page.SourceDocument)
+                    .ToList();
                 var missingSourceDocuments = _sourceDocuments.Except(sourcesOfDocumentsToRemain);
 
                 // Calculate source documents that are only source documents, i.e., that are not also expected
@@ -1181,35 +1247,22 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Generate the paginated output.
                 foreach (var outputDocument in outputDocuments)
                 {
-                    if (outputDocument.PageControls.Any(c => !c.Deleted))
+                    if (CreateDocumentOnOutput && outputDocument.PageControls.Any(c => !c.Deleted))
                     {
-                        // Create the physical output document only if configured to do so
-                        if (CreateDocumentOnOutput)
-                        {
-                            outputDocument.Output();
-                        }
-                        else
-                        {
-                            // Even if a physical document was not created, call ProcessOutputDocument
-                            // to assign the output document name, write pagination history and queue
-                            // the output file.
-                            ProcessOutputDocument(outputDocument);
-                        }
+                        // Create the physical output document only if configured to do so and there is at least
+                        // one non-deleted page.
+                        outputDocument.Output();
                     }
-                    else if (outputDocument.PageControls.Any())
+                    else
                     {
-                        // Even if the document is not output, pagination still needs to be written
-                        // to record the pages deleted from the source.
-                        WriteDeletedPageHistory(outputDocument);
+                        // Even if a physical document was not created, call ProcessOutputDocument
+                        // to assign the output document name, write pagination history and queue
+                        // the output file.
+                        ProcessOutputDocument(outputDocument);
                     }
 
-                    _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
-                    _pendingDocuments.Remove(outputDocument);
+                    outputDocument.Collapsed = true;
                 }
-
-                // Anytime output documents are created, store the source document voas to reflect
-                // the documents output.
-                OutputVoa();
 
                 LinkFilesWithRecordIDs(documentsToCommit);
 
@@ -1233,7 +1286,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 // For any documents did not have either manual or suggested pagination, reset all
                 // data about these documents so that nothing about the document is marked dirty.
-                foreach (var document in _pendingDocuments
+                foreach (var document in PendingDocuments
                     .Where(doc => documentsToCommit.Contains(doc)))
                 {
                     document.PaginationSuggested = false;
@@ -1331,44 +1384,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Records to the database the pagination that has occurred (which pages have been used in
-        /// which output documents, which pages have been deleted).
-        /// </summary>
-        /// <param name="outputDocument">The <see cref="OutputDocument"/> for which history should
-        /// be recorded.</param>
-        void WriteDeletedPageHistory(OutputDocument outputDocument)
-        {
-            ExtractException.Assert("ELI47060", "Unexpected non-deleted page",
-                outputDocument.PageControls.Any(c => !c.Deleted));
-
-            var firstSourceFileName = outputDocument
-                .PageControls
-                .FirstOrDefault()
-                ?.Page.OriginalDocumentName;
-
-            var deletedSourcePageInfo = outputDocument
-                .PageControls
-                .Select(c => new StringPairClass
-                {
-                    StringKey = c.Page.OriginalDocumentName,
-                    StringValue = c.Page.OriginalPageNumber.ToString(CultureInfo.InvariantCulture)
-                })
-                .ToIUnknownVector();
-
-            int firstSourceFileId = FileProcessingDB.GetFileID(firstSourceFileName);
-            var sessionIdRequestArgs = new FileTaskSessionRequestEventArgs(firstSourceFileId);
-            FileTaskSessionIdRequest?.Invoke(this, sessionIdRequestArgs);
-
-            ExtractException.Assert("ELI45596", "Session not available",
-                sessionIdRequestArgs.FileTaskSessionID.HasValue);
-
-            FileProcessingDB.AddPaginationHistory(outputDocument.FileID, 
-                null, // No undeleted pages
-                deletedSourcePageInfo,
-                sessionIdRequestArgs.FileTaskSessionID.Value);
-        }
-
-        /// <summary>
         /// Checks if changes can be committed.
         /// </summary>
         /// <returns><see langword="true"/> if the documents can be submitted or
@@ -1412,10 +1427,10 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _primaryPageLayoutControl.ClearSelection();
 
-                foreach (var outputDocument in _pendingDocuments.ToArray())
+                foreach (var outputDocument in _displayedDocuments.ToArray())
                 {
                     _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
-                    _pendingDocuments.Remove(outputDocument);
+                    _displayedDocuments.Remove(outputDocument);
                 }
 
                 SourceDocument[] sourceDocArray;
@@ -1452,13 +1467,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                                         statusOnly: true, displayValidationErrors: false);
                                 }
                             }
-                            _pendingDocuments.Add(outputDocument);
+                            _displayedDocuments.Add(outputDocument);
                         }
                         // Reverting a document for which there was suggested pagination. Rather than
                         // reverting document data, a new document data instance will be needed.
                         else
                         {
-                            // CreateOutputDocument will add the document to _pendingDocuments.
+                            // CreateOutputDocument will add the document to _displayedDocuments.
                             var outputDocument =
                                 ((IPaginationUtility)this).CreateOutputDocument(sourceDocument.FileName);
                             outputDocument.SetOriginalForm();
@@ -1488,9 +1503,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _primaryPageLayoutControl.LoadOutputDocument(outputDocument,
                             outputDocument.OriginalPages, outputDocument.OriginalDeletedPages,
                             outputDocument.OriginalViewedPages, true);
-                        if (!_pendingDocuments.Contains(outputDocument))
+                        if (!_displayedDocuments.Contains(outputDocument))
                         {
-                            _pendingDocuments.Add(outputDocument);
+                            _displayedDocuments.Add(outputDocument);
                         }
 
                         if (outputDocument.DocumentData != null)
@@ -1554,7 +1569,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             .SingleOrDefault(doc => doc.FileName == fileName);
                         if (sourceDocument != null)
                         {
-                            var documentsToDelete = _pendingDocuments
+                            var documentsToDelete = _displayedDocuments
                                 .Where(doc =>
                                     doc.PageControls
                                     .Any(c => c.Page.SourceDocument == sourceDocument))
@@ -1575,7 +1590,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                         ? docPosition
                                         : Math.Min(position, docPosition);
                                 }
-                                _pendingDocuments.Remove(outputDocument);
+                                _displayedDocuments.Remove(outputDocument);
                             }
 
                             // Output expected voa if so configured
@@ -1749,7 +1764,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     outputDocument.DocumentData = args.DocumentData;
                 }
 
-                _pendingDocuments.Add(outputDocument);
+                _displayedDocuments.Add(outputDocument);
 
                 return outputDocument;
             }
@@ -2154,60 +2169,69 @@ namespace Extract.UtilityApplications.PaginationUtility
                 });
 
             int pageCount = currentPages.Count();
-            long fileSize = File.Exists(tempFileName)
-                ? new FileInfo(tempFileName).Length
-                : 0; // Default to 0 if output file size is TBD
 
-            bool? suggestedPaginationAccepted = outputDocument.PaginationSuggested
-                ? (bool?)(outputDocument.InOriginalForm ? true : false)
-                : null;
-
-            int position = _outputDocumentPositions[outputDocument];
-
-            var sourcePages = outputDocument.PageControls
-                .Where(c => !c.Deleted)
-                .Select(c => (documentName: c.Page.OriginalDocumentName,
-                              page: c.Page.OriginalPageNumber,
-                              rotation: c.Page.ImageOrientation));
-            var rotatedPages = sourcePages
-                .Where(page => page.rotation != 0)
-                .Select(page =>
-                    (page.documentName,
-                        page.page,
-                        page.rotation))
-                .ToList().AsReadOnly();
-
-            bool pagesEqualButRotated = pagesEqual && rotatedPages.Count() > 0;
-
-            var eventArgs = new CreatingOutputDocumentEventArgs(
-                sourcePageInfo, pageCount, fileSize, suggestedPaginationAccepted, position,
-                outputDocument.DocumentData, rotatedPages, pagesEqualButRotated);
-
-            // CreatingOutputDocument will trigger the ouput document ID and pagination history to
-            // be added to the DB (and prevent it from being queued from a watching supplier)
-            // https://extract.atlassian.net/browse/ISSUE-13760
-            OnCreatingOutputDocument(eventArgs);
-            outputDocument.FileID = eventArgs.FileID;
-            string outputFileName = eventArgs.OutputFileName;
-
-            if (CreateDocumentOnOutput)
+            if (pageCount > 0)
             {
-                ExtractException.Assert("ELI39588",
-                    "No filename has been specified for pagination output.",
-                    !string.IsNullOrWhiteSpace(outputFileName));
+                long fileSize = File.Exists(tempFileName)
+                    ? new FileInfo(tempFileName).Length
+                    : 0; // Default to 0 if output file size is TBD
 
-                File.Copy(tempFileName, outputFileName);
+                bool? suggestedPaginationAccepted = outputDocument.PaginationSuggested
+                    ? (bool?)(outputDocument.InOriginalForm ? true : false)
+                    : null;
+
+                int position = _outputDocumentPositions[outputDocument];
+
+                var sourcePages = outputDocument.PageControls
+                    .Where(c => !c.Deleted)
+                    .Select(c => (documentName: c.Page.OriginalDocumentName,
+                                  page: c.Page.OriginalPageNumber,
+                                  rotation: c.Page.ImageOrientation));
+                var rotatedPages = sourcePages
+                    .Where(page => page.rotation != 0)
+                    .Select(page =>
+                        (page.documentName,
+                            page.page,
+                            page.rotation))
+                    .ToList().AsReadOnly();
+
+                bool pagesEqualButRotated = pagesEqual && rotatedPages.Count() > 0;
+
+                var eventArgs = new CreatingOutputDocumentEventArgs(
+                    sourcePageInfo, pageCount, fileSize, suggestedPaginationAccepted, position,
+                    outputDocument.DocumentData, rotatedPages, pagesEqualButRotated);
+
+                // CreatingOutputDocument will trigger the output document ID and pagination history to
+                // be added to the DB (and prevent it from being queued from a watching supplier)
+                // https://extract.atlassian.net/browse/ISSUE-13760
+                OnCreatingOutputDocument(eventArgs);
+                outputDocument.FileID = eventArgs.FileID;
+                string outputFileName = eventArgs.OutputFileName;
+
+                if (CreateDocumentOnOutput)
+                {
+                    ExtractException.Assert("ELI39588",
+                        "No filename has been specified for pagination output.",
+                        !string.IsNullOrWhiteSpace(outputFileName));
+
+                    File.Copy(tempFileName, outputFileName);
+                }
+                else
+                {
+                    IUnknownVector saveFileData = new IUnknownVector();
+                    saveFileData.PushBack(GetDocumentAttribute(outputDocument, outputFileName));
+                    saveFileData.SaveTo(outputFileName + ".voa", false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
+                    saveFileData.ReportMemoryUsage();
+                }
+
+                // Will queue the output file per task settings.
+                OnOutputDocumentCreated(eventArgs);
             }
             else
             {
-                IUnknownVector saveFileData = new IUnknownVector();
-                saveFileData.PushBack(GetDocumentAttribute(outputDocument, outputFileName));
-                saveFileData.SaveTo(outputFileName + ".voa", false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
-                saveFileData.ReportMemoryUsage();
+                // All pages in the document are deleted; raise OutputDocumentDeleted.
+                OnOutputDocumentDeleted(new OutputDocumentDeletedEventArgs(sourcePageInfo, outputDocument.DocumentData));
             }
-
-            // Will queue the output file per task settings.
-            OnOutputDocumentCreated(eventArgs);
         }
 
         /// <summary>
@@ -2378,12 +2402,12 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Handles the ObservableCollection.CollectionChanged event of
-        /// <see cref="_pendingDocuments"/>.
+        /// <see cref="_displayedDocuments"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/> instance containing
         /// the event data.</param>
-        void HandlePendingDocuments_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        void HandleDisplayedDocuments_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             try
             {
@@ -2416,7 +2440,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Handles the <see cref="OutputDocument.DocumentStateChanged"/> event for all
-        /// <see cref="_pendingDocuments"/>.
+        /// <see cref="_displayedDocuments"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
@@ -2428,7 +2452,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var document = (OutputDocument)sender;
 
                 // Prevent unnecessary updates of separators as document data is being prepared for commit.
-                if (_committingChanges && _pendingDocuments.Contains(document))
+                if (_committingChanges && _displayedDocuments.Contains(document))
                 {
                     return;
                 }
@@ -2669,6 +2693,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Private Members
 
         /// <summary>
+        /// The subset of <see cref="_displayedDocuments"/> that are still pending to be applied.
+        /// </summary>
+        IEnumerable<OutputDocument> PendingDocuments
+        {
+            get
+            {
+                return _displayedDocuments?.Where(document => !document.OutputProcessed);
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether all documents are currently collapsed (pages hidden).
         /// </summary>
         /// <value><see langword="true"/> if all documents are collapsed; otherwise,
@@ -2678,7 +2713,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return _pendingDocuments.All(doc => doc.Collapsed
+                return _displayedDocuments.All(doc => doc.Collapsed
                     || !doc.PageControls.Any());
             }
         }
@@ -2690,7 +2725,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// pages of <see langword="false"/> to expand them to display all pages.</param>
         void CollapseAll(bool collapse)
         {
-            foreach (var document in _pendingDocuments)
+            foreach (var document in _displayedDocuments)
             {
                 var separator = document.PaginationSeparator;
                 if (separator != null)
@@ -2711,8 +2746,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             get
             {
                 return CommitOnlySelection &&
-                    _pendingDocuments.Any() &&
-                    _pendingDocuments.All(doc => doc.PageControls.Count == 0 || doc.Selected);
+                    _displayedDocuments.Any() &&
+                    _displayedDocuments.All(doc => doc.PageControls.Count == 0 || doc.Selected);
             }
         }
 
@@ -2723,7 +2758,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see langword="false"/> to clear all the check boxes.</param>
         void SelectAllToCommit(bool select)
         {
-            foreach (var document in _pendingDocuments)
+            foreach (var document in PendingDocuments)
             {
                 var separator = document.PaginationSeparator;
                 if (separator != null)
@@ -2935,7 +2970,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return true;
             }
 
-            if (IsDataPanelOpen)
+            var documentsToSave = _displayedDocuments.Where(document =>
+                document.PageControls.Any(c => !c.Deleted) &&
+                (!selectedDocumentsOnly || document.Selected))
+                .ToArray();
+
+            if (IsDataPanelOpen && documentsToSave.Contains(_primaryPageLayoutControl.DocumentInDataEdit))
             {
                 if (!CloseDataPanel(validateData))
                 {
@@ -2944,11 +2984,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return false;
                 }
             }
-
-            var documentsToSave = _pendingDocuments.Where(document =>
-                document.PageControls.Any(c => !c.Deleted) &&
-                (!selectedDocumentsOnly || document.Selected))
-                .ToArray();
 
             if (documentsToSave.Length > 0)
             {
@@ -3010,73 +3045,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Outputs the data pagination and index data for all source documents without
-        /// first updating the index data from each document.
-        /// NOTE: An exception will be thrown if the pages from multiple source documents
-        /// are currently combined into a single proposed output document.
-        /// </summary>
-        /// <returns><c>true</c> if the data was saved; otherwise, <c>false</c>.</returns>
-        bool OutputVoa()
-        {
-            try
-            {
-                var sourcesToOutputList = _pendingDocuments.Select(pendingDocument =>
-                    (sourceDocs:
-                        pendingDocument
-                            .PageControls
-                            .Select(pageControl => pageControl.Page.SourceDocument)
-                            .Distinct()
-                            .ToList(),
-                    pendingDocument: pendingDocument)
-                ).ToList();
-
-                if (sourcesToOutputList.Any(x => x.sourceDocs.Count() > 1))
-                {
-                    UtilityMethods.ShowMessageBox("It is not possible to save progress when multiple " +
-                        "source documents have been combined into a single output document.",
-                        "Unable to save", true);
-                    return false;
-                }
-
-
-                var documentsToSave = new Dictionary<SourceDocument, List<OutputDocument>>();
-                foreach (var (sourceDocs, pendingDocument) in sourcesToOutputList.Where(entry => entry.sourceDocs.Any()))
-                {
-                    var outputDocs = documentsToSave.GetOrAdd(sourceDocs.Single(), _ => new List<OutputDocument>());
-                    outputDocs.Add(pendingDocument);
-                }
-
-                var orderedDocuments = _primaryPageLayoutControl.Documents.ToList();
-
-                foreach (var sourceEntry in documentsToSave)
-                {
-                    var sourceDocName = sourceEntry.Key.FileName;
-                    var documentAttributes = new IUnknownVector();
-
-                    foreach (var outputDoc in sourceEntry.Value.OrderBy(doc => orderedDocuments.IndexOf(doc)))
-                    {
-                        var documentAttribute = GetDocumentAttribute(outputDoc, sourceDocName);
-                        documentAttributes.PushBack(documentAttribute);
-                    }
-
-                    if (documentAttributes.Size() > 0)
-                    {
-                        IUnknownVector saveFileData = new IUnknownVector();
-                        saveFileData.Append(documentAttributes);
-                        saveFileData.SaveTo(sourceEntry.Key.FileName + ".voa", false, _ATTRIBUTE_STORAGE_MANAGER_GUID);
-                        saveFileData.ReportMemoryUsage();
-                    }
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45736");
-            }
         }
 
         /// <summary>
@@ -3263,7 +3231,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _updatingCommandStates = true;
 
-                    var nonEmptyDocs = _pendingDocuments.Where(doc =>
+                    var nonEmptyDocs = PendingDocuments.Where(doc =>
                         doc.PageControls.Any()).ToList();
                     var docsWithNonDeletedPages = nonEmptyDocs.Where(doc =>
                         doc.PageControls.Any(c => !c.Deleted));
@@ -3281,7 +3249,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         || nonEmptyDocs.Any(doc => !doc.InSourceDocForm);
                     _revertToSourceToolStripButton.Enabled = RevertToSourceEnabled;
 
-                    _saveToolStripButton.Enabled = _pendingDocuments.Any();
+                    _saveToolStripButton.Enabled = PendingDocuments.Any();
                     _applyToolStripButton.Enabled = CommitEnabled;
                     _collapseAllToolStripButton.Image =
                         AllDocumentsCollapsed
@@ -3289,7 +3257,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             : Properties.Resources.Collapse;
                     if (CommitOnlySelection)
                     {
-                        _selectAllToCommitCheckBox.Enabled = _pendingDocuments.Any();
+                        _selectAllToCommitCheckBox.Enabled = PendingDocuments.Any();
                         _selectAllToCommitCheckBox.Checked = AllDocumentsSelected;
                     }
                 }
@@ -3667,6 +3635,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         private void OnOutputDocumentCreated(CreatingOutputDocumentEventArgs eventArgs)
         {
             OutputDocumentCreated?.Invoke(this, eventArgs);
+        }
+
+        /// <summary>
+        /// Raises the <see cref="OutputDocumentDeleted"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The <see cref="OutputDocumentDeletedEventArgs"/> instance to
+        /// use when raising the event.</param>
+        private void OnOutputDocumentDeleted(OutputDocumentDeletedEventArgs eventArgs)
+        {
+            OutputDocumentDeleted?.Invoke(this, eventArgs);
         }
 
         /// <summary>

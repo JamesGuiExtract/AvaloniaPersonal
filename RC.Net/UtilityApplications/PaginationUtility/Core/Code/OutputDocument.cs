@@ -551,6 +551,18 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// <c>true</c> if the document has already been processed (output or deleted).
+        /// <c>false</c> if the document is still pending for output.
+        /// </summary>
+        public bool OutputProcessed
+        {
+            get
+            {
+                return _documentData?.PaginationRequest != null;
+            }
+        }
+
         #endregion Properties
 
         #region Methods

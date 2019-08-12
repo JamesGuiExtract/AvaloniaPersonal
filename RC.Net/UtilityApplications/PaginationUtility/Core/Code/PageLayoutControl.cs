@@ -1099,7 +1099,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
-                if (DefaultToCollapsed)
+                if (DefaultToCollapsed || outputDocument.OutputProcessed)
                 {
                     outputDocument.Collapsed = true;
                 }
@@ -2191,6 +2191,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return;
                 }
 
+                // Do not allow modification of documents that have already been output.
+                if (SelectedControls
+                        .OfType<PageThumbnailControl>()
+                        .Any(pageControl => pageControl.Document.OutputProcessed))
+                {
+                    return;
+                }
+
                 // Assigning a ToolTip instance for all page controls uses a lot of GDI handles.
                 // Instead, dynamically assign a single _toolTip instance the control the mouse is
                 // currently over.
@@ -2218,9 +2226,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // Don't start a drag and drop operation unless the user has dragged out of
                         // the origin control to help prevent accidental drag/drops.
                         Point mouseLocation = PointToClient(Control.MousePosition);
-                        var currentControl = GetPaginationControlAtPoint(mouseLocation);
+                        var pageThumbnailControl = GetThumbnailControlAtPoint(mouseLocation);
+                        var originThumbnailControl = sender as PageThumbnailControl;
 
-                        if (currentControl != null && currentControl != originControl)
+                        if (pageThumbnailControl != null
+                            && pageThumbnailControl != originControl
+                            && originThumbnailControl?.Document?.OutputProcessed != true
+                            && !pageThumbnailControl.Document.OutputProcessed)
                         {
                             // [DotNetRCAndUtils:968]
                             // If the control where the drag originated is not selected, imply
@@ -2331,31 +2343,33 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 Point dragLocation = PointToClient(new Point(e.X, e.Y));
-                var control = GetPaginationControlAtPoint(dragLocation);
+                var pageThumbnailControl = GetThumbnailControlAtPoint(dragLocation);
 
-                if (control != null && control.Visible)
+                if (pageThumbnailControl != null
+                    && pageThumbnailControl.Visible
+                    && pageThumbnailControl.Document.OutputProcessed != true)
                 {
-                    _dropLocationIndex = _flowLayoutPanel.Controls.IndexOf(control);
+                    _dropLocationIndex = _flowLayoutPanel.Controls.IndexOf(pageThumbnailControl);
                     Point location;
 
                     // Because a lot of padding may be added to extend a page control out to the end
                     // of a row, take the padding into account when deciding whether a drop should
                     // occur before or after the page.
-                    int left = control.Left + control.Padding.Left;
-                    int right = control.Right - control.Padding.Right;
+                    int left = pageThumbnailControl.Left + pageThumbnailControl.Padding.Left;
+                    int right = pageThumbnailControl.Right - pageThumbnailControl.Padding.Right;
                     int center = (right - left) / 2;
 
-                    if ((dragLocation.X - control.Left) > center)
+                    if ((dragLocation.X - pageThumbnailControl.Left) > center)
                     {
                         _dropLocationIndex++;
-                        location = control.TrailingInsertionPoint;
+                        location = pageThumbnailControl.TrailingInsertionPoint;
                     }
                     else
                     {
-                        location = control.PreceedingInsertionPoint;
+                        location = pageThumbnailControl.PreceedingInsertionPoint;
                     }
 
-                    ShowDropLocationIndicator(location, control.Height);
+                    ShowDropLocationIndicator(location, pageThumbnailControl.Height);
                     e.Effect = e.AllowedEffect;
                 }
                 else
@@ -2517,7 +2531,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Whenever the context menu opens, use the current mouse position as the target of
                 // any context menu command rather than the active control.
                 Point mouseLocation = PointToClient(MousePosition);
-                _commandTargetControl = GetPaginationControlAtPoint(mouseLocation);
+                _commandTargetControl = GetThumbnailControlAtPoint(mouseLocation);
                 if (_commandTargetControl != null && !_commandTargetControl.Selected)
                 {
                     ProcessControlSelection(_commandTargetControl);
@@ -3606,9 +3620,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _commandTargetControl != null && _commandTargetControl.Selected &&
                     SelectedControls.Where(control => control != _loadNextDocumentButtonControl).Any();
 
+            // Do not allow modification of documents that have already been output.
+            bool enablePageModificationCommands =
+                !SelectedControls.OfType<PageThumbnailControl>().Any(c => c.Document.OutputProcessed);
+
             // The cut command is applicable to separators if the only thing selected is a
             // separator. Depending upon SetSelected to prevent mixed selection.
-            bool enabledCutCommand = enableSelectionBasedCommands &&
+            bool enabledCutCommand = enableSelectionBasedCommands && enablePageModificationCommands &&
                 (!SelectedControls
                     .OfType<PageThumbnailControl>()
                     .Any(page => page.Deleted) ||
@@ -3616,7 +3634,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             // The delete command is applicable to separators if the only thing selected is a
             // separator. Depending upon SetSelected to prevent mixed selection.
-            bool enableDeleteCommand =
+            bool enableDeleteCommand = enablePageModificationCommands &&
                 _commandTargetControl != null && _commandTargetControl.Selected &&
                 (SelectedControls
                     .OfType<PageThumbnailControl>()
@@ -3624,9 +3642,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 SelectedControls.Any(c => c.GetType() == typeof(PaginationSeparator)));
             _deleteCommand.Enabled = enableDeleteCommand;
 
-            // The un-delete command will be enabled only in the case that there are no deleted
+            // The un-delete command will be enabled only in the case that there are deleted
             // pages included in the selection.
-            bool enableUnDeleteCommand =
+            bool enableUnDeleteCommand = enablePageModificationCommands &&
                 _commandTargetControl != null && _commandTargetControl.Selected &&
                 SelectedControls
                     .OfType<PageThumbnailControl>()
@@ -3661,9 +3679,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         ? SelectedPageControls.Single().Document
                         : null;
                 _toggleDocumentSeparatorCommand.Enabled =
-                    (contextMenuControlIndex > 1 &&
-                    singlySelectedDocument != null &&
-                    !singlySelectedDocument.Collapsed);
+                    (enablePageModificationCommands
+                    && contextMenuControlIndex > 1
+                    && singlySelectedDocument != null
+                    && !singlySelectedDocument.Collapsed);
                 var asPageThumbnailControl = _commandTargetControl as PageThumbnailControl;
 
                 if (_toggleDocumentSeparatorCommand.Enabled &&
@@ -3672,6 +3691,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _toggleDocumentSeparatorMenuItem.Text = "Merge with previous document";
                     _toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "";
+
+                    // Search for the previous page control to _commandTargetControl.
+                    if (!(_commandTargetControl.PreviousControl is PageThumbnailControl previousPage))
+                    {
+                        previousPage = _commandTargetControl.PreviousControl?.PreviousControl
+                            as PageThumbnailControl;
+                    }
+
+                    // If the previous page belongs to an alread output document, don't allow this document to be merged.
+                    if (previousPage == null || previousPage.Document.OutputProcessed)
+                    {
+                        _toggleDocumentSeparatorCommand.Enabled = false;
+                    }
                 }
                 else
                 {
@@ -3680,8 +3712,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 // Inserted copied items requires there to be copied items and a single selection.
-                _pasteCommand.Enabled = ClipboardHasData() &&
-                    SelectedControls.Count() == 1;
+                _pasteCommand.Enabled =
+                    enablePageModificationCommands
+                    && ClipboardHasData()
+                    && SelectedControls.Count() == 1;
             }
 
             // Initiating document output via this control is only allowed if ExternalOutputOnly is
@@ -3814,15 +3848,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets the <see cref="PaginationControl"/> that exists at the specified
+        /// Gets the <see cref="PageThumbnailControl"/> that exists at the specified
         /// <see paramref="location"/>.
         /// </summary>
-        /// <param name="location">The location to check for a <see cref="PaginationControl"/>.
+        /// <param name="location">The location to check for a <see cref="PageThumbnailControl"/>.
         /// </param>
-        /// <returns>The <see cref="PaginationControl"/> that exists at the specified
+        /// <returns>The <see cref="PageThumbnailControl"/> that exists at the specified
         /// <see paramref="location"/> or <see langword="null"/> if no control exists at the
         /// specified location.</returns>
-        PaginationControl GetPaginationControlAtPoint(Point location)
+        PageThumbnailControl GetThumbnailControlAtPoint(Point location)
         {
             return _flowLayoutPanel
                 .Controls

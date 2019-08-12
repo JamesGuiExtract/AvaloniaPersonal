@@ -100,14 +100,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         DataEntryPaginationDocumentData _documentData;
 
         /// <summary>
-        /// Keeps track of the documents for which a <see cref="UpdateDocumentStatus"/> call is in
+        /// Keeps track of the documents for which a <see cref="StartUpdateDocumentStatus"/> call is in
         /// progress on a background thread.
         /// </summary>
         ConcurrentDictionary<PaginationDocumentData, int> _pendingDocumentStatusUpdate =
             new ConcurrentDictionary<PaginationDocumentData, int>();
 
         /// <summary>
-        /// Limits the number of threads that can run concurrently for <see cref="UpdateDocumentStatus"/> calls.
+        /// Limits the number of threads that can run concurrently for <see cref="StartUpdateDocumentStatus"/> calls.
         /// I recently changed this from 4 to 10 because threads tend to get tied up in locking for cache access
         /// in SQLQueryNodes which means it doesn't get anywhere near full CPU utilization of the threads here.
         /// The only reason I hesitate to go higher is potential memory usage in complex DEPs (esp that use
@@ -223,7 +223,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         /// <param name="imageViewer">The <see cref="ImageViewer"/> to use.</param>
         /// <param name="threadManager">The <see cref="ThreadManager"/> to use to manage
-        /// <see cref="UpdateDocumentStatus"/> threads.</param>
+        /// <see cref="StartUpdateDocumentStatus"/> threads.</param>
         DataEntryPanelContainer(DataEntryConfigurationManager<Properties.Settings> configManager,
             IDataEntryApplication dataEntryApp, ITagUtility tagUtility, ImageViewer imageViewer,
             ThreadManager threadManager)
@@ -525,7 +525,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var documentData = ActiveDataEntryPanel.GetDocumentData(attributes, sourceDocName);
-                UpdateDocumentStatus(documentData, statusOnly: true, applyUpdateToUI: true, displayValidationErrors: false);
+                StartUpdateDocumentStatus(documentData, statusOnly: true, applyUpdateToUI: true, displayValidationErrors: false);
 
                 return documentData;
             }
@@ -555,7 +555,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var documentData = ActiveDataEntryPanel.GetDocumentData(documentDataAttribute, sourceDocName);
-                UpdateDocumentStatus(documentData, statusOnly: true, applyUpdateToUI: true, displayValidationErrors: false);
+                StartUpdateDocumentStatus(documentData, statusOnly: true, applyUpdateToUI: true, displayValidationErrors: false);
 
                 return documentData;
             }
@@ -580,7 +580,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var dataEntryData = data as DataEntryPaginationDocumentData;
-                UpdateDocumentStatus(dataEntryData, statusOnly, applyUpdateToUI: true, displayValidationErrors: displayValidationErrors);
+                StartUpdateDocumentStatus(dataEntryData, statusOnly, applyUpdateToUI: true, displayValidationErrors: displayValidationErrors);
             }
             catch (Exception ex)
             {
@@ -1047,7 +1047,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Gets or sets the <see cref="ThreadManager"/> to use to manage
-        /// <see cref="UpdateDocumentStatus"/> threads.
+        /// <see cref="StartUpdateDocumentStatus"/> threads.
         /// </summary>
         ThreadManager StatusUpdateThreadManager
         {
@@ -1112,8 +1112,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Updates the <see cref="Summary"/>, <see cref="DataModified"/> and  <see cref="DataError"/>
-        /// properties of <see paramref="documentData"/> by loading the data into a background panel.
+        /// Triggers an update to the <see cref="Summary"/>, <see cref="DataModified"/> and
+        /// <see cref="DataError"/> properties of <see paramref="documentData"/> by processing the
+        /// data in a background thread. If the results of status updates are needed
+        /// programmatically rather than to update the UI, <see cref="WaitForDocumentStatusUpdates"/>
+        /// should be used before checking the updated status.
         /// </summary>
         /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData"/> for which
         /// document status should be updated.</param>
@@ -1124,7 +1127,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <c>false</c> if the status is going to be used programmatically (without a UI).</param>
         /// <param name = "displayValidationErrors"><c>true</c> if you want to display validation errors;
         /// <c>false</c> if you do not want to display validation errors.</param>
-        public async void UpdateDocumentStatus(DataEntryPaginationDocumentData documentData,
+        public void StartUpdateDocumentStatus(DataEntryPaginationDocumentData documentData,
             bool statusOnly, bool applyUpdateToUI, bool displayValidationErrors)
         {
             try
@@ -1172,12 +1175,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }));
 
-                await Task.Run(() =>
-                {
-                    thread.SetApartmentState(ApartmentState.STA);
-                    thread.Start();
-                    thread.Join();
-                });
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
             }
             catch (Exception ex)
             {
@@ -1186,7 +1185,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Code running in a background thread in support of <see cref="UpdateDocumentStatus" />
+        /// Code running in a background thread in support of <see cref="StartUpdateDocumentStatus" />
         /// </summary>
         /// <param name="backgroundConfigManager">The manager to use to load the data.</param>
         /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData" /> for which

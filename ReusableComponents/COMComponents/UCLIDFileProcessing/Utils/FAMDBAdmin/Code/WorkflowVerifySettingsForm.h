@@ -183,6 +183,9 @@ private: System::Windows::Forms::DataGridView^  _redactionTypesDataGridView;
 private: System::Windows::Forms::DataGridViewTextBoxColumn^  _docTypeColumn;
 private: System::Windows::Forms::CheckBox^  _autoCloseSessionCheckBox;
 private: System::Windows::Forms::NumericUpDown^  _inactivityTimeoutMinutesUpDown;
+private: System::Windows::Forms::Label^ label3;
+private: System::Windows::Forms::TextBox^ _docTypeListFilename;
+
 
 
 
@@ -207,7 +210,7 @@ private: System::Windows::Forms::NumericUpDown^  _inactivityTimeoutMinutesUpDown
 			/// </summary>
 			void InitializeComponent(void)
 			{
-				System::Windows::Forms::Label^  label2;
+				System::Windows::Forms::Label^ label2;
 				this->okButton = (gcnew System::Windows::Forms::Button());
 				this->cancelButton = (gcnew System::Windows::Forms::Button());
 				this->label1 = (gcnew System::Windows::Forms::Label());
@@ -215,6 +218,8 @@ private: System::Windows::Forms::NumericUpDown^  _inactivityTimeoutMinutesUpDown
 				this->_docTypeColumn = (gcnew System::Windows::Forms::DataGridViewTextBoxColumn());
 				this->_autoCloseSessionCheckBox = (gcnew System::Windows::Forms::CheckBox());
 				this->_inactivityTimeoutMinutesUpDown = (gcnew System::Windows::Forms::NumericUpDown());
+				this->label3 = (gcnew System::Windows::Forms::Label());
+				this->_docTypeListFilename = (gcnew System::Windows::Forms::TextBox());
 				label2 = (gcnew System::Windows::Forms::Label());
 				(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->_redactionTypesDataGridView))->BeginInit();
 				(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->_inactivityTimeoutMinutesUpDown))->BeginInit();
@@ -224,19 +229,19 @@ private: System::Windows::Forms::NumericUpDown^  _inactivityTimeoutMinutesUpDown
 				// 
 				label2->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
 				label2->AutoSize = true;
-				label2->Location = System::Drawing::Point(267, 252);
+				label2->Location = System::Drawing::Point(267, 319);
 				label2->Name = L"label2";
 				label2->Size = System::Drawing::Size(102, 13);
-				label2->TabIndex = 4;
+				label2->TabIndex = 6;
 				label2->Text = L"minutes of inactivity.";
 				// 
 				// okButton
 				// 
 				this->okButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
-				this->okButton->Location = System::Drawing::Point(228, 282);
+				this->okButton->Location = System::Drawing::Point(228, 349);
 				this->okButton->Name = L"okButton";
 				this->okButton->Size = System::Drawing::Size(75, 23);
-				this->okButton->TabIndex = 5;
+				this->okButton->TabIndex = 7;
 				this->okButton->Text = L"O&K";
 				this->okButton->UseVisualStyleBackColor = true;
 				this->okButton->Click += gcnew System::EventHandler(this, &WorkflowVerifySettingsForm::HandleOkButton_Click);
@@ -246,10 +251,10 @@ private: System::Windows::Forms::NumericUpDown^  _inactivityTimeoutMinutesUpDown
 				this->cancelButton->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right));
 				this->cancelButton->CausesValidation = false;
 				this->cancelButton->DialogResult = System::Windows::Forms::DialogResult::Cancel;
-				this->cancelButton->Location = System::Drawing::Point(309, 282);
+				this->cancelButton->Location = System::Drawing::Point(309, 349);
 				this->cancelButton->Name = L"cancelButton";
 				this->cancelButton->Size = System::Drawing::Size(75, 23);
-				this->cancelButton->TabIndex = 6;
+				this->cancelButton->TabIndex = 8;
 				this->cancelButton->Text = L"&Cancel";
 				this->cancelButton->UseVisualStyleBackColor = true;
 				// 
@@ -272,7 +277,7 @@ private: System::Windows::Forms::NumericUpDown^  _inactivityTimeoutMinutesUpDown
 				this->_redactionTypesDataGridView->Columns->AddRange(gcnew cli::array< System::Windows::Forms::DataGridViewColumn^  >(1) { this->_docTypeColumn });
 				this->_redactionTypesDataGridView->Location = System::Drawing::Point(125, 12);
 				this->_redactionTypesDataGridView->Name = L"_redactionTypesDataGridView";
-				this->_redactionTypesDataGridView->Size = System::Drawing::Size(258, 220);
+				this->_redactionTypesDataGridView->Size = System::Drawing::Size(258, 241);
 				this->_redactionTypesDataGridView->TabIndex = 1;
 				// 
 				// _docTypeColumn
@@ -285,10 +290,10 @@ private: System::Windows::Forms::NumericUpDown^  _inactivityTimeoutMinutesUpDown
 				// 
 				this->_autoCloseSessionCheckBox->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
 				this->_autoCloseSessionCheckBox->AutoSize = true;
-				this->_autoCloseSessionCheckBox->Location = System::Drawing::Point(16, 251);
+				this->_autoCloseSessionCheckBox->Location = System::Drawing::Point(16, 318);
 				this->_autoCloseSessionCheckBox->Name = L"_autoCloseSessionCheckBox";
 				this->_autoCloseSessionCheckBox->Size = System::Drawing::Size(183, 17);
-				this->_autoCloseSessionCheckBox->TabIndex = 2;
+				this->_autoCloseSessionCheckBox->TabIndex = 4;
 				this->_autoCloseSessionCheckBox->Text = L"Automatically close sessions after";
 				this->_autoCloseSessionCheckBox->UseVisualStyleBackColor = true;
 				this->_autoCloseSessionCheckBox->CheckedChanged += gcnew System::EventHandler(this, &WorkflowVerifySettingsForm::HandleAutoCloseSessionCheckBox_CheckedChanged);
@@ -296,13 +301,32 @@ private: System::Windows::Forms::NumericUpDown^  _inactivityTimeoutMinutesUpDown
 				// _inactivityTimeoutMinutesUpDown
 				// 
 				this->_inactivityTimeoutMinutesUpDown->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
-				this->_inactivityTimeoutMinutesUpDown->Location = System::Drawing::Point(210, 250);
+				this->_inactivityTimeoutMinutesUpDown->Location = System::Drawing::Point(210, 317);
 				this->_inactivityTimeoutMinutesUpDown->Maximum = System::Decimal(gcnew cli::array< System::Int32 >(4) { 60, 0, 0, 0 });
 				this->_inactivityTimeoutMinutesUpDown->Minimum = System::Decimal(gcnew cli::array< System::Int32 >(4) { 1, 0, 0, 0 });
 				this->_inactivityTimeoutMinutesUpDown->Name = L"_inactivityTimeoutMinutesUpDown";
 				this->_inactivityTimeoutMinutesUpDown->Size = System::Drawing::Size(51, 20);
-				this->_inactivityTimeoutMinutesUpDown->TabIndex = 3;
+				this->_inactivityTimeoutMinutesUpDown->TabIndex = 5;
 				this->_inactivityTimeoutMinutesUpDown->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) { 1, 0, 0, 0 });
+				// 
+				// label3
+				// 
+				this->label3->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left));
+				this->label3->AutoSize = true;
+				this->label3->Location = System::Drawing::Point(13, 261);
+				this->label3->Name = L"label3";
+				this->label3->Size = System::Drawing::Size(245, 13);
+				this->label3->TabIndex = 2;
+				this->label3->Text = L"Specify a file containing available document types:";
+				// 
+				// _docTypeListFilename
+				// 
+				this->_docTypeListFilename->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Left)
+					| System::Windows::Forms::AnchorStyles::Right));
+				this->_docTypeListFilename->Location = System::Drawing::Point(16, 278);
+				this->_docTypeListFilename->Name = L"_docTypeListFilename";
+				this->_docTypeListFilename->Size = System::Drawing::Size(368, 20);
+				this->_docTypeListFilename->TabIndex = 3;
 				// 
 				// WorkflowVerifySettingsForm
 				// 
@@ -310,7 +334,9 @@ private: System::Windows::Forms::NumericUpDown^  _inactivityTimeoutMinutesUpDown
 				this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 				this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 				this->CancelButton = this->cancelButton;
-				this->ClientSize = System::Drawing::Size(395, 315);
+				this->ClientSize = System::Drawing::Size(395, 382);
+				this->Controls->Add(this->_docTypeListFilename);
+				this->Controls->Add(this->label3);
 				this->Controls->Add(label2);
 				this->Controls->Add(this->_inactivityTimeoutMinutesUpDown);
 				this->Controls->Add(this->_autoCloseSessionCheckBox);

@@ -75,6 +75,7 @@ namespace Extract
 				{
 					settings->InactivityTimeout = 0;
 				}
+				settings->DocumentTypes = _docTypeListFilename->Text;
 
 				_settings = settings;
 
@@ -125,6 +126,8 @@ namespace Extract
 					_inactivityTimeoutMinutesUpDown->Value = defaults.InactivityTimeout;
 					_inactivityTimeoutMinutesUpDown->Enabled = false;
 				}
+
+				_docTypeListFilename->Text = _settings->DocumentTypes;
 			}
 		}
 

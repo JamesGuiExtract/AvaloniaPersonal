@@ -18,7 +18,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             if (disposing)
             {
-                foreach (var oldDocument in _pendingDocuments)
+                foreach (var oldDocument in _displayedDocuments)
                 {
                     var disposableData = oldDocument.DocumentData as IDisposable;
                     if (disposableData != null)
@@ -26,7 +26,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         disposableData.Dispose();
                     }
                 }
-                _pendingDocuments.Clear();
+                _displayedDocuments.Clear();
 
                 Extract.Utilities.CollectionMethods.ClearAndDispose(_sourceDocuments);
 

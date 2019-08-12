@@ -1378,7 +1378,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // Register for OutputDocumentCreated event in order to set status for the
                     // PaginationOutputAction _after_ the document has been created
                     _paginationPanel.OutputDocumentCreated += HandlePaginationPanel_OutputDocumentCreated;
-                    _paginationPanel.FileTaskSessionIdRequest += (o, args) => args.FileTaskSessionID = _fileTaskSessionID;
 
                     if (_configManager.RegisteredDocumentTypes.Any())
                     {
@@ -3169,7 +3168,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // process from getting it.
                 var newFileInfo = _paginatedOutputCreationUtility.AddFileWithNameConflictResolve(
                     e.SourcePageInfo, (FAMTagManager)_tagUtility, _fileTaskSessionID.Value);
-                
+                e.FileID = newFileInfo.FileID;
+                e.OutputFileName = newFileInfo.FileName;
+
                 // Add pagination history before the image is created so that it does not
                 // get queued by a watching supplier
                 // https://extract.atlassian.net/browse/ISSUE-13760
@@ -3236,6 +3237,30 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI39595");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="PaginationPanel.OutputDocumentDeleted"/> of the <see cref="_paginationPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="OutputDocumentDeletedEventArgs"/> instance containing the event data.</param>
+        void HandlePaginationPanel_OutputDocumentDeleted(object sender, OutputDocumentDeletedEventArgs e)
+        {
+            try
+            {
+                var firstSourceFile = e.DeletePageInfo
+                    .Select(pageInfo => pageInfo.DocumentName)
+                    .First();
+                
+                ExtractException.Assert("ELI47217", "FileTaskSession was not started.", _fileTaskSessionID.HasValue);
+
+                _paginatedOutputCreationUtility.WritePaginationHistory(
+                    e.DeletePageInfo, -1, _fileTaskSessionID.Value);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47218");
             }
         }
 

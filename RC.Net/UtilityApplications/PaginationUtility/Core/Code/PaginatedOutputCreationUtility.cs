@@ -154,62 +154,69 @@ namespace Extract.UtilityApplications.PaginationUtility
         public (int FileID, string FileName) AddFileWithNameConflictResolve(
             IEnumerable<PageInfo> pageInfos, FAMTagManager tagManager, int fileTaskSessionId)
         {
-            var sourcePageInfo = pageInfos.Where(info => !info.Deleted).ToList();
-            int pageCount = sourcePageInfo.Count;
-
-            string outputFileName = GetPaginatedDocumentFileName(pageInfos, tagManager);
-            var priority = GetPriorityForFile(pageInfos);
-
-            // Create directory if it doesn't exist
-            Directory.CreateDirectory(Path.GetDirectoryName(outputFileName));
-
-            // First resolve conflict with file system
-            if (File.Exists(outputFileName))
-            {
-                var pathTags = new SourceDocumentPathTags(outputFileName);
-                outputFileName = pathTags.Expand(
-                    "$InsertBeforeExt(<SourceDocName>,_$RandomAlphaNumeric(6))");
-            }
-
-            int fileID = -1;
-            const int nCurrentWorkflow = -1;
             try
             {
-                fileID = _fileProcessingDB.AddFileNoQueue(
-                    outputFileName, 0, pageCount, priority, nCurrentWorkflow);
-            }
-            catch (Exception ex)
-            {
-                // Query to see if the e.OutputFileName can be found in the database.
-                string query = string.Format(CultureInfo.InvariantCulture,
-                    "SELECT [ID] FROM [FAMFile] WHERE [FileName] = '{0}'",
-                    outputFileName.Replace("'", "''"));
+                var sourcePageInfo = pageInfos.Where(info => !info.Deleted).ToList();
+                int pageCount = sourcePageInfo.Count;
 
-                var recordset = _fileProcessingDB.GetResultsForQuery(query);
-                bool fileExistsInDB = !recordset.EOF;
-                recordset.Close();
-                if (fileExistsInDB)
+                string outputFileName = GetPaginatedDocumentFileName(pageInfos, tagManager);
+                var priority = GetPriorityForFile(pageInfos);
+
+                // Create directory if it doesn't exist
+                Directory.CreateDirectory(Path.GetDirectoryName(outputFileName));
+
+                // First resolve conflict with file system
+                if (File.Exists(outputFileName))
                 {
                     var pathTags = new SourceDocumentPathTags(outputFileName);
                     outputFileName = pathTags.Expand(
                         "$InsertBeforeExt(<SourceDocName>,_$RandomAlphaNumeric(6))");
+                }
 
+                int fileID = -1;
+                const int nCurrentWorkflow = -1;
+                try
+                {
                     fileID = _fileProcessingDB.AddFileNoQueue(
                         outputFileName, 0, pageCount, priority, nCurrentWorkflow);
                 }
-                else
+                catch (Exception ex)
                 {
-                    // The file was not in the database, the call failed for another reason.
-                    throw ex.AsExtract("ELI47053");
+                    // Query to see if the e.OutputFileName can be found in the database.
+                    string query = string.Format(CultureInfo.InvariantCulture,
+                        "SELECT [ID] FROM [FAMFile] WHERE [FileName] = '{0}'",
+                        outputFileName.Replace("'", "''"));
+
+                    var recordset = _fileProcessingDB.GetResultsForQuery(query);
+                    bool fileExistsInDB = !recordset.EOF;
+                    recordset.Close();
+                    if (fileExistsInDB)
+                    {
+                        var pathTags = new SourceDocumentPathTags(outputFileName);
+                        outputFileName = pathTags.Expand(
+                            "$InsertBeforeExt(<SourceDocName>,_$RandomAlphaNumeric(6))");
+
+                        fileID = _fileProcessingDB.AddFileNoQueue(
+                            outputFileName, 0, pageCount, priority, nCurrentWorkflow);
+                    }
+                    else
+                    {
+                        // The file was not in the database, the call failed for another reason.
+                        throw ex.AsExtract("ELI47053");
+                    }
                 }
-            }
 
-            if (fileTaskSessionId > 0)
+                if (fileTaskSessionId > 0)
+                {
+                    WritePaginationHistory(pageInfos, fileID, fileTaskSessionId);
+                }
+
+                return (fileID, outputFileName);
+            }
+            catch (Exception ex)
             {
-                WritePaginationHistory(pageInfos, fileID, fileTaskSessionId);
+                throw ex.AsExtract("ELI47215");
             }
-
-            return (fileID, outputFileName);
         }
 
         /// <summary>
@@ -218,17 +225,28 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="outputDocument">The <see cref="OutputDocument"/> for which history should
         /// be recorded.</param>
-        void WritePaginationHistory(IEnumerable<PageInfo> pageInfos, int outputFileID, int fileTaskSessionId)
+        public void WritePaginationHistory(IEnumerable<PageInfo> pageInfos, int outputFileID, int fileTaskSessionId)
         {
-            var firstSourceFileName = pageInfos
-                .OrderBy(sourcePage => !sourcePage.Deleted) // Prefer (but not require) a non-deleted source document
-                .FirstOrDefault()
-                ?.DocumentName;
+            try
+            {
+                var firstSourceFileName = pageInfos
+            .OrderBy(sourcePage => !sourcePage.Deleted) // Prefer (but not require) a non-deleted source document
+            .FirstOrDefault()
+            ?.DocumentName;
 
-            var sourcePageInfo = (firstSourceFileName == null)
-                ? null
-                : pageInfos
-                    .Where(sourcePage => !sourcePage.Deleted)
+                var sourcePageInfo = (firstSourceFileName == null)
+                    ? null
+                    : pageInfos
+                        .Where(sourcePage => !sourcePage.Deleted)
+                        .Select(sourcePage => new StringPairClass
+                        {
+                            StringKey = sourcePage.DocumentName,
+                            StringValue = sourcePage.Page.ToString(CultureInfo.InvariantCulture)
+                        })
+                        .ToIUnknownVector();
+
+                var deletedSourcePageInfo = pageInfos
+                    .Where(sourcePage => sourcePage.Deleted)
                     .Select(sourcePage => new StringPairClass
                     {
                         StringKey = sourcePage.DocumentName,
@@ -236,17 +254,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     })
                     .ToIUnknownVector();
 
-            var deletedSourcePageInfo = pageInfos
-                .Where(sourcePage => sourcePage.Deleted)
-                .Select(sourcePage => new StringPairClass
-                {
-                    StringKey = sourcePage.DocumentName,
-                    StringValue = sourcePage.Page.ToString(CultureInfo.InvariantCulture)
-                })
-                .ToIUnknownVector();
-
-            _fileProcessingDB.AddPaginationHistory(
-                outputFileID, sourcePageInfo, deletedSourcePageInfo, fileTaskSessionId);
+                _fileProcessingDB.AddPaginationHistory(
+                    outputFileID, sourcePageInfo, deletedSourcePageInfo, fileTaskSessionId);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47216");
+            }
         }
     }
 }
