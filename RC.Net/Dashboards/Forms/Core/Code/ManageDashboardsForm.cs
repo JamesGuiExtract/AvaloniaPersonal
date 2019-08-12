@@ -113,7 +113,8 @@ namespace Extract.Dashboard.Forms
                 {
                     string message = string.Format(
                         CultureInfo.CurrentCulture,
-                        "{0} dashboard cannot be used with caching. The dashboard either needs to be reimported or caching is not supported for the dashboard.",
+                        "Cached data cannot be used in '{0}' dashboard. Caching is not supported for dashboards with parameters. " +
+                        "If this dashboard does not have parameters, reimport the dashboard and try again.",
                         dashboardDataGridView.CurrentRow.Cells["DashboardName"].Value);
                     MessageBox.Show(
                         message,
