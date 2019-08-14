@@ -549,18 +549,14 @@ namespace Extract.Utilities
                         {
                             process.Kill();
                         }
-                        standardOutputTask.Wait();
-                        standardErrorTask.Wait();
-                        standardOutput = standardOutputTask.Result;
-                        standardError = standardErrorTask.Result;
+                        standardOutput = standardOutputTask.GetAwaiter().GetResult();
+                        standardError = standardErrorTask.GetAwaiter().GetResult();
 
 						return OperationCanceledExitCode;
                     }
 
-                    standardOutputTask.Wait();
-                    standardErrorTask.Wait();
-                    standardOutput = standardOutputTask.Result;
-                    standardError = standardErrorTask.Result;
+                    standardOutput = standardOutputTask.GetAwaiter().GetResult();
+                    standardError = standardErrorTask.GetAwaiter().GetResult();
 
                     return process.ExitCode;
                 }
@@ -910,7 +906,7 @@ namespace Extract.Utilities
             char lastChar = '\n';
             char[] buffer = new char[256];
             int charsRead;
-            while ((charsRead = await reader.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            while ((charsRead = await reader.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false)) > 0)
             {
                 for (int i = 0; i < charsRead; i++)
                 {
