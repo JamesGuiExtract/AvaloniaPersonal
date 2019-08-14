@@ -1,4 +1,5 @@
 ﻿using Extract.Testing.Utilities;
+using Extract.Utilities.Forms;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Extract.Utilities.Test
 {
@@ -188,5 +191,79 @@ namespace Extract.Utilities.Test
             // Executable should not have been allowed to finish
             Assert.Less(elapsed, 30000);
         }
+
+        #region TestForDeadlock
+
+        /// <summary>
+        /// Helper class to test for deadlock
+        /// Before fixing the issue by using ConfigureAwait(false) this class would consistently deadlock on load
+        /// https://extract.atlassian.net/browse/ISSUE-16555
+        /// </summary>
+        private class LaunchFromUI : InvisibleForm
+        {
+            private readonly string _pathToExe;
+            private readonly List<string> _argList;
+            private CancellationToken _token;
+
+            public LaunchFromUI(string pathToExe, List<string> argList, CancellationToken token) : base()
+            {
+                _pathToExe = pathToExe;
+                _argList = argList;
+                _token = token;
+            }
+
+            protected override void OnLoad(EventArgs e)
+            {
+                base.OnLoad(e);
+                SystemMethods.RunExecutable(_pathToExe, _argList, out string _, out string _, cancelToken: _token);
+                Application.Exit();
+            }
+        }
+
+        private static async Task<bool> RunAndCheckForTimeout(int timeout, CancellationToken token)
+        {
+            List<string> argList = new List<string>() { "/SleepTime", "30000" };
+
+            LaunchFromUI form = null;
+            var task = Task.Run(() =>
+            {
+                form = new LaunchFromUI(pathToExe, argList, token);
+                Application.Run(form);
+            });
+
+            if (await Task.WhenAny(task, Task.Delay(timeout)).ConfigureAwait(false) == task)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        [Test, Category("Automated")]
+        public static void TestRunExecutableWithCancelAndRedirectOutputFromUIThread()
+        {
+            string nameForTokenSource = Guid.NewGuid().AsString();
+            NamedTokenSource tokenSource = new NamedTokenSource(nameForTokenSource);
+            Task.Run(() =>
+            {
+                Task.Delay(5000);
+                tokenSource.Cancel();
+            });
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            bool timedOut = RunAndCheckForTimeout(10000, tokenSource.Token).GetAwaiter().GetResult();
+
+            long elapsed = sw.ElapsedMilliseconds;
+
+            Assert.IsFalse(timedOut, "Wait for task exceeded timeout. Deadlock likely occurred!");
+
+            // Executable should not have been allowed to finish
+            Assert.Less(elapsed, 30000);
+        }
+
+        #endregion TestForDeadlock
     }
 }

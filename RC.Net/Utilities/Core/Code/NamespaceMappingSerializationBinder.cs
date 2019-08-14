@@ -19,6 +19,7 @@ namespace Extract.Utilities
         /// Creates instance with given namespace mappings
         /// </summary>
         /// <param name="namespaceMappings">Pairs to translate namespaces (type prefixes) from/to</param>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public NamespaceMappingSerializationBinder(IEnumerable<KeyValuePair<string, string>> namespaceMappings)
             : base()
         {
