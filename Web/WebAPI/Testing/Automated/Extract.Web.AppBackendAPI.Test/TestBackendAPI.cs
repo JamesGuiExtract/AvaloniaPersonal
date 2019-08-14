@@ -52,6 +52,21 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         static FAMTestDBManager<TestBackendAPI> _testDbManager;
 
+        /// <summary>
+        /// Represents a file processingdb
+        /// </summary>
+        private static FileProcessingDB fileProcessingDb;
+
+        /// <summary>
+        /// Represents a user.
+        /// </summary>
+        private static User user;
+
+        /// <summary>
+        /// Represents a fake controller to call.
+        /// </summary>
+        private static AppBackendController controller;
+
         #endregion Fields
 
         #region Setup and Teardown
@@ -94,9 +109,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -128,11 +141,60 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "", "123");
+                InitialzeDBAndUser(dbName, "", "123");
 
                 Assert.AreEqual(((ErrorResult)(((ObjectResult)controller.Login(user)).Value)).Error.Message, "Username is empty");
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void Test_SetMetadataValue()
+        {
+            string dbName = "AppBackendAPI_Test_SetMetadataValue";
+
+            try
+            {
+                InitialzeDBAndUser(dbName);
+                fileProcessingDb.AddMetadataField("DocumentType");
+
+                var openDocumentResult = loginToWebapp(controller, user, true);
+
+                var documenttype = controller.SetMetadataField(openDocumentResult.Id, "DocumentType", "IgnoreTheAlien");
+
+                Assert.AreEqual("IgnoreTheAlien"
+                    , controller.GetMetadataField(1, "DocumentType").AssertGoodResult<MetadataFieldResult>().Value
+                    , "Document Type should have been set to Ignore the alien and failed for some reason");
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void Test_GetNullMetadataValue()
+        {
+            string dbName = "AppBackendAPI_Test_GetNullMetadataValue";
+
+            try
+            {
+                InitialzeDBAndUser(dbName);
+                fileProcessingDb.AddMetadataField("DocumentType");
+
+                var openDocumentResult = loginToWebapp(controller, user, true);
+
+                var documenttype = controller.GetMetadataField(openDocumentResult.Id, "DocumentType").AssertGoodResult<MetadataFieldResult>().Value;
+                Assert.AreEqual(null, documenttype, "DocumentType should default to null");
             }
             finally
             {
@@ -150,9 +212,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "");
+                InitialzeDBAndUser(dbName, "jane_doe","");
 
                 Assert.AreEqual(((ErrorResult)(((ObjectResult)controller.Login(user)).Value)).Error.Message,"Password is empty");
             }
@@ -172,9 +232,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
                 // Test that SessionLogin requires a logged in user
                 controller.SessionLogin().AssertResultCode(500, "User should be logged in before logging into to session");
@@ -224,20 +282,18 @@ namespace Extract.Web.WebAPI.Test
         public static void Test_GetSettings()
         {
             string dbName = "AppBackendAPI_Test_GetSettings";
+            var temporaryDocType = Path.GetTempFileName();
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
-
+                File.WriteAllText(temporaryDocType, "Ambulance - Encounter \nAmbulance - Patient \nAnesthesia \nAppeal Request");
+                InitialzeDBAndUser(dbName);
+                var newSettings = $"{{ \"InactivityTimeout\": 5, \"RedactionTypes\": [\"SSN\", \"DOB\"], \"DocumentTypes\": \"{temporaryDocType.Replace(@"\", @"\\")}\" }}";
+                fileProcessingDb.ExecuteCommandQuery($"UPDATE [dbo].[WebAppConfig] SET SETTINGS = '{newSettings}' WHERE TYPE = 'RedactionVerificationSettings'");
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
-
-                // Test that there is an error if the login token is used
                 controller.ApplyTokenClaimPrincipalToContext(token);
-                result = controller.GetSettings();
-                result.AssertResultCode(500, "Action should have a valid session login token.");
+
 
                 var sessionToken = controller.SessionLogin().AssertGoodResult<JwtSecurityToken>();
                 controller.ApplyTokenClaimPrincipalToContext(sessionToken);
@@ -246,7 +302,11 @@ namespace Extract.Web.WebAPI.Test
                 var settings = result.AssertGoodResult<WebAppSettingsResult>();
 
                 Assert.IsTrue(settings.RedactionTypes.SequenceEqual(
-                    new[] { "DOB", "SSN", "TestType" }), "Failed to retrieve redaction types");
+                    new[] { "SSN", "DOB" }), "Failed to retrieve redaction types");
+
+                Assert.IsTrue(settings.ParsedDocumentTypes.SequenceEqual(
+                    new[] { "Ambulance - Encounter ", "Ambulance - Patient ", "Anesthesia ", "Appeal Request" }),
+                    "Document Settings failed to retrive");
 
                 // Default value
                 Assert.IsTrue(settings.InactivityTimeout == 5);
@@ -256,6 +316,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
+                File.Delete(temporaryDocType);
                 FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
@@ -270,9 +331,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -326,9 +385,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -382,34 +439,32 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user1, AppBackendController controller1) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
-                var result = controller1.Login(user1);
+                var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
-                controller1.ApplyTokenClaimPrincipalToContext(token);
+                controller.ApplyTokenClaimPrincipalToContext(token);
 
                 // Should be able to get status without a session login
-                result = controller1.GetQueueStatus();
+                result = controller.GetQueueStatus();
                 var queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(0, queueStatus.ActiveUsers);
                 Assert.AreEqual(4, queueStatus.PendingDocuments);
 
                 // ... as well as with a session login
-                var sessionResult = controller1.SessionLogin();
+                var sessionResult = controller.SessionLogin();
                 var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
-                controller1.ApplyTokenClaimPrincipalToContext(sessionToken);
+                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
 
-                result = controller1.GetQueueStatus();
+                result = controller.GetQueueStatus();
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(1, queueStatus.ActiveUsers);
                 Assert.AreEqual(4, queueStatus.PendingDocuments);
 
-                result = controller1.OpenDocument();
+                result = controller.OpenDocument();
                 var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
 
-                result = controller1.GetQueueStatus();
+                result = controller.GetQueueStatus();
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(1, queueStatus.ActiveUsers);
                 Assert.AreEqual(3, queueStatus.PendingDocuments);
@@ -424,15 +479,15 @@ namespace Extract.Web.WebAPI.Test
                 sessionResult = controller2.SessionLogin();
                 sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
 
-                result = controller1.GetQueueStatus();
+                result = controller.GetQueueStatus();
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(2, queueStatus.ActiveUsers);
                 Assert.AreEqual(3, queueStatus.PendingDocuments);
 
-                controller1.CloseDocument(openDocumentResult.Id, commit: true)
+                controller.CloseDocument(openDocumentResult.Id, commit: true)
                     .AssertGoodResult<NoContentResult>();
 
-                result = controller1.OpenDocument();
+                result = controller.OpenDocument();
                 result.AssertGoodResult<DocumentIdResult>();
 
                 result = controller2.GetQueueStatus();
@@ -449,7 +504,7 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual(2, queueStatus.ActiveUsers);
                 Assert.AreEqual(1, queueStatus.PendingDocuments);
 
-                controller1.Logout()
+                controller.Logout()
                     .AssertGoodResult<NoContentResult>();
 
                 result = controller2.GetQueueStatus();
@@ -476,26 +531,16 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
-                var result = controller.Login(user);
-                var token = result.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(token);
-
-                var sessionResult = controller.SessionLogin();
-                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
-
-                result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+                var openDocumentResult = loginToWebapp(controller, user, true);
+                
                 controller.CloseDocument(openDocumentResult.Id, commit: false)
                     .AssertGoodResult<NoContentResult>();
 
                 Assert.AreEqual(EActionStatus.kActionPending, fileProcessingDb.GetFileStatus(2, _VERIFY_ACTION, false));
 
-                result = controller.OpenDocument(2);
+                var result = controller.OpenDocument(2);
                 openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(2, openDocumentResult.Id);
 
@@ -537,21 +582,9 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
-                var result = controller.Login(user);
-                var token = result.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(token);
-
-                var sessionResult = controller.SessionLogin();
-                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
-
-                result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
-                Assert.AreEqual(1, openDocumentResult.Id);
+                loginToWebapp(controller, user, true);
 
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
@@ -576,9 +609,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
                 // Login to register an active FAM.
                 var result = controller.Login(user);
@@ -649,9 +680,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
                 string testFileName = _testFiles.GetFile(_TEST_FILE1);
 
@@ -660,19 +689,10 @@ namespace Extract.Web.WebAPI.Test
                     EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
                 int fileId = fileRecord.FileID;
 
-                var result = controller.Login(user);
-                var token = result.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(token);
-
-                var sessionResult = controller.SessionLogin();
-                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
-
-                result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+                var openDocumentResult = loginToWebapp(controller, user, true);
                 Assert.AreEqual(fileId, openDocumentResult.Id);
 
-                result = controller.GetPageInfo(openDocumentResult.Id);
+                var result = controller.GetPageInfo(openDocumentResult.Id);
                 var pagesInfo = result.AssertGoodResult<PagesInfoResult>();
 
                 Assert.AreEqual(pagesInfo.PageCount, 4, "Unexpected page count");
@@ -709,9 +729,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
                 string testFileName = _testFiles.GetFile(_TEST_FILE1);
                 _testFiles.GetFile(_TEST_FILE1_USS);
@@ -721,16 +739,7 @@ namespace Extract.Web.WebAPI.Test
                     EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
                 int fileId = fileRecord.FileID;
 
-                var result = controller.Login(user);
-                var token = result.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(token);
-
-                var sessionResult = controller.SessionLogin();
-                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
-
-                result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+                var openDocumentResult = loginToWebapp(controller, user, true);
                 Assert.AreEqual(fileId, openDocumentResult.Id);
 
                 string voaFile = _testFiles.GetFile(_TEST_FILE1_VOA);
@@ -764,9 +773,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
                 string testFileName = _testFiles.GetFile(_TEST_FILE1);
                 _testFiles.GetFile(_TEST_FILE1_USS);
@@ -776,19 +783,10 @@ namespace Extract.Web.WebAPI.Test
                     EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
                 int fileId = fileRecord.FileID;
 
-                var result = controller.Login(user);
-                var token = result.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(token);
-
-                var sessionResult = controller.SessionLogin();
-                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
-
-                result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+                var openDocumentResult = loginToWebapp(controller, user, true);
                 Assert.AreEqual(fileId, openDocumentResult.Id);
 
-                result = controller.GetPageInfo(openDocumentResult.Id);
+                var result = controller.GetPageInfo(openDocumentResult.Id);
                 var pagesInfo = result.AssertGoodResult<PagesInfoResult>();
 
                 Assert.AreEqual(pagesInfo.PageCount, 4, "Unexpected page count");
@@ -829,9 +827,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
                 string testFileName = _testFiles.GetFile(_TEST_FILE1);
 
@@ -839,21 +835,12 @@ namespace Extract.Web.WebAPI.Test
                     testFileName, _VERIFY_ACTION, 1, EFilePriority.kPriorityHigh, false, false,
                     EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
 
-                var result = controller.Login(user);
-                var token = result.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(token);
-
-                var sessionResult = controller.SessionLogin();
-                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
-
-                result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+                var openDocumentResult = loginToWebapp(controller, user, true);
 
                 using (var codecs = new ImageCodecs())
                     for (int page = 1; page <= 4; page++)
                     {
-                        result = controller.GetDocumentPage(openDocumentResult.Id, page);
+                        var result = controller.GetDocumentPage(openDocumentResult.Id, page);
                         var fileResult = result.AssertGoodResult<FileContentResult>();
 
                         using (var temporaryFile = new Utilities.TemporaryFile(".pdf", false))
@@ -904,22 +891,11 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
-                var result = controller.Login(user);
-                var token = result.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(token);
+                loginToWebapp(controller, user, true);
 
-                var sessionResult = controller.SessionLogin();
-                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
-
-                result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
-
-                result = controller.GetDocumentData(openDocumentResult.Id);
+                var result = controller.GetDocumentData(1);
                 var attributeSet = result.AssertGoodResult<DocumentDataResult>();
 
                 Assert.IsTrue(attributeSet.Attributes.Count > 0);
@@ -948,9 +924,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
                 // Since the uss file will need to be used to translate the saved data into a VOA,
                 // we can't use pre-existing files in the database that may or may not actually
@@ -976,18 +950,9 @@ namespace Extract.Web.WebAPI.Test
 
                 fileProcessingDb.SetFileStatusToPending(fileId, _VERIFY_ACTION, false);
 
-                var result = controller.Login(user);
-                var token = result.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(token);
+                var openDocumentResult = loginToWebapp(controller, user, true);
 
-                var sessionResult = controller.SessionLogin();
-                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
-
-                result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
-
-                result = controller.GetDocumentData(openDocumentResult.Id);
+                var result = controller.GetDocumentData(openDocumentResult.Id);
                 var attributeSet = result.AssertGoodResult<DocumentDataResult>();
 
                 var updatedAttributes = attributeSet.Attributes.Skip(1);
@@ -1029,9 +994,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                   _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                       ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
                 string testFileName = _testFiles.GetFile(_TEST_FILE1);
                 string ussFileName = _testFiles.GetFile(_TEST_FILE1_USS);
@@ -1041,16 +1004,7 @@ namespace Extract.Web.WebAPI.Test
                     EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
                 int fileId = fileRecord.FileID;
 
-                var result = controller.Login(user);
-                var token = result.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(token);
-
-                var sessionResult = controller.SessionLogin();
-                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
-
-                result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+                var openDocumentResult = loginToWebapp(controller, user, true);
 
                 var documentText = new SpatialString();
                 documentText.LoadFrom(ussFileName, false);
@@ -1068,7 +1022,7 @@ namespace Extract.Web.WebAPI.Test
                                 .Select(word => (ComRasterZone)word.GetOriginalImageRasterZones().At(0)))
                             .ToList();
 
-                    result = controller.GetPageWordZones(openDocumentResult.Id, page);
+                    var result = controller.GetPageWordZones(openDocumentResult.Id, page);
                     var wordZoneData = result.AssertGoodResult<WordZoneDataResult>()
                         .Zones
                         .SelectMany(line => line)
@@ -1111,26 +1065,15 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
-                var result = controller.Login(user);
-                var token = result.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(token);
-
-                var sessionResult = controller.SessionLogin();
-                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
-
-                result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+                var openDocumentResult = loginToWebapp(controller, user, true);
 
                 CommentData commentData = new CommentData()
                 {
                     Comment = "Add Test Comment"
                 };
-                result = controller.AddComment(openDocumentResult.Id, commentData);
+                var result = controller.AddComment(openDocumentResult.Id, commentData);
                 result.AssertGoodResult<NoContentResult>();
 
                 result = controller.GetComment(openDocumentResult.Id);
@@ -1157,20 +1100,9 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
-                var result = controller.Login(user);
-                var token = result.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(token);
-
-                var sessionResult = controller.SessionLogin();
-                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
-
-                result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+                var openDocumentResult = loginToWebapp(controller, user, true);
 
                 SkipDocumentData skipDocumentData = new SkipDocumentData()
                 {
@@ -1178,7 +1110,7 @@ namespace Extract.Web.WebAPI.Test
                     Comment = "Add Test Comment"
                 };
 
-                result = controller.SkipDocument(openDocumentResult.Id, skipDocumentData);
+                var result = controller.SkipDocument(openDocumentResult.Id, skipDocumentData);
                 result.AssertGoodResult<NoContentResult>();
 
                 var actionId = fileProcessingDb.GetActionID(_VERIFY_ACTION);
@@ -1205,22 +1137,11 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                (FileProcessingDB fileProcessingDb, User user, AppBackendController controller) =
-                    _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, "jane_doe", "123");
+                InitialzeDBAndUser(dbName);
 
-                var result = controller.Login(user);
-                var token = result.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(token);
+                var openDocumentResult = loginToWebapp(controller,user,true);
 
-                var sessionResult = controller.SessionLogin();
-                var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
-                controller.ApplyTokenClaimPrincipalToContext(sessionToken);
-
-                result = controller.OpenDocument();
-                var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
-
-                result = controller.FailDocument(openDocumentResult.Id);
+                var result = controller.FailDocument(openDocumentResult.Id);
                 result.AssertGoodResult<NoContentResult>();
 
                 var actionId = fileProcessingDb.GetActionID(_VERIFY_ACTION);
@@ -1238,5 +1159,30 @@ namespace Extract.Web.WebAPI.Test
         }
 
         #endregion Public Test Functions
+
+        
+        private static DocumentIdResult loginToWebapp(AppBackendController controller, User user, bool openDocument)
+        {
+            var result = controller.Login(user);
+            var token = result.AssertGoodResult<JwtSecurityToken>();
+            controller.ApplyTokenClaimPrincipalToContext(token);
+
+            var sessionResult = controller.SessionLogin();
+            var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
+            controller.ApplyTokenClaimPrincipalToContext(sessionToken);
+            if(openDocument)
+            {
+                result = controller.OpenDocument();
+                return result.AssertGoodResult<DocumentIdResult>();
+            }
+            return null;
+        }
+
+        private static void InitialzeDBAndUser(string dbName, string username = "jane_doe", string password = "123")
+        {
+            (fileProcessingDb, user, controller) =
+                _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
+                        ("Resources.Demo_IDShield.bak", dbName, username, password);
+        }
     }
 }
