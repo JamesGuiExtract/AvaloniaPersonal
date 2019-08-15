@@ -39,6 +39,8 @@ namespace Extract.AttributeFinder
 
         const string _BITMAP_PATTERN = @"(?in)\ABitmap: (?'width'\d+) x (?'height'\d+) = (?'data'-?\d+(\.\d+)?(,-?\d+(\.\d+)?)*)\z";
 
+        public static readonly object RootNode = new object();
+
         #endregion Constants
 
         #region XPathIterator
@@ -122,11 +124,7 @@ namespace Extract.AttributeFinder
             {
                 get
                 {
-                    return XPathNodeIterator.Current.NodeType == XPathNodeType.Element
-                        && ((IHasXmlNode)XPathNodeIterator.Current)
-                        .GetNode()
-                        .ParentNode
-                        .NodeType == XmlNodeType.Document;
+                    return IsAtRoot(XPathNodeIterator);
                 }
             }
 
@@ -740,21 +738,37 @@ namespace Extract.AttributeFinder
                 List<object> objectList = new List<object>();
                 while (nodeIterator.MoveNext())
                 {
-                    object value = nodeIterator.Current.Value;
-                    IAttribute attribute = null;
-
-                    var currentNode = nodeIterator.Current as IHasXmlNode;
-                    if (currentNode != null)
+                    if (IsAtRoot(nodeIterator))
                     {
-                        // Convert any node result to the corresponding attribute (if there is one).
-                        _nodeToAttributeMap.TryGetValue(currentNode.GetNode(), out attribute);
+                        objectList.Add(RootNode);
                     }
+                    else
+                    {
+                        object value = nodeIterator.Current.Value;
+                        IAttribute attribute = null;
 
-                    objectList.Add(attribute ?? value);
+                        var currentNode = nodeIterator.Current as IHasXmlNode;
+                        if (currentNode != null)
+                        {
+                            // Convert any node result to the corresponding attribute (if there is one).
+                            _nodeToAttributeMap.TryGetValue(currentNode.GetNode(), out attribute);
+                        }
+
+                        objectList.Add(attribute ?? value);
+                    }
                 }
 
                 return objectList;
             }
+        }
+
+        static bool IsAtRoot(XPathNodeIterator nodeIterator)
+        {
+            return nodeIterator.Current.NodeType == XPathNodeType.Element
+                && ((IHasXmlNode)nodeIterator.Current)
+                .GetNode()
+                .ParentNode
+                .NodeType == XmlNodeType.Document;
         }
 
         #endregion Private Members

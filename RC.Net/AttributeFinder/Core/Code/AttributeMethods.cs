@@ -673,19 +673,22 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <param name="unknownVector">The IUknownVector to remove the attributes from</param>
         /// <param name="attributesToRemove">The attributes to remove</param>
-        public static void RemoveAttributes(this IIUnknownVector unknownVector, IList<IAttribute> attributesToRemove)
+        public static void RemoveAttributes(this IIUnknownVector unknownVector, HashSet<IAttribute> attributesToRemove)
         {
             try
             {
-                var attributeList = unknownVector.ToIEnumerable<IAttribute>().ToList();
-
-                var removeFromVector = attributeList.Where(a => attributesToRemove.Contains(a)).ToList();
-                var subAttributesToCheck = attributeList.Except(removeFromVector).ToList();
-
-                subAttributesToCheck
-                    .ForEach(a => a.SubAttributes.RemoveAttributes(attributesToRemove.Except(removeFromVector).ToList()));
-
-                removeFromVector.ForEach(a => unknownVector.RemoveValue(a));
+                foreach (var a in unknownVector.ToIEnumerable<IAttribute>().ToList())
+                {
+                    if (attributesToRemove.Contains(a))
+                    {
+                        unknownVector.RemoveValue(a);
+                        attributesToRemove.Remove(a);
+                    }
+                    else
+                    {
+                        a.SubAttributes.RemoveAttributes(attributesToRemove);
+                    }
+                }
             }
             catch (Exception ex)
             {

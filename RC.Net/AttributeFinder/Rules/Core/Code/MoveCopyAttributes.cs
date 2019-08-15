@@ -148,89 +148,44 @@ namespace Extract.AttributeFinder.Rules
                 ExtractException.Assert("ELI46983", "Source cannot be root.", SourceAttributeTreeXPath != "/");
 
                 var xPathContext = new XPathContext(pAttributes);
+                var iter = xPathContext.GetIterator(SourceAttributeTreeXPath);
 
-                var sources = (xPathContext.Evaluate(SourceAttributeTreeXPath) as List<object>)
-                    ?.OfType<IAttribute>()
-                    .ToList();
-
-                var destinations = (xPathContext.Evaluate(DestinationAttributeTreeXPath) as List<object>)
-                    ?.OfType<IAttribute>().ToList();
-
-                if (destinations.Count == 0)
+                var attributesToRemove = CopyAttributes ? null : new HashSet<IAttribute>();
+                while (iter.MoveNext())
                 {
-                    // If the destination is the root copy all of the sources to root
-                    if (DestinationAttributeTreeXPath == "/")
+                    var source = iter.CurrentAttribute;
+                    if (source == null)
                     {
-                        CopyOrMoveToRoot(pAttributes, sources);
-
+                        continue;
                     }
-                    return;
-                }
-
-                // Do not allow Destination to be in a Source tree
-                if (destinations.Any(d => sources.Any(s => AttributeMethods.EnumerateDepthFirst(s).Contains(d))))
-                {
-                    ExtractException ee = new ExtractException("ELI46984", "Destination node cannot be in Source tree.");
-                    throw ee;
-                }
-
-                foreach (var baseAttribute in pAttributes.ToIEnumerable<IAttribute>())
-                {
-                    var destinationsUnderBase = destinations
-                        .Where(d => AttributeMethods.EnumerateDepthFirst(baseAttribute).Contains(d))
-                        .ToList();
-
-                    var sourcesUnderBase = sources
-                        .Where(s => AttributeMethods.EnumerateDepthFirst(baseAttribute).Contains(s))
-                        .ToList();
-
-                    // find sources that are not under any dest : Move all these sources to dest within the same tree
-                    var sourcesNotUnderDestinations = sourcesUnderBase
-                        .Where(s => !destinationsUnderBase.Any(d => AttributeMethods.EnumerateDepthFirst(d).Contains(s)))
-                        .ToList();
-
-                    // Find sources that are under destination
-                    var sourcesUnderDestinations = sourcesUnderBase.Except(sourcesNotUnderDestinations).ToList();
-
-                    // Copy the sources that are under a destination
-                    if (sourcesUnderDestinations.Count > 0)
-                    {
-                        destinationsUnderBase.ForEach(d =>
-                        {
-                            IUnknownVector sourceUnderDest = null;
-                            sourceUnderDest = sourcesUnderDestinations
-                                .Where(s => AttributeMethods.EnumerateDepthFirst(d).Any(v => v.Equals(s)))
-                                ?.Select(a => (a as ICopyableObject)?.Clone())
-                                ?.OfType<IAttribute>()?.ToIUnknownVector();
-
-                            if (sourceUnderDest != null && sourceUnderDest.Size() > 0)
-                            {
-                                d.SubAttributes.Append(sourceUnderDest);
-                            }
-
-                            sourceUnderDest.ReportMemoryUsage();
-                        });
-                    }
-
-                    // Copy the sources not under a destination to all destinations
-                    if (sourcesNotUnderDestinations.Count > 0)
-                    {
-                        if (destinationsUnderBase.Count == 0)
-                        {
-                            CopySourcesToDestinations(sourcesNotUnderDestinations, destinations);
-                        }
-                        else if (sourcesNotUnderDestinations.Count > 0)
-                        {
-                            CopySourcesToDestinations(sourcesNotUnderDestinations, destinationsUnderBase);
-                        }
-                    }
-
-                    // If not copying the attributes remove them
                     if (!CopyAttributes)
                     {
-                        pAttributes.RemoveAttributes(sourcesUnderDestinations);
-                        pAttributes.RemoveAttributes(sourcesNotUnderDestinations);
+                        attributesToRemove.Add(source);
                     }
+
+                    var copyable = (ICopyableObject)source;
+                    var destinations = xPathContext.Evaluate(iter, DestinationAttributeTreeXPath) as List<object>;
+
+                    foreach (var dest in destinations ?? Enumerable.Empty<object>())
+                    {
+                        var copy = (IAttribute)copyable.Clone();
+                        copy.ReportMemoryUsage();
+
+                        if (dest == XPathContext.RootNode)
+                        {
+                            pAttributes.PushBack(copy);
+                        }
+                        else if (dest is IAttribute attr)
+                        {
+                            attr.SubAttributes.PushBack(copy);
+                        }
+                    }
+                }
+
+                if (!CopyAttributes)
+                {
+                    pAttributes.RemoveAttributes(attributesToRemove);
+                    pAttributes.ReportMemoryUsage();
                 }
             }
             catch (Exception ex)
@@ -455,38 +410,6 @@ namespace Extract.AttributeFinder.Rules
         #endregion
 
         #region Private Members
-
-        void CopyOrMoveToRoot(IUnknownVector pAttributes, List<IAttribute> sources)
-        {
-            IUnknownVector clonedSources = sources
-                ?.Select(a => (a as ICopyableObject)?.Clone())
-                ?.OfType<IAttribute>().ToIUnknownVector();
-
-            if (!CopyAttributes)
-            {
-                pAttributes.RemoveAttributes(sources);
-            }
-
-            pAttributes.Append(clonedSources);
-
-            clonedSources.ReportMemoryUsage();
-        }
-
-        static void CopySourcesToDestinations(List<IAttribute> sources, List<IAttribute> destinations)
-        {
-            destinations.ForEach(d =>
-            {
-                IUnknownVector sourcesToCopyMove = null;
-                sourcesToCopyMove = sources
-                    ?.Select(a => (a as ICopyableObject)?.Clone())
-                    ?.OfType<IAttribute>()?.ToIUnknownVector();
-
-                if (sourcesToCopyMove != null && sourcesToCopyMove.Size() > 0)
-                {
-                    d.SubAttributes.Append(sourcesToCopyMove);
-                }
-            });
-        }
 
         /// <summary>
         /// Code to be executed upon registration in order to add this class to the
