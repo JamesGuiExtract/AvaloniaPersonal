@@ -1082,7 +1082,7 @@ LRESULT FileProcessingDlg::OnProcessingComplete(WPARAM wParam, LPARAM lParam)
 		updateUIForProcessingComplete();
 
 		// If any files failed we will automatically show the user the failed list on the report page.
-		if (m_nNumFailed > 0)
+		if (m_nNumFailed > 0 && isPageDisplayed(kProcessingLogPage))
 		{
 			m_propSheet.SetActivePage(&m_propProcessingPage);
 		}
