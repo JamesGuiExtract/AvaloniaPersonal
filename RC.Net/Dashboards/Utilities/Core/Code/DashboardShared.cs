@@ -450,6 +450,37 @@ namespace Extract.Dashboard.Utilities
             return true;
         }
 
+        /// <summary>
+        /// Returns a list of dashboard names from the current database
+        /// </summary>
+        /// <returns>IList of dashboard names</returns>
+        public IList<string> GetDashboardListFromDatabase()
+        {
+            try
+            {
+                using (var connection = NewSqlDBConnection())
+                using (var command = connection.CreateCommand())
+                {
+                    connection.Open();
+
+                    command.CommandText = "SELECT DashboardName FROM Dashboard ";
+
+                    using (var reader = command.ExecuteReader())
+                    using (DataTable dataTable = new DataTable())
+                    {
+                        dataTable.Locale = CultureInfo.CurrentCulture;
+                        dataTable.Load(reader);
+
+                        return dataTable.AsEnumerable().Select(dr => dr.Field<string>(0)).ToList();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47220"); ;
+            }
+        }
+
         #endregion
 
         #region Private Methods
@@ -574,7 +605,7 @@ namespace Extract.Dashboard.Utilities
                     newItem.ItemClick += HandleOpenDashboardMenuClick;
                     _dashboardOpenSubMenu.AddItem(newItem);
                 }
-                
+
                 // Handle the missing dashboards
                 if (missingDashboards.Count > 0)
                 {

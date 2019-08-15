@@ -10,7 +10,7 @@ using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
-using System.Data;
+using System.ComponentModel;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
@@ -87,6 +87,26 @@ namespace Extract.DashboardViewer
         /// This will contain a copy of the dashboard as saved in the database. It will be null if not using cached data
         /// </summary>
         DevExpress.DashboardCommon.Dashboard _dashboardForExtractedFileUpdate;
+
+        /// <summary>
+        /// The modified times for the extracted data files
+        /// </summary>
+        DateTime _extractedDataFileModifiedTime;
+
+        /// <summary>
+        /// Background work that is used to update the cached data
+        /// </summary>
+        BackgroundWorker _backgroundWorkerForUpdate = new BackgroundWorker();
+
+        /// <summary>
+        /// Reset event used to signal when the update is finished which will close the update wait dialog
+        /// </summary>
+        ManualResetEvent _updateResetEvent = new ManualResetEvent(true);
+
+        /// <summary>
+        /// Form displayed when the cached data is being updated
+        /// </summary>
+        PleaseWaitForm _updateWaitForm;
 
         #endregion
 
@@ -295,6 +315,12 @@ namespace Extract.DashboardViewer
                 _dashboardShared = null;
                 _dashboardForExtractedFileUpdate?.Dispose();
                 _dashboardForExtractedFileUpdate = null;
+                _backgroundWorkerForUpdate?.Dispose();
+                _backgroundWorkerForUpdate = null;
+                _updateWaitForm?.Dispose();
+                _updateWaitForm = null;
+                _updateResetEvent?.Dispose();
+                _updateResetEvent = null;
             }
             base.Dispose(disposing);
         }
@@ -318,7 +344,7 @@ namespace Extract.DashboardViewer
         public DashboardViewerForm()
         {
             InitializeComponent();
-
+            SetupBackgroundWorkerForCacheUpdate();
             _dashboardShared = new DashboardShared<DashboardViewerForm>(this, true);
         }
 
@@ -327,13 +353,10 @@ namespace Extract.DashboardViewer
         /// </summary>
         /// <param name="fileName">File containing dashboard to open</param>
         public DashboardViewerForm(string fileName)
+            : this()
         {
             try
             {
-                InitializeComponent();
-
-                _dashboardShared = new DashboardShared<DashboardViewerForm>(this, true);
-
                 _dashboardName = fileName;
             }
             catch (Exception ex)
@@ -350,13 +373,10 @@ namespace Extract.DashboardViewer
         /// <param name="serverName">Server name to use when opening a dashboard.</param>
         /// <param name="databaseName">Database name to use when opening a dashboard</param>
         public DashboardViewerForm(string dashboard, bool inDatabase, string serverName, string databaseName)
+            : this()
         {
             try
             {
-                InitializeComponent();
-
-                _dashboardShared = new DashboardShared<DashboardViewerForm>(this, true);
-
                 ServerName = serverName;
                 DatabaseName = databaseName;
                 _dashboardName = dashboard;
@@ -374,13 +394,10 @@ namespace Extract.DashboardViewer
         /// <param name="serverName">Server name to use when opening a dashboard.</param>
         /// <param name="databaseName">Database name to use when opening a dashboard</param>
         public DashboardViewerForm(string serverName, string databaseName)
+            : this()
         {
             try
             {
-                InitializeComponent();
-
-                _dashboardShared = new DashboardShared<DashboardViewerForm>(this, true);
-
                 ServerName = serverName;
                 DatabaseName = databaseName;
             }
@@ -461,22 +478,27 @@ namespace Extract.DashboardViewer
 
                     if (_usingCachedData && !reloadData)
                     {
-                        if (MessageBox.Show("Cached data source needs to be updated from the database. Continue?",
-                                "Update Cached",
-                                MessageBoxButtons.YesNo,
-                                MessageBoxIcon.Exclamation,
-                                MessageBoxDefaultButton.Button1,
-                                (MessageBoxOptions)0) != DialogResult.Yes)
+                        if (MessageBox.Show(string.Empty +
+                            "Cached data source needs to be updated from the database. Updating from the database can take time. Refresh anyway?",
+                            "Update Cached",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Exclamation,
+                            MessageBoxDefaultButton.Button1,
+                            (MessageBoxOptions)0) != DialogResult.Yes)
                         {
                             return;
                         }
-                        
-                        DashboardDataConverter.UpdateExtractedDataSources(_dashboardForExtractedFileUpdate, CancellationToken.None);
-                        this.Focus();
+                        _updateResetEvent.Reset();
+                        _backgroundWorkerForUpdate.RunWorkerAsync();
+                        _updateWaitForm.ShowDialog();
                     }
-
-                    ReloadExtractedData();
-                    _toolStripTextBoxlastRefresh.Text = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    else if (reloadData)
+                    {
+                        ReloadData();
+                        _toolStripTextBoxlastRefresh.Text = (_usingCachedData) ?
+                            _extractedDataFileModifiedTime.ToString(CultureInfo.CurrentCulture)
+                            : DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                    }
                 }
             }
             catch (Exception ex)
@@ -672,7 +694,9 @@ namespace Extract.DashboardViewer
 
                 UpdateMainTitle();
                 _dashboardShared.GridConfigurationsFromXml(CurrentDashboard?.UserData);
-                _toolStripTextBoxlastRefresh.Text = DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                _toolStripTextBoxlastRefresh.Text = (_usingCachedData) ?
+                        _extractedDataFileModifiedTime.ToString(CultureInfo.CurrentCulture)
+                        : DateTime.Now.ToString(CultureInfo.CurrentCulture);
             }
             catch (Exception ex)
             {
@@ -787,6 +811,11 @@ namespace Extract.DashboardViewer
             UpdateMainTitle();
         }
 
+        /// <summary>
+        /// Load the dashboard from a XDocument
+        /// </summary>
+        /// <param name="xdoc">The XDocument that has the dashboard definition</param>
+        /// <returns>The new dashboard object loaded from the <paramref name="xdoc"/></returns>
         DevExpress.DashboardCommon.Dashboard LoadDashboardFromXDocument(XDocument xdoc)
         {
             DisposeOfDashboardsAndDereferenceTempFiles();
@@ -871,19 +900,8 @@ namespace Extract.DashboardViewer
                 {
                     return;
                 }
-                using (var connection = NewSqlDBConnection())
-                {
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandText = "SELECT DashboardName FROM Dashboard ";
 
-                    DataTable dataTable = new DataTable();
-                    dataTable.Locale = CultureInfo.CurrentCulture;
-                    dataTable.Load(command.ExecuteReader());
-
-                    var dashboardList = dataTable.AsEnumerable().ToList().Select(dr => dr.Field<string>(0));
-                    _dashboardsInDBListBoxControl.DataSource = dashboardList;
-                }
+                _dashboardsInDBListBoxControl.DataSource = _dashboardShared.GetDashboardListFromDatabase();
             }
             catch (Exception ex)
             {
@@ -907,7 +925,10 @@ namespace Extract.DashboardViewer
             return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
-
+        /// <summary>
+        /// Changes all the Extracted datasources
+        /// </summary>
+        /// <param name="dashboard"></param>
         void ReplaceExtractDataSourceFileWithTemporary(DevExpress.DashboardCommon.Dashboard dashboard)
         {
             try
@@ -918,6 +939,8 @@ namespace Extract.DashboardViewer
 
                 foreach (var eds in existingExtractDataSources)
                 {
+                    _extractedDataFileModifiedTime = File.GetLastWriteTime(eds.FileName);
+
                     _dictionaryDataSourceToFileName.Add(eds, eds.FileName);
                     eds.FileName = _temporaryDatasourceFileCopyManager.GetCurrentTemporaryFileName(
                         eds.FileName, eds, true, false);
@@ -929,17 +952,24 @@ namespace Extract.DashboardViewer
             }
         }
 
-        void ReloadExtractedData()
+        /// <summary>
+        /// Reload the data for the dashboard
+        /// </summary>
+        void ReloadData()
         {
             try
             {
-                foreach (var pair in _dictionaryDataSourceToFileName)
+                // If there is cached data load the dashboard from the saved _dashboardForExtractedFileUpdate which
+                // is the original definition
+                if (_dashboardForExtractedFileUpdate != null)
                 {
-                    var eds = pair.Key as DashboardExtractDataSource;
-                    eds.FileName = _temporaryDatasourceFileCopyManager.GetCurrentTemporaryFileName(
-                        pair.Value, eds, true, false);
+                    dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(_dashboardForExtractedFileUpdate.SaveToXDocument());
                 }
-                dashboardViewerMain.ReloadData(false);
+                else
+                {
+                    // Just reload the data
+                    dashboardViewerMain.ReloadData(false);
+                }
             }
             catch (Exception ex)
             {
@@ -947,6 +977,9 @@ namespace Extract.DashboardViewer
             }
         }
 
+        /// <summary>
+        /// Clear the dashboard that is currently being displayed and all associated data
+        /// </summary>
         void DisposeOfDashboardsAndDereferenceTempFiles()
         {
             dashboardViewerMain.Dashboard?.Dispose();
@@ -960,8 +993,57 @@ namespace Extract.DashboardViewer
             }
 
             _dictionaryDataSourceToFileName.Clear();
+            _usingCachedData = false;
         }
 
+        /// <summary>
+        /// Setup the background worker for updating the cached data
+        /// </summary>
+        void SetupBackgroundWorkerForCacheUpdate()
+        {
+            _updateWaitForm = new PleaseWaitForm("Updating cached data", _updateResetEvent);
+            _backgroundWorkerForUpdate.DoWork += (object sender, DoWorkEventArgs workEventArgs) =>
+            {
+                DashboardDataConverter.UpdateExtractedDataSources(_dashboardForExtractedFileUpdate, CancellationToken.None);
+            };
+
+            _backgroundWorkerForUpdate.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs completedArgs) =>
+            {
+                try
+                {
+                    // this should trigger the close of the dialog
+                    _updateResetEvent.Set();
+                    _updateWaitForm.Visible = false;
+
+                    if (completedArgs.Error != null)
+                    {
+                        completedArgs.Error.ExtractDisplay("ELI47222");
+                    }
+
+                    this.Focus();
+                    this.BringToFront();
+
+                    ReloadData();
+                    _toolStripTextBoxlastRefresh.Text = (_usingCachedData) ?
+                        _extractedDataFileModifiedTime.ToString(CultureInfo.CurrentCulture)
+                        : DateTime.Now.ToString(CultureInfo.CurrentCulture);
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI47225");
+                }
+                finally
+                {
+                    // this should trigger the close of the dialog
+                    _updateResetEvent?.Set();
+                    if (_updateWaitForm != null)
+                    {
+                        _updateWaitForm.Visible = false;
+                    }
+                }
+
+            };
+        }
         #endregion
     }
 }

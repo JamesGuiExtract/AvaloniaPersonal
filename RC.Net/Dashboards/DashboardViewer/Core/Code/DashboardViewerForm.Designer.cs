@@ -196,7 +196,7 @@
             this._toolStripTextBoxlastRefresh.Name = "_toolStripTextBoxlastRefresh";
             this._toolStripTextBoxlastRefresh.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this._toolStripTextBoxlastRefresh.ReadOnly = true;
-            this._toolStripTextBoxlastRefresh.Size = new System.Drawing.Size(134, 25);
+            this._toolStripTextBoxlastRefresh.Size = new System.Drawing.Size(130, 25);
             // 
             // toolStripButtonClearMasterFilter
             // 

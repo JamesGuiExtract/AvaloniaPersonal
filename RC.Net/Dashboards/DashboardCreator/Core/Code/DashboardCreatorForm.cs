@@ -1,6 +1,7 @@
 ﻿using DevExpress.DashboardCommon;
 using DevExpress.DashboardCommon.ViewerData;
 using DevExpress.DashboardWin;
+using DevExpress.Utils.Extensions;
 using DevExpress.XtraBars;
 using DevExpress.XtraBars.Ribbon;
 using Extract;
@@ -249,8 +250,10 @@ namespace DashboardCreator
                 }
 
                 GridDetailConfiguration configurationData = GetDetailConfigurationData(component);
+                var existingDashboards = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                existingDashboards.AddRange(_dashboardShared.GetDashboardListFromDatabase());
 
-                ConfigureDashboardLinksForm linksForm = new ConfigureDashboardLinksForm(configurationData.DashboardLinks);
+                var linksForm = new ConfigureDashboardLinksForm(configurationData.DashboardLinks, existingDashboards);
                 linksForm.ShowDialog();
                 if (!configurationData.DashboardLinks.SetEquals(linksForm.DashboardLinks))
                 {

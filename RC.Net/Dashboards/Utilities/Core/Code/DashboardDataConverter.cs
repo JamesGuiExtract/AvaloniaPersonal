@@ -113,25 +113,25 @@ namespace Extract.Dashboard.Utilities
                 foreach (var ds in existingExtractDataSources)
                 {
                     cancelToken.ThrowIfCancellationRequested();
-                    string existingDataFile = ds.FileName;
                     string tempFileName = FileSystemMethods.GetTemporaryFileName();
+
                     try
                     {
-                        using (ds)
+                        using (var tempDS = new DashboardExtractDataSource())
                         {
-                            ds.FileName = tempFileName;
-                            ds.UpdateExtractFile(cancelToken);
-                            ds.FileName = existingDataFile;
+                            // this is a clone of the datasource
+                            tempDS.LoadFromXml(ds.SaveToXml());
+                            tempDS.FileName = tempFileName;
+                            tempDS.UpdateExtractFile(cancelToken);
                         }
-
                         // Copy the newly extracted file to extracted file
-                        File.Copy(tempFileName, existingDataFile, true);
+                        File.Copy(tempFileName, ds.FileName, true);
                     }
                     catch (Exception ex)
                     {
                         var ee = new ExtractException("ELI46888", "Unable to update extracted datasource.", ex);
                         ee.AddDebugData("DatasourceName", ds.Name);
-                        ee.AddDebugData("Extracted FileName", existingDataFile);
+                        ee.AddDebugData("Extracted FileName", ds.FileName);
                         ee.AddDebugData("Temp extracted filename", tempFileName);
                         throw ee;
                     }

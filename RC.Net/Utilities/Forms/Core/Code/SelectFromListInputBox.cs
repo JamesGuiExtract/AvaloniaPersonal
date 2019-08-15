@@ -77,6 +77,22 @@ namespace Extract.Utilities.Forms
         /// </summary>
         public Point StartLocation { get; set; }
 
+        /// <summary>
+        /// Set the style of the combobox that is on the form
+        /// </summary>
+        public ComboBoxStyle DropDownStyle
+        {
+            get
+            {
+                return comboBox.DropDownStyle;
+            }
+
+            set
+            {
+                comboBox.DropDownStyle = value;
+            }
+        }
+
         #endregion
 
         #region Constructors
@@ -87,6 +103,7 @@ namespace Extract.Utilities.Forms
             {
                 InitializeComponent();
                 ReturnValue = string.Empty;
+                comboBox.Text = DefaultResponse;
             }
             catch (Exception ex)
             {

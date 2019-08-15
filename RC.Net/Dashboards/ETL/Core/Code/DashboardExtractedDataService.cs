@@ -111,26 +111,27 @@ namespace Extract.Dashboard.ETL
                 {
                     connection.Open();
                     cmd.CommandText = "SELECT ExtractedDataDefinition, DashboardName FROM dbo.Dashboard WHERE UseExtractedData = 1";
-                    var task = cmd.ExecuteReaderAsync(_cancelToken);
-                    var reader = task.Result;
-
-                    while (reader.Read() && !_cancelToken.IsCancellationRequested)
+                    using (var task = cmd.ExecuteReaderAsync(_cancelToken))
+                    using (var reader = task.Result)
                     {
-                        var xdoc = XDocument.Load(reader.GetXmlReader(0), LoadOptions.None);
-                        using (var dashboard = new DevExpress.DashboardCommon.Dashboard())
+                        while (reader.Read() && !_cancelToken.IsCancellationRequested)
                         {
-                            dashboard.LoadFromXDocument(xdoc);
-
-                            string dashboardName = reader.GetString(1);
-
-                            try
+                            var xdoc = XDocument.Load(reader.GetXmlReader(0), LoadOptions.None);
+                            using (var dashboard = new DevExpress.DashboardCommon.Dashboard())
                             {
-                                DashboardDataConverter.UpdateExtractedDataSources(dashboard, _cancelToken);
-                            }
-                            catch (ExtractException ee)
-                            {
-                                ee.AddDebugData("DashboardName", dashboardName);
-                                ee.Log();
+                                dashboard.LoadFromXDocument(xdoc);
+
+                                string dashboardName = reader.GetString(1);
+
+                                try
+                                {
+                                    DashboardDataConverter.UpdateExtractedDataSources(dashboard, _cancelToken);
+                                }
+                                catch (ExtractException ee)
+                                {
+                                    ee.AddDebugData("DashboardName", dashboardName);
+                                    ee.Log();
+                                }
                             }
                         }
                     }

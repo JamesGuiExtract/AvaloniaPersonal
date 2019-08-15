@@ -71,9 +71,11 @@ namespace Extract.Dashboard.Forms
                     DialogResult = DialogResult.None;
                     throw exFile;
                 }
-                else if (string.IsNullOrEmpty(_dashboardNameTextBox.Text))
+                else if (string.IsNullOrEmpty(_dashboardNameTextBox.Text) ||
+                    _dashboardNameTextBox.Text.IndexOfAny(@"/\<>:""|?*".ToArray()) != -1)
                 {
-                    ExtractException exName = new ExtractException("ELI46457", "Dashboard name must be specified.");
+                    ExtractException exName = new ExtractException("ELI46457",
+                        @"Dashboard name must be specified and cannot contain the following characters /\<>:""|?*");
                     _dashboardNameTextBox.Focus();
                     DialogResult = DialogResult.None;
                     throw exName;

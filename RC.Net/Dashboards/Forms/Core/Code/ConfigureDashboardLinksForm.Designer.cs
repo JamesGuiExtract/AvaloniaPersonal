@@ -37,8 +37,9 @@
             // 
             // listBoxDashboardLinks
             // 
-            this.listBoxDashboardLinks.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+            this.listBoxDashboardLinks.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.listBoxDashboardLinks.FormattingEnabled = true;
             this.listBoxDashboardLinks.Location = new System.Drawing.Point(12, 12);
             this.listBoxDashboardLinks.Name = "listBoxDashboardLinks";
@@ -95,8 +96,8 @@
             this.AcceptButton = this.buttonAdd;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(573, 236);
+            this.ControlBox = false;
             this.Controls.Add(this.buttonOk);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonDelete);
@@ -109,6 +110,7 @@
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configure Dashboard Links";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.HandleConfigureDashboardLinksForm_FormClosing);
             this.ResumeLayout(false);
 
         }
