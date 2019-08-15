@@ -1,0 +1,1 @@
+UCLIDAFCoreTest.AutomatedRuleSetTester;;MoveCopyAttributes.dat

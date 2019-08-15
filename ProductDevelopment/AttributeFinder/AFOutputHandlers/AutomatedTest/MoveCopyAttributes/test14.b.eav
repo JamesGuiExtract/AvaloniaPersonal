@@ -1,0 +1,53 @@
+Other|Placeholder
+Test|N/A
+.CollectionDate|10/10/2008
+.CollectionTime|13:00
+.Name|HEMATOLOGY
+.Component|PT FASTING?
+..Value|NO
+.Component|CALCIUM
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.5
+.Component|GFR AFRO AMER
+..Value|34
+.Component|GFR NON AF AM
+..Value|28
+.Component|GLUCOSE
+..Range|70-99
+..Units|MG/DL
+..Value|82
+.Component|BUN
+..Range|8-21
+..Units|MG/DL
+..Value|21
+.Component|CREATININE
+..Flag|H
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|1.8
+.Component|SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|140
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.8
+.Component|CHLORIDE
+..Range|98-107
+..Units|MMOL/L
+..Value|105
+.Component|TOTAL CO2
+..Flag|L
+..Range|23-29
+..Units|MMOL/L
+..Value|22
+.Component|ANION GAP
+..Range|4-14
+..Units|MMOL/L
+..Value|13
+Test|N/A
+.CollectionDate|10/10/2008
+.CollectionTime|13:00
+.Name|CHEMISTRY
