@@ -33,3 +33,6 @@
 
 // Test DocumentClassifier PreProcessor
 <FILE>;..\DocumentClassifier\TestDocumentClassifier.dat
+
+// Test FSharpPreprocessor
+<FILE>;..\FSharpPreprocessor\FSharpPreprocessor.dat
