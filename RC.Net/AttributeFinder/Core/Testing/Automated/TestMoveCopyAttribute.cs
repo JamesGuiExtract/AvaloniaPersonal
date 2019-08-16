@@ -445,7 +445,7 @@ namespace Extract.AttributeFinder.Test
         {
             var moveAttribute = new MoveCopyAttributes();
             moveAttribute.SourceAttributeTreeXPath = "//*";
-            moveAttribute.DestinationAttributeTreeXPath = "/";
+            moveAttribute.DestinationAttributeTreeXPath = "/*";
             moveAttribute.CopyAttributes = false;
 
             var attributes = CreateAttributesVector(AttributeSet);
@@ -466,11 +466,7 @@ namespace Extract.AttributeFinder.Test
 
             var attributes = CreateAttributesVector(AttributeSet);
 
-            Assert.Throws<ExtractException>(() =>
-            {
-                moveAttribute.ProcessOutput(attributes, null, null);
-            },
-            "Exception should be thrown if the source contains destination.");
+            moveAttribute.ProcessOutput(attributes, null, null);
         }
 
         [Test]
@@ -481,7 +477,7 @@ namespace Extract.AttributeFinder.Test
         {
             var moveAttribute = new MoveCopyAttributes();
             moveAttribute.SourceAttributeTreeXPath = "//*";
-            moveAttribute.DestinationAttributeTreeXPath = "/";
+            moveAttribute.DestinationAttributeTreeXPath = "/*";
             moveAttribute.CopyAttributes = true;
 
             var attributes = CreateAttributesVector(AttributeSet);
@@ -503,11 +499,7 @@ namespace Extract.AttributeFinder.Test
 
             var attributes = CreateAttributesVector(AttributeSet);
 
-            Assert.Throws<ExtractException>(() =>
-            {
-                moveAttribute.ProcessOutput(attributes, null, null);
-            },
-            "Exception should be thrown if the source contains destination.");
+            moveAttribute.ProcessOutput(attributes, null, null);
         }
 
 
@@ -519,7 +511,7 @@ namespace Extract.AttributeFinder.Test
         {
             var moveAttribute = new MoveCopyAttributes();
             moveAttribute.SourceAttributeTreeXPath = "//A/B/C";
-            moveAttribute.DestinationAttributeTreeXPath = "//A";
+            moveAttribute.DestinationAttributeTreeXPath = "../..";
             moveAttribute.CopyAttributes = true;
 
             var attributes = CreateAttributesVector(AttributeSet);
@@ -536,7 +528,7 @@ namespace Extract.AttributeFinder.Test
         {
             var moveAttribute = new MoveCopyAttributes();
             moveAttribute.SourceAttributeTreeXPath = "//A/B/C";
-            moveAttribute.DestinationAttributeTreeXPath = "//A";
+            moveAttribute.DestinationAttributeTreeXPath = "../..";
             moveAttribute.CopyAttributes = false;
 
             var attributes = CreateAttributesVector(AttributeSet);
@@ -553,7 +545,7 @@ namespace Extract.AttributeFinder.Test
         {
             var moveAttribute = new MoveCopyAttributes();
             moveAttribute.SourceAttributeTreeXPath = "//*/B";
-            moveAttribute.DestinationAttributeTreeXPath = "/";
+            moveAttribute.DestinationAttributeTreeXPath = "/*";
             moveAttribute.CopyAttributes = true;
 
             var attributes = CreateAttributesVector(AttributeSet);
@@ -570,7 +562,7 @@ namespace Extract.AttributeFinder.Test
         {
             var moveAttribute = new MoveCopyAttributes();
             moveAttribute.SourceAttributeTreeXPath = "//*/B";
-            moveAttribute.DestinationAttributeTreeXPath = "/";
+            moveAttribute.DestinationAttributeTreeXPath = "/*";
             moveAttribute.CopyAttributes = false;
 
             var attributes = CreateAttributesVector(AttributeSet);
