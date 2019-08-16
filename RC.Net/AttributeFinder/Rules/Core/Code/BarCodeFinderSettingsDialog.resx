@@ -117,14 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="label1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <data name="label1.Text" xml:space="preserve">
-    <value>Search for the following barcode types.
-
-Note that depending on the types selected searches will occur in multiple passes which will increase processing time, so if possible limit the target barcode types to reduce the number of passes required.</value>
-  </data>
   <metadata name="_barcodeEnableColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -134,7 +126,16 @@ Note that depending on the types selected searches will occur in multiple passes
   <metadata name="_barcodeImageColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="_passNumberColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="_defaultColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="infoTip1.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAJBJREFUOE+9
+        j1EOwCAIQz26R/NkumHtBCTO7GMv6YZIG0yK9kEPbaJrged1Rnyw9wBrlJZXKYW3+N7NlHPuxURSvQHn
+        tRcGCPqM2gawZwLQBDjTRB0/gaxGy8sGUYCdCzeotY5qB+Y3ARyA/NtJEOD/Hnv/BDBEbyKwt9HEbyI1
+        wyN1k2Y0YffpJzBg6C9SugBXWzYR3RcoFQAAAABJRU5ErkJggg==
+</value>
+  </data>
 </root>

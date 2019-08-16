@@ -45,37 +45,47 @@ namespace Extract.AttributeFinder.Rules
 
                 // Populate a grid that shows all available barcode types and the pass in which the
                 // rule would search for it.
-                AddGridRow(BAR_TYPE.BAR_A2of5, "Airline 2 of 5");
-                AddGridRow(BAR_TYPE.BAR_CB, "Codabar");
-                AddGridRow(BAR_TYPE.BAR_CODE11, "Code 11");
-                AddGridRow(BAR_TYPE.BAR_C39, "Code 39");
-                AddGridRow(BAR_TYPE.BAR_C39_EXT, "Code 39 Extended");
-                AddGridRow(BAR_TYPE.BAR_C93, "Code 93. The full ASCII character set is supported");
-                AddGridRow(BAR_TYPE.BAR_C128, "Code 128");
-                AddGridRow(BAR_TYPE.BAR_DMATRIX, "Data Matrix (2D barcode)");
-                AddGridRow(BAR_TYPE.BAR_EAN, "EAN 8/13");
-                AddGridRow(BAR_TYPE.BAR_EAN14, "EAN-14 Code");
-                AddGridRow(BAR_TYPE.BAR_SSCC18, "SSCC18/EAN-18 Code");
-                AddGridRow(BAR_TYPE.BAR_UCC128, "UCC/EAN Code 128. Includes SSCC-18 and EAN-14 as well");
-                AddGridRow(BAR_TYPE.BAR_BOOKLAND, "Bookland EAN Code");
-                AddGridRow(BAR_TYPE.BAR_PDF417, "PDF417 (2D barcode)");
-                AddGridRow(BAR_TYPE.BAR_QR, "QR Code (Quick Response) (2D barcode)");
-                AddGridRow(BAR_TYPE.BAR_UPC_A, "UPC-A");
-                AddGridRow(BAR_TYPE.BAR_UPC_E, "UPC-E (6-digit)");
-                AddGridRow(BAR_TYPE.BAR_POSTNET, "Postnet code (US postal code)");
-                AddGridRow(BAR_TYPE.BAR_4STATE_USPS, "USPS 4-State Customer Barcode. (a.k.a. OneCode, Intelligent Mail)");
-                AddGridRow(BAR_TYPE.BAR_4STATE_AUSPOST, "Australia Post 4-State Customer Barcode)");
-                AddGridRow(BAR_TYPE.BAR_DATABAR_LTD, "GS1 Databar Limited Code");
-                AddGridRow(BAR_TYPE.BAR_DATABAR_EXP, "GS1 Databar Expanded Code");
-                AddGridRow(BAR_TYPE.BAR_C39_NSS, "Code 39 without start-stop characters");
-                AddGridRow(BAR_TYPE.BAR_PATCH, "Patch Code");
-                AddGridRow(BAR_TYPE.BAR_2of5, "Code 2 of 5 Standard");
-                AddGridRow(BAR_TYPE.BAR_ITF, "ITF (Interleaved 2 of 5)");
-                AddGridRow(BAR_TYPE.BAR_ITF14, "ITF 14 Code");
-                AddGridRow(BAR_TYPE.BAR_PLANET, "Planet Code (US postal code)");
-                AddGridRow(BAR_TYPE.BAR_ITAPOST25, "Italian Postal 2 of 5 Code");
-                AddGridRow(BAR_TYPE.BAR_MAT25, "Matrix 2 of 5");
-                AddGridRow(BAR_TYPE.BAR_MSI, "Modified Plessey Code");
+                AddGridRow(BAR_TYPE.BAR_EAN, "BAR_EAN (EAN 8/13)");
+                AddGridRow(BAR_TYPE.BAR_UPC_A, "BAR_UPC_A (UPC-A)");
+                AddGridRow(BAR_TYPE.BAR_UPC_E, "BAR_UPC_E (UPC-E (6-digit))");
+                AddGridRow(BAR_TYPE.BAR_ITF, "BAR_ITF (ITF (Interleaved 2 of 5))");
+                AddGridRow(BAR_TYPE.BAR_C39, "BAR_C39 (Code 39)");
+                AddGridRow(BAR_TYPE.BAR_C39_EXT, "BAR_C39_EXT (Code 39 Extended. The full ASCII character set is supported)");
+                AddGridRow(BAR_TYPE.BAR_C128, "BAR_C128 (Code 128)");
+                AddGridRow(BAR_TYPE.BAR_CB, "BAR_CB (Codabar)");
+                AddGridRow(BAR_TYPE.BAR_POSTNET, "BAR_POSTNET (Postnet code (US postal code))");
+                AddGridRow(BAR_TYPE.BAR_A2of5, "BAR_A2of5 (Airline 2 of 5)");
+                AddGridRow(BAR_TYPE.BAR_UCC128, "BAR_UCC128 (UCC/EAN Code 128. Includes SSCC-18 and EAN-14 as well)");
+                AddGridRow(BAR_TYPE.BAR_2of5, "BAR_2of5 (Code 2 of 5 Standard)");
+                AddGridRow(BAR_TYPE.BAR_C93, "BAR_C93 (Code 93. The full ASCII character set is supported)");
+                AddGridRow(BAR_TYPE.BAR_PATCH, "BAR_PATCH (Patch Code)");
+                AddGridRow(BAR_TYPE.BAR_PDF417, "BAR_PDF417 (PDF417 (2D barcode))");
+                AddGridRow(BAR_TYPE.BAR_PLANET, "BAR_PLANET (Planet Code (US postal code))");
+                AddGridRow(BAR_TYPE.BAR_DMATRIX, "BAR_DMATRIX (Data Matrix)");
+                AddGridRow(BAR_TYPE.BAR_C39_NSS, "BAR_C39_NSS (Code 39 without start-stop characters)");
+                AddGridRow(BAR_TYPE.BAR_QR, "BAR_QR (QR Code (Quick Response) (2D barcode))");
+                AddGridRow(BAR_TYPE.BAR_MAT25, "BAR_MAT25 (Matrix 2 of 5)");
+                AddGridRow(BAR_TYPE.BAR_CODE11, "BAR_CODE11 (Code 11)");
+                AddGridRow(BAR_TYPE.BAR_ITAPOST25, "BAR_ITAPOST25 (Italian Postal 2 of 5 Code)");
+                AddGridRow(BAR_TYPE.BAR_MSI, "BAR_MSI (Modified Plessey Code)");
+                AddGridRow(BAR_TYPE.BAR_BOOKLAND, "BAR_BOOKLAND (Bookland EAN Code)");
+                AddGridRow(BAR_TYPE.BAR_ITF14, "BAR_ITF14 (ITF 14 Code)");
+                AddGridRow(BAR_TYPE.BAR_EAN14, "BAR_EAN14 (EAN-14 Code)");
+                AddGridRow(BAR_TYPE.BAR_SSCC18, "BAR_SSCC18 (SSCC18/EAN-18 Code)");
+                AddGridRow(BAR_TYPE.BAR_DATABAR_LTD, "BAR_DATABAR_LTD (GS1 Databar Limited Code)");
+                AddGridRow(BAR_TYPE.BAR_DATABAR_EXP, "BAR_DATABAR_EXP (GS1 Databar Expanded Code)");
+                AddGridRow(BAR_TYPE.BAR_4STATE_USPS, "BAR_4STATE_USPS (USPS 4-State Customer Barcode. (a.k.a. OneCode, Intelligent Mail))");
+                AddGridRow(BAR_TYPE.BAR_4STATE_AUSPOST, "BAR_4STATE_AUSPOST (Australia Post 4-State Customer Barcode)");
+
+                // Set this here to avoid FXCop complaining about mispellings in the string (RecAPI)
+                infoTip1.TipText = @"Note 1: If the real barcode type is not enabled but one of its family is, the engine can recognize the barcode.
+In such a case it is more useful to give a result of type within the family than not to give anything,
+thus the ""main"" member of the family can be retrieved as recognized type, even if this ""main"" member was not enabled.
+To disable this behavior, set Kernel.OcrMgr.BarEnableFamily to 0 (in the advanced OCR params tab).
+Source: Nuance ""RecAPI"" help file
+
+Note 2: Depending on the types selected, searches will occur in multiple passes. Multiple passes will increase processing time.";
+
             }
             catch (Exception ex)
             {
@@ -121,6 +131,8 @@ namespace Extract.AttributeFinder.Rules
                 {
                     row.Cells[0].Value = true;
                 }
+
+                _inheritOCRParametersCheckBox.Checked = Settings.InheritOCRParameters;
 
                 UpdatePassCount();
             }
@@ -187,12 +199,63 @@ namespace Extract.AttributeFinder.Rules
                 }
 
                 Settings.Types = BarTypes.ToVariantVector();
+                Settings.InheritOCRParameters = _inheritOCRParametersCheckBox.Checked;
 
                 DialogResult = DialogResult.OK;
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI46977");
+            }
+        }
+
+        private void Handle_SelectAllButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                foreach (DataGridViewRow row in _barcodeTypesDataGridView.Rows)
+                {
+                    var chk = (DataGridViewCheckBoxCell)row.Cells[0];
+                    chk.Value = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI47238");
+            }
+        }
+
+        private void Handle_SelectNoneButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                foreach (DataGridViewRow row in _barcodeTypesDataGridView.Rows)
+                {
+                    var chk = (DataGridViewCheckBoxCell)row.Cells[0];
+                    chk.Value = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI47239");
+            }
+
+        }
+
+        private void Handle_SelectDefaultButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                foreach (DataGridViewRow row in _barcodeTypesDataGridView.Rows)
+                {
+                    DataGridViewCheckBoxCell chk = (DataGridViewCheckBoxCell)row.Cells[0];
+                    BAR_TYPE type = (BAR_TYPE)row.Tag;
+                    chk.Value = BarcodeFinder.AutoBarTypes.Contains(type);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI47240");
             }
         }
 
@@ -205,8 +268,9 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         void AddGridRow(BAR_TYPE type, string name)
         {
-            var pass = Invariant($"Pass {Settings.PassMapping[type]}");
-            var index = _barcodeTypesDataGridView.Rows.Add(false, name, null, pass);
+            var auto = BarcodeFinder.AutoBarTypes.Contains(type);
+            var autoOrNot = auto ? "true" : "";
+            var index = _barcodeTypesDataGridView.Rows.Add(false, name, null, autoOrNot);
             _barcodeTypesDataGridView.Rows[index].Tag = type;
         }
 
@@ -243,7 +307,7 @@ namespace Extract.AttributeFinder.Rules
 
         void UpdatePassCount()
         {
-            var passCount = BarcodeFinder.GetPassSequence(BarTypes).Length;
+            var passCount = Settings.GetNumberOfPasses(BarTypes);
             _passCountLabel.Text = 
                 Invariant($"The current configuration will require {passCount} pass{(passCount == 1 ? "" : "es")} ");
         }

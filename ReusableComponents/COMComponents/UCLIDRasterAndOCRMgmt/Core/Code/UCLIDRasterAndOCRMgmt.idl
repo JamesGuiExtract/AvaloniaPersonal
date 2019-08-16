@@ -134,6 +134,8 @@ library UCLID_RASTERANDOCRMGMTLib
 		kAssignSpatialInfoToSpaceCharacters = 20,
 		kIgnoreParagraphFlag = 21,
 		kTreatZonesAsParagraphs = 22,
+		kOCRType = 23,
+		kBarCodeType = 24
 	} EOCRParameter;
 
 	typedef 
@@ -147,6 +149,18 @@ library UCLID_RASTERANDOCRMGMTLib
 		kForceWhenBitonal = 1,
 		kAlwaysForce = 2
 	} EForceDespeckleMode;
+
+	typedef 
+	[
+		uuid(5F6715E5-0767-416B-8364-1C2EBB16433C), 
+		helpstring("OCR find type")
+	]
+	enum
+	{
+		kFindStandardOCR = 0,
+		kFindMICROnly = 1,
+		kFindBarcodesOnly = 2
+	} EOCRFindType;
 
 	//----------------------------------------------------------------------------------------------
 	//-I N T E R F A C E S -------------------------------------------------------------------------

@@ -76,7 +76,8 @@ namespace Extract.FileActionManager.Forms.Test
                 RequireOnePageSuccess = 0
                 SkipPageOnFailure = 0
                 TimeoutLength = 120000
-                TreatZonesAsParagraphs = 0", @"(?m)^ +", "");
+                TreatZonesAsParagraphs = 0
+                OCRFindType = 0", @"(?m)^ +", "");
 
             using (var tmpFile = new TemporaryFile(false))
             {
@@ -133,7 +134,8 @@ namespace Extract.FileActionManager.Forms.Test
                 RequireOnePageSuccess = 0
                 SkipPageOnFailure = 0
                 TimeoutLength = 120000
-                TreatZonesAsParagraphs = 0", @"(?m)^ +", "");
+                TreatZonesAsParagraphs = 0
+                OCRFindType = 0", @"(?m)^ +", "");
 
             using (var config = new OCRParametersConfigure())
             {
@@ -180,7 +182,8 @@ namespace Extract.FileActionManager.Forms.Test
                     RequireOnePageSuccess = 1
                     SkipPageOnFailure = 1
                     TimeoutLength = 240000
-                    TreatZonesAsParagraphs = 1", @"(?m)^ +", "");
+                    TreatZonesAsParagraphs = 1
+                    OCRFindType = 0", @"(?m)^ +", "");
 
             // Set default settings by opening and closing the dialog with the OK button
             using (var config = new OCRParametersConfigure())
@@ -244,7 +247,8 @@ namespace Extract.FileActionManager.Forms.Test
                     RequireOnePageSuccess = 1
                     SkipPageOnFailure = 1
                     TimeoutLength = 240000
-                    TreatZonesAsParagraphs = 1", @"(?m)^ +", "");
+                    TreatZonesAsParagraphs = 1
+                    OCRFindType = 0", @"(?m)^ +", "");
 
             // Set default settings by opening and closing the dialog with the OK button
             using (var config = new OCRParametersConfigure())
@@ -304,7 +308,8 @@ namespace Extract.FileActionManager.Forms.Test
                     RequireOnePageSuccess = 1
                     SkipPageOnFailure = 1
                     TimeoutLength = 240000
-                    TreatZonesAsParagraphs = 1", @"(?m)^ +", "");
+                    TreatZonesAsParagraphs = 1
+                    OCRFindType = 0", @"(?m)^ +", "");
 
             using (var config = new OCRParametersConfigure())
             {
@@ -399,7 +404,8 @@ namespace Extract.FileActionManager.Forms.Test
                     RequireOnePageSuccess = 1
                     SkipPageOnFailure = 1
                     TimeoutLength = 240000
-                    TreatZonesAsParagraphs = 1", @"(?m)^ +", "");
+                    TreatZonesAsParagraphs = 1
+                    OCRFindType = 0", @"(?m)^ +", "");
 
             using (var config = new OCRParametersConfigure())
             {
@@ -468,7 +474,8 @@ namespace Extract.FileActionManager.Forms.Test
                     RequireOnePageSuccess = 1
                     SkipPageOnFailure = 1
                     TimeoutLength = 240000
-                    TreatZonesAsParagraphs = 1", @"(?m)^ +", "");
+                    TreatZonesAsParagraphs = 1
+                    OCRFindType = 0", @"(?m)^ +", "");
 
             using (var config = new OCRParametersConfigure())
             {

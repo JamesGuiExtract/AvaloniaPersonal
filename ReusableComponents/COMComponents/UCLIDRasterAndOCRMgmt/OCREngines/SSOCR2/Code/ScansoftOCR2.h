@@ -231,7 +231,6 @@ private:
 	bool m_bLimitToBasicLatinCharacters;
 
 	bool m_bSettingsApplied;
-	bool m_bOCRParamertersApplied;
 
 	EPageDecompositionMethod m_ePrimaryDecompositionMethod;
 
@@ -243,6 +242,7 @@ private:
 	bool m_bAssignSpatialInfoToSpaceCharacters;
 	bool m_bIgnoreParagraphFlag;
 	bool m_bTreatZonesAsParagraphs;
+	EOCRFindType m_eOCRFindType;
 
 	/////////////
 	// Methods
@@ -486,4 +486,5 @@ private:
 	//          basic latin character set (eg. accented characters, fractions, copyright symbol).
 	// P16 #2356
 	bool isBasicLatinCharacter(unsigned short usLetterCode);
+	bool isMICRCharacter(unsigned short usLetterCode);
 };

@@ -159,9 +159,6 @@
     <Reference Include="Nuance.OmniPage.CSDK.ArgTypes">
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\Nuance_20\Bin\Nuance.OmniPage.CSDK.ArgTypes.dll</HintPath>
     </Reference>
-    <Reference Include="Nuance.OmniPage.CSDK.Objects">
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\Nuance_20\Bin\Nuance.OmniPage.CSDK.Objects.dll</HintPath>
-    </Reference>
     <Reference Include="OpenNLP.IKVM, Version=1.8.1.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\OpenNLP.IKVM.1.8.1\lib\OpenNLP.IKVM.exe</HintPath>
     </Reference>
@@ -425,6 +422,15 @@
     </COMReference>
     <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
       <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_SSOCRLib">
+      <Guid>{C0F50AC4-62B2-4D15-A26F-404FEC1D58B2}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>

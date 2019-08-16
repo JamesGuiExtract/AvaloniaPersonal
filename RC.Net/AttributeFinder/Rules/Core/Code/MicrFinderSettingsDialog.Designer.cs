@@ -60,6 +60,7 @@
             this._micrSplitterTextBox = new System.Windows.Forms.TextBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.browseButton1 = new Extract.Utilities.Forms.BrowseButton();
+            this._inheritOCRParametersCheckBox = new System.Windows.Forms.CheckBox();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -151,6 +152,7 @@
             this.fileActionManagerPathTagButton1.Image = ((System.Drawing.Image)(resources.GetObject("fileActionManagerPathTagButton1.Image")));
             this.fileActionManagerPathTagButton1.Location = new System.Drawing.Point(510, 131);
             this.fileActionManagerPathTagButton1.Name = "fileActionManagerPathTagButton1";
+            this.fileActionManagerPathTagButton1.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this.fileActionManagerPathTagButton1.Size = new System.Drawing.Size(18, 20);
             this.fileActionManagerPathTagButton1.TabIndex = 8;
             this.fileActionManagerPathTagButton1.TextControl = this._micrSplitterRegexTextBox;
@@ -282,7 +284,7 @@
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(423, 352);
+            this._okButton.Location = new System.Drawing.Point(423, 372);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 14;
@@ -294,7 +296,7 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(504, 352);
+            this._cancelButton.Location = new System.Drawing.Point(504, 372);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 15;
@@ -341,6 +343,7 @@
             this._regexFilterFileNamePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_regexFilterFileNamePathTagsButton.Image")));
             this._regexFilterFileNamePathTagsButton.Location = new System.Drawing.Point(528, 113);
             this._regexFilterFileNamePathTagsButton.Name = "_regexFilterFileNamePathTagsButton";
+            this._regexFilterFileNamePathTagsButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
             this._regexFilterFileNamePathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._regexFilterFileNamePathTagsButton.TabIndex = 11;
             this._regexFilterFileNamePathTagsButton.TextControl = this._filterRegExTextBox;
@@ -403,12 +406,25 @@
             this.browseButton1.UseVisualStyleBackColor = true;
             this.browseButton1.PathSelected += new System.EventHandler<Extract.Utilities.Forms.PathSelectedEventArgs>(this.HandleMicrSplitterRegexBrowseButton_PathSelected);
             // 
+            // _inheritOCRParametersCheckBox
+            // 
+            this._inheritOCRParametersCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this._inheritOCRParametersCheckBox.AutoSize = true;
+            this._inheritOCRParametersCheckBox.Location = new System.Drawing.Point(15, 349);
+            this._inheritOCRParametersCheckBox.Name = "_inheritOCRParametersCheckBox";
+            this._inheritOCRParametersCheckBox.Size = new System.Drawing.Size(204, 17);
+            this._inheritOCRParametersCheckBox.TabIndex = 16;
+            this._inheritOCRParametersCheckBox.Text = "Inherit OCR parameters (advanced)";
+            this._inheritOCRParametersCheckBox.UseVisualStyleBackColor = true;
+            // 
             // MicrFinderSettingsDialog
             // 
+            this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(591, 387);
+            this.ClientSize = new System.Drawing.Size(591, 407);
+            this.Controls.Add(this._inheritOCRParametersCheckBox);
             this.Controls.Add(this._regexFilterFileNamePathTagsButton);
             this.Controls.Add(this._regexFilterFileNameBrowseButton);
             this.Controls.Add(this._filterRegExTextBox);
@@ -468,5 +484,6 @@
         private System.Windows.Forms.CheckBox _filterCharsWhenSplittingCheckBox;
         private System.Windows.Forms.CheckBox checkBox1;
         private Utilities.Forms.BrowseButton browseButton1;
+        private System.Windows.Forms.CheckBox _inheritOCRParametersCheckBox;
     }
 }

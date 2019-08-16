@@ -128,7 +128,6 @@ CScansoftOCR2::CScansoftOCR2()
 	m_nTimeoutLength(120000),
 	m_bLimitToBasicLatinCharacters(true),
 	m_bSettingsApplied(false),
-	m_bOCRParamertersApplied(false),
 	m_ePrimaryDecompositionMethod(kAutoDecomposition),
 	m_eDefaultFillingMethod(FM_OMNIFONT),
 	m_bOutputMultipleSpaceCharacterSequences(false),
@@ -136,7 +135,8 @@ CScansoftOCR2::CScansoftOCR2()
 	m_bOutputTabCharactersForTabSpaceType(false),
 	m_bAssignSpatialInfoToSpaceCharacters(false),
 	m_bIgnoreParagraphFlag(false),
-	m_bTreatZonesAsParagraphs(false)
+	m_bTreatZonesAsParagraphs(false),
+	m_eOCRFindType(kFindStandardOCR)
 {
 	try
 	{
@@ -466,8 +466,26 @@ STDMETHODIMP CScansoftOCR2::SetOCRParameters(IOCRParameters* pOCRParameters, VAR
 
 	try
 	{
+		// If first use or not just a second try due to failure then apply settings
 		if (!m_bSettingsApplied || asCppBool(vbReApply))
 		{
+			// If settings were previously applied then set everything back to the default values so
+			// that none of the previous values remain.
+			// This should be done because IOCRParameters collections are unbounded and the new
+			// settings may not have all the parameters that the registry or the last collection had.
+			if (m_bSettingsApplied)
+			{
+				// Set everything to default values
+				HSETTING hSetting;
+				THROW_UE_ON_ERROR("ELI45929", "Unable to get OCR setting.",
+					kRecSettingGetHandle(NULL, "Kernel", &hSetting, NULL));
+				THROW_UE_ON_ERROR("ELI45930", "Unable to set default options",
+					kRecSettingSetToDefault(0, hSetting, TRUE));
+
+				// Set Extract-specific default settings
+				applyCommonSettings();
+			}
+
 			IOCRParametersPtr ipOCRParameters;
 			if (pOCRParameters != __nullptr)
 			{
@@ -478,28 +496,9 @@ STDMETHODIMP CScansoftOCR2::SetOCRParameters(IOCRParameters* pOCRParameters, VAR
 			if (ipOCRParameters != __nullptr && ipOCRParameters->Size > 0)
 			{
 				applySettingsFromParameters(ipOCRParameters);
-				m_bOCRParamertersApplied = true;
 			}
 			else
 			{
-				// If settings were previously applied using an IOCRParameters collection
-				// then set everything back to the default values so that none of those settings
-				// values remain
-				if (m_bOCRParamertersApplied)
-				{
-					// Set everything to default values
-					HSETTING hSetting;
-					THROW_UE_ON_ERROR("ELI45929", "Unable to get OCR setting.",
-						kRecSettingGetHandle(NULL, "Kernel", &hSetting, NULL));
-					THROW_UE_ON_ERROR("ELI45930", "Unable to set default options",
-						kRecSettingSetToDefault(0, hSetting, TRUE));
-
-					// Set Extract-specific default settings
-					applyCommonSettings();
-
-					m_bOCRParamertersApplied = false;
-				}
-
 				applySettingsFromRegistry();
 			}
 
@@ -541,6 +540,7 @@ STDMETHODIMP CScansoftOCR2::WriteOCRSettingsToFile(BSTR bstrFileName, VARIANT_BO
 			outfile << "\nSkipPageOnFailure = " << m_bSkipPageOnFailure;
 			outfile << "\nTimeoutLength = " << m_nTimeoutLength;
 			outfile << "\nTreatZonesAsParagraphs = " << m_bTreatZonesAsParagraphs;
+			outfile << "\nOCRFindType = " << m_eOCRFindType;
 
 			outfile.close();
 		}
@@ -1459,6 +1459,11 @@ void CScansoftOCR2::addRecognizedLettersToVector(vector<CPPLetter>* pvecLetters,
 					(bIsTabSpace && m_bOutputTabCharactersForTabSpaceType
 						? '\t'
 						: bIsRecognized ? pCurLetter->code : gcUNRECOGNIZED);
+
+				if (m_eOCRFindType == kFindBarcodesOnly)
+				{
+					letter.m_usGuess2 = RH_BARTYPE(pCurLetter->info);
+				}
 			}
 
 			if(bIsSpace)
@@ -1487,7 +1492,7 @@ void CScansoftOCR2::addRecognizedLettersToVector(vector<CPPLetter>* pvecLetters,
 							for (int i = 1; i <= nSpaceCount; ++i)
 							{
 								letter.m_ulLeft = ulLastRight;
-								letter.m_ulRight = ulStart + round(i * dWidth);
+								letter.m_ulRight = ulStart + (unsigned long)round(i * dWidth);
 								ulLastRight = letter.m_ulRight;
 								pvecLetters->push_back(letter);
 							}
@@ -1811,8 +1816,21 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 		zone.rectBBox.bottom = pZone->bottom;
 
 		// Set other items
-		zone.fm = FM_OMNIFONT;
-		zone.rm = RM_OMNIFONT_PLUS3W;
+		if (m_eOCRFindType == kFindMICROnly)
+		{
+			zone.fm = FM_MICR;
+			zone.rm = RM_MAT;
+		}
+		else if (m_eOCRFindType == kFindBarcodesOnly)
+		{
+			zone.fm = FM_BARCODE;
+			zone.rm = RM_BAR;
+		}
+		else
+		{
+			zone.fm = m_eDefaultFillingMethod;
+			zone.rm = RM_OMNIFONT_PLUS3W;
+		}
 		zone.type = WT_FLOW;
 		zone.filter = FILTER_DEFAULT;
 
@@ -2085,7 +2103,7 @@ void CScansoftOCR2::createZonesFromLineRemoval(const RECT* pArea)
 	memset(&zone, 0, sizeof(ZONE));
 
 	zone.type = WT_FLOW;
-	zone.fm = FM_OMNIFONT;
+	zone.fm = m_eDefaultFillingMethod;
 	zone.rm = RM_OMNIFONT_PLUS3W;
 	zone.filter = FILTER_ALL;
 
@@ -2740,6 +2758,18 @@ void CScansoftOCR2::applyCommonSettings()
 		THROW_UE_ON_ERROR("ELI37098", "Unable to get OCR setting.",
 			kRecSettingGetHandle(NULL, "Kernel.Imf.PDF.Resolution", &hSetting, NULL) );
 		THROW_UE_ON_ERROR("ELI37099", "", kRecSettingSetInt(0, hSetting, 300));
+
+		// Extract-implemented settings that don't exist in the registry should be set to legacy values in case there were previously applied parameters
+		m_bLimitToBasicLatinCharacters = true;
+		m_bRequireOnePageSuccess = false;
+		m_bOutputMultipleSpaceCharacterSequences = false;
+		m_bOutputOneSpaceCharacterPerCount = false;
+		m_bOutputTabCharactersForTabSpaceType = false;
+		m_bAssignSpatialInfoToSpaceCharacters = false;
+		m_bIgnoreParagraphFlag = false;
+		m_bTreatZonesAsParagraphs = false;
+		m_eOCRFindType = kFindStandardOCR;
+		m_eDefaultFillingMethod = FM_OMNIFONT;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45914")
 }
@@ -2785,16 +2815,6 @@ void CScansoftOCR2::applySettingsFromRegistry()
 		// Enable automatic image-despeckling mode per the low-bit of m_apCfg->getDespeckleMode().
 		THROW_UE_ON_ERROR("ELI03417", "Unable to set image despeckling mode in the OCR engine!",
 			kRecSetImgDespeckleMode(0, m_bEnableDespeckleMode ? TRUE : FALSE));
-
-		// Extract-implemented settings that don't exist in the registry should be set to legacy values in case there were previously applied parameters
-		m_bLimitToBasicLatinCharacters = true;
-		m_bRequireOnePageSuccess = false;
-		m_bOutputMultipleSpaceCharacterSequences = false;
-		m_bOutputOneSpaceCharacterPerCount = false;
-		m_bOutputTabCharactersForTabSpaceType = false;
-		m_bAssignSpatialInfoToSpaceCharacters = false;
-		m_bIgnoreParagraphFlag = false;
-		m_bTreatZonesAsParagraphs = false;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45914")
 }
@@ -2814,6 +2834,12 @@ void CScansoftOCR2::applySettingsFromParameters(IOCRParametersPtr ipOCRParameter
 		ASSERT_RESOURCE_ALLOCATION("ELI46003", ipPairs != __nullptr);
 
 		bool bFirstLanguage = true;
+		bool bBarTypesSet = false;
+		BAR_ENA barTypes[BAR_SIZE];
+		for (int i = 0; i < BAR_SIZE; i++)
+		{
+			barTypes[i] = BAR_DISABLED;
+		}
 
 		for (long i = 0; i < nCount; i++)
 		{	
@@ -2879,8 +2905,7 @@ void CScansoftOCR2::applySettingsFromParameters(IOCRParametersPtr ipOCRParameter
 					setTradeOff((EOcrTradeOff)nValue);
 					break;
 				case kDefaultFillingMethod:
-					THROW_UE_ON_ERROR("ELI46010", "Unable to set default filling method in the OCR engine!",
-						kRecSetDefaultFillingMethod(0, (FILLINGMETHOD)nValue));
+					m_eDefaultFillingMethod = (FILLINGMETHOD)nValue;
 					break;
 				case kTimeout:
 					m_nTimeoutLength = nValue;
@@ -2902,6 +2927,16 @@ void CScansoftOCR2::applySettingsFromParameters(IOCRParametersPtr ipOCRParameter
 					break;
 				case kTreatZonesAsParagraphs:
 					m_bTreatZonesAsParagraphs = !!nValue;
+					break;
+				case kOCRType:
+					m_eOCRFindType = (EOCRFindType)nValue;
+					break;
+				case kBarCodeType:
+					if (nValue >= 0 && nValue < BAR_SIZE)
+					{
+						barTypes[nValue] = BAR_ENABLED;
+						bBarTypesSet = true;
+					}
 					break;
 				}
 			}
@@ -2932,6 +2967,38 @@ void CScansoftOCR2::applySettingsFromParameters(IOCRParametersPtr ipOCRParameter
 				}
 			}
 		}
+
+
+		// Setup the engine for non-standard OCR, if necessary
+		if (m_eOCRFindType == kFindMICROnly)
+		{
+			WCHAR* langPlus = L"\u2446\u2447\u2448\u2449";
+			THROW_UE_ON_ERROR("ELI47229", "Unable to set languages plus of the OCR engine!",
+				kRecSetLanguagesPlus(0, langPlus));
+
+			THROW_UE_ON_ERROR("ELI47230", "Unable to set default recognition module of the OCR engine!",
+				kRecSetDefaultRecognitionModule(0, RM_MAT));
+
+			THROW_UE_ON_ERROR("ELI47231", "Unable to set default filling method of the OCR engine!",
+				kRecSetDefaultFillingMethod(0, FM_MICR));
+		}
+		else if (m_eOCRFindType == kFindBarcodesOnly)
+		{
+			THROW_UE_ON_ERROR("ELI47232", "Unable to set default recognition module of the OCR engine",
+				kRecSetDefaultRecognitionModule(0, RM_BAR));
+
+			THROW_UE_ON_ERROR("ELI47233", "Unable to set default filling method of the OCR engine!",
+				kRecSetDefaultFillingMethod(0, FM_BARCODE));
+
+			if (!bBarTypesSet)
+			{
+				THROW_UE_ON_ERROR("ELI47234", "Unable to get auto barcode types from the OCR engine!",
+					kRecGetAutoBarTypes(0, barTypes));
+			}
+
+			THROW_UE_ON_ERROR("ELI47235", "Unable to set barcode types of the OCR engine!",
+				kRecSetBarTypes(0, barTypes));
+		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45922")
 }
@@ -2951,14 +3018,48 @@ bool CScansoftOCR2::isBasicLatinCharacter(unsigned short usLetterCode)
 	return usLetterCode > 0 && usLetterCode <= 126 || usLetterCode == 176;
 }
 //-------------------------------------------------------------------------------------------------
+bool CScansoftOCR2::isMICRCharacter(unsigned short usLetterCode)
+{
+	return (usLetterCode >= 0x2446 && usLetterCode <= 0x2449) || usLetterCode == 0xFFFD;
+}
+//-------------------------------------------------------------------------------------------------
 bool CScansoftOCR2::isRecognizedCharacter(unsigned short usLetterCode)
 {
 	return usLetterCode > 0
-		&& (!m_bLimitToBasicLatinCharacters || isBasicLatinCharacter(usLetterCode));
+		&& (!m_bLimitToBasicLatinCharacters
+			|| isBasicLatinCharacter(usLetterCode)
+			|| (m_eOCRFindType == kFindMICROnly) && isMICRCharacter(usLetterCode)
+			);
 }
 //-------------------------------------------------------------------------------------------------
 void CScansoftOCR2::convertToCodePage(unsigned short *usLetterCode)
 {
+	if (m_eOCRFindType == kFindMICROnly)
+	{
+		switch (*usLetterCode)
+		{
+		case 0x2446:
+			*usLetterCode = 'T';
+			break;
+
+		case 0x2447:
+			*usLetterCode = 'A';
+			break;
+
+		case 0x2448:
+			*usLetterCode = 'U';
+			break;
+
+		case 0x2449:
+			*usLetterCode = 'D';
+			break;
+
+		case 0xFFFD:
+			*usLetterCode = gcUNRECOGNIZED;
+			break;
+		}
+	}
+
 	if (isBasicLatinCharacter(*usLetterCode))
 	{
 		return;

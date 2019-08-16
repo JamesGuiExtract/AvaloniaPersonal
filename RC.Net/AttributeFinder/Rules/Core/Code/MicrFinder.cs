@@ -2,8 +2,6 @@
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Parsers;
-using Nuance.OmniPage.CSDK.ArgTypes;
-using Nuance.OmniPage.CSDK.Objects;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,8 +15,9 @@ using UCLID_AFCORELib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
+using UCLID_SSOCRLib;
 using ComAttribute = UCLID_AFCORELib.Attribute;
-using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
+using OCRParam = Extract.Utilities.Union<(int key, int value), (int key, double value), (string key, int value), (string key, double value), (string key, string value)>;
 
 namespace Extract.AttributeFinder.Rules
 {
@@ -88,6 +87,12 @@ namespace Extract.AttributeFinder.Rules
         /// into sub-attributes.
         /// </summary>
         bool FilterCharsWhenSplitting { get; set; }
+
+        /// <summary>
+        /// Whether to use OCRParameters specified in the containing ruleset or the input spatial string
+        /// (if <c>true</c>) or to use only built-in parameters (if <c>false</c>)
+        /// </summary>
+        bool InheritOCRParameters { get; set; }
     }
 
     /// <summary>
@@ -109,7 +114,7 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// Current version.
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -138,15 +143,6 @@ namespace Extract.AttributeFinder.Rules
 
         #endregion Constants
 
-        /// <summary>
-        /// Represents the spatial area and recognized letters of a candidate MICR zone.
-        /// </summary>
-        class ZoneData
-        {
-            public ComRasterZone RasterZone { get; set; }
-            public IEnumerable<LETTER> Letters { get; set; }
-        }
-
         #region Fields
 
         int _highConfidenceThreshold = 80;
@@ -162,7 +158,6 @@ namespace Extract.AttributeFinder.Rules
         bool _dirty;
 
         AFDocument _currentDocument;
-        static int _instanceCount;
 
         /// <summary>
         /// A cached set of <see cref="SpatialStringSearcher"/>s for each page of the current
@@ -205,6 +200,15 @@ namespace Extract.AttributeFinder.Rules
         [ThreadStatic]
         static MiscUtils _miscUtils;
 
+        static ThreadLocal<ScansoftOCRClass> _ocrEngine = new ThreadLocal<ScansoftOCRClass>(() =>
+        {
+            var engine = new ScansoftOCRClass();
+            engine.InitPrivateLicense(LicenseUtilities.GetMapLabelValue(new MapLabel()));
+            return engine;
+        });
+
+        bool _inheritOCRParameters;
+
         #endregion Fields
 
         #region Constructors
@@ -214,18 +218,6 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         public MicrFinder()
         {
-            try
-            {
-                if (Interlocked.Increment(ref _instanceCount) == 1)
-                {
-                    Engine.SetLicenseKey(null, "9d478fe171d5");
-                    Engine.Init("Extract Systems", "Extract Systems");
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI46893");
-            }
         }
 
         /// <summary>
@@ -458,6 +450,23 @@ namespace Extract.AttributeFinder.Rules
             }
         }
 
+        /// <summary>
+        /// Whether to use OCRParameters specified in the containing ruleset or the input spatial string
+        /// (if <c>true</c>) or to use only built-in parameters (if <c>false</c>)
+        /// </summary>
+        public bool InheritOCRParameters
+        {
+            get
+            {
+                return _inheritOCRParameters;
+            }
+            set
+            {
+                _dirty = _dirty || _inheritOCRParameters != value;
+                _inheritOCRParameters = value;
+            }
+        }
+
         #endregion IMicrFinder
 
         #region IAttributeFindingRule
@@ -491,7 +500,7 @@ namespace Extract.AttributeFinder.Rules
         #region IConfigurableObject Members
 
         /// <summary>
-        /// Performs configuration needed to create a valid <see cref="CreateAttribute"/>.
+        /// Performs configuration needed to create a valid <see cref="MicrFinder"/>.
         /// </summary>
         /// <returns><see langword="true"/> if the configuration was successfully updated or
         /// <see langword="false"/> if configuration was unsuccessful.</returns>
@@ -639,6 +648,11 @@ namespace Extract.AttributeFinder.Rules
                     MicrSplitterRegex = reader.ReadString();
                     FilterCharsWhenSplitting = reader.ReadBoolean();
 
+                    if (reader.Version >= 2)
+                    {
+                        InheritOCRParameters = reader.ReadBoolean();
+                    }
+
                     // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
                 }
@@ -677,6 +691,7 @@ namespace Extract.AttributeFinder.Rules
                     writer.Write(SplitAmount);
                     writer.Write(MicrSplitterRegex);
                     writer.Write(FilterCharsWhenSplitting);
+                    writer.Write(InheritOCRParameters);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -739,10 +754,6 @@ namespace Extract.AttributeFinder.Rules
         /// Copies the specified <see cref="MicrFinder"/> instance into this one.
         /// </summary><param name="source">The <see cref="MicrFinder"/> from which to copy.
         /// </param>
-        // Even though this currently does nothing, this method is here to keep the ICopyableObject
-        // pattern consistent. Block FXCop warnings related to the fact this currently does nothing.
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "source")]
         void CopyFrom(MicrFinder source)
         {
             HighConfidenceThreshold = source.HighConfidenceThreshold;
@@ -755,6 +766,7 @@ namespace Extract.AttributeFinder.Rules
             SplitAmount = source.SplitAmount;
             MicrSplitterRegex = source.MicrSplitterRegex;
             FilterCharsWhenSplitting = source.FilterCharsWhenSplitting;
+            InheritOCRParameters = source.InheritOCRParameters;
         }
 
         /// <summary>
@@ -763,248 +775,64 @@ namespace Extract.AttributeFinder.Rules
         /// <param name="pDocument">The document to search.</param>
         IUnknownVector FindMicrs(AFDocument pDocument)
         {
-            var results = new List<IAttribute>();
+            var pagesToSearch = string.Join(",",
+                pDocument.Text.GetPages(false, "")
+                .ToIEnumerable<SpatialString>()
+                .Select(p => p.GetFirstPageNumber()));
 
-            using (SettingCollection settings = new SettingCollection())
-            {
-                settings.DefaultRecognitionModule = RECOGNITIONMODULE.RM_MAT;
-                settings.DefaultFillingMethod = FILLINGMETHOD.FM_MICR;
-                settings.Languages.LanguagesPlus = new string(new char[]
-                    { _TRANSIT_CHAR, _AMOUNT_CHAR, _ON_US_CHAR, _DASH_CHAR });
-                settings.DTXTOutputformat = DTXTOUTPUTFORMATS.DTXT_TXTS;
+            IOCRParameters ocrParams = GetOCRParams(pDocument);
+            var recognized =
+                _ocrEngine.Value.RecognizeTextInImage2(pDocument.Text.SourceDocName,
+                    pagesToSearch, true, null, ocrParams);
 
-                var pagesToSearch = pDocument.Text.GetPages(true, "[BLANK]")
-                    .ToIEnumerable<SpatialString>()
-                    .Select(p => p.GetFirstPageNumber());
-
-                foreach (var page in pagesToSearch)
+            var resultVector = recognized.GetLines()
+                .ToIEnumerable<SpatialString>()
+                .Where(line => QualifyLine(line, pDocument))
+                .Select(line =>
                 {
-                    using (Page p = new Page(pDocument.Text.SourceDocName, page - 1, settings))
-                    {
-                        var pageResults = FindMicrsOnPage(pDocument, page, p);
-                        results.AddRange(pageResults);
-                    }
-                }
-            }
+                    var attribute = new AttributeClass();
+                    attribute.Value = line;
+                    SplitMicrComponents(attribute);
+                    return attribute;
+                })
+                .ToIUnknownVector();
 
-            var resultVector = results.ToIUnknownVector<IAttribute>();
             resultVector.ReportMemoryUsage();
 
             return resultVector;
         }
 
-        /// <summary>
-        /// Finds MICR lines on the specified page of a document.
-        /// </summary>
-        /// <returns>Each MICR line represented as an <see cref="IAttribute"/>.</returns>
-        List<IAttribute> FindMicrsOnPage(AFDocument pDocument, int page, Page imagePage)
+        IOCRParameters GetOCRParams(AFDocument pDocument)
         {
-            var results = new List<IAttribute>();
+            bool truf<T> (T _) { return true; }
 
-            imagePage.Preprocess();
-            imagePage.Recognize();
+            var ocrParams = InheritOCRParameters
+                ?  ((IHasOCRParameters)pDocument).OCRParameters
+                    .ToIEnumerable()
+                    .Where(p => p.Match(
+                        kv => (EOCRParameter)kv.key != EOCRParameter.kOCRType,
+                        truf, truf, truf, truf))
+                    .ToList()
+                : new List<OCRParam>();
 
-            var spatialPageInfos = new LongToObjectMap();
-            var letters = imagePage[IMAGEINDEX.II_CURRENT].GetLetters();
+            ocrParams.Add(new OCRParam(((int)EOCRParameter.kOCRType, (int)EOCRFindType.kFindMICROnly)));
 
-            if (letters.Any() && !spatialPageInfos.Contains(page))
-            {
-                InitSpatialPageInfo(imagePage, page, spatialPageInfos);
-            }
-
-            // Initialize loop variables the track current/previous letter and letters that are being built
-            // up into the next candidate MICR line.
-            var lastLetter = letters.FirstOrDefault();
-            if (lastLetter == null)
-            {
-                return results;
-            }
-
-            var zoneLetters = new[] { lastLetter }.ToList();
-            var letterEnumerator = letters.Skip(1).GetEnumerator();
-            letterEnumerator.MoveNext();
-            var letter = letterEnumerator.Current;
-            ZoneData lastZone = null;
-            var zoneStart = (zone: lastLetter.zone, top: lastLetter.top, bottom: lastLetter.top + lastLetter.height);
-
-            // Loop thru every regonized char to compile candidate zones
-            while (lastLetter != null)
-            {
-                // If the current letter is in the same Nuance-assigned zone as the previous and arranged
-                // either to the left of right of the zone (not above/below), add this char to the candidate zone
-                // and continue
-                if (letter != null
-                    && letter.zone == zoneStart.zone
-                    && (letter.top == 0 || (letter.top < zoneStart.bottom && (letter.top + letter.height) > zoneStart.top)))
-                {
-                    zoneLetters.Add(letter);
-                }
-                else
-                // At the end of the candidate zone; evaluate it.
-                {
-                    var micrZoneData = GetQualifiedZone(zoneLetters, pDocument, page, ref lastZone);
-
-                    if (micrZoneData != null)
-                    {
-                        var attribute = CreateAttribute(micrZoneData, pDocument, spatialPageInfos);
-
-                        if (micrZoneData == lastZone)
-                        {
-                            results.Remove(results.Last());
-                            results.Add(attribute);
-                        }
-                        else
-                        {
-                            lastZone = micrZoneData;
-                            results.Add(attribute);
-                        }
-                    }
-
-                    if (letter != null)
-                    {
-                        zoneLetters = new[] { letter }.ToList();
-                        zoneStart = (zone: letter.zone, top: letter.top, bottom: letter.top + letter.height);
-                    }
-                }
-
-                lastLetter = letter;
-                letter = letterEnumerator.MoveNext()
-                    ? letterEnumerator.Current
-                    : null;
-            }
-
-            return results;
+            return ocrParams.ToOCRParameters();
         }
 
-        /// <summary>
-        /// Initialize the <see cref="SpatialPageInfo"/> within <see paramref="spatialPageInfos"/>
-        /// for the current page (to be used by any recognized MICR attributes).
-        /// </summary>
-        static void InitSpatialPageInfo(Page imagePage, int pageNumber, LongToObjectMap spatialPageInfos)
+        bool QualifyLine(SpatialString line, AFDocument document)
         {
-            var size = imagePage[IMAGEINDEX.II_CURRENT].ImageInfo.Size;
-            var pageInfo = new SpatialPageInfo();
-            var deskew = Math.Atan2(imagePage.PreprocessInfo.Slope, 1000) * (180.0 / Math.PI);
-            EOrientation orientation = EOrientation.kRotNone;
-            switch (imagePage.PreprocessInfo.Rotation)
-            {
-                case IMG_ROTATE.ROT_NO:
-                    orientation = EOrientation.kRotNone;
-                    break;
-
-                case IMG_ROTATE.ROT_RIGHT:
-                    orientation = EOrientation.kRotRight;
-                    break;
-
-                case IMG_ROTATE.ROT_DOWN:
-                    orientation = EOrientation.kRotDown;
-                    break;
-
-                case IMG_ROTATE.ROT_LEFT:
-                    orientation = EOrientation.kRotLeft;
-                    break;
-
-                default:
-                    throw new ExtractException("ELI46901", "");
-            }
-            var width = (orientation == EOrientation.kRotNone || orientation == EOrientation.kRotDown)
-                ? size.cx
-                : size.cy;
-            var height = (orientation == EOrientation.kRotNone || orientation == EOrientation.kRotDown)
-                ? size.cy
-                : size.cx;
-            pageInfo.Initialize(width, height, orientation, deskew);
-
-            spatialPageInfos.Set(pageNumber, pageInfo);
-        }
-
-        /// <summary>
-        /// Evaluates <see paramref="zoneLetters"/> as a MICR zone candidate.
-        /// </summary>
-        /// <param name="lastZone">The previously qualified zone; Used to merge separate zones along
-        /// the same line if needed.</param>
-        /// <returns>If the letters are determined to represent a qualified MICR line, an <see cref="ZoneData"/>
-        /// instance representing the MICR line is returned. In the case that the new zone is to be merged with
-        /// the last, both the return value and lastZone will be this newly merged zone.
-        /// <c>null</c> if the letters do not represent a qualified zone.
-        /// </returns>
-        ZoneData GetQualifiedZone(IEnumerable<LETTER> zoneLetters, AFDocument document, int page, ref ZoneData lastZone)
-        {
-            if (!zoneLetters.Any(l => l.code != ' '))
-            {
-                return null;
-            }
-
-            var rect = new LongRectangle();
-            rect.SetBounds(zoneLetters.Min(l => l.left),
-                zoneLetters.Min(l => l.top),
-                zoneLetters.Max(l => l.left + l.width),
-                zoneLetters.Max(l => l.top + l.height));
-            var micrZone = new ComRasterZone();
-
-            micrZone.CreateFromLongRectangle(rect, page);
-
-            // Check if new zone should be combined with the previous zone.
-            if (lastZone != null
-                && (rect.Left > lastZone.RasterZone.EndX || rect.Right < lastZone.RasterZone.StartX)
-                && rect.Top < lastZone.RasterZone.EndY
-                && rect.Bottom > lastZone.RasterZone.EndY)
-            {
-                var combinedRect = micrZone.GetBoundsFromMultipleRasterZones(
-                    new[] { lastZone.RasterZone, micrZone }.ToIUnknownVector(), null);
-
-                var combinedZone = new ComRasterZone();
-                combinedZone.CreateFromLongRectangle(combinedRect, page);
-
-                var combinedLetters = (zoneLetters.First().left > lastZone.Letters.First().left)
-                    ? lastZone.Letters
-                        .Concat(new[] { new LETTER() { code = ' ' } })
-                        .Concat(zoneLetters)
-                    : zoneLetters
-                        .Concat(new[] { new LETTER() { code = ' ' } })
-                        .Concat(lastZone.Letters);
-
-                if (QualifyZone(combinedZone, combinedLetters, document))
-                {
-                    lastZone = new ZoneData() { RasterZone = combinedZone, Letters = combinedLetters };
-                    return lastZone;
-                }
-                else
-                {
-                    lastZone = null;
-                }
-            }
-
-            // Otherwise, qualify this new zone individually
-            if (QualifyZone(micrZone, zoneLetters, document))
-            {
-                return new ZoneData() { RasterZone = micrZone, Letters = zoneLetters }; ;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Determines if the specified <see paramref="micrZone"/> qualifies as a valid MICR zone.
-        /// </summary>
-        bool QualifyZone(ComRasterZone micrZone, IEnumerable<LETTER> zoneLetters, AFDocument document)
-        {
-            if (!zoneLetters.Any())
+            if (!line.HasSpatialInfo())
             {
                 return false;
             }
 
-            var confidence = (int)zoneLetters
-                .Where(l => !char.IsWhiteSpace(l.code))
-                .Select(l => 100 - Math.Min(99, l.err & RE_ERROR_LEVEL_MASK))
-                .Average();
+            int min = 0, max = 0, confidence = 0;
+            line.GetCharConfidence(ref min, ref max, ref confidence);
 
             if (FilterRegexInstance != null)
             {
-                var text = new string(zoneLetters.Select(l => l.code).ToArray());
-                if (!FilterRegexInstance.IsMatch(text))
+                if (!FilterRegexInstance.IsMatch(line.String))
                 {
                     return false;
                 }
@@ -1019,9 +847,9 @@ namespace Extract.AttributeFinder.Rules
             {
                 var ocrData = GetOriginalOcrData(document);
 
-                var originalOcr = GetOCRText(micrZone, ocrData);
+                var originalOcr = GetOCRText(line, ocrData);
                 originalOcr.Trim(" \t\r\n", " \t\r\n");
-                int min = 0, max = 0, origOcrConf = 0;
+                int origOcrConf = 0;
                 originalOcr.GetCharConfidence(ref min, ref max, ref origOcrConf);
 
                 if (confidence <= origOcrConf)
@@ -1089,14 +917,9 @@ namespace Extract.AttributeFinder.Rules
         /// Gets a <see cref="SpatialString"/> via the uss file representing the original OCR from
         /// the zone's spatial area.
         /// </summary>
-        static SpatialString GetOCRText(ComRasterZone rasterZone, SpatialString documentSource)
+        static SpatialString GetOCRText(SpatialString line, SpatialString documentSource)
         {
-            // [FlexIDSCore:5093] Don't process any pages without spatial info.
-            int page = rasterZone.PageNumber;
-            if (documentSource.GetSpecifiedPages(page, page).IsEmpty())
-            {
-                return null;
-            }
+            int page = line.GetFirstPageNumber();
 
             SpatialStringSearcher searcher = GetSearcherForPage(page, documentSource);
 
@@ -1104,10 +927,7 @@ namespace Extract.AttributeFinder.Rules
             // memory.
             searcher.ReportMemoryUsage();
 
-            var pageInfo = documentSource.GetPageInfo(rasterZone.PageNumber);
-            var pageBounds = new LongRectangle();
-            pageBounds.SetBounds(0, 0, pageInfo.Width, pageInfo.Height);
-            LongRectangle bounds = rasterZone.GetRectangularBounds(pageBounds);
+            LongRectangle bounds = line.GetOCRImageBounds();
             var ocrText = searcher.GetDataInRegion(bounds, false);
             ocrText.ReportMemoryUsage();
 
@@ -1137,77 +957,6 @@ namespace Extract.AttributeFinder.Rules
             }
 
             return searcher;
-        }
-
-        /// <summary>
-        /// Creates an <see cref="IAttribute"/> to reprevent the specified <see cref="ZoneData"/>.
-        /// This includes splitting out MICR components if so configured.
-        /// </summary>
-        IAttribute CreateAttribute(ZoneData micrZoneData, AFDocument pDocument, LongToObjectMap spatialPageInfos)
-        {
-            var letters = micrZoneData.Letters.Select(zoneLetter =>
-            {
-                var letter = new Letter();
-                switch (zoneLetter.code)
-                {
-                    case _TRANSIT_CHAR:
-                        letter.Guess1 = 'T';
-                        break;
-
-                    case _AMOUNT_CHAR:
-                        letter.Guess1 = 'A';
-                        break;
-
-                    case _ON_US_CHAR:
-                        letter.Guess1 = 'U';
-                        break;
-
-                    case _DASH_CHAR:
-                        letter.Guess1 = 'D';
-                        break;
-
-                    case _UNRECOGNIZED_CHAR:
-                        letter.Guess1 = '?';
-                        break;
-
-                    default:
-                        letter.Guess1 = (char)zoneLetter.code;
-                        break;
-                }
-
-                letter.Bottom = zoneLetter.top + zoneLetter.height;
-                letter.CharConfidence = (zoneLetter.err > 127) ? 0 : (100 - zoneLetter.err);
-                letter.FontSize = (int)zoneLetter.pointSize;
-                letter.IsBold = (zoneLetter.fontAttrib & FONTATTRIB.R_BOLD) > 0;
-                letter.IsItalic = (zoneLetter.fontAttrib & FONTATTRIB.R_ITALIC) > 0;
-                letter.IsSpatialChar = !char.IsWhiteSpace(zoneLetter.code);
-                letter.IsSubScript = (zoneLetter.fontAttrib & FONTATTRIB.R_SUBSCRIPT) > 0;
-                letter.IsSuperScript = (zoneLetter.fontAttrib & FONTATTRIB.R_SUPERSCRIPT) > 0;
-                letter.IsUnderline = (zoneLetter.fontAttrib & FONTATTRIB.R_UNDERLINE) > 0;
-                letter.Left = zoneLetter.left;
-                letter.PageNumber = micrZoneData.RasterZone.PageNumber;
-                letter.Right = zoneLetter.left + zoneLetter.width;
-                letter.Top = zoneLetter.top;
-                return letter;
-            }).ToList();
-
-            if (!letters.Last().IsSpatialChar)
-            {
-                letters.Remove(letters.Last());
-            }
-
-            letters.Last().IsEndOfParagraph = true;
-            letters.Last().IsEndOfZone = true;
-
-            var spatialString = new SpatialString();
-            spatialString.CreateFromILetters(letters.ToIUnknownVector<ILetter>(), pDocument.Text.SourceDocName, spatialPageInfos);
-
-            var attribute = new AttributeClass();
-            attribute.Value = spatialString;
-
-            SplitMicrComponents(attribute);
-
-            return attribute;
         }
 
         /// <summary>
