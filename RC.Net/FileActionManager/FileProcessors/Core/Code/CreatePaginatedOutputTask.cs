@@ -277,25 +277,33 @@ namespace Extract.FileActionManager.FileProcessors
 
                 var documentAttribute =
                     AttributeMethods.GetSingleAttributeByName(voaData, "Document");
-                var requestAttribute =
-                    AttributeMethods.GetSingleAttributeByName(documentAttribute.SubAttributes, "PaginationRequest");
-                ExtractException.Assert("ELI46852", "Missing PaginationRequest", requestAttribute != null);
-
-                var request = new PaginationRequest(requestAttribute);
-
-                if (File.Exists(pFileRecord.Name))
+                // https://extract.atlassian.net/browse/ISSUE-16502
+                // More that one Document attribute at root or a document attribute without a pagination request
+                // should be an error condition... but allow reprocessing on actions with create paginated output
+                // by doing nothing on files without any Document attributes on root (likely final voa file generated
+                // by previous run of this task)
+                if (documentAttribute != null)
                 {
-                    var ee = new ExtractException("ELI46872", "File already exists.");
-                    ee.AddDebugData("Filename", pFileRecord.Name, false);
-                    throw ee;
+                    var requestAttribute =
+                        AttributeMethods.GetSingleAttributeByName(documentAttribute.SubAttributes, "PaginationRequest");
+                    ExtractException.Assert("ELI46852", "Missing PaginationRequest", requestAttribute != null);
+
+                    var request = new PaginationRequest(requestAttribute);
+
+                    if (File.Exists(pFileRecord.Name))
+                    {
+                        var ee = new ExtractException("ELI46872", "File already exists.");
+                        ee.AddDebugData("Filename", pFileRecord.Name, false);
+                        throw ee;
+                    }
+
+                    ImageMethods.StaplePagesAsNewDocument(request.ImagePages, pFileRecord.Name);
+
+                    var documentData = AttributeMethods.GetSingleAttributeByName(
+                        documentAttribute.SubAttributes, "DocumentData");
+                    AttributeMethods.CreateUssAndVoaForPaginatedDocument(
+                        pFileRecord.Name, documentData.SubAttributes, request.ImagePages);
                 }
-
-                ImageMethods.StaplePagesAsNewDocument(request.ImagePages, pFileRecord.Name);
-
-                var documentData = AttributeMethods.GetSingleAttributeByName(
-                    documentAttribute.SubAttributes, "DocumentData");
-                AttributeMethods.CreateUssAndVoaForPaginatedDocument(
-                    pFileRecord.Name, documentData.SubAttributes, request.ImagePages);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }
