@@ -570,7 +570,14 @@ namespace Extract.FileActionManager.Forms
                 // Set defaults
                 _forceDespeckleMethodComboBox.SelectEnumValue(DESPECKLE_METHOD.DESPECKLE_AUTO);
 
-                SetDefaultRecognitionOptions();
+                if (_parameterMap.Size > 0)
+                {
+                    SetClassicRecognitionOptions();
+                }
+                else
+                {
+                    SetDefaultRecognitionOptions();
+                }
 
                 foreach(var ocrParam in ((IOCRParameters)_parameterMap).ToIEnumerable())
                 {
@@ -608,8 +615,17 @@ namespace Extract.FileActionManager.Forms
                             case EOCRParameter.kZoneOrdering:
                                 _zoneOrderingCheckBox.Checked = value != 0;
                                 break;
+                            case EOCRParameter.kIgnoreAreaOutsideSpecifiedZone:
+                                _ignoreAreaOutsideSpecifiedZoneCheckBox.Checked = value != 0;
+                                break;
+                            case EOCRParameter.kLocateZonesInSpecifiedZone:
+                                _locateZonesInsideSpecifiedZoneCheckBox.Checked = value != 0;
+                                break;
                             case EOCRParameter.kLimitToBasicLatinCharacters:
                                 _limitToBasicLatinCharactersCheckBox.Checked = value != 0;
+                                break;
+                            case EOCRParameter.kReturnUnrecognizedCharacters:
+                                _returnUnrecognizedCharactersCheckBox.Checked = value != 0;
                                 break;
                             case EOCRParameter.kSkipPageOnFailure:
                                 _skipPageOnFailureCheckBox.Checked = value != 0;
@@ -775,7 +791,10 @@ namespace Extract.FileActionManager.Forms
 
             // Recognition settings
             _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kZoneOrdering, VariantValue = _zoneOrderingCheckBox.Checked ? 1 : 0 });
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kIgnoreAreaOutsideSpecifiedZone, VariantValue = _ignoreAreaOutsideSpecifiedZoneCheckBox.Checked ? 1 : 0 });
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kLocateZonesInSpecifiedZone, VariantValue = _locateZonesInsideSpecifiedZoneCheckBox.Checked ? 1 : 0 });
             _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kLimitToBasicLatinCharacters, VariantValue = _limitToBasicLatinCharactersCheckBox.Checked ? 1 : 0 });
+            _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kReturnUnrecognizedCharacters, VariantValue = _returnUnrecognizedCharactersCheckBox.Checked ? 1 : 0 });
             _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kSkipPageOnFailure, VariantValue = _skipPageOnFailureCheckBox.Checked ? 1 : 0 });
             if (_skipPageOnFailureCheckBox.Checked)
             {
@@ -865,12 +884,15 @@ namespace Extract.FileActionManager.Forms
             _maxPageFailurePercentNumericUpDown.Value = 100;
 
             _limitToBasicLatinCharactersCheckBox.Checked = false;
+            _returnUnrecognizedCharactersCheckBox.Checked = false;
             _outputMultipleSpaceCharacterSequencesCheckBox.Checked = true;
             _outputOneSpaceCharPerCountCheckBox.Checked = true;
             _outputTabCharactersCheckBox.Checked = false;
             _assignSpatialInfoToSpaceCharsCheckBox.Checked = true;
             _ignoreParagraphFlagCheckBox.Checked = true;
             _treatZonesAsParagraphsCheckBox.Checked = true;
+            _ignoreAreaOutsideSpecifiedZoneCheckBox.Checked = true;
+            _locateZonesInsideSpecifiedZoneCheckBox.Checked = true;
         }
 
         private void SetClassicRecognitionOptions()
@@ -888,12 +910,15 @@ namespace Extract.FileActionManager.Forms
             _maxPageFailurePercentNumericUpDown.Value = 25;
 
             _limitToBasicLatinCharactersCheckBox.Checked = true;
+            _returnUnrecognizedCharactersCheckBox.Checked = false;
             _outputMultipleSpaceCharacterSequencesCheckBox.Checked = false;
             _outputOneSpaceCharPerCountCheckBox.Checked = false;
             _outputTabCharactersCheckBox.Checked = false;
             _assignSpatialInfoToSpaceCharsCheckBox.Checked = false;
             _ignoreParagraphFlagCheckBox.Checked = false;
             _treatZonesAsParagraphsCheckBox.Checked = false;
+            _ignoreAreaOutsideSpecifiedZoneCheckBox.Checked = false;
+            _locateZonesInsideSpecifiedZoneCheckBox.Checked = false;
         }
 
         #endregion

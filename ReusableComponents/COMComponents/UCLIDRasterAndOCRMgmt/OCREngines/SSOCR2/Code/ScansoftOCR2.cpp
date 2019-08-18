@@ -136,7 +136,10 @@ CScansoftOCR2::CScansoftOCR2()
 	m_bAssignSpatialInfoToSpaceCharacters(false),
 	m_bIgnoreParagraphFlag(false),
 	m_bTreatZonesAsParagraphs(false),
-	m_eOCRFindType(kFindStandardOCR)
+	m_eOCRFindType(kFindStandardOCR),
+	m_bReturnUnrecognizedCharacters(false),
+	m_bLocateZonesInSpecifiedZone(false),
+	m_bIgnoreAreaOutsideSpecifiedZone(false)
 {
 	try
 	{
@@ -541,6 +544,9 @@ STDMETHODIMP CScansoftOCR2::WriteOCRSettingsToFile(BSTR bstrFileName, VARIANT_BO
 			outfile << "\nTimeoutLength = " << m_nTimeoutLength;
 			outfile << "\nTreatZonesAsParagraphs = " << m_bTreatZonesAsParagraphs;
 			outfile << "\nOCRFindType = " << m_eOCRFindType;
+			outfile << "\nReturnUnrecognizedCharacters = " << m_bReturnUnrecognizedCharacters;
+			outfile << "\nLocateZonesInSpecifiedZone = " << m_bLocateZonesInSpecifiedZone;
+			outfile << "\nIgnoreAreaOutsideSpecifiedZone = " << m_bIgnoreAreaOutsideSpecifiedZone;
 
 			outfile.close();
 		}
@@ -1430,7 +1436,7 @@ void CScansoftOCR2::addRecognizedLettersToVector(vector<CPPLetter>* pvecLetters,
 		// or if it is a positive-width character AND unrecognized characters should be returned.
 		// NOTE: RecAPI v15 uses a width-less dummy space to mark the end of a line.
 		// We don't add these dummy spaces to maintain backwards-compatibility.
-		if(pCurLetter->width > 0 && (bIsRecognized || bReturnUnrecognized))
+		if(pCurLetter->width > 0 && (bIsRecognized || bReturnUnrecognized || m_bReturnUnrecognizedCharacters))
 		{
 			// check if this character is a space
 			bool bIsSpace = pCurLetter->code == ' ';
@@ -1792,6 +1798,13 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	THROW_UE_ON_ERROR("ELI12720", "Unable to delete zones!", 
 		kRecDeleteAllZones(m_hPage) );
 
+	// Fill area outside of zone so that it doesn't influence things like rotation/skew detection and zone location
+	if (pZone != __nullptr && m_bIgnoreAreaOutsideSpecifiedZone)
+	{
+		THROW_UE_ON_ERROR("ELI47242", "Unable to fill outside of specified zone!",
+			kRecFillImgArea(0, m_hPage, pZone, 0xFFFFFFFF, FILL_OUTSIDE));
+	}
+
 	// Determine requirement for rotation and/or deskew
 	int slope = 0;
 	IMG_ROTATE imgRotate = ROT_NO;
@@ -1816,22 +1829,11 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 		zone.rectBBox.bottom = pZone->bottom;
 
 		// Set other items
-		if (m_eOCRFindType == kFindMICROnly)
-		{
-			zone.fm = FM_MICR;
-			zone.rm = RM_MAT;
-		}
-		else if (m_eOCRFindType == kFindBarcodesOnly)
-		{
-			zone.fm = FM_BARCODE;
-			zone.rm = RM_BAR;
-		}
-		else
-		{
-			zone.fm = m_eDefaultFillingMethod;
-			zone.rm = RM_OMNIFONT_PLUS3W;
-		}
-		zone.type = WT_FLOW;
+		zone.fm = m_eDefaultFillingMethod;
+		zone.rm = m_eDefaultFillingMethod == FM_OMNIFONT
+			? RM_OMNIFONT_PLUS3W
+			: RM_AUTO; // Use this so that a compatible recognition module will be chosen automatically based on the filling method
+		zone.type = m_bLocateZonesInSpecifiedZone ? WT_AUTO : WT_FLOW;
 		zone.filter = FILTER_DEFAULT;
 
 		try
@@ -1931,7 +1933,7 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 
 		prepareHandwritingZones(pArea, info);
 	}
-	else if(pZone == NULL)
+	else if(pZone == NULL || m_bLocateZonesInSpecifiedZone)
 	{
 		// OCR Engine will find appropriate zones
 		RECERR rc = kRecLocateZones(0, m_hPage);
@@ -2770,6 +2772,9 @@ void CScansoftOCR2::applyCommonSettings()
 		m_bTreatZonesAsParagraphs = false;
 		m_eOCRFindType = kFindStandardOCR;
 		m_eDefaultFillingMethod = FM_OMNIFONT;
+		m_bReturnUnrecognizedCharacters = false;
+		m_bLocateZonesInSpecifiedZone = false;
+		m_bIgnoreAreaOutsideSpecifiedZone = false;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45914")
 }
@@ -2938,6 +2943,15 @@ void CScansoftOCR2::applySettingsFromParameters(IOCRParametersPtr ipOCRParameter
 						bBarTypesSet = true;
 					}
 					break;
+				case kReturnUnrecognizedCharacters:
+					m_bReturnUnrecognizedCharacters = !!nValue;
+					break;
+				case kLocateZonesInSpecifiedZone:
+					m_bLocateZonesInSpecifiedZone = !!nValue;
+					break;
+				case kIgnoreAreaOutsideSpecifiedZone:
+					m_bIgnoreAreaOutsideSpecifiedZone = !!nValue;
+					break;
 				}
 			}
 			// Interpret string-int/double/string pair values as RecSettings
@@ -2972,23 +2986,21 @@ void CScansoftOCR2::applySettingsFromParameters(IOCRParametersPtr ipOCRParameter
 		// Setup the engine for non-standard OCR, if necessary
 		if (m_eOCRFindType == kFindMICROnly)
 		{
+			m_eDefaultFillingMethod = FM_MICR;
+
 			WCHAR* langPlus = L"\u2446\u2447\u2448\u2449";
 			THROW_UE_ON_ERROR("ELI47229", "Unable to set languages plus of the OCR engine!",
 				kRecSetLanguagesPlus(0, langPlus));
 
 			THROW_UE_ON_ERROR("ELI47230", "Unable to set default recognition module of the OCR engine!",
 				kRecSetDefaultRecognitionModule(0, RM_MAT));
-
-			THROW_UE_ON_ERROR("ELI47231", "Unable to set default filling method of the OCR engine!",
-				kRecSetDefaultFillingMethod(0, FM_MICR));
 		}
 		else if (m_eOCRFindType == kFindBarcodesOnly)
 		{
+			m_eDefaultFillingMethod = FM_BARCODE;
+
 			THROW_UE_ON_ERROR("ELI47232", "Unable to set default recognition module of the OCR engine",
 				kRecSetDefaultRecognitionModule(0, RM_BAR));
-
-			THROW_UE_ON_ERROR("ELI47233", "Unable to set default filling method of the OCR engine!",
-				kRecSetDefaultFillingMethod(0, FM_BARCODE));
 
 			if (!bBarTypesSet)
 			{
@@ -2999,6 +3011,9 @@ void CScansoftOCR2::applySettingsFromParameters(IOCRParametersPtr ipOCRParameter
 			THROW_UE_ON_ERROR("ELI47235", "Unable to set barcode types of the OCR engine!",
 				kRecSetBarTypes(0, barTypes));
 		}
+
+		THROW_UE_ON_ERROR("ELI47231", "Unable to set default filling method in the OCR engine!",
+					kRecSetDefaultFillingMethod(0, m_eDefaultFillingMethod));
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45922")
 }
@@ -3025,7 +3040,7 @@ bool CScansoftOCR2::isMICRCharacter(unsigned short usLetterCode)
 //-------------------------------------------------------------------------------------------------
 bool CScansoftOCR2::isRecognizedCharacter(unsigned short usLetterCode)
 {
-	return usLetterCode > 0
+	return usLetterCode > 0 && usLetterCode != 0xFFFD
 		&& (!m_bLimitToBasicLatinCharacters
 			|| isBasicLatinCharacter(usLetterCode)
 			|| (m_eOCRFindType == kFindMICROnly) && isMICRCharacter(usLetterCode)
@@ -3052,10 +3067,6 @@ void CScansoftOCR2::convertToCodePage(unsigned short *usLetterCode)
 
 		case 0x2449:
 			*usLetterCode = 'D';
-			break;
-
-		case 0xFFFD:
-			*usLetterCode = gcUNRECOGNIZED;
 			break;
 		}
 	}

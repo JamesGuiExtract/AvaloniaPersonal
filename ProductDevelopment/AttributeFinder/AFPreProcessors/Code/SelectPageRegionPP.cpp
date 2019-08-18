@@ -229,8 +229,13 @@ LRESULT CSelectPageRegionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 				{
 					nReOcrChecked = BST_CHECKED;
 					m_editRegionRotation.EnableWindow(TRUE);
-					m_editRegionRotation.SetWindowText(
-						asString(ipSelectPageRegion->SelectedRegionRotation).c_str());
+
+					_bstr_t bstrRotation = "";
+					if (ipSelectPageRegion->SelectedRegionRotation >= 0)
+					{
+						bstrRotation = asString(ipSelectPageRegion->SelectedRegionRotation).c_str();
+					}
+					m_editRegionRotation.SetWindowText(bstrRotation);
 				}
 				break;
 
@@ -562,9 +567,18 @@ bool CSelectPageRegionPP::saveReturnItems(UCLID_AFPREPROCESSORSLib::ISelectPageR
 				// Set return type to re-ocr
 				eReturnType = kReturnReOcr;
 
-				// Set rotation
-				ipSelectPageRegion->SelectedRegionRotation =
-					GetDlgItemInt( IDC_EDIT_ROTATION, NULL, FALSE );
+				// Set rotation. Use special value -1 if box is empty (meaning auto-rotation)
+				_bstr_t bstrRotationText;
+				m_editRegionRotation.GetWindowText(bstrRotationText.GetAddress());
+				if (SysStringLen(bstrRotationText) == 0)
+				{
+					ipSelectPageRegion->SelectedRegionRotation = -1;
+				}
+				else
+				{
+					ipSelectPageRegion->SelectedRegionRotation =
+						GetDlgItemInt(IDC_EDIT_ROTATION, NULL, FALSE);
+				}
 			}
 			else if (m_radioReturnRegion.GetCheck() == BST_CHECKED)
 			{

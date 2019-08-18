@@ -229,6 +229,9 @@ private:
 	list<ZoneLayoutType> m_listZoneLayouts;
 
 	bool m_bLimitToBasicLatinCharacters;
+	bool m_bReturnUnrecognizedCharacters;
+	bool m_bLocateZonesInSpecifiedZone;
+	bool m_bIgnoreAreaOutsideSpecifiedZone;
 
 	bool m_bSettingsApplied;
 

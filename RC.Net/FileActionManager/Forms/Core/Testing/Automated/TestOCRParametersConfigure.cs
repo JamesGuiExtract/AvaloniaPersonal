@@ -77,7 +77,10 @@ namespace Extract.FileActionManager.Forms.Test
                 SkipPageOnFailure = 0
                 TimeoutLength = 120000
                 TreatZonesAsParagraphs = 0
-                OCRFindType = 0", @"(?m)^ +", "");
+                OCRFindType = 0
+                ReturnUnrecognizedCharacters = 0
+                LocateZonesInSpecifiedZone = 0
+                IgnoreAreaOutsideSpecifiedZone = 0", @"(?m)^ +", "");
 
             using (var tmpFile = new TemporaryFile(false))
             {
@@ -135,7 +138,10 @@ namespace Extract.FileActionManager.Forms.Test
                 SkipPageOnFailure = 0
                 TimeoutLength = 120000
                 TreatZonesAsParagraphs = 0
-                OCRFindType = 0", @"(?m)^ +", "");
+                OCRFindType = 0
+                ReturnUnrecognizedCharacters = 0
+                LocateZonesInSpecifiedZone = 0
+                IgnoreAreaOutsideSpecifiedZone = 0", @"(?m)^ +", "");
 
             using (var config = new OCRParametersConfigure())
             {
@@ -183,7 +189,10 @@ namespace Extract.FileActionManager.Forms.Test
                     SkipPageOnFailure = 1
                     TimeoutLength = 240000
                     TreatZonesAsParagraphs = 1
-                    OCRFindType = 0", @"(?m)^ +", "");
+                    OCRFindType = 0
+                    ReturnUnrecognizedCharacters = 0
+                    LocateZonesInSpecifiedZone = 1
+                    IgnoreAreaOutsideSpecifiedZone = 1", @"(?m)^ +", "");
 
             // Set default settings by opening and closing the dialog with the OK button
             using (var config = new OCRParametersConfigure())
@@ -248,7 +257,10 @@ namespace Extract.FileActionManager.Forms.Test
                     SkipPageOnFailure = 1
                     TimeoutLength = 240000
                     TreatZonesAsParagraphs = 1
-                    OCRFindType = 0", @"(?m)^ +", "");
+                    OCRFindType = 0
+                    ReturnUnrecognizedCharacters = 0
+                    LocateZonesInSpecifiedZone = 1
+                    IgnoreAreaOutsideSpecifiedZone = 1", @"(?m)^ +", "");
 
             // Set default settings by opening and closing the dialog with the OK button
             using (var config = new OCRParametersConfigure())
@@ -309,7 +321,10 @@ namespace Extract.FileActionManager.Forms.Test
                     SkipPageOnFailure = 1
                     TimeoutLength = 240000
                     TreatZonesAsParagraphs = 1
-                    OCRFindType = 0", @"(?m)^ +", "");
+                    OCRFindType = 0
+                    ReturnUnrecognizedCharacters = 0
+                    LocateZonesInSpecifiedZone = 1
+                    IgnoreAreaOutsideSpecifiedZone = 1", @"(?m)^ +", "");
 
             using (var config = new OCRParametersConfigure())
             {
@@ -405,7 +420,10 @@ namespace Extract.FileActionManager.Forms.Test
                     SkipPageOnFailure = 1
                     TimeoutLength = 240000
                     TreatZonesAsParagraphs = 1
-                    OCRFindType = 0", @"(?m)^ +", "");
+                    OCRFindType = 0
+                    ReturnUnrecognizedCharacters = 0
+                    LocateZonesInSpecifiedZone = 1
+                    IgnoreAreaOutsideSpecifiedZone = 1", @"(?m)^ +", "");
 
             using (var config = new OCRParametersConfigure())
             {
@@ -475,7 +493,10 @@ namespace Extract.FileActionManager.Forms.Test
                     SkipPageOnFailure = 1
                     TimeoutLength = 240000
                     TreatZonesAsParagraphs = 1
-                    OCRFindType = 0", @"(?m)^ +", "");
+                    OCRFindType = 0
+                    ReturnUnrecognizedCharacters = 0
+                    LocateZonesInSpecifiedZone = 1
+                    IgnoreAreaOutsideSpecifiedZone = 1", @"(?m)^ +", "");
 
             using (var config = new OCRParametersConfigure())
             {

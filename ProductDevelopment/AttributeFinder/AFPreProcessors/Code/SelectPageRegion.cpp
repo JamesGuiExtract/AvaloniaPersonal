@@ -489,10 +489,10 @@ STDMETHODIMP CSelectPageRegion::put_SelectedRegionRotation(long newVal)
 		validateLicense();
 
 		// Validate new setting
-		if ((newVal != 0) && (newVal != 90) && (newVal != 180) && (newVal != 270))
+		if (newVal > 0 && newVal != 0 && newVal != 90 && newVal != 180 && newVal != 270)
 		{
 			// Create and throw exception
-			UCLIDException ue("ELI12626", "Invalid degree of rotation - must be {0, 90, 180, 270}.");
+			UCLIDException ue("ELI12626", "Invalid degree of rotation - must be {< 0, 0, 90, 180, 270}.");
 			ue.addDebugInfo( "Rotation", newVal );
 			throw ue;
 		}
@@ -1125,7 +1125,7 @@ STDMETHODIMP CSelectPageRegion::raw_IsConfigured(VARIANT_BOOL *pbValue)
 			case kReturnReOcr:
 				{
 					// Region Rotation must be between 0 and 360 degrees
-					if ((m_nRegionRotation < 0) || (m_nRegionRotation > 360))
+					if (m_nRegionRotation > 360)
 					{
 						bConfigured = false;
 					}
@@ -1519,14 +1519,19 @@ ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(const ISpatialStri
 
 		case kReturnReOcr:
 			{
-				// Handle 0 degree rotation in special way
+				// Handle 0 and negative degree rotation in special way
+				// Interpret 0 to mean force no rotation and -1 to mean 'perform auto rotation'
 				int nActualRotation = m_nRegionRotation;
-				if (nActualRotation == 0)
+				if (m_nRegionRotation == 0)
 				{
 					// RecognizeTextInImageZone() interprets 
 					//		  0 = automatic rotation
 					//		360 = no rotation
 					nActualRotation = 360;
+				}
+				else if (m_nRegionRotation < 0)
+				{
+					nActualRotation = 0;
 				}
 
 				// If excluding the region and this is a specified page, then

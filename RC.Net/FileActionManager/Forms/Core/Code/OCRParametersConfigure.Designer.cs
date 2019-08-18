@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OCRParametersConfigure));
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
             this._languagesTabPage = new System.Windows.Forms.TabPage();
@@ -36,6 +37,11 @@
             this._languagesDataGridView = new System.Windows.Forms.DataGridView();
             this._singleLanguageDetectionCheckBox = new System.Windows.Forms.CheckBox();
             this._recognitionOptionsTabPage = new System.Windows.Forms.TabPage();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.infoTip2 = new Extract.Utilities.Forms.InfoTip();
+            this.infoTip1 = new Extract.Utilities.Forms.InfoTip();
+            this._locateZonesInsideSpecifiedZoneCheckBox = new System.Windows.Forms.CheckBox();
+            this._ignoreAreaOutsideSpecifiedZoneCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this._setClassicButton = new System.Windows.Forms.Button();
             this._setDefaultsButton = new System.Windows.Forms.Button();
@@ -51,6 +57,7 @@
             this._accuracyTradeoffComboBox = new System.Windows.Forms.ComboBox();
             this.label13 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this._returnUnrecognizedCharactersCheckBox = new System.Windows.Forms.CheckBox();
             this._limitToBasicLatinCharactersCheckBox = new System.Windows.Forms.CheckBox();
             this._treatZonesAsParagraphsCheckBox = new System.Windows.Forms.CheckBox();
             this._outputMultipleSpaceCharacterSequencesCheckBox = new System.Windows.Forms.CheckBox();
@@ -93,6 +100,7 @@
             this._recognitionLanguagesGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._languagesDataGridView)).BeginInit();
             this._recognitionOptionsTabPage.SuspendLayout();
+            this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._timeoutNumericUpDown)).BeginInit();
@@ -121,7 +129,7 @@
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.CausesValidation = false;
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(242, 606);
+            this._cancelButton.Location = new System.Drawing.Point(390, 632);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
             this._cancelButton.TabIndex = 2;
@@ -132,7 +140,7 @@
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this._okButton.Location = new System.Drawing.Point(161, 606);
+            this._okButton.Location = new System.Drawing.Point(309, 632);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
             this._okButton.TabIndex = 1;
@@ -146,7 +154,7 @@
             this._languagesTabPage.Location = new System.Drawing.Point(4, 22);
             this._languagesTabPage.Name = "_languagesTabPage";
             this._languagesTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._languagesTabPage.Size = new System.Drawing.Size(297, 557);
+            this._languagesTabPage.Size = new System.Drawing.Size(445, 583);
             this._languagesTabPage.TabIndex = 2;
             this._languagesTabPage.Text = "Languages";
             this._languagesTabPage.UseVisualStyleBackColor = true;
@@ -171,7 +179,7 @@
             this._recognitionLanguagesGroupBox.Controls.Add(this._singleLanguageDetectionCheckBox);
             this._recognitionLanguagesGroupBox.Location = new System.Drawing.Point(6, 29);
             this._recognitionLanguagesGroupBox.Name = "_recognitionLanguagesGroupBox";
-            this._recognitionLanguagesGroupBox.Size = new System.Drawing.Size(285, 425);
+            this._recognitionLanguagesGroupBox.Size = new System.Drawing.Size(433, 548);
             this._recognitionLanguagesGroupBox.TabIndex = 1;
             this._recognitionLanguagesGroupBox.TabStop = false;
             this._recognitionLanguagesGroupBox.Text = "Recognition languages";
@@ -185,7 +193,7 @@
             this._languagesDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._languagesDataGridView.Location = new System.Drawing.Point(8, 42);
             this._languagesDataGridView.Name = "_languagesDataGridView";
-            this._languagesDataGridView.Size = new System.Drawing.Size(271, 377);
+            this._languagesDataGridView.Size = new System.Drawing.Size(419, 500);
             this._languagesDataGridView.TabIndex = 1;
             this._languagesDataGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.Handle_DataGridView_DataError);
             this._languagesDataGridView.EnabledChanged += new System.EventHandler(this.Handle_DataGridView_EnabledChanged);
@@ -202,6 +210,7 @@
             // 
             // _recognitionOptionsTabPage
             // 
+            this._recognitionOptionsTabPage.Controls.Add(this.groupBox5);
             this._recognitionOptionsTabPage.Controls.Add(this.groupBox4);
             this._recognitionOptionsTabPage.Controls.Add(this.groupBox3);
             this._recognitionOptionsTabPage.Controls.Add(this.groupBox2);
@@ -209,19 +218,74 @@
             this._recognitionOptionsTabPage.Location = new System.Drawing.Point(4, 22);
             this._recognitionOptionsTabPage.Name = "_recognitionOptionsTabPage";
             this._recognitionOptionsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._recognitionOptionsTabPage.Size = new System.Drawing.Size(297, 557);
+            this._recognitionOptionsTabPage.Size = new System.Drawing.Size(445, 583);
             this._recognitionOptionsTabPage.TabIndex = 1;
             this._recognitionOptionsTabPage.Text = "Recognition";
             this._recognitionOptionsTabPage.UseVisualStyleBackColor = true;
             // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.infoTip2);
+            this.groupBox5.Controls.Add(this.infoTip1);
+            this.groupBox5.Controls.Add(this._locateZonesInsideSpecifiedZoneCheckBox);
+            this.groupBox5.Controls.Add(this._ignoreAreaOutsideSpecifiedZoneCheckBox);
+            this.groupBox5.Location = new System.Drawing.Point(7, 170);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(432, 70);
+            this.groupBox5.TabIndex = 1;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Image area OCR behavior";
+            // 
+            // infoTip2
+            // 
+            this.infoTip2.BackColor = System.Drawing.Color.Transparent;
+            this.infoTip2.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("infoTip2.BackgroundImage")));
+            this.infoTip2.Location = new System.Drawing.Point(209, 43);
+            this.infoTip2.Name = "infoTip2";
+            this.infoTip2.Size = new System.Drawing.Size(16, 16);
+            this.infoTip2.TabIndex = 16;
+            this.infoTip2.TipText = "This will make reOCRing (e.g., SPR) behave more like initial OCR";
+            // 
+            // infoTip1
+            // 
+            this.infoTip1.BackColor = System.Drawing.Color.Transparent;
+            this.infoTip1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("infoTip1.BackgroundImage")));
+            this.infoTip1.Location = new System.Drawing.Point(256, 19);
+            this.infoTip1.Name = "infoTip1";
+            this.infoTip1.Size = new System.Drawing.Size(16, 16);
+            this.infoTip1.TabIndex = 15;
+            this.infoTip1.TipText = "If false, the entire page will be used to detect rotation for reOCR operations";
+            // 
+            // _locateZonesInsideSpecifiedZoneCheckBox
+            // 
+            this._locateZonesInsideSpecifiedZoneCheckBox.AutoSize = true;
+            this._locateZonesInsideSpecifiedZoneCheckBox.Location = new System.Drawing.Point(5, 42);
+            this._locateZonesInsideSpecifiedZoneCheckBox.Name = "_locateZonesInsideSpecifiedZoneCheckBox";
+            this._locateZonesInsideSpecifiedZoneCheckBox.Size = new System.Drawing.Size(188, 17);
+            this._locateZonesInsideSpecifiedZoneCheckBox.TabIndex = 13;
+            this._locateZonesInsideSpecifiedZoneCheckBox.Text = "Detect zones inside specified area";
+            this._locateZonesInsideSpecifiedZoneCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // _ignoreAreaOutsideSpecifiedZoneCheckBox
+            // 
+            this._ignoreAreaOutsideSpecifiedZoneCheckBox.AutoSize = true;
+            this._ignoreAreaOutsideSpecifiedZoneCheckBox.Location = new System.Drawing.Point(5, 19);
+            this._ignoreAreaOutsideSpecifiedZoneCheckBox.Name = "_ignoreAreaOutsideSpecifiedZoneCheckBox";
+            this._ignoreAreaOutsideSpecifiedZoneCheckBox.Size = new System.Drawing.Size(236, 17);
+            this._ignoreAreaOutsideSpecifiedZoneCheckBox.TabIndex = 14;
+            this._ignoreAreaOutsideSpecifiedZoneCheckBox.Text = "Use only specified area for rotation detection";
+            this._ignoreAreaOutsideSpecifiedZoneCheckBox.UseVisualStyleBackColor = true;
+            // 
             // groupBox4
             // 
+            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox4.Controls.Add(this._setClassicButton);
             this.groupBox4.Controls.Add(this._setDefaultsButton);
-            this.groupBox4.Location = new System.Drawing.Point(6, 500);
+            this.groupBox4.Location = new System.Drawing.Point(6, 526);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(284, 49);
-            this.groupBox4.TabIndex = 13;
+            this.groupBox4.Size = new System.Drawing.Size(433, 49);
+            this.groupBox4.TabIndex = 4;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Reset recognition options to...";
             // 
@@ -247,6 +311,8 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox3.Controls.Add(this.label11);
             this.groupBox3.Controls.Add(this._defaultDecompositionMethodComboBox);
             this.groupBox3.Controls.Add(this.label14);
@@ -259,8 +325,8 @@
             this.groupBox3.Controls.Add(this.label13);
             this.groupBox3.Location = new System.Drawing.Point(6, 6);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(284, 169);
-            this.groupBox3.TabIndex = 12;
+            this.groupBox3.Size = new System.Drawing.Size(433, 148);
+            this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             // 
             // label11
@@ -269,16 +335,16 @@
             this.label11.Location = new System.Drawing.Point(6, 16);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(150, 13);
-            this.label11.TabIndex = 2;
+            this.label11.TabIndex = 0;
             this.label11.Text = "Default decomposition method";
             // 
             // _defaultDecompositionMethodComboBox
             // 
             this._defaultDecompositionMethodComboBox.FormattingEnabled = true;
-            this._defaultDecompositionMethodComboBox.Location = new System.Drawing.Point(165, 13);
+            this._defaultDecompositionMethodComboBox.Location = new System.Drawing.Point(215, 12);
             this._defaultDecompositionMethodComboBox.Name = "_defaultDecompositionMethodComboBox";
-            this._defaultDecompositionMethodComboBox.Size = new System.Drawing.Size(110, 21);
-            this._defaultDecompositionMethodComboBox.TabIndex = 3;
+            this._defaultDecompositionMethodComboBox.Size = new System.Drawing.Size(207, 21);
+            this._defaultDecompositionMethodComboBox.TabIndex = 1;
             // 
             // label14
             // 
@@ -286,16 +352,16 @@
             this.label14.Location = new System.Drawing.Point(6, 70);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(105, 13);
-            this.label14.TabIndex = 6;
+            this.label14.TabIndex = 4;
             this.label14.Text = "Default filling method";
             // 
             // _zoneOrderingCheckBox
             // 
             this._zoneOrderingCheckBox.AutoSize = true;
-            this._zoneOrderingCheckBox.Location = new System.Drawing.Point(6, 143);
+            this._zoneOrderingCheckBox.Location = new System.Drawing.Point(294, 120);
             this._zoneOrderingCheckBox.Name = "_zoneOrderingCheckBox";
             this._zoneOrderingCheckBox.Size = new System.Drawing.Size(129, 17);
-            this._zoneOrderingCheckBox.TabIndex = 0;
+            this._zoneOrderingCheckBox.TabIndex = 9;
             this._zoneOrderingCheckBox.Text = "Perform zone ordering";
             this._zoneOrderingCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -305,20 +371,20 @@
             this.label12.Location = new System.Drawing.Point(6, 96);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(169, 13);
-            this.label12.TabIndex = 8;
+            this.label12.TabIndex = 6;
             this.label12.Text = "Timeout (max ms without progress)";
             // 
             // _defaultFillingMethodComboBox
             // 
             this._defaultFillingMethodComboBox.FormattingEnabled = true;
-            this._defaultFillingMethodComboBox.Location = new System.Drawing.Point(165, 67);
+            this._defaultFillingMethodComboBox.Location = new System.Drawing.Point(215, 66);
             this._defaultFillingMethodComboBox.Name = "_defaultFillingMethodComboBox";
-            this._defaultFillingMethodComboBox.Size = new System.Drawing.Size(110, 21);
-            this._defaultFillingMethodComboBox.TabIndex = 7;
+            this._defaultFillingMethodComboBox.Size = new System.Drawing.Size(207, 21);
+            this._defaultFillingMethodComboBox.TabIndex = 5;
             // 
             // _timeoutNumericUpDown
             // 
-            this._timeoutNumericUpDown.Location = new System.Drawing.Point(202, 94);
+            this._timeoutNumericUpDown.Location = new System.Drawing.Point(215, 92);
             this._timeoutNumericUpDown.Maximum = new decimal(new int[] {
             2147483647,
             0,
@@ -326,7 +392,7 @@
             0});
             this._timeoutNumericUpDown.Name = "_timeoutNumericUpDown";
             this._timeoutNumericUpDown.Size = new System.Drawing.Size(73, 20);
-            this._timeoutNumericUpDown.TabIndex = 9;
+            this._timeoutNumericUpDown.TabIndex = 7;
             this._timeoutNumericUpDown.Value = new decimal(new int[] {
             12000,
             0,
@@ -339,17 +405,17 @@
             this._preferAccuracteEngineCheckBox.Location = new System.Drawing.Point(6, 120);
             this._preferAccuracteEngineCheckBox.Name = "_preferAccuracteEngineCheckBox";
             this._preferAccuracteEngineCheckBox.Size = new System.Drawing.Size(226, 17);
-            this._preferAccuracteEngineCheckBox.TabIndex = 10;
+            this._preferAccuracteEngineCheckBox.TabIndex = 8;
             this._preferAccuracteEngineCheckBox.Text = "Prefer accurate engine (perform third pass)";
             this._preferAccuracteEngineCheckBox.UseVisualStyleBackColor = true;
             // 
             // _accuracyTradeoffComboBox
             // 
             this._accuracyTradeoffComboBox.FormattingEnabled = true;
-            this._accuracyTradeoffComboBox.Location = new System.Drawing.Point(165, 40);
+            this._accuracyTradeoffComboBox.Location = new System.Drawing.Point(215, 39);
             this._accuracyTradeoffComboBox.Name = "_accuracyTradeoffComboBox";
-            this._accuracyTradeoffComboBox.Size = new System.Drawing.Size(110, 21);
-            this._accuracyTradeoffComboBox.TabIndex = 5;
+            this._accuracyTradeoffComboBox.Size = new System.Drawing.Size(207, 21);
+            this._accuracyTradeoffComboBox.TabIndex = 3;
             // 
             // label13
             // 
@@ -357,11 +423,14 @@
             this.label13.Location = new System.Drawing.Point(6, 43);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(125, 13);
-            this.label13.TabIndex = 4;
+            this.label13.TabIndex = 2;
             this.label13.Text = "Accuracy/speed tradeoff";
             // 
             // groupBox2
             // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this._returnUnrecognizedCharactersCheckBox);
             this.groupBox2.Controls.Add(this._limitToBasicLatinCharactersCheckBox);
             this.groupBox2.Controls.Add(this._treatZonesAsParagraphsCheckBox);
             this.groupBox2.Controls.Add(this._outputMultipleSpaceCharacterSequencesCheckBox);
@@ -369,12 +438,22 @@
             this.groupBox2.Controls.Add(this._outputOneSpaceCharPerCountCheckBox);
             this.groupBox2.Controls.Add(this._assignSpatialInfoToSpaceCharsCheckBox);
             this.groupBox2.Controls.Add(this._outputTabCharactersCheckBox);
-            this.groupBox2.Location = new System.Drawing.Point(7, 309);
+            this.groupBox2.Location = new System.Drawing.Point(6, 343);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(284, 185);
-            this.groupBox2.TabIndex = 11;
+            this.groupBox2.Size = new System.Drawing.Size(432, 159);
+            this.groupBox2.TabIndex = 3;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Character handling";
+            // 
+            // _returnUnrecognizedCharactersCheckBox
+            // 
+            this._returnUnrecognizedCharactersCheckBox.AutoSize = true;
+            this._returnUnrecognizedCharactersCheckBox.Location = new System.Drawing.Point(215, 19);
+            this._returnUnrecognizedCharactersCheckBox.Name = "_returnUnrecognizedCharactersCheckBox";
+            this._returnUnrecognizedCharactersCheckBox.Size = new System.Drawing.Size(207, 17);
+            this._returnUnrecognizedCharactersCheckBox.TabIndex = 1;
+            this._returnUnrecognizedCharactersCheckBox.Text = "Return unrecognized characters (as ^)";
+            this._returnUnrecognizedCharactersCheckBox.UseVisualStyleBackColor = true;
             // 
             // _limitToBasicLatinCharactersCheckBox
             // 
@@ -389,10 +468,10 @@
             // _treatZonesAsParagraphsCheckBox
             // 
             this._treatZonesAsParagraphsCheckBox.AutoSize = true;
-            this._treatZonesAsParagraphsCheckBox.Location = new System.Drawing.Point(9, 157);
+            this._treatZonesAsParagraphsCheckBox.Location = new System.Drawing.Point(157, 134);
             this._treatZonesAsParagraphsCheckBox.Name = "_treatZonesAsParagraphsCheckBox";
             this._treatZonesAsParagraphsCheckBox.Size = new System.Drawing.Size(265, 17);
-            this._treatZonesAsParagraphsCheckBox.TabIndex = 6;
+            this._treatZonesAsParagraphsCheckBox.TabIndex = 7;
             this._treatZonesAsParagraphsCheckBox.Text = "Treat zones as paragraphs (separate with \\r\\n\\r\\n)";
             this._treatZonesAsParagraphsCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -402,7 +481,7 @@
             this._outputMultipleSpaceCharacterSequencesCheckBox.Location = new System.Drawing.Point(9, 42);
             this._outputMultipleSpaceCharacterSequencesCheckBox.Name = "_outputMultipleSpaceCharacterSequencesCheckBox";
             this._outputMultipleSpaceCharacterSequencesCheckBox.Size = new System.Drawing.Size(231, 17);
-            this._outputMultipleSpaceCharacterSequencesCheckBox.TabIndex = 1;
+            this._outputMultipleSpaceCharacterSequencesCheckBox.TabIndex = 2;
             this._outputMultipleSpaceCharacterSequencesCheckBox.Text = "Output multiple space character sequences";
             this._outputMultipleSpaceCharacterSequencesCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -412,7 +491,7 @@
             this._ignoreParagraphFlagCheckBox.Location = new System.Drawing.Point(9, 134);
             this._ignoreParagraphFlagCheckBox.Name = "_ignoreParagraphFlagCheckBox";
             this._ignoreParagraphFlagCheckBox.Size = new System.Drawing.Size(127, 17);
-            this._ignoreParagraphFlagCheckBox.TabIndex = 5;
+            this._ignoreParagraphFlagCheckBox.TabIndex = 6;
             this._ignoreParagraphFlagCheckBox.Text = "Ignore paragraph flag";
             this._ignoreParagraphFlagCheckBox.UseVisualStyleBackColor = true;
             this._ignoreParagraphFlagCheckBox.CheckedChanged += new System.EventHandler(this.Handle_ValueChanged);
@@ -423,7 +502,7 @@
             this._outputOneSpaceCharPerCountCheckBox.Location = new System.Drawing.Point(9, 65);
             this._outputOneSpaceCharPerCountCheckBox.Name = "_outputOneSpaceCharPerCountCheckBox";
             this._outputOneSpaceCharPerCountCheckBox.Size = new System.Drawing.Size(254, 17);
-            this._outputOneSpaceCharPerCountCheckBox.TabIndex = 2;
+            this._outputOneSpaceCharPerCountCheckBox.TabIndex = 3;
             this._outputOneSpaceCharPerCountCheckBox.Text = "Output one space per count (spcCount property)";
             this._outputOneSpaceCharPerCountCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -433,7 +512,7 @@
             this._assignSpatialInfoToSpaceCharsCheckBox.Location = new System.Drawing.Point(9, 111);
             this._assignSpatialInfoToSpaceCharsCheckBox.Name = "_assignSpatialInfoToSpaceCharsCheckBox";
             this._assignSpatialInfoToSpaceCharsCheckBox.Size = new System.Drawing.Size(207, 17);
-            this._assignSpatialInfoToSpaceCharsCheckBox.TabIndex = 4;
+            this._assignSpatialInfoToSpaceCharsCheckBox.TabIndex = 5;
             this._assignSpatialInfoToSpaceCharsCheckBox.Text = "Assign spatial info to space characters";
             this._assignSpatialInfoToSpaceCharsCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -443,7 +522,7 @@
             this._outputTabCharactersCheckBox.Location = new System.Drawing.Point(9, 88);
             this._outputTabCharactersCheckBox.Name = "_outputTabCharactersCheckBox";
             this._outputTabCharactersCheckBox.Size = new System.Drawing.Size(217, 17);
-            this._outputTabCharactersCheckBox.TabIndex = 3;
+            this._outputTabCharactersCheckBox.TabIndex = 4;
             this._outputTabCharactersCheckBox.Text = "Output tab characters for tab space-type";
             this._outputTabCharactersCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -457,10 +536,10 @@
             this._pageFailureOptionsGroupBox.Controls.Add(this._maxPageFailurePercentNumericUpDown);
             this._pageFailureOptionsGroupBox.Controls.Add(this.label9);
             this._pageFailureOptionsGroupBox.Controls.Add(this._maxPageFailureNumberNumericUpDown);
-            this._pageFailureOptionsGroupBox.Location = new System.Drawing.Point(7, 181);
+            this._pageFailureOptionsGroupBox.Location = new System.Drawing.Point(6, 256);
             this._pageFailureOptionsGroupBox.Name = "_pageFailureOptionsGroupBox";
-            this._pageFailureOptionsGroupBox.Size = new System.Drawing.Size(284, 122);
-            this._pageFailureOptionsGroupBox.TabIndex = 1;
+            this._pageFailureOptionsGroupBox.Size = new System.Drawing.Size(432, 71);
+            this._pageFailureOptionsGroupBox.TabIndex = 2;
             this._pageFailureOptionsGroupBox.TabStop = false;
             this._pageFailureOptionsGroupBox.Text = "Page failure options";
             // 
@@ -477,11 +556,11 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(6, 94);
+            this.label10.Location = new System.Drawing.Point(220, 44);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(117, 13);
+            this.label10.Size = new System.Drawing.Size(93, 13);
             this.label10.TabIndex = 4;
-            this.label10.Text = "Maximum failed page %";
+            this.label10.Text = "Max failed page %";
             // 
             // _skipPageOnFailureCheckBox
             // 
@@ -496,7 +575,7 @@
             // 
             // _maxPageFailurePercentNumericUpDown
             // 
-            this._maxPageFailurePercentNumericUpDown.Location = new System.Drawing.Point(139, 92);
+            this._maxPageFailurePercentNumericUpDown.Location = new System.Drawing.Point(329, 42);
             this._maxPageFailurePercentNumericUpDown.Name = "_maxPageFailurePercentNumericUpDown";
             this._maxPageFailurePercentNumericUpDown.Size = new System.Drawing.Size(93, 20);
             this._maxPageFailurePercentNumericUpDown.TabIndex = 5;
@@ -509,15 +588,15 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(6, 68);
+            this.label9.Location = new System.Drawing.Point(220, 18);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(111, 13);
+            this.label9.Size = new System.Drawing.Size(87, 13);
             this.label9.TabIndex = 2;
-            this.label9.Text = "Maximum failed pages";
+            this.label9.Text = "Max failed pages";
             // 
             // _maxPageFailureNumberNumericUpDown
             // 
-            this._maxPageFailureNumberNumericUpDown.Location = new System.Drawing.Point(139, 66);
+            this._maxPageFailureNumberNumericUpDown.Location = new System.Drawing.Point(329, 16);
             this._maxPageFailureNumberNumericUpDown.Maximum = new decimal(new int[] {
             -1,
             0,
@@ -539,7 +618,7 @@
             this._imageOptionsTabPage.Location = new System.Drawing.Point(4, 22);
             this._imageOptionsTabPage.Name = "_imageOptionsTabPage";
             this._imageOptionsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._imageOptionsTabPage.Size = new System.Drawing.Size(297, 557);
+            this._imageOptionsTabPage.Size = new System.Drawing.Size(445, 583);
             this._imageOptionsTabPage.TabIndex = 0;
             this._imageOptionsTabPage.Text = "Image options";
             this._imageOptionsTabPage.UseVisualStyleBackColor = true;
@@ -558,7 +637,7 @@
             this._forceDespeckleGroupBox.Controls.Add(this._alwaysForceDespeckleRadioButton);
             this._forceDespeckleGroupBox.Location = new System.Drawing.Point(6, 91);
             this._forceDespeckleGroupBox.Name = "_forceDespeckleGroupBox";
-            this._forceDespeckleGroupBox.Size = new System.Drawing.Size(285, 224);
+            this._forceDespeckleGroupBox.Size = new System.Drawing.Size(433, 224);
             this._forceDespeckleGroupBox.TabIndex = 1;
             this._forceDespeckleGroupBox.TabStop = false;
             this._forceDespeckleGroupBox.Text = "Despeckle";
@@ -662,7 +741,7 @@
             this.groupBox1.Controls.Add(this._maxXNumericUpDown);
             this.groupBox1.Location = new System.Drawing.Point(6, 6);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(285, 79);
+            this.groupBox1.Size = new System.Drawing.Size(433, 79);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Maximum image size";
@@ -749,7 +828,7 @@
             this._tabControl.Location = new System.Drawing.Point(12, 12);
             this._tabControl.Name = "_tabControl";
             this._tabControl.SelectedIndex = 0;
-            this._tabControl.Size = new System.Drawing.Size(305, 583);
+            this._tabControl.Size = new System.Drawing.Size(453, 609);
             this._tabControl.TabIndex = 0;
             // 
             // _advancedTabPage
@@ -758,7 +837,7 @@
             this._advancedTabPage.Location = new System.Drawing.Point(4, 22);
             this._advancedTabPage.Name = "_advancedTabPage";
             this._advancedTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this._advancedTabPage.Size = new System.Drawing.Size(297, 557);
+            this._advancedTabPage.Size = new System.Drawing.Size(445, 583);
             this._advancedTabPage.TabIndex = 3;
             this._advancedTabPage.Text = "Advanced";
             this._advancedTabPage.UseVisualStyleBackColor = true;
@@ -779,8 +858,8 @@
             // 
             this._advancedSplitContainer.Panel2.Controls.Add(this.label8);
             this._advancedSplitContainer.Panel2.Controls.Add(this._stringSettingsDataGridView);
-            this._advancedSplitContainer.Size = new System.Drawing.Size(291, 551);
-            this._advancedSplitContainer.SplitterDistance = 270;
+            this._advancedSplitContainer.Size = new System.Drawing.Size(439, 577);
+            this._advancedSplitContainer.SplitterDistance = 282;
             this._advancedSplitContainer.TabIndex = 0;
             // 
             // label7
@@ -801,7 +880,7 @@
             this._enumSettingsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._enumSettingsDataGridView.Location = new System.Drawing.Point(3, 23);
             this._enumSettingsDataGridView.Name = "_enumSettingsDataGridView";
-            this._enumSettingsDataGridView.Size = new System.Drawing.Size(285, 244);
+            this._enumSettingsDataGridView.Size = new System.Drawing.Size(433, 256);
             this._enumSettingsDataGridView.TabIndex = 0;
             this._enumSettingsDataGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.Handle_DataGridView_DataError);
             this._enumSettingsDataGridView.EnabledChanged += new System.EventHandler(this.Handle_DataGridView_EnabledChanged);
@@ -824,7 +903,7 @@
             this._stringSettingsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._stringSettingsDataGridView.Location = new System.Drawing.Point(3, 25);
             this._stringSettingsDataGridView.Name = "_stringSettingsDataGridView";
-            this._stringSettingsDataGridView.Size = new System.Drawing.Size(285, 247);
+            this._stringSettingsDataGridView.Size = new System.Drawing.Size(433, 261);
             this._stringSettingsDataGridView.TabIndex = 1;
             this._stringSettingsDataGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.Handle_DataGridView_DataError);
             this._stringSettingsDataGridView.EnabledChanged += new System.EventHandler(this.Handle_DataGridView_EnabledChanged);
@@ -836,7 +915,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(329, 641);
+            this.ClientSize = new System.Drawing.Size(477, 667);
             this.Controls.Add(this._tabControl);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
@@ -853,6 +932,8 @@
             this._recognitionLanguagesGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._languagesDataGridView)).EndInit();
             this._recognitionOptionsTabPage.ResumeLayout(false);
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -947,5 +1028,11 @@
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.Button _setClassicButton;
         private System.Windows.Forms.Button _setDefaultsButton;
+        private System.Windows.Forms.CheckBox _returnUnrecognizedCharactersCheckBox;
+        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.CheckBox _locateZonesInsideSpecifiedZoneCheckBox;
+        private System.Windows.Forms.CheckBox _ignoreAreaOutsideSpecifiedZoneCheckBox;
+        private Utilities.Forms.InfoTip infoTip1;
+        private Utilities.Forms.InfoTip infoTip2;
     }
 }

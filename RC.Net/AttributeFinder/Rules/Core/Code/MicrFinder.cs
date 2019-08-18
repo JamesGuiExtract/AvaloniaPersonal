@@ -93,6 +93,11 @@ namespace Extract.AttributeFinder.Rules
         /// (if <c>true</c>) or to use only built-in parameters (if <c>false</c>)
         /// </summary>
         bool InheritOCRParameters { get; set; }
+
+        /// <summary>
+        /// Whether to return unrecognized characters (as ^) or not
+        /// </summary>
+        bool ReturnUnrecognizedCharacters { get; set; }
     }
 
     /// <summary>
@@ -114,7 +119,7 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// Current version.
         /// </summary>
-        const int _CURRENT_VERSION = 2;
+        const int _CURRENT_VERSION = 3;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -208,6 +213,7 @@ namespace Extract.AttributeFinder.Rules
         });
 
         bool _inheritOCRParameters;
+        bool _returnUnrecognizedCharacters;
 
         #endregion Fields
 
@@ -467,6 +473,22 @@ namespace Extract.AttributeFinder.Rules
             }
         }
 
+        /// <summary>
+        /// Whether to return unrecognized characters (as ^) or not
+        /// </summary>
+        public bool ReturnUnrecognizedCharacters
+        {
+            get
+            {
+                return _returnUnrecognizedCharacters;
+            }
+            set
+            {
+                _dirty = _dirty || _returnUnrecognizedCharacters != value;
+                _returnUnrecognizedCharacters = value;
+            }
+        }
+
         #endregion IMicrFinder
 
         #region IAttributeFindingRule
@@ -652,6 +674,14 @@ namespace Extract.AttributeFinder.Rules
                     {
                         InheritOCRParameters = reader.ReadBoolean();
                     }
+                    if (reader.Version >= 3)
+                    {
+                        ReturnUnrecognizedCharacters = reader.ReadBoolean();
+                    }
+                    else
+                    {
+                        ReturnUnrecognizedCharacters = true;
+                    }
 
                     // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
@@ -692,6 +722,7 @@ namespace Extract.AttributeFinder.Rules
                     writer.Write(MicrSplitterRegex);
                     writer.Write(FilterCharsWhenSplitting);
                     writer.Write(InheritOCRParameters);
+                    writer.Write(ReturnUnrecognizedCharacters);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -767,6 +798,7 @@ namespace Extract.AttributeFinder.Rules
             MicrSplitterRegex = source.MicrSplitterRegex;
             FilterCharsWhenSplitting = source.FilterCharsWhenSplitting;
             InheritOCRParameters = source.InheritOCRParameters;
+            ReturnUnrecognizedCharacters = source.ReturnUnrecognizedCharacters;
         }
 
         /// <summary>
@@ -804,10 +836,10 @@ namespace Extract.AttributeFinder.Rules
 
         IOCRParameters GetOCRParams(AFDocument pDocument)
         {
-            bool truf<T> (T _) { return true; }
+            bool truf<T>(T _) { return true; }
 
             var ocrParams = InheritOCRParameters
-                ?  ((IHasOCRParameters)pDocument).OCRParameters
+                ? ((IHasOCRParameters)pDocument).OCRParameters
                     .ToIEnumerable()
                     .Where(p => p.Match(
                         kv => (EOCRParameter)kv.key != EOCRParameter.kOCRType,
@@ -816,6 +848,7 @@ namespace Extract.AttributeFinder.Rules
                 : new List<OCRParam>();
 
             ocrParams.Add(new OCRParam(((int)EOCRParameter.kOCRType, (int)EOCRFindType.kFindMICROnly)));
+            ocrParams.Add(new OCRParam(((int)EOCRParameter.kReturnUnrecognizedCharacters, ReturnUnrecognizedCharacters ? 1 : 0)));
 
             return ocrParams.ToOCRParameters();
         }
@@ -827,9 +860,6 @@ namespace Extract.AttributeFinder.Rules
                 return false;
             }
 
-            int min = 0, max = 0, confidence = 0;
-            line.GetCharConfidence(ref min, ref max, ref confidence);
-
             if (FilterRegexInstance != null)
             {
                 if (!FilterRegexInstance.IsMatch(line.String))
@@ -838,6 +868,8 @@ namespace Extract.AttributeFinder.Rules
                 }
             }
 
+            int min = 0, max = 0, confidence = 0;
+            line.GetCharConfidence(ref min, ref max, ref confidence);
             if (confidence >= HighConfidenceThreshold)
             {
                 return true;
@@ -965,6 +997,11 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         void SplitMicrComponents(IAttribute micrAttribute)
         {
+            if (SplitterRegexInstance == null)
+            {
+                return;
+            }
+
             var componentNames = new List<string>();
 
             var groupNames = SplitterRegexInstance.GetGroupNames();

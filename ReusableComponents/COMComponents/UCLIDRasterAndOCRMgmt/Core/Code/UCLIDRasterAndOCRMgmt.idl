@@ -135,7 +135,10 @@ library UCLID_RASTERANDOCRMGMTLib
 		kIgnoreParagraphFlag = 21,
 		kTreatZonesAsParagraphs = 22,
 		kOCRType = 23,
-		kBarCodeType = 24
+		kBarCodeType = 24,
+		kReturnUnrecognizedCharacters = 25,
+		kLocateZonesInSpecifiedZone = 26,
+		kIgnoreAreaOutsideSpecifiedZone = 27
 	} EOCRParameter;
 
 	typedef 

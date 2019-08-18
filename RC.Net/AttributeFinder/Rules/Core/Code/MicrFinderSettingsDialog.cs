@@ -98,6 +98,7 @@ namespace Extract.AttributeFinder.Rules
                 _micrSplitterRegexTextBox.Text = Settings.MicrSplitterRegex;
                 _filterCharsWhenSplittingCheckBox.Checked = Settings.FilterCharsWhenSplitting;
                 _inheritOCRParametersCheckBox.Checked = Settings.InheritOCRParameters;
+                _returnUnrecognizedCharactersCheckBox.Checked = Settings.ReturnUnrecognizedCharacters;
             }
             catch (Exception ex)
             {
@@ -196,6 +197,7 @@ namespace Extract.AttributeFinder.Rules
                 Settings.MicrSplitterRegex = _micrSplitterRegexTextBox.Text;
                 Settings.FilterCharsWhenSplitting = _filterCharsWhenSplittingCheckBox.Checked;
                 Settings.InheritOCRParameters = _inheritOCRParametersCheckBox.Checked;
+                Settings.ReturnUnrecognizedCharacters = _returnUnrecognizedCharactersCheckBox.Checked;
 
                 DialogResult = DialogResult.OK;
             }
