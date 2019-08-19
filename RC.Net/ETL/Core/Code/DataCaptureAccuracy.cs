@@ -252,11 +252,11 @@ namespace Extract.ETL
             var queriesToRunInBatch = new ConcurrentQueue<string>();
 
             using (var connection = NewSqlDBConnection())
+            using(SqlCommand cmd = connection.CreateCommand())
             {
                 // Open the connection
                 connection.Open();
 
-                SqlCommand cmd = connection.CreateCommand();
                 // Set the timeout so that it waits indefinitely
                 cmd.CommandTimeout = 0;
 
@@ -265,11 +265,10 @@ namespace Extract.ETL
 
                 addParametersToCommand(cmd, endFileTaskSessionID);
                 
-				// Keep track of active threads
-                CountdownEvent threadCountdown = new CountdownEvent(1);
-
-                Semaphore threadSemaphore = new Semaphore(NumberOfProcessingThreads, NumberOfProcessingThreads);
-
+                
+                // Keep track of active threads
+                using (CountdownEvent threadCountdown = new CountdownEvent(1))
+                using (Semaphore threadSemaphore = new Semaphore(NumberOfProcessingThreads, NumberOfProcessingThreads))
                 using (SqlDataReader ExpectedAndFoundReader = cmd.ExecuteReader())
                 {
                     // Get VOA and other relevant data for each file needed to calculate capture statistics.
@@ -292,7 +291,9 @@ namespace Extract.ETL
                                 {
                                     // Get the VOAs from the streams
                                     IUnknownVector expectedAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(queryResultRow.ExpectedStream);
+                                    expectedAttributes.ReportMemoryUsage();
                                     IUnknownVector foundAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(queryResultRow.FoundStream);
+                                    foundAttributes.ReportMemoryUsage();
 
                                     // If the original file ID differs from the expected file ID, search the
                                     // original file's attribute hierarchy to find the comparison attributes
@@ -324,17 +325,18 @@ namespace Extract.ETL
                             }
                             finally
                             {
-                                // Decrement the number of pending threads
-                                threadCountdown.Signal();
-
                                 // Release semaphore after thread has been created
                                 threadSemaphore.Release();
+
+                                // Decrement the number of pending threads
+                                threadCountdown.Signal();
                             }
                         });
                     }
+
+                    threadCountdown.Signal();
+                    WaitHandle.WaitAny(new WaitHandle[] { threadCountdown.WaitHandle, cancelToken.WaitHandle });
                 }
-                threadCountdown.Signal();
-                WaitHandle.WaitAny(new WaitHandle[] { threadCountdown.WaitHandle, cancelToken.WaitHandle });
             }
 
             AddTheDataToTheDatabase(queriesToRunInBatch, endFileTaskSessionID, cancelToken);

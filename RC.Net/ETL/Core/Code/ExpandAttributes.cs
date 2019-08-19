@@ -504,6 +504,7 @@ namespace Extract.ETL
                     {
                         // Get the VOAs from the stream
                         IUnknownVector AttributesToStore = AttributeMethods.GetVectorOfAttributesFromSqlBinary(voaStream);
+                        AttributesToStore.ReportMemoryUsage();
 
                         if (!hasExpandedAttributes && _status.LastFileTaskSessionIDProcessed < fileTaskSessionID)
                         {

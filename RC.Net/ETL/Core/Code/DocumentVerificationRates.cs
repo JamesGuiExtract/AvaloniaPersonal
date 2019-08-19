@@ -226,30 +226,29 @@ namespace Extract.ETL
                 while (_status.LastFileTaskSessionIDProcessed < maxFileTaskSession)
                 {
                     using (var scope = GetNewTransactionScope())
+                    using (var connection = NewSqlDBConnection())
                     {
-                        using (var connection = NewSqlDBConnection())
+                        connection.Open();
+
+                        using (var sourceCmd = connection.CreateCommand())
                         {
-                            connection.Open();
+                            int endOfBatch = Math.Min(_status.LastFileTaskSessionIDProcessed + PROCESS_BATCH_SIZE, maxFileTaskSession);
 
-                            using (var sourceCmd = connection.CreateCommand())
+                            sourceCmd.CommandTimeout = 0;
+                            sourceCmd.CommandText = _QUERY_FOR_SOURCE_RECORDS;
+
+                            sourceCmd.Parameters.AddWithValue("@LastProcessedFileTaskSessionID", _status.LastFileTaskSessionIDProcessed);
+                            sourceCmd.Parameters.AddWithValue("@EndOfBatch", endOfBatch);
+
+                            sourceCmd.CommandTimeout = 0;
+                            using (var readerTask = sourceCmd.ExecuteReaderAsync(cancelToken))
                             {
-                                int endOfBatch = Math.Min(_status.LastFileTaskSessionIDProcessed + PROCESS_BATCH_SIZE, maxFileTaskSession);
-
-                                sourceCmd.CommandTimeout = 0;
-                                sourceCmd.CommandText = _QUERY_FOR_SOURCE_RECORDS;
-
-                                sourceCmd.Parameters.AddWithValue("@LastProcessedFileTaskSessionID", _status.LastFileTaskSessionIDProcessed);
-                                sourceCmd.Parameters.AddWithValue("@EndOfBatch", endOfBatch);
-
-                                sourceCmd.CommandTimeout = 0;
-                                using (var readerTask = sourceCmd.ExecuteReaderAsync(cancelToken))
-                                {
-                                    ProcessBatch(connection, readerTask);
-                                }
-                                _status.LastFileTaskSessionIDProcessed = endOfBatch;
-
+                                ProcessBatch(connection, readerTask);
                             }
+                            _status.LastFileTaskSessionIDProcessed = endOfBatch;
+
                         }
+
                         scope.Complete();
                     }
 

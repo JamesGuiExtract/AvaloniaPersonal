@@ -478,6 +478,9 @@ namespace Extract.ETL
         /// <param name="cancelToken"></param>
         void SaveAccuracy(SqlCommand cmd, ConcurrentQueue<string> queriesToRunInBatch, CancellationToken cancelToken)
         {
+            // keep track of number of active threads
+            using (CountdownEvent threadCountDown = new CountdownEvent(1))
+            using (Semaphore threadSemaphore = new Semaphore(NumberOfProcessingThreads, NumberOfProcessingThreads))
             using (SqlDataReader ExpectedAndFoundReader = cmd.ExecuteReader())
             {
                 // Get the ordinal for the FoundVOA and ExpectedVOA columns
@@ -492,11 +495,6 @@ namespace Extract.ETL
                 int expectedDateTimeStampColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedDateTimeStamp");
                 int expectedActionIDColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedActionID");
                 int expectedFAMUserIDColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedFAMUserID");
-
-                Semaphore threadSemaphore = new Semaphore(NumberOfProcessingThreads, NumberOfProcessingThreads);
-                
-                // keep track of number of active threads
-                CountdownEvent threadCountDown = new CountdownEvent(1);
 
                 // Process the found records
                 while (ExpectedAndFoundReader.Read())
@@ -531,11 +529,13 @@ namespace Extract.ETL
                             {
                                 // Get the VOAs from the streams
                                 IUnknownVector ExpectedAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(expectedStream);
+                                ExpectedAttributes.ReportMemoryUsage();
                                 IUnknownVector FoundAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(foundStream);
+                                FoundAttributes.ReportMemoryUsage();
 
                                 // Compare the VOAs
                                 var output = IDShieldAttributeComparer.CompareAttributes(ExpectedAttributes, FoundAttributes,
-                                    XPathOfSensitiveAttributes, cancelToken).ToList();
+                                        XPathOfSensitiveAttributes, cancelToken).ToList();
 
                                 // process output for each page
                                 foreach (var pageKeyPair in output)

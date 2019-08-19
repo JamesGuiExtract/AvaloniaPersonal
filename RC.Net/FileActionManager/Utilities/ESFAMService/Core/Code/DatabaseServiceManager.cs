@@ -184,7 +184,7 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>
-        void Dispose(bool disposing)
+        virtual protected void Dispose(bool disposing)
         {
             if (disposing)
             {

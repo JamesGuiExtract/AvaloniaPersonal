@@ -671,11 +671,11 @@ namespace Extract.ETL
                 return creator();
             }
             using (var connection = NewSqlDBConnection(enlist: false))
+            using (var statusCmd = connection.CreateCommand())
             {
                 connection.Open();
 
                 // need to get the previous status
-                var statusCmd = connection.CreateCommand();
                 statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID";
                 statusCmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
                 using (var statusResult = statusCmd.ExecuteReader())
