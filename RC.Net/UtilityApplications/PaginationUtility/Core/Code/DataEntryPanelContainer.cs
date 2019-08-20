@@ -1153,10 +1153,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                     catch (Exception ex)
                     {
-                    // Exceptions will be thrown if the FAM task has been stopped while a
-                    // UpdateDocumentStatusThread was still running, but we don't care to know about
-                    // the exceptions in this case.
-                    if (IsHandleCreated)
+                        // Exceptions will be thrown if the FAM task has been stopped while a
+                        // UpdateDocumentStatusThread was still running, but we don't care to know about
+                        // the exceptions in this case.
+                        if (IsHandleCreated)
                         {
                             ex.ExtractLog("ELI41494");
                         }
@@ -1204,7 +1204,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             bool registeredThread = false;
             bool gotSemaphore = false;
-            ExtractException ee = null;
 
             try
             {
@@ -1265,13 +1264,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                                                                         // than focus on efficiency, focus on getting full
                                                                         // data for PaginationConditions
                     }
-
-                    backgroundConfigManager.Dispose();
                 }
             }
             catch (Exception ex)
             {
-                ee = ex.AsExtract("ELI41453");
+                documentData.PendingDocumentStatus = 
+                    new DocumentStatus() { Exception = ex.AsExtract("ELI41453") };
             }
             finally
             {
@@ -1284,6 +1282,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _documentStatusUpdateSemaphore.Release();
                 }
+
+                backgroundConfigManager.Dispose();
             }
 
             if (StatusUpdateThreadManager != null && StatusUpdateThreadManager.StoppingThreads)
@@ -1309,9 +1309,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     try
                     {
-                        if (ee != null)
+                        if (documentData.PendingDocumentStatus?.Exception != null)
                         {
-                            ee.ExtractDisplay("ELI41464");
+                            documentData.PendingDocumentStatus?.Exception.ExtractDisplay("ELI41464");
                         }
 
                         if (_pendingDocumentStatusUpdate.ContainsKey(documentData))

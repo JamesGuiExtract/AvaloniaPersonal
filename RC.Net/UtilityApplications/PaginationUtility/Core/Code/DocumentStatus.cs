@@ -85,6 +85,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         public string StringizedError { get; set; }
 
         /// <summary>
+        /// An exception that occured trying to generate document status data.
+        /// </summary>
+        public ExtractException Exception { get; set; }
+
+        /// <summary>
         /// Produces a JSON representation of this instance.
         /// </summary>
         /// <returns></returns>

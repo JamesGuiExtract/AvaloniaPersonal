@@ -1174,6 +1174,11 @@ namespace Extract.FileActionManager.FileProcessors
 
             if (outputData.PendingDocumentStatus != null)
             {
+                if (outputData.PendingDocumentStatus.Exception != null)
+                {
+                    throw outputData.PendingDocumentStatus.Exception;
+                }
+
                 docData.SubAttributes.Clear();
                 var updatedAttributes = (IUnknownVector)_miscUtils.Value.GetObjectFromStringizedByteStream(
                     outputData.PendingDocumentStatus.StringizedData);
