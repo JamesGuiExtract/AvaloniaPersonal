@@ -1116,15 +1116,13 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         static List<PageInfo> GetSourcePageInfos(FileRecord pFileRecord, IAttribute docAttribute)
         {
-            int pageCount = NuanceImageMethods.GetPageCount(pFileRecord.Name);
-
             var pages = UtilityMethods.GetPageNumbersFromString(
                 docAttribute.SubAttributes
                     .ToIEnumerable<IAttribute>()
                     .Where(attribute => attribute.Name.Equals(
                         "Pages", StringComparison.OrdinalIgnoreCase))
                     .Select(attribute => attribute.Value.String)
-                    .SingleOrDefault() ?? "", pageCount, true);
+                    .SingleOrDefault() ?? "", -1, false);
 
             var deletedPages = new HashSet<int>(UtilityMethods.GetPageNumbersFromString(
                 docAttribute.SubAttributes
@@ -1132,7 +1130,7 @@ namespace Extract.FileActionManager.FileProcessors
                     .Where(attribute => attribute.Name.Equals(
                         "DeletedPages", StringComparison.OrdinalIgnoreCase))
                     .Select(attribute => attribute.Value.String)
-                    .SingleOrDefault() ?? "", pageCount, true));
+                    .SingleOrDefault() ?? "", -1, false));
 
             var sourcePageInfos = pages
                 .Union(deletedPages)
@@ -1220,12 +1218,14 @@ namespace Extract.FileActionManager.FileProcessors
             var newFileInfo = _paginatedOutputCreationUtility.AddFileWithNameConflictResolve(
                 sourcePageInfos, pFAMTM, fileTaskSessionID);
 
+            var nonDeletedPageInfos = sourcePageInfos.Where(pageInfo => !pageInfo.Deleted).ToList();
+
             if (AutoRotatePages)
             {
-                AutoRotateFilePages(pFileRecord.Name, sourcePageInfos);
+                AutoRotateFilePages(pFileRecord.Name, nonDeletedPageInfos);
             }
 
-            var imagePages = sourcePageInfos
+            var imagePages = nonDeletedPageInfos
                 .Select(p => p.ImagePage)
                 .ToList();
 
@@ -1244,11 +1244,7 @@ namespace Extract.FileActionManager.FileProcessors
 
             var paginationRequest = new PaginationRequest(
                 fileTaskSessionID, newFileInfo.FileID,
-                sourcePageInfos
-                    .Where(p => !p.Deleted)
-                    .Select(p => p.ImagePage)
-                    .ToList()
-                    .AsReadOnly());
+                imagePages.AsReadOnly());
             docAttribute.SubAttributes.PushBack(
                 paginationRequest.GetAsAttribute(PaginationRequestType.Automatic));
         }

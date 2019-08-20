@@ -660,7 +660,7 @@ namespace Extract.Utilities
                                int endPage,
                                bool throwExceptionOnPageOutOfRange)
         {
-            bool endOutOfRange = endPage > totalNumberOfPages;
+            bool endOutOfRange = totalNumberOfPages > 0 && endPage > totalNumberOfPages;
             if (throwExceptionOnPageOutOfRange)
             {
                 if (endOutOfRange)
@@ -678,6 +678,10 @@ namespace Extract.Utilities
                     throw ue;
                 }
             }
+
+            ExtractException.Assert("ELI47245",
+                "Open-ended page range not supported in this context",
+                endPage > 0 || totalNumberOfPages > 0);
 
             int lastPageNumber = !endOutOfRange && endPage > 0 ? endPage : totalNumberOfPages;
             for (int n = startPage; n <= lastPageNumber; n++)
@@ -703,7 +707,7 @@ namespace Extract.Utilities
                                bool lastPagesDefined = false)
         {
             // Check if the page number is valid
-            bool pageOutOfRange = pageNumber > totalNumberOfPages;
+            bool pageOutOfRange = totalNumberOfPages > 0 && pageNumber > totalNumberOfPages;
             if (pageOutOfRange)
             {
                 // Throw exception if specified
@@ -722,6 +726,10 @@ namespace Extract.Utilities
             }
             if (lastPagesDefined)
             {
+                ExtractException.Assert("ELI47246",
+                    "Open-ended page range not supported in this context",
+                    totalNumberOfPages > 0);
+
                 int n = !pageOutOfRange ? (totalNumberOfPages - pageNumber) + 1 : 1;
                 for (; n <= totalNumberOfPages; n++)
                 {
@@ -823,7 +831,8 @@ namespace Extract.Utilities
         /// strSpecifiedPageNumbers.
         /// </summary>
         /// <param name="specifiedPageNumbers">String containing specified page numbers in various formats.</param>
-        /// <param name="totalPages">The total number of pages in the image</param>
+        /// <param name="totalPages">The total number of pages in the image; If -1, open ended page ranges
+        /// with no end page specified will not be supported (e.g., "2-").</param>
         /// <param name="throwExceptionOnPageOutOfRange">Whether to throw an exception if a page number
         /// is greater than <see paramref="totalPages"/></param>
         /// <returns>A list of page numbers in the order indicated by <see paramref="specifiedPageNumbers"/>.

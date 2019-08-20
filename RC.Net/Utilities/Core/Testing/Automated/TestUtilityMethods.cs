@@ -596,6 +596,20 @@ namespace Extract.Utilities.Test
             CollectionAssert.AreEquivalent(new[] { 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 3, 10 }, result);
         }
 
+        [Test, Category("PagesAndStringConversions")]
+        [CLSCompliant(false)]
+        public static void GetPageNumbersFromStringNoPageTotal()
+        {
+            Assert.Throws<ExtractException>(() => UtilityMethods.GetPageNumbersFromString("1-2", -1, true));
+
+            var result = UtilityMethods.GetPageNumbersFromString("1-2", -1, false);
+            CollectionAssert.AreEquivalent(new[] { 1, 2, }, result);
+
+            Assert.Throws<ExtractException>(() => UtilityMethods.GetPageNumbersFromString("1-", -1, false));
+
+            Assert.Throws<ExtractException>(() => UtilityMethods.GetPageNumbersFromString("-2", -1, false));
+        }
+
         /// <summary>
         /// Tests exception handling generating page numbers from formatted string
         /// </summary>
