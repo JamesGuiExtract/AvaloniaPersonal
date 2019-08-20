@@ -943,7 +943,9 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     _paginationPanel.SafeBeginInvoke("ELI44676", () =>
                     {
-                        if (!_paginationPanel.IsDataPanelOpen && _paginationPanel.OutputDocumentCount == 1)
+                        if (!_paginationPanel.IsDataPanelOpen
+                            && _paginationPanel.OutputDocumentCount == 1
+                            && _paginationDocumentDataPanel != null)
                         {
                             _paginationPanel.OpenDataPanel();
                         }
@@ -984,8 +986,10 @@ namespace Extract.FileActionManager.FileProcessors
                     }
 
                     // SingleSourceDocumentMode should auto-open the DEP if there is no suggested pagination
-                    if (_settings.SingleSourceDocumentMode && !_paginationPanel.IsDataPanelOpen &&
-                        _paginationPanel.OutputDocumentCount == 1)
+                    if (_settings.SingleSourceDocumentMode
+                        && !_paginationPanel.IsDataPanelOpen
+                        && _paginationPanel.OutputDocumentCount == 1
+                        && _paginationDocumentDataPanel != null)
                     {
                         _paginationPanel.OpenDataPanel();
                     }
