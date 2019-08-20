@@ -1694,8 +1694,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         .Documents
                         .FirstOrDefault();
 
-                if (targetDocument != null &&
-                    targetDocument != _primaryPageLayoutControl.DocumentInDataEdit)
+                if (targetDocument != null
+                    && !targetDocument.OutputProcessed
+                    && targetDocument != _primaryPageLayoutControl.DocumentInDataEdit)
                 {
                     targetDocument.Collapsed = false;
 
@@ -2789,7 +2790,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see langword="false"/> to clear all the check boxes.</param>
         void SelectAllToCommit(bool select)
         {
-            foreach (var document in PendingDocuments)
+            // If selecting, select only documents pending. If clearing selection, ensure already
+            // committed documents are de-selected as well.
+            foreach (var document in (select ? PendingDocuments: _displayedDocuments))
             {
                 var separator = document.PaginationSeparator;
                 if (separator != null)
