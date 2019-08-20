@@ -1020,8 +1020,8 @@ namespace Extract.FileActionManager.Utilities
                     {
                         if (_etlFAMDB != null)
                         {
-                            _etlFAMDB.RecordFAMSessionStop();
                             _etlFAMDB.UnregisterActiveFAM();
+                            _etlFAMDB.RecordFAMSessionStop();
                             _etlFAMDB.CloseAllDBConnections();
                             _etlFAMDB = null;
                         }
@@ -1099,8 +1099,8 @@ namespace Extract.FileActionManager.Utilities
             {
                 if (_etlFAMDB != null)
                 {
-                    _etlFAMDB.RecordFAMSessionStop();
                     _etlFAMDB.UnregisterActiveFAM();
+                    _etlFAMDB.RecordFAMSessionStop();
                     _etlFAMDB.CloseAllDBConnections();
                     _etlFAMDB = null;
                 }
@@ -1397,8 +1397,8 @@ namespace Extract.FileActionManager.Utilities
                 {
                     if (_etlFAMDB != null)
                     {
-                        _etlFAMDB.RecordFAMSessionStop();
                         _etlFAMDB.UnregisterActiveFAM();
+                        _etlFAMDB.RecordFAMSessionStop();
                         _etlFAMDB.CloseAllDBConnections();
                         _etlFAMDB = null;
                     }
