@@ -29,11 +29,11 @@ namespace Extract.Imaging
         /// <returns></returns>
         public static int GetPageCount(string fileName)
         {
+            IntPtr fileHandle = IntPtr.Zero;
             try
             {
-                IntPtr fileHandle = IntPtr.Zero;
                 int pageCount = 0;
-                
+
                 RecAPI.kRecOpenImgFile(fileName, out fileHandle, FILEOPENMODE.IMGF_READ, IMF_FORMAT.FF_SIZE)
                     .ThrowOnError("ELI46862", "Unable to open image",
                         new KeyValuePair<string, string>("Image path", fileName));
@@ -48,6 +48,20 @@ namespace Extract.Imaging
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI46857");
+            }
+            finally
+            {
+                if (fileHandle != IntPtr.Zero)
+                {
+                    try
+                    {
+                        RecAPI.kRecCloseImgFile(fileHandle).ThrowOnError("ELI47243", "Unable to close image file");
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractLog("ELI47244");
+                    }
+                }
             }
         }
 
