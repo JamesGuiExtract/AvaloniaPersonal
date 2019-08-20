@@ -1259,6 +1259,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // to assign the output document name, write pagination history and queue
                         // the output file.
                         ProcessOutputDocument(outputDocument);
+
+                        // https://extract.atlassian.net/browse/ISSUE-16571
+                        // After applying partial pagination, this document should no longer be
+                        // reverted from this state via the "Restore as originally loaded" button.
+                        outputDocument.SetOriginalForm();
                     }
 
                     outputDocument.Collapsed = true;
@@ -1492,30 +1497,55 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 else
                 {
-                    foreach (var outputDocument in sourceDocArray
-                        .SelectMany(source => _sourceToOriginalDocuments[source]
-                            .OrderBy(doc => doc.OriginalPages.Select(
-                                page => page.OriginalPageNumber).Min())))
+                    foreach (var sourceDocument in sourceDocArray)
                     {
-                        outputDocument.Collapsed = false;
-                        outputDocument.Selected = false;
+                        var sourcePagesReverted = new List<int>();
 
-                        _primaryPageLayoutControl.LoadOutputDocument(outputDocument,
-                            outputDocument.OriginalPages, outputDocument.OriginalDeletedPages,
-                            outputDocument.OriginalViewedPages, true);
-                        if (!_displayedDocuments.Contains(outputDocument))
+                        foreach (var outputDocument in _sourceToOriginalDocuments[sourceDocument]
+                            .OrderBy(doc => doc.OriginalPages.Select(
+                                page => page.OriginalPageNumber).Min()))
                         {
-                            _displayedDocuments.Add(outputDocument);
+                            outputDocument.Collapsed = false;
+                            outputDocument.Selected = false;
+
+                            _primaryPageLayoutControl.LoadOutputDocument(outputDocument,
+                                outputDocument.OriginalPages, outputDocument.OriginalDeletedPages,
+                                outputDocument.OriginalViewedPages, true);
+                            if (!_displayedDocuments.Contains(outputDocument))
+                            {
+                                _displayedDocuments.Add(outputDocument);
+                            }
+
+                            if (outputDocument.DocumentData != null)
+                            {
+                                outputDocument.DocumentData.Revert();
+                                if (_documentDataPanel != null)
+                                {
+                                    _documentDataPanel.UpdateDocumentData(outputDocument.DocumentData,
+                                        statusOnly: true, displayValidationErrors: false);
+                                }
+                            }
+
+                            sourcePagesReverted.AddRange(
+                                outputDocument.OriginalPages
+                                    .Union(outputDocument.OriginalDeletedPages)
+                                    .Select(page => page.OriginalPageNumber));
                         }
 
-                        if (outputDocument.DocumentData != null)
+                        // https://extract.atlassian.net/browse/ISSUE-16571
+                        // It is possible that pages had been moved from applied documents to pending documents
+                        // and now that the pending documents are reverted have not been included in any
+                        // _displayedDocuments added thus far. In this case, create a separate document for these
+                        // pages in which all the pages will show as deleted.
+                        var orphanedPages = sourceDocument.Pages
+                            .Select(page => page.OriginalPageNumber)
+                            .Except(sourcePagesReverted);
+                        if (orphanedPages.Any())
                         {
-                            outputDocument.DocumentData.Revert();
-                            if (_documentDataPanel != null)
-                            {
-                                _documentDataPanel.UpdateDocumentData(outputDocument.DocumentData,
-                                    statusOnly: true, displayValidationErrors: false);
-                            }
+                            var leftOverPagesDocument = _primaryPageLayoutControl.CreateOutputDocument(
+                                sourceDocument, null, orphanedPages, null, -1, true);
+
+                            _displayedDocuments.Add(leftOverPagesDocument);
                         }
                     }
                 }
@@ -2288,7 +2318,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 var response = MessageBox.Show(this,
                     "Restore all pages and extracted data to the state at which they existed when " +
-                    "first displayed. This may represent the original state or the state saved by a prior user.",
+                    "first displayed (except for any documents that have already been processed). " +
+                    "This may represent the original state or the state saved by a prior user.",
                     "Restore as originally loaded?", MessageBoxButtons.YesNo,
                     MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2, 0);
 
@@ -3245,8 +3276,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         nonEmptyDocs.Any(doc => isDocDataEdited || documentCopyExists || !doc.InOriginalForm);
                     _revertToOriginalToolStripButton.Enabled = RevertToSuggestedEnabled;
 
-                    RevertToSourceEnabled = isDocDataEdited || documentCopyExists
-                        || nonEmptyDocs.Any(doc => !doc.InSourceDocForm);
+                    RevertToSourceEnabled = !_displayedDocuments.Any(doc => doc.OutputProcessed) &&
+                        (isDocDataEdited || documentCopyExists || nonEmptyDocs.Any(doc => !doc.InSourceDocForm));
                     _revertToSourceToolStripButton.Enabled = RevertToSourceEnabled;
 
                     _saveToolStripButton.Enabled = PendingDocuments.Any();

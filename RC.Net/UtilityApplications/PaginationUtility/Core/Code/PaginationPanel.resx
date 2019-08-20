@@ -121,6 +121,6 @@
     <value>17, 17</value>
   </metadata>
   <data name="_revertToOriginalToolStripButton.ToolTipText" xml:space="preserve">
-    <value>This returns all pages to the document groupings and states that existed when the document loaded into this application. It will also revert to the extracted data that existed at that time. This state may represent the result of automated processing or may be the state at which a previous user saved.</value>
+    <value>Restore all pages and extracted data to the state at which they existed when first displayed (except for any documents that have already been processed). This may represent the original state or the state saved by a prior user.</value>
   </data>
 </root>

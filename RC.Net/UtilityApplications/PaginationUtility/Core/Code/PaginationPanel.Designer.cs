@@ -57,12 +57,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PaginationPanel));
             this._toolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this._tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._topToolStrip = new System.Windows.Forms.ToolStrip();
             this._collapseAllToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this._saveToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._applyToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this._saveToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._revertToSourceToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._revertToOriginalToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._toolStripContainer.ContentPanel.SuspendLayout();
@@ -119,7 +120,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._revertToOriginalToolStripButton});
             this._topToolStrip.Location = new System.Drawing.Point(3, 0);
             this._topToolStrip.Name = "_topToolStrip";
-            this._topToolStrip.Size = new System.Drawing.Size(434, 25);
+            this._topToolStrip.Size = new System.Drawing.Size(513, 25);
             this._topToolStrip.TabIndex = 0;
             // 
             // _collapseAllToolStripButton
@@ -132,16 +133,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._collapseAllToolStripButton.Size = new System.Drawing.Size(23, 22);
             this._collapseAllToolStripButton.Click += new System.EventHandler(this.HandleCollapseAllToolStripButton_Click);
             // 
-            // _saveToolStripButton
-            // 
-            this._saveToolStripButton.Image = global::Extract.UtilityApplications.PaginationUtility.Properties.Resources.SaveImageButton;
-            this._saveToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._saveToolStripButton.Name = "_saveToolStripButton";
-            this._saveToolStripButton.Size = new System.Drawing.Size(51, 22);
-            this._saveToolStripButton.Text = "Save Progress";
-            this._saveToolStripButton.ToolTipText = "Use this button to save your current pagination and indexing progress.";
-            this._saveToolStripButton.Click += new System.EventHandler(this.HandleSaveToolStripButton_Click);
-            // 
             // _applyToolStripButton
             // 
             this._applyToolStripButton.Image = global::Extract.UtilityApplications.PaginationUtility.Properties.Resources.Accept;
@@ -150,6 +141,16 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._applyToolStripButton.Size = new System.Drawing.Size(58, 22);
             this._applyToolStripButton.Text = "Apply";
             this._applyToolStripButton.Click += new System.EventHandler(this.HandleApplyToolStripButton_Click);
+            // 
+            // _saveToolStripButton
+            // 
+            this._saveToolStripButton.Image = global::Extract.UtilityApplications.PaginationUtility.Properties.Resources.SaveImageButton;
+            this._saveToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._saveToolStripButton.Name = "_saveToolStripButton";
+            this._saveToolStripButton.Size = new System.Drawing.Size(99, 22);
+            this._saveToolStripButton.Text = "Save Progress";
+            this._saveToolStripButton.ToolTipText = "Use this button to save your current pagination and indexing progress.";
+            this._saveToolStripButton.Click += new System.EventHandler(this.HandleSaveToolStripButton_Click);
             // 
             // _revertToSourceToolStripButton
             // 
@@ -170,8 +171,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._revertToOriginalToolStripButton.Name = "_revertToOriginalToolStripButton";
             this._revertToOriginalToolStripButton.Size = new System.Drawing.Size(171, 22);
             this._revertToOriginalToolStripButton.Text = "Restore as originally loaded";
-            this._revertToOriginalToolStripButton.ToolTipText = "Restore all pages and extracted data to the state at which they existed when " +
-                    "first displayed. This may represent the original state or the state saved by a prior user.";
+            this._revertToOriginalToolStripButton.ToolTipText = resources.GetString("_revertToOriginalToolStripButton.ToolTipText");
             this._revertToOriginalToolStripButton.Click += new System.EventHandler(this.HandleRevertToOriginalToolStripButton_Click);
             // 
             // PaginationPanel
