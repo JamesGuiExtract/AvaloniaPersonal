@@ -97,7 +97,6 @@ namespace Extract.FileActionManager.FileProcessors
                 base.OnLoad(e);
 
                 _sourceIfFullyPaginatedActionComboBox.Items.Add(_NO_ACTION);
-                _outputActionComboBox.Items.Add(_NO_ACTION);
 
                 var actionNames = _fileProcessingDB
                     .GetActions()
