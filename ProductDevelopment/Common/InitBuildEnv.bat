@@ -16,7 +16,7 @@ SET ENGSVR_INTERNAL_BASE=D:\Internal
 SET BUILD_PRODUCT_RELEASE=\\extract.local\Eng\Builds
 SET NAS_BUILD_BASE=/volume8/Eng-Builds
 SET MSBUILDDISABLENODEREUSE=1
-SET GitPath="C:\Program Files\Git\bin\git.exe"
+SET GITPATH="C:\Program Files\Git\bin\git.exe"
 
 net use i: \\extract.local\All
 

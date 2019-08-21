@@ -83,7 +83,7 @@ Replace=$(BinariesFolder)\ReplaceString
 #
 CleanBranch:
 	@CD $(EngineeringRootDirectory)
-	$(GitPath) clean -d -f -x
+	$(GITPATH) clean -d -f -x
 
 BuildFKDBIfRequired:
 	@CD $(EngineeringRootDirectory)\Rules\Build_FKB
