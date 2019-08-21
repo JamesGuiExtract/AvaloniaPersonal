@@ -81,6 +81,10 @@ Replace=$(BinariesFolder)\ReplaceString
 #############################################################################
 # B U I L D    T A R G E T S
 #
+CleanBranch:
+	@CD $(EngineeringRootDirectory)
+	$(GitPath) clean -d -f -x
+
 BuildFKDBIfRequired:
 	@CD $(EngineeringRootDirectory)\Rules\Build_FKB
 	@IF "$(FKBBuildNeeded)"=="True" @nmake /F FKBUpdate.mak CreateFKBInstall
@@ -246,7 +250,7 @@ CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateIDShie
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemos
 
-DoBuilds: DisplayTimeStamp SetupBuildEnv BuildAttributeFinderCore
+DoBuilds: DisplayTimeStamp SetupBuildEnv CleanBranch BuildAttributeFinderCore
 
 DoEverythingNoGet: DoBuilds CreateInstalls CopyComponentVersionFile DoDemos UpdateLicenseFiles
     @ECHO.
