@@ -1195,7 +1195,6 @@ namespace Extract.FileActionManager.FileProcessors
                 e.DocumentData.PaginationRequest = new PaginationRequest(
                     sessionData.SessionID, newFileInfo.FileID, 
                     e.SourcePageInfo
-                        .Where(p => !p.Deleted)
                         .Select(p => p.ImagePage)
                         .ToList()
                         .AsReadOnly());
@@ -1270,7 +1269,7 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 // Anytime output documents are created, store the source document voas to reflect
                 // the documents output.
-                _paginationPanel.OutputSourceVoas();
+                _paginationPanel.OutputSourceVoas(selectedDocsOnly: true, displayMessageOnFailure: false);
 
                 // HandlePaginationPanel_CreatingOutputDocument will have already paused the
                 // queue in most cases, but not if the applied pagination matched source doc form.
@@ -1985,37 +1984,6 @@ namespace Extract.FileActionManager.FileProcessors
                         // document as far as the _paginationPanel is concerned.
                         foreach (var documentAttribute in attributeArray)
                         {
-                            // There should be two attributes under the root Document attribute:
-                            // Pages- The range/list specification of pages to be included.
-                            // DocumentData- The data (redaction or indexing() the rules found for the
-                            //  virtual document.
-                            var pages =
-                                UtilityMethods.GetPageNumbersFromString(
-                                    documentAttribute.SubAttributes
-                                    .ToIEnumerable<IAttribute>()
-                                    .Where(attribute => attribute.Name.Equals(
-                                        "Pages", StringComparison.OrdinalIgnoreCase))
-                                    .Select(attribute => attribute.Value.String)
-                                    .SingleOrDefault() ?? "", pageCount, true);
-
-                            var deletedPages =
-                                UtilityMethods.GetPageNumbersFromString(
-                                    documentAttribute.SubAttributes
-                                    .ToIEnumerable<IAttribute>()
-                                    .Where(attribute => attribute.Name.Equals(
-                                        "DeletedPages", StringComparison.OrdinalIgnoreCase))
-                                    .Select(attribute => attribute.Value.String)
-                                    .SingleOrDefault() ?? "", pageCount, true);
-
-                            var viewedPages =
-                                UtilityMethods.GetPageNumbersFromString(
-                                    documentAttribute.SubAttributes
-                                    .ToIEnumerable<IAttribute>()
-                                    .Where(attribute => attribute.Name.Equals(
-                                        "ViewedPages", StringComparison.OrdinalIgnoreCase))
-                                    .Select(attribute => attribute.Value.String)
-                                    .SingleOrDefault() ?? "", pageCount, true);
-
                             var documentDataAttribute = documentAttribute.SubAttributes
                                 .ToIEnumerable<IAttribute>()
                                 .SingleOrDefault(attribute => attribute.Name.Equals(
@@ -2024,10 +1992,56 @@ namespace Extract.FileActionManager.FileProcessors
                             PaginationDocumentData documentData =
                                 GetAsPaginationDocumentData(documentDataAttribute, fileName);
 
+                            var paginationRequestAttribute = AttributeMethods.GetSingleAttributeByName(
+                                documentAttribute.SubAttributes, "PaginationRequest");
+                            if (paginationRequestAttribute != null)
+                            {
+                                documentData.PaginationRequest = new PaginationRequest(paginationRequestAttribute);
+                            }
+
+                            List<int> pages = null;
+                            List<int> deletedPages = null;
+                            List<int> viewedPages = null;
+
+                            // Only compile numbers of included, deleted and viewed pages for documents without
+                            // pagination requests. Page numbers may be invalid for documents already generated
+                            // as some pages may have come from separate source documents.
+                            // If a PaginationRequest is present, _paginationPanel will use that to identify
+                            // the included pages.
+                            if (documentData.PaginationRequest == null)
+                            {
+                                pages = UtilityMethods.GetPageNumbersFromString(
+                                    documentAttribute.SubAttributes
+                                    .ToIEnumerable<IAttribute>()
+                                    .Where(attribute => attribute.Name.Equals(
+                                        "Pages", StringComparison.OrdinalIgnoreCase))
+                                    .Select(attribute => attribute.Value.String)
+                                    .SingleOrDefault() ?? "", pageCount, true)
+                                    .ToList();
+
+                                deletedPages = UtilityMethods.GetPageNumbersFromString(
+                                    documentAttribute.SubAttributes
+                                    .ToIEnumerable<IAttribute>()
+                                    .Where(attribute => attribute.Name.Equals(
+                                        "DeletedPages", StringComparison.OrdinalIgnoreCase))
+                                    .Select(attribute => attribute.Value.String)
+                                    .SingleOrDefault() ?? "", pageCount, true)
+                                    .ToList();
+
+                                viewedPages = UtilityMethods.GetPageNumbersFromString(
+                                    documentAttribute.SubAttributes
+                                    .ToIEnumerable<IAttribute>()
+                                    .Where(attribute => attribute.Name.Equals(
+                                        "ViewedPages", StringComparison.OrdinalIgnoreCase))
+                                    .Select(attribute => attribute.Value.String)
+                                    .SingleOrDefault() ?? "", pageCount, true)
+                                    .ToList();
+                            }
+
                             if (!suggestedPagination.HasValue)
                             {
                                 if (attributeArray.Length == 1 &&
-                                    pages.Count() == pageCount)
+                                    pages?.Count() == pageCount)
                                 {
                                     suggestedPagination = false;
                                 }
@@ -2037,17 +2051,14 @@ namespace Extract.FileActionManager.FileProcessors
                                 }
                             }
 
-                            var paginationRequestAttribute = AttributeMethods.GetSingleAttributeByName(
-                                documentAttribute.SubAttributes, "PaginationRequest");
-                            if (paginationRequestAttribute != null)
-                            {
-                                documentData.PaginationRequest = new PaginationRequest(paginationRequestAttribute);
-                            }
-
                             _paginationPanel.LoadFile(fileName, fileId, -1, pages, deletedPages,
                                 viewedPages, suggestedPagination.Value, documentData, selectDocument);
                             selectDocument = false;
                         }
+
+                        // Account for pages that been moved into documents from other sources and thus was not
+                        // included in any of the pages loaded in the above iteration.
+                        _paginationPanel.AddOrphanedPages(fileName);
 
                         return;
                     }

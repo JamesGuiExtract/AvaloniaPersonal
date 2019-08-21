@@ -32,11 +32,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="outputFileId">The ID of the output file generated.</param>
         /// <param name="imagePages">The source document <see cref="ImagePage"/>s representing each
         /// successive page in the requested pagination output document.</param>
-        public PaginationRequest(int fileTaskSessionId, int outputFileId, ReadOnlyCollection<ImagePage> imagePages)
+        public PaginationRequest(int fileTaskSessionId, int outputFileId, IEnumerable<ImagePage> imagePages)
         {
             FileTaskSessionId = fileTaskSessionId;
             OutputFileId = outputFileId;
-            ImagePages = imagePages ?? new ImagePage[0].ToList().AsReadOnly();
+            ImagePages = (imagePages ?? new ImagePage[0]).ToList().AsReadOnly();
         }
 
         /// <summary>

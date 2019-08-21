@@ -82,11 +82,20 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _pageControl = pageControl;
                 _page = page;
 
-                // Set the labels based on the source document name and page number, not the output
-                // Filename.
-                _fileNameLabel.Text = Path.GetFileNameWithoutExtension(_page.OriginalDocumentName);
-                _pageNumberLabel.Text = string.Format(CultureInfo.CurrentCulture, "Page {0:D}",
-                    _page.OriginalPageNumber);
+                if (_page.SourceDocument == null)
+                {
+                    // For output documents that were the result of two or more source documents
+                    // merged, we may not have the source document available. 
+                    _fileNameLabel.Text = "Unavailable";
+                }
+                else
+                {
+                    // Set the labels based on the source document name and page number, not the output
+                    // Filename.
+                    _fileNameLabel.Text = Path.GetFileNameWithoutExtension(_page.OriginalDocumentName);
+                    _pageNumberLabel.Text = string.Format(CultureInfo.CurrentCulture, "Page {0:D}",
+                        _page.OriginalPageNumber);
+                }
 
                 if (_pageControl.Viewed && _fileNameLabel.Font.Bold)
                 {
@@ -153,6 +162,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         if (_page != null)
                         {
+                            // For output documents that were the result of two or more source documents
+                            // merged, we may not have the source document available. In this case we
+                            // have nothing to display, but we should close any previously displayed image.
+                            if (_page.SourceDocument == null)
+                            {
+                                if (imageViewer != null)
+                                {
+                                    imageViewer.CloseImage(false);
+                                }
+
+                                return false;
+                            }
+
                             if (_page.OriginalDocumentName != imageViewer.ImageFile)
                             {
                                 imagePageChanged = true;

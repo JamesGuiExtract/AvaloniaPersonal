@@ -7,6 +7,7 @@ using Extract.UtilityApplications.PaginationUtility;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using UCLID_COMLMLib;
@@ -289,6 +290,7 @@ namespace Extract.FileActionManager.FileProcessors
                     ExtractException.Assert("ELI46852", "Missing PaginationRequest", requestAttribute != null);
 
                     var request = new PaginationRequest(requestAttribute);
+                    var nonDeletedImagePages = request.ImagePages.Where(p => !p.Deleted).ToList();
 
                     if (File.Exists(pFileRecord.Name))
                     {
@@ -297,12 +299,12 @@ namespace Extract.FileActionManager.FileProcessors
                         throw ee;
                     }
 
-                    ImageMethods.StaplePagesAsNewDocument(request.ImagePages, pFileRecord.Name);
+                    ImageMethods.StaplePagesAsNewDocument(nonDeletedImagePages, pFileRecord.Name);
 
                     var documentData = AttributeMethods.GetSingleAttributeByName(
                         documentAttribute.SubAttributes, "DocumentData");
                     AttributeMethods.CreateUssAndVoaForPaginatedDocument(
-                        pFileRecord.Name, documentData.SubAttributes, request.ImagePages);
+                        pFileRecord.Name, documentData.SubAttributes, nonDeletedImagePages);
                 }
 
                 return EFileProcessingResult.kProcessingSuccessful;

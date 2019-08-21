@@ -340,7 +340,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return new ImagePage(DocumentName, Page, Orientation);
+                return new ImagePage(DocumentName, Page, Orientation, Deleted);
             }
         }
     }

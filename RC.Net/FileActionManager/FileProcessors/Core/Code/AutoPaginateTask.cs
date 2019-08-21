@@ -1226,14 +1226,14 @@ namespace Extract.FileActionManager.FileProcessors
                 AutoRotateFilePages(pFileRecord.Name, nonDeletedPageInfos);
             }
 
-            var imagePages = nonDeletedPageInfos
+            var nonDeletedImagePages = nonDeletedPageInfos
                 .Select(p => p.ImagePage)
                 .ToList();
 
-            ImageMethods.StaplePagesAsNewDocument(imagePages, newFileInfo.FileName);
+            ImageMethods.StaplePagesAsNewDocument(nonDeletedImagePages, newFileInfo.FileName);
 
             AttributeMethods.CreateUssAndVoaForPaginatedDocument(
-                newFileInfo.FileName, outputData.Attributes, imagePages);
+                newFileInfo.FileName, outputData.Attributes, nonDeletedImagePages);
 
             _fileProcessingDB.SetFileStatusToPending(newFileInfo.FileID, OutputAction,
                 vbAllowQueuedStatusOverride: true);
@@ -1245,7 +1245,7 @@ namespace Extract.FileActionManager.FileProcessors
 
             var paginationRequest = new PaginationRequest(
                 fileTaskSessionID, newFileInfo.FileID,
-                imagePages.AsReadOnly());
+                sourcePageInfos.Select(p => p.ImagePage));
             docAttribute.SubAttributes.PushBack(
                 paginationRequest.GetAsAttribute(PaginationRequestType.Automatic));
         }

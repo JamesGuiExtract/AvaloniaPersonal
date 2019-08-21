@@ -39,7 +39,13 @@ namespace Extract.Imaging
         /// degrees.
         /// </summary>
         int _imageOrientation;
-        
+
+        /// <summary>
+        /// Indicates whether this represents a deleted page in contexts where deleted pages can be
+        /// represented.
+        /// </summary>
+        bool _deleted;
+
         #endregion Fields
 
         #region Constructors
@@ -51,11 +57,14 @@ namespace Extract.Imaging
         /// <param name="pageNumber">The page number of the document this page came from.</param>
         /// <param name="imageOrientation">The orientation of the image page relative to its
         /// original orientation in degrees.</param>
-        public ImagePage(string documentName, int pageNumber, int imageOrientation)
+        /// <param name="deleted">Indicates whether this represents a deleted page in contexts where
+        /// deleted pages can be represented.</param>
+        public ImagePage(string documentName, int pageNumber, int imageOrientation, bool deleted = false)
         {
             _documentName = documentName;
             _pageNumber = pageNumber;
             _imageOrientation = imageOrientation;
+            _deleted = deleted;
         }
 
         #endregion Constructors
@@ -140,6 +149,18 @@ namespace Extract.Imaging
             }
         }
 
+        /// <summary>
+        /// Indicates whether this represents a deleted page in contexts where deleted pages can be
+        /// represented.
+        /// </summary>
+        public bool Deleted
+        {
+            get
+            {
+                return _deleted;
+            }
+        }
+
         #endregion Properties
 
         #region Overrides
@@ -164,7 +185,10 @@ namespace Extract.Imaging
         /// </returns>
         public override int GetHashCode()
         {
-            return DocumentName.GetHashCode() ^ PageNumber.GetHashCode() ^ ImageOrientation.GetHashCode();
+            return DocumentName.GetHashCode()
+                ^ PageNumber.GetHashCode()
+                ^ ImageOrientation.GetHashCode()
+                ^ Deleted.GetHashCode();
         }
 
         /// <summary>
@@ -210,7 +234,8 @@ namespace Extract.Imaging
         {
             return left.DocumentName == right.DocumentName
                 && left.PageNumber == right.PageNumber
-                && left.ImageOrientation == right.ImageOrientation;
+                && left.ImageOrientation == right.ImageOrientation
+                && left.Deleted == right.Deleted;
         }
 
         /// <summary>

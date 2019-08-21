@@ -981,6 +981,81 @@ namespace Extract.UtilityApplications.PaginationUtility
             IEnumerable<int> pages, IEnumerable<int> deletedPages, IEnumerable<int> viewedPages,
              int position, bool insertSeparator)
         {
+            var pagesList = (pages == null && deletedPages == null)
+                    ? null
+                    : new List<int>((pages ?? new int[0]).Union(deletedPages ?? new int[0]));
+            var pagesToLoad = (pagesList == null)
+                ? sourceDocument.Pages.ToArray()
+                : sourceDocument.Pages
+                    .Where(page => pagesList
+                        .Contains(page.OriginalPageNumber))
+                    .OrderBy(page => pagesList.IndexOf(page.OriginalPageNumber))
+                    .ToArray();
+
+            return CreateOutputDocument(sourceDocument, pagesToLoad, position, insertSeparator, deletedPages, viewedPages);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="OutputDocument"/> based on the specified
+        /// <paramref name="sourceDocument"/>, and adds <see cref="PageThumbnailControl"/>s for its
+        /// pages.
+        /// </summary>
+        /// <param name="sourceDocument">The <see cref="SourceDocument"/> to be loaded as an
+        /// <see cref="OutputDocument"/>.</param>
+        /// <param name="paginationRequest">The <see cref="PaginationRequest"/> to define the pages
+        /// in the document.</param>
+        /// <param name="position">The position at which a document should be loaded. 0 = Load at
+        /// the front (top), -1 = load at the end (bottom). Any other value should be a value
+        /// passed via <see cref="CreatingOutputDocumentEventArgs"/> and not a value the caller
+        /// should expect to be able to calculate.
+        /// NOTE: If position != -1, all pages will be loaded even it if results in more than
+        /// _MAX_LOADED_PAGES.
+        /// </param>
+        /// <param name="insertSeparator"><see langword="true"/> if a separator should be inserted
+        /// before creating the new; otherwise, <see langword="false"/>.</param>
+        /// <returns>The <see cref="OutputDocument"/> that was created.</returns>
+        public OutputDocument CreateOutputDocument(SourceDocument sourceDocument,
+            PaginationRequest paginationRequest, int position, bool insertSeparator)
+        {
+            var pagesToLoad = paginationRequest.ImagePages
+                .Select(imagePage => imagePage.DocumentName == sourceDocument.FileName
+                    ? sourceDocument.Pages.Single(sourcePage => sourcePage.OriginalPageNumber == imagePage.PageNumber)
+                    : new Page(null, imagePage.PageNumber))
+                .ToArray();
+
+            var deletedPages = paginationRequest.ImagePages
+                .Where(imagePage => imagePage.Deleted && imagePage.DocumentName == sourceDocument.FileName)
+                .Select(imagePage => imagePage.PageNumber);
+
+            return CreateOutputDocument(sourceDocument, pagesToLoad, position, insertSeparator, deletedPages);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="OutputDocument"/> based on the specified
+        /// <paramref name="sourceDocument"/>, and adds <see cref="PageThumbnailControl"/>s for its
+        /// pages.
+        /// </summary>
+        /// <param name="sourceDocument">The <see cref="SourceDocument"/> to be loaded as an
+        /// <see cref="OutputDocument"/>.</param>
+        /// <param name="pages">The array of <see cref="Page"/>s to be included in the document.</param>
+        /// <param name="deletedPages">The page numbers from <see paramref="fileName"/> to be
+        /// loaded but shown as deleted.</param>
+        /// <param name="viewedPages">The page numbers fro <see paramref="fileName"/> to be
+        /// loaded but shown as viewed.</param>
+        /// <param name="position">The position at which a document should be loaded. 0 = Load at
+        /// the front (top), -1 = load at the end (bottom). Any other value should be a value
+        /// passed via <see cref="CreatingOutputDocumentEventArgs"/> and not a value the caller
+        /// should expect to be able to calculate.
+        /// NOTE: If position != -1, all pages will be loaded even it if results in more than
+        /// _MAX_LOADED_PAGES.
+        /// </param>
+        /// <param name="insertSeparator"><see langword="true"/> if a separator should be inserted
+        /// before creating the new; otherwise, <see langword="false"/>.</param>
+        /// <returns>The <see cref="OutputDocument"/> that was created.</returns>
+        public OutputDocument CreateOutputDocument(SourceDocument sourceDocument, 
+            Page[] pages, int position, bool insertSeparator,
+            IEnumerable<int> deletedPages = null, IEnumerable<int> viewedPages = null)
+        {
             bool removedLoadNextDocumentButton = false;
 
             try
@@ -1047,21 +1122,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 outputDocument = outputDocument ??
                     GetOutputDocumentFromUtility(sourceDocument.FileName);
 
-                var pagesList = (pages == null && deletedPages == null)
-                    ? null
-                    : new List<int>((pages ?? new int[0]).Union(deletedPages ?? new int[0]));
-                var pagesToLoad = (pagesList == null)
-                    ? sourceDocument.Pages.ToArray()
-                    : sourceDocument.Pages
-                        .Where(page => pagesList
-                            .Contains(page.OriginalPageNumber))
-                        .OrderBy(page => pagesList.IndexOf(page.OriginalPageNumber))
-                        .ToArray();
-
                 if (position == -1)
                 {
                     // Handle case that loading pagesToLoad would exceed _MAX_LOADED_PAGES.
-                    AssertAllPagesBeLoaded(pagesToLoad.Length);
+                    AssertAllPagesBeLoaded(pages.Length);
                 }
 
                 // Retrieve spatialPageInfos, which will trigger auto-page rotation, only if
@@ -1071,7 +1135,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     : null;
 
                 // Create a page control for every page in sourceDocument.
-                foreach (Page page in pagesToLoad)
+                foreach (Page page in pages)
                 {
                     var orientation = ImageMethods.GetPageRotation(spatialPageInfos, page.OriginalPageNumber);
                     if (orientation != null)
@@ -1080,7 +1144,20 @@ namespace Extract.UtilityApplications.PaginationUtility
                         page.ImageOrientation = orientation.Value;
                     }
 
+                    // For output documents that were the result of two or more source documents
+                    // merged, we may not have the source document available. Display a blank page
+                    // in this case.
+                    if (page.SourceDocument == null)
+                    {
+                        using (var blankImage = new Bitmap(1, 1))
+                        {
+                            blankImage.SetPixel(0, 0, Color.White);
+                            page.ThumbnailImage = RasterImageConverter.ConvertFromImage(blankImage, ConvertFromImageOptions.None);
+                        }
+                    }
+
                     var pageControl = new PageThumbnailControl(outputDocument, page);
+
                     if (deletedPages != null && deletedPages.Contains(page.OriginalPageNumber))
                     {
                         pageControl.Deleted = true;
@@ -3620,6 +3697,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _commandTargetControl != null && _commandTargetControl.Selected &&
                     SelectedControls.Where(control => control != _loadNextDocumentButtonControl).Any();
 
+            if (enableSelectionBasedCommands 
+                && SelectedControls.OfType<PageThumbnailControl>()
+                    .Any(page => page.Page.SourceDocument == null))
+            {
+                enableSelectionBasedCommands = false;
+            }
+
             // Do not allow modification of documents that have already been output.
             bool enablePageModificationCommands =
                 !SelectedControls.OfType<PageThumbnailControl>().Any(c => c.Document.OutputProcessed);
@@ -3651,8 +3735,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     .Any(c => c.Deleted);
             _unDeleteCommand.Enabled = enableUnDeleteCommand;
 
-            bool enablePrintCommand =
-                _commandTargetControl != null && _commandTargetControl.Selected &&
+            bool enablePrintCommand = enableSelectionBasedCommands &&
                 SelectedPageControls.ToArray().Length > 0;
 
             _cutCommand.Enabled = enabledCutCommand;

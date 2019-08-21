@@ -640,7 +640,9 @@ namespace Extract.AttributeFinder
                             CultureInfo.InvariantCulture),
                     imageOrientation:
                         int.Parse(AttributeMethods.GetSingleAttributeByName(attribute.SubAttributes, "Orientation").Value.String,
-                        CultureInfo.InvariantCulture)
+                            CultureInfo.InvariantCulture),
+                    deleted:
+                        bool.Parse(AttributeMethods.GetSingleAttributeByName(attribute.SubAttributes, "Deleted")?.Value?.String ?? "False")
                     );
 
                 return imagePage;
@@ -671,6 +673,10 @@ namespace Extract.AttributeFinder
                 pageAttribute.AddSubAttribute("SourceDocument", imagePage.DocumentName);
                 pageAttribute.AddSubAttribute("SourcePage", imagePage.PageNumber.ToString(CultureInfo.InvariantCulture));
                 pageAttribute.AddSubAttribute("Orientation", imagePage.ImageOrientation.ToString(CultureInfo.InvariantCulture));
+                if (imagePage.Deleted)
+                {
+                    pageAttribute.AddSubAttribute("Deleted", "True");
+                }
 
                 return pageAttribute;
             }

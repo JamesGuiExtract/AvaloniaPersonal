@@ -828,8 +828,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // This will call Application.DoEvents in the midst of loading a document to
                     // keep the UI responsive as pages are loaded. This allows an opportunity
                     // for there to be multiple calls into LoadNextDocument at the same time.
-                    var outputDocument = _primaryPageLayoutControl.CreateOutputDocument(
-                        sourceDocument, pages, deletedPages, viewedPages, position, true);
+                    var outputDocument = (documentData.PaginationRequest == null)
+                        ? _primaryPageLayoutControl.CreateOutputDocument(sourceDocument, pages, deletedPages, viewedPages, position, true)
+                        : _primaryPageLayoutControl.CreateOutputDocument(sourceDocument, documentData.PaginationRequest, position, true);
 
                     _originalDocuments.Add(outputDocument);
                     var setOutputDocs = _sourceToOriginalDocuments.GetOrAdd(
@@ -860,6 +861,37 @@ namespace Extract.UtilityApplications.PaginationUtility
             finally
             {
                 _documentData.Remove(fileName);
+            }
+        }
+
+        /// <summary>
+        /// Adds any pages from <see paramref="sourceDocumentName"/> not already included in the
+        /// panel into a separate output document where all pages are marked as deleted by default.
+        /// It is possible such pages had been moved into documents from other sources or into a
+        /// document that has since been reverted such that it no longer includes the page.
+        /// This ensures the page is there to be added to a new output document if needed.
+        /// </summary>
+        /// <param name="sourceDocumentName">The name of a source document already represented in
+        /// the UI for which any missing pages should be added.</param>
+        public void AddOrphanedPages(string sourceDocumentName)
+        {
+            try
+            {
+                var sourceDocument = _sourceDocuments.Single(s => s.FileName == sourceDocumentName);
+
+                var orphanedPages = sourceDocument.Pages
+                    .Except(_primaryPageLayoutControl.PageControls.Select(c => c.Page));
+                if (orphanedPages.Any())
+                {
+                    var leftOverPagesDocument = _primaryPageLayoutControl.CreateOutputDocument(
+                        sourceDocument, null, orphanedPages.Select(p => p.OriginalPageNumber), null, -1, true);
+
+                    _displayedDocuments.Add(leftOverPagesDocument);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47248");
             }
         }
 
@@ -1064,7 +1096,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (result)
                 {
-                    result = OutputSourceVoas();
+                    result = OutputSourceVoas(selectedDocsOnly: false, displayMessageOnFailure: true);
                 }
 
                 return result;
@@ -1085,35 +1117,76 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// NOTE: A message will be displayed if the pages from multiple source documents
         /// are currently combined into a single proposed output document and the method will return false.
         /// </summary>
+        /// <param name="selectedDocsOnly"><c>true</c> if only the source documents relating to selected
+        /// output documents should be saved. <c>false</c> to save all source documents represented in
+        /// the UI.</param>
+        /// <param name="displayMessageOnFailure"><c>true</c> to display a message and return false
+        /// if there are merges not compatible to be saved. <c>false</c> if an exception should
+        /// be thrown instead.</param>
         /// <returns><c>true</c> if the data was saved; otherwise, <c>false</c>.</returns>
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Voas")]
-        public bool OutputSourceVoas()
+        public bool OutputSourceVoas(bool selectedDocsOnly, bool displayMessageOnFailure)
         {
             try
             {
-                var sourcesToOutputList = _displayedDocuments.Select(pendingDocument =>
+                var affectedDocs = selectedDocsOnly
+                    ? _displayedDocuments.Where(doc => doc.Selected)
+                    : _displayedDocuments;
+
+                var affectedSources = new HashSet<SourceDocument>(
+                    affectedDocs.SelectMany(doc => doc.PageControls
+                        .Select(pageControl => pageControl.Page.SourceDocument)
+                        .Where(sourceDoc => sourceDoc != null)
+                        .Distinct()));
+
+                // List affected source docs => each output doc
+                // (for all output documents involved with affectedSources)
+                var sourcesToOutputMapping = _displayedDocuments
+                    .Where(doc => doc.PageControls.Any(pageControl => 
+                        affectedSources.Contains(pageControl.Page.SourceDocument)))
+                    .Select(doc => 
                     (sourceDocs:
-                        pendingDocument
-                            .PageControls
+                        doc.PageControls
                             .Select(pageControl => pageControl.Page.SourceDocument)
+                            .Where(sourceDoc => sourceDoc != null)
                             .Distinct()
                             .ToList(),
-                    pendingDocument: pendingDocument)
+                    outputDocument: doc)
                 ).ToList();
 
-                if (sourcesToOutputList.Any(x => x.sourceDocs.Count() > 1))
+                // Cannot output source voa in the case of merges for any document that has not been
+                // applied (pages will not be available when sources are reloaded)
+                var unsupportedMergeSourceDocuments = sourcesToOutputMapping
+                    .Where(x => !x.outputDocument.OutputProcessed && x.sourceDocs.Count() > 1)
+                    .SelectMany(x => x.sourceDocs.Select(y => y.FileName))
+                    .Distinct()
+                    .ToList();
+
+                if (unsupportedMergeSourceDocuments.Any())
                 {
-                    UtilityMethods.ShowMessageBox("It is not possible to save progress when multiple " +
-                        "source documents have been combined into a single output document.",
-                        "Unable to save", true);
+                    if (displayMessageOnFailure)
+                    {
+                        UtilityMethods.ShowMessageBox("It is not possible to save progress when multiple " +
+                            "source documents have been combined into a single output document.",
+                            "Unable to save", true);
+                    }
+                    else
+                    {
+                        var ee = new ExtractException("ELI47247", "Failed to save merged source documents");
+                        unsupportedMergeSourceDocuments.ForEach(sourceDoc => ee.AddDebugData("Merged Source", sourceDoc, false));
+                        throw ee;
+                    }
                     return false;
                 }
 
                 var documentsToSave = new Dictionary<SourceDocument, List<OutputDocument>>();
-                foreach (var (sourceDocs, pendingDocument) in sourcesToOutputList.Where(entry => entry.sourceDocs.Any()))
+                foreach (var (sourceDocs, pendingDocument) in sourcesToOutputMapping.Where(entry => entry.sourceDocs.Any()))
                 {
-                    var outputDocs = documentsToSave.GetOrAdd(sourceDocs.Single(), _ => new List<OutputDocument>());
-                    outputDocs.Add(pendingDocument);
+                    foreach (var sourceDoc in sourceDocs)
+                    {
+                        var outputDocs = documentsToSave.GetOrAdd(sourceDoc, _ => new List<OutputDocument>());
+                        outputDocs.Add(pendingDocument);
+                    }
                 }
 
                 var orderedDocuments = _primaryPageLayoutControl.Documents.ToList();
@@ -1409,13 +1482,80 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
             }
 
+            // Ensure that if any source documents are being merged, all pages from the respective
+            // sources are selected.
+            var unsupportedMerges = GetUnselectedPagesAffectedByMerge();
+
+            if (unsupportedMerges.unselectedPagesControls.Any())
+            {
+                using (var msgBox = new CustomizableMessageBox())
+                {
+                    msgBox.Caption = "Commit error";
+                    msgBox.StandardIcon = MessageBoxIcon.Error;
+                    msgBox.Text = string.Format(CultureInfo.CurrentCulture,
+                        "Cannot commit because the following document(s) were merged but not fully selected: {0}\r\n\r\n" +
+                        "Expand selection to include all affected source document pages?",
+                        string.Join(", ", unsupportedMerges.mergedSourceDocuments));
+                    msgBox.AddButton("Expand selection", "expand", false);
+                    msgBox.AddButton("Cancel", "cancel", false);
+                    if (msgBox.Show(this) == "expand")
+                    {
+                        foreach (var separator in unsupportedMerges.unselectedPagesControls
+                            .Select(c => c.Document.PaginationSeparator)
+                            .Distinct())
+                        {
+                            separator.DocumentSelectedToCommit = true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
             // If document data could not be saved, abort the commit operation.
             if (!SaveDocumentData(selectedDocumentsOnly: CommitOnlySelection, validateData: true))
-            { 
+            {
                 return false;
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Identifies pages not included in the current selection that are affected by output document(s)
+        /// that merge two or more source documents. Such merges cannot be processed if the sources
+        /// documents are not entirely selected.
+        /// </summary>
+        /// <returns></returns>
+        (HashSet<string> mergedSourceDocuments, List<PageThumbnailControl> unselectedPagesControls)
+        GetUnselectedPagesAffectedByMerge()
+        {
+            // All merged source documents in the UI.
+            var allMergedSourceDocuments = new HashSet<string>(
+                PendingDocuments
+                    .Select(doc => doc.PageControls
+                        .Select(c => c.Page.OriginalDocumentName)
+                        .Distinct())
+                    .Where(set => set.Count() > 1)
+                    .SelectMany(set => set));
+
+            // Only the merged documents affected by the current selection
+            var mergedSourceDocuments = new HashSet<string>(
+                PendingDocuments
+                    .Where(doc => doc.Selected &&
+                        doc.PageControls.Any(c => allMergedSourceDocuments.Contains(c.Page.OriginalDocumentName)))
+                    .SelectMany(doc => doc.PageControls
+                        .Select(c => c.Page.OriginalDocumentName))
+                        .Distinct());
+
+            var unselectedPagesControls = new List<PageThumbnailControl>(
+                PendingDocuments
+                    .Where(doc => !doc.Selected)
+                    .SelectMany(doc => doc.PageControls
+                        .Where(c =>
+                            mergedSourceDocuments.Contains(c.Page.OriginalDocumentName))));
+
+            return (mergedSourceDocuments, unselectedPagesControls);
         }
 
         /// <summary>
@@ -1537,16 +1677,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // and now that the pending documents are reverted have not been included in any
                         // _displayedDocuments added thus far. In this case, create a separate document for these
                         // pages in which all the pages will show as deleted.
-                        var orphanedPages = sourceDocument.Pages
-                            .Select(page => page.OriginalPageNumber)
-                            .Except(sourcePagesReverted);
-                        if (orphanedPages.Any())
-                        {
-                            var leftOverPagesDocument = _primaryPageLayoutControl.CreateOutputDocument(
-                                sourceDocument, null, orphanedPages, null, -1, true);
-
-                            _displayedDocuments.Add(leftOverPagesDocument);
-                        }
+                        AddOrphanedPages(sourceDocument.FileName);
                     }
                 }
 
@@ -3024,7 +3155,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 string sourceFileName = null;
                 foreach (var document in documentsToSave)
                 {
-                    sourceFileName = document.PageControls.First().Page.SourceDocument.FileName;
+                    sourceFileName = document.PageControls
+                        .Select(c => c.Page.SourceDocument?.FileName)
+                        .First(n => n != null);
                     SavingData?.Invoke(this, new SavingDataEventArgs(sourceFileName));
                     _documentDataPanel.UpdateDocumentData(document.DocumentData, statusOnly: false, 
                         displayValidationErrors: validateData);

@@ -122,7 +122,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return SourceDocument.FileName;
+                return SourceDocument?.FileName;
             }
         }
 

@@ -173,7 +173,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (_fileID == -1 && InSourceDocForm)
                 {
-                    return PageControls.First().Page.SourceDocument.FileID;
+                    return PageControls.First().Page.SourceDocument?.FileID ?? -1;
                 }
 
                 return _fileID;
@@ -264,6 +264,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
+                    // If this document has been processed, it may contain merged pages from sources that
+                    // can't now be referenced.
+                    // Consider processed documents in a original form.
+                    if (OutputProcessed)
+                    {
+                        return true;
+                    }
+
                     // If there are no original pages specified, only in original form if there are no
                     // page controls.
                     if (_originalPages == null)
@@ -304,6 +312,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
+                    // If this document has been processed, it may contain merged pages from sources that
+                    // can't now be referenced.
+                    // Consider processed documents in source form.
+                    if (OutputProcessed)
+                    {
+                        return true;
+                    }
+
                     var pages = _pageControls
                         .Where(c => !c.Deleted)
                         .Select(c => c.Page)
