@@ -19,7 +19,7 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Input is a text file or CSV path
         /// </summary>
-        [Obsolete]
+        [Obsolete("Use TextFile or Csv")]
         TextFileOrCsv = 0,
 
         /// <summary>

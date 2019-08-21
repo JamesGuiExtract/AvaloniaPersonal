@@ -80,6 +80,7 @@ namespace Extract.AttributeFinder
         [NonSerialized]
         private bool _createCompactMachine = true;
 
+        [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
         [OptionalField(VersionAdded = 3)]
         protected bool _calibrateMachineToProduceProbabilities;
 

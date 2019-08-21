@@ -1116,25 +1116,26 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         static List<PageInfo> GetSourcePageInfos(FileRecord pFileRecord, IAttribute docAttribute)
         {
-            var pages = UtilityMethods.GetPageNumbersFromString(
-                docAttribute.SubAttributes
+            IEnumerable<int> getPages(string attributeName)
+            {
+                var pagesString = docAttribute.SubAttributes
                     .ToIEnumerable<IAttribute>()
                     .Where(attribute => attribute.Name.Equals(
-                        "Pages", StringComparison.OrdinalIgnoreCase))
+                        attributeName, StringComparison.OrdinalIgnoreCase))
                     .Select(attribute => attribute.Value.String)
-                    .SingleOrDefault() ?? "", -1, false);
+                    .SingleOrDefault() ?? "";
+                return UtilityMethods.GetPageNumbersFromString(pagesString, -1, false);
+            }
 
-            var deletedPages = new HashSet<int>(UtilityMethods.GetPageNumbersFromString(
-                docAttribute.SubAttributes
-                    .ToIEnumerable<IAttribute>()
-                    .Where(attribute => attribute.Name.Equals(
-                        "DeletedPages", StringComparison.OrdinalIgnoreCase))
-                    .Select(attribute => attribute.Value.String)
-                    .SingleOrDefault() ?? "", -1, false));
+            var pages = getPages("Pages");
+            var deletedPages = new HashSet<int>(getPages("DeletedPages"));
 
+            // Ensure deleted pages are represented
+            pages = pages.Union(deletedPages);
+
+            // Don't sort pages
+            // https://extract.atlassian.net/browse/ISSUE-16578
             var sourcePageInfos = pages
-                .Union(deletedPages)
-                .OrderBy(p => p)
                 .Select(p => new PageInfo
                 {
                     DocumentName = pFileRecord.Name,

@@ -1487,9 +1487,9 @@ namespace Extract.AttributeFinder
                     || InputConfig.InputPathType == InputType.Csv)
                 {
                     objectToSerialize = InputConfig.ShallowClone();
-#pragma warning disable CS0612 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
                     objectToSerialize.InputPathType = InputType.TextFileOrCsv;
-#pragma warning restore CS0612 // Type or member is obsolete
+#pragma warning restore CS0618 // Type or member is obsolete
                 }
                 var serializer = new NetDataContractSerializer();
                 serializer.AssemblyFormat = FormatterAssemblyStyle.Simple;
@@ -1586,9 +1586,9 @@ namespace Extract.AttributeFinder
             LabelAttributesSettings = _labelAttributesPersistedSettings;
 
             // Remove ambiguity with text file/csv file input
-#pragma warning disable CS0612 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
             if (InputConfig.InputPathType == InputType.TextFileOrCsv)
-#pragma warning restore CS0612 // Type or member is obsolete
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 if (Usage == LearningMachineUsage.AttributeCategorization
                     || Usage == LearningMachineUsage.Deletion

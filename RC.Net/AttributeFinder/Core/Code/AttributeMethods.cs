@@ -585,7 +585,20 @@ namespace Extract.AttributeFinder
                 {
                     var newPageData = newPageDataArray
                         .Where(s => s != null)
-                        .ToIUnknownVector<SpatialString>();
+                        .Select(s =>
+                        {
+                            var text = s.String;
+                            if (!text.EndsWith("\r\n\r\n", StringComparison.Ordinal))
+                            {
+                                var suffixToAdd = "\r\n";
+                                if (!text.EndsWith("\r\n", StringComparison.Ordinal))
+                                {
+                                    suffixToAdd += suffixToAdd;
+                                }
+                                s.AppendString(suffixToAdd);
+                            }
+                            return s;
+                        }).ToIUnknownVector();
 
                     if (newPageData.Size() > 0)
                     {
