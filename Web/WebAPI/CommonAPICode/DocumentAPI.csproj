@@ -1,6 +1,6 @@
 ﻿<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup Label="Configuration">
-    <DocumentationFile></DocumentationFile>
+    <DocumentationFile>bin\Release\DocumentAPI.xml</DocumentationFile>
     <SignAssembly>True</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
