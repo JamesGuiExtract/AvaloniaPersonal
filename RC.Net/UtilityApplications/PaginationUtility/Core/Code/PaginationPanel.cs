@@ -883,10 +883,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     .Except(_primaryPageLayoutControl.PageControls.Select(c => c.Page));
                 if (orphanedPages.Any())
                 {
-                    var leftOverPagesDocument = _primaryPageLayoutControl.CreateOutputDocument(
+                    _primaryPageLayoutControl.CreateOutputDocument(
                         sourceDocument, null, orphanedPages.Select(p => p.OriginalPageNumber), null, -1, true);
-
-                    _displayedDocuments.Add(leftOverPagesDocument);
                 }
             }
             catch (Exception ex)
