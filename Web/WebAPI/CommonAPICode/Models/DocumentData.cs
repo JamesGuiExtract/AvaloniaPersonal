@@ -342,8 +342,10 @@ namespace WebAPI.Models
         /// <param name="id">The identifier.</param>
         /// <param name="processSkipped">If <paramref name="id"/> is -1, if this is <c>true</c> then the document to open
         /// will be the next one in the skipped queue for the user, if <c>false</c> the next document in the pending queue will be opend</param>
+        /// <param name="userName"> The username of the user who is making the call. Only required for the recursive version </param>
+        /// <param name="retries"> the number of times to retry. </param>
         /// <returns></returns>
-        public DocumentIdResult OpenDocument(int id, bool processSkipped = false)
+        public DocumentIdResult OpenDocument(int id, bool processSkipped = false, string userName = "", int retries = 10)
         {
             try
             {
@@ -376,6 +378,11 @@ namespace WebAPI.Models
                     var fileRecords = FileApi.FileProcessingDB.GetFilesToProcess(FileApi.Workflow.EditAction, 1, processSkipped, _user.GetUsername());
                     if (fileRecords.Size() == 0)
                     {
+                        if (GetQueueStatus(userName).PendingDocuments > 1 && retries > 0)
+                        {
+                            return OpenDocument(id, processSkipped, userName, retries--);
+                        }
+
                         return new DocumentIdResult()
                         {
                             Id = -1

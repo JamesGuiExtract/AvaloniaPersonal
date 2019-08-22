@@ -286,7 +286,7 @@ namespace WebAPI.Controllers
 
                 using (var data = new DocumentData(User, requireSession: true))
                 {
-                    var documentId = data.OpenDocument(docID, processSkipped);
+                    var documentId = data.OpenDocument(docID, processSkipped, this.User.GetUsername());
 
                     return Ok(documentId);
                 }
