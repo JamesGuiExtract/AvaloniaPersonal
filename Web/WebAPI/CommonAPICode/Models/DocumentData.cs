@@ -202,7 +202,9 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI45272");
+                ExtractException ee = ex.AsExtract("ELI45272");
+                ee.AddDebugData("Current User", System.Environment.UserDomainName);
+                throw ee;
             }
         }
 
