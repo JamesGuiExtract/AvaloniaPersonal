@@ -2919,8 +2919,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             get
             {
                 return CommitOnlySelection &&
-                    _displayedDocuments.Any() &&
-                    _displayedDocuments.All(doc => doc.PageControls.Count == 0 || doc.Selected);
+                    PendingDocuments.Any() &&
+                    PendingDocuments.All(doc => doc.PageControls.Count == 0 || doc.Selected);
             }
         }
 

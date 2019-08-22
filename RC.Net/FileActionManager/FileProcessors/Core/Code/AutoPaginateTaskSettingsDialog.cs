@@ -182,6 +182,16 @@ namespace Extract.FileActionManager.FileProcessors
                     return;
                 }
 
+                if (_qualifierConditionConfigurableObjectControl.ConfigurableObject != null &&
+                    !_qualifierConditionConfigurableObjectControl.IsConfigured)
+                {
+                    UtilityMethods.ShowMessageBox(
+                       "The auto-pagination condition is not properly configured.",
+                       "Invalid configuration", true);
+
+                    return;
+                }
+
                 Settings.SourceActionIfFullyPaginated = _sourceIfFullyPaginatedActionComboBox.Text;
                 Settings.SourceActionIfNotFullyPaginated = _sourceIfNotFullyPaginatedActionComboBox.Text;
                 Settings.OutputPath = _outputPathTextBox.Text;

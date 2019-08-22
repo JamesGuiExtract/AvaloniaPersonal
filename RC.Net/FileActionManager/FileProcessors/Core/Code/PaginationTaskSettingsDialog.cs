@@ -96,7 +96,6 @@ namespace Extract.FileActionManager.FileProcessors
                 base.OnLoad(e);
 
                 _sourceActionComboBox.Items.Add(_NO_ACTION);
-                _outputActionComboBox.Items.Add(_NO_ACTION);
 
                 foreach (var actionName in _fileProcessingDB
                     .GetActions()
@@ -162,8 +161,16 @@ namespace Extract.FileActionManager.FileProcessors
                     return;
                 }
 
-                if (!string.IsNullOrWhiteSpace(_outputActionComboBox.Text) &&
-                    !_outputActionComboBox.Items.Contains(_outputActionComboBox.Text))
+                if (string.IsNullOrWhiteSpace(_outputActionComboBox.Text))
+                {
+                    UtilityMethods.ShowMessageBox(
+                        "An action must be specified for output documents; this action will be " +
+                        "responsible for the creation of the document via the \"Pagination: Create output\" task.",
+                        "Invalid configuration", true);
+
+                    return;
+                }
+                else if (!_outputActionComboBox.Items.Contains(_outputActionComboBox.Text))
                 {
                     UtilityMethods.ShowMessageBox(
                         "The action to set pagination output files to is not valid.",
