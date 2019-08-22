@@ -1337,6 +1337,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // After applying partial pagination, this document should no longer be
                         // reverted from this state via the "Restore as originally loaded" button.
                         outputDocument.SetOriginalForm();
+
+                        // https://extract.atlassian.net/browse/ISSUE-16581
+                        // Upon committing a document, add it to the original document list if it is not
+                        // there already. This is needed for the output to be represented in the case
+                        // of "Restore as originally loaded".
+                        foreach (var originalDocSet in outputDocument.PageControls
+                            .Select(c => c.Page.SourceDocument)
+                            .Distinct()
+                            .Select(s => _sourceToOriginalDocuments[s]))
+                        {
+                            originalDocSet.Add(outputDocument);
+                        }
                     }
 
                     outputDocument.Collapsed = true;
