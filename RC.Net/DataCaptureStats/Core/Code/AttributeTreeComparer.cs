@@ -519,9 +519,10 @@ namespace Extract.DataCaptureStats
             {
                 try
                 {
-                    // if nothing found then nothing to do (expected have already been counted)
+                    // if nothing found then anything expected is missed (already counted but not collected)
                     if (found.Size() == 0)
                     {
+                        collectAttributesAsMissed(expected.ToIEnumerable<IAttribute>(), qualifiedAncestorName);
                         return;
                     }
 
