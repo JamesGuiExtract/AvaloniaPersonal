@@ -1,7 +1,9 @@
-﻿using Extract.FileActionManager.Forms;
+﻿using Extract.DataEntry.LabDE;
+using Extract.FileActionManager.Forms;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -260,6 +262,40 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI47216");
+            }
+        }
+
+        /// <summary>
+        /// Links <see paramref="fileId"/> to the specified <paramref name="orders"/>
+        /// and <paramref name="encounters"/> in the FAM DB.
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public void LinkFilesWithRecordIds(int fileId,
+            IEnumerable<(string OrderNumber, DateTime? OrderDate)> orders,
+            IEnumerable<(string EncounterNumber, DateTime? EncounterDate)> encounters)
+        {
+            try
+            {
+                if (orders?.Any() != true && encounters?.Any() != true)
+                {
+                    return;
+                }
+
+                ExtractException.Assert("ELI47250", "Failed to link order ID to document.", fileId > 0);
+                ExtractException.Assert("ELI47251", "Failed to link encounter ID to document.", fileId > 0);
+
+                using (var famData = new FAMData(_fileProcessingDB))
+                {
+                    orders?.ToList().ForEach(order =>
+                        famData.LinkFileWithOrder(fileId, order.OrderNumber, order.OrderDate));
+
+                    encounters?.ToList().ForEach(encounter =>
+                        famData.LinkFileWithEncounter(fileId, encounter.EncounterNumber, encounter.EncounterDate));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47252");
             }
         }
     }

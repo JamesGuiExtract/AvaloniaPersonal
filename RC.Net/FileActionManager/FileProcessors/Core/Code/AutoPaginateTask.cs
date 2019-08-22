@@ -1235,6 +1235,9 @@ namespace Extract.FileActionManager.FileProcessors
             AttributeMethods.CreateUssAndVoaForPaginatedDocument(
                 newFileInfo.FileName, outputData.Attributes, nonDeletedImagePages);
 
+            _paginatedOutputCreationUtility.LinkFilesWithRecordIds(newFileInfo.FileID,
+                outputData?.PendingDocumentStatus.Orders, outputData.PendingDocumentStatus.Encounters);
+
             _fileProcessingDB.SetFileStatusToPending(newFileInfo.FileID, OutputAction,
                 vbAllowQueuedStatusOverride: true);
 
