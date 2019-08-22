@@ -87,12 +87,12 @@ namespace WebAPI.Models
 
                         if (fileApi != null)
                         {
+                            fileApi.InUse = true;
+
                             if (requestedFAMSessionID > 0)
                             {
                                 fileApi.ResumeSession(requestedFAMSessionID);
                             }
-
-                            fileApi.InUse = true;
                         }
                         else if (!waiting)
                         {
