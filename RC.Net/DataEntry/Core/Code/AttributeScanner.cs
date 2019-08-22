@@ -31,7 +31,8 @@ namespace Extract.DataEntry
         /// control more that two generations of attributes.</bullet>
         /// </list>
         /// </summary>
-        class AttributeScanner
+        /// <typeparam name="T">The data type of value accessed by <see cref="AccessorMethod"/></typeparam>
+        class AttributeScanner<T>
         {
             #region Fields
 
@@ -104,13 +105,13 @@ namespace Extract.DataEntry
             /// A method used to get or set an <see cref="AttributeStatusInfo"/> field for each 
             /// attribute.
             /// </summary>
-            public AccessorMethod _accessorMethod;
+            public AccessorMethod<T> _accessorMethod;
 
             /// <summary>
             /// Either specifies the value an <see cref="AttributeStatusInfo"/> field should be set
             /// to or specifies the value a field is required to be.
             /// </summary>
-            public bool _value;
+            public T _value;
 
             #endregion Fields
 
@@ -134,8 +135,8 @@ namespace Extract.DataEntry
             /// </param>
             /// <param name="forward"><see langword="true"/> if scanning forward through the 
             /// attribute hierarchy, <see langword="false"/> if scanning backward.</param>
-            AttributeScanner(IUnknownVector attributes, AccessorMethod accessorMethod,
-                bool value, bool forward, Stack<IAttribute> resultAttributeGenealogy)
+            AttributeScanner(IUnknownVector attributes, AccessorMethod<T> accessorMethod,
+                T value, bool forward, Stack<IAttribute> resultAttributeGenealogy)
             {
                 try
                 {
@@ -181,7 +182,7 @@ namespace Extract.DataEntry
             /// <see cref="AttributeStatusInfo.AccessorMethod"/> returning <see langword="false"/>
             /// </param>
             public static bool Scan(IUnknownVector attributes,
-                Stack<IAttribute> startingPoint, AccessorMethod accessorMethod, bool value,
+                Stack<IAttribute> startingPoint, AccessorMethod<T> accessorMethod, T value,
                 bool forward, bool loop, Stack<IAttribute> resultAttributeGenealogy)
             {
                 try
@@ -191,7 +192,7 @@ namespace Extract.DataEntry
                         LicenseIdName.DataEntryCoreComponents, "ELI26132", _OBJECT_NAME);
 
                     // Create a node in charge of scanning the root-level attributes.
-                    AttributeScanner rootScanNode = new AttributeScanner(attributes, accessorMethod,
+                    AttributeScanner<T> rootScanNode = new AttributeScanner<T>(attributes, accessorMethod,
                         value, forward, resultAttributeGenealogy);
 
                     // Initialize the scan node for the first pass of the scan (from the starting
@@ -236,11 +237,11 @@ namespace Extract.DataEntry
             /// looping back from the beginning of the attribute vector to the specified starting 
             /// point.</param>
             /// <returns>A <see cref="AttributeScanner"/> instance.</returns>
-            AttributeScanner GetScanNode(IUnknownVector attributes, 
+            AttributeScanner<T> GetScanNode(IUnknownVector attributes, 
                 Stack<IAttribute> startingPoint, bool firstPass)
             {
                 // Create and initialize the child AttributeScanner instance.
-                AttributeScanner childStatusinfo = new AttributeScanner(attributes, _accessorMethod,
+                AttributeScanner<T> childStatusinfo = new AttributeScanner<T>(attributes, _accessorMethod,
                     _value, _forward, _resultAttributeGenealogy);
                 childStatusinfo._attributes = attributes;
                 childStatusinfo._firstPass = firstPass;
@@ -339,7 +340,7 @@ namespace Extract.DataEntry
                         _startingPoint = null;
                     }
 
-                    AttributeScanner childScanNode = null;
+                    AttributeScanner<T> childScanNode = null;
 
                     // [DataEntry:1106]
                     // Iff:
@@ -487,8 +488,9 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> to continue traversing the attribute tree, 
         /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
         /// without traversing any more attributes.</returns>
-        delegate bool AccessorMethod(IAttribute attribute, AttributeStatusInfo statusInfo,
-            bool value);
+        /// <typeparam name="T">The data type of value accessed.</typeparam>
+        delegate bool AccessorMethod<T>(IAttribute attribute, AttributeStatusInfo statusInfo,
+            T value);
 
         #endregion Delegates
 
@@ -513,50 +515,21 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// An <see cref="AccessorMethod"/> implementation used to confirm all attributes
-        /// have valid data.
-        /// <para><b>Note</b></para>
-        /// An attribute that does not have an <see cref="OwningControl"/> 
-        /// specified will pass this test (return <see langword="true"/>) whether the specfied 
-        /// value is <see langword="true"/> or <see langword="false"/>.
+        /// An <see cref="AccessorMethod"/> implementation to test that an attribute's
+        /// data validity is not included in <see paramref="targetValidity"/>.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
         /// <param name="statusInfo">The <see cref="AttributeStatusInfo"/> instance containing
         /// the status information for the attribute in question.</param>
-        /// <param name="value"><see langword="true"/> to confirm all attributes have valid data
-        /// or <see langword="false"/> to confirm all attributes do not have valid data.</param>
+        /// <param name="targetValidity">The <see cref="DataValidity"/> values that should
+        /// trigger the scan to stop on a particular attribute.</param>
         /// <returns><see langword="true"/> to continue traversing the attribute tree, 
         /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
         /// without traversing any more attributes.</returns>
-        static bool ConfirmDataIsValid(IAttribute attribute, AttributeStatusInfo statusInfo,
-            bool value)
+        static bool DataValidityDoesNotMatch(IAttribute attribute,
+            AttributeStatusInfo statusInfo, DataValidity targetValidity)
         {
-            return (statusInfo._owningControl == null || !statusInfo._isViewable ||
-                (statusInfo._dataValidity == DataValidity.Valid) == value);
-        }
-
-        /// <summary>
-        /// An <see cref="AccessorMethod"/> implementation used to confirm all attributes
-        /// do not have invalid data (validation warnings are allowed).
-        /// <para><b>Note</b></para>
-        /// An attribute that does not have an <see cref="OwningControl"/> 
-        /// specified will pass this test (return <see langword="true"/>) whether the specfied 
-        /// value is <see langword="true"/> or <see langword="false"/>.
-        /// </summary>
-        /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
-        /// <param name="statusInfo">The <see cref="AttributeStatusInfo"/> instance containing
-        /// the status information for the attribute in question.</param>
-        /// <param name="value"><see langword="true"/> to confirm all attributes do not have
-        /// invalid data or <see langword="false"/> to confirm all attributes do not have invalid
-        /// data.</param>
-        /// <returns><see langword="true"/> to continue traversing the attribute tree, 
-        /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
-        /// without traversing any more attributes.</returns>
-        static bool ConfirmDataIsNotInvalid(IAttribute attribute, AttributeStatusInfo statusInfo,
-            bool value)
-        {
-            return (!statusInfo._isViewable ||
-                (statusInfo._dataValidity != DataValidity.Invalid) == value);
+            return (!statusInfo._isViewable || !targetValidity.HasFlag(statusInfo._dataValidity));
         }
 
         /// <summary>

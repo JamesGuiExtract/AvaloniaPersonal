@@ -1377,19 +1377,19 @@ namespace Extract.UtilityApplications.PaginationUtility
             IAttribute invalidAttribute = null;
             if (!backgroundConfigManager.ActiveDataEntryConfiguration.Config.Settings.PerformanceTesting)
             {
-                invalidAttribute = AttributeStatusInfo.FindNextInvalidAttribute(
-                    documentData.Attributes, false, null, true, false)
+                invalidAttribute = AttributeStatusInfo.FindNextAttributeByValidity(
+                    documentData.Attributes, DataValidity.Invalid, null, true, false)
                         ?.LastOrDefault();
 
                 documentStatus.DataError = invalidAttribute != null;
 
                 if (verboseWarningCheck || !documentStatus.DataError)
                 {
-                    invalidAttribute = AttributeStatusInfo.FindNextInvalidAttribute(
-                        documentData.Attributes, true, null, true, false)
+                    var warningAttribute = AttributeStatusInfo.FindNextAttributeByValidity(
+                        documentData.Attributes, DataValidity.ValidationWarning, null, true, false)
                             ?.LastOrDefault();
 
-                    documentStatus.DataWarning = invalidAttribute != null;
+                    documentStatus.DataWarning = warningAttribute != null;
                 }
             }
 
@@ -1519,19 +1519,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                 IAttribute invalidAttribute = null;
                 if (!tempPanel.ActiveDataEntryPanel.Config.Settings.PerformanceTesting)
                 {
-                    invalidAttribute = AttributeStatusInfo.FindNextInvalidAttribute(
-                        tempData.Attributes, false, null, true, false)
+                    invalidAttribute = AttributeStatusInfo.FindNextAttributeByValidity(
+                        tempData.Attributes, DataValidity.Invalid, null, true, false)
                             ?.LastOrDefault();
 
                     documentStatus.DataError = invalidAttribute != null;
 
                     if (verboseWarningCheck || !documentStatus.DataError)
                     {
-                        invalidAttribute = AttributeStatusInfo.FindNextInvalidAttribute(
-                            tempData.Attributes, true, null, true, false)
+                        var warningAttribute = AttributeStatusInfo.FindNextAttributeByValidity(
+                            tempData.Attributes, DataValidity.ValidationWarning, null, true, false)
                                 ?.LastOrDefault();
 
-                        documentStatus.DataWarning = invalidAttribute != null;
+                        documentStatus.DataWarning = warningAttribute != null;
                     }
                 }
 

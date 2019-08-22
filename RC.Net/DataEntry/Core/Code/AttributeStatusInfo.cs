@@ -78,22 +78,24 @@ namespace Extract.DataEntry
     /// <summary>
     /// Specifies whether a particular data element is valid or not.
     /// </summary>
+    [SuppressMessage("Microsoft.Naming", "CA1714:FlagsEnumsShouldHavePluralNames")]
+    [Flags]
     public enum DataValidity
     {
         /// <summary>
         /// The data is valid.
         /// </summary>
-        Valid = 0,
+        Valid = 1,
 
         /// <summary>
         /// The data is invalid.
         /// </summary>
-        Invalid = 1,
+        Invalid = 2,
 
         /// <summary>
         /// The data is suspect; there is reason to believe it is not valid.
         /// </summary>
-        ValidationWarning = 2
+        ValidationWarning = 4
     }
 
     /// <summary>
@@ -2240,7 +2242,7 @@ namespace Extract.DataEntry
                 else if (recursive)
                 {
                     // Check to see that all subattributes have been viewed as well.
-                    return AttributeScanner.Scan(attribute.SubAttributes, null,
+                    return AttributeScanner<bool>.Scan(attribute.SubAttributes, null,
                         ConfirmDataViewed, true, true, true, null);
                 }
 
@@ -2282,7 +2284,7 @@ namespace Extract.DataEntry
             {
                 Stack<IAttribute> unviewedAttributes = new Stack<IAttribute>();
 
-                if (!AttributeScanner.Scan(attributes, startingPoint, ConfirmDataViewed, true,
+                if (!AttributeScanner<bool>.Scan(attributes, startingPoint, ConfirmDataViewed, true,
                     forward, loop, unviewedAttributes))
                 {
                     return unviewedAttributes;
@@ -2336,14 +2338,13 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Checks to see if the specified <see cref="IUnknownVector"/> of 
-        /// <see cref="IAttribute"/>'s (and their sub-attributes) have passed data validation. If 
-        /// not, the first invalid <see cref="IAttribute"/> is specified.
+        /// Finds the first attribute in the specified <see cref="IUnknownVector"/> of 
+        /// <see cref="IAttribute"/>'s to find one matching a <see cref="DataValidity"/>
+        /// in <see paramref="targetValidity"/>. 
         /// </summary>
         /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s 
         /// to be checked for whether its data is valid.</param>
-        /// <param name="includeWarnings">Whether attributes marked as
-        /// <see cref="InvalidDataSaveMode.AllowWithWarnings"/> should be included.</param>
+        /// <param name="targetValidity">The <see cref="DataValidity"/> value(s) sought.</param>
         /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
         /// the point at which the scan should be started with each attribute further down the
         /// the stack being a descendant to the previous <see cref="IAttribute"/> in the stack.
@@ -2354,30 +2355,25 @@ namespace Extract.DataEntry
         /// the <see cref="IAttribute"/>s (back to the starting point) if the end was reached 
         /// successfully, <see langword="false"/> to end the scan once the end of the 
         /// <see cref="IAttribute"/> vector is reached.</param>
-        /// <returns><see langword="true"/> if the data <see cref="IAttribute"/>s' data 
-        /// and the data of all sub-<see cref="IAttribute"/>s is know to be valid; 
-        /// <see langword="false"/> if any of descendants contain invalid data or if
-        /// the validity of their data has not yet been checked.</returns>
         /// <returns>A stack of <see cref="IAttribute"/>s
         /// where the first attribute in the stack represents the root-level attribute
-        /// the first invalid attribute is descended from, and each successive attribute represents
-        /// a sub-attribute to the previous until the final attribute is the first invalid attribute.
+        /// the first attribute matching targetValidity is descended from, and each successive
+        /// attribute represents a sub-attribute to the previous until the final attribute is
+        /// the first attribute matching targetValidity.
         /// </returns>
         [ComVisible(false)]
-        public static Stack<IAttribute> FindNextInvalidAttribute(IUnknownVector attributes,
-            bool includeWarnings, Stack<IAttribute> startingPoint, bool forward, bool loop)
+        public static Stack<IAttribute> FindNextAttributeByValidity(IUnknownVector attributes,
+            DataValidity targetValidity, Stack<IAttribute> startingPoint, bool forward, bool loop)
         {
             try
             {
                 Stack<IAttribute> invalidAttributes = new Stack<IAttribute>();
 
-                // Scan with ConfirmDataIsValid or ConfirmDataIsNotInvalid depending on the value of
-                // includeWarnings.
-                bool scanResult = includeWarnings ?
-                    AttributeScanner.Scan(attributes, startingPoint, ConfirmDataIsValid, true,
-                        forward, loop, invalidAttributes) :
-                    AttributeScanner.Scan(attributes, startingPoint, ConfirmDataIsNotInvalid, true,
-                        forward, loop, invalidAttributes);
+                // Keep scanning as long as an attribute's data DataValidityDoesNotMatch
+                // the targetValidity.
+                bool scanResult =
+                    AttributeScanner<DataValidity>.Scan(attributes, startingPoint,
+                        DataValidityDoesNotMatch, targetValidity, forward, loop, invalidAttributes);
 
                 if (!scanResult)
                 {
@@ -2518,7 +2514,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                return AttributeScanner.Scan(attributes, startingPoint, ConfirmHasBeenPropagated,
+                return AttributeScanner<bool>.Scan(attributes, startingPoint, ConfirmHasBeenPropagated,
                     true, true, true, unPropagatedAttributes);
             }
             catch (Exception ex)
@@ -2550,7 +2546,7 @@ namespace Extract.DataEntry
                 if (recursive)
                 {
                     // Mark all descendant attributes as propagated as well.
-                    AttributeScanner.Scan(attribute.SubAttributes, null, MarkAsPropagated,
+                    AttributeScanner<bool>.Scan(attribute.SubAttributes, null, MarkAsPropagated,
                         propagated, true, true, null);
                 }
             }
@@ -2671,7 +2667,7 @@ namespace Extract.DataEntry
 
                 Stack<IAttribute> nextTabStopAttributeGenealogy = new Stack<IAttribute>();
 
-                if (!AttributeScanner.Scan(
+                if (!AttributeScanner<bool>.Scan(
                         attributes, startingPoint, ConfirmIsTabStop, false, forward, true,
                         nextTabStopAttributeGenealogy))
                 {
@@ -2715,7 +2711,7 @@ namespace Extract.DataEntry
 
                 Stack<IAttribute> nextTabGroupAttributeGenealogy = new Stack<IAttribute>();
 
-                if (!AttributeScanner.Scan(
+                if (!AttributeScanner<bool>.Scan(
                         attributes, startingPoint, ConfirmIsTabGroup, false, forward, true,
                         nextTabGroupAttributeGenealogy))
                 {
@@ -2771,7 +2767,7 @@ namespace Extract.DataEntry
                 Stack<IAttribute> nextTabStopOrGroupAttributeGenealogy = new Stack<IAttribute>();
 
                 // Find the next tab stop or group attribute
-                if (!AttributeScanner.Scan(
+                if (!AttributeScanner<bool>.Scan(
                         attributes, startingPoint, ConfirmIsTabStopOrGroup, false, forward, true,
                         nextTabStopOrGroupAttributeGenealogy))
                 {

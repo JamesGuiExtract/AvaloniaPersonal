@@ -5123,8 +5123,8 @@ namespace Extract.DataEntry
                 // In the case that nothing is selected, navigate to the first invalid attribute as
                 // the starting point for validation.
                 currentlySelectedAttribute =
-                    AttributeStatusInfo.FindNextInvalidAttribute(_attributes,
-                        true, null, true, false);
+                    AttributeStatusInfo.FindNextAttributeByValidity(_attributes,
+                        DataValidity.Invalid | DataValidity.ValidationWarning, null, true, false);
 
                 // If there are no invalid attributes, we can return early from this call.
                 if (currentlySelectedAttribute == null || !currentlySelectedAttribute.Any())
@@ -6577,10 +6577,14 @@ namespace Extract.DataEntry
         /// else <see langword="false"/></returns>
         bool HasInvalidAttribute(bool includeValidationWarnings)
         {
+            var targetValidity = includeValidationWarnings
+                ? DataValidity.Invalid | DataValidity.ValidationWarning
+                : DataValidity.Invalid;
+
             // Look for any attributes whose data failed validation.
             Stack<IAttribute> invalidAttributeGenealogy =
-                AttributeStatusInfo.FindNextInvalidAttribute(_attributes,
-                    includeValidationWarnings, ActiveAttributeGenealogy(true, null), true, true);
+                AttributeStatusInfo.FindNextAttributeByValidity(_attributes,
+                    targetValidity, ActiveAttributeGenealogy(true, null), true, true);
 
             return invalidAttributeGenealogy != null;
         }
@@ -6613,10 +6617,14 @@ namespace Extract.DataEntry
                 control.Select();
             }
 
+            var targetValidity = includeValidationWarnings
+                ? DataValidity.Invalid | DataValidity.ValidationWarning
+                : DataValidity.Invalid;
+
             // Look for any attributes whose data failed validation.
             Stack<IAttribute> invalidAttributeGenealogy = 
-                AttributeStatusInfo.FindNextInvalidAttribute(_attributes, 
-                    includeValidationWarnings, ActiveAttributeGenealogy(true, null), true, true);
+                AttributeStatusInfo.FindNextAttributeByValidity(_attributes,
+                    targetValidity, ActiveAttributeGenealogy(true, null), true, true);
             
             if (invalidAttributeGenealogy != null)
             {
