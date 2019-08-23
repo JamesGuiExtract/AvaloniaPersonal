@@ -1257,7 +1257,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// Creates and STA thread to host the <see cref="_depPanel"/> to be used to format and validate all
         /// prposed output data.
         /// </summary>
-        static IPaginationDocumentDataPanel CreateDEPContainerThread(string documentDataPanelAssembly, ITagUtility tagUtility, uint minStackSize)
+        IPaginationDocumentDataPanel CreateDEPContainerThread(string documentDataPanelAssembly, ITagUtility tagUtility, uint minStackSize)
         {
             var createdEvent = new ManualResetEvent(false);
             IPaginationDocumentDataPanel panel = null;
@@ -1306,12 +1306,13 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="paginationDocumentDataPanelAssembly"></param>
         /// <returns>The <see cref="IPaginationDocumentDataPanel"/> that should be used to edit data
         /// for documents in the pagination pane.</returns>
-        static IPaginationDocumentDataPanel CreateDocumentDataPanel(string paginationDocumentDataPanelAssembly, ITagUtility tagUtility)
+        IPaginationDocumentDataPanel CreateDocumentDataPanel(string paginationDocumentDataPanelAssembly, ITagUtility tagUtility)
         {
             if (paginationDocumentDataPanelAssembly.EndsWith(".config", StringComparison.OrdinalIgnoreCase))
             {
                 var paginationPanelContainer =
-                    new DataEntryPanelContainer(paginationDocumentDataPanelAssembly, new NullDataEntryApp(), tagUtility, null);
+                    new DataEntryPanelContainer(
+                        paginationDocumentDataPanelAssembly, new NullDataEntryApp(_fileProcessingDB), tagUtility, null);
 
                 return paginationPanelContainer;
             }
