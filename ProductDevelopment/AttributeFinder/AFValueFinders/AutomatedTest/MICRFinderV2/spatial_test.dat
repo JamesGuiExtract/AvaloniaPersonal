@@ -1,0 +1,11 @@
+<SETTING>;VerificationCondition=micr
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;QueryForAutomatedRedaction=micr
+<SETTING>;AutomatedCondition=micr
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;CreateTestOutputVOAFiles=0
+
+<TESTFOLDER>;test1-default_micr_finder.rsd;.\ImagesWithUSS;;$DirOf(<SourceDocName>)\..\ExpectedVOAs\test1-$FileOf(<SourceDocName>).evoa
+<TESTFOLDER>;test2-micr_plus_no_subattributes.rsd;.\Images;;$DirOf(<SourceDocName>)\..\ExpectedVOAs\test2-$FileOf(<SourceDocName>).evoa 
+<TESTFOLDER>;test3-micr_plus_with_subattributes.rsd;.\Images;;$DirOf(<SourceDocName>)\..\ExpectedVOAs\test3-$FileOf(<SourceDocName>).evoa
+<TESTFOLDER>;test4-micr_plus_with_unrecognized.rsd;.\Images;;$DirOf(<SourceDocName>)\..\ExpectedVOAs\test3-$FileOf(<SourceDocName>).evoa

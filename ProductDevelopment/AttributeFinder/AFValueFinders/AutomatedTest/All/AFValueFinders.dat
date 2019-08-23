@@ -15,3 +15,5 @@
 <FILE>;..\ValueFromList\ValueFromList.dat
 <FILE>;..\DataQuery\DataQuery.dat
 <FILE>;..\TemplateFinder\test.dat
+<FILE>;..\BarcodeFinder\test.dat
+<FILE>;..\MICRFinderV2\test.dat

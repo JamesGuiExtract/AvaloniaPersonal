@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net46</TargetFramework>
+    <Platforms>x86</Platforms>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>..\bin\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Common\Utils.fs" />
+    <Compile Include="Fam.fs" />
+    <Compile Include="DropReferencedDBsApp.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Argu" Version="5.5.0" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net46" Version="1.0.0-preview.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Extract">
+      <HintPath>$(ES_DLL_DIR)\Extract.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.UCLID_FILEPROCESSINGLib">
+      <HintPath>$(ES_DLL_DIR)\Interop.UCLID_FILEPROCESSINGLib.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

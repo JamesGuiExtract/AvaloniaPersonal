@@ -1,0 +1,16 @@
+# MICR components will only be split if there is a match for this expression
+# Once a match is achieved, sub-components will be identified using the following specific group names:
+# 'Routing'
+# 'Account'
+# 'CheckNumber'
+# 'Amount'
+# Only these group names which exist in the expression will be available to configure to be split.
+# NOTE: After the corresponding text is extracted from the group, all spaces and special MICR chars
+# will be removed in the corresponding sub-attribute
+(?'CheckNumber'(U\s?)?([\^\d]\s?){3,}U)?
+\s*
+(?'Routing'(T\s?)?([\^\d]\s?(D\s?)?){4,}T)
+\s*
+(?'Account'([\^\d]\s?(D\s?)?){4,}U)
+\s*
+(?'CheckNumber'([\^\d]\s?){3,})?

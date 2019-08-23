@@ -1,0 +1,11 @@
+<SETTING>;VerificationCondition=barcode
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;QueryForAutomatedRedaction=barcode
+<SETTING>;AutomatedCondition=barcode
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;CreateTestOutputVOAFiles=0
+<SETTING>;TestOutputVoaPath=<SourceDocName>.testoutput.voa
+
+<TESTFOLDER>;test01-default_types.rsd;.\Images;;$DirOf(<SourceDocName>)\..\ExpectedVOAs\test01-$FileOf(<SourceDocName>).evoa
+<TESTFOLDER>;test01-default_types.rsd;.\ImagesWithUSS;;$DirOf(<SourceDocName>)\..\ExpectedVOAs\test01-$FileOf(<SourceDocName>).evoa
+<TESTFOLDER>;test02-almost_all_types.rsd;.\Images;;$DirOf(<SourceDocName>)\..\ExpectedVOAs\test02-$FileOf(<SourceDocName>).evoa 

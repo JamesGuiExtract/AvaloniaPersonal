@@ -1,0 +1,27 @@
+// Routing and account with optional check #
+(?'CheckNumber'(U\s?)?([\^\d]\s?){3,}U)?
+\s*
+(?'Routing'(T\s?)?([\^\d]\s?(D\s?)?){4,}T)
+\s*
+(?'Account'([\^\d]\s?(D\s?)?){4,}U)
+\s*
+(?'CheckNumber'([\^\d]\s?){3,})?
+
+| // Check #, Routing and optional, partial account (sample1.tiff)
+(?'CheckNumber'(U\s?)?([\^\d]\s?){3,}U)
+\s*
+(?'Routing'(T\s?)?([\^\d]\s?([TD]\s?)?){4,}T)
+\s*
+(?'Account'([\^\d]\s?(D\s?)?){4,})?
+
+| // Check # has special chars, and account ends in U, else use spaces (Checks_006.tif)
+(?'CheckNumber'(U\s?)?([\^\d]\s?){3,}U)
+\s
+(?'Routing'(T\s?)?([\^\d]\s?(D\s?)?){4,}T?)
+\s
+(?'Account'([\^\d]\s?(D\s?)?){4,}U)
+
+| // Routing and partial account
+(?'Routing'(T\s?)?([\^\d]\s?(D\s?)?){4,}T)
+\s*
+(?'Account'([\^\d]\s?(D\s?)?){4,})

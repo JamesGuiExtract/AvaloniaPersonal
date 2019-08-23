@@ -1,0 +1,2 @@
+#By default, require at least 3 consecutive regonized digits to qualify a MICR result.
+(\d\s?){3,}

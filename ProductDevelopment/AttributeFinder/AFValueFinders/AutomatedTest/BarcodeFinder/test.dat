@@ -1,0 +1,6 @@
+<TESTCASE>;test01-default_types.rsd;.\Images\barcodes3.pdf;;test01.pdf.eav
+<TESTCASE>;test01-default_types.rsd;.\Images\barcodes3.pdf.tif;;test01.tif.eav
+<TESTCASE>;test02-almost_all_types.rsd;.\Images\barcodes3.pdf;;test02.pdf.eav
+<TESTCASE>;test02-almost_all_types.rsd;.\Images\barcodes3.pdf.tif;;test02.tif.eav
+<TESTCASE>;test03-all_types.rsd;.\Images\barcodes3.pdf;;test03.pdf.eav
+<TESTCASE>;test03-all_types.rsd;.\Images\barcodes3.pdf.tif;;test03.tif.eav
