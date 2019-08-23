@@ -891,7 +891,7 @@ namespace Extract.FileActionManager.FileProcessors
                     if (AutoPaginateQualifier != null)
                     {
                         string proposedDocumentName = _paginatedOutputCreationUtility.GetPaginatedDocumentFileName(sourcePageInfos, pFAMTM);
-                        var documentStatusJson = outputData?.PendingDocumentStatus?.ToJson();
+                        var documentStatusJson = outputData.PendingDocumentStatus?.ToJson();
                         var serializedAttributes = _miscUtils.Value.GetObjectAsStringizedByteStream(docAttribute.SubAttributes);
 
                         if (!AutoPaginateQualifier.FileMatchesPaginationCondition(pFileRecord, proposedDocumentName,
@@ -1236,7 +1236,7 @@ namespace Extract.FileActionManager.FileProcessors
                 newFileInfo.FileName, outputData.Attributes, nonDeletedImagePages);
 
             _paginatedOutputCreationUtility.LinkFilesWithRecordIds(newFileInfo.FileID,
-                outputData?.PendingDocumentStatus.Orders, outputData.PendingDocumentStatus.Encounters);
+                outputData.PendingDocumentStatus?.Orders, outputData.PendingDocumentStatus?.Encounters);
 
             _fileProcessingDB.SetFileStatusToPending(newFileInfo.FileID, OutputAction,
                 vbAllowQueuedStatusOverride: true);

@@ -1442,7 +1442,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             using (var famData = new FAMData(FileProcessingDB))
             {
                 foreach (var document in documentsToCommit
-                    .Where(doc => doc.DocumentData.Orders?.Any() == true))
+                    .Where(doc => doc.DocumentData.Orders?.Any() == true
+                        && doc.PageControls.Any(c => !c.Deleted)))
                 {
                     if (document.FileID == -1)
                     {
@@ -1456,7 +1457,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 foreach (var document in documentsToCommit
-                   .Where(doc => doc.DocumentData.Encounters?.Any() == true))
+                   .Where(doc => doc.DocumentData.Encounters?.Any() == true
+                        && doc.PageControls.Any(c => !c.Deleted)))
                 {
                     if (document.FileID == -1)
                     {

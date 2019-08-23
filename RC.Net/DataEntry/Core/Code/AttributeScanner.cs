@@ -529,7 +529,7 @@ namespace Extract.DataEntry
         static bool DataValidityDoesNotMatch(IAttribute attribute,
             AttributeStatusInfo statusInfo, DataValidity targetValidity)
         {
-            return (!statusInfo._isViewable || !targetValidity.HasFlag(statusInfo._dataValidity));
+            return (!statusInfo._isViewable || (targetValidity & statusInfo._dataValidity) == 0);
         }
 
         /// <summary>
