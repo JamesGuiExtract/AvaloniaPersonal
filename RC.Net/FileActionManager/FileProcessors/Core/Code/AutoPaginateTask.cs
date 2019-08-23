@@ -874,6 +874,16 @@ namespace Extract.FileActionManager.FileProcessors
                 // Process each candidate pagination output document.
                 foreach (var docAttribute in attributeArray)
                 {
+                    // https://extract.atlassian.net/browse/ISSUE-16592
+                    // Do not process any candidate document that was previously generated (either by
+                    // auto -pagination or by the create paginated output task)
+                    var previousPaginationRequest = AttributeMethods.GetSingleAttributeByName(
+                        docAttribute.SubAttributes, "PaginationRequest");
+                    if (previousPaginationRequest != null)
+                    {
+                        continue;
+                    }
+
                     List<PageInfo> sourcePageInfos = GetSourcePageInfos(pFileRecord, docAttribute);
 
                     if (sourcePageInfos.All(page => page.Deleted))
