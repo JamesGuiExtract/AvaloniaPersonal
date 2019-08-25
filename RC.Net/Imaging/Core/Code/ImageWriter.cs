@@ -113,7 +113,7 @@ namespace Extract.Imaging
                 int count = image.PageCount;
 
                 _codecs.Save(image, _tempFile.FileName, _format, image.BitsPerPixel, 1, count,
-                            _pageCount + 1, CodecsSavePageMode.Append); 
+                    _pageCount + 1, CodecsSavePageMode.Append); 
 
                 _pageCount += count;
             }
@@ -162,7 +162,21 @@ namespace Extract.Imaging
         {
             try
             {
-                FileSystemMethods.MoveFile(_tempFile.FileName, _fileName, overwrite);
+                // https://extract.atlassian.net/browse/ISSUE-16595
+                // The files being produced by this class when running under the FAM service
+                // (rather than via an application being run via the UI) do not seem to have
+                // correct permissions applied. This can be worked around by creating the file
+                // via .Net and copying in the bytes rather tha moving the file itself.
+                using (var fileStream = new FileStream(_fileName,
+                    overwrite ? FileMode.Create : FileMode.CreateNew,
+                    FileAccess.ReadWrite))
+                {
+                    var fileData = File.ReadAllBytes(_tempFile.FileName);
+                    fileStream.Write(fileData, 0, fileData.Length);
+                }
+
+                FileSystemMethods.DeleteFile(_tempFile.FileName);
+
                 _tempFile.Dispose();
                 _tempFile = null;
             }
