@@ -288,7 +288,7 @@ public:
 	STDMETHOD(AddFileSet)(BSTR bstrFileSetName, IVariantVector *pvecIDs);
 	STDMETHOD(GetFileSetFileIDs)(BSTR bstrFileSetName, IVariantVector **ppvecFileIDs);
 	STDMETHOD(GetFileSetFileNames)(BSTR bstrFileSetName, IVariantVector **ppvecFileNames);
-	STDMETHOD(GetFileToProcess)(long nFileID, BSTR strAction, IFileRecord** ppFileRecord);
+	STDMETHOD(GetFileToProcess)(long nFileID, BSTR strAction, BSTR bstrFromState, IFileRecord** ppFileRecord);
 	STDMETHOD(SetFallbackStatus)(IFileRecord* pFileRecord, EActionStatus eaFallbackStatus);
 	STDMETHOD(GetWorkItemsToProcess)(BSTR bstrActionName, VARIANT_BOOL vbRestrictToFAMSessionID, 
 			long nMaxWorkItemsToReturn, EFilePriority eMinPriority, IIUnknownVector **ppWorkItems);
@@ -1336,7 +1336,7 @@ private:
 		EActionStatus * poldStatus);
 	bool GetFilesToProcess_Internal(bool bDBLocked, BSTR strAction,  long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, IIUnknownVector * * pvecFileRecords);
-	bool GetFileToProcess_Internal(bool bDBLocked, long nFileID, BSTR strAction, IFileRecord** ppFileRecord);
+	bool GetFileToProcess_Internal(bool bDBLocked, long nFileID, BSTR strAction, BSTR bstrFromState, IFileRecord** ppFileRecord);
 	bool RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BSTR strAction);
 	bool GetStats_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs, IActionStatistics* *pStats);
 	bool CopyActionStatusFromAction_Internal(bool bDBLocked, long  nFromAction, long nToAction);

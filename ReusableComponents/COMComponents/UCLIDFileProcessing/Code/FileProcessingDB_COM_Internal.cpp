@@ -3721,7 +3721,7 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetFileToProcess_Internal(bool bDBLocked, long nFileID, BSTR strAction,
+bool CFileProcessingDB::GetFileToProcess_Internal(bool bDBLocked, long nFileID, BSTR strAction, BSTR bstrFromState,
 												  IFileRecord** ppFileRecord)
 {
 	try
@@ -3729,6 +3729,9 @@ bool CFileProcessingDB::GetFileToProcess_Internal(bool bDBLocked, long nFileID, 
 		try
 		{
 			ASSERT_ARGUMENT("ELI37460", ppFileRecord != __nullptr);
+
+			string strFromState = asString(bstrFromState);
+			ASSERT_ARGUMENT("ELI47261", strFromState != "R");
 		
 			// Set the action name from the parameter
 			string strActionName = asString(strAction);
@@ -3752,21 +3755,25 @@ bool CFileProcessingDB::GetFileToProcess_Internal(bool bDBLocked, long nFileID, 
 			// All workflows is not allowed so this will be a singular ID
 			string strActionID = getActionIDsForActiveWorkflow(ipConnection, strActionName);
 			
-			// Unlike SelectFilesToProcess which will always be selecting files that already exist
-			// in the FileActionStatus table, specific file IDs passed into this method should not
-			// be assumed to exist in the table for the specified action. This query will insert
-			// the row that can be updated by setFilesToProcessing. 
-			string strInsertSQL =
-				"INSERT INTO [FileActionStatus] ([FileID], [ActionID], [ActionStatus], [Priority]) "
-				"SELECT <FileID>, <ActionID>, 'U', [FAMFile].[Priority] "
-				"FROM FAMFile LEFT JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID "
-				"	AND FileActionStatus.ActionID = <ActionID> "
-				"WHERE [FAMFile].[ID] = <FileID> AND ActionStatus IS NULL";
+			// Only need ot insert the U record if any from or from U
+			if (strFromState.empty() || strFromState == "U")
+			{
+				// Unlike SelectFilesToProcess which will always be selecting files that already exist
+				// in the FileActionStatus table, specific file IDs passed into this method should not
+				// be assumed to exist in the table for the specified action. This query will insert
+				// the row that can be updated by setFilesToProcessing. 
+				string strInsertSQL =
+					"INSERT INTO [FileActionStatus] ([FileID], [ActionID], [ActionStatus], [Priority]) "
+					"SELECT <FileID>, <ActionID>, 'U', [FAMFile].[Priority] "
+					"FROM FAMFile LEFT JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID "
+					"	AND FileActionStatus.ActionID = <ActionID> "
+					"WHERE [FAMFile].[ID] = <FileID> AND ActionStatus IS NULL";
 
-			replaceVariable(strInsertSQL, "<FileID>", strFileID);
-			replaceVariable(strInsertSQL, "<ActionID>", strActionID);
+				replaceVariable(strInsertSQL, "<FileID>", strFileID);
+				replaceVariable(strInsertSQL, "<ActionID>", strActionID);
 
-			executeCmdQuery(ipConnection, strInsertSQL);
+				executeCmdQuery(ipConnection, strInsertSQL);
+			}
 
 			// Select the required file info from the database based on the file ID and current action.
 			string strSelectSQL =
@@ -3779,6 +3786,10 @@ bool CFileProcessingDB::GetFileToProcess_Internal(bool bDBLocked, long nFileID, 
 
 			replaceVariable(strSelectSQL, "<FileID>", strFileID);
 			replaceVariable(strSelectSQL, "<ActionID>", strActionID);
+			if (!strFromState.empty())
+			{
+				strSelectSQL = strSelectSQL + " AND ActionStatus = '" + strFromState + "'";
+			}
 
 			// Perform all processing related to setting a file as processing.
 			IIUnknownVectorPtr ipFiles = setFilesToProcessing(

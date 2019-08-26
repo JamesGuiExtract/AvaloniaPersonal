@@ -1196,7 +1196,7 @@ bool FPRecordManager::loadTaskFromDB(long &rnFileId, bool bAllowQueuedStatusOver
 	}
 	else
 	{
-		ipRecord = m_ipFPMDB->GetFileToProcess(rnFileId, m_strAction.c_str());
+		ipRecord = m_ipFPMDB->GetFileToProcess(rnFileId, m_strAction.c_str(), "");
 		ASSERT_RESOURCE_ALLOCATION("ELI40155", ipRecord != __nullptr );
 	}
 

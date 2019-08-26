@@ -1659,9 +1659,11 @@ library UCLID_FILEPROCESSINGLib
 			[in] BSTR bstrFileSetName, [out, retval] IVariantVector **ppvecFileNames);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE:	Gets the specified file for processing. The status for the file will be set to
-		//			'R' in the specified action before this method returns. 
+		//			'R' in the specified action before this method returns.
+		//			if strFromState is an empty string any state except 'R' will be changed to 'R'
+		//			otherwise only the state that is specified 'R' is not allowed.
 		[id(131), helpstring("method GetFileToProcess")] HRESULT GetFileToProcess([in] long nFileID,
-			[in] BSTR strAction, [out, retval] IFileRecord** ppFileRecord);
+			[in] BSTR strAction, [in] BSTR bstrFromState, [out, retval] IFileRecord** ppFileRecord);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE:	Applies a new EActionStatus as the fallback status to return to if this
 		//			currently processing file is cancelled before processing completes.

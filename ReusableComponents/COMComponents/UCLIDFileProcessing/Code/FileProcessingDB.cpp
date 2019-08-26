@@ -3214,7 +3214,7 @@ STDMETHODIMP CFileProcessingDB::GetFileSetFileNames(BSTR bstrFileSetName,
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI37348");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetFileToProcess(long nFileID, BSTR strAction,
+STDMETHODIMP CFileProcessingDB::GetFileToProcess(long nFileID, BSTR strAction, BSTR bstrFromStatus,
 												 IFileRecord** ppFileRecord)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -3226,12 +3226,12 @@ STDMETHODIMP CFileProcessingDB::GetFileToProcess(long nFileID, BSTR strAction,
 		ASSERT_RUNTIME_CONDITION("ELI43393", !m_bRunningAllWorkflows,
 			"GetFileToProcess is not valid when processing <All workflows>");
 
-		if (!GetFileToProcess_Internal(false, nFileID, strAction, ppFileRecord))
+		if (!GetFileToProcess_Internal(false, nFileID, strAction, bstrFromStatus, ppFileRecord))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			GetFileToProcess_Internal(true, nFileID, strAction, ppFileRecord);
+			GetFileToProcess_Internal(true, nFileID, strAction, bstrFromStatus, ppFileRecord);
 		}
 
 		return S_OK;
