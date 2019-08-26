@@ -266,7 +266,7 @@ STDMETHODIMP CScansoftOCR2::RecognizeText(BSTR bstrImageFileName, IVariantVector
 
 			// a decomposition sequence is necessary to help identify the locations of handwritten 
 			// characters, but not used if locating printed text within a zone
-			if(bDetectHandwriting)
+			if(bDetectHandwriting || m_bLocateZonesInSpecifiedZone)
 			{
 				setDecompositionSequence(eDecompMethod);
 			}
@@ -1816,7 +1816,9 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 
 	// Define a new zone from pZone info
 	// NOTE: Handwriting recognition is handled after rotation and deskew
-	if (pZone != __nullptr && !bDetectHandwriting)
+	// If the area outside the zone was already filled then don't need to create a user zone
+	// (not creating a user zone helps makes OCR results when reOCRing via Select Page Region more consistent with standard OCR results)
+	if (pZone != __nullptr && !bDetectHandwriting && !m_bIgnoreAreaOutsideSpecifiedZone)
 	{
 		// Define and initialize a ZONE
 		ZONE zone;

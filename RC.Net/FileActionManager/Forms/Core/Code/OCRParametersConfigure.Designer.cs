@@ -250,11 +250,12 @@
             // 
             this.infoTip1.BackColor = System.Drawing.Color.Transparent;
             this.infoTip1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("infoTip1.BackgroundImage")));
-            this.infoTip1.Location = new System.Drawing.Point(256, 19);
+            this.infoTip1.Location = new System.Drawing.Point(266, 19);
             this.infoTip1.Name = "infoTip1";
             this.infoTip1.Size = new System.Drawing.Size(16, 16);
             this.infoTip1.TabIndex = 15;
-            this.infoTip1.TipText = "If false, the entire page will be used to detect rotation for reOCR operations";
+            this.infoTip1.TipText = "The biggest impact this has is with rotation detection but it can also impact how" +
+    " the OCR engine behaves in more subtle ways";
             // 
             // _locateZonesInsideSpecifiedZoneCheckBox
             // 
@@ -271,9 +272,9 @@
             this._ignoreAreaOutsideSpecifiedZoneCheckBox.AutoSize = true;
             this._ignoreAreaOutsideSpecifiedZoneCheckBox.Location = new System.Drawing.Point(5, 19);
             this._ignoreAreaOutsideSpecifiedZoneCheckBox.Name = "_ignoreAreaOutsideSpecifiedZoneCheckBox";
-            this._ignoreAreaOutsideSpecifiedZoneCheckBox.Size = new System.Drawing.Size(236, 17);
+            this._ignoreAreaOutsideSpecifiedZoneCheckBox.Size = new System.Drawing.Size(247, 17);
             this._ignoreAreaOutsideSpecifiedZoneCheckBox.TabIndex = 14;
-            this._ignoreAreaOutsideSpecifiedZoneCheckBox.Text = "Use only specified area for rotation detection";
+            this._ignoreAreaOutsideSpecifiedZoneCheckBox.Text = "Use only specified area (white-out rest of page)";
             this._ignoreAreaOutsideSpecifiedZoneCheckBox.UseVisualStyleBackColor = true;
             // 
             // groupBox4
