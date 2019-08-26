@@ -596,8 +596,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                while (!_documentStatusesUpdated.WaitOne(100))
+                for (int retry = 0; !_documentStatusesUpdated.WaitOne(100);  retry++)
                 {
+                    if (_pendingDocumentStatusUpdate.Count > 0)
+                    {
+                        retry = 0;
+                    }
+                    else if (retry >= 100)
+                    {
+                        _documentStatusesUpdated.Set();
+                        _pendingDocumentStatusUpdate.Clear();
+
+                        throw new ExtractException("ELI47260", "Stalled status update condition");
+                    }
+
                     Application.DoEvents();
                 }
             }
