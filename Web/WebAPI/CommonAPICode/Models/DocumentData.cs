@@ -372,20 +372,24 @@ namespace WebAPI.Models
                         processSkipped ? "S":"P");
 
                     HTTPError.Assert("ELI46297", StatusCodes.Status423Locked, fileRecord != null,
-                        "Document is not in the current queue", ("FileId", id, true));
+                        "Document is not in the current queue.", ("FileId", id, true));
                 }
                 else
                 {
                     var fileRecords = FileApi.FileProcessingDB.GetFilesToProcess(FileApi.Workflow.EditAction, 1, processSkipped, _user.GetUsername());
                     if (fileRecords.Size() == 0)
                     {
-                        if (retries > 0 && GetQueueStatus(userName).PendingDocuments > 1)
+                        if (retries > 0 )
                         {
-                            ExtractException retryException = new ExtractException("ELI47262", "Application Trace: Retry open document.");
-                            retryException.AddDebugData("Remaining Retries", retries);
-                            retryException.Log();
-                            
-                            return OpenDocument(id, processSkipped, userName, retries--);
+                            var queueStatus = GetQueueStatus(userName);
+                            if ((processSkipped ? queueStatus.skippedDocumentsForCurrentUser : queueStatus.PendingDocuments) > 0)
+                            {
+                                ExtractException retryException = new ExtractException("ELI47262", "Application Trace: Retry open document.");
+                                retryException.AddDebugData("Remaining Retries", retries);
+                                retryException.Log();
+
+                                return OpenDocument(id, processSkipped, userName, retries--);
+                            }
                         }
 
                         return new DocumentIdResult()
