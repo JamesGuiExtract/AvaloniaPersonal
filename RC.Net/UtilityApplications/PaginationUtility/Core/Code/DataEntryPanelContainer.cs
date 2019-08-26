@@ -1269,7 +1269,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 documentData.PendingDocumentStatus = 
-                    new DocumentStatus() { Exception = ex.AsExtract("ELI41453") };
+                    new DocumentStatus() { Exception = ex.CreateComVisible("ELI41453", "Failed to update document status") };
             }
             finally
             {

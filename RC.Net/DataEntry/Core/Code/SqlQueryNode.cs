@@ -264,15 +264,17 @@ namespace Extract.DataEntry
                 // Otherwise, execute the query and submit the results for caching.
                 else if (!string.IsNullOrWhiteSpace(sqlQuery.ToString()))
                 {
-                    DateTime startTime = DateTime.Now;
-
-                    // Execute the query.
-                    queryResults = DBMethods.GetQueryResultsAsStringArray(
-                        _currentConnection, sqlQuery.ToString(), parameters, ", ", SplitCsv);
-
-                    if (AllowCaching && !FlushCache)
+                    // Lock here to prevent timeout exceptions
+                    // https://extract.atlassian.net/browse/ISSUE-16590
+                    lock (_lock)
                     {
-                        lock (_lock)
+                        DateTime startTime = DateTime.Now;
+
+                        // Execute the query.
+                        queryResults = DBMethods.GetQueryResultsAsStringArray(
+                            _currentConnection, sqlQuery.ToString(), parameters, ", ", SplitCsv);
+
+                        if (AllowCaching && !FlushCache)
                         {
                             // Attempt to cache the results.
                             double executionTime = (DateTime.Now - startTime).TotalMilliseconds;
