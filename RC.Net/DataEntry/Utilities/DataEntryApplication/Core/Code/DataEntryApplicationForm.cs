@@ -3588,6 +3588,18 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// <c>true</c> would indicated this application is running the in the background; 
+        /// This form is visible to user, visible so return <c>false</c>.
+        /// </summary>
+        public bool RunningInBackground
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Saves the data currently displayed to disk.
         /// </summary>
         /// <param name="validateData"><see langword="true"/> to ensure the data is conforms to the

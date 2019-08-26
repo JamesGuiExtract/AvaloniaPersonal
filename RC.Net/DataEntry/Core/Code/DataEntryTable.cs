@@ -2007,22 +2007,28 @@ namespace Extract.DataEntry
 
                 _tabOrderPlaceholderAttributes.Clear();
 
-                try
+                // https://extract.atlassian.net/browse/ISSUE-16596
+                // Trying to access the clipboard in a background context can cause a exceptions which
+                // spam the log file.
+                if (DataEntryControlHost?.DataEntryApplication?.RunningInBackground == false)
                 {
-                    // [DataEntry:378]
-                    // Prevent copying and pasting table data between different documents.
-                    string rowDataType = GetDataFormatName(Clipboard.GetDataObject());
-                    if (!string.IsNullOrEmpty(rowDataType) && rowDataType != "System.String")
+                    try
                     {
-                        DataEntryMethods.ClearClipboardData();
+                        // [DataEntry:378]
+                        // Prevent copying and pasting table data between different documents.
+                        string rowDataType = GetDataFormatName(Clipboard.GetDataObject());
+                        if (!string.IsNullOrEmpty(rowDataType) && rowDataType != "System.String")
+                        {
+                            DataEntryMethods.ClearClipboardData();
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    // https://extract.atlassian.net/browse/ISSUE-14294
-                    // Clipboard operations being finicky has long been an issue. Don't allow a
-                    // failure checking clipboard data to cause a larger issue.
-                    ex.ExtractLog("ELI41660");
+                    catch (Exception ex)
+                    {
+                        // https://extract.atlassian.net/browse/ISSUE-14294
+                        // Clipboard operations being finicky has long been an issue. Don't allow a
+                        // failure checking clipboard data to cause a larger issue.
+                        ex.ExtractLog("ELI41660");
+                    }
                 }
             }
             catch (Exception ex)

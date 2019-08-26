@@ -266,7 +266,7 @@
     </Compile>
     <Compile Include="LuceneAutoSuggest.cs" />
     <Compile Include="NativeMethods.cs" />
-    <Compile Include="NullDataEntryApp.cs" />
+    <Compile Include="BackgroundDataEntryApp.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

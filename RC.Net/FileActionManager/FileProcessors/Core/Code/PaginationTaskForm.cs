@@ -639,6 +639,18 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+        /// <summary>
+        /// <c>true</c> would indicated this application is running the in the background; 
+        /// This form is visible to user, visible so return <c>false</c>.
+        /// </summary>
+        public bool RunningInBackground
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         #endregion IDataEntryApplication
 
         #region Overrides

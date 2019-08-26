@@ -1322,7 +1322,7 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 var paginationPanelContainer =
                     new DataEntryPanelContainer(
-                        paginationDocumentDataPanelAssembly, new NullDataEntryApp(_fileProcessingDB), tagUtility, null);
+                        paginationDocumentDataPanelAssembly, new BackgroundDataEntryApp(_fileProcessingDB), tagUtility, null);
 
                 return paginationPanelContainer;
             }

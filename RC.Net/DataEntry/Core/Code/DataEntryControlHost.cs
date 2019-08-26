@@ -3512,7 +3512,11 @@ namespace Extract.DataEntry
                 // that the new attribute's value ends with that it has been pasted.
                 // NOTE: Don't call Clipboard.ContainsText separately... that seems to lead to
                 // "Clipboard operation did not succeed" exceptions in this case.
-                if (e.AutoUpdatedAttributes.Count == 0)
+                // https://extract.atlassian.net/browse/ISSUE-16596
+                // Trying to access the clipboard in a background context can cause a exceptions which
+                // spam the log file.
+                if (e.AutoUpdatedAttributes.Count == 0
+                     && DataEntryApplication?.RunningInBackground == false)
                 {
                     IDataEntryControl owningControl =
                         AttributeStatusInfo.GetOwningControl(e.Attribute);

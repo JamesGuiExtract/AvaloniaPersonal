@@ -147,6 +147,17 @@ namespace Extract.DataEntry
             get;
         }
 
+        /// <summary>
+        /// <c>true</c> if this application is running the in the background-- either for background
+        /// loading of all documents in the pagination verification UI or as part of the pagination
+        /// verification task; <c>false</c> if the application is displaying the data entry
+        /// controls to a user.
+        /// </summary>
+        bool RunningInBackground
+        {
+            get;
+        }
+
         #endregion Properties
 
         #region Methods

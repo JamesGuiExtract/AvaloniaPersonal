@@ -404,7 +404,7 @@ namespace Extract.DataEntry
             try
             {
                 var manager = new DataEntryConfigurationManager<T>(
-                    new NullDataEntryApp(), _tagUtility, _applicationConfig, null, null);
+                    new BackgroundDataEntryApp(), _tagUtility, _applicationConfig, null, null);
 
                 manager.IsBackgroundManager = true;
                 manager.ChangeActiveDocumentType(null, true);
