@@ -596,20 +596,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                for (int retry = 0; !_documentStatusesUpdated.WaitOne(100);  retry++)
+                while (!_documentStatusesUpdated.WaitOne(100))
                 {
-                    if (_pendingDocumentStatusUpdate.Count > 0)
-                    {
-                        retry = 0;
-                    }
-                    else if (retry >= 100)
-                    {
-                        _documentStatusesUpdated.Set();
-                        _pendingDocumentStatusUpdate.Clear();
-
-                        throw new ExtractException("ELI47260", "Stalled status update condition");
-                    }
-
                     Application.DoEvents();
                 }
             }
@@ -1150,8 +1138,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return;
                 }
 
-                _documentStatusesUpdated.Reset();
-
                 string serializedAttributes = _miscUtils.GetObjectAsStringizedByteStream(documentData.WorkingAttributes);
 
                 var backgroundConfigManager = _configManager.CreateBackgroundManager();
@@ -1188,6 +1174,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }));
 
                 thread.SetApartmentState(ApartmentState.STA);
+
+                _documentStatusesUpdated.Reset();
+
                 thread.Start();
             }
             catch (Exception ex)

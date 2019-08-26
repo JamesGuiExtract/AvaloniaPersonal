@@ -1246,12 +1246,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _primaryPageLayoutControl.ClearSelection();
 
                 // Depending upon the manipulations that occurred, there may be some displayed
-                // documents that have been left without any pages. Disregard these.
+                // documents that have been left without any pages. There could also be rare
+                // circumstances where all none of the pages in a previously processed document
+                // are from a different document. In either case, these documents don't represent
+                // an active source document. Disregard these.
                 var documentsToRemove = _displayedDocuments
-                    .Where(doc => !doc.PageControls.Any())
+                    .Where(doc => !doc.PageControls.Any(c => c.Page.SourceDocument != null))
                     .ToArray();
                 foreach (var document in documentsToRemove)
                 {
+                    _primaryPageLayoutControl.DeleteOutputDocument(document);
                     _displayedDocuments.Remove(document);
                 }
 
@@ -3169,15 +3173,22 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     sourceFileName = document.PageControls
                         .Select(c => c.Page.SourceDocument?.FileName)
-                        .First(n => n != null);
-                    SavingData?.Invoke(this, new SavingDataEventArgs(sourceFileName));
-                    _documentDataPanel.UpdateDocumentData(document.DocumentData, statusOnly: false, 
-                        displayValidationErrors: validateData);
+                        .FirstOrDefault(n => n != null);
+
+                    if (sourceFileName != null)
+                    {
+                        SavingData?.Invoke(this, new SavingDataEventArgs(sourceFileName));
+                        _documentDataPanel.UpdateDocumentData(document.DocumentData, statusOnly: false,
+                            displayValidationErrors: validateData);
+                    }
                 }
 
-                _documentDataPanel.WaitForDocumentStatusUpdates();
+                if (sourceFileName != null)
+                {
+                    _documentDataPanel.WaitForDocumentStatusUpdates();
 
-                DoneSavingData?.Invoke(this, new SavingDataEventArgs(sourceFileName));
+                    DoneSavingData?.Invoke(this, new SavingDataEventArgs(sourceFileName));
+                }
             }
 
             if (validateData)
