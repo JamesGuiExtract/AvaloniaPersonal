@@ -196,7 +196,10 @@ namespace WebAPI.Models
 
                 var result = JsonConvert.DeserializeObject<WebAppSettingsResult>(json);
 
-                result.ParsedDocumentTypes = File.ReadAllLines(result.DocumentTypes);
+                if(!string.IsNullOrEmpty(result.DocumentTypes))
+                {
+                    result.ParsedDocumentTypes = File.ReadAllLines(result.DocumentTypes);
+                }
 
                 return result;
             }
