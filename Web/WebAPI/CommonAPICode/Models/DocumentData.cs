@@ -391,7 +391,7 @@ namespace WebAPI.Models
                                 retryException.AddDebugData("Remaining Retries", retries);
                                 retryException.Log();
 
-                                return OpenDocument(id, processSkipped, userName, retries--);
+                                return OpenDocument(id, processSkipped, userName, --retries);
                             }
                         }
 
