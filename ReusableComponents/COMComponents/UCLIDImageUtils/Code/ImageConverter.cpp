@@ -183,8 +183,6 @@ STDMETHODIMP CImageConverter::InterfaceSupportsErrorInfo(REFIID riid)
 void CImageConverter::validateLicense()
 {
 	VALIDATE_LICENSE(gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI45146", "ImageConverter");
-	// Since we will be using the Nuance PDF conversion, ensure we are licensed for it.
-	VALIDATE_LICENSE(gnPDF_READWRITE_FEATURE, "ELI45147", "ImageConverter");
 }
 //-------------------------------------------------------------------------------------------------
 void CImageConverter::initNuanceEngineAndLicense()
