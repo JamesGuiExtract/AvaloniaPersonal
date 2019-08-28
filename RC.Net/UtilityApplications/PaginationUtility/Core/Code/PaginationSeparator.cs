@@ -344,6 +344,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             _outputDocument.Invalidated -= HandleDocument_Invalidated;
                             _outputDocument.DocumentStateChanged -= HandleOutputDocument_DocumentStateChanged;
+
+                            // https://extract.atlassian.net/browse/ISSUE-16619
+                            // Output documents will be dynamically assigned a separator based on the position
+                            // of the controls in the panel in UpdateControls(). If the document for this separator
+                            // is being re-assigned, document needs to be dis-associated with this instance, else
+                            // in a case such as when all pages are moved to another document multiple documents
+                            // will identify with the same separator causing issues when applying documents.
+                            if (_outputDocument.PaginationSeparator == this)
+                            {
+                                _outputDocument.PaginationSeparator = null;
+                            }
                         }
 
                         _outputDocument = document;

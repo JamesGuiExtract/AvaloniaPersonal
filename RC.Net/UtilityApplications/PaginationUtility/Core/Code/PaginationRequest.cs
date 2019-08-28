@@ -1,6 +1,7 @@
 ﻿using Extract.AttributeFinder;
 using Extract.Imaging;
 using Extract.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -37,6 +38,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             FileTaskSessionId = fileTaskSessionId;
             OutputFileId = outputFileId;
             ImagePages = (imagePages ?? new ImagePage[0]).ToList().AsReadOnly();
+            RequestDateTime = DateTime.Now;
         }
 
         /// <summary>
@@ -55,6 +57,13 @@ namespace Extract.UtilityApplications.PaginationUtility
             OutputFileId = int.Parse(
                 AttributeMethods.GetSingleAttributeByName(requestAttribute.SubAttributes, "OutputFileId").Value.String,
                 CultureInfo.InvariantCulture);
+
+            var requestDateTimeAttribute = AttributeMethods.GetSingleAttributeByName(requestAttribute.SubAttributes, "RequestDateTime");
+            RequestDateTime = (requestDateTimeAttribute == null)
+                ? DateTime.Now
+                : DateTime.Parse(
+                    AttributeMethods.GetSingleAttributeByName(requestAttribute.SubAttributes, "RequestDateTime").Value.String,
+                    CultureInfo.InvariantCulture);
 
             var pageAttributes = AttributeMethods.GetAttributesByName(requestAttribute.SubAttributes, "Page");
             ImagePages = pageAttributes.AsEnumerable<IAttribute>()
@@ -79,6 +88,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         public int OutputFileId { get; set; }
 
         /// <summary>
+        /// Gets or sets the DateTime of the pagination request
+        /// </summary>
+        public DateTime RequestDateTime { get; set; }
+
+        /// <summary>
         /// Gets or sets the ID of the output file generated.
         /// </summary>
         public ReadOnlyCollection<ImagePage> ImagePages { get; private set; }
@@ -96,6 +110,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 requestAttribute.AddSubAttribute("Type", requestType.ToString());
                 requestAttribute.AddSubAttribute("SourceTaskSessionID", FileTaskSessionId.ToString(CultureInfo.InvariantCulture));
                 requestAttribute.AddSubAttribute("OutputFileID", OutputFileId.ToString(CultureInfo.InvariantCulture));
+                requestAttribute.AddSubAttribute("RequestDateTime", RequestDateTime.ToString("G", CultureInfo.InvariantCulture));
 
                 requestAttribute.SubAttributes.Append(
                     ImagePages.Select((page, pageNum) => page.GetAsAttribute(++pageNum))
