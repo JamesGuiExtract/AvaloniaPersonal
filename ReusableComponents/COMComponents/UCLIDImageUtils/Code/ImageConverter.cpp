@@ -97,6 +97,13 @@ RecMemoryReleaser<RECPAGESTRUCT>::~RecMemoryReleaser()
 //-------------------------------------------------------------------------------------------------
 CImageConverter::CImageConverter()
 {
+	try
+	{
+		// construct the path to ImageFormatConverter relative to the common components directory
+		m_strImageFormatConverterEXE = getModuleDirectory(_Module.m_hInst);
+		m_strImageFormatConverterEXE += "\\ImageFormatConverter.exe";
+	}
+	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI47275");
 }
 //-------------------------------------------------------------------------------------------------
 CImageConverter::~CImageConverter()
@@ -106,7 +113,8 @@ CImageConverter::~CImageConverter()
 //-------------------------------------------------------------------------------------------------
 // IImageConverter
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CImageConverter::GetPDFImage(BSTR bstrFileName, int nPage, VARIANT *pImageData)
+STDMETHODIMP CImageConverter::GetPDFImage(BSTR bstrFileName, int nPage, VARIANT_BOOL vbUseSeparateProcess,
+	VARIANT *pImageData)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	
@@ -119,7 +127,14 @@ STDMETHODIMP CImageConverter::GetPDFImage(BSTR bstrFileName, int nPage, VARIANT 
 
 		string strFileName = asString(bstrFileName);
 
-		convertPageToPDF(strFileName, nPage, pImageData);
+		if (vbUseSeparateProcess == VARIANT_FALSE)
+		{
+			convertPageToPDF(strFileName, nPage, pImageData);
+		}
+		else
+		{
+			convertPageToPdfWithSeparateProcess(strFileName, nPage, pImageData);
+		}
 
 		return S_OK;
 	}
@@ -320,6 +335,35 @@ void CImageConverter::convertPageToPDF(const string& strInputFileName, int nPage
 			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI45165");
 		}
 
+		ue.addDebugInfo("Source image", strInputFileName);
+		ue.addDebugInfo("Page", asString(nPage + 1));
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CImageConverter::convertPageToPdfWithSeparateProcess(const string& strInputFileName, int nPage, VARIANT *pImageData)
+{
+	unique_ptr<TemporaryFileName> pTempOutputFile;
+
+	try
+	{
+		try
+		{
+			pTempOutputFile = std::make_unique<TemporaryFileName>(true, (const char*)NULL, ".pdf", true);
+			string strTempOutputFileName = pTempOutputFile->getName();
+
+			// Execute the utility to convert page to PDF
+			string strArgs = "\"" + strInputFileName + "\" \"" + strTempOutputFileName + "\" /pdf /page " + asString(nPage);
+			DWORD dwExitCode = runExeWithProcessKiller(m_strImageFormatConverterEXE, true, strArgs);
+
+			ASSERT_RUNTIME_CONDITION("ELI47276", dwExitCode == EXIT_SUCCESS, "ImageFormatConverter Failed");
+
+			readFileDataToVariant(strTempOutputFileName, pImageData);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45164");
+	}
+	catch (UCLIDException &ue)
+	{
 		ue.addDebugInfo("Source image", strInputFileName);
 		ue.addDebugInfo("Page", asString(nPage + 1));
 		throw ue;

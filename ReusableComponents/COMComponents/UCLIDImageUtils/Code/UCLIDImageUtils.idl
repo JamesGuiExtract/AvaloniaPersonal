@@ -290,7 +290,7 @@ library UCLID_IMAGEUTILSLib
 	{
 		// Gets the specified image page as a PDF.
 		[id(1), helpstring("method GetPDFImage")] HRESULT GetPDFImage(
-			[in] BSTR bstrFileName, [in] int nPage, [out, retval] VARIANT *pImageData);
+			[in] BSTR bstrFileName, [in] int nPage, VARIANT_BOOL vbUseSeparateProcess, [out, retval] VARIANT *pImageData);
 	}
 
 	//----------------------------------------------------------------------------------------------

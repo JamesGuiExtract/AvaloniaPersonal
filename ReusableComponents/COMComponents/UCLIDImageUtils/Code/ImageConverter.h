@@ -51,12 +51,14 @@ END_COM_MAP()
 
 // IImageConverter
 public:
-	STDMETHOD(GetPDFImage)(BSTR bstrFileName, int nPage, VARIANT *pImageData);
+	STDMETHOD(GetPDFImage)(BSTR bstrFileName, int nPage, VARIANT_BOOL vbUseSeparateProcess, VARIANT *pImageData);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 	
 private:
+
+	string m_strImageFormatConverterEXE;
 
 	////////////////////
 	// Methods
@@ -66,6 +68,8 @@ private:
 	void initNuanceEngineAndLicense();
 	//---------------------------------------------------------------------------------------------
 	void convertPageToPDF(const string& strInputFileName, int nPage, VARIANT *pImageData);
+	//---------------------------------------------------------------------------------------------
+	void convertPageToPdfWithSeparateProcess(const string& strInputFileName, int nPage, VARIANT *pImageData);
 	//---------------------------------------------------------------------------------------------
 	void readFileDataToVariant(const string& strFileName, VARIANT *pFileData);
 };

@@ -566,6 +566,180 @@ void nuanceConvertImage(const string strInputFileName, const string strOutputFil
 	}
 }
 //-------------------------------------------------------------------------------------------------
+void nuanceConvertImagePage(const string strInputFileName, const string strOutputFileName, 
+				  EConverterFileType eOutputType, bool bPreserveColor, int nPage,
+				  IMF_FORMAT nExplicitFormat, int nCompressionLevel)
+{
+	// [LegacyRCAndUtils:6275]
+	// Since we will be using the Nuance engine, ensure we are licensed for it.
+	VALIDATE_LICENSE( gnOCR_ON_CLIENT_FEATURE, "ELI47263", "ImageFormatConverter" );
+
+	IMF_FORMAT nFormat(FF_TIFNO);
+	bool bOutputImageOpened(false);
+	unique_ptr<HIMGFILE> uphOutputImage(__nullptr);
+
+	try
+	{
+		try
+		{
+			// initialize the Nuance engine and any necessary licensing thereof
+			initNuanceEngineAndLicense();
+
+			HIMGFILE hInputImage;
+			THROW_UE_ON_ERROR("ELI47264", "Unable to open source image file.",
+				kRecOpenImgFile(strInputFileName.c_str(), &hInputImage, IMGF_READ, FF_SIZE));
+
+			// Ensure that the memory stored for the image file is released
+			RecMemoryReleaser<tagIMGFILEHANDLE> inputImageFileMemoryReleaser(hInputImage);
+
+			int nPageCount = 0;
+			THROW_UE_ON_ERROR("ELI47265", "Unable to get page count.",
+				kRecGetImgFilePageCount(hInputImage, &nPageCount));
+
+			// Set format and temp file extension based on the ouput type. If the extension doesn't
+			// match the format, the nuance engine will throw and error when saving.
+			string strExt;
+			switch (eOutputType)
+			{
+				case kFileType_Tif:
+					strExt = ".tif";
+					break;
+				case kFileType_Pdf:
+					strExt = ".pdf";
+					break;
+
+				case kFileType_Jpg:
+					strExt = ".jpg";
+					break;
+			}
+
+			if (nCompressionLevel > 0)
+			{
+				kRecSetCompressionLevel(0, nCompressionLevel);
+			}
+
+			// If the destination file name exists before Nuance tries to open it, it will throw an error.
+			// If the destination file name exists before Nuance tries to open it, it will throw an error.
+			if (isFileOrFolderValid(strOutputFileName))
+			{
+				deleteFile(strOutputFileName);
+			}
+
+			// Don't use RecMemoryReleaser on the output image because we will need to manually
+			// close it at the end of this method to be able to copy it to its permanent location.
+			uphOutputImage = std::make_unique<HIMGFILE>();
+			THROW_UE_ON_ERROR("ELI47266", "Unable to create destination image file.",
+				kRecOpenImgFile(strOutputFileName.c_str(), uphOutputImage.get(), IMGF_RDWR, FF_SIZE));
+
+			bOutputImageOpened = true;
+
+			ASSERT_RUNTIME_CONDITION("ELI47267", nPage > 0 && nPage <= nPageCount, "Page must be less than or equal to input document page count");
+
+			IMG_INFO imgInfo = {0};
+			bool bConversionSet = false;
+			nFormat = FF_TIFNO;
+			if (nExplicitFormat >= 0)
+			{
+				nFormat = nExplicitFormat;
+			}
+			else if (eOutputType == kFileType_Tif && !bPreserveColor)
+			{
+				nFormat = FF_TIFG4;
+			}
+			else if (eOutputType == kFileType_Jpg)
+			{
+				nFormat = FF_JPG_SUPERB;
+			}
+			else
+			{
+				IMF_FORMAT imgFormat;
+				THROW_UE_ON_ERROR("ELI47268", "Failed to identify image format.",
+					kRecGetImgFilePageInfo(0, hInputImage, nPage - 1, &imgInfo, &imgFormat));
+				int nBitsPerPixel = imgInfo.BitsPerPixel;
+
+				switch (eOutputType)
+				{
+				case kFileType_Tif:
+				{
+					nFormat = (nBitsPerPixel == 1) ? FF_TIFG4 : FF_TIFLZW;
+				}
+				break;
+
+				case kFileType_Pdf:
+				{
+					// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
+					// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
+					// FF_PDF_SUPERB.
+					nFormat = (nBitsPerPixel == 1) ? FF_PDF_SUPERB : FF_PDF_GOOD;
+				}
+				break;
+				}
+			}
+
+			// https://extract.atlassian.net/browse/ISSUE-12162
+			// kRecSetImgConvMode(0, CNV_AUTO) should be called only in the case that we are
+			// outputting tif files without preserving color depth, otherwise color information will
+			// be stripped out.
+			if (eOutputType == kFileType_Tif
+				&& (!bPreserveColor || nFormat != FF_TIFNO && nFormat != FF_TIFPB && nFormat != FF_TIFLZW))
+			{
+				if (!bConversionSet)
+				{
+					THROW_UE_ON_ERROR("ELI47269", "Unable to set image conversion method.",
+						kRecSetImgConvMode(0, CNV_AUTO));
+					bConversionSet = true;
+				}
+			}
+			else if (bConversionSet)
+			{
+				THROW_UE_ON_ERROR("ELI47270", "Unable to set image conversion method.",
+					kRecSetImgConvMode(0, CNV_NO));
+				bConversionSet = false;
+			}
+
+			// NOTE: RecAPI uses zero-based page number indexes
+			HPAGE hImagePage;
+			loadPageFromImageHandle(strInputFileName, hInputImage, nPage - 1, &hImagePage);
+
+			// Ensure that the memory stored for the image page is released.
+			RecMemoryReleaser<RECPAGESTRUCT> pageMemoryReleaser(hImagePage);
+
+			if (eOutputType == kFileType_Jpg)
+			{
+				THROW_UE_ON_ERROR("ELI47271", "Cannot save to image page in jpg format.",
+					kRecSaveImgForce(0, *uphOutputImage, nFormat, hImagePage, II_CURRENT, FALSE));
+			}
+			else
+			{
+				THROW_UE_ON_ERROR("ELI47272", "Cannot save to image page in the specified format.",
+					kRecSaveImg(0, *uphOutputImage, nFormat, hImagePage, II_CURRENT, TRUE));
+			}
+
+			kRecCloseImgFile(*uphOutputImage);
+
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI47273");
+	}
+	catch (UCLIDException &ue)
+	{
+		// We need to close the out image file if the output image file was opened but we didn't
+		// make it to the "happy case" close call.
+		if (bOutputImageOpened && nPage != -1)
+		{
+			try
+			{
+				kRecCloseImgFile(*uphOutputImage);
+			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI47274");
+		}
+
+		ue.addDebugInfo("Source image", strInputFileName);
+		ue.addDebugInfo("Page", asString(nPage));
+		ue.addDebugInfo("Format", asString((int)nFormat));
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
 // Will perform the image conversion and will also retain the existing annotations
 // if bRetainAnnotations is true.
 // If the output format is a tif then the annotations will remain as annotations
@@ -991,6 +1165,7 @@ void usage()
 					" \t\tAllow all options = 255.\n"
 					"The optional argument /vp [perspective_id] will set the view perspective of the output to the specified value (1-8) or to 1 (top-left) if the perspective_id is not specified.\n"
 					"The optional argument /am will use an alternate method to perform the conversion. This option is not compatible with any other optional argument except '/RemovePages', '/ef', '/color' and '/format'. \n"
+					"The optional argument /page [page_number] will write a single converted page directly to the output file. This option implies /am and thus is not compatible with any other optional argument except '/ef', '/color' and '/format'. \n"
 					"The optional argument /RemovePages will exclude the specified pages from the output. The pages can be specified as an individual page number, a comma-separated list, \n"
 					"\ta range of pages denoted with a hyphen, or a dash followed by a number to indicate the last x pages should be removed. \n"
 					"The optional argument /color will preserve the color depth of the source image even if the output is a tif image. If this option is not used, all tif output images will be bitonal regardless of source bit depth. \n"
@@ -1116,6 +1291,8 @@ BOOL CImageFormatConverterApp::InitInstance()
 				string strPagesToRemove;
 				IMF_FORMAT eExplicitFormat = (IMF_FORMAT)-1;
 				int nCompressionLevel = -1;
+				bool bSinglePage = false;
+				long nPage = -1;
 				for (size_t i=3; i < uiParamCount; i++)
 				{
 					string strTemp = vecParams[i];
@@ -1194,6 +1371,30 @@ BOOL CImageFormatConverterApp::InitInstance()
 					else if (strTemp == "/am")
 					{
 						bUseNuance = true;
+					}
+					else if (strTemp == "/page")
+					{
+						bSinglePage = bUseNuance = true;
+						i++;
+						if (i >= uiParamCount)
+						{
+							usage();
+							return FALSE;
+						}
+						
+						strTemp = vecParams[i];
+						try
+						{
+							nPage = asLong(strTemp);
+						}
+						catch (...) {}
+
+						if (nPage < 1)
+						{
+							string strMsg = "Invalid page number! Expecting > 0, got '" + strTemp + "'";
+							AfxMessageBox(strMsg.c_str());
+							return FALSE;
+						}
 					}
 					// [LegacyRCAndUtils:6461]
 					// Allows specified pages to be excluded from the output
@@ -1321,7 +1522,12 @@ BOOL CImageFormatConverterApp::InitInstance()
 					VALIDATE_LICENSE(gnREMOVE_IMAGE_PAGES, "ELI36150", "RemovePages" );
 				}
 
-				if (bUseNuance)
+				if (bSinglePage)
+				{
+					nuanceConvertImagePage(strInputName, strOutputName, eOutputType, bPreserveColor,
+						nPage, eExplicitFormat, nCompressionLevel);
+				}
+				else if (bUseNuance)
 				{
 					if (bRetainAnnotations || !strUserPassword.empty() || !strOwnerPassword.empty() ||
 						nOwnerPermissions != 0 || nViewPerspective != 0)

@@ -1113,7 +1113,7 @@ namespace WebAPI.Models
                 AssertRequestFilePage("ELI45174", fileId, pageNum);
 
                 var fileName = GetSourceFileName(fileId);
-                byte[] imageData = (byte[])ImageConverter.GetPDFImage(fileName, pageNum);
+                byte[] imageData = (byte[])ImageConverter.GetPDFImage(fileName, pageNum, true);
 
                 return imageData;
             }
