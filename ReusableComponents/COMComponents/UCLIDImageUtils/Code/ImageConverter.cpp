@@ -15,6 +15,9 @@
 
 #include <set>
 
+// add license management password function
+DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
+
 //-------------------------------------------------------------------------------------------------
 // Macros
 //-------------------------------------------------------------------------------------------------
@@ -354,13 +357,49 @@ void CImageConverter::convertPageToPdfWithSeparateProcess(const string& strInput
 
 			// Execute the utility to convert page to PDF
 			string strArgs = "\"" + strInputFileName + "\" \"" + strTempOutputFileName + "\" /pdf /page " + asString(nPage);
-			DWORD dwExitCode = runExeWithProcessKiller(m_strImageFormatConverterEXE, true, strArgs);
+			try
+			{
+				runExeWithProcessKiller(m_strImageFormatConverterEXE, true, strArgs);
+			}
+			catch (UCLIDException &ue)
+			{
+				bool bLicenseError = false;
+				for (auto&& debugItem : ue.getDebugVector())
+				{
+					auto& debugValue = debugItem.GetPair();
+					if (debugValue.getType() == ValueTypePair::kString)
+					{
+						string& strVal = debugValue.getStringValue();
+						if (strVal == "API_LICENSEMGR_ERR")
+						{
+							bLicenseError = true;
+							break;
+						}
+					}
+				}
+				if (bLicenseError)
+				{
+					// Log original exception
+					ue.log();
 
-			ASSERT_RUNTIME_CONDITION("ELI47276", dwExitCode == EXIT_SUCCESS, "ImageFormatConverter Failed");
+					IPrivateLicensedComponentPtr ipOCREngine(CLSID_ScansoftOCR);
+					ASSERT_RESOURCE_ALLOCATION("ELI47277", ipOCREngine != __nullptr);
+
+					// This will reset the license if needed
+					ipOCREngine->InitPrivateLicense(LICENSE_MGMT_PASSWORD.c_str());
+
+					// Try again
+					runExeWithProcessKiller(m_strImageFormatConverterEXE, true, strArgs);
+				}
+				else
+				{
+					throw;
+				}
+			}
 
 			readFileDataToVariant(strTempOutputFileName, pImageData);
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45164");
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI47276");
 	}
 	catch (UCLIDException &ue)
 	{
