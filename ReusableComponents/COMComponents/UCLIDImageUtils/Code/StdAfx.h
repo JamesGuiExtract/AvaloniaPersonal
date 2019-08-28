@@ -31,9 +31,6 @@ using namespace UCLID_COMLMLib;
 	rename("LoadImage", "LoadRasterImage")
 using namespace UCLID_RASTERANDOCRMGMTLib;
 
-#import "..\..\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.tlb" named_guids
-using namespace UCLID_SSOCRLib;
-
 #import "UCLIDImageUtils.tlb" 
 
 //{{AFX_INSERT_LOCATION}}

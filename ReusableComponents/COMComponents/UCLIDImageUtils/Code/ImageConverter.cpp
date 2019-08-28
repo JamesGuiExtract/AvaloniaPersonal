@@ -382,7 +382,7 @@ void CImageConverter::convertPageToPdfWithSeparateProcess(const string& strInput
 					// Log original exception
 					ue.log();
 
-					IPrivateLicensedComponentPtr ipOCREngine(CLSID_ScansoftOCR);
+					IPrivateLicensedComponentPtr ipOCREngine("SSOCR.ScansoftOCR");
 					ASSERT_RESOURCE_ALLOCATION("ELI47277", ipOCREngine != __nullptr);
 
 					// This will reset the license if needed
