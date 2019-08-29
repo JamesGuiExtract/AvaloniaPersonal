@@ -1261,7 +1261,7 @@ namespace Extract.FileActionManager.FileProcessors
                 outputData.PendingDocumentStatus?.Orders, outputData.PendingDocumentStatus?.Encounters);
 
             _fileProcessingDB.SetStatusForFile(
-                pFileRecord.FileID,
+                newFileInfo.FileID,
                 OutputAction,
                 pFileRecord.WorkflowID,
                 EActionStatus.kActionPending,

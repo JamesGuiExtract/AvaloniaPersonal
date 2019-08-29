@@ -63,9 +63,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             var requestDateTimeAttribute = AttributeMethods.GetSingleAttributeByName(requestAttribute.SubAttributes, "RequestDateTime");
             RequestDateTime = (requestDateTimeAttribute == null)
                 ? DateTime.Now
-                : DateTime.Parse(
-                    AttributeMethods.GetSingleAttributeByName(requestAttribute.SubAttributes, "RequestDateTime").Value.String,
-                    CultureInfo.InvariantCulture);
+                : DateTime.Parse(requestDateTimeAttribute.Value.String, CultureInfo.InvariantCulture);
 
             var pageAttributes = AttributeMethods.GetAttributesByName(requestAttribute.SubAttributes, "Page");
             ImagePages = pageAttributes.AsEnumerable<IAttribute>()
