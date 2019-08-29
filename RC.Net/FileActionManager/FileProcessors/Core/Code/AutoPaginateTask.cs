@@ -803,13 +803,25 @@ namespace Extract.FileActionManager.FileProcessors
 
                 if (fullyPaginated && !string.IsNullOrWhiteSpace(SourceActionIfFullyPaginated))
                 {
-                    pDB.SetFileStatusToPending(pFileRecord.FileID, SourceActionIfFullyPaginated,
-                        vbAllowQueuedStatusOverride: true);
+                    pDB.SetStatusForFile(
+                        pFileRecord.FileID,
+                        SourceActionIfFullyPaginated,
+                        pFileRecord.WorkflowID,
+                        EActionStatus.kActionPending,
+                        vbQueueChangeIfProcessing: true,
+                        vbAllowQueuedStatusOverride: false,
+                        out EActionStatus oldStatus);
                 }
                 else if (!fullyPaginated && !string.IsNullOrWhiteSpace(SourceActionIfNotFullyPaginated))
                 {
-                    pDB.SetFileStatusToPending(pFileRecord.FileID, SourceActionIfNotFullyPaginated,
-                        vbAllowQueuedStatusOverride: true);
+                    pDB.SetStatusForFile(
+                        pFileRecord.FileID,
+                        SourceActionIfNotFullyPaginated,
+                        pFileRecord.WorkflowID,
+                        EActionStatus.kActionPending,
+                        vbQueueChangeIfProcessing: true,
+                        vbAllowQueuedStatusOverride: false,
+                        out EActionStatus oldStatus);
                 }
 
                 var sessionSeconds = (DateTime.Now - sessionStartTime).TotalSeconds;
@@ -1248,8 +1260,14 @@ namespace Extract.FileActionManager.FileProcessors
             _paginatedOutputCreationUtility.LinkFilesWithRecordIds(newFileInfo.FileID,
                 outputData.PendingDocumentStatus?.Orders, outputData.PendingDocumentStatus?.Encounters);
 
-            _fileProcessingDB.SetFileStatusToPending(newFileInfo.FileID, OutputAction,
-                vbAllowQueuedStatusOverride: true);
+            _fileProcessingDB.SetStatusForFile(
+                pFileRecord.FileID,
+                OutputAction,
+                pFileRecord.WorkflowID,
+                EActionStatus.kActionPending,
+                vbQueueChangeIfProcessing: true,
+                vbAllowQueuedStatusOverride: false,
+                out EActionStatus oldStatus);
 
             if (!string.IsNullOrWhiteSpace(AutoPaginatedTag))
             {
