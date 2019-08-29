@@ -336,6 +336,7 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@COPY /v  "$(BinariesFolder)\Obfuscated\SpecialImageFormatConverter.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\ResolutionNormalizer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\DashboardViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V  "$(BinariesFolder)\Obfuscated\DashboardCreator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\NERAnnotator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\TrainingDataCollector.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\TrainingCoordinator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
