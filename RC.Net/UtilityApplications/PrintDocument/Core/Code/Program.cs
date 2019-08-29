@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using Extract.Imaging.Utilities;
 
 namespace Extract.PrintDocument
 {
@@ -28,6 +29,8 @@ namespace Extract.PrintDocument
 
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
                     "ELI36005", "Print document utility");
+
+                UnlockLeadtools.UnlockLeadToolsSupport();
 
                 // Check the number of command line arguments
                 if (args.Length < 1 || args[0] == "/?")
