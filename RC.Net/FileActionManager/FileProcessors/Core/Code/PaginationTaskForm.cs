@@ -1205,7 +1205,9 @@ namespace Extract.FileActionManager.FileProcessors
                 e.OutputFileName = newFileInfo.FileName;
 
                 e.DocumentData.PaginationRequest = new PaginationRequest(
-                    sessionData.SessionID, newFileInfo.FileID, 
+                    PaginationRequestType.Verified,
+                    sessionData.SessionID, 
+                    newFileInfo.FileID, 
                     e.SourcePageInfo
                         .Select(p => p.ImagePage)
                         .ToList()
@@ -1260,7 +1262,8 @@ namespace Extract.FileActionManager.FileProcessors
                 _paginatedOutputCreationUtility.WritePaginationHistory(
                     e.DeletePageInfo, -1, sessionData.SessionID);
 
-                e.DocumentData.PaginationRequest = new PaginationRequest(sessionData.SessionID, -1, null);
+                e.DocumentData.PaginationRequest = new PaginationRequest(
+                    PaginationRequestType.Verified, sessionData.SessionID, -1, null);
             }
             catch (Exception ex)
             {

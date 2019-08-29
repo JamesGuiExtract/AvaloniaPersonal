@@ -29,12 +29,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Initializes a new instance of the <see cref="PaginationRequest"/> class.
         /// </summary>
+        /// <param name="requestType">The <see cref="PaginationRequestType"/> of this request.</param>
         /// <param name="fileTaskSessionId">The file task session ID from the process that generated the request.</param>
         /// <param name="outputFileId">The ID of the output file generated.</param>
         /// <param name="imagePages">The source document <see cref="ImagePage"/>s representing each
         /// successive page in the requested pagination output document.</param>
-        public PaginationRequest(int fileTaskSessionId, int outputFileId, IEnumerable<ImagePage> imagePages)
+        public PaginationRequest(PaginationRequestType requestType, int fileTaskSessionId, int outputFileId, IEnumerable<ImagePage> imagePages)
         {
+            PaginationRequestType = requestType;
             FileTaskSessionId = fileTaskSessionId;
             OutputFileId = outputFileId;
             ImagePages = (imagePages ?? new ImagePage[0]).ToList().AsReadOnly();
@@ -101,13 +103,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Returns an <see cref="IAttribute"/> representing this instance.
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public IAttribute GetAsAttribute(PaginationRequestType requestType)
+        public IAttribute GetAsAttribute()
         {
             try
             {
                 var requestAttribute = new AttributeClass() { Name = "PaginationRequest" };
 
-                requestAttribute.AddSubAttribute("Type", requestType.ToString());
+                requestAttribute.AddSubAttribute("Type", PaginationRequestType.ToString());
                 requestAttribute.AddSubAttribute("SourceTaskSessionID", FileTaskSessionId.ToString(CultureInfo.InvariantCulture));
                 requestAttribute.AddSubAttribute("OutputFileID", OutputFileId.ToString(CultureInfo.InvariantCulture));
                 requestAttribute.AddSubAttribute("RequestDateTime", RequestDateTime.ToString("G", CultureInfo.InvariantCulture));

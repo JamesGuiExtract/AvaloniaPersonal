@@ -3125,7 +3125,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (outputDoc.DocumentData.PaginationRequest != null)
             {
                 documentAttribute.SubAttributes.PushBack(
-                    outputDoc.DocumentData.PaginationRequest.GetAsAttribute(PaginationRequestType.Verified));
+                    outputDoc.DocumentData.PaginationRequest.GetAsAttribute());
             }
 
             documentAttribute.SubAttributes.PushBack(outputDoc.DocumentData.DocumentDataAttribute);

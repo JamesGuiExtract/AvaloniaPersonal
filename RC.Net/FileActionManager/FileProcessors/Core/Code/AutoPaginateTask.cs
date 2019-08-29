@@ -1275,10 +1275,11 @@ namespace Extract.FileActionManager.FileProcessors
             }
 
             var paginationRequest = new PaginationRequest(
-                fileTaskSessionID, newFileInfo.FileID,
+                PaginationRequestType.Automatic,
+                fileTaskSessionID, 
+                newFileInfo.FileID,
                 sourcePageInfos.Select(p => p.ImagePage));
-            docAttribute.SubAttributes.PushBack(
-                paginationRequest.GetAsAttribute(PaginationRequestType.Automatic));
+            docAttribute.SubAttributes.PushBack(paginationRequest.GetAsAttribute());
         }
 
         /// <summary>
