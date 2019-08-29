@@ -810,7 +810,7 @@ namespace Extract.FileActionManager.FileProcessors
                         EActionStatus.kActionPending,
                         vbQueueChangeIfProcessing: true,
                         vbAllowQueuedStatusOverride: false,
-                        out EActionStatus oldStatus);
+                        poldStatus: out EActionStatus oldStatus);
                 }
                 else if (!fullyPaginated && !string.IsNullOrWhiteSpace(SourceActionIfNotFullyPaginated))
                 {
@@ -821,7 +821,7 @@ namespace Extract.FileActionManager.FileProcessors
                         EActionStatus.kActionPending,
                         vbQueueChangeIfProcessing: true,
                         vbAllowQueuedStatusOverride: false,
-                        out EActionStatus oldStatus);
+                        poldStatus: out EActionStatus oldStatus);
                 }
 
                 var sessionSeconds = (DateTime.Now - sessionStartTime).TotalSeconds;
@@ -1267,7 +1267,7 @@ namespace Extract.FileActionManager.FileProcessors
                 EActionStatus.kActionPending,
                 vbQueueChangeIfProcessing: true,
                 vbAllowQueuedStatusOverride: false,
-                out EActionStatus oldStatus);
+                poldStatus: out EActionStatus oldStatus);
 
             if (!string.IsNullOrWhiteSpace(AutoPaginatedTag))
             {
