@@ -39,7 +39,6 @@
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label1;
             this._filterCharsWhenSplittingCheckBox = new System.Windows.Forms.CheckBox();
-            this.fileActionManagerPathTagButton1 = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._micrSplitterRegexTextBox = new System.Windows.Forms.TextBox();
             this._micrSplitterRegexBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._splitAccountCheckBox = new System.Windows.Forms.CheckBox();
@@ -54,7 +53,6 @@
             this.browseButton1 = new Extract.Utilities.Forms.BrowseButton();
             this._inheritOCRParametersCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this._regexFilterFileNamePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._filterRegExTextBox = new System.Windows.Forms.TextBox();
             this._regexFilterFileNameBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._lowConfidenceCheckBox = new System.Windows.Forms.CheckBox();
@@ -63,6 +61,8 @@
             this._lowConfidenceLabel2 = new System.Windows.Forms.Label();
             this._highConfidenceUpDown = new System.Windows.Forms.NumericUpDown();
             this._returnUnrecognizedCharactersCheckBox = new System.Windows.Forms.CheckBox();
+            this._regexFilterFileNamePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
+            this._micrSplitterRegexPathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             groupBox1 = new System.Windows.Forms.GroupBox();
             infoTip4 = new Extract.Utilities.Forms.InfoTip();
             label4 = new System.Windows.Forms.Label();
@@ -84,7 +84,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             groupBox1.Controls.Add(this._filterCharsWhenSplittingCheckBox);
             groupBox1.Controls.Add(infoTip4);
-            groupBox1.Controls.Add(this.fileActionManagerPathTagButton1);
+            groupBox1.Controls.Add(this._micrSplitterRegexPathTagButton);
             groupBox1.Controls.Add(this._micrSplitterRegexBrowseButton);
             groupBox1.Controls.Add(this._micrSplitterRegexTextBox);
             groupBox1.Controls.Add(label4);
@@ -120,18 +120,6 @@
             infoTip4.Size = new System.Drawing.Size(16, 16);
             infoTip4.TabIndex = 6;
             infoTip4.TipText = resources.GetString("infoTip4.TipText");
-            // 
-            // fileActionManagerPathTagButton1
-            // 
-            this.fileActionManagerPathTagButton1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.fileActionManagerPathTagButton1.Image = ((System.Drawing.Image)(resources.GetObject("fileActionManagerPathTagButton1.Image")));
-            this.fileActionManagerPathTagButton1.Location = new System.Drawing.Point(521, 131);
-            this.fileActionManagerPathTagButton1.Name = "fileActionManagerPathTagButton1";
-            this.fileActionManagerPathTagButton1.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
-            this.fileActionManagerPathTagButton1.Size = new System.Drawing.Size(18, 20);
-            this.fileActionManagerPathTagButton1.TabIndex = 8;
-            this.fileActionManagerPathTagButton1.TextControl = this._micrSplitterRegexTextBox;
-            this.fileActionManagerPathTagButton1.UseVisualStyleBackColor = true;
             // 
             // _micrSplitterRegexTextBox
             // 
@@ -365,18 +353,6 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Filter";
             // 
-            // _regexFilterFileNamePathTagsButton
-            // 
-            this._regexFilterFileNamePathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._regexFilterFileNamePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_regexFilterFileNamePathTagsButton.Image")));
-            this._regexFilterFileNamePathTagsButton.Location = new System.Drawing.Point(520, 127);
-            this._regexFilterFileNamePathTagsButton.Name = "_regexFilterFileNamePathTagsButton";
-            this._regexFilterFileNamePathTagsButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
-            this._regexFilterFileNamePathTagsButton.Size = new System.Drawing.Size(18, 20);
-            this._regexFilterFileNamePathTagsButton.TabIndex = 24;
-            this._regexFilterFileNamePathTagsButton.TextControl = this._filterRegExTextBox;
-            this._regexFilterFileNamePathTagsButton.UseVisualStyleBackColor = true;
-            // 
             // _filterRegExTextBox
             // 
             this._filterRegExTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -452,6 +428,30 @@
             this._returnUnrecognizedCharactersCheckBox.Text = "Include unrecognized characters (as ^)";
             this._returnUnrecognizedCharactersCheckBox.UseVisualStyleBackColor = true;
             // 
+            // _regexFilterFileNamePathTagsButton
+            // 
+            this._regexFilterFileNamePathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._regexFilterFileNamePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_regexFilterFileNamePathTagsButton.Image")));
+            this._regexFilterFileNamePathTagsButton.Location = new System.Drawing.Point(520, 127);
+            this._regexFilterFileNamePathTagsButton.Name = "_regexFilterFileNamePathTagsButton";
+            this._regexFilterFileNamePathTagsButton.PathTags = new AttributeFinderPathTags();
+            this._regexFilterFileNamePathTagsButton.Size = new System.Drawing.Size(18, 20);
+            this._regexFilterFileNamePathTagsButton.TabIndex = 24;
+            this._regexFilterFileNamePathTagsButton.TextControl = this._filterRegExTextBox;
+            this._regexFilterFileNamePathTagsButton.UseVisualStyleBackColor = true;
+            // 
+            // _micrSplitterRegexPathTagButton
+            // 
+            this._micrSplitterRegexPathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._micrSplitterRegexPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_micrSplitterRegexPathTagButton.Image")));
+            this._micrSplitterRegexPathTagButton.Location = new System.Drawing.Point(521, 131);
+            this._micrSplitterRegexPathTagButton.Name = "_micrSplitterRegexPathTagButton";
+            this._micrSplitterRegexPathTagButton.PathTags = new AttributeFinderPathTags();
+            this._micrSplitterRegexPathTagButton.Size = new System.Drawing.Size(18, 20);
+            this._micrSplitterRegexPathTagButton.TabIndex = 8;
+            this._micrSplitterRegexPathTagButton.TextControl = this._micrSplitterRegexTextBox;
+            this._micrSplitterRegexPathTagButton.UseVisualStyleBackColor = true;
+            // 
             // MicrFinderSettingsDialog
             // 
             this.AcceptButton = this._okButton;
@@ -495,7 +495,7 @@
         private System.Windows.Forms.CheckBox _splitCheckCheckBox;
         private System.Windows.Forms.CheckBox _splitAmountCheckBox;
         private Utilities.Forms.BrowseButton _configFileNameBrowseButton;
-        private FileActionManager.Forms.FileActionManagerPathTagButton fileActionManagerPathTagButton1;
+        private FileActionManager.Forms.FileActionManagerPathTagButton _micrSplitterRegexPathTagButton;
         private System.Windows.Forms.TextBox _micrSplitterRegexTextBox;
         private Utilities.Forms.BrowseButton _micrSplitterRegexBrowseButton;
         private System.Windows.Forms.TextBox _micrSplitterTextBox;
