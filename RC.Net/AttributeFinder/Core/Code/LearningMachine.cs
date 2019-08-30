@@ -610,8 +610,8 @@ namespace Extract.AttributeFinder
                 }
 
                 IEnumerable<double[]> inputs = Encoder.GetFeatureVectors(document, attributeVector);
-                var outputsAndScores = inputs.Select(v => Classifier.ComputeAnswer(v));
-                var outputs = (UseUnknownCategory
+                List<(int answerCode, double? score)> outputsAndScores = inputs.Select(v => Classifier.ComputeAnswer(v)).ToList();
+                List<string> outputs = (UseUnknownCategory
                         ? outputsAndScores
                             .Select(t =>
                                 t.score is double score && score < UnknownCategoryCutoff
@@ -660,10 +660,15 @@ namespace Extract.AttributeFinder
                     int numberOfPages = isFirstPageList.Count + 1;
 
                     // - 2 because isFirstPageList is zero-indexed and does not include the first page of the image
-                    Func<int, bool> isFirstPage = sourcePage => isFirstPageList[sourcePage - 2];
+                    bool isFirstPage(int sourcePage) => sourcePage == 1
+                        ? true
+                        : isFirstPageList[sourcePage - 2];
+                    double pageScore(int sourcePage) => sourcePage == 1 || sourcePage > numberOfPages
+                        ? 1
+                        : outputsAndScores[sourcePage - 2].score ?? double.NaN;
 
                     var paginationAttributes = CreatePaginationAttributes(document.SourceDocName,
-                        numberOfPages, isFirstPage, document, inputPageAttributes);
+                        numberOfPages, isFirstPage, pageScore, document, inputPageAttributes);
                     resultingAttributes.AddRange(paginationAttributes);
 
                     attributeVector.Clear();
@@ -1613,6 +1618,7 @@ namespace Extract.AttributeFinder
         /// <param name="numberOfPages">The number of pages in the source document</param>
         /// <param name="isFirstPage">Function used to determine whether a source page number is
         /// the first page of a paginated document</param>
+        /// <param name="pageScore">Function to lookup the confidence score for a source page number</param>
         /// <param name="sourceDocument">Optional source document <see cref="SpatialString"/></param>
         /// <param name="inputPageAttributes">Optional collection of one attribute per page to be
         /// added as subattributes to the appropriate Document attribute in the output</param>
@@ -1621,6 +1627,7 @@ namespace Extract.AttributeFinder
             string sourceDocName,
             int numberOfPages,
             Func<int, bool> isFirstPage,
+            Func<int, double> pageScore,
             ISpatialString sourceDocument = null,
             IList<ComAttribute> inputPageAttributes = null)
         {
@@ -1631,8 +1638,11 @@ namespace Extract.AttributeFinder
 
                 var resultingAttributes = new List<ComAttribute>();
                 int firstPageInRange = 1;
+                double docScore = 1;
                 for (int nextPageNumber = 2; nextPageNumber <= numberOfPages + 1; nextPageNumber++)
                 {
+                    docScore *= pageScore(nextPageNumber);
+
                     if (nextPageNumber > numberOfPages || isFirstPage(nextPageNumber))
                     {
                         int lastPageInRange = nextPageNumber - 1;
@@ -1667,12 +1677,17 @@ namespace Extract.AttributeFinder
                         }
 
                         var documentAttribute = new ComAttribute { Name = "Document", Value = ss };
+                        resultingAttributes.Add(documentAttribute);
 
                         // Add a Pages attribute to denote the range of pages in this document
                         ss = new SpatialStringClass();
                         ss.CreateNonSpatialString(range, sourceDocName);
                         documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = "Pages", Value = ss });
-                        resultingAttributes.Add(documentAttribute);
+
+                        // Add a PaginationConfidence attribute
+                        ss = new SpatialStringClass();
+                        ss.CreateNonSpatialString(string.Format(CultureInfo.InvariantCulture, "{0:N4}", docScore), sourceDocName);
+                        documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = "PaginationConfidence", Value = ss });
 
                         // Add input page attributes that are in this range
                         if (inputPageAttributes != null)
@@ -1686,6 +1701,7 @@ namespace Extract.AttributeFinder
 
                         // Set up next page range
                         firstPageInRange = nextPageNumber;
+                        docScore = pageScore(nextPageNumber);
                     }
                 }
 
