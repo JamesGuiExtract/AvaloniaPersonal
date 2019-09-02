@@ -3551,6 +3551,8 @@ namespace Extract.DataEntry
 
             // The style to use for table cells when the table is disabled.
             _disabledCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
+            _disabledCellStyle.SelectionForeColor = SystemColors.GrayText;
+            _disabledCellStyle.ForeColor = SystemColors.GrayText;
             _disabledCellStyle.SelectionBackColor = SystemColors.Control;
             _disabledCellStyle.BackColor = SystemColors.Control;
         }

@@ -980,7 +980,7 @@ namespace Extract.AttributeFinder.Rules
                 // In case the there are multiple configurations for different document types,
                 // ensure the proper configuration is loaded for the supplied data.
                 // NOTE: Probably better that forDisplay be false, but don't want to change late in 10.5 cycle.
-                dataEntryApplicationForm.ActiveDataEntryControlHost.LoadData(attributes, null, forDisplay: true);
+                dataEntryApplicationForm.ActiveDataEntryControlHost.LoadData(attributes, null, forEditing: true);
                 IUnknownVector loadedAttributes =
                     dataEntryApplicationForm.ActiveDataEntryControlHost.GetData(false);
                 ExtractException.Assert("ELI41673", "Failed to load data", loadedAttributes != null);

@@ -724,6 +724,26 @@ namespace Extract.DataEntry
         /// </summary>
         private MessageFilterType _messageFilters;
 
+        /// <summary>
+        /// Indicates whether validation errors/warnings will be flagged with an icon in the DEP
+        /// </summary>
+        bool _showValidationIcons = true;
+
+        /// <summary>
+        /// The icon to show for any validation errors
+        /// </summary>
+        Icon _errorIcon;
+
+        /// <summary>
+        /// The icon to show for any validation warnings.
+        /// </summary>
+        Icon _warningIcon;
+
+        /// <summary>
+        /// The icon to show in place of _errorIcon or _warningIcon if _showValidationIcons == false;
+        /// </summary>
+        Icon _blankIcon;
+
         #endregion Fields
 
         #region Delegates
@@ -788,8 +808,11 @@ namespace Extract.DataEntry
                 LayerObject.SelectionPen = ExtractPens.GetThickPen(Color.Gray);
 
                 // Blinking error icons are annoying and unnecessary.
+
                 _validationErrorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
                 _validationWarningErrorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
+
+                _errorIcon = _validationErrorProvider.Icon;
 
                 // Scale SystemIcons.Warning down to 16x16 for _validationWarningErrorProvider
                 using (Bitmap scaledBitmap = new Bitmap(16, 16))
@@ -798,12 +821,27 @@ namespace Extract.DataEntry
                     {
                         graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
                         graphics.DrawImage(SystemIcons.Warning.ToBitmap(), 0, 0, 16, 16);
-                        using (Icon warningIcon = Icon.FromHandle(scaledBitmap.GetHicon()))
-                        {
-                            // NOTE: This requires the icon to be explicitly destroyed via
-                            // NativeMethods.DestroyIcon to prevent GDI object leaks.
-                            _validationWarningErrorProvider.Icon = warningIcon;
-                        }
+
+                        // NOTE: This requires the icon to be explicitly destroyed via
+                        // NativeMethods.DestroyIcon to prevent GDI object leaks.
+                        _warningIcon = Icon.FromHandle(scaledBitmap.GetHicon());
+                        _validationWarningErrorProvider.Icon = _warningIcon;
+                    }
+                }
+
+                // Create transparent 1 pixel icon to use if ShowValidationIcons == false
+                // (ErrorProvider does not allow for a null icon)
+                using (Bitmap blankImage = new Bitmap(1, 1))
+                {
+                    blankImage.SetPixel(0, 0, Color.FromArgb(0, 0, 0, 0));
+                    using (Graphics graphics = Graphics.FromImage(blankImage))
+                    {
+                        graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        graphics.DrawImage(SystemIcons.Warning.ToBitmap(), 0, 0, 16, 16);
+
+                        // NOTE: This requires the icon to be explicitly destroyed via
+                        // NativeMethods.DestroyIcon to prevent GDI object leaks.
+                        _blankIcon = Icon.FromHandle(blankImage.GetHicon());
                     }
                 }
             }
@@ -1409,6 +1447,36 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Gets or sets whether validation errors/warnings will be flagged with an icon in the DEP.
+        /// </summary>
+        public virtual bool ShowValidationIcons
+        {
+            get
+            {
+                return _showValidationIcons;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _showValidationIcons)
+                    {
+                        // _blankIcon is a transparent 1 pixel icon (ErrorProvider does not allow for a null icon)
+                        _validationErrorProvider.Icon = value ? _errorIcon : _blankIcon;
+                        _validationWarningErrorProvider.Icon = value ? _warningIcon : _blankIcon;
+
+                        _showValidationIcons = value;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI47280");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region IImageViewerControl Members
@@ -1698,9 +1766,10 @@ namespace Extract.DataEntry
         /// DEP, remove data validation warnings and to disable the DEP.</param>
         /// <param name="sourceDocName">The name of the source document to which
         /// <see paramref="attributes"/> correspond.</param>
-        /// <param name="forDisplay"><c>true</c> if the loaded data is to be displayed; <c>false</c>
-        /// if the data is being loaded only for data manipulation or validation.</param>
-        public void LoadData(IUnknownVector attributes, string sourceDocName, bool forDisplay)
+        /// <param name="forEditing"><c>true</c> if the loaded data is to be displayed for editing;
+        /// <c>false</c> if the data is to be displayed read-only, or if it is being used for
+        /// background formatting.</param>
+        public void LoadData(IUnknownVector attributes, string sourceDocName, bool forEditing)
         {
             try
             {
@@ -1866,7 +1935,7 @@ namespace Extract.DataEntry
                     // Some tasks (such as selecting the first control), must take place after the
                     // ImageFileChanged event is complete. Use BeginInvoke to schedule
                     // FinalizeDocumentLoad at the end of the current message queue.
-                    if (forDisplay)
+                    if (forEditing)
                     {
                         this.SafeBeginInvoke("ELI34448", () => FinalizeDocumentLoad());
                     }
@@ -3108,13 +3177,20 @@ namespace Extract.DataEntry
 
                 if (_validationWarningErrorProvider != null)
                 {
-                    if (_validationWarningErrorProvider.Icon != null)
-                    {
-                        NativeMethods.DestroyIcon(_validationWarningErrorProvider.Icon);
-                        _validationWarningErrorProvider.Icon.Dispose();
-                    }
                     _validationWarningErrorProvider.Dispose();
                     _validationWarningErrorProvider = null;
+                }
+
+                if (_warningIcon != null)
+                {
+                    NativeMethods.DestroyIcon(_warningIcon);
+                    _warningIcon = null;
+                }
+
+                if (_blankIcon != null)
+                {
+                    NativeMethods.DestroyIcon(_blankIcon);
+                    _blankIcon = null;
                 }
 
                 if (_toolTipFont != null)

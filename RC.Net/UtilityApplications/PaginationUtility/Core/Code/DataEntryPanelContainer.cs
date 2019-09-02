@@ -152,6 +152,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         ManualResetEvent _documentStatusesUpdated = new ManualResetEvent(true);
 
+        /// <summary>
+        /// Whether this panel's data should be editable (!read-only).
+        /// </summary>
+        bool _editable = true;
+
         #endregion Fields
 
         #region Constructors
@@ -411,12 +416,49 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets or sets whether this panel should be editable (!read-only).
+        /// </summary>
+        public bool Editable
+        {
+            get
+            {
+                return _editable;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _editable)
+                    {
+                        _editable = value;
+
+                        Enabled = Editable;
+
+                        if (ActiveDataEntryPanel != null)
+                        {
+                            ActiveDataEntryPanel.Active = Editable;
+                            ActiveDataEntryPanel.ShowValidationIcons = Editable;
+                            AttributeStatusInfo.DisableAutoUpdateQueries = !Editable;
+                            AttributeStatusInfo.DisableValidationQueries = !Editable;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI47279");
+                }
+            }
+        }
+
+        /// <summary>
         /// Loads the specified <see paramref="data" />.
         /// </summary>
         /// <param name="data">The data to load.</param>
-        /// <param name="forDisplay"><c>true</c> if the loaded data is to be displayed; <c>false</c>
-        /// if the data is being loaded only for data manipulation or validation.</param>
-        public void LoadData(PaginationDocumentData data, bool forDisplay)
+        /// <param name="forEditing"><c>true</c> if the loaded data is to be displayed for editing;
+        /// <c>false</c> if the data is to be displayed read-only, or if it is being used for
+        /// background formatting.</param>
+        public void LoadData(PaginationDocumentData data, bool forEditing)
         {
             try
             {
@@ -436,7 +478,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _configManager.LoadCorrectConfigForData(_documentData.WorkingAttributes);
                 _configManager.ActiveDataEntryConfiguration.OpenDatabaseConnections();
 
-                ActiveDataEntryPanel.LoadData(data, forDisplay);
+                ActiveDataEntryPanel.LoadData(data, forEditing);
 
                 _documentTypeComboBox.Enabled = true;
                 _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeComboBox_SelectedIndexChanged;
@@ -864,7 +906,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             // from being marked permanently dirty.
                             _documentData.SetPermanentlyModified();
                         }
-                        newDataEntryControlHost.LoadData(_documentData, forDisplay: true);
+                        newDataEntryControlHost.LoadData(_documentData, forEditing: Editable);
 
                         _undoButton.Enabled = UndoOperationAvailable;
                         _redoButton.Enabled = RedoOperationAvailable;
@@ -876,7 +918,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     newDataEntryControlHost.DuplicateDocumentsApplied += HandleDataEntryControlHost_DuplicateDocumentsApplied;
 
                     // Set Active = true for the new DEP so that it tracks image viewer events.
-                    newDataEntryControlHost.Active = true;
+                    newDataEntryControlHost.Active = Editable;
+                    newDataEntryControlHost.ShowValidationIcons = Editable;
                 }
 
                 OnDataPanelChanged();
@@ -1515,7 +1558,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 form.Controls.Add(tempPanel);
                 form.Controls.Add(imageViewer);
 
-                tempPanel.LoadData(tempData, forDisplay: false);
+                tempPanel.LoadData(tempData, forEditing: false);
 
                 IAttribute invalidAttribute = null;
                 if (!tempPanel.ActiveDataEntryPanel.Config.Settings.PerformanceTesting)

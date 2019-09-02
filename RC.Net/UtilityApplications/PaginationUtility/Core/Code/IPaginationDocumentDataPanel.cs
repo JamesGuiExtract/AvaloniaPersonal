@@ -106,12 +106,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets or sets whether this panel should be editable (!read-only).
+        /// </summary>
+        bool Editable
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Loads the specified <see paramref="data"/>.
         /// </summary>
         /// <param name="data">The data to load.</param>
-        /// <param name="forDisplay"><c>true</c> if the loaded data is to be displayed; <c>false</c>
-        /// if the data is being loaded only for data manipulation or validation.</param>
-        void LoadData(PaginationDocumentData data, bool forDisplay);
+        /// <param name="forEditing"><c>true</c> if the loaded data is to be displayed for editing;
+        /// <c>false</c> if the data is to be displayed read-only, or if it is being used for
+        /// background formatting.</param>
+        void LoadData(PaginationDocumentData data, bool forEditing);
 
         /// <summary>
         /// Applies any data to the specified <see paramref="data"/>.

@@ -265,6 +265,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         PromptForDuplicateEncounters = PendingDocumentStatus.PromptForDuplicateEncounters;
                         Attributes =
                             (IUnknownVector)_miscUtils.Value.GetObjectFromStringizedByteStream(PendingDocumentStatus.StringizedData);
+                        // Any data updates that happened as part of the save should be reflected in the DEP via WorkingAttributes.
+                        // In general, will be restricted to attributes that hadn't be auto-updated via queries when the user opens
+                        // a DEP. This is needed after applying a document to ensure the DEP that displays submitted data properly
+                        // (It won't be using auto-update queries that would otherwise mirror the updates that happened in Attributes)
+                        WorkingAttributes = Attributes;
                     }
                 }
 

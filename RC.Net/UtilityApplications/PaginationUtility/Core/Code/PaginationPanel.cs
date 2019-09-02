@@ -1658,8 +1658,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         var sourcePagesReverted = new List<int>();
 
                         foreach (var outputDocument in _sourceToOriginalDocuments[sourceDocument]
-                            .OrderBy(doc => doc.OriginalPages.Select(
-                                page => page.OriginalPageNumber).Min()))
+                            .Where(doc => doc.OriginalPages.Any())
+                            .OrderBy(doc =>
+                                doc.OriginalPages.Select(page => page.OriginalPageNumber).Min()))
                         {
                             outputDocument.Collapsed = false;
                             outputDocument.Selected = false;
@@ -3122,7 +3123,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     sourceDocName);
             }
 
-            if (outputDoc.DocumentData.PaginationRequest != null)
+            // https://extract.atlassian.net/browse/ISSUE-16631
+            // Pagination requests will be used to indicate "applied" documents in the UI even when
+            // all pages have been deleted. However, such a pagination request should not be persisted
+            // to disk in the case that no output document was actually created.
+            if (outputDoc.DocumentData.PaginationRequest != null
+                && outputDoc.DocumentData.PaginationRequest.ImagePages.Any())
             {
                 documentAttribute.SubAttributes.PushBack(
                     outputDoc.DocumentData.PaginationRequest.GetAsAttribute());
@@ -3152,8 +3158,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             var documentsToSave = _displayedDocuments.Where(document =>
-                document.PageControls.Any(c => !c.Deleted) &&
-                (!selectedDocumentsOnly || document.Selected))
+                document.PageControls.Any(c => !c.Deleted)
+                && !document.OutputProcessed
+                && (!selectedDocumentsOnly || document.Selected))
                 .ToArray();
 
             if (IsDataPanelOpen && documentsToSave.Contains(_primaryPageLayoutControl.DocumentInDataEdit))

@@ -95,6 +95,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         Color _currentColor;
 
+        /// <summary>
+        /// The edit button icon (to be displayed for editable documents and hidden for read-only documents)
+        /// </summary>
+        Image _editButtonImage;
+
         #endregion Fields
 
         #region Constructors
@@ -118,7 +123,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // to collapse.
                     _tableLayoutPanel.ColumnStyles[2].Width = 0;
                 }
-                
+
+                _editButtonImage = _editDocumentDataButton.Image;
+
                 _toolTip.SetToolTip(_newDocumentGlyph, "This is a new document that will be created");
                 _toolTip.SetToolTip(_editedPaginationGlyph, "Manual pagination has been applied");
                 _toolTip.SetToolTip(_reprocessDocumentPictureBox, "This document will be returned to the server");
@@ -465,13 +472,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         FormsMethods.LockControlUpdate(this, true);
                         locked = true;
+                        args.DocumentDataPanel.Editable = !Document.OutputProcessed;
                         _documentDataPanelControl = (Control)args.DocumentDataPanel;
                         _documentDataPanelControl.Width = _tableLayoutPanel.Width;
                         _documentDataPanelControl.Anchor = AnchorStyles.Left | AnchorStyles.Right;
                         _tableLayoutPanel.Controls.Add(_documentDataPanelControl, 0, 3);
                         _tableLayoutPanel.SetColumnSpan(_documentDataPanelControl, _tableLayoutPanel.ColumnCount);
 
-                        args.DocumentDataPanel.LoadData(args.OutputDocument.DocumentData, forDisplay: true);
+                        args.DocumentDataPanel.LoadData(args.OutputDocument.DocumentData, forEditing: !Document.OutputProcessed);
 
                         _editDocumentDataButton.Checked = true;
 
@@ -1050,11 +1058,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     ? Properties.Resources.Expand
                     : Properties.Resources.Collapse;
                 _editDocumentDataButton.Visible =
-                    !Document.OutputProcessed
-                    && Document.DocumentData != null
+                    Document.DocumentData != null
                     && Document.DocumentData.AllowDataEdit;
+                _editDocumentDataButton.Image = Document.OutputProcessed ? null : _editButtonImage;
+                _editDocumentDataButton.Text = Document.OutputProcessed ? "View" : "Edit";
                 _summaryLabel.Visible = true;
-                _summaryLabel.Text = Document.Summary;
+                _summaryLabel.Text = Document.Summary
+                    + (Document.OutputProcessed ? " (PROCESSED)" : "");
                 _pagesLabel.Visible = true;
                 int pageCount = Document.PageControls.Count(c => !c.Deleted);
                 _pagesLabel.Text = string.Format(CultureInfo.CurrentCulture,

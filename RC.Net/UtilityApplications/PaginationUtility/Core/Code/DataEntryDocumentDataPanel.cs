@@ -255,9 +255,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Loads the specified <see paramref="data" />.
         /// </summary>
         /// <param name="data">The data to load.</param>
-        /// <param name="forDisplay"><c>true</c> if the loaded data is to be displayed; <c>false</c>
-        /// if the data is being loaded only for data manipulation or validation.</param>
-        public virtual void LoadData(PaginationDocumentData data, bool forDisplay)
+        /// <param name="forEditing"><c>true</c> if the loaded data is to be displayed for editing;
+        /// <c>false</c> if the data is to be displayed read-only, or if it is being used for
+        /// background formatting.</param>
+        public virtual void LoadData(PaginationDocumentData data, bool forEditing)
         {
             try
             {
@@ -268,7 +269,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _documentData = (DataEntryPaginationDocumentData)data;
 
-                LoadData(_documentData.WorkingAttributes, _documentData.SourceDocName, forDisplay);
+                LoadData(_documentData.WorkingAttributes, _documentData.SourceDocName, forEditing);
 
                 if (_imageViewer != null && _imageViewer.Visible)
                 {
@@ -301,7 +302,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _imageViewer.ImageFileClosing += HandleImageViewer_ImageFileClosing;
                 }
 
-                Active = true;
+                if (forEditing)
+                {
+                    Active = true;
+                }
             }
             catch (Exception ex)
             {
