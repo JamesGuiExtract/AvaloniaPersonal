@@ -516,6 +516,8 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI33190", _COMPONENT_DESCRIPTION);
+
+                UnlockLeadtools.UnlockLeadToolsSupport();
             }
             catch (Exception ex)
             {
@@ -738,7 +740,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        void Dispose(bool disposing)
+        virtual protected void Dispose(bool disposing)
         {
             if (disposing)
             {
