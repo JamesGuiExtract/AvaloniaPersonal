@@ -190,6 +190,7 @@
     <Compile Include="SpatialStringFeatureVectorizer.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>
+    <Compile Include="SpecialAttributeNames.cs" />
     <Compile Include="SupportVectorMachineClassifier.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>

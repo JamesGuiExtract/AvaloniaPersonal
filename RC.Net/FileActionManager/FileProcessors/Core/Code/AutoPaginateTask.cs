@@ -19,6 +19,8 @@ using UCLID_AFCORELib;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
+using System.Globalization;
+using UCLID_AFUTILSLib;
 
 namespace Extract.FileActionManager.FileProcessors
 {
@@ -113,6 +115,16 @@ namespace Extract.FileActionManager.FileProcessors
             get;
             set;
         }
+
+        /// <summary>
+        /// Whether to perform the pagination (output documents and update the DB) or to only load/save the input VOA.
+        /// </summary>
+        bool OutputQualifiedDocuments { get; set; }
+
+        /// <summary>
+        /// Path tag function for the input VOA file
+        /// </summary>
+        string InputDataPath { get; set; }
     }
 
     /// <summary>
@@ -136,8 +148,9 @@ namespace Extract.FileActionManager.FileProcessors
         /// Current task version.
         /// Versions:
         /// 1. Initial version
+        /// 2. Add InputDataPath and OutputQualifiedDocuments
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        const int _CURRENT_VERSION = 2;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -242,6 +255,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// For converting attribute to/from stringized bytestreams
         /// </summary>
         static ThreadLocal<MiscUtils> _miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtils());
+
+        /// <summary>
+        /// For removing attributes with queries
+        /// </summary>
+        static ThreadLocal<AFUtility> _afUtil = new ThreadLocal<AFUtility>(() => new AFUtilityClass());
 
         #endregion Fields
 
@@ -571,9 +589,12 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(OutputPath)
-                    || string.IsNullOrWhiteSpace(SourceActionIfNotFullyPaginated)
-                    || string.IsNullOrWhiteSpace(OutputAction))
+                if (string.IsNullOrWhiteSpace(InputDataPath)
+                    || OutputQualifiedDocuments &&
+                        (string.IsNullOrWhiteSpace(OutputPath)
+                        || string.IsNullOrWhiteSpace(SourceActionIfFullyPaginated)
+                        || string.IsNullOrWhiteSpace(SourceActionIfNotFullyPaginated)
+                        || string.IsNullOrWhiteSpace(OutputAction)))
                 {
                     return false;
                 }
@@ -638,6 +659,16 @@ namespace Extract.FileActionManager.FileProcessors
                 return true;
             }
         }
+
+        /// <summary>
+        /// Whether to perform the pagination (output documents and update the DB) or to only load/save the input VOA.
+        /// </summary>
+        public bool OutputQualifiedDocuments { get; set; } = true;
+
+        /// <summary>
+        /// Path tag function for the input VOA file
+        /// </summary>
+        public string InputDataPath { get; set; } = "<SourceDocName>.voa";
 
         /// <summary>
         /// Stops processing the current file.
@@ -800,27 +831,30 @@ namespace Extract.FileActionManager.FileProcessors
                     }
                 }
 
-                if (fullyPaginated && !string.IsNullOrWhiteSpace(SourceActionIfFullyPaginated))
+                if (OutputQualifiedDocuments)
                 {
-                    pDB.SetStatusForFile(
-                        pFileRecord.FileID,
-                        SourceActionIfFullyPaginated,
-                        pFileRecord.WorkflowID,
-                        EActionStatus.kActionPending,
-                        vbQueueChangeIfProcessing: true,
-                        vbAllowQueuedStatusOverride: false,
-                        poldStatus: out EActionStatus oldStatus);
-                }
-                else if (!fullyPaginated && !string.IsNullOrWhiteSpace(SourceActionIfNotFullyPaginated))
-                {
-                    pDB.SetStatusForFile(
-                        pFileRecord.FileID,
-                        SourceActionIfNotFullyPaginated,
-                        pFileRecord.WorkflowID,
-                        EActionStatus.kActionPending,
-                        vbQueueChangeIfProcessing: true,
-                        vbAllowQueuedStatusOverride: false,
-                        poldStatus: out EActionStatus oldStatus);
+                    if (fullyPaginated && !string.IsNullOrWhiteSpace(SourceActionIfFullyPaginated))
+                    {
+                        pDB.SetStatusForFile(
+                            pFileRecord.FileID,
+                            SourceActionIfFullyPaginated,
+                            pFileRecord.WorkflowID,
+                            EActionStatus.kActionPending,
+                            vbQueueChangeIfProcessing: true,
+                            vbAllowQueuedStatusOverride: false,
+                            poldStatus: out EActionStatus oldStatus);
+                    }
+                    else if (!fullyPaginated && !string.IsNullOrWhiteSpace(SourceActionIfNotFullyPaginated))
+                    {
+                        pDB.SetStatusForFile(
+                            pFileRecord.FileID,
+                            SourceActionIfNotFullyPaginated,
+                            pFileRecord.WorkflowID,
+                            EActionStatus.kActionPending,
+                            vbQueueChangeIfProcessing: true,
+                            vbAllowQueuedStatusOverride: false,
+                            poldStatus: out EActionStatus oldStatus);
+                    }
                 }
 
                 var sessionSeconds = (DateTime.Now - sessionStartTime).TotalSeconds;
@@ -838,7 +872,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             string fileName = pFileRecord.Name;
             var voaData = new IUnknownVector();
-            string dataFilename = fileName + ".voa";
+            string dataFilename = pFAMTM.ExpandTagsAndFunctions(InputDataPath, fileName);
             voaData.LoadFrom(dataFilename, false);
             voaData.UpdateSourceDocNameOfAttributes(fileName);
             voaData.ReportMemoryUsage();
@@ -882,6 +916,8 @@ namespace Extract.FileActionManager.FileProcessors
                     _depPanel.WaitForDocumentStatusUpdates();
                 }
 
+                int subDocIndex = -1;
+
                 // Process each candidate pagination output document.
                 foreach (var docAttribute in attributeArray)
                 {
@@ -896,12 +932,22 @@ namespace Extract.FileActionManager.FileProcessors
                     }
 
                     List<PageInfo> sourcePageInfos = GetSourcePageInfos(pFileRecord, docAttribute);
+
                     var outputData = GetUpdatedDocumentData(pFileRecord, docDataDictionary, docAttribute, sourcePageInfos);
 
                     // Check to see if the document qualifies to be output automatically.
                     if (AutoPaginateQualifier != null)
                     {
-                        string proposedDocumentName = _paginatedOutputCreationUtility.GetPaginatedDocumentFileName(sourcePageInfos, pFAMTM);
+                        if (subDocIndex < 0)
+                        {
+                            subDocIndex = _paginatedOutputCreationUtility.GetFirstSubDocIndex(sourcePageInfos, pFAMTM);
+                        }
+                        else
+                        {
+                            subDocIndex++;
+                        }
+
+                        string proposedDocumentName = _paginatedOutputCreationUtility.GetPaginatedDocumentFileName(sourcePageInfos, pFAMTM, subDocIndex);
                         var documentStatusJson = outputData.PendingDocumentStatus?.ToJson();
                         var serializedAttributes = _miscUtils.Value.GetObjectAsStringizedByteStream(docAttribute.SubAttributes);
 
@@ -909,31 +955,41 @@ namespace Extract.FileActionManager.FileProcessors
                             documentStatusJson, serializedAttributes, fileProcessingDB, pFileRecord.ActionID, pFAMTM))
                         {
                             fullyPaginated = false;
+                            SetQualifiedFlag(false, docAttribute, fileName);
                             continue;
                         }
-                    }
-
-                    // https://extract.atlassian.net/browse/ISSUE-16644
-                    // Don't skip output because all pages are deleted until the AutoPaginateQualifier
-                    // has been executed so that such documents can be funneled to verification if the
-                    // condition is not met.
-                    if (sourcePageInfos.All(page => page.Deleted))
-                    {
-                        // Write pagination history to record the deleted pages from the source document.
-                        _paginatedOutputCreationUtility.WritePaginationHistory(
-                            sourcePageInfos, -1, fileTaskSessionID);
+                        else
+                        {
+                            SetQualifiedFlag(true, docAttribute, fileName);
+                        }
                     }
                     else
                     {
-                        // The document qualifies to be output; create it.
-                        CreatePaginatedOutput(docAttribute, sourcePageInfos, outputData, pFileRecord, fileProcessingDB, pFAMTM, fileTaskSessionID);
+                        SetQualifiedFlag(true, docAttribute, fileName);
+                    }
+
+                    // The document qualifies to be output; create it if so configured.
+                    if (OutputQualifiedDocuments)
+                    {
+                        // https://extract.atlassian.net/browse/ISSUE-16644
+                        // Don't skip output because all pages are deleted until the AutoPaginateQualifier
+                        // has been executed so that such documents can be funneled to verification if the
+                        // condition is not met.
+                        if (sourcePageInfos.All(page => page.Deleted))
+                        {
+                            // Write pagination history to record the deleted pages from the source document.
+                            _paginatedOutputCreationUtility.WritePaginationHistory(
+                                sourcePageInfos, -1, fileTaskSessionID);
+                        }
+                        else
+                        {
+                            CreatePaginatedOutput(docAttribute, sourcePageInfos, outputData, pFileRecord, fileProcessingDB, pFAMTM, fileTaskSessionID);
+                        }
                     }
                 }
             }
 
-            attributeArray
-                .ToIUnknownVector<IAttribute>()
-                .SaveAttributes(dataFilename);
+            attributeArray.SaveToIUnknownVector(dataFilename);
 
             return fullyPaginated;
         }
@@ -1018,6 +1074,17 @@ namespace Extract.FileActionManager.FileProcessors
                     }
                     AutoPaginatedTag = reader.ReadString();
                     AutoRotatePages = reader.ReadBoolean();
+
+                    if (reader.Version >= 2)
+                    {
+                        InputDataPath = reader.ReadString();
+                        OutputQualifiedDocuments = reader.ReadBoolean();
+                    }
+                    else
+                    {
+                        InputDataPath = "<SourceDocName>.voa";
+                        OutputQualifiedDocuments = true;
+                    }
                 }
 
                 // Freshly loaded object is not dirty
@@ -1059,6 +1126,8 @@ namespace Extract.FileActionManager.FileProcessors
                     }
                     writer.Write(AutoPaginatedTag);
                     writer.Write(AutoRotatePages);
+                    writer.Write(InputDataPath);
+                    writer.Write(OutputQualifiedDocuments);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -1130,6 +1199,8 @@ namespace Extract.FileActionManager.FileProcessors
                 : (IPaginationCondition)((ICopyableObject)task.AutoPaginateQualifier).Clone();
             AutoPaginatedTag = task.AutoPaginatedTag;
             AutoRotatePages = task.AutoRotatePages;
+            OutputQualifiedDocuments = task.OutputQualifiedDocuments;
+            InputDataPath = task.InputDataPath;
 
             _dirty = true;
         }
@@ -1353,6 +1424,14 @@ namespace Extract.FileActionManager.FileProcessors
                 return UtilityMethods.CreateTypeFromAssembly<IPaginationDocumentDataPanel>(
                     paginationDocumentDataPanelAssembly);
             }
+        }
+
+        // Create/replace "QualifiedForAutomatedOutput" attribute for computing stats
+        static void SetQualifiedFlag(bool flagVal, IAttribute docAttribute, string fileName)
+        {
+            // Remove flag if present
+            _afUtil.Value.QueryAttributes(docAttribute.SubAttributes, SpecialAttributeNames.QualifiedForAutomaticOutput, true);
+            docAttribute.AddSubAttribute(SpecialAttributeNames.QualifiedForAutomaticOutput, flagVal.ToString(CultureInfo.InvariantCulture), fileName);
         }
 
         #endregion Private Members

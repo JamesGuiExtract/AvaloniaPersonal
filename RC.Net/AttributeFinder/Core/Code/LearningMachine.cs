@@ -643,7 +643,7 @@ namespace Extract.AttributeFinder
                         inputPageAttributes = new List<ComAttribute>();
                         foreach (var attribute in attributeVector.ToIEnumerable<ComAttribute>())
                         {
-                            if (attribute.Name.Equals(LearningMachineDataEncoder.PageAttributeName, StringComparison.OrdinalIgnoreCase))
+                            if (attribute.Name.Equals(SpecialAttributeNames.Page, StringComparison.OrdinalIgnoreCase))
                             {
                                 inputPageAttributes.Add(attribute);
                             }

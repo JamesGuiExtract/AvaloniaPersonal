@@ -243,6 +243,7 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="userName">The currently logged in user's name</param>
         /// <param name="skippedFiles">Whether to return files skipped for this user rather than pending files</param>
+        /// <param name="filter">Search string to filter the results</param>
         /// <param name="fromBeginning">Sort file IDs in ascending order before selecting the subset</param>
         /// <param name="pageIndex">Skip pageIndex * pageSize records from the beginning/end</param>
         /// <param name="pageSize">The maximum records to return</param>

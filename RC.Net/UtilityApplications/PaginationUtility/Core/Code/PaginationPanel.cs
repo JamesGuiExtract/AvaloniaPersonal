@@ -3099,7 +3099,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <returns>The root-level "Document" attribute </returns>
         static IAttribute GetDocumentAttribute(OutputDocument outputDoc, string sourceDocName)
         {
-            var documentAttribute = new AttributeClass() { Name = "Document" };
+            var documentAttribute = new AttributeClass() { Name = SpecialAttributeNames.Document };
 
             void addPagesSubattribute(string name)
             {
@@ -3672,14 +3672,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     var ss = new SpatialStringClass();
                     ss.CreateNonSpatialString(_DOCUMENT_PLACEHOLDER_TEXT, sourceDocName);
-                    var documentAttribute = new ComAttribute { Name = "Document", Value = ss };
+                    var documentAttribute = new ComAttribute { Name = SpecialAttributeNames.Document, Value = ss };
 
                     // Add a Pages attribute to denote the range(s) of pages in this document
                     if (!string.IsNullOrEmpty(doc.pages))
                     {
                         ss = new SpatialStringClass();
                         ss.CreateNonSpatialString(doc.pages, sourceDocName);
-                        documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = "Pages", Value = ss });
+                        documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = SpecialAttributeNames.Pages, Value = ss });
                     }
 
                     // Add a DeletedPages attribute to denote the range(s) of deleted pages in this document
@@ -3687,7 +3687,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         ss = new SpatialStringClass();
                         ss.CreateNonSpatialString(doc.deletedPages, sourceDocName);
-                        documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = "DeletedPages", Value = ss });
+                        documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = SpecialAttributeNames.DeletedPages, Value = ss });
                     }
                     return documentAttribute;
                 })
@@ -3700,13 +3700,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                         ss.CreateNonSpatialString(flag, sourceDocName);
                         return new ComAttribute
                         {
-                            Name = LearningMachineDataEncoder.IncompatibleWithPaginationTrainingAttributeName,
+                            Name = SpecialAttributeNames.IncompatibleWithPaginationTraining,
                             Value = ss
                         };
                     }
                 ))
                 .SaveToIUnknownVector(outputFileName);
-
             }
             catch (Exception e)
             {

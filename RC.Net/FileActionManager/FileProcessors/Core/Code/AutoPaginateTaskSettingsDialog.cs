@@ -120,6 +120,12 @@ namespace Extract.FileActionManager.FileProcessors
                     Settings.AutoPaginateQualifier as ICategorizedComponent;
                 _autoPaginatedTagComboBox.Text = Settings.AutoPaginatedTag;
                 _autoRotateCheckBox.Checked = Settings.AutoRotatePages;
+
+                _newDocumentsGroupBox.Enabled =
+                    _sourceDocumentsGroupBox.Enabled =
+                    _outputQualifiedDocumentsCheckBox.Checked =
+                    Settings.OutputQualifiedDocuments;
+                _inputPathTextBox.Text = Settings.InputDataPath;
             }
             catch (Exception ex)
             {
@@ -141,42 +147,10 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(_outputPathTextBox.Text))
+                if (string.IsNullOrWhiteSpace(_inputPathTextBox.Text))
                 {
                     UtilityMethods.ShowMessageBox(
-                        "The pagination output path must be specified.",
-                        "Invalid configuration", true);
-
-                    return;
-                }
-
-                if (!string.IsNullOrWhiteSpace(_sourceIfFullyPaginatedActionComboBox.Text) &&
-                    !_sourceIfFullyPaginatedActionComboBox.Items.Contains(_sourceIfFullyPaginatedActionComboBox.Text))
-                {
-                    UtilityMethods.ShowMessageBox(
-                        "The action to set fully paginated source source files to is not valid.",
-                        "Invalid configuration", true);
-                    _sourceIfFullyPaginatedActionComboBox.Focus();
-
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(_sourceIfNotFullyPaginatedActionComboBox.Text) ||
-                    !_sourceIfNotFullyPaginatedActionComboBox.Items.Contains(_sourceIfNotFullyPaginatedActionComboBox.Text))
-                {
-                    UtilityMethods.ShowMessageBox(
-                        "The action to set source files that are not fully paginated to is not valid.",
-                        "Invalid configuration", true);
-                    _sourceIfNotFullyPaginatedActionComboBox.Focus();
-
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(_outputActionComboBox.Text) ||
-                    !_outputActionComboBox.Items.Contains(_outputActionComboBox.Text))
-                {
-                    UtilityMethods.ShowMessageBox(
-                        "The action to set pagination output files to is not valid.",
+                        "The input data path must be specified.",
                         "Invalid configuration", true);
 
                     return;
@@ -192,6 +166,51 @@ namespace Extract.FileActionManager.FileProcessors
                     return;
                 }
 
+                // If outputing document, validate associated properties
+                if (_outputQualifiedDocumentsCheckBox.Checked)
+                {
+                    if (string.IsNullOrWhiteSpace(_outputPathTextBox.Text))
+                    {
+                        UtilityMethods.ShowMessageBox(
+                            "The pagination output path must be specified.",
+                            "Invalid configuration", true);
+
+                        return;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(_sourceIfFullyPaginatedActionComboBox.Text) &&
+                        !_sourceIfFullyPaginatedActionComboBox.Items.Contains(_sourceIfFullyPaginatedActionComboBox.Text))
+                    {
+                        UtilityMethods.ShowMessageBox(
+                            "The action to set fully paginated source source files to is not valid.",
+                            "Invalid configuration", true);
+                        _sourceIfFullyPaginatedActionComboBox.Focus();
+
+                        return;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(_sourceIfNotFullyPaginatedActionComboBox.Text) ||
+                        !_sourceIfNotFullyPaginatedActionComboBox.Items.Contains(_sourceIfNotFullyPaginatedActionComboBox.Text))
+                    {
+                        UtilityMethods.ShowMessageBox(
+                            "The action to set source files that are not fully paginated to is not valid.",
+                            "Invalid configuration", true);
+                        _sourceIfNotFullyPaginatedActionComboBox.Focus();
+
+                        return;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(_outputActionComboBox.Text) ||
+                        !_outputActionComboBox.Items.Contains(_outputActionComboBox.Text))
+                    {
+                        UtilityMethods.ShowMessageBox(
+                            "The action to set pagination output files to is not valid.",
+                            "Invalid configuration", true);
+
+                        return;
+                    }
+                }
+
                 Settings.SourceActionIfFullyPaginated = _sourceIfFullyPaginatedActionComboBox.Text;
                 Settings.SourceActionIfNotFullyPaginated = _sourceIfNotFullyPaginatedActionComboBox.Text;
                 Settings.OutputPath = _outputPathTextBox.Text;
@@ -201,6 +220,8 @@ namespace Extract.FileActionManager.FileProcessors
                     _qualifierConditionConfigurableObjectControl.ConfigurableObject as IPaginationCondition;
                 Settings.AutoPaginatedTag = _autoPaginatedTagComboBox.Text;
                 Settings.AutoRotatePages = _autoRotateCheckBox.Checked;
+                Settings.OutputQualifiedDocuments = _outputQualifiedDocumentsCheckBox.Checked;
+                Settings.InputDataPath = _inputPathTextBox.Text;
 
                 DialogResult = DialogResult.OK;
             }
@@ -248,6 +269,20 @@ namespace Extract.FileActionManager.FileProcessors
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI47086");
+            }
+        }
+
+        private void HandleOutputQualifiedDocumentsCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _newDocumentsGroupBox.Enabled =
+                    _sourceDocumentsGroupBox.Enabled =
+                    _outputQualifiedDocumentsCheckBox.Checked;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI47287");
             }
         }
 

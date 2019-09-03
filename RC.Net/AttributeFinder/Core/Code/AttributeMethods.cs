@@ -217,7 +217,7 @@ namespace Extract.AttributeFinder
         /// <param name="enumerable">The <see cref="IEnumerable{ComAttribute}" /> to convert.</param>
         /// <param name="fileName">Full path of the file to be saved.</param>
         [CLSCompliant(false)]
-        public static void SaveToIUnknownVector(this IEnumerable<ComAttribute> enumerable, string fileName)
+        public static void SaveToIUnknownVector(this IEnumerable<IAttribute> enumerable, string fileName)
         {
             try
             {

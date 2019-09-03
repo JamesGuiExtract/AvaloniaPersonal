@@ -155,6 +155,9 @@
 to the source document of the first page in the output file. The source document of any other pages
 in the output will not influence the values of these tags.</value>
   </data>
+  <metadata name="label8.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
   <data name="_documentDataAssemblyPathTags.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -163,6 +166,13 @@ in the output will not influence the values of these tags.</value>
 </value>
   </data>
   <data name="_outputPathPathTags.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAA4SURBVFhH7c4xCgAgFMPQ3v/SSkHB/QtZ8paOTSRJGlhn
+        MQ1AI24AFvEGIBHoeaHnhZ5LkvRJsgGqxA/xBJK2bgAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="_inputPathPathTagButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAA4SURBVFhH7c4xCgAgFMPQ3v/SSkHB/QtZ8paOTSRJGlhn

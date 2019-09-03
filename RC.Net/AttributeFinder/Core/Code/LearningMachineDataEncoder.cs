@@ -314,11 +314,6 @@ namespace Extract.AttributeFinder
         public static readonly string NotFirstPageCategory = "NotFirstPage";
         static readonly int _NOT_FIRST_PAGE_CATEGORY_CODE = 0;
 
-        /// <summary>
-        /// The name of page attributes that have pagination protofeature subattributes
-        /// </summary>
-        public static readonly string PageAttributeName = "Page";
-
         // For pagination, the query for answer page range attributes
         static readonly string _PAGE_ATTRIBUTE_QUERY = "Document/Pages";
 
@@ -330,14 +325,6 @@ namespace Extract.AttributeFinder
         static readonly int _NOT_DELETED_PAGE_CATEGORY_CODE = 0;
 
         static readonly string _DELETED_PAGE_ATTRIBUTE_QUERY = "Document/DeletedPages";
-
-        /// <summary>
-        /// The name of the flag attributes used to indicate a situation that won't work for pagination training,
-        /// e.g., rearranged or duplicated pages
-        /// https://extract.atlassian.net/browse/ISSUE-14923
-        /// </summary>
-        public static readonly string IncompatibleWithPaginationTrainingAttributeName =
-            "IncompatibleWithPaginationTraining";
 
         public static readonly string CategoryAttributeName = "AttributeType";
 
@@ -768,7 +755,7 @@ namespace Extract.AttributeFinder
                 // if there were no pagination
                 // https://extract.atlassian.net/browse/ISSUE-14923
                 var flags = _afUtility.Value.QueryAttributes(attributes,
-                    IncompatibleWithPaginationTrainingAttributeName, false);
+                    SpecialAttributeNames.IncompatibleWithPaginationTraining, false);
                 if (flags.Size() == 0)
                 {
                     // No flags so parse Pages attributes with regex and mark any document breaks
@@ -1722,7 +1709,7 @@ namespace Extract.AttributeFinder
         {
             var pages = attributes
                 .ToIEnumerable<ComAttribute>()
-                .Where(a => a.Name.Equals(PageAttributeName, StringComparison.OrdinalIgnoreCase));
+                .Where(a => a.Name.Equals(SpecialAttributeNames.Page, StringComparison.OrdinalIgnoreCase));
 
             if (!returnFirstPage)
             {

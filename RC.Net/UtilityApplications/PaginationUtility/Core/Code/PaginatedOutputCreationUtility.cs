@@ -64,30 +64,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="pageInfos">The PageInfos for the pages to be in the document.</param>
         /// <param name="tagManager">The tag manager that should be used to expand the path tag expression.</param>
-        public string GetPaginatedDocumentFileName(IEnumerable<PageInfo> pageInfos, FAMTagManager tagManager)
+        /// <param name="subDocIndex">The one-based index of this sub document. If less than 1, the DB will be queried for the subDocIndex</param>
+        public string GetPaginatedDocumentFileName(IEnumerable<PageInfo> pageInfos, FAMTagManager tagManager, int subDocIndex = -1)
         {
             try
             {
                 var sourcePageInfo = pageInfos.Where(info => !info.Deleted).ToList();
-                string sourceDocName = sourcePageInfo.FirstOrDefault()?.DocumentName;
+				string sourceDocName = sourcePageInfo.FirstOrDefault()?.DocumentName;
                 if (sourceDocName == null)
                 {
                     return "";
                 }
-
                 var pathTags = new FileActionManagerPathTags(tagManager, sourceDocName);
                 if (_outputPathTagExpression.Contains(PaginationSettings.SubDocIndexTag))
                 {
-                    string query = string.Format(CultureInfo.InvariantCulture,
-                        "SELECT COUNT(DISTINCT([DestFileID])) + 1 AS [SubDocIndex] " +
-                        "   FROM [Pagination] " +
-                        "   INNER JOIN [FAMFile] ON [Pagination].[SourceFileID] = [FAMFile].[ID] " +
-                        "   WHERE [FileName] = '{0}'",
-                        sourceDocName.Replace("'", "''"));
-
-                    var recordset = _fileProcessingDB.GetResultsForQuery(query);
-                    int subDocIndex = (int)recordset.Fields["SubDocIndex"].Value;
-                    recordset.Close();
+                    if (subDocIndex <= 0)
+                    {
+                        subDocIndex = GetFirstSubDocIndex(pageInfos, tagManager);
+                    }
 
                     pathTags.AddTag(PaginationSettings.SubDocIndexTag,
                         subDocIndex.ToString(CultureInfo.InvariantCulture));
@@ -116,6 +110,44 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI47051");
+            }
+        }
+
+        /// <summary>
+        /// Calculates first sub-document index (one-based) if the output path tag expression contains SubDocIndex tag></SubDocIndex>
+        /// </summary>
+        /// <param name="pageInfos">The PageInfos for the pages to be in the document.</param>
+        /// <param name="tagManager">The tag manager that should be used to expand the path tag expression.</param>
+        /// <returns>The count + 1 of previously output documents for this source document or 0 if the output tag expression doesn't contain a SubDocIndex tag</returns>
+        public int GetFirstSubDocIndex(IEnumerable<PageInfo> pageInfos, FAMTagManager tagManager)
+        {
+            try
+            {
+                int subDocIndex = 0;
+
+                if (_outputPathTagExpression.Contains(PaginationSettings.SubDocIndexTag))
+                {
+                    var sourcePageInfo = pageInfos.Where(info => !info.Deleted).ToList();
+                    string sourceDocName = sourcePageInfo.FirstOrDefault()?.DocumentName;
+                    if (sourceDocName != null)
+                    {
+                        string query = string.Format(CultureInfo.InvariantCulture,
+                            "SELECT COUNT(DISTINCT([DestFileID])) + 1 AS [SubDocIndex] " +
+                            "   FROM [Pagination] " +
+                            "   INNER JOIN [FAMFile] ON [Pagination].[SourceFileID] = [FAMFile].[ID] " +
+                            "   WHERE [FileName] = '{0}'",
+                            sourceDocName.Replace("'", "''"));
+
+                        var recordset = _fileProcessingDB.GetResultsForQuery(query);
+                        subDocIndex = (int)recordset.Fields["SubDocIndex"].Value;
+                        recordset.Close();
+                    }
+                }
+                return subDocIndex;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47288");
             }
         }
 
