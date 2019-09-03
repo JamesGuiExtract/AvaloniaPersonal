@@ -3101,35 +3101,26 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             var documentAttribute = new AttributeClass() { Name = "Document" };
 
-            var pages = outputDoc.PageControls
-                .Where(pageControl => !pageControl.Deleted)
-                .Select(pageControl => pageControl.Page.OriginalPageNumber);
-            if (pages.Any())
+            void addPagesSubattribute(string name)
             {
-                documentAttribute.AddSubAttribute("Pages",
-                    UtilityMethods.GetPageNumbersAsString(pages),
-                    sourceDocName);
-            }
+                var pages = outputDoc.PageControls
+                    .Where(pageControl =>
+                           name == "Pages"
+                        || name == "DeletedPages" && pageControl.Deleted
+                        || name == "ViewedPages" && pageControl.Viewed
+                    )
+                    .Select(pageControl => pageControl.Page.OriginalPageNumber);
+                if (pages.Any())
+                {
+                    documentAttribute.AddSubAttribute(name,
+                        UtilityMethods.GetPageNumbersAsString(pages),
+                        sourceDocName);
+                }
 
-            var deletedPages = outputDoc.PageControls
-                .Where(pageControl => pageControl.Deleted)
-                .Select(pageControl => pageControl.Page.OriginalPageNumber);
-            if (deletedPages.Any())
-            {
-                documentAttribute.AddSubAttribute("DeletedPages",
-                    UtilityMethods.GetPageNumbersAsString(deletedPages),
-                    sourceDocName);
             }
-
-            var viewedPages = outputDoc.PageControls
-                .Where(pageControl => pageControl.Viewed)
-                .Select(pageControl => pageControl.Page.OriginalPageNumber);
-            if (viewedPages.Any())
-            {
-                documentAttribute.AddSubAttribute("ViewedPages",
-                    UtilityMethods.GetPageNumbersAsString(viewedPages),
-                    sourceDocName);
-            }
+            addPagesSubattribute("Pages");
+            addPagesSubattribute("DeletedPages");
+            addPagesSubattribute("ViewedPages");
 
             // https://extract.atlassian.net/browse/ISSUE-16631
             // Pagination requests will be used to indicate "applied" documents in the UI even when
