@@ -3768,9 +3768,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     && !singlySelectedDocument.Collapsed);
                 var asPageThumbnailControl = _commandTargetControl as PageThumbnailControl;
 
+                // If a separator is selected, or the first page of a document 
+                // (whether that page is marked as deleted or not)
                 if (_toggleDocumentSeparatorCommand.Enabled &&
                     (controlIsSeparator ||
-                        (asPageThumbnailControl != null && asPageThumbnailControl.PageNumber == 1)))
+                        (asPageThumbnailControl != null 
+                        && asPageThumbnailControl == asPageThumbnailControl.Document?.PageControls.FirstOrDefault())))
                 {
                     _toggleDocumentSeparatorMenuItem.Text = "Merge with previous document";
                     _toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "";
