@@ -351,7 +351,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Defines the current state of the <see cref="Attributes"/> hierarchy as the original
         /// state (used to determine the value of <see cref="Modified"/>).
         /// </summary>
-        public void SetOriginalForm()
+        public virtual void SetOriginalForm()
         {
             try
             {

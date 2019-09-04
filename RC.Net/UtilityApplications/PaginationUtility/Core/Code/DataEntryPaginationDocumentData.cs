@@ -407,6 +407,25 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Defines the current state of the <see cref="Attributes"/> hierarchy as the original
+        /// state (used to determine the value of <see cref="Modified"/>).
+        /// </summary>
+        public override void SetOriginalForm()
+        {
+            try
+            {
+                base.SetOriginalForm();
+
+                _originalData = (IAttribute)((ICopyableObject)DocumentDataAttribute).Clone();
+                _originalData.ReportMemoryUsage();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47281");
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether this instance wants to override whether the document
         /// is returned to the server for reprocessing.
         /// </summary>
