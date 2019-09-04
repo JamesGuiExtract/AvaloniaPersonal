@@ -125,6 +125,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 _editButtonImage = _editDocumentDataButton.Image;
+                // Having auto-size set in the designer allows the button to be initialized to a size that
+                // fits the edit icon/text. But once initialized, disable so that the button doesn't resize
+                // when text is changed to "View"
+                _editDocumentDataButton.AutoSize = false;
 
                 _toolTip.SetToolTip(_newDocumentGlyph, "This is a new document that will be created");
                 _toolTip.SetToolTip(_editedPaginationGlyph, "Manual pagination has been applied");
@@ -1075,7 +1079,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // To fix cases where the width has no updated properly
                     _pagesLabel.PerformLayout();
                 }
-                _newDocumentGlyph.Visible = !Document.InSourceDocForm && !Document.OutputProcessed;
+                _newDocumentGlyph.Visible = !Document.InSourceDocForm && !Document.OutputProcessed
+                    && Document.PageControls.Any(page => !page.Deleted);
                 _editedPaginationGlyph.Visible = !Document.InOriginalForm && !Document.OutputProcessed;
                 _reprocessDocumentPictureBox.Visible = Document.SendForReprocessing && pageCount > 0 && !Document.OutputProcessed;
                 _editedDataPictureBox.Visible = Document.DataModified && !Document.OutputProcessed;

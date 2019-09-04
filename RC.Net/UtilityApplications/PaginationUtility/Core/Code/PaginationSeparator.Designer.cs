@@ -235,7 +235,7 @@
             this._editDocumentDataButton.TabIndex = 12;
             this._editDocumentDataButton.TabStop = false;
             this._editDocumentDataButton.Text = "Edit";
-            this._editDocumentDataButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this._editDocumentDataButton.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this._editDocumentDataButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this._editDocumentDataButton.UseVisualStyleBackColor = true;
             this._editDocumentDataButton.Visible = false;
