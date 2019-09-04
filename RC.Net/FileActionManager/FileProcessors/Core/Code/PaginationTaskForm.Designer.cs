@@ -193,6 +193,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._paginationPanel.SuspendUIUpdates = false;
             this._paginationPanel.TabIndex = 1;
             this._paginationPanel.ToolBarVisible = true;
+            this._paginationPanel.AcceptedSourcePagination += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.AcceptedSourcePaginationEventArgs>(this.HandlePaginationPanel_AcceptedSourcePagination);
             this._paginationPanel.DocumentDataRequest += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.DocumentDataRequestEventArgs>(this.HandlePaginationPanel_DocumentDataRequest);
             this._paginationPanel.CreatingOutputDocument += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CreatingOutputDocumentEventArgs>(this.HandlePaginationPanel_CreatingOutputDocument);
             this._paginationPanel.OutputDocumentDeleted += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.OutputDocumentDeletedEventArgs>(this.HandlePaginationPanel_OutputDocumentDeleted);

@@ -232,6 +232,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<OutputDocumentDeletedEventArgs> OutputDocumentDeleted;
 
         /// <summary>
+        /// Raised when a proposed output document applied without adding/deleting/re-ordering/rotating
+        /// any pages from the source document.
+        /// </summary>
+        public event EventHandler<AcceptedSourcePaginationEventArgs> AcceptedSourcePagination;
+
+        /// <summary>
         /// Raised when a pagination operation is complete. May follow multiple
         /// <see cref="CreatingOutputDocument"/> events if a single pagination event produced
         /// multiple documents.
@@ -1358,6 +1364,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     outputDocument.Collapsed = true;
                 }
 
+                // https://extract.atlassian.net/browse/ISSUE-16645
+                // Ensure any documents with unmodified pagination are handled so that pagination history, etc can be recorded.
+                foreach (var document in documentsToCommit.Except(outputDocuments))
+                {
+                    OnAcceptedSourcePagination(new AcceptedSourcePaginationEventArgs(document.SourcePageInfo, document.DocumentData));
+                }
+
                 LinkFilesWithRecordIDs(documentsToCommit);
 
                 var disregardedPagination = documentsInSourceForm
@@ -2340,14 +2353,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             bool pagesEqual = Page.PagesAreEqual(originalPages, currentPages);
 
-            var sourcePageInfo = outputDocument.PageControls
-                .Select(c => new PageInfo
-                {
-                    DocumentName = c.Page.OriginalDocumentName,
-                    Page = c.Page.OriginalPageNumber,
-                    Deleted = c.Deleted,
-                    Orientation = c.Page.ImageOrientation
-                });
+            var sourcePageInfo = outputDocument.SourcePageInfo;
 
             int pageCount = currentPages.Count();
 
@@ -3844,6 +3850,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         private void OnOutputDocumentDeleted(OutputDocumentDeletedEventArgs eventArgs)
         {
             OutputDocumentDeleted?.Invoke(this, eventArgs);
+        }
+
+        /// <summary>
+        /// Raises the <see cref="AcceptedSourcePagination"/> event.
+        /// </summary>
+        /// <param name="eventArgs">The <see cref="AcceptedSourcePaginationEventArgs"/> instance to
+        /// use when raising the event.</param>
+        private void OnAcceptedSourcePagination(AcceptedSourcePaginationEventArgs eventArgs)
+        {
+            AcceptedSourcePagination?.Invoke(this, eventArgs);
         }
 
         /// <summary>

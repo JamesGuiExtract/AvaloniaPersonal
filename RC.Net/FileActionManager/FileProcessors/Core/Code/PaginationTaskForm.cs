@@ -1244,6 +1244,33 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
+        /// Handles the <see cref="PaginationPanel.AcceptedSourcePagination"/> of the <see cref="_paginationPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="AcceptedSourcePaginationEventArgs"/> instance containing the event data.</param>
+        void HandlePaginationPanel_AcceptedSourcePagination(object sender, AcceptedSourcePaginationEventArgs e)
+        {
+            try
+            {
+                var sourceFile = e.PageInfo
+                    .Select(pageInfo => pageInfo.DocumentName)
+                    .First();
+
+                var sourceFileId = GetFileID(sourceFile);
+
+                ExtractException.Assert("ELI47285", "FileTaskSession was not started.",
+                    _fileTaskSessionMap.TryGetValue(sourceFileId, out var sessionData));
+
+                _paginatedOutputCreationUtility.WritePaginationHistory(
+                    e.PageInfo, sourceFileId, sessionData.SessionID);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47282");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="PaginationPanel.OutputDocumentDeleted"/> of the <see cref="_paginationPanel"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -1252,7 +1279,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                var firstSourceFile = e.DeletePageInfo
+                var firstSourceFile = e.DeletedPageInfo
                     .Select(pageInfo => pageInfo.DocumentName)
                     .First();
 
@@ -1260,7 +1287,7 @@ namespace Extract.FileActionManager.FileProcessors
                     _fileTaskSessionMap.TryGetValue(GetFileID(firstSourceFile), out var sessionData));
 
                 _paginatedOutputCreationUtility.WritePaginationHistory(
-                    e.DeletePageInfo, -1, sessionData.SessionID);
+                    e.DeletedPageInfo, -1, sessionData.SessionID);
 
                 e.DocumentData.PaginationRequest = new PaginationRequest(
                     PaginationRequestType.Verified, sessionData.SessionID, -1, null);

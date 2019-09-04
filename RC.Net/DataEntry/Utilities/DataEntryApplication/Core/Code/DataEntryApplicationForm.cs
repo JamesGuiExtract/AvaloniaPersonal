@@ -3241,6 +3241,30 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
+        /// Handles the <see cref="PaginationPanel.AcceptedSourcePagination"/> of the <see cref="_paginationPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="AcceptedSourcePaginationEventArgs"/> instance containing the event data.</param>
+        void HandlePaginationPanel_AcceptedSourcePagination(object sender, AcceptedSourcePaginationEventArgs e)
+        {
+            try
+            {
+                var sourceFile = e.PageInfo
+                    .Select(pageInfo => pageInfo.DocumentName)
+                    .First();
+
+                ExtractException.Assert("ELI47283", "FileTaskSession was not started.", _fileTaskSessionID.HasValue);
+
+                _paginatedOutputCreationUtility.WritePaginationHistory(
+                    e.PageInfo, _fileId, _fileTaskSessionID.Value);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI47284");
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="PaginationPanel.OutputDocumentDeleted"/> of the <see cref="_paginationPanel"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -3249,14 +3273,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                var firstSourceFile = e.DeletePageInfo
+                var firstSourceFile = e.DeletedPageInfo
                     .Select(pageInfo => pageInfo.DocumentName)
                     .First();
                 
                 ExtractException.Assert("ELI47217", "FileTaskSession was not started.", _fileTaskSessionID.HasValue);
 
                 _paginatedOutputCreationUtility.WritePaginationHistory(
-                    e.DeletePageInfo, -1, _fileTaskSessionID.Value);
+                    e.DeletedPageInfo, -1, _fileTaskSessionID.Value);
             }
             catch (Exception ex)
             {

@@ -134,6 +134,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets the <see cref="PaginationUtility.PageInfo"/>s that represent the source document
+        /// pages for the document to output.
+        /// </summary>
+        public ReadOnlyCollection<PageInfo> SourcePageInfo
+        {
+            get
+            {
+                return _pageControls.Select(c => new PageInfo
+                    {
+                        DocumentName = c.Page.OriginalDocumentName,
+                        Page = c.Page.OriginalPageNumber,
+                        Deleted = c.Deleted,
+                        Orientation = c.Page.ImageOrientation
+                    }).ToList().AsReadOnly();
+            }
+        }
+
+        /// <summary>
         /// The <see cref="PaginationSeparator"/> representing this document in the UI.
         /// </summary>
         public PaginationSeparator PaginationSeparator

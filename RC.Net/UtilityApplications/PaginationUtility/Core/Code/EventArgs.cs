@@ -276,7 +276,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         public OutputDocumentDeletedEventArgs(IEnumerable<PageInfo> deletedPageInfo, PaginationDocumentData documentData)
             : base()
         {
-            DeletePageInfo = deletedPageInfo.ToList().AsReadOnly();
+            DeletedPageInfo = deletedPageInfo.ToList().AsReadOnly();
             DocumentData = documentData;
         }
 
@@ -284,7 +284,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// The <see cref="PageInfo"/>s that indicate the source document page for each respective page
         /// in the output document being deleted.
         /// </summary>
-        public ReadOnlyCollection<PageInfo> DeletePageInfo
+        public ReadOnlyCollection<PageInfo> DeletedPageInfo
         {
             get;
             private set;
@@ -292,6 +292,45 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Gets the <see cref="PaginationDocumentData"/> that has been associated with the deleted document.
+        /// </summary>
+        public PaginationDocumentData DocumentData
+        {
+            get;
+            private set;
+        }
+    }
+
+    /// <summary>
+    /// Event args for <see cref="PaginationPanel.AcceptedSourcePagination"/>.
+    /// </summary>
+    public class AcceptedSourcePaginationEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new <see cref="NotPaginateddEventArgs"/> instance.
+        /// </summary>
+        /// <param name="pageInfo"><see cref="PageInfo"/>s that indicate the source document
+        /// page for each respective page in the output document.</param>
+        /// <param name="documentData">The <see cref="PaginationDocumentData"/> that has been associated
+        /// with the deleted document.</param>
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public AcceptedSourcePaginationEventArgs(IEnumerable<PageInfo> pageInfo, PaginationDocumentData documentData)
+            : base()
+        {
+            PageInfo = pageInfo.ToList().AsReadOnly();
+            DocumentData = documentData;
+        }
+
+        /// <summary>
+        /// The <see cref="PageInfo"/>s that represents each respective page of the document
+        /// </summary>
+        public ReadOnlyCollection<PageInfo> PageInfo
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="PaginationDocumentData"/> that has been associated with the document.
         /// </summary>
         public PaginationDocumentData DocumentData
         {

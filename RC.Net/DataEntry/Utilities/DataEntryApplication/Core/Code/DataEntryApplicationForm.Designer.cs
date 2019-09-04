@@ -346,6 +346,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._paginationPanel.SuspendUIUpdates = false;
             this._paginationPanel.TabIndex = 0;
             this._paginationPanel.ToolBarVisible = true;
+            this._paginationPanel.AcceptedSourcePagination += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.AcceptedSourcePaginationEventArgs>(this.HandlePaginationPanel_AcceptedSourcePagination);
             this._paginationPanel.CreatingOutputDocument += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CreatingOutputDocumentEventArgs>(this.HandlePaginationPanel_CreatingOutputDocument);
             this._paginationPanel.OutputDocumentDeleted += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.OutputDocumentDeletedEventArgs>(this.HandlePaginationPanel_OutputDocumentDeleted);
             this._paginationPanel.Paginated += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.PaginatedEventArgs>(this.HandlePaginationPanel_Paginated);
