@@ -62,7 +62,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var sourcePageInfo = pageInfos.Where(info => !info.Deleted).ToList();
-                string sourceDocName = sourcePageInfo.First().DocumentName;
+                string sourceDocName = sourcePageInfo.FirstOrDefault()?.DocumentName;
+                if (sourceDocName == null)
+                {
+                    return "";
+                }
+
                 var pathTags = new FileActionManagerPathTags(tagManager, sourceDocName);
                 if (_outputPathTagExpression.Contains(PaginationSettings.SubDocIndexTag))
                 {
@@ -83,8 +88,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_outputPathTagExpression.Contains(PaginationSettings.FirstPageTag))
                 {
                     int firstPageNum = sourcePageInfo
-                        .Where(page => page.DocumentName == sourceDocName)
-                        .Min(page => page.Page);
+                            .Where(page => page.DocumentName == sourceDocName)
+                            .Min(page => page.Page);
 
                     pathTags.AddTag(PaginationSettings.FirstPageTag,
                         firstPageNum.ToString(CultureInfo.InvariantCulture));

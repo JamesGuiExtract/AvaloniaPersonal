@@ -897,16 +897,6 @@ namespace Extract.FileActionManager.FileProcessors
                     }
 
                     List<PageInfo> sourcePageInfos = GetSourcePageInfos(pFileRecord, docAttribute);
-
-                    if (sourcePageInfos.All(page => page.Deleted))
-                    {
-                        _paginatedOutputCreationUtility.WritePaginationHistory(
-                            sourcePageInfos, -1, fileTaskSessionID);
-
-                        // Does not count against fullyPaginated.
-                        continue;
-                    }
-
                     var outputData = GetUpdatedDocumentData(pFileRecord, docDataDictionary, docAttribute, sourcePageInfos);
 
                     // Check to see if the document qualifies to be output automatically.
@@ -923,10 +913,22 @@ namespace Extract.FileActionManager.FileProcessors
                             continue;
                         }
                     }
-                    
 
-                    // The document qualifies to be output; create it.
-                    CreatePaginatedOutput(docAttribute, sourcePageInfos, outputData, pFileRecord, fileProcessingDB, pFAMTM, fileTaskSessionID);
+                    // https://extract.atlassian.net/browse/ISSUE-16644
+                    // Don't skip output because all pages are deleted until the AutoPaginateQualifier
+                    // has been executed so that such documents can be funneled to verification if the
+                    // condition is not met.
+                    if (sourcePageInfos.All(page => page.Deleted))
+                    {
+                        // Write pagination history to record the deleted pages from the source document.
+                        _paginatedOutputCreationUtility.WritePaginationHistory(
+                            sourcePageInfos, -1, fileTaskSessionID);
+                    }
+                    else
+                    {
+                        // The document qualifies to be output; create it.
+                        CreatePaginatedOutput(docAttribute, sourcePageInfos, outputData, pFileRecord, fileProcessingDB, pFAMTM, fileTaskSessionID);
+                    }
                 }
             }
 
