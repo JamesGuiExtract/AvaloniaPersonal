@@ -828,7 +828,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // This will call Application.DoEvents in the midst of loading a document to
                     // keep the UI responsive as pages are loaded. This allows an opportunity
                     // for there to be multiple calls into LoadNextDocument at the same time.
-                    var outputDocument = (documentData.PaginationRequest == null)
+                    var outputDocument = (documentData?.PaginationRequest == null)
                         ? _primaryPageLayoutControl.CreateOutputDocument(sourceDocument, pages, deletedPages, viewedPages, position, true)
                         : _primaryPageLayoutControl.CreateOutputDocument(sourceDocument, documentData.PaginationRequest, position, true);
 
