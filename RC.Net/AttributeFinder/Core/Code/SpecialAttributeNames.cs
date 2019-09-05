@@ -30,6 +30,11 @@
         public static readonly string QualifiedForAutomaticOutput = "QualifiedForAutomaticOutput";
 
         /// <summary>
+        /// Value set by the LearningMachine class (joint probability of document pages and next doc's first page)
+        /// </summary>
+        public static readonly string PaginationConfidence = "PaginationConfidence";
+
+        /// <summary>
         /// The parent node for all 'real' data
         /// </summary>
         public static readonly string DocumentData = "DocumentData";

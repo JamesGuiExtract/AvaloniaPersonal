@@ -309,8 +309,12 @@ namespace Extract.ETL
                                     }
 
                                     // Compare the VOAs
-                                    var output = AttributeTreeComparer.CompareAttributes(expectedAttributes,
-                                    foundAttributes, XPathOfAttributesToIgnore, XPathOfContainerOnlyAttributes, cancelToken)
+                                    var output = AttributeTreeComparer.CompareAttributes(
+                                        expected: expectedAttributes,
+                                        found: foundAttributes,
+                                        ignoreXPath: XPathOfAttributesToIgnore,
+                                        containerXPath: XPathOfContainerOnlyAttributes,
+                                        cancelToken: cancelToken)
                                     .ToList();
 
                                     // Add the comparison results to the Results

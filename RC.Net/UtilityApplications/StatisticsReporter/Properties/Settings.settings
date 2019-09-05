@@ -57,10 +57,13 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="OutputAggregateTestResultVOAs" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="PerFileTestResultPathTagFunction" Type="System.String" Scope="User">
       <Value Profile="(Default)">&lt;SourceDocName&gt;.testoutput.voa</Value>
+    </Setting>
+    <Setting Name="PathsRequiredToBeCorrect" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

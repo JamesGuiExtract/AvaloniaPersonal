@@ -27,37 +27,6 @@ namespace Extract.DataCaptureStats
 
         static ThreadLocal<MiscUtils> _miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtilsClass());
 
-        /// <summary>
-        /// Compares one set of attributes with another. The per-file, map function of the design
-        /// </summary>
-        /// <param name="ignoreXPath">The XPath to select attributes to ignore.</param>
-        /// <param name="containerXPath">The XPath to select attributes that will be considered as containers only</param>
-        /// <remarks><see paramref="found"/> and <see paramref="expected"/> hierarchies may be modified
-        /// by this method.</remarks>
-        /// <param name="cancelToken">CancellationToken to allow cancellation of comparison</param>
-        public static IEnumerable<AccuracyDetail> CompareAttributes(IUnknownVector expected, IUnknownVector found,
-            string ignoreXPath = DefaultIgnoreXPath, string containerXPath = DefaultContainerXPath,
-            CancellationToken cancelToken = default(CancellationToken))
-        {
-            // Return only count accuracy details
-            return CompareAttributes(expected, found, ignoreXPath, containerXPath, false, cancelToken);
-        }
-
-        /// <summary>
-        /// Compares one set of attributes with another and collects the correct, incorrect and missed attributes
-        /// </summary>
-        /// <param name="ignoreXPath">The XPath to select attributes to ignore.</param>
-        /// <param name="containerXPath">The XPath to select attributes that will be considered as containers only</param>
-        /// <remarks><see paramref="found"/> and <see paramref="expected"/> hierarchies may be modified
-        /// by this method.</remarks>
-        /// <param name="cancelToken">CancellationToken to allow cancellation of comparison</param>
-        public static IEnumerable<AccuracyDetail> CompareAttributesPlus(IUnknownVector expected, IUnknownVector found,
-            string ignoreXPath = DefaultIgnoreXPath, string containerXPath = DefaultContainerXPath,
-            CancellationToken cancelToken = default(CancellationToken))
-        {
-            // Return count and collection accuracy details
-            return CompareAttributes(expected, found, ignoreXPath, containerXPath, true, cancelToken);
-        }
 
         /// <summary>
         /// Compares one set of attributes with another. The per-file, map function of the design
@@ -68,8 +37,9 @@ namespace Extract.DataCaptureStats
         /// by this method.</remarks>
         /// <param name="collectMatchData">Whether to collect each correct/incorrect/missed attribute in addition to counts</param>
         /// <param name="cancelToken">CancellationToken to allow cancellation of comparison</param>
-        private static IEnumerable<AccuracyDetail> CompareAttributes(IUnknownVector expected, IUnknownVector found,
-            string ignoreXPath = DefaultIgnoreXPath, string containerXPath = DefaultContainerXPath,
+        public static IEnumerable<AccuracyDetail> CompareAttributes(IUnknownVector expected, IUnknownVector found,
+            string ignoreXPath = DefaultIgnoreXPath,
+            string containerXPath = DefaultContainerXPath,
             bool collectMatchData = true,
             CancellationToken cancelToken = default(CancellationToken))
         {
@@ -239,7 +209,6 @@ namespace Extract.DataCaptureStats
             /// </summary>
             public bool Matched;
         }
-
 
         /// <summary>
         /// Builds a new fully qualified path for an attribute by adding to the path of its parent

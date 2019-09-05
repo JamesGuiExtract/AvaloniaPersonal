@@ -1687,7 +1687,7 @@ namespace Extract.AttributeFinder
                         // Add a PaginationConfidence attribute
                         ss = new SpatialStringClass();
                         ss.CreateNonSpatialString(string.Format(CultureInfo.InvariantCulture, "{0:N4}", docScore), sourceDocName);
-                        documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = "PaginationConfidence", Value = ss });
+                        documentAttribute.SubAttributes.PushBack(new ComAttribute { Name = SpecialAttributeNames.PaginationConfidence, Value = ss });
 
                         // Add input page attributes that are in this range
                         if (inputPageAttributes != null)

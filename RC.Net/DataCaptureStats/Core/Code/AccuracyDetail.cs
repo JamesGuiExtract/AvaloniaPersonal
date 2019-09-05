@@ -24,23 +24,46 @@ namespace Extract.DataCaptureStats
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AccuracyDetail"/> class.
+        /// Initializes a new instance of the <see cref="AccuracyDetail"/> with an integer value.
         /// </summary>
         /// <param name="label">The label.</param>
         /// <param name="path">The path.</param>
         /// <param name="value">The value.</param>
-        public AccuracyDetail(AccuracyDetailLabel label, string path, int value)
+        /// <param name="statsType">A string used to separate details into groups</param>
+        public AccuracyDetail(AccuracyDetailLabel label, string path, int value, string statsType = "")
         {
             Label = label;
             Path = path;
             Value = value;
+            StatsType = statsType;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccuracyDetail"/> with an attribute instead of an integer value.
+        /// </summary>
+        /// <remarks>This is used to pass around instances of misses/incorrect/correct items</remarks>
+        /// <param name="label">The label.</param>
+        /// <param name="path">The path.</param>
+        /// <param name="attribute">The attribute.</param>
         public AccuracyDetail(AccuracyDetailLabel label, string path, string attribute)
         {
             Label = label;
             Path = path;
             Attribute = attribute;
+        }
+
+        /// <summary>
+        /// Clones an <see cref="AccuracyDetail"/> instance using the provided statistics type value for the copy
+        /// </summary>
+        /// <param name="source">The other instance to copy from</param>
+        /// <param name="statsType">A string used to separate details into groups</param>
+        public AccuracyDetail(AccuracyDetail source, string statsType)
+        {
+            Label = source.Label;
+            Path = source.Path;
+            Value = source.Value;
+            Attribute = source.Attribute;
+            StatsType = statsType;
         }
 
         #endregion Constructors
@@ -64,6 +87,8 @@ namespace Extract.DataCaptureStats
 
         public string Attribute { get; set; } = "";
 
+        public string StatsType { get; set; } = "";
+
         #endregion Properties
 
         #region Overrides
@@ -85,7 +110,8 @@ namespace Extract.DataCaptureStats
                 || other.Label != Label
                 || other.Path != Path
                 || other.Value != Value
-                || other.Attribute != Attribute)
+                || other.Attribute != Attribute
+                || other.StatsType != StatsType)
             {
                 return false;
             }
@@ -103,7 +129,8 @@ namespace Extract.DataCaptureStats
                 .Hash(Label)
                 .Hash(Path)
                 .Hash(Value)
-                .Hash(Attribute ?? "");
+                .Hash(Attribute ?? "")
+                .Hash(StatsType ?? "");
         }
 
         /// <summary>
@@ -114,7 +141,7 @@ namespace Extract.DataCaptureStats
         /// </returns>
         public override string ToString()
         {
-            return String.Format(CultureInfo.CurrentCulture, "{0}|{1}|{2}|{3}", Label, Path, Value, Attribute ?? "");
+            return String.Format(CultureInfo.CurrentCulture, "{0}|{1}|{2}|{3}|{4}", Label, Path, Value, Attribute ?? "", StatsType ?? "");
         }
 
         #endregion Overrides

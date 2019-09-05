@@ -104,6 +104,7 @@ namespace StatisticsReporter
                 dcSettings.FileSettings.TypeOfStatistics = ReportSettings.Settings.TypeOfStatistics;
                 dcSettings.FileSettings.XPathToIgnore = ReportSettings.Settings.XPathOfAttributesToIgnore;
                 dcSettings.FileSettings.XPathOfContainerOnlyAttributes = ReportSettings.Settings.XPathOfContainerOnlyAttributes;
+                dcSettings.FileSettings.PathsRequiredToBeCorrect = ReportSettings.Settings.PathsRequiredToBeCorrect.Cast<string>();
                 dcSettings.ExpectedAttributeSetName = ReportSettings.Settings.ExpectedAttributeSetName;
                 dcSettings.FoundAttributeSetName = ReportSettings.Settings.FoundAttributeSetName;
 
@@ -208,9 +209,6 @@ namespace StatisticsReporter
 
                 dcSettings.ApplyDatesToFound = ReportSettings.Settings.ApplyDateRangeToFound;
 
-                // Create the Process Statistics 
-                ProcessStatistics Statistics = new ProcessStatistics(dcSettings);
-
                 var outputPerFileVOAs = ReportSettings.Settings.OutputPerFileTestResultVOAs;
                 var outputAggregateVOAs = ReportSettings.Settings.OutputAggregateTestResultVOAs;
                 var perFilePathTagFunction = ReportSettings.Settings.PerFileTestResultPathTagFunction;
@@ -222,15 +220,8 @@ namespace StatisticsReporter
                         !string.IsNullOrWhiteSpace(ReportSettings.Settings.PerFileTestResultPathTagFunction));
                 }
 
-                // Set the delegate
-                if (outputPerFileVOAs || outputAggregateVOAs)
-                {
-                    Statistics.PerFileAction = AttributeTreeComparer.CompareAttributesPlus;
-                }
-                else
-                {
-                    Statistics.PerFileAction = AttributeTreeComparer.CompareAttributes;
-                }
+                // Create the Process Statistics 
+                ProcessStatistics Statistics = new ProcessStatistics(dcSettings, outputPerFileVOAs || outputAggregateVOAs);
 
                 string timeStamp = DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd.HH.mm.ss", CultureInfo.InvariantCulture) + "UTC";
                 Console.WriteLine(UtilityMethods.FormatInvariant($"Processing started at {timeStamp}"));
@@ -599,6 +590,7 @@ namespace StatisticsReporter
                 "ErrorIfContainerOnlyConflict",
                 "Tagged",
                 "GroupByCriteria",
+                "PathsRequiredToBeCorrect",
             };
 
             // Table for configuration
@@ -648,6 +640,12 @@ namespace StatisticsReporter
                         : string.Join(", ", ((StringCollection)setting.PropertyValue).Cast<string>());
                 }
                 else if (setting.Name.Equals("GroupByCriteria"))
+                {
+                    Value =  setting.PropertyValue == null
+                        ? ""
+                        : string.Join("; ", ((StringCollection)setting.PropertyValue).Cast<string>());
+                }
+                else if (setting.Name.Equals("PathsRequiredToBeCorrect"))
                 {
                     Value =  setting.PropertyValue == null
                         ? ""

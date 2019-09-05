@@ -12,13 +12,12 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using GroupByCriterion = Extract.Utilities.Union<
     StatisticsReporter.GroupByDBField,
     StatisticsReporter.GroupByFoundXPath,
     StatisticsReporter.GroupByExpectedXPath>;
-
-using UCLID_AFCORELib;
 
 namespace StatisticsReporter
 {
@@ -103,6 +102,11 @@ namespace StatisticsReporter
         /// XPath Query to select the container only attributes
         /// </summary>
         public string XPathOfContainerOnlyAttributes { get; set; }
+
+        /// <summary>
+        /// Attribute paths that must be correct for a document to be considered correct
+        /// </summary>
+        public IEnumerable<string> PathsRequiredToBeCorrect { get; set; }
     }
 
     /// <summary>
@@ -271,7 +275,7 @@ namespace StatisticsReporter
         /// Delegate for the action that will be ran for each file
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public Func<IUnknownVector, IUnknownVector, string, string, CancellationToken,IEnumerable<AccuracyDetail>> PerFileAction { get; set; }
+        public CompareAttributesFunc PerFileAction { get; }
 
         #endregion
 
@@ -375,9 +379,72 @@ namespace StatisticsReporter
         /// Constructs the ProcessStatistics class
         /// </summary>
         /// <param name="settings">Settings for processing the data</param>
-        public ProcessStatistics(DataCaptureSettings settings)
+        public ProcessStatistics(DataCaptureSettings settings, bool returnInvestigationInfo, double confidenceThreshold = -1)
         {
             Settings = settings;
+
+            var xpathToIgnore = settings.FileSettings.XPathToIgnore;
+            var xpathOfContainerOnly = settings.FileSettings.XPathOfContainerOnlyAttributes;
+            var requiredPaths = settings.FileSettings.PathsRequiredToBeCorrect;
+
+            CompareAttributesFunc dataCaptureComparer = (expectedAttributes, foundAttributes) =>
+                AttributeTreeComparer.CompareAttributes(
+                    expected: expectedAttributes,
+                    found: foundAttributes,
+                    ignoreXPath: xpathToIgnore,
+                    containerXPath: xpathOfContainerOnly,
+                    collectMatchData: returnInvestigationInfo,
+                    cancelToken: default(CancellationToken));
+
+            switch (settings.FileSettings.TypeOfStatistics)
+            {
+                case "DataCapture":
+                    PerFileAction = dataCaptureComparer;
+                    break;
+                case "AutoPaginationAndData":
+                    IncludeFoundDocumentFunc includeFoundDocument = null;
+                    if (confidenceThreshold > 0)
+                    {
+                        includeFoundDocument = document =>
+                        {
+                            bool valid = document
+                                .SubAttributes
+                                .ToIEnumerable<IAttribute>()
+                                .FirstOrDefault(a =>
+                                    a.Name == SpecialAttributeNames.QualifiedForAutomaticOutput
+                                    && bool.TryParse(a.Value.String, out bool qualifies)
+                                    && qualifies)
+                                != null;
+
+                            if (valid)
+                            {
+                                return document
+                                    .SubAttributes
+                                    .ToIEnumerable<IAttribute>()
+                                    .FirstOrDefault(a =>
+                                        a.Name == SpecialAttributeNames.PaginationConfidence
+                                        && double.TryParse(a.Value.String, out double confidence)
+                                        && confidence >= confidenceThreshold)
+                                    != null;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        };
+                    }
+                    PerFileAction = (expectedAttributes, foundAttributes) =>
+                        PaginationComparer.CompareAttributes(
+                            expected: expectedAttributes,
+                            found: foundAttributes,
+                            compareDocumentData: dataCaptureComparer,
+                            includeFoundDocument: includeFoundDocument,
+                            requiredForDocumentMatchPaths: requiredPaths, //new List<string> { "DocumentType", "PatientInfo/DOB", "PatientInfo/Name/First", "PatientInfo/Name/Last" },
+                            cancelToken: default(CancellationToken));
+                    break;
+                default:
+                    throw new ArgumentException("Unknown TypeOfStatistics specified in settings: " + settings.FileSettings.TypeOfStatistics);
+            }
         }
 
         #endregion
@@ -480,12 +547,7 @@ namespace StatisticsReporter
                                         .ToArray();
 
                                     // Compare the VOAs
-                                    var allOutput = PerFileAction(ExpectedAttributes,
-                                              FoundAttributes,
-                                              Settings.FileSettings.XPathToIgnore,
-                                              Settings.FileSettings.XPathOfContainerOnlyAttributes,
-                                              default(CancellationToken))
-                                              .ToList();
+                                    var allOutput = PerFileAction(ExpectedAttributes, FoundAttributes).ToList();
 
                                     var output = new List<AccuracyDetail>();
                                     var collected = new List<AccuracyDetail>();
@@ -533,20 +595,32 @@ namespace StatisticsReporter
                 }
 
                 // Group the results by the group-by value array and create GroupStatistics objects
-                string[] groupByNames = Settings.GroupByCriteria
+                string[] groupByNames =
+                    Enumerable.Repeat("Statistics Type", 1)
+                    .Concat(Settings.GroupByCriteria
                     .Select(c => c.Match(e => e.ToReadableValue(),
                         xpath => xpath.ToString(),
-                        xpath => xpath.ToString()))
+                        xpath => xpath.ToString())))
                     .ToArray();
 
+                var comparer = new GroupByComparer();
                 var stats = Results
-                    .GroupBy(t => t.Item1, new GroupByComparer())
+                    .SelectMany(t =>
+                    {
+                        string[] perFileGroupBy = t.Item1;
+                        var details = t.Item2;
+                        return details.GroupBy(detail => detail.StatsType ?? "")
+                            .Select(group =>
+                                Tuple.Create(Enumerable.Repeat(group.Key, 1).Concat(perFileGroupBy).ToArray(), group.AsEnumerable())
+                            );
+                    })
+                    .GroupBy(t => t.Item1, comparer)
                     .Select(group =>
                         {
                             var perFile = group.Select(t => t.Item2).ToList();
                             return new GroupStatistics(perFile.Count, groupByNames, group.Key, perFile.SelectMany(items => items));
                         })
-                    .OrderBy(g => g.GroupByValues, new GroupByComparer())
+                    .OrderBy(g => g.GroupByValues, comparer)
                     .ToList();
 
                 return (stats, investigationInfo);

@@ -133,42 +133,6 @@ namespace StatisticsReporter.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool OutputAggregateTestResultVOAs {
-            get {
-                return ((bool)(this["OutputAggregateTestResultVOAs"]));
-            }
-            set {
-                this["OutputAggregateTestResultVOAs"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool OutputPerFileTestResultVOAs {
-            get {
-                return ((bool)(this["OutputPerFileTestResultVOAs"]));
-            }
-            set {
-                this["OutputPerFileTestResultVOAs"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<SourceDocName>.testoutput.voa")]
-        public string PerFileTestResultPathTagFunction {
-            get {
-                return ((string)(this["PerFileTestResultPathTagFunction"]));
-            }
-            set {
-                this["PerFileTestResultPathTagFunction"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool ApplyDateRangeToFound {
             get {
@@ -258,6 +222,53 @@ namespace StatisticsReporter.Properties {
             }
             set {
                 this["Header1"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool OutputPerFileTestResultVOAs {
+            get {
+                return ((bool)(this["OutputPerFileTestResultVOAs"]));
+            }
+            set {
+                this["OutputPerFileTestResultVOAs"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<SourceDocName>.testoutput.voa")]
+        public string PerFileTestResultPathTagFunction {
+            get {
+                return ((string)(this["PerFileTestResultPathTagFunction"]));
+            }
+            set {
+                this["PerFileTestResultPathTagFunction"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool OutputAggregateTestResultVOAs {
+            get {
+                return ((bool)(this["OutputAggregateTestResultVOAs"]));
+            }
+            set {
+                this["OutputAggregateTestResultVOAs"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection PathsRequiredToBeCorrect {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["PathsRequiredToBeCorrect"]));
+            }
+            set {
+                this["PathsRequiredToBeCorrect"] = value;
             }
         }
     }
