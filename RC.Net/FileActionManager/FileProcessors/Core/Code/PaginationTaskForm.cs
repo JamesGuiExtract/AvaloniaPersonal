@@ -674,7 +674,8 @@ namespace Extract.FileActionManager.FileProcessors
 
                 base.OnLoad(e);
 
-                _paginatedOutputCreationUtility = new PaginatedOutputCreationUtility(_settings.OutputPath, FileProcessingDB, _actionID);
+                _paginatedOutputCreationUtility = new PaginatedOutputCreationUtility(
+                    _settings.OutputPath, FileProcessingDB, _actionID, -1);
 
                 // Establish image viewer connections prior to calling base.OnLoad which will
                 // potentially remove some IImageViewerControls.

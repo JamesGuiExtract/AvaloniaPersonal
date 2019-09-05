@@ -213,11 +213,6 @@ namespace Extract.FileActionManager.FileProcessors
         FileProcessingDB _fileProcessingDB;
 
         /// <summary>
-        /// The ID of the action being processed.
-        /// </summary>
-        int _actionID;
-
-        /// <summary>
         /// Utility methods to generalte new paginated output files and record them into in the FAM database.
         /// </summary>
         PaginatedOutputCreationUtility _paginatedOutputCreationUtility;
@@ -719,7 +714,6 @@ namespace Extract.FileActionManager.FileProcessors
                 UnlockLeadtools.UnlockLeadToolsSupport();
 
                 _fileProcessingDB = pDB;
-                _actionID = nActionID;
 
                 if (pFAMTM == null)
                 {
@@ -729,8 +723,6 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 _tagUtility = (ITagUtility)pFAMTM;
-
-                _paginatedOutputCreationUtility = new PaginatedOutputCreationUtility(OutputPath, pDB, _actionID);
 
                 if (!string.IsNullOrWhiteSpace(DocumentDataPanelAssembly))
                 {
@@ -780,8 +772,15 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 int fileTaskSessionID = _fileProcessingDB.StartFileTaskSession(
-                    _AUTO_PAGINATE_TASK_GUID, pFileRecord.FileID, _actionID);
+                    _AUTO_PAGINATE_TASK_GUID, pFileRecord.FileID, pFileRecord.ActionID);
                 DateTime sessionStartTime = DateTime.Now;
+
+                // https://extract.atlassian.net/browse/ISSUE-16623
+                // The pagination output utility needs to be initialized per output file. In the case that
+                // <All workflows> is being excercised, the priority retreieved needs to pertain to the
+                // workflow-specific action indicated by pFileRecord.ActionID.
+                _paginatedOutputCreationUtility = new PaginatedOutputCreationUtility(
+                    OutputPath, pDB, pFileRecord.ActionID, pFileRecord.WorkflowID);
 
                 bool fullyPaginated = false;
                 if (_depPanel == null)
@@ -907,7 +906,7 @@ namespace Extract.FileActionManager.FileProcessors
                         var serializedAttributes = _miscUtils.Value.GetObjectAsStringizedByteStream(docAttribute.SubAttributes);
 
                         if (!AutoPaginateQualifier.FileMatchesPaginationCondition(pFileRecord, proposedDocumentName,
-                            documentStatusJson, serializedAttributes, fileProcessingDB, _actionID, pFAMTM))
+                            documentStatusJson, serializedAttributes, fileProcessingDB, pFileRecord.ActionID, pFAMTM))
                         {
                             fullyPaginated = false;
                             continue;

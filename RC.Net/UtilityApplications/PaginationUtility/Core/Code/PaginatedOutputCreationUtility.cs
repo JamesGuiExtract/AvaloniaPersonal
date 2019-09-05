@@ -33,18 +33,25 @@ namespace Extract.UtilityApplications.PaginationUtility
         int _actionID;
 
         /// <summary>
+        /// The ID for the workflow into which the file should be added.
+        /// </summary>
+        int _workflowID;
+
+        /// <summary>
         /// Initializes a new PaginatedOutputCreationUtility instance.
         /// </summary>
         /// <param name="outputPathTagExpression">The path tag expression used to generate filenames for output documents.</param>
         /// <param name="fileProcessingDB">The interface providing access into the FAM DB the output document is being added to.</param>
         /// <param name="actionID">The ID of the action in the database into which the file is being added.</param>
-        public PaginatedOutputCreationUtility(string outputPathTagExpression, FileProcessingDB fileProcessingDB, int actionID)
+        /// <param name="workflowID">The ID for the workflow into which the file should be added.</param>
+        public PaginatedOutputCreationUtility(string outputPathTagExpression, FileProcessingDB fileProcessingDB, int actionID, int workflowID)
         {
             try
             {
                 _outputPathTagExpression = outputPathTagExpression;
                 _fileProcessingDB = fileProcessingDB;
                 _actionID = actionID;
+                _workflowID = workflowID;
             }
             catch (Exception ex)
             {
@@ -181,11 +188,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 int fileID = -1;
-                const int nCurrentWorkflow = -1;
                 try
                 {
                     fileID = _fileProcessingDB.AddFileNoQueue(
-                        outputFileName, 0, pageCount, priority, nCurrentWorkflow);
+                        outputFileName, 0, pageCount, priority, _workflowID);
                 }
                 catch (Exception ex)
                 {
@@ -204,7 +210,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             "$InsertBeforeExt(<SourceDocName>,_$RandomAlphaNumeric(6))");
 
                         fileID = _fileProcessingDB.AddFileNoQueue(
-                            outputFileName, 0, pageCount, priority, nCurrentWorkflow);
+                            outputFileName, 0, pageCount, priority, _workflowID);
                     }
                     else
                     {

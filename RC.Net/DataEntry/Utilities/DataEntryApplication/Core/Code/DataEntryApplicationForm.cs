@@ -1098,7 +1098,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 base.OnLoad(e);
 
                 _paginatedOutputCreationUtility = new PaginatedOutputCreationUtility(
-                    _settings.PaginationSettings.PaginationOutputPath, FileProcessingDB, _actionId);
+                    _settings.PaginationSettings.PaginationOutputPath, FileProcessingDB, _actionId, workflowID: -1);
 
                 // Set the application name
                 if (string.IsNullOrEmpty(_actionName))
