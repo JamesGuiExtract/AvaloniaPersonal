@@ -1825,22 +1825,29 @@ namespace Extract.DataEntry
         /// </summary>
         void UpdateValidation()
         {
-            if (_validationErrorProvider != null || _validationWarningErrorProvider != null)
+            try
             {
-                DataValidity dataValidity = Validate(false);
-
-                if (_validationErrorProvider != null)
+                if (_validationErrorProvider != null || _validationWarningErrorProvider != null)
                 {
-                    _validationErrorProvider.SetError(this, dataValidity == DataValidity.Invalid ?
-                        _activeValidator.ValidationErrorMessage : "");
-                }
+                    DataValidity dataValidity = Validate(false);
 
-                if (_validationWarningErrorProvider != null)
-                {
-                    _validationWarningErrorProvider.SetError(this, 
-                        dataValidity == DataValidity.ValidationWarning ? 
+                    if (_validationErrorProvider != null)
+                    {
+                        _validationErrorProvider.SetError(this, dataValidity == DataValidity.Invalid ?
                             _activeValidator.ValidationErrorMessage : "");
+                    }
+
+                    if (_validationWarningErrorProvider != null)
+                    {
+                        _validationWarningErrorProvider.SetError(this,
+                            dataValidity == DataValidity.ValidationWarning ?
+                                _activeValidator.ValidationErrorMessage : "");
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI48286", "Error setting error icon", ex);
             }
         }
 
