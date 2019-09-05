@@ -237,11 +237,6 @@ namespace Extract.FileActionManager.FileProcessors
         IPaginationDocumentDataPanel _depPanel;
 
         /// <summary>
-        /// Used to expand path tag expressions.
-        /// </summary>
-        ITagUtility _tagUtility;
-
-        /// <summary>
         /// Indicates whether this task object is dirty or not
         /// </summary>
         bool _dirty;
@@ -684,16 +679,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                if (_depPanel != null)
-                {
-                    _depPanel.PanelControl.Invoke((MethodInvoker)(() =>
-                    {
-                        // Disposing the owning form of the _depPanel will end the thread.
-                        var owningForm = _depPanel.PanelControl.TopLevelControl;
-                        owningForm.Dispose();
-                        _depPanel = null;
-                    }));
-                }
+                EndDEPContainerThread();
             }
             catch (Exception ex)
             {
@@ -743,25 +729,6 @@ namespace Extract.FileActionManager.FileProcessors
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI47027", _COMPONENT_DESCRIPTION);
 
                 UnlockLeadtools.UnlockLeadToolsSupport();
-
-                _fileProcessingDB = pDB;
-
-                if (pFAMTM == null)
-                {
-                    // A FAMTagManager without path tags is better than no tag manager (still can
-                    // be used to expand path functions).
-                    pFAMTM = new FAMTagManager();
-                }
-
-                _tagUtility = (ITagUtility)pFAMTM;
-
-                if (!string.IsNullOrWhiteSpace(DocumentDataPanelAssembly))
-                {
-                    var expandedAssemblyFileName = _tagUtility.ExpandTagsAndFunctions(
-                        DocumentDataPanelAssembly, null, null);
-
-                    _depPanel = CreateDEPContainerThread(expandedAssemblyFileName, _tagUtility, MinStackSize);
-                }
             }
             catch (Exception ex)
             {
@@ -802,9 +769,20 @@ namespace Extract.FileActionManager.FileProcessors
                         pDB.GetDBInfoSetting("AlternateComponentDataDir", false);
                 }
 
+                _fileProcessingDB = pDB;
+
                 int fileTaskSessionID = _fileProcessingDB.StartFileTaskSession(
                     _AUTO_PAGINATE_TASK_GUID, pFileRecord.FileID, pFileRecord.ActionID);
                 DateTime sessionStartTime = DateTime.Now;
+
+                if (pFAMTM == null)
+                {
+                    // A FAMTagManager without path tags is better than no tag manager (still can
+                    // be used to expand path functions).
+                    pFAMTM = new FAMTagManager();
+                }
+
+                var tagUtility = (ITagUtility)pFAMTM;
 
                 // https://extract.atlassian.net/browse/ISSUE-16623
                 // The pagination output utility needs to be initialized per output file. In the case that
@@ -814,7 +792,7 @@ namespace Extract.FileActionManager.FileProcessors
                     OutputPath, pDB, pFileRecord.ActionID, pFileRecord.WorkflowID);
 
                 bool fullyPaginated = false;
-                if (_depPanel == null)
+                if (string.IsNullOrWhiteSpace(DocumentDataPanelAssembly))
                 {
                     fullyPaginated = ProcessFile(pFileRecord, pDB, pFAMTM, fileTaskSessionID);
                 }
@@ -824,10 +802,29 @@ namespace Extract.FileActionManager.FileProcessors
                     // The invoke call should serialize anyway, but to be sure, use _lock.
                     lock (_lock)
                     {
-                        _depPanel.PanelControl.Invoke((MethodInvoker)(() =>
+                        try
                         {
-                            fullyPaginated = ProcessFile(pFileRecord, pDB, pFAMTM, fileTaskSessionID);
-                        }));
+                            // https://extract.atlassian.net/browse/ISSUE-16648
+                            // The DEP panel needs to be initialized per output file so that it will use
+                            // the workflow context of the current file when running in an <All Workflows> fps.
+                            var expandedAssemblyFileName = tagUtility.ExpandTagsAndFunctions(
+                                DocumentDataPanelAssembly, null, null);
+
+                            _depPanel = CreateDEPContainerThread(expandedAssemblyFileName, tagUtility, MinStackSize);
+
+                            _depPanel.PanelControl.Invoke((MethodInvoker)(() =>
+                            {
+                                fullyPaginated = ProcessFile(pFileRecord, pDB, pFAMTM, fileTaskSessionID);
+                            }));
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex.AsExtract("ELI47286");
+                        }
+                        finally
+                        {
+                            EndDEPContainerThread();
+                        }
                     }
                 }
 
@@ -1360,44 +1357,68 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         IPaginationDocumentDataPanel CreateDEPContainerThread(string documentDataPanelAssembly, ITagUtility tagUtility, uint minStackSize)
         {
-            var createdEvent = new ManualResetEvent(false);
-            IPaginationDocumentDataPanel panel = null;
-            Form form = new Form();
-            ExtractException ee = null;
-
-            Thread thread = new Thread(() =>
+            using (var createdEvent = new ManualResetEvent(false))
             {
-                try
+                IPaginationDocumentDataPanel panel = null;
+                Form form = new Form();
+                ExtractException ee = null;
+
+                Thread thread = new Thread(() =>
                 {
-                    panel = CreateDocumentDataPanel(documentDataPanelAssembly, tagUtility);
-                    form = new InvisibleForm();
-                    form.Controls.Add(panel.PanelControl);
+                    try
+                    {
+                        panel = CreateDocumentDataPanel(documentDataPanelAssembly, tagUtility);
+                        form = new InvisibleForm();
+                        form.Controls.Add(panel.PanelControl);
+
+                        // Wait until the DEP is initialized before returning.
+                        panel.PanelControl.HandleCreated += (o, e) => createdEvent.Set();
+                    }
+                    catch (Exception ex)
+                    {
+                        ee = ex.AsExtract("ELI47047");
+
+                        // Don't wait for the panel if there was an error creating it.
+                        createdEvent.Set();
+                    }
+
+                    Application.Run(form);
                 }
-                catch (Exception ex)
+                , (int)minStackSize);
+
+                // [DataEntry:292] Some .Net control functionality such as clipboard and 
+                // auto-complete depends upon the STA threading model.
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
+
+                ExtractException.Assert("ELI47290",
+                    "Timeout waiting for DEP framework to initialize",
+                    createdEvent.WaitOne(30000));
+
+                if (ee != null)
                 {
-                    ee = ex.AsExtract("ELI47047");
-                }
-                finally
-                {
-                    createdEvent.Set();
+                    throw ee;
                 }
 
-                Application.Run(form);
+                return panel;
             }
-            , (int)minStackSize);
+        }
 
-            // [DataEntry:292] Some .Net control functionality such as clipboard and 
-            // auto-complete depends upon the STA threading model.
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
-            createdEvent.WaitOne();
-
-            if (ee != null)
+        /// <summary>
+        /// Closes the DEP container (and, thus, ending the thread)
+        /// </summary>
+        void EndDEPContainerThread()
+        {
+            if (_depPanel != null)
             {
-                throw ee;
+                _depPanel.PanelControl.Invoke((MethodInvoker)(() =>
+                {
+                    // Disposing the owning form of the _depPanel will end the thread.
+                    var owningForm = _depPanel.PanelControl.TopLevelControl;
+                    owningForm.Dispose();
+                    _depPanel = null;
+                }));
             }
-
-            return panel;
         }
 
         /// <summary>
