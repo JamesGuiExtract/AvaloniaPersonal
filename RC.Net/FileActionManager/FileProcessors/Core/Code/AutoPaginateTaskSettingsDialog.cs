@@ -156,14 +156,31 @@ namespace Extract.FileActionManager.FileProcessors
                     return;
                 }
 
-                if (_qualifierConditionConfigurableObjectControl.ConfigurableObject != null &&
-                    !_qualifierConditionConfigurableObjectControl.IsConfigured)
+                if (_qualifierConditionConfigurableObjectControl.ConfigurableObject != null)
                 {
-                    UtilityMethods.ShowMessageBox(
-                       "The auto-pagination condition is not properly configured.",
-                       "Invalid configuration", true);
+                    if (!_qualifierConditionConfigurableObjectControl.IsConfigured)
+                    {
+                        UtilityMethods.ShowMessageBox(
+                           "The auto-pagination condition is not properly configured.",
+                           "Invalid configuration", true);
 
-                    return;
+                        return;
+                    }
+
+                    // https://extract.atlassian.net/browse/ISSUE-16589
+                    // Because there is not a trivial solution to prevent configuration of nested conditions
+                    // that are not compatible with pagination, for the moment instead check before applying
+                    // the condition that no such conditions are configured.
+                    if (!IsPaginationCondition(
+                        _qualifierConditionConfigurableObjectControl.ConfigurableObject))
+                    {
+                        UtilityMethods.ShowMessageBox(
+                            "Condition is not compatible with pagination; "
+                                + "please make sure all nested conditions are compatible with pagination.",
+                            "Invalid configuration", true);
+
+                        return;
+                    }
                 }
 
                 // If outputing document, validate associated properties
@@ -287,5 +304,39 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         #endregion Event Handlers
+
+        #region Private Members
+
+        /// <summary>
+        /// Returns <c>true</c> if the conditional and all of its descendents are of type IPaginationCondition
+        /// or <c>false</c> if at least one of them are not.
+        /// </summary>
+        bool IsPaginationCondition(object condition)
+        {
+            if (condition is IObjectWithDescription objectWithDescription)
+            {
+                condition = objectWithDescription.Object;
+            }
+
+            if (condition is IPaginationCondition)
+            {
+                if (condition is IMultipleObjectHolder multiCondition)
+                {
+                    return multiCondition.ObjectsVector
+                        .ToIEnumerable<object>()
+                        .All(c => IsPaginationCondition(c));
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        #endregion Private Members
     }
 }

@@ -587,7 +587,6 @@ namespace Extract.FileActionManager.FileProcessors
                 if (string.IsNullOrWhiteSpace(InputDataPath)
                     || OutputQualifiedDocuments &&
                         (string.IsNullOrWhiteSpace(OutputPath)
-                        || string.IsNullOrWhiteSpace(SourceActionIfFullyPaginated)
                         || string.IsNullOrWhiteSpace(SourceActionIfNotFullyPaginated)
                         || string.IsNullOrWhiteSpace(OutputAction)))
                 {
