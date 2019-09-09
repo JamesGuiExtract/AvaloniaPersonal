@@ -390,9 +390,9 @@ namespace Extract.AttributeFinder.Test
             CollectionAssert.AreEqual(topLevelAttributes, enumeration);
 
             // After removing all attributes the context will only contain the root node,
-            // returned as an empty string from Evaluate
+            // returned as a RootNode object from Evaluate
             var resultObject = xpathContext.Evaluate("//*");
-            Assert.IsEmpty((string)((IEnumerable<object>)resultObject).First());
+            Assert.AreEqual(XPathContext.RootNode, ((IEnumerable<object>)resultObject).First());
         }
 
         // Empty attributes should not have a text node

@@ -112,8 +112,11 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(2, voa.Size());
             for (int i = 0; i < voa.Size(); ++i)
             {
-                // There should only be a Pages subattribute of each Document attribute
-                Assert.AreEqual(1, ((IAttribute)voa.At(i)).SubAttributes.Size());
+                var subattributes = ((IAttribute)voa.At(i)).SubAttributes;
+                // There should a Pages and a PaginationConfidence subattribute of each Document attribute
+                Assert.AreEqual(2, subattributes.Size());
+                Assert.AreEqual(SpecialAttributeNames.Pages, ((IAttribute)subattributes.At(0)).Name);
+                Assert.AreEqual(SpecialAttributeNames.PaginationConfidence, ((IAttribute)subattributes.At(1)).Name);
             }
 
             // Test preserving input attributes
@@ -123,14 +126,14 @@ namespace Extract.AttributeFinder.Test
             lmo.PreserveInputAttributes = true;
             lmo.ProcessOutput(voa, doc, null);
             Assert.AreEqual(2, voa.Size());
-            // The first doc should have a Pages subattribute and three Page subattributes
-            Assert.AreEqual(4, ((IAttribute)voa.At(0)).SubAttributes.Size());
-            // The enumeration of the first Document attributes includes 1 Doc + 1 Pages + what was there before
-            Assert.AreEqual(2 + pageOneTwoThreeAttributesCount, ((IAttribute)voa.At(0)).EnumerateDepthFirst().Count());
-            // The second doc should have a Pages subattribute and one Page subattribute
-            Assert.AreEqual(2, ((IAttribute)voa.At(1)).SubAttributes.Size());
-            // The enumeration of the second Document attributes includes 1 Doc + 1 Pages + what was there before
-            Assert.AreEqual(2 + pageFourAttributesCount, ((IAttribute)voa.At(1)).EnumerateDepthFirst().Count());
+            // The first doc should have Pages and PaginationConfidence subattributes and three Page subattributes
+            Assert.AreEqual(5, ((IAttribute)voa.At(0)).SubAttributes.Size());
+            // The enumeration of the first Document attributes includes 1 Doc + 1 Pages + 1 PaginationConfidence + what was there before
+            Assert.AreEqual(3 + pageOneTwoThreeAttributesCount, ((IAttribute)voa.At(0)).EnumerateDepthFirst().Count());
+            // The second doc should have Pages and PaginationConfidence subattributes and one Page subattribute
+            Assert.AreEqual(3, ((IAttribute)voa.At(1)).SubAttributes.Size());
+            // The enumeration of the second Document attributes includes 1 Doc + 1 Pages + 1 PaginationConfidence + what was there before
+            Assert.AreEqual(3 + pageFourAttributesCount, ((IAttribute)voa.At(1)).EnumerateDepthFirst().Count());
         }
 
         [Test, Category("LearningMachineOutputHandler")]

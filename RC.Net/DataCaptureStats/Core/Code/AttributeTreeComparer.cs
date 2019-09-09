@@ -40,7 +40,7 @@ namespace Extract.DataCaptureStats
         public static IEnumerable<AccuracyDetail> CompareAttributes(IUnknownVector expected, IUnknownVector found,
             string ignoreXPath = DefaultIgnoreXPath,
             string containerXPath = DefaultContainerXPath,
-            bool collectMatchData = true,
+            bool collectMatchData = false,
             CancellationToken cancelToken = default(CancellationToken))
         {
             try
