@@ -510,6 +510,36 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets a value indicating whether the document's data currently has a warning
+        /// NOTE: Will be <c>false</c> if <see cref="DataError"/> is <c>true</c>.
+        /// </summary>
+        /// <value><see langword="true"/> if the document data contains a warning but no error;
+        /// otherwise, <see langword="false"/>.
+        /// </value>
+        public bool DataWarning
+        {
+            get
+            {
+                return PageControls.Any(c => !c.Deleted) &&
+                    (_documentData != null) &&
+                    _documentData.AllowDataEdit &&
+                    _documentData.DataWarning;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the document has qualified to be processed automatically
+        /// by the auto-paginate task or <c>null</c> if no such detemination has been made.
+        /// </summary>
+        public bool? QualifiedForAutomaticOutput
+        {
+            get
+            {
+                return _documentData?.QualifiedForAutomaticOutput;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating the there was pagination suggested for the current
         /// document.
         /// </summary>

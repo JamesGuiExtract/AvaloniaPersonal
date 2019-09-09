@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.Label label1;
-            System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label3;
             System.Windows.Forms.Label label4;
             System.Windows.Forms.Label label5;
@@ -39,6 +38,7 @@
             Extract.Utilities.Forms.InfoTip infoTip1;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AutoPaginateTaskSettingsDialog));
             System.Windows.Forms.Label label8;
+            this._sourceIfFullyPaginatedActionLabel = new System.Windows.Forms.Label();
             this._sourceIfFullyPaginatedActionComboBox = new System.Windows.Forms.ComboBox();
             this._outputActionComboBox = new System.Windows.Forms.ComboBox();
             this._cancelButton = new System.Windows.Forms.Button();
@@ -61,7 +61,6 @@
             this._qualifierConditionConfigurableObjectControl = new Extract.Utilities.Forms.ConfigurableObjectControl();
             this._outputQualifiedDocumentsCheckBox = new System.Windows.Forms.CheckBox();
             label1 = new System.Windows.Forms.Label();
-            label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
             label5 = new System.Windows.Forms.Label();
@@ -83,14 +82,14 @@
             label1.TabIndex = 0;
             label1.Text = "Output document path (path for paginated image files)";
             // 
-            // label2
+            // _sourceIfFullyPaginatedActionLabel
             // 
-            label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(3, 24);
-            label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(263, 13);
-            label2.TabIndex = 5;
-            label2.Text = "Queue fully-paginated source documents to this action";
+            this._sourceIfFullyPaginatedActionLabel.AutoSize = true;
+            this._sourceIfFullyPaginatedActionLabel.Location = new System.Drawing.Point(3, 24);
+            this._sourceIfFullyPaginatedActionLabel.Name = "_sourceIfFullyPaginatedActionLabel";
+            this._sourceIfFullyPaginatedActionLabel.Size = new System.Drawing.Size(263, 13);
+            this._sourceIfFullyPaginatedActionLabel.TabIndex = 5;
+            this._sourceIfFullyPaginatedActionLabel.Text = "Queue fully-paginated source documents to this action";
             // 
             // label3
             // 
@@ -329,7 +328,7 @@
             // 
             this._sourceDocumentsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._sourceDocumentsGroupBox.Controls.Add(label2);
+            this._sourceDocumentsGroupBox.Controls.Add(this._sourceIfFullyPaginatedActionLabel);
             this._sourceDocumentsGroupBox.Controls.Add(this._sourceIfFullyPaginatedActionComboBox);
             this._sourceDocumentsGroupBox.Controls.Add(label5);
             this._sourceDocumentsGroupBox.Controls.Add(this._sourceIfNotFullyPaginatedActionComboBox);
@@ -474,5 +473,6 @@
         private Utilities.Forms.BrowseButton _inputPathBrowseButton;
         private Utilities.Forms.BetterTextBox _inputPathTextBox;
         private Forms.FileActionManagerPathTagButton _inputPathPathTagButton;
+        private System.Windows.Forms.Label _sourceIfFullyPaginatedActionLabel;
     }
 }

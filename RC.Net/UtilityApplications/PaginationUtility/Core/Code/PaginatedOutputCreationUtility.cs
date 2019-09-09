@@ -80,7 +80,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (subDocIndex <= 0)
                     {
-                        subDocIndex = GetFirstSubDocIndex(pageInfos, tagManager);
+                        subDocIndex = GetFirstSubDocIndex(pageInfos);
                     }
 
                     pathTags.AddTag(PaginationSettings.SubDocIndexTag,
@@ -117,9 +117,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Calculates first sub-document index (one-based) if the output path tag expression contains SubDocIndex tag></SubDocIndex>
         /// </summary>
         /// <param name="pageInfos">The PageInfos for the pages to be in the document.</param>
-        /// <param name="tagManager">The tag manager that should be used to expand the path tag expression.</param>
         /// <returns>The count + 1 of previously output documents for this source document or 0 if the output tag expression doesn't contain a SubDocIndex tag</returns>
-        public int GetFirstSubDocIndex(IEnumerable<PageInfo> pageInfos, FAMTagManager tagManager)
+        public int GetFirstSubDocIndex(IEnumerable<PageInfo> pageInfos)
         {
             try
             {

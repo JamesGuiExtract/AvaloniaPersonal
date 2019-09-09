@@ -813,20 +813,13 @@ namespace Extract.DataEntry
                 _validationWarningErrorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
 
                 _errorIcon = _validationErrorProvider.Icon;
-
                 // Scale SystemIcons.Warning down to 16x16 for _validationWarningErrorProvider
-                using (Bitmap scaledBitmap = new Bitmap(16, 16))
+                using (var resizedWarningImage = SystemIcons.Warning.ToBitmap().ResizeHighQuality(16, 16))
                 {
-                    using (Graphics graphics = Graphics.FromImage(scaledBitmap))
-                    {
-                        graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                        graphics.DrawImage(SystemIcons.Warning.ToBitmap(), 0, 0, 16, 16);
-
-                        // NOTE: This requires the icon to be explicitly destroyed via
-                        // NativeMethods.DestroyIcon to prevent GDI object leaks.
-                        _warningIcon = Icon.FromHandle(scaledBitmap.GetHicon());
-                        _validationWarningErrorProvider.Icon = _warningIcon;
-                    }
+                    // NOTE: This requires the icon to be explicitly destroyed via
+                    // NativeMethods.DestroyIcon to prevent GDI object leaks.
+                    _warningIcon = Icon.FromHandle(resizedWarningImage.GetHicon());
+                    _validationWarningErrorProvider.Icon = _warningIcon;
                 }
 
                 // Create transparent 1 pixel icon to use if ShowValidationIcons == false
@@ -834,15 +827,10 @@ namespace Extract.DataEntry
                 using (Bitmap blankImage = new Bitmap(1, 1))
                 {
                     blankImage.SetPixel(0, 0, Color.FromArgb(0, 0, 0, 0));
-                    using (Graphics graphics = Graphics.FromImage(blankImage))
-                    {
-                        graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                        graphics.DrawImage(SystemIcons.Warning.ToBitmap(), 0, 0, 16, 16);
 
-                        // NOTE: This requires the icon to be explicitly destroyed via
-                        // NativeMethods.DestroyIcon to prevent GDI object leaks.
-                        _blankIcon = Icon.FromHandle(blankImage.GetHicon());
-                    }
+                    // NOTE: This requires the icon to be explicitly destroyed via
+                    // NativeMethods.DestroyIcon to prevent GDI object leaks.
+                    _blankIcon = Icon.FromHandle(blankImage.GetHicon());
                 }
             }
             catch (Exception ex)
@@ -7524,7 +7512,6 @@ namespace Extract.DataEntry
                 // NOTE: For now I think the cases where the error icon would extend off-page are so
                 // rare that it's not worth handling. But this would be where such a check should
                 // be made (see ShowAttributeToolTip).
-
                 errorIconsForAttribute.Add(errorIcon);
             }
         }

@@ -1,7 +1,6 @@
 ﻿using Extract.AttributeFinder;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -210,10 +209,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (PendingDocumentStatus.DataError != _dataError)
                 {
                     _dataError = PendingDocumentStatus.DataError;
-                    if (!PendingDocumentStatus.DataError)
-                    {
-                        _dataErrorMessage = null;
-                    }
                     dirty = true;
                 }
 
@@ -221,6 +216,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _dataWarning = PendingDocumentStatus.DataWarning;
                     dirty = true;
+                }
+
+                if (!_dataError && !_dataWarning)
+                {
+                    _dataErrorMessage = null;
                 }
 
                 if (statusOnly)
@@ -529,7 +529,26 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (dataError != _dataError)
             {
                 _dataError = dataError;
-                if (!dataError)
+                if (!dataError && !_dataWarning)
+                {
+                    _dataErrorMessage = null;
+                }
+
+                OnDocumentDataStateChanged();
+            }
+        }
+
+        /// <summary>
+        /// Sets the whether this data contains a validation warning.
+        /// </summary>
+        /// <param name="dataWarning"><c>true</c> if this data contains a validation warning; otherwise,
+        /// <c>false</c>.</param>
+        internal void SetDataWarning(bool dataWarning)
+        {
+            if (dataWarning != _dataWarning)
+            {
+                _dataWarning = dataWarning;
+                if (!dataWarning && !_dataError)
                 {
                     _dataErrorMessage = null;
                 }

@@ -278,7 +278,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _documentData.SetModified(UndoOperationAvailable);
                     if (!Config.Settings.PerformanceTesting)
                     {
-                        _documentData.SetDataError(DataValidity == DataValidity.Invalid);
+                        UpdateDataValidity(_documentData, DataValidity);
                     }
 
                     _documentData.SetInitialized();
@@ -348,7 +348,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var dataEntryData = (DataEntryPaginationDocumentData)data;
                 if (!Config.Settings.PerformanceTesting)
                 {
-                    dataEntryData.SetDataError(DataValidity == DataValidity.Invalid);
+                    UpdateDataValidity(dataEntryData, DataValidity);
                 }
                 dataEntryData.UndoState = AttributeStatusInfo.UndoManager.GetState();
 
@@ -728,7 +728,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (_documentData != null && !Config.Settings.PerformanceTesting)
                 {
-                    _documentData.SetDataError(DataValidity == DataValidity.Invalid);
+                    UpdateDataValidity(_documentData, DataValidity);
                 }
             }
             catch (Exception ex)
@@ -1105,6 +1105,37 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41665");
+            }
+        }
+
+        /// <summary>
+        /// Sets the error/warning status for <paramref name="documentData"/> according to <paramref name="dataValidity"/>.
+        /// </summary>
+        /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData"/> instance to update.</param>
+        /// <param name="dataValidity">The <see cref="DataValidity"/> to use to update it.</param>
+        static void UpdateDataValidity(DataEntryPaginationDocumentData documentData, DataValidity dataValidity)
+        {
+            switch (dataValidity)
+            {
+                case DataValidity.Invalid:
+                    documentData.SetDataError(true);
+                    documentData.SetDataWarning(false);
+                    break;
+
+                case DataValidity.ValidationWarning:
+                    documentData.SetDataError(false);
+                    documentData.SetDataWarning(true);
+                    break;
+
+                case DataValidity.Invalid | DataValidity.ValidationWarning:
+                    documentData.SetDataError(true);
+                    documentData.SetDataWarning(true);
+                    break;
+
+                case DataValidity.Valid:
+                    documentData.SetDataError(false);
+                    documentData.SetDataWarning(false);
+                    break;
             }
         }
 

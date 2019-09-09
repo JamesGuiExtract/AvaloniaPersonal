@@ -2041,6 +2041,12 @@ namespace Extract.FileActionManager.FileProcessors
                             {
                                 documentData.PaginationRequest = new PaginationRequest(paginationRequestAttribute);
                             }
+                            else
+                            {
+                                var qualifiedAttribute = AttributeMethods.GetSingleAttributeByName(
+                                    documentAttribute.SubAttributes, SpecialAttributeNames.QualifiedForAutomaticOutput);
+                                documentData.QualifiedForAutomaticOutput = qualifiedAttribute?.Value.String.ToBoolean();
+                            }
 
                             List<int> pages = null;
                             List<int> deletedPages = null;

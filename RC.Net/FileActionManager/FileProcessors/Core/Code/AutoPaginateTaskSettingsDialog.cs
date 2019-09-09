@@ -122,7 +122,8 @@ namespace Extract.FileActionManager.FileProcessors
                 _autoRotateCheckBox.Checked = Settings.AutoRotatePages;
 
                 _newDocumentsGroupBox.Enabled =
-                    _sourceDocumentsGroupBox.Enabled =
+                    _sourceIfFullyPaginatedActionLabel.Enabled =
+                    _sourceIfFullyPaginatedActionComboBox.Enabled =
                     _outputQualifiedDocumentsCheckBox.Checked =
                     Settings.OutputQualifiedDocuments;
                 _inputPathTextBox.Text = Settings.InputDataPath;
@@ -294,7 +295,8 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 _newDocumentsGroupBox.Enabled =
-                    _sourceDocumentsGroupBox.Enabled =
+                    _sourceIfFullyPaginatedActionLabel.Enabled =
+                    _sourceIfFullyPaginatedActionComboBox.Enabled =
                     _outputQualifiedDocumentsCheckBox.Checked;
             }
             catch (Exception ex)

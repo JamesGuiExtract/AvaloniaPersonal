@@ -286,6 +286,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets a value indicating whether the document has qualified to be processed automatically
+        /// by the auto-paginate task or <c>null</c> if no such detemination has been made.
+        /// </summary>
+        public virtual bool? QualifiedForAutomaticOutput
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// A description of the document.
         /// </summary>
         public virtual string Summary

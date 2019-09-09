@@ -827,30 +827,29 @@ namespace Extract.FileActionManager.FileProcessors
                     }
                 }
 
-                if (OutputQualifiedDocuments)
+                if ((fullyPaginated && OutputQualifiedDocuments)
+                    && !string.IsNullOrWhiteSpace(SourceActionIfFullyPaginated))
                 {
-                    if (fullyPaginated && !string.IsNullOrWhiteSpace(SourceActionIfFullyPaginated))
-                    {
-                        pDB.SetStatusForFile(
-                            pFileRecord.FileID,
-                            SourceActionIfFullyPaginated,
-                            pFileRecord.WorkflowID,
-                            EActionStatus.kActionPending,
-                            vbQueueChangeIfProcessing: true,
-                            vbAllowQueuedStatusOverride: false,
-                            poldStatus: out EActionStatus oldStatus);
-                    }
-                    else if (!fullyPaginated && !string.IsNullOrWhiteSpace(SourceActionIfNotFullyPaginated))
-                    {
-                        pDB.SetStatusForFile(
-                            pFileRecord.FileID,
-                            SourceActionIfNotFullyPaginated,
-                            pFileRecord.WorkflowID,
-                            EActionStatus.kActionPending,
-                            vbQueueChangeIfProcessing: true,
-                            vbAllowQueuedStatusOverride: false,
-                            poldStatus: out EActionStatus oldStatus);
-                    }
+                    pDB.SetStatusForFile(
+                        pFileRecord.FileID,
+                        SourceActionIfFullyPaginated,
+                        pFileRecord.WorkflowID,
+                        EActionStatus.kActionPending,
+                        vbQueueChangeIfProcessing: true,
+                        vbAllowQueuedStatusOverride: false,
+                        poldStatus: out EActionStatus oldStatus);
+                }
+                else if ((!fullyPaginated || !OutputQualifiedDocuments)
+                    && !string.IsNullOrWhiteSpace(SourceActionIfNotFullyPaginated))
+                {
+                    pDB.SetStatusForFile(
+                        pFileRecord.FileID,
+                        SourceActionIfNotFullyPaginated,
+                        pFileRecord.WorkflowID,
+                        EActionStatus.kActionPending,
+                        vbQueueChangeIfProcessing: true,
+                        vbAllowQueuedStatusOverride: false,
+                        poldStatus: out EActionStatus oldStatus);
                 }
 
                 var sessionSeconds = (DateTime.Now - sessionStartTime).TotalSeconds;
@@ -936,7 +935,7 @@ namespace Extract.FileActionManager.FileProcessors
                     {
                         if (subDocIndex < 0)
                         {
-                            subDocIndex = _paginatedOutputCreationUtility.GetFirstSubDocIndex(sourcePageInfos, pFAMTM);
+                            subDocIndex = _paginatedOutputCreationUtility.GetFirstSubDocIndex(sourcePageInfos);
                         }
                         else
                         {

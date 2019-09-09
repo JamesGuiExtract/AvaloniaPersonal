@@ -7,19 +7,6 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary> 
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
         #region Component Designer generated code
 
         /// <summary> 
@@ -41,13 +28,13 @@
             this._editedPaginationGlyph = new Extract.UtilityApplications.PaginationUtility.EditedPaginationGlyph();
             this._editedDataPictureBox = new System.Windows.Forms.PictureBox();
             this._editDocumentDataButton = new System.Windows.Forms.CheckBox();
-            this._dataErrorPictureBox = new System.Windows.Forms.PictureBox();
+            this._dataValidityPictureBox = new System.Windows.Forms.PictureBox();
             this._bottomDividingLinePanel = new System.Windows.Forms.Panel();
             this._toolTip = new System.Windows.Forms.ToolTip(this.components);
             this._tableLayoutPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._reprocessDocumentPictureBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._editedDataPictureBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this._dataErrorPictureBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._dataValidityPictureBox)).BeginInit();
             this.SuspendLayout();
             // 
             // _tableLayoutPanel
@@ -80,7 +67,7 @@
             this._tableLayoutPanel.Controls.Add(this._editedPaginationGlyph, 8, 1);
             this._tableLayoutPanel.Controls.Add(this._editedDataPictureBox, 9, 1);
             this._tableLayoutPanel.Controls.Add(this._editDocumentDataButton, 3, 1);
-            this._tableLayoutPanel.Controls.Add(this._dataErrorPictureBox, 10, 1);
+            this._tableLayoutPanel.Controls.Add(this._dataValidityPictureBox, 10, 1);
             this._tableLayoutPanel.Controls.Add(this._bottomDividingLinePanel, 0, 2);
             this._tableLayoutPanel.Location = new System.Drawing.Point(0, 0);
             this._tableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
@@ -244,15 +231,15 @@
             // 
             // _dataErrorPictureBox
             // 
-            this._dataErrorPictureBox.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this._dataErrorPictureBox.Image = ((System.Drawing.Image)(resources.GetObject("_dataErrorPictureBox.Image")));
-            this._dataErrorPictureBox.Location = new System.Drawing.Point(224, 4);
-            this._dataErrorPictureBox.Margin = new System.Windows.Forms.Padding(0);
-            this._dataErrorPictureBox.Name = "_dataErrorPictureBox";
-            this._dataErrorPictureBox.Size = new System.Drawing.Size(17, 17);
-            this._dataErrorPictureBox.TabIndex = 21;
-            this._dataErrorPictureBox.TabStop = false;
-            this._dataErrorPictureBox.Visible = false;
+            this._dataValidityPictureBox.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this._dataValidityPictureBox.Image = ((System.Drawing.Image)(resources.GetObject("_dataErrorPictureBox.Image")));
+            this._dataValidityPictureBox.Location = new System.Drawing.Point(224, 4);
+            this._dataValidityPictureBox.Margin = new System.Windows.Forms.Padding(0);
+            this._dataValidityPictureBox.Name = "_dataErrorPictureBox";
+            this._dataValidityPictureBox.Size = new System.Drawing.Size(17, 17);
+            this._dataValidityPictureBox.TabIndex = 21;
+            this._dataValidityPictureBox.TabStop = false;
+            this._dataValidityPictureBox.Visible = false;
             // 
             // _bottomDividingLinePanel
             // 
@@ -280,7 +267,7 @@
             this._tableLayoutPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._reprocessDocumentPictureBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._editedDataPictureBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this._dataErrorPictureBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._dataValidityPictureBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -299,7 +286,7 @@
         private System.Windows.Forms.ToolTip _toolTip;
         private System.Windows.Forms.CheckBox _selectedCheckBox;
         private System.Windows.Forms.PictureBox _reprocessDocumentPictureBox;
-        private System.Windows.Forms.PictureBox _dataErrorPictureBox;
+        private System.Windows.Forms.PictureBox _dataValidityPictureBox;
         private System.Windows.Forms.Panel _bottomDividingLinePanel;
         private System.Windows.Forms.Panel _topDividingLinePanel;
     }

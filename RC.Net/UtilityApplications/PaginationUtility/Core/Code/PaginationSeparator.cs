@@ -1,5 +1,7 @@
 ﻿using Extract.DataEntry;
+using Extract.Imaging;
 using Extract.Utilities.Forms;
+using Extract.UtilityApplications.PaginationUtility.Properties;
 using System;
 using System.Drawing;
 using System.Globalization;
@@ -100,6 +102,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         Image _editButtonImage;
 
+        /// <summary>
+        /// The error icon to be displayed on the separator bar for documents with invalid data.
+        /// </summary>
+        Image _errorIconImage;
+
+        /// <summary>
+        /// The warning icon to be displayed on the separator bar for documents with validation warnings.
+        /// </summary>
+        Image _warningIconImage;
+
+        /// <summary>
+        /// The green check icon to be displayed on the separator bar for documents that were qualified
+        /// to be processed automatically (but weren't).
+        /// </summary>
+        Image _qualifiedIconImage;
+
         #endregion Fields
 
         #region Constructors
@@ -125,6 +143,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 _editButtonImage = _editDocumentDataButton.Image;
+                _qualifiedIconImage = Resources.Accept.ResizeHighQuality(16, 16);
+                _errorIconImage = Resources.Error.ResizeHighQuality(16, 16);
+                using (var warningBitmap = SystemIcons.Warning.ToBitmap())
+                {
+                    _warningIconImage = warningBitmap.ResizeHighQuality(16, 16);
+                }
+
                 // Having auto-size set in the designer allows the button to be initialized to a size that
                 // fits the edit icon/text. But once initialized, disable so that the button doesn't resize
                 // when text is changed to "View"
@@ -134,7 +159,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _toolTip.SetToolTip(_editedPaginationGlyph, "Manual pagination has been applied");
                 _toolTip.SetToolTip(_reprocessDocumentPictureBox, "This document will be returned to the server");
                 _toolTip.SetToolTip(_editedDataPictureBox, "The data for this document has been modified");
-                _toolTip.SetToolTip(_dataErrorPictureBox, "The data for this document has error(s)");
+                _toolTip.SetToolTip(_dataValidityPictureBox, "The data for this document has error(s)");
             }
             catch (Exception ex)
             {
@@ -807,6 +832,48 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary> 
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (components != null)
+                {
+                    components.Dispose();
+                    components = null;
+                }
+
+                if (_editButtonImage != null)
+                {
+                    _editButtonImage.Dispose();
+                    _editButtonImage = null;
+                }
+
+                if (_errorIconImage != null)
+                {
+                    _errorIconImage.Dispose();
+                    _errorIconImage = null;
+                }
+
+                if (_warningIconImage != null)
+                {
+                    _warningIconImage.Dispose();
+                    _warningIconImage = null;
+                }
+
+                if (_qualifiedIconImage != null)
+                {
+                    _qualifiedIconImage.Dispose();
+                    _qualifiedIconImage = null;
+                }
+            }
+
+            base.Dispose(disposing);
+        }
+
         #endregion Overrides
 
         #region Event Handlers
@@ -1084,16 +1151,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _editedPaginationGlyph.Visible = !Document.InOriginalForm && !Document.OutputProcessed;
                 _reprocessDocumentPictureBox.Visible = Document.SendForReprocessing && pageCount > 0 && !Document.OutputProcessed;
                 _editedDataPictureBox.Visible = Document.DataModified && !Document.OutputProcessed;
-                _dataErrorPictureBox.Visible = Document.DataError && !Document.OutputProcessed;
-                if (Document.OutputProcessed)
-                {
-                    _toolTip.SetToolTip(_dataErrorPictureBox, null);
-                }
-                else
-                {
-                    _toolTip.SetToolTip(_dataErrorPictureBox,
-                        Document?.DocumentData?.DataErrorMessage ?? "The data for this document has error(s)");
-                }
+
+                UpdateDataValidityIcon();
 
                 SetColor();
 
@@ -1115,10 +1174,39 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _editedPaginationGlyph.Visible = false;
                     _reprocessDocumentPictureBox.Visible = false;
                     _editedDataPictureBox.Visible = false;
-                    _dataErrorPictureBox.Visible = false;
+                    _dataValidityPictureBox.Visible = false;
                 }
 
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Updates the status of the <see cref="_dataValidityPictureBox"/> based on the current document's data.
+        /// </summary>
+        void UpdateDataValidityIcon()
+        {
+            bool errorOrWarning = (Document.DataError || Document.DataWarning) && !Document.OutputProcessed;
+            if (errorOrWarning)
+            {
+                _dataValidityPictureBox.Visible = true;
+                _dataValidityPictureBox.Image = Document.DataError ? _errorIconImage : _warningIconImage;
+                _toolTip.SetToolTip(_dataValidityPictureBox,
+                    Document?.DocumentData?.DataErrorMessage ??
+                        $"The data for this document has {(Document.DataError ? "error(s)" : "warning(s)")}");
+            }
+            else if (Document.QualifiedForAutomaticOutput == true 
+                && !Document.OutputProcessed
+                && Document.InOriginalForm
+                && !Document.DocumentData.Modified)
+            {
+                _dataValidityPictureBox.Visible = true;
+                _dataValidityPictureBox.Image = _qualifiedIconImage;
+                _toolTip.SetToolTip(_dataValidityPictureBox, "This document qualified for automated processing");
+            }
+            else
+            {
+                _dataValidityPictureBox.Visible = false;
             }
         }
 

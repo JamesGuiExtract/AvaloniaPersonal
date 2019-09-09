@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -420,6 +421,47 @@ namespace Extract.Imaging
                 }
 
                 throw ExtractException.AsExtractException("ELI23773", ex);
+            }
+        }
+
+        /// <summary>
+        /// Generates a high-quality, resized copy of the source image.
+        /// Credit: https://stackoverflow.com/questions/1922040/how-to-resize-an-image-c-sharp
+        /// </summary>
+        /// <param name="sourceImage">The source <see cref="Image"/></param>
+        /// <param name="newWidth">The desired width.</param>
+        /// <param name="newHeight">The desired width.</param>
+        /// <returns>A resized copy of <see paramref="sourceImage"/></returns>
+        public static Bitmap ResizeHighQuality(this Image sourceImage, int newWidth, int newHeight)
+        {
+            try
+            {
+                var destRect = new Rectangle(0, 0, newWidth, newHeight);
+                var destImage = new Bitmap(newWidth, newHeight);
+
+                destImage.SetResolution(sourceImage.HorizontalResolution, sourceImage.VerticalResolution);
+               
+                using (Graphics graphics = Graphics.FromImage(destImage))
+                {
+                    graphics.CompositingMode = CompositingMode.SourceCopy;
+                    graphics.CompositingQuality = CompositingQuality.HighQuality;
+                    graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    graphics.SmoothingMode = SmoothingMode.HighQuality;
+                    graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                    using (var wrapMode = new ImageAttributes())
+                    {
+                        wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                        graphics.DrawImage(sourceImage, destRect, 0, 0, 
+                            sourceImage.Width, sourceImage.Height, GraphicsUnit.Pixel, wrapMode);
+                    }
+                }
+
+                return destImage;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI48288");
             }
         }
 
