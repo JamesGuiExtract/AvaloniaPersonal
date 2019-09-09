@@ -1432,16 +1432,21 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    _committingChanges = false;
-                    SuspendUIUpdates = false;
-                    if (_outputDocumentPositions != null)
+                    // https://extract.atlassian.net/browse/ISSUE-16654
+                    // Account for scenarios where the pagination UI is disposed in the midst of a commit.
+                    if (!IsDisposed)
                     {
-                        _outputDocumentPositions.Clear();
+                        _committingChanges = false;
+                        SuspendUIUpdates = false;
+                        if (_outputDocumentPositions != null)
+                        {
+                            _outputDocumentPositions.Clear();
+                        }
+
+                        ApplyOrderOfLoadedSourceDocuments();
+
+                        UpdateCommandStates();
                     }
-
-                    ApplyOrderOfLoadedSourceDocuments();
-
-                    UpdateCommandStates();
                 }
                 catch (Exception ex)
                 {
@@ -3195,6 +3200,13 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     DoneSavingData?.Invoke(this, new SavingDataEventArgs(sourceFileName));
                 }
+            }
+
+            // https://extract.atlassian.net/browse/ISSUE-16654
+            // Account for scenarios where the pagination UI is disposed in the midst of saving.
+            if (IsDisposed)
+            {
+                return false;
             }
 
             if (validateData)

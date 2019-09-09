@@ -1152,7 +1152,17 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI40094");
+                // https://extract.atlassian.net/browse/ISSUE-16654
+                // Attempting to display an exception after the form has been disposed can result
+                // in the application crashing
+                if (IsDisposed)
+                {
+                    ex.ExtractLog("ELI48289");
+                }
+                else
+                {
+                    ex.ExtractDisplay("ELI40094");
+                }
             }
             finally
             {
@@ -1168,7 +1178,17 @@ namespace Extract.FileActionManager.FileProcessors
                 }
                 catch (Exception ex)
                 {
-                    ex.ExtractDisplay("ELI40168");
+                    // https://extract.atlassian.net/browse/ISSUE-16654
+                    // Attempting to display an exception after the form has been disposed can result
+                    // in the application crashing
+                    if (IsDisposed)
+                    {
+                        ex.ExtractLog("ELI48290");
+                    }
+                    else
+                    {
+                        ex.ExtractDisplay("ELI40168");
+                    }
                 }
             }
         }
@@ -2196,6 +2216,14 @@ namespace Extract.FileActionManager.FileProcessors
         /// changes or the user is okay losing them.</returns>
         bool PreventClose()
         {
+            // Prevent the UI from being closed in the midst of committing changes
+            // (One scenario here is that there is an active validaton error being displayed).
+            // https://extract.atlassian.net/browse/ISSUE-16654
+            if (_paginationPanel?.IsCommittingChanges == true)
+            {
+                return true;
+            }
+
             if (FileIds.Any())
             {
                 // Because PaginationPanel.CheckForChanges is not very robust a determining when there

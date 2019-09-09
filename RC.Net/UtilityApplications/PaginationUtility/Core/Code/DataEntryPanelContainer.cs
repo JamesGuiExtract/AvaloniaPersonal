@@ -638,7 +638,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                while (!_documentStatusesUpdated.WaitOne(100))
+                // https://extract.atlassian.net/browse/ISSUE-16654
+                // Account for scenarios where the pagination UI is disposed in the midst of a status update.
+                while (_documentStatusesUpdated?.WaitOne(100) == false)
                 {
                     Application.DoEvents();
                 }
