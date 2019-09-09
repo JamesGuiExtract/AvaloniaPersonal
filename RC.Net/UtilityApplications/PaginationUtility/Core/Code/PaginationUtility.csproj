@@ -224,6 +224,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="PaginationSeparator.resx">
       <DependentUpon>PaginationSeparator.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -324,6 +325,7 @@
     <None Include="Resources\office_128.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\view.bmp" />
     <None Include="Resources\YellowArrow.png" />
     <None Include="Resources\RevertToSuggestion.png" />
     <None Include="Resources\RevertToDisk.png" />

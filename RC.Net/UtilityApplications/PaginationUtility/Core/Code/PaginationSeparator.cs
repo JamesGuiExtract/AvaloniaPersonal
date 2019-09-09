@@ -103,6 +103,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         Image _editButtonImage;
 
         /// <summary>
+        /// The view button icon
+        /// </summary>
+        Image _viewButtonImage;
+
+        /// <summary>
         /// The error icon to be displayed on the separator bar for documents with invalid data.
         /// </summary>
         Image _errorIconImage;
@@ -143,6 +148,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 _editButtonImage = _editDocumentDataButton.Image;
+
+                System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PaginationSeparator));
+                _viewButtonImage = ((System.Drawing.Image)(resources.GetObject("_viewDocumentDataButton.Image")));
+
                 _qualifiedIconImage = Resources.Accept.ResizeHighQuality(16, 16);
                 _errorIconImage = Resources.Error.ResizeHighQuality(16, 16);
                 using (var warningBitmap = SystemIcons.Warning.ToBitmap())
@@ -852,6 +861,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _editButtonImage = null;
                 }
 
+                if (_viewButtonImage != null)
+                {
+                    _viewButtonImage.Dispose();
+                    _viewButtonImage = null;
+                }
+
                 if (_errorIconImage != null)
                 {
                     _errorIconImage.Dispose();
@@ -1131,7 +1146,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _editDocumentDataButton.Visible =
                     Document.DocumentData != null
                     && Document.DocumentData.AllowDataEdit;
-                _editDocumentDataButton.Image = Document.OutputProcessed ? null : _editButtonImage;
+                _editDocumentDataButton.Image = Document.OutputProcessed ? _viewButtonImage : _editButtonImage;
                 _editDocumentDataButton.Text = Document.OutputProcessed ? "View" : "Edit";
                 _summaryLabel.Visible = true;
                 _summaryLabel.Text = Document.Summary

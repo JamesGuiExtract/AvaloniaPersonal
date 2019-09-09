@@ -55,17 +55,18 @@ namespace Extract.FileActionManager.FileProcessors.Test
             { "Core: Delete empty folder", "Extract.FileActionManager.FileProcessors.DeleteEmptyFolderTask" },
             { "Redaction: Verify sensitive data", "Extract.Redaction.Verification.VerificationTask" },
             { "Core: Store or retrieve attributes in database", "Extract.FileActionManager.FileProcessors.StoreAttributesInDbTask" },
-            { "Core: Pagination - Create output", "Extract.FileActionManager.CreatePaginatedOutputTask" },
+            { "Pagination: Create output", "Extract.FileActionManager.CreatePaginatedOutputTask" },
             { "Core: View image", "Extract.FileActionManager.ViewImageTask" },
             { "Core: Rasterize PDF", "Extract.FileActionManager.FileProcessors.RasterizePdfTask" },
             { "Core: Set file-action status in database", "FileProcessors.SetActionStatusFileProcessor.1" },
             { "Core: Copy, move or delete file", "FileProcessors.CopyMoveDeleteFileProcessor.1" },
             { "Core: Enhance OCR", "AFFileProcessors.EnhanceOCRTask.1" },
-            { "Core: Paginate files", "Extract.FileActionManager.PaginationTask" },
+            { "Pagination: Verify", "Extract.FileActionManager.PaginationTask" },
             { "Core: Add watermark", "FileProcessors.AddWatermarkTask.1" },
             { "Core: Split multi-page document", "Extract.FileActionManager.FileProcessors.SplitMultipageDocumentTask" },
             { "Core: OCR document", "FileProcessors.OCRFileProcessor.1" },
-            { "Core: Conditionally execute task(s)", "FileProcessors.ConditionalTask.1" }
+            { "Core: Conditionally execute task(s)", "FileProcessors.ConditionalTask.1" },
+            { "Pagination: Auto-Paginate", "Extract.FileActionManager.AutoPaginateTask" },
         };
 
         /// <summary>
@@ -102,7 +103,6 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
         /// <summary>
         /// Tests that all the file processing tasks return appropriate values for DisplayUI
-        /// 
         /// </summary>
         [Test, Category("DisplayUI")]
         public static void TestDisplayUIProperty()
@@ -111,13 +111,13 @@ namespace Extract.FileActionManager.FileProcessors.Test
             var fileProcessorsProgIDs = categoryManager.GetDescriptionToProgIDMap1(ExtractCategories.FileProcessorsName);
             var processorsProgIDs = fileProcessorsProgIDs.ComToDictionary();
 
-            // Checks to see if any items are not licensed.
-            var licensedButNotInTest = fileProcessors.Where(m => !processorsProgIDs.Any(m2 => m2.Key == m.Key)).ToDictionary(x => x.Key, x=> x.Value);
-            Assert.IsTrue(licensedButNotInTest.Count == 0, "You Need to license this file: " + licensedButNotInTest.Keys.FirstOrDefault() + " " + licensedButNotInTest.Values.FirstOrDefault());
-
             // Checks to see if any new licenses were created, if so it asks you to add them to this test.
+            var licensedButNotInTest = fileProcessors.Where(m => !processorsProgIDs.Any(m2 => m2.Key == m.Key)).ToDictionary(x => x.Key, x=> x.Value);
+            Assert.IsTrue(licensedButNotInTest.Count == 0, "Please add the following item to the fileProcessors dictionary (in the test class) as its a new license: " + licensedButNotInTest.Keys.FirstOrDefault() + " " + licensedButNotInTest.Values.FirstOrDefault());
+
+            // Checks to see if any items are not licensed.
             var notlicensed = processorsProgIDs.Where(m => !fileProcessors.Any(m2 => m2.Key == m.Key)).ToDictionary(x => x.Key, x => x.Value);
-            Assert.IsTrue(notlicensed.Count == 0, "Please add the following item to the fileProcessors dictionary (in the test class) as its a new license: " + notlicensed.Keys.FirstOrDefault() + " " + notlicensed.Values.FirstOrDefault());
+            Assert.IsTrue(notlicensed.Count == 0, "You Need to license this file: " + notlicensed.Keys.FirstOrDefault() + " " + notlicensed.Values.FirstOrDefault());
 
             // Test the Tasks that have a UI           
             var uiTasks = processorsProgIDs.Where(t => _UI_SELECTION_LIST.Any(w => t.Key.Contains(w)));
