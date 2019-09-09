@@ -1133,7 +1133,7 @@ namespace Extract.Dashboard.Utilities
                             && !string.IsNullOrWhiteSpace(_dashboardForm.ServerName)
                             && !string.IsNullOrWhiteSpace(_dashboardForm.DatabaseName))
                         {
-                            if (File.Exists(((string)columnValues[customValues.DataMemberUsedForFileName])))
+                            if (!string.IsNullOrWhiteSpace(customValues.RowQuery) && File.Exists(((string)columnValues[customValues.DataMemberUsedForFileName])))
                             {
                                 DashboardFileDetailForm detailForm = new DashboardFileDetailForm(
                                     columnValues, _dashboardForm.ServerName, _dashboardForm.DatabaseName, CustomGridValues[e.DashboardItemName]);

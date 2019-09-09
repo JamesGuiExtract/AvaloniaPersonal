@@ -32,10 +32,10 @@ namespace Extract.Dashboard.Utilities
                 var axisPoint = startingAxisPoint;
                 while (axisPoint.Parent?.Parent != null)
                 {
+                    dict[axisPoint.Dimension.DataMember] = axisPoint.GetDimensionValue(axisPoint.Dimension).Value;
                     axisPoint = axisPoint.Parent;
                 }
 
-                AddAllNodesInList(axisPoint, ref dict);
                 return dict;
             }
             catch (Exception ex)
@@ -43,35 +43,5 @@ namespace Extract.Dashboard.Utilities
                 throw ex.AsExtract("ELI47054");
             }
         }
-
-        #region Private methods
-
-        static void AddAllNodesInList(AxisPoint axisPoint, ref Dictionary<string, object> dictionary)
-        {
-            if (axisPoint == null)
-            {
-                return;
-            }
-
-            dictionary[axisPoint.Dimension.DataMember] = axisPoint.GetDimensionValue(axisPoint.Dimension).Value;
-
-            // The ChildItems for a row is expected to have either 0 or 1 items
-            if (axisPoint.ChildItems.Count == 0)
-            {
-                return;
-            }
-            if (axisPoint.ChildItems.Count == 1)
-            {
-                AddAllNodesInList(axisPoint.ChildItems[0], ref dictionary);
-            }
-            else
-            {
-                ExtractException ee = new ExtractException("ELI47055", "Unable to get data from Row.");
-                throw ee;
-            }
-            return;
-        }
-
-        #endregion
     }
 }
