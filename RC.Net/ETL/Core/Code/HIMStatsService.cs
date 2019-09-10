@@ -93,7 +93,8 @@ namespace Extract.ETL
                            ('FD7867BD-815B-47B5-BAF4-243B8C44AABB', 
                             '59496DF7-3951-49B7-B063-8C28F4CD843F', 
                             'AD7F3F3F-20EC-4830-B014-EC118F6D4567',
-                            'DF414AD2-742A-4ED7-AD20-C1A1C4993175')) 
+                            'DF414AD2-742A-4ED7-AD20-C1A1C4993175',
+                            '8ECBCC95-7371-459F-8A84-A2AFF7769800')) 
                 )
                 
                 INSERT INTO @FilesTable
