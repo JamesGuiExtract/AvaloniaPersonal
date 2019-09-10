@@ -107,6 +107,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             new ConcurrentDictionary<PaginationDocumentData, int>();
 
         /// <summary>
+        /// Records exceptions generated while processing status updates.
+        /// </summary>
+        ConcurrentBag<ExtractException> _documentStatusUpdateErrors = new ConcurrentBag<ExtractException>();
+
+        /// <summary>
         /// Limits the number of threads that can run concurrently for <see cref="StartUpdateDocumentStatus"/> calls.
         /// I recently changed this from 4 to 10 because threads tend to get tied up in locking for cache access
         /// in SQLQueryNodes which means it doesn't get anywhere near full CPU utilization of the threads here.
@@ -634,7 +639,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Waits for all documents status updates (started via <see cref="UpdateDocumentData"/>)
         /// to complete.
         /// </summary>
-        public void WaitForDocumentStatusUpdates()
+        /// <returns><c>true</c> if the wait completed successfully; <c>false</c> if the status update was cancelled.</returns>
+        public bool WaitForDocumentStatusUpdates()
         {
             try
             {
@@ -644,6 +650,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     Application.DoEvents();
                 }
+
+                if (StatusUpdateThreadManager?.StoppingThreads == true)
+                {
+                    return false;
+                }
+
+                if (_documentStatusUpdateErrors.Count > 0)
+                {
+                    throw _documentStatusUpdateErrors.AsAggregateException();
+                }
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -1220,6 +1238,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 thread.SetApartmentState(ApartmentState.STA);
 
+                Interlocked.Exchange<ConcurrentBag<ExtractException>>(
+                    ref _documentStatusUpdateErrors, new ConcurrentBag<ExtractException>());
                 _documentStatusesUpdated.Reset();
 
                 thread.Start();
@@ -1344,6 +1364,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     ex.ExtractLog("ELI45579");
                 }
                 return;
+            }
+
+            if (documentData.PendingDocumentStatus?.Exception != null)
+            {
+                _documentStatusUpdateErrors.Add(documentData.PendingDocumentStatus.Exception);
             }
 
             if (applyUpdateToUI)

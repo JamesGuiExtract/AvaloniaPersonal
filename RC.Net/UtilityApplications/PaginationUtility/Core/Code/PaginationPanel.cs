@@ -3196,7 +3196,11 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (sourceFileName != null)
                 {
-                    _documentDataPanel.WaitForDocumentStatusUpdates();
+                    if (!_documentDataPanel.WaitForDocumentStatusUpdates())
+                    {
+                        // Status updates were cancelled; data should not be saved.
+                        return false;
+                    }
 
                     DoneSavingData?.Invoke(this, new SavingDataEventArgs(sourceFileName));
                 }

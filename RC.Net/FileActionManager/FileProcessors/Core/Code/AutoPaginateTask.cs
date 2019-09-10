@@ -908,7 +908,10 @@ namespace Extract.FileActionManager.FileProcessors
                         _depPanel.StartUpdateDocumentStatus(docData, statusOnly: false, applyUpdateToUI: false, displayValidationErrors: false);
                     }
 
-                    _depPanel.WaitForDocumentStatusUpdates();
+                    if (!_depPanel.WaitForDocumentStatusUpdates())
+                    {
+                        throw new ExtractException("ELI48293", "Auto-pagination aborted.");
+                    }
                 }
 
                 int subDocIndex = -1;

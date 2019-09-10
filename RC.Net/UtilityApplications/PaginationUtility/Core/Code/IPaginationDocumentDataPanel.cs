@@ -206,7 +206,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Waits for all documents status updates (started via <see cref="UpdateDocumentData"/>)
         /// to complete.
         /// </summary>
-        void WaitForDocumentStatusUpdates();
+        bool WaitForDocumentStatusUpdates();
 
         /// <summary>
         /// Provides a message to be displayed.
