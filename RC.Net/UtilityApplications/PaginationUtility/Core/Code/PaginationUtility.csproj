@@ -325,7 +325,7 @@
     <None Include="Resources\office_128.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\view.bmp" />
+    <None Include="Resources\view.png" />
     <None Include="Resources\YellowArrow.png" />
     <None Include="Resources\RevertToSuggestion.png" />
     <None Include="Resources\RevertToDisk.png" />
