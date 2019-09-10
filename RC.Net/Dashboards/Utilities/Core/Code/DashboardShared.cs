@@ -1128,12 +1128,13 @@ namespace Extract.Dashboard.Utilities
                         var customValues = CustomGridValues[e.DashboardItemName];
 
                         // the form will only be displayed if there is a FileName specified and the datasource is SQL database
-                        if (columnValues.Count > 0
+                        if (!string.IsNullOrWhiteSpace(customValues.RowQuery) 
+                            && columnValues.Count > 0
                             && columnValues.ContainsKey(customValues.DataMemberUsedForFileName)
                             && !string.IsNullOrWhiteSpace(_dashboardForm.ServerName)
                             && !string.IsNullOrWhiteSpace(_dashboardForm.DatabaseName))
                         {
-                            if (!string.IsNullOrWhiteSpace(customValues.RowQuery) && File.Exists(((string)columnValues[customValues.DataMemberUsedForFileName])))
+                            if (File.Exists(((string)columnValues[customValues.DataMemberUsedForFileName])))
                             {
                                 DashboardFileDetailForm detailForm = new DashboardFileDetailForm(
                                     columnValues, _dashboardForm.ServerName, _dashboardForm.DatabaseName, CustomGridValues[e.DashboardItemName]);
