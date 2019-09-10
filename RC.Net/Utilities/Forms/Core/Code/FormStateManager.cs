@@ -717,7 +717,14 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                SaveState();
+                // Sometimes when verification is stopped via an unexpected sequence
+                // it can lead to the form already having been disposed by the time we got here.
+                // Avoid displaying an exception in that case... this can even lead to a crash at this point
+                // (one example: UI close, then while dirty prompt is up, save from FAM)
+                if (!_form.IsDisposed)
+                {
+                    SaveState();
+                }
             }
             catch (Exception ex)
             {
