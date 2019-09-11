@@ -2996,7 +2996,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // https://extract.atlassian.net/browse/ISSUE-15805
                     // Force a load of a document that has not yet been loaded due to the pagination
                     // tab being defaulted for a document.
-                    if (!_imageOpened && !_paginating)
+                    if (!_imageOpened && !_paginating && !string.IsNullOrWhiteSpace(_fileName))
                     {
                         _imageViewer.OpenImage(_fileName, false);
                     }
