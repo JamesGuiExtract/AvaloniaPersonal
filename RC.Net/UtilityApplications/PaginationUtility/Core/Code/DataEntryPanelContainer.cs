@@ -1405,7 +1405,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }, 
                 displayExceptions: false, 
-                exception => _newDocumentStatusUpdateErrors.Add(exception.AsExtract("ELI48297")));
+                exceptionAction: exception => _newDocumentStatusUpdateErrors.Add(exception.AsExtract("ELI48297")));
             }
             else
             {
