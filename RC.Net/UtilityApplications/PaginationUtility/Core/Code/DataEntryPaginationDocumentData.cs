@@ -277,7 +277,17 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI47125");
+                // If the document status update has an exception, assume that to be the primary
+                // cause and only log the secondary exception here.
+                if (PendingDocumentStatus.Exception != null)
+                {
+                    ex.ExtractLog("ELI48296");
+                    return null;
+                }
+                else
+                {
+                    throw ex.AsExtract("ELI47125");
+                }
             }
             finally
             {

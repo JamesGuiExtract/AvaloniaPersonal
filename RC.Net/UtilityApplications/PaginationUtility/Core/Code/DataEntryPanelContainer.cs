@@ -107,9 +107,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             new ConcurrentDictionary<PaginationDocumentData, int>();
 
         /// <summary>
-        /// Records exceptions generated while processing status updates.
+        /// Records new exceptions generated while in the processes of running status updates.
         /// </summary>
-        ConcurrentBag<ExtractException> _documentStatusUpdateErrors = new ConcurrentBag<ExtractException>();
+        ConcurrentBag<ExtractException> _newDocumentStatusUpdateErrors = new ConcurrentBag<ExtractException>();
+
+        /// <summary>
+        /// Aggregate document status update exceptions to be reported by at the end of the status updates.
+        /// </summary>
+        ExtractException _documentStatusUpdateErrors = null;
 
         /// <summary>
         /// Limits the number of threads that can run concurrently for <see cref="StartUpdateDocumentStatus"/> calls.
@@ -656,9 +661,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return false;
                 }
 
-                if (_documentStatusUpdateErrors.Count > 0)
+                if (_documentStatusUpdateErrors != null)
                 {
-                    throw _documentStatusUpdateErrors.AsAggregateException();
+                    throw _documentStatusUpdateErrors;
                 }
 
                 return true;
@@ -1238,8 +1243,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 thread.SetApartmentState(ApartmentState.STA);
 
-                Interlocked.Exchange<ConcurrentBag<ExtractException>>(
-                    ref _documentStatusUpdateErrors, new ConcurrentBag<ExtractException>());
                 _documentStatusesUpdated.Reset();
 
                 thread.Start();
@@ -1335,7 +1338,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 documentData.PendingDocumentStatus = 
-                    new DocumentStatus() { Exception = ex.CreateComVisible("ELI41453", "Failed to update document status") };
+                    new DocumentStatus() { Exception = new ExtractException("ELI41453", "Failed to update document status", ex) };
             }
             finally
             {
@@ -1368,7 +1371,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (documentData.PendingDocumentStatus?.Exception != null)
             {
-                _documentStatusUpdateErrors.Add(documentData.PendingDocumentStatus.Exception);
+                _newDocumentStatusUpdateErrors.Add(documentData.PendingDocumentStatus.Exception);
             }
 
             if (applyUpdateToUI)
@@ -1380,11 +1383,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     try
                     {
-                        if (documentData.PendingDocumentStatus?.Exception != null)
-                        {
-                            documentData.PendingDocumentStatus?.Exception.ExtractDisplay("ELI41464");
-                        }
-
                         if (_pendingDocumentStatusUpdate.ContainsKey(documentData))
                         {
                             var dataError = documentData.ApplyPendingStatusUpdate(statusOnly);
@@ -1403,27 +1401,57 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                     finally
                     {
-                        if (_pendingDocumentStatusUpdate.TryRemove(documentData, out int _)
-                            && _pendingDocumentStatusUpdate.Count == 0)
-                        {
-                            // Once any active batch of status updates is complete, clear shared cache data.
-                            AttributeStatusInfo.ClearProcessWideCache();
-
-                            _documentStatusesUpdated.Set();
-                        }
+                        SignalIfLastDocumentStatusUpdate(documentData, displayErrors: true);
                     }
-                });
+                }, 
+                displayExceptions: false, 
+                exception => _newDocumentStatusUpdateErrors.Add(exception.AsExtract("ELI48297")));
             }
             else
             {
-                if (_pendingDocumentStatusUpdate.TryRemove(documentData, out int _)
-                    && _pendingDocumentStatusUpdate.Count == 0)
-                {
-                    // Once any active batch of status updates is complete, clear shared cache data.
-                    AttributeStatusInfo.ClearProcessWideCache();
+                SignalIfLastDocumentStatusUpdate(documentData, displayErrors: false);
+            }
+        }
 
-                    _documentStatusesUpdated.Set();
+        /// <summary>
+        /// If <see paramref="documentData"/> is the last pending document status update, any
+        /// exceptions from those updates are gathered and <see cref="_documentStatusesUpdated"/>
+        /// is signaled.
+        /// </summary>
+        /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData"/> that was just updated.</param>
+        /// <param name="displayErrors"><c>true</c> to display the errors via the errors; otherwise, <c>false</c>.</param>
+        void SignalIfLastDocumentStatusUpdate(DataEntryPaginationDocumentData documentData, bool displayErrors)
+        {
+            if (_pendingDocumentStatusUpdate.TryRemove(documentData, out int _)
+                && _pendingDocumentStatusUpdate.Count == 0)
+            {
+                // Create a single aggregate exception to ecapsulate all exceptions encountered updating
+                // document statuses
+                ExtractException aggregateException = null;
+                if (_newDocumentStatusUpdateErrors.Count > 0)
+                {
+                    aggregateException =
+                        new ExtractException("ELI48295", "Error updating the status of one or more documents.",
+                        _newDocumentStatusUpdateErrors.AsAggregateException());
+
+                    if (displayErrors && _imageViewer != null)
+                    {
+                        _imageViewer.SafeBeginInvoke("ELI48294", () => aggregateException.Display());
+                    }
                 }
+
+                // Now that the status updates are complete, set _documentStatusUpdateErrors as the
+                // errors to be reported by WaitForDocumentStatusUpdates and reset
+                // _newDocumentStatusUpdateErrors in anticipation of new document status updates.
+                Interlocked.Exchange<ExtractException>(
+                    ref _documentStatusUpdateErrors, aggregateException);
+                Interlocked.Exchange<ConcurrentBag<ExtractException>>(
+                    ref _newDocumentStatusUpdateErrors, new ConcurrentBag<ExtractException>());
+
+                // Once any active batch of status updates is complete, clear shared cache data.
+                AttributeStatusInfo.ClearProcessWideCache();
+
+                _documentStatusesUpdated.Set();
             }
         }
 
