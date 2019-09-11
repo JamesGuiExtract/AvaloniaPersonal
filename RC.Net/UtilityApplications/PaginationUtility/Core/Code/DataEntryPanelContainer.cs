@@ -1443,9 +1443,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Now that the status updates are complete, set _documentStatusUpdateErrors as the
                 // errors to be reported by WaitForDocumentStatusUpdates and reset
                 // _newDocumentStatusUpdateErrors in anticipation of new document status updates.
-                Interlocked.Exchange<ExtractException>(
+                Interlocked.Exchange(
                     ref _documentStatusUpdateErrors, aggregateException);
-                Interlocked.Exchange<ConcurrentBag<ExtractException>>(
+                Interlocked.Exchange(
                     ref _newDocumentStatusUpdateErrors, new ConcurrentBag<ExtractException>());
 
                 // Once any active batch of status updates is complete, clear shared cache data.

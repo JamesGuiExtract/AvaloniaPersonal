@@ -849,7 +849,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // active file task sessions.
                 if (!e.Cancel)
                 {
-                    ReleaseFiles(_fileIDs.Keys.ToList(), null, cancelling: true);
+                    ReleaseFiles(_fileIDs.Keys.ToList(), null, cancelling: true, error: false);
                 }
             }
             catch (Exception ex)
@@ -1054,12 +1054,15 @@ namespace Extract.FileActionManager.FileProcessors
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         void HandlePaginationPanel_LoadNextDocument(object sender, EventArgs e)
         {
+            string fileName = null;
+            int fileID = -1;
+
             try
             {
                 // https://extract.atlassian.net/browse/ISSUE-13904
                 // First check to see if there is an additional file that has been checked out for
                 // processing that is not yet actively processing in the FAM.
-                int fileID = FileRequestHandler.GetNextCheckedOutFile(
+                fileID = FileRequestHandler.GetNextCheckedOutFile(
                     (_fileIDsLoaded.Count == 0) ? -1 : _fileIDsLoaded.Last());
                 ExtractException.Assert("ELI41282", "Unexpected file",
                     !_fileIDsLoaded.Contains(fileID));
@@ -1071,7 +1074,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
                 if (fileID > 0)
                 {
-                    string fileName = FileProcessingDB.GetFileNameFromFileID(fileID);
+                    fileName = FileProcessingDB.GetFileNameFromFileID(fileID);
                     LoadDocumentForPagination(fileID, fileName, true);
                 }
                 else
@@ -1081,6 +1084,22 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
+                try
+                {
+                    if (fileID > 0)
+                    {
+                        ReleaseFiles(new[] { fileName }, targetAction: null, cancelling: false, error: true);
+
+                        // ReleaseFiles will leaves it up to caller to release the file from the FAM queue when error = true;
+                        ReleaseFile(fileID);
+                        DelayFile(fileID);
+                    }
+                }
+                catch (Exception ex2)
+                {
+                    ex2.ExtractLog("ELI48299");
+                }
+
                 ex.ExtractDisplay("ELI40088");
             }
         }
@@ -1311,7 +1330,13 @@ namespace Extract.FileActionManager.FileProcessors
                     e.DeletedPageInfo, -1, sessionData.SessionID);
 
                 e.DocumentData.PaginationRequest = new PaginationRequest(
-                    PaginationRequestType.Verified, sessionData.SessionID, -1, null);
+                    PaginationRequestType.Verified,
+                    sessionData.SessionID,
+                    -1,
+                    e.DeletedPageInfo
+                        .Select(p => p.ImagePage)
+                        .ToList()
+                        .AsReadOnly());
             }
             catch (Exception ex)
             {
@@ -1353,9 +1378,9 @@ namespace Extract.FileActionManager.FileProcessors
 
                 // SourceAction allows a paginated source to be moved into a cleanup action even
                 // if it not moving forward in the primary workflow.
-                ReleaseFiles(e.PaginatedDocumentSources, _settings.SourceAction, cancelling: false);
+                ReleaseFiles(e.PaginatedDocumentSources, _settings.SourceAction, cancelling: false, error: false);
                 // OutputAction is for documents that should move forward in the primary workflow.
-                ReleaseFiles(e.UnmodifiedPaginationSources.Select(source => source.Key), _settings.OutputAction, cancelling: false);
+                ReleaseFiles(e.UnmodifiedPaginationSources.Select(source => source.Key), _settings.OutputAction, cancelling: false, error: false);
             }
             catch (Exception ex)
             {
@@ -1658,6 +1683,17 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
+                try
+                {
+                    ReleaseFiles(new[] { fileName }, targetAction: null, cancelling: false, error: true);
+                    // Intentionally not releasing file from FAM queue so that document falls thru standar FAM error
+                    // handling (shows up in failed files grid, and has associated exception registered in FAM DB)
+                }
+                catch (Exception ex2)
+                {
+                    ex2.ExtractLog("ELI48300");
+                }
+
                 ExtractException ee = new ExtractException("ELI40097", "Unable to open file.", ex);
                 ee.AddDebugData("File name", fileName, false);
                 RaiseVerificationException(ee, true);
@@ -1918,9 +1954,13 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         /// <param name="sourceFileNames">The names of the files to release.</param>
         /// <param name="targetAction">The action the source files should be queued to.</param>
+        /// <param name="cancelling"><c>true</c> if being released because processing is being cancelled.</param>
+        /// <param name="error"><c>true</c> if being released because there was an error loading the document.
+        /// In this case it will be up to the caller to release the file from the FAM queue if
+        /// appropriate.</param>
         /// <returns>The <see cref="_paginationPanel"/> index at which the first of the removed
         /// pages was at the time of release.</returns>
-        int ReleaseFiles(IEnumerable<string> sourceFileNames, string targetAction, bool cancelling)
+        int ReleaseFiles(IEnumerable<string> sourceFileNames, string targetAction, bool cancelling, bool error)
         {
             int position = -1;
 
@@ -1949,20 +1989,23 @@ namespace Extract.FileActionManager.FileProcessors
                         : Math.Min(docPosition, position);
 
                     var success = FileRequestHandler.SetFallbackStatus(
-                        sourceFileID, EActionStatus.kActionCompleted);
+                        sourceFileID, error ? EActionStatus.kActionFailed : EActionStatus.kActionCompleted);
                     ExtractException.Assert("ELI40104", "Failed to set fallback status", success,
                         "FileID", sourceFileID);
 
                     EndFileTaskSession(sourceFileID);
 
-                    ReleaseFile(sourceFileID);
-                    DelayFile(sourceFileID);
-
-                    if (!string.IsNullOrWhiteSpace(targetAction))
+                    if (!error)
                     {
-                        EActionStatus oldStatus;
-                        FileProcessingDB.SetStatusForFile(sourceFileID,
-                            targetAction, -1, EActionStatus.kActionPending, false, true, out oldStatus);
+                        ReleaseFile(sourceFileID);
+                        DelayFile(sourceFileID);
+
+                        if (!string.IsNullOrWhiteSpace(targetAction))
+                        {
+                            EActionStatus oldStatus;
+                            FileProcessingDB.SetStatusForFile(sourceFileID,
+                                targetAction, -1, EActionStatus.kActionPending, false, true, out oldStatus);
+                        }
                     }
                 }
             }
@@ -2043,9 +2086,8 @@ namespace Extract.FileActionManager.FileProcessors
 
                         bool? suggestedPagination = null;
 
-                        // Iterate each virtual document suggested by the rules and add as a separate
-                        // document as far as the _paginationPanel is concerned.
-                        foreach (var documentAttribute in attributeArray)
+                        // Loop to prepare the documentData for every document attribute.
+                        var docAttributesAndDatas = attributeArray.Select(documentAttribute =>
                         {
                             var documentDataAttribute = documentAttribute.SubAttributes
                                 .ToIEnumerable<IAttribute>()
@@ -2061,7 +2103,26 @@ namespace Extract.FileActionManager.FileProcessors
                             {
                                 documentData.PaginationRequest = new PaginationRequest(paginationRequestAttribute);
                             }
-                            else
+
+                            return (documentAttribute: documentAttribute, documentData: documentData);
+                        }).ToList();
+
+                        if (docAttributesAndDatas.All(d => d.documentData.PaginationRequest != null))
+                        {
+                            var ee = new ExtractException("ELI48298",
+                                "This document has been previously processed and cannot be displayed for verification.");
+                            ee.AddDebugData("Filename", fileName, false);
+                            throw ee;
+                        }
+
+                        // Iterate each virtual document suggested by the rules and add as a separate
+                        // document as far as the _paginationPanel is concerned.
+                        foreach (var docAttributeAndData in docAttributesAndDatas)
+                        {
+                            var documentAttribute = docAttributeAndData.documentAttribute;
+                            var documentData = docAttributeAndData.documentData;
+
+                            if (documentData.PaginationRequest == null)
                             {
                                 var qualifiedAttribute = AttributeMethods.GetSingleAttributeByName(
                                     documentAttribute.SubAttributes, SpecialAttributeNames.QualifiedForAutomaticOutput);
