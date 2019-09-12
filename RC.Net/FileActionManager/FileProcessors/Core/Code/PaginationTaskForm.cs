@@ -1906,8 +1906,15 @@ namespace Extract.FileActionManager.FileProcessors
                 if (fileID == _activeFileID)
                 {
                     _activeFileID = -1;
-                    sessionData.ActiveSeconds += _inputEventTracker.StopActivityTimer();
-                    _inputEventTracker.Active = false;
+
+                    // https://extract.atlassian.net/browse/ISSUE-16667
+                    // There are certain cases where the form (and _inputEventTracker) can be disposed
+                    // before getting here. Ignore active time if _inputEventTracker is no longer available.
+                    if (_inputEventTracker != null)
+                    {
+                        sessionData.ActiveSeconds += _inputEventTracker?.StopActivityTimer() ?? 0;
+                        _inputEventTracker.Active = false;
+                    }
                 }
 
                 if (_fileSessionInOverhead == sessionData)
