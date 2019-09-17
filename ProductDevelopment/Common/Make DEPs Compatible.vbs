@@ -1,7 +1,8 @@
-Dim targetApplications(2)
+Dim targetApplications(3)
 targetApplications(0) = "ProcessFiles.exe"
 targetApplications(1) = "DataEntryApplication.exe"
 targetApplications(2) = "RunFPSFile.exe"
+targetApplications(3) = "FAMProcess.exe"
 
 Dim dependentAssemblies(15)
 dependentAssemblies(0) = "Extract"
