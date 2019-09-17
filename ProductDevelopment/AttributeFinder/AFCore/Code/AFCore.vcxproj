@@ -173,7 +173,6 @@
       <OutputFile>.\..\Release/AFCore.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
@@ -357,6 +356,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <CopyFileToFolders Include="..\..\Misc\uclidafcore.ini">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
     <None Include="AFCore.def" />
     <None Include="AFDocument.rgs" />
     <None Include="Attribute.rgs" />

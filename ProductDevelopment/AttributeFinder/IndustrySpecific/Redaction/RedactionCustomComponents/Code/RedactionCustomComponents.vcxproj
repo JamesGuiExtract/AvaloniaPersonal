@@ -121,7 +121,6 @@
       <OutputFile>.\..\Release/RedactionCustomComponents.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -180,12 +179,10 @@
       <PreserveSBR>true</PreserveSBR>
     </Bscmake>
     <PostBuildEvent>
-      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
     <PostBuildEvent>
-      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -224,6 +221,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <CopyFileToFolders Include="..\Misc\IDShield.ini">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
     <None Include="RedactionCustomComponents.def" />
     <None Include="res\dataarea.bmp" />
     <None Include="res\DataAreaDialog.ico" />
