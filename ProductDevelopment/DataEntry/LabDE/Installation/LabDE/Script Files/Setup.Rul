@@ -49,10 +49,6 @@ begin
 		// Delete all lst files
 		DeleteFile(CommonAppDataFolder ^ EXTRACT_CATEGORYFILES ^ "*.LST");
 		
-		// Removed Corepoint install because not sure if silent install works properly
-   		//InstallCorepoint();
-   		InstallMSMQ();    
-   		
    		SetDCOMPermissions();   
    		
    		// Disable Vista themes if this is Vista.
@@ -102,55 +98,7 @@ begin
 end; 
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// Function: InstallMSMQ
-//
-//  Purpose: This function sets up MSMQ
-//	Returns 0 if no errors
-///////////////////////////////////////////////////////////////////////////////
-function InstallMSMQ()
-STRING szProgram, szCmdLine, strUninstallKey, tmp;
-int nResult, svServiceState;
-begin
-	SdShowMsg("Setup is Configuring MSMQ", TRUE);
-
-	// Need to install msmq which depends on the OS Version
-	if ( SYSINFO.nOSMajor = 5 ) then
-		szProgram = "sysocmgr";
-		szCmdLine = "/i:" + WINDIR ^ "sysoc.inf /u:\"" + SUPPORTDIR ^ "XP_2003_MSMQ.ini\" /q /c";
-		//MessageBox( szCmdLine, MB_OK);
-		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
-	elseif (SYSINFO.nOSMajor = 6 ) then
-		// If 64 bit file system redirection is not turned off the DISM command will not work
-		// on 64 bit OS
-		Disable(WOW64FSREDIRECTION);
-
-		if (SYSINFO.nWinMinor < 2 ) then
-			szProgram = "ocsetup";
-			// If it is server the arguments need to be different
-			if ( SYSINFO. nOSProductType = VER_NT_SERVER ) then
-				szCmdLine = "MSMQ-Server /passive /quiet /norestart";	
-			else
-				szCmdLine = "MSMQ-Container;MSMQ-Server /passive /quiet /norestart";
-			endif;
-		else
-			szProgram = "DISM ";
-			// If it is server the arguments need to be different
-			if ( SYSINFO.nOSProductType != VER_NT_SERVER ) then
-				szCmdLine = " /online /enable-feature /featurename:MSMQ-Container /all /quiet /norestart";
-				LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
-			endif;	
-			szCmdLine = " /online /enable-feature /featurename:MSMQ-Server /all /quiet /norestart";	
-		endif;
-		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
-		
-		Enable(WOW64FSREDIRECTION);
-	endif;
-
-	SdShowMsg("Setup is Configuring MSMQ", FALSE);
-end;
-             
+            
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Function: DisableVistaThemes

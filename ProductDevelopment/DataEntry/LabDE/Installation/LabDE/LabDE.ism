@@ -1921,7 +1921,6 @@
 		<row><td>SetupFile11</td><td>RegisterExtensionDotNet40.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_LOGICNP_FILES&gt;\RegisterExtensionDotNet40.exe</td></row>
 		<row><td>SetupFile12</td><td>RegisterExtensionDotNet40_x64.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_LOGICNP_FILES&gt;\RegisterExtensionDotNet40_x64.exe</td></row>
 		<row><td>SetupFile13</td><td>Extract Systems FKB.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_FKBINSTALL_FILES&gt;\Extract Systems FKB.msi</td></row>
-		<row><td>SetupFile14</td><td>XP_2003_MSMQ.ini</td><td/><td>0</td><td>0</td><td>&lt;ISPROJECTDIR&gt;\support files\XP_2003_MSMQ.ini</td></row>
 		<row><td>SetupFile15</td><td>CbSetup.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_INLITE_KEY_INSTALL&gt;\CbSetup.exe</td></row>
 		<row><td>SetupFile2</td><td>setup.bmp</td><td/><td>0</td><td>1</td><td>&lt;ISPROJECTDIR&gt;\support files\setup.bmp</td></row>
 		<row><td>SetupFile3</td><td>ClearImagePDK.7_0_3253.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_INLITE_INSTALL&gt;\ClearImagePDK.7_0_3253.exe</td></row>
