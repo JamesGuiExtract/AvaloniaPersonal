@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MoveCopyAttributesSettingsDialog));
             this._okButton = new System.Windows.Forms.Button();
             this._cancelButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -37,6 +38,7 @@
             this._moveRadioButton = new System.Windows.Forms.RadioButton();
             this._copyRadioButton = new System.Windows.Forms.RadioButton();
             this._moveCopyGroupBox = new System.Windows.Forms.GroupBox();
+            this.infoTip1 = new Extract.Utilities.Forms.InfoTip();
             this._moveCopyGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -86,9 +88,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(13, 106);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(186, 13);
+            this.label2.Size = new System.Drawing.Size(297, 13);
             this.label2.TabIndex = 19;
-            this.label2.Text = "XPath to copy/move source attributes";
+            this.label2.Text = "XPath for destination (copy/move attributes to children of this)";
             // 
             // _destinationXPathtextBox
             // 
@@ -132,6 +134,17 @@
             this._moveCopyGroupBox.TabIndex = 23;
             this._moveCopyGroupBox.TabStop = false;
             // 
+            // infoTip1
+            // 
+            this.infoTip1.BackColor = System.Drawing.Color.Transparent;
+            this.infoTip1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("infoTip1.BackgroundImage")));
+            this.infoTip1.Location = new System.Drawing.Point(331, 100);
+            this.infoTip1.Name = "infoTip1";
+            this.infoTip1.Size = new System.Drawing.Size(16, 16);
+            this.infoTip1.TabIndex = 24;
+            this.infoTip1.TipText = "This XPath can be absolute (start with /) or based on the source node.\n" +
+                "E.g., could use \'Sub\' to copy into a child named \'Sub\' or \'../Other\' to copy into a sibling named \'Other\'";
+            // 
             // MoveCopyAttributesSettingsDialog
             // 
             this.AcceptButton = this._okButton;
@@ -139,6 +152,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
             this.ClientSize = new System.Drawing.Size(584, 273);
+            this.Controls.Add(this.infoTip1);
             this.Controls.Add(this._moveCopyGroupBox);
             this.Controls.Add(this._destinationXPathtextBox);
             this.Controls.Add(this.label2);
@@ -172,5 +186,6 @@
         private System.Windows.Forms.RadioButton _moveRadioButton;
         private System.Windows.Forms.RadioButton _copyRadioButton;
         private System.Windows.Forms.GroupBox _moveCopyGroupBox;
+        private Utilities.Forms.InfoTip infoTip1;
     }
 }

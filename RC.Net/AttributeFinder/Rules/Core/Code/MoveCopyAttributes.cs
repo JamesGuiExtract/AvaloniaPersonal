@@ -93,7 +93,7 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// The description of the rule
         /// </summary>
-        const string _COMPONENT_DESCRIPTION = "Move/Copy attributes";
+        const string _COMPONENT_DESCRIPTION = "Move or Copy attributes";
 
         /// <summary>
         /// Current version.
