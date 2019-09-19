@@ -126,6 +126,7 @@
             // _summaryLabel
             // 
             this._summaryLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this._summaryLabel.AutoEllipsis = true;
             this._summaryLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._summaryLabel.ForeColor = System.Drawing.Color.Black;
             this._summaryLabel.Location = new System.Drawing.Point(98, 6);

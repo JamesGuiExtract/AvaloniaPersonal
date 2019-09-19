@@ -617,7 +617,15 @@ namespace Extract.DataEntry
                 // which represents the attribute's value).
                 else if (!string.IsNullOrWhiteSpace(dataEntryQuery.TargetProperty))
                 {
-                    return ApplyQueryResult(queryResult, dataEntryQuery.TargetProperty);
+                    // In the context of a background load, there may be no controls available to manipulate.
+                    if (AttributeStatusInfo.GetOwningControl(_targetAttribute) == null)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return ApplyQueryResult(queryResult, dataEntryQuery.TargetProperty);
+                    }
                 }
                 // Otherwise a normal auto-update query; apply the query result to the attribute
                 // value.
