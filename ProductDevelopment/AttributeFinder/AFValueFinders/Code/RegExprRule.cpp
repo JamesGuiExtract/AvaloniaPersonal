@@ -966,7 +966,7 @@ IIUnknownVectorPtr CRegExprRule::parseText(IAFDocumentPtr ipAFDoc)
 		// matching the specified regular expression
 		IIUnknownVectorPtr ipMatches = ipParser->Find(ipInputText->String,
 			asVariantBool(m_bFirstMatchOnly),
-			asVariantBool(m_bAddCapturesAsSubAttributes));
+			asVariantBool(m_bAddCapturesAsSubAttributes), VARIANT_FALSE);
 		ASSERT_RESOURCE_ALLOCATION("ELI29404", ipMatches != __nullptr);
 
 		long nNumMatches = ipMatches->Size();

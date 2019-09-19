@@ -1695,7 +1695,7 @@ IAttributePtr CMicrFinder::findOtherRoutingNumber(ISpatialStringPtr ipSpatialStr
 				// Look for the other routing number
 				IIUnknownVectorPtr ipMatches =
 					getOtherRoutingNumberRegexParser()->Find(ipSS->String,
-					VARIANT_TRUE, VARIANT_TRUE);
+					VARIANT_TRUE, VARIANT_TRUE, VARIANT_FALSE);
 				ASSERT_RESOURCE_ALLOCATION("ELI24949", ipMatches != __nullptr);
 
 				if (ipMatches->Size() >= 1)

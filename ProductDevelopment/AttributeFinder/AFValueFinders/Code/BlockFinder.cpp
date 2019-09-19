@@ -748,7 +748,7 @@ STDMETHODIMP CBlockFinder::GetBlockScore(BSTR strBlockText, IAFDocument* pAFDoc,
 			// use a regular expression parser to search for clue match
 			ipParser->Pattern = strClue.c_str();
 			IIUnknownVectorPtr ipFoundMatches = ipParser->Find(strBlockText, VARIANT_FALSE, 
-				VARIANT_FALSE);
+				VARIANT_FALSE, VARIANT_FALSE);
 			if (ipFoundMatches != __nullptr && ipFoundMatches->Size() > 0)
 			{
 				nScore += ipFoundMatches->Size();

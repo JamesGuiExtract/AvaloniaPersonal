@@ -240,7 +240,7 @@ void FindVariableInFile(const string& strFileName, const string& strSearchString
 	if(ipRegExParser)
 	{
 		IIUnknownVectorPtr ipMatches = 
-			ipRegExParser->Find(strFileContents.c_str(), VARIANT_FALSE, VARIANT_FALSE);
+			ipRegExParser->Find(strFileContents.c_str(), VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE);
 		ASSERT_RESOURCE_ALLOCATION("ELI20687", ipMatches != __nullptr);
 
 		long lSize = ipMatches->Size();

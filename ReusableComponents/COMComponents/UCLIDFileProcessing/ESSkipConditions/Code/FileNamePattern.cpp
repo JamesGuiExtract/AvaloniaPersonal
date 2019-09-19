@@ -670,7 +670,7 @@ STDMETHODIMP CFileNamePattern::raw_FileMatchesFAMCondition(IFileRecord* pFileRec
 		{
 			// If current selection is "contain"
 			IIUnknownVectorPtr ipFound = ipParser->Find(get_bstr_t(strFAMFile), 
-				VARIANT_TRUE, VARIANT_FALSE);
+				VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE);
 			if(ipFound->Size() > 0 && m_bDoesDoesNot == true)
 			{
 				*pRetVal = VARIANT_TRUE;

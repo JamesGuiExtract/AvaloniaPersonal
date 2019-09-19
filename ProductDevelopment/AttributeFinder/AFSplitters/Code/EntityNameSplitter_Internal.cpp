@@ -675,7 +675,7 @@ void CEntityNameSplitter::processDelimiter(ISpatialStringPtr ipEntity, string st
 				ipSubstring = ipEntity->GetSubString( lEndOfPreviousToken + 1, lStartPos - 1 );
 
 				// Locate any delimiters in the substring
-				ipResults = m_ipRegExprParser->Find( ipSubstring->String, VARIANT_FALSE, VARIANT_FALSE );
+				ipResults = m_ipRegExprParser->Find( ipSubstring->String, VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE );
 			}
 			// Ignore empty substring before leading token
 		}
@@ -689,7 +689,7 @@ void CEntityNameSplitter::processDelimiter(ISpatialStringPtr ipEntity, string st
 				ipSubstring = ipEntity->GetSubString( lEndOfPreviousToken + 1, -1 );
 
 				// Locate any delimiters in the substring
-				ipResults = m_ipRegExprParser->Find( ipSubstring->String, VARIANT_FALSE, VARIANT_FALSE );
+				ipResults = m_ipRegExprParser->Find( ipSubstring->String, VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE );
 				lEndPos = ipEntity->Size - 1;
 			}
 			// Ignore empty substring after trailing token
@@ -703,7 +703,7 @@ void CEntityNameSplitter::processDelimiter(ISpatialStringPtr ipEntity, string st
 		else
 		{
 			// Locate any delimiters in the entire string
-			ipResults = m_ipRegExprParser->Find( ipEntity->String, VARIANT_FALSE , VARIANT_FALSE);
+			ipResults = m_ipRegExprParser->Find( ipEntity->String, VARIANT_FALSE , VARIANT_FALSE, VARIANT_FALSE);
 			lEndPos = ipEntity->Size - 1;
 		}
 
@@ -1659,7 +1659,7 @@ long CEntityNameSplitter::getWordsFromString(string strText, IIUnknownVectorPtr 
 	// Each word is composed of alpha-numeric characters, dash(-), underscore(_), 
 	// period(.), forward slash(/), backward slash(\) and apostrophe(')
 	m_ipRegExprParser->Pattern = _bstr_t("[A-Za-z0-9\\-_\\./\\\\']+");
-	ripMatches = m_ipRegExprParser->Find( _bstr_t( strText.c_str() ), VARIANT_FALSE, VARIANT_FALSE );
+	ripMatches = m_ipRegExprParser->Find( _bstr_t( strText.c_str() ), VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE );
 
 	// Return the word count
 	return ripMatches->Size();

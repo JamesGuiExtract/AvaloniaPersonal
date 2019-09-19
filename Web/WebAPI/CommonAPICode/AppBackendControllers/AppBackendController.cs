@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using System;
 using System.Globalization;
 using System.Net;
@@ -755,6 +753,41 @@ namespace WebAPI.Controllers
             catch (Exception ex)
             {
                 return this.GetAsHttpError(ex, "ELI45357");
+            }
+        }
+
+        /// <summary>
+        /// Gets the results of a search as <see cref="DocumentAttribute"/>s
+        /// </summary>
+        /// <param name="docID">The currently open document ID</param>
+        /// <param name="searchParameters">The query and options for the search</param>
+        [HttpPost("Search/{docID}")]
+        [Authorize]
+        [ProducesResponseType(200, Type = typeof(DocumentDataResult))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404, Type = typeof(ErrorResult))]
+        public IActionResult PostSearch(int docID, [FromBody] SearchParameters searchParameters)
+        {
+            try
+            {
+                ExtractException.Assert("ELI48304", "GetSearchResults requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
+                // using ensures that the underlying FileApi.InUse flag is cleared on exit
+                using (var data = new DocumentData(User, requireSession: true))
+                {
+                    ExtractException.Assert("ELI48305", "The supplied document ID doesn't match the open session's document ID",
+                        docID == data.DocumentSessionFileId);
+
+                    var result = data.GetSearchResults(docID: data.DocumentSessionFileId, searchParameters: searchParameters);
+
+                    return Ok(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI48306");
             }
         }
     }

@@ -321,7 +321,7 @@ namespace Extract.Utilities.Parsers
         ///     Object1 = a Token object representing a match
         ///     Object2 = null if no captured groups and a IUnknownVector of Token objects
         ///                 with the Name set to the group name. </returns>
-        public IUnknownVector Find(string strInput, bool bFindFirstMatchOnly, bool bReturnNamedMatches)
+        public IUnknownVector Find(string strInput, bool bFindFirstMatchOnly, bool bReturnNamedMatches, bool bDoNotStopAtEmptyMatch)
         {
             try
             {
@@ -333,7 +333,7 @@ namespace Extract.Utilities.Parsers
                     plainOldParser =>
                     {
                         // Return the results
-                        return Find(plainOldParser, strInput, bFindFirstMatchOnly, bReturnNamedMatches);
+                        return Find(plainOldParser, strInput, bFindFirstMatchOnly, bReturnNamedMatches, bDoNotStopAtEmptyMatch);
                     },
                     findIfXOf =>
                     {
@@ -342,7 +342,7 @@ namespace Extract.Utilities.Parsers
                         if (StringContainsXOfPatterns(_findIfXOfRequirement, findIfXOf.TestParsers,
                             strInput, bReturnNamedMatches, out namedGroups))
                         {
-                            var result = findIfXOf.FindingParser.Find(strInput, bFindFirstMatchOnly, bReturnNamedMatches);
+                            var result = findIfXOf.FindingParser.Find(strInput, bFindFirstMatchOnly, bReturnNamedMatches, bDoNotStopAtEmptyMatch);
 
                             // If returning named group matches, also collect the named groups of the test patterns
                             // and attach them to the primary results
@@ -889,11 +889,12 @@ namespace Extract.Utilities.Parsers
         /// or all matches.</param>
         /// <param name="returnNamedMatches">If <see langword="true"/> returns named submatches 
         /// otherwise returns no sub matches</param>
+        /// <param name="doNotStopAtZeroLengthMatch">Override legacy behavior that maybe made sense at some point...</param>
         /// <returns>IUnknownVector that contains ObjectPair objects that have  
         ///     Object1 = a Token object representing a match
         ///     Object2 = null if no captured groups and a IUnknownVector of Token objects
         ///                 with the Name set to the group name. </returns>
-        IUnknownVector Find(Regex parser, string input, bool findFirstMatchOnly, bool returnNamedMatches)
+        IUnknownVector Find(Regex parser, string input, bool findFirstMatchOnly, bool returnNamedMatches, bool doNotStopAtZeroLengthMatch)
         {
             try
             {
@@ -903,8 +904,8 @@ namespace Extract.Utilities.Parsers
                 // Create the return object
                 IUnknownVector returnVector = new IUnknownVector();
 
-                // While there is a match and that match is not empty process the matches
-                while (foundMatch.Success && foundMatch.Length != 0 && foundMatch.Index < input.Length)
+                // Process the matches while there is a match and that match is not empty (unless doNotStopAtZeroLengthMatch)
+                while (foundMatch.Success && (foundMatch.Length != 0 || doNotStopAtZeroLengthMatch) && foundMatch.Index < input.Length)
                 {
                     // Create the token object for the match
                     Token t = new Token();

@@ -628,6 +628,82 @@ STDMETHODIMP CSpatialString::LoadPageFromFile(BSTR bstrInputFile, long nPage)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46767");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::LoadPagesFromFile(BSTR bstrInputFile, IIUnknownVector** pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		string inputFile = asString(bstrInputFile);
+
+		////////////////////////////////////////
+		// Check for SourceDocName image, prefer
+		// image in same location as USS file
+		////////////////////////////////////////
+
+		// Get folder for USS file
+		string strFolder = getDirectoryFromFullPath(inputFile);
+
+		// Get filename without extension
+		string strSourceFile = getFileNameWithoutExtension(inputFile);
+
+		// Check existence of SourceDocName file in present folder
+		string strNewSource = strFolder + "\\" + strSourceFile;
+		_bstr_t bstrNewSource = get_bstr_t(strNewSource.c_str());
+		bool bHasNewSource = isFileOrFolderValid(strNewSource);
+
+		IIUnknownVectorPtr ipPages(CLSID_IUnknownVector);
+
+		if (CompressionEngine::isZipFile(inputFile))
+		{
+			string originalSourceDocName;
+			auto pageMap = loadPagesFromArchive(inputFile, false, &originalSourceDocName);
+			for (auto& p : *pageMap)
+			{
+				auto& ipPage = p.second;
+
+				// if the new source file exists, use that for the SourceDocName
+				if (bHasNewSource)
+				{
+					ipPage->SourceDocName = bstrNewSource;
+				}
+				else
+				{
+					ipPage->SourceDocName = get_bstr_t(originalSourceDocName.c_str());
+				}
+
+				ipPages->PushBack(ipPage);
+			}
+		}
+		else
+		{
+			// Load the entire string and then split into pages
+			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipWhole(CLSID_SpatialString);
+			loadFromStorageObject(inputFile, ipWhole);
+
+			ipPages = ipWhole->GetPages(VARIANT_FALSE, "");
+
+			// if the new source file exists, use that for the SourceDocName
+			if (bHasNewSource)
+			{
+				for (long i = 0, size = ipPages->Size(); i < size; i++)
+				{
+					UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipPage = ipPages->At(i);
+					ipPage->SourceDocName = bstrNewSource;
+				}
+			}
+		}
+		
+		*pVal = ipPages.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI48351");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::AppendToFile(BSTR bstrOutputFile, VARIANT_BOOL vbCheckForExistingPages)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())

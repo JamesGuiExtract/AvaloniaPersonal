@@ -1394,7 +1394,7 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 //-------------------------------------------------------------------------------------------------
 bool CSelectPageRegion::isRegExFoundOnPage(IRegularExprParserPtr ipRegExpParser, string strPageText)
 {
-	IIUnknownVectorPtr ipFound = ipRegExpParser->Find(strPageText.c_str(), VARIANT_TRUE, VARIANT_FALSE);
+	IIUnknownVectorPtr ipFound = ipRegExpParser->Find(strPageText.c_str(), VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE);
 	ASSERT_RESOURCE_ALLOCATION("ELI28169", ipFound != __nullptr);
 
 	return (ipFound->Size() > 0);

@@ -324,8 +324,12 @@ library UCLID_COMUTILSLib
 		//										 underscore.
 		//							    -- false: Object2 parameter of ObjectPairs in the 
 		//										  returned vector will be NULL.
+		//			bDoNotStopAtEmptyMatch
+		//				-- true: Return tokens for empty matches and keep matching after an empty match
+		//				-- false: Legacy behavior, stop matching as soon as an empty match is encountered
 		[id(3), helpstring("method Find")] HRESULT Find([in] BSTR strInput, 
 			[in] VARIANT_BOOL bFindFirstMatchOnly, [in] VARIANT_BOOL bReturnNamedMatches,
+			VARIANT_BOOL bDoNotStopAtEmptyMatch,
 			[out, retval] IIUnknownVector **ippObjectPairs);
 		//-----------------------------------------------------------------------------------------
 		// whether or not the pattern matches exactly with the input string

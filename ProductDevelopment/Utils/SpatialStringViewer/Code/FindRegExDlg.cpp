@@ -356,7 +356,7 @@ void FindRegExDlg::computeMatches()
 
 		// Get the matches
 		IIUnknownVectorPtr ipMatches = m_ipRegExpr->Find(m_strSearchText.c_str(),
-			VARIANT_FALSE, VARIANT_FALSE);
+			VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE);
 		long nSize = ipMatches != __nullptr ? ipMatches->Size() : 0;
 		if (nSize == 0)
 		{

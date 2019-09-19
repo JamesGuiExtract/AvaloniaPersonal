@@ -214,7 +214,7 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 			{
 				// Search the string for the address
 				IIUnknownVectorPtr ipFoundAddresses = ipAddressParser->Find(ipSS->String, 
-					VARIANT_FALSE, VARIANT_FALSE);
+					VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE);
 				ASSERT_RESOURCE_ALLOCATION("ELI15398", ipFoundAddresses != __nullptr);
 
 				long lFoundSize = ipFoundAddresses->Size();
@@ -234,7 +234,7 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 
 					// Now remove the prefix from the string
 					IIUnknownVectorPtr ipPrefixes = ipPrefixParser->Find(ipAddressString->GetString(),
-						VARIANT_TRUE, VARIANT_FALSE);
+						VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE);
 					ASSERT_RESOURCE_ALLOCATION("ELI25638", ipPrefixes != __nullptr);
 
 					// Get the substing
@@ -279,7 +279,7 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 
 					// find the prefixes on this page
 					IIUnknownVectorPtr ipFoundOnPage = 
-						ipPrefixParser->Find(ipPage->String, VARIANT_FALSE, VARIANT_FALSE);
+						ipPrefixParser->Find(ipPage->String, VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE);
 					ASSERT_RESOURCE_ALLOCATION("ELI20433", ipFoundOnPage != __nullptr);
 
 					// check if any prefixes were found
@@ -372,7 +372,7 @@ STDMETHODIMP CReturnAddrFinder::raw_ParseText(IAFDocument *pAFDoc, IProgressStat
 					// Now get the prefix again from the new address so we may remove the prefix
 					// We only want the first match
 					IIUnknownVectorPtr ipPrefixes = ipPrefixParser->Find(ipNewBlock->GetString(), 
-						VARIANT_TRUE, VARIANT_FALSE);
+						VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE);
 					ASSERT_RESOURCE_ALLOCATION("ELI15403", ipPrefixes != __nullptr);
 
 					if(ipPrefixes->Size() > 0)
@@ -712,7 +712,7 @@ ISpatialStringPtr CReturnAddrFinder::chooseBlock(IRegularExprParserPtr ipSuffixP
 		{
 			ISpatialStringPtr ipSS = vecNewBlocks[uj];
 			IIUnknownVectorPtr ipTmpVec = ipSuffixParser->Find(ipSS->String, VARIANT_TRUE, 
-				VARIANT_FALSE);
+				VARIANT_FALSE, VARIANT_FALSE);
 			ASSERT_RESOURCE_ALLOCATION("ELI25643", ipTmpVec != __nullptr);
 
 			if (ipTmpVec->Size() > 0)
@@ -789,7 +789,7 @@ ISpatialStringPtr CReturnAddrFinder::getAddressNearPrefix(ISpatialStringSearcher
 			// Now that we have the region of the document where the address is likely to be 
 			// run the full address regexp on it
 			IIUnknownVectorPtr ipAddresses = ipRegExpParser->Find(ipRegion->String, 
-				VARIANT_TRUE, VARIANT_FALSE);
+				VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE);
 			ASSERT_RESOURCE_ALLOCATION("ELI25650", ipAddresses != __nullptr);
 
 			if (ipAddresses->Size() > 0)

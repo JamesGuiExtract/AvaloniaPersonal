@@ -371,7 +371,7 @@ STDMETHODIMP CStringTokenizerSplitter::raw_SplitAttribute(IAttribute *pAttribute
 				// expression string
 				IIUnknownVectorPtr ipVecTokens;
 				ipVecTokens = ipParser->Find(strValue.c_str(), VARIANT_FALSE, 
-					VARIANT_FALSE);
+					VARIANT_FALSE, VARIANT_FALSE);
 				ASSERT_RESOURCE_ALLOCATION("ELI05400", ipVecTokens != __nullptr);
 
 				// vector to store token indices

@@ -99,7 +99,7 @@ STDMETHODIMP CAddressFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus
 
 		// Find all the suffixes
 		IIUnknownVectorPtr ipSuffixes = m_ipRegExpParser->Find(ipText->String, VARIANT_FALSE, 
-			VARIANT_FALSE);
+			VARIANT_FALSE, VARIANT_FALSE);
 		ASSERT_RESOURCE_ALLOCATION("ELI15588", ipSuffixes != __nullptr);
 
 		long lSize = ipSuffixes->Size();
@@ -458,7 +458,7 @@ IIUnknownVectorPtr CAddressFinder::chooseAddressBlocks(IRegularExprParserPtr ipS
 		ASSERT_RESOURCE_ALLOCATION("ELI15597", ipSS != __nullptr);
 
 		IIUnknownVectorPtr ipTmpVec = ipSuffixParser->Find(ipSS->GetString(), VARIANT_TRUE, 
-			VARIANT_FALSE);
+			VARIANT_FALSE, VARIANT_FALSE);
 		if (ipTmpVec->Size() == 0)
 		{
 			continue;

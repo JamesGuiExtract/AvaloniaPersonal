@@ -1757,7 +1757,7 @@ long CEntityFinder::findFirstCaseWord(const string& strText, int iStartPos, bool
 
 		// Tokenize the string, i.e. find all "whole words"	
 		ipParser->Pattern = "\\S+";
-		IIUnknownVectorPtr ipMatches = ipParser->Find( bstrText, VARIANT_FALSE, VARIANT_FALSE );
+		IIUnknownVectorPtr ipMatches = ipParser->Find( bstrText, VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE );
 
 		// Check each word
 		int iCount = ipMatches->Size();
@@ -2121,7 +2121,7 @@ void CEntityFinder::handleParentheses(ISpatialStringPtr &ripText, IRegularExprPa
 	while (true)
 	{
 		// Find an instance of the search pattern
-		ipFound = ipParser->Find( ripText->String, VARIANT_TRUE, VARIANT_FALSE );
+		ipFound = ipParser->Find( ripText->String, VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE );
 
 		// Retrieve text from vector of results
 		if (ipFound->Size() > 0)
@@ -2164,7 +2164,7 @@ void CEntityFinder::handleParentheses(ISpatialStringPtr &ripText, IRegularExprPa
 	while (true)
 	{
 		// Find an instance of the search pattern
-		ipFound = ipParser->Find( ripText->String, VARIANT_TRUE, VARIANT_FALSE );
+		ipFound = ipParser->Find( ripText->String, VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE );
 
 		// Retrieve text from vector of results
 		if (ipFound->Size() > 0)
@@ -2590,7 +2590,7 @@ long CEntityFinder::makeSpaceForAnd(ISpatialStringPtr ipText, IRegularExprParser
 	ipParser->PutIgnoreCase( VARIANT_FALSE );
 
 	// Locate match
-	IIUnknownVectorPtr	ipMatch1 = ipParser->Find( ipText->String, VARIANT_TRUE, VARIANT_FALSE );
+	IIUnknownVectorPtr	ipMatch1 = ipParser->Find( ipText->String, VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE );
 	ASSERT_RESOURCE_ALLOCATION( "ELI10532", ipMatch1 != __nullptr );
 
 	long		lStartPos, lEndPos;
@@ -2614,7 +2614,7 @@ long CEntityFinder::makeSpaceForAnd(ISpatialStringPtr ipText, IRegularExprParser
 	ipParser->PutPattern( _bstr_t( "\\sand[A-Z]{2,}" ) );
 
 	// Locate match
-	IIUnknownVectorPtr	ipMatch2 = ipParser->Find( ipText->String, VARIANT_TRUE, VARIANT_FALSE );
+	IIUnknownVectorPtr	ipMatch2 = ipParser->Find( ipText->String, VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE );
 	ASSERT_RESOURCE_ALLOCATION( "ELI10533", ipMatch2 != __nullptr );
 
 	// Retrieve this token
@@ -2652,7 +2652,7 @@ long CEntityFinder::removeFirstDigitsWords(const string& strInput, IRegularExprP
 	///////////////////////////////////////////////////////////
 	ipParser->Pattern = "\\S+";
 	IIUnknownVectorPtr ipMatches = ipParser->Find(strInput.c_str(), VARIANT_FALSE, 
-		VARIANT_FALSE );
+		VARIANT_FALSE, VARIANT_FALSE );
 	long lCount = ipMatches->Size();
 	long lTrimPos = 0;
 	if (lCount > 0)

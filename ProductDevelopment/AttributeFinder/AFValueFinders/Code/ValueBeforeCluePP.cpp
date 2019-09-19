@@ -374,7 +374,7 @@ LRESULT CValueBeforeCluePP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam
 					ipRegExpParser->IgnoreCase = m_bCaseSensitive?VARIANT_FALSE:VARIANT_TRUE;
 					IIUnknownVectorPtr ipVecObjPairs = 
 						ipRegExpParser->Find(_bstr_t(bstrPunctuations), VARIANT_FALSE, 
-						VARIANT_FALSE);
+						VARIANT_FALSE, VARIANT_FALSE);
 
 					ATLControls::CButton checkOther(GetDlgItem(IDC_CHK_OTHER_PUNC_BC));
 					long nSize = ipVecObjPairs->Size();

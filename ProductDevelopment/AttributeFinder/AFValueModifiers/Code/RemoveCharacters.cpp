@@ -695,7 +695,7 @@ IIUnknownVectorPtr CRemoveCharacters::findPatternInString(IRegularExprParserPtr 
 	ipParser->Pattern = _bstrPattern;
 	ipParser->IgnoreCase = asVariantBool(!m_bCaseSensitive);
 	ipFoundStringInfos = ipParser->Find(_bstrInput, asVariantBool(bFindFirstMatchOnly), 
-		VARIANT_FALSE);
+		VARIANT_FALSE, VARIANT_FALSE);
 
 	return ipFoundStringInfos;
 }

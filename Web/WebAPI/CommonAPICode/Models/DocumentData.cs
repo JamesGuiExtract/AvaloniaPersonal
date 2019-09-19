@@ -16,6 +16,8 @@ using static WebAPI.Utils;
 using AttributeDBMgr = AttributeDbMgrComponentsLib.AttributeDBMgr;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 using EActionStatus = UCLID_FILEPROCESSINGLib.EActionStatus;
+using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace WebAPI.Models
 {
@@ -1405,6 +1407,104 @@ namespace WebAPI.Models
         /// </summary>
         public EWorkflowType WorkflowType => FileApi.Workflow.Type;
 
+        /// <summary>
+        /// Gets the results of a search as <see cref="DocumentAttribute"/>s
+        /// </summary>
+        /// <param name="docID">The currently open document ID</param>
+        /// <param name="searchParameters">The query and options for the search</param>
+        public DocumentDataResult GetSearchResults(int docID, SearchParameters searchParameters)
+        {
+            try
+            {
+                AssertRequestFileId("ELI48347", docID);
+
+                HTTPError.Assert("ELI48348", StatusCodes.Status400BadRequest,
+                    !string.IsNullOrWhiteSpace(searchParameters.Query),
+                    "Cannot search for empty string");
+
+                HTTPError.Assert("ELI48353", StatusCodes.Status400BadRequest,
+                    string.IsNullOrEmpty(searchParameters.ResultType) || IsValidIdentifier(searchParameters.ResultType),
+                    @"Invalid result type. Type must fully match this pattern: ([_a-zA-Z]\w*)?");
+
+                int magicPage = -1;
+                if (searchParameters.PageNumber != null)
+                {
+                    magicPage = searchParameters.PageNumber.Value;
+                    AssertRequestFilePage("ELI48349", docID, magicPage);
+                }
+
+                var resultType = searchParameters.ResultType ?? "";
+                IEnumerable<ISpatialString> pages = null;
+
+                if (magicPage == -1)
+                {
+                    var pageVector = GetSpatialStringPages(GetSourceFileName(docID));
+                    pages = pageVector?.ToIEnumerable<ISpatialString>();
+                }
+                else
+                {
+                    var uss = GetUssData(GetSourceFileName(docID), magicPage);
+                    pages = uss == null ? null : Enumerable.Repeat(uss, 1);
+                }
+
+                if (pages == null)
+                {
+                    return new DocumentDataResult();
+                }
+
+                var query = searchParameters.Query;
+                if (searchParameters.QueryType == QueryType.Literal)
+                {
+                    query = Regex.Escape(query);
+                }
+
+                var parserType = Type.GetTypeFromProgID("ESRegExParser.DotNetRegExParser.1");
+                var parser = (IRegularExprParser)Activator.CreateInstance(parserType);
+                parser.IgnoreCase = !searchParameters.CaseSensitive;
+                parser.Pattern = query;
+
+                List<DocumentAttribute> results = new List<DocumentAttribute>();
+
+                foreach (var page in pages)
+                {
+                    IEnumerable<IToken> tokens = null;
+                    try
+                    {
+                        tokens =
+                            parser
+                            .Find(page.String, false, false, bDoNotStopAtEmptyMatch: true) // Continue after empty match so that end users aren't surprised by this, non-standard behavior
+                            .ToIEnumerable<IObjectPair>()
+                            .Select(pair => pair.Object1) // This is the 'top-level match' (i.e., not the named group matches)
+                            .Cast<IToken>();
+                    }
+                    catch (Exception ex) when (searchParameters.QueryType == QueryType.Regex)
+                    {
+                        var httpError = new HTTPError("ELI48350", StatusCodes.Status400BadRequest, "Error executing search. Possibly due to a bad regex", ex);
+                        httpError.AddDebugData("Query", searchParameters.Query);
+                        throw httpError;
+                    }
+
+                    var mapper = new AttributeMapper(null, FileApi.Workflow.Type);
+                    results.AddRange(
+                        tokens
+                        .Where(token => token.StartPosition <= token.EndPosition) // Exclude empty matches
+                        .Select(token => mapper.MapTokenToAttribute(token, "Manual", resultType, page, false))
+                        .Where(attr => attr.HasPositionInfo ?? false)
+                    );
+                }
+
+                return new DocumentDataResult { Attributes = results };
+            }
+            catch (HTTPError)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI48303");
+            }
+        }
+
         #region Private Members
 
         FileApi FileApi
@@ -1561,6 +1661,28 @@ namespace WebAPI.Models
                 Utils.ReportMemoryUsage(ussData);
 
                 return ussData;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the USS file data as a collection of pages for the specified file.
+        /// </summary>
+        /// <param name="fileName">The source document name of the file for which the data is needed.
+        /// </param>
+        /// <returns>A <see cref="IIUnknownVector"/> of <see cref="SpatialString"/>s representing the pages.</returns>
+        IIUnknownVector GetSpatialStringPages(string fileName)
+        {
+            var ussFileName = fileName + ".uss";
+            if (File.Exists(ussFileName))
+            {
+                var loader = new SpatialString();
+                var pages = loader.LoadPagesFromFile(ussFileName);
+
+                ReportMemoryUsage(pages);
+
+                return pages;
             }
 
             return null;

@@ -150,17 +150,17 @@ namespace Extract.Utilities.Parsers.Test
             var regexParser = new DotNetRegexParser();
 
             regexParser.Pattern = @"(?'_test'.*)";
-            var result = regexParser.Find(_INPUT, true, true);
+            var result = regexParser.Find(_INPUT, true, true, false);
             IUnknownVector namedGroupData = (IUnknownVector)((ObjectPair)result.At(0)).Object2;
             Assert.AreEqual(0, namedGroupData.Size());
 
             regexParser.Pattern = @"(??OutputUnderScoreGroups=true)(?'_test'.*)";
-            result = regexParser.Find(_INPUT, true, true);
+            result = regexParser.Find(_INPUT, true, true, false);
             namedGroupData = (IUnknownVector)((ObjectPair)result.At(0)).Object2;
             Assert.AreEqual(1, namedGroupData.Size());
 
             regexParser.Pattern = @"(??OutputUnderScoreGroups=false)(?'_test'.*)";
-            result = regexParser.Find(_INPUT, true, true);
+            result = regexParser.Find(_INPUT, true, true, false);
             namedGroupData = (IUnknownVector)((ObjectPair)result.At(0)).Object2;
             Assert.AreEqual(0, namedGroupData.Size());
         }
@@ -179,7 +179,7 @@ namespace Extract.Utilities.Parsers.Test
                                       ))
                                       ((?'birth'birth))
                                     )(\w+)";
-            var result = regexParser.Find(input, bFindFirstMatchOnly: false, bReturnNamedMatches: true);
+            var result = regexParser.Find(input, bFindFirstMatchOnly: false, bReturnNamedMatches: true, bDoNotStopAtEmptyMatch: false);
 
             // Test succeeded and five words are found
             Assert.AreEqual(5, result.Size());
@@ -206,7 +206,7 @@ namespace Extract.Utilities.Parsers.Test
                                       ))
                                       ((?'birth'birth))
                                     )((?'sub'\w)\w+)";
-            var result = regexParser.Find(input, bFindFirstMatchOnly: false, bReturnNamedMatches: true);
+            var result = regexParser.Find(input, bFindFirstMatchOnly: false, bReturnNamedMatches: true, bDoNotStopAtEmptyMatch: false);
 
             // Test succeeded and five words are found
             Assert.AreEqual(5, result.Size());
@@ -287,7 +287,7 @@ namespace Extract.Utilities.Parsers.Test
                                       )
                                       ((?'findpattern_is_output'[\S\s]+))
                                     )";
-            var result = regexParser.Find(input, bFindFirstMatchOnly: false, bReturnNamedMatches: true);
+            var result = regexParser.Find(input, bFindFirstMatchOnly: false, bReturnNamedMatches: true, bDoNotStopAtEmptyMatch: false);
 
             // Test succeeded, one match
             Assert.AreEqual(1, result.Size());
@@ -377,7 +377,7 @@ namespace Extract.Utilities.Parsers.Test
                                       (certificate)
                                       (birth)
                                     )";
-            var exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false));
+            var exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false, false));
             var inner = ExtractException.FromStringizedByteStream("", exception.Message).InnerException;
 
             Assert.AreEqual("Could not parse FindIfXOf pattern", inner.Message);
@@ -391,7 +391,7 @@ namespace Extract.Utilities.Parsers.Test
                                       (birth)
                                     )
                                     (birth\scertificate)";
-            exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false));
+            exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false, false));
             inner = ExtractException.FromStringizedByteStream("", exception.Message).InnerException;
             Assert.AreEqual("Could not parse FindIfXOf pattern", inner.Message);
             Assert.That(inner.Data.Contains("Hint"));
@@ -410,7 +410,7 @@ namespace Extract.Utilities.Parsers.Test
                                     )
                                     (birth\scertificate)
                                     extra stuff";
-            var exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false));
+            var exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false, false));
             var inner = ExtractException.FromStringizedByteStream("", exception.Message).InnerException;
             Assert.AreEqual("Could not parse FindIfXOf pattern", inner.Message);
             Assert.That(inner.Data.Contains("Hint"));
@@ -425,7 +425,7 @@ namespace Extract.Utilities.Parsers.Test
             regexParser.Pattern = @"(??FindIfXOf=2)
                                     ()
                                     (birth\scertificate)";
-            var exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false));
+            var exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false, false));
             var inner = ExtractException.FromStringizedByteStream("", exception.Message).InnerException;
             Assert.AreEqual("Could not parse FindIfXOf pattern", inner.Message);
             Assert.That(inner.Data.Contains("Hint"));
@@ -436,7 +436,7 @@ namespace Extract.Utilities.Parsers.Test
                                       no parens
                                     )
                                     (birth\scertificate)";
-            exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false));
+            exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false, false));
             inner = ExtractException.FromStringizedByteStream("", exception.Message).InnerException;
             Assert.AreEqual("Could not parse FindIfXOf pattern", inner.Message);
             Assert.That(inner.Data.Contains("Hint"));
@@ -447,7 +447,7 @@ namespace Extract.Utilities.Parsers.Test
                                       (missing paren
                                     )
                                     (birth\scertificate)";
-            exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false));
+            exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false, false));
             inner = ExtractException.FromStringizedByteStream("", exception.Message).InnerException;
             Assert.AreEqual("Could not parse FindIfXOf pattern", inner.Message);
             Assert.That(inner.Data.Contains("Hint"));
@@ -458,7 +458,7 @@ namespace Extract.Utilities.Parsers.Test
                                       (testpattern))
                                     )
                                     (birth\scertificate)";
-            exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false));
+            exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false, false));
             inner = ExtractException.FromStringizedByteStream("", exception.Message).InnerException;
             Assert.AreEqual("Could not parse FindIfXOf pattern", inner.Message);
             Assert.That(inner.Data.Contains("Hint"));
@@ -471,7 +471,7 @@ namespace Extract.Utilities.Parsers.Test
                                       (birth)
                                     )
                                     (birth\scertificate)";
-            exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false));
+            exception = Assert.Throws<ExtractException>(() => regexParser.Find("", false, false, false));
             inner = ExtractException.FromStringizedByteStream("", exception.Message).InnerException;
             Assert.AreEqual("Could not parse FindIfXOf pattern", inner.Message);
             Assert.That(inner.Data.Contains("Hint"));

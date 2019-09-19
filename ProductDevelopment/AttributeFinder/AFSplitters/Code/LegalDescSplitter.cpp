@@ -1131,7 +1131,7 @@ IIUnknownVectorPtr CLegalDescSplitter::getFoundStrings( ISpatialStringPtr ipInpu
 	// matching the specified regular expression
 	m_ipRegExParser->Pattern = _bstr_t(strFindRegExp.c_str());
 	m_ipRegExParser->IgnoreCase = VARIANT_TRUE;
-	IIUnknownVectorPtr ipMatches = m_ipRegExParser->Find(_bstrText, VARIANT_FALSE, VARIANT_FALSE);
+	IIUnknownVectorPtr ipMatches = m_ipRegExParser->Find(_bstrText, VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE);
 	IIUnknownVectorPtr ipReturnStrings(CLSID_IUnknownVector );
 	ASSERT_RESOURCE_ALLOCATION( "ELI08057", ipReturnStrings != __nullptr );
 
@@ -1143,7 +1143,7 @@ IIUnknownVectorPtr CLegalDescSplitter::getFoundStrings( ISpatialStringPtr ipInpu
 	}
 	else
 	{
-		ipExcludeRegions = m_ipRegExParser->Find( _bstrText, VARIANT_FALSE, VARIANT_FALSE);
+		ipExcludeRegions = m_ipRegExParser->Find( _bstrText, VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE);
 	}
 
 	long nNumMatches = ipMatches->Size();
@@ -1255,7 +1255,7 @@ bool CLegalDescSplitter::isRegExpInText ( string strSearchText, string strRegExp
 		m_ipRegExParser->Pattern = _bstr_t(strRegExp.c_str());
 		m_ipRegExParser->IgnoreCase = VARIANT_TRUE;
 		IIUnknownVectorPtr ipFoundMatches = m_ipRegExParser->Find(_bstr_t(strSearchText.c_str()), 
-			VARIANT_TRUE, VARIANT_FALSE );
+			VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE );
 		if ( ipFoundMatches->Size() > 0 )
 		{
 			return true;

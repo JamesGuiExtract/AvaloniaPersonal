@@ -712,7 +712,7 @@ IIUnknownVectorPtr CAFUtility::getCandidateAttributesEnhanced(const IAttributePt
 			// Use the regular expression engine to parse the attribute's value and find matches
 			// matches using the specified regular expression.
 			IIUnknownVectorPtr ipMatches = getParser()->Find(
-				ipValue->String, VARIANT_FALSE, VARIANT_FALSE);
+				ipValue->String, VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE);
 			ASSERT_RESOURCE_ALLOCATION("ELI36309", ipMatches != __nullptr);
 
 			// Iterate through the matches and populate the return vector.

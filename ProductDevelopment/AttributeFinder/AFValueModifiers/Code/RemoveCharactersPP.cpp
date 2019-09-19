@@ -182,7 +182,7 @@ LRESULT CRemoveCharactersPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lPara
 
 				ipRegExpr->Pattern = "[\\S]+";
 				IIUnknownVectorPtr ipFoundStringInfos(ipRegExpr->Find(_bstrCharactersDefined, 
-					VARIANT_FALSE, VARIANT_FALSE));
+					VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE));
 				long nSize = ipFoundStringInfos->Size();
 				BOOL bCheckOthers = nSize!=0;
 				ATLControls::CButton chkOtherChars(GetDlgItem(IDC_CHK_OTHER_CHARS));

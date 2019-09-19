@@ -537,7 +537,7 @@ bool CMERSHandler::findMERSKeyword(const string& strInput, int& nStartPos, int& 
 	// Get the parser and search for matches
 	IRegularExprParserPtr ipParser = getParser();
 	IIUnknownVectorPtr ipFoundMatch = ipParser->Find(_bstr_t(strInput.c_str()), VARIANT_TRUE,
-		VARIANT_FALSE);
+		VARIANT_FALSE, VARIANT_FALSE);
 
 	if (ipFoundMatch->Size() > 0)
 	{

@@ -89,7 +89,7 @@ namespace Extract.DataEntry
                 // Search for regex matches
                 IUnknownVector regexResults =
                     _regexParser.Find(childQueryString,
-                        SelectionMode == MultipleQueryResultSelectionMode.First, false);
+                        SelectionMode == MultipleQueryResultSelectionMode.First, false, false);
 
                 // Convert the matches to a string array.
                 string[] matches = regexResults.ToIEnumerable<IObjectPair>()

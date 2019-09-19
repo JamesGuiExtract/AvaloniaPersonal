@@ -7,6 +7,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
+using System.Threading;
 using UCLID_COMUTILSLib;
 using WebAPI.Models;
 
@@ -381,6 +383,34 @@ namespace WebAPI
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI46753", ex);
+            }
+        }
+
+        /// <summary>
+        /// Used to validate identifiers (identifiers must start with either an underscore
+        /// or a letter and can be followed by 0 or more underscores, letters or numbers).
+        /// </summary>
+        static ThreadLocal<Regex> _identifierValidator = new ThreadLocal<Regex>(() => new Regex(@"^[_a-zA-Z]\w*$"));
+
+        /// <summary>
+        /// Determines whether all of the specified identifiers are valid.
+        /// <para>Note:</para>
+        /// A valid identifier must be of the form '[_a-zA-Z]\w*'
+        /// </summary>
+        /// <param name="identifiers">The identifiers.</param>
+        /// <returns>
+        /// <see langword="true"/> if all of the identifiers are valid;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        public static bool IsValidIdentifier(params string[] identifiers)
+        {
+            try
+            {
+                return identifiers.All(s => _identifierValidator.Value.IsMatch(s));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI48352");
             }
         }
     }

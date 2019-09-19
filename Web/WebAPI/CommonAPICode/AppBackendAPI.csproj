@@ -101,6 +101,14 @@
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>
+    <COMReference Include="UCLID_AFVALUEFINDERSLib.dll">
+      <Guid>55a9de56-080b-43e0-ac99-02b815c1df6c</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="TokenProvider\" />

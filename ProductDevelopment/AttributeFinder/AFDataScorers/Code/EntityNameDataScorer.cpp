@@ -958,7 +958,7 @@ long CEntityNameDataScorer::countOfRegExpInInput( const string &strRegExpToFind,
 	ipParser->Pattern = strRegExpToFind.c_str();
 
 	IIUnknownVectorPtr ipFound;
-	ipFound =	ipParser->Find( strInput.c_str(), VARIANT_TRUE, VARIANT_FALSE );
+	ipFound =	ipParser->Find( strInput.c_str(), VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE );
 
 	if (ipFound != __nullptr )
 	{

@@ -313,7 +313,7 @@ STDMETHODIMP CStringTokenizerModifier::raw_ModifyValue(IAttribute* pAttribute, I
 
 		// find all token place holders (i.e. %d or %d-%d) in the result expression
 		IIUnknownVectorPtr ipTokenPlaceHolders = 
-			ipParser->Find(_bstr_t(m_strResultExpression.c_str()), VARIANT_FALSE, VARIANT_TRUE);
+			ipParser->Find(_bstr_t(m_strResultExpression.c_str()), VARIANT_FALSE, VARIANT_TRUE, VARIANT_FALSE);
 		ASSERT_RESOURCE_ALLOCATION("ELI05375", ipTokenPlaceHolders!=NULL);
 
 		long nPlaceHoldersSize  = ipTokenPlaceHolders->Size();
@@ -775,7 +775,7 @@ bool CStringTokenizerModifier::validateExpression(const string& strExpr)
 {
 	// set pattern
 	IRegularExprParserPtr ipParser = getRegexParser("(?'a'\\\\*)(?'b'%|-|\\\\)");
-	IIUnknownVectorPtr ipFound = ipParser->Find(strExpr.c_str(), VARIANT_FALSE, VARIANT_TRUE);
+	IIUnknownVectorPtr ipFound = ipParser->Find(strExpr.c_str(), VARIANT_FALSE, VARIANT_TRUE, VARIANT_FALSE);
 	if (ipFound != __nullptr)
 	{
 		long nSize = ipFound->Size();

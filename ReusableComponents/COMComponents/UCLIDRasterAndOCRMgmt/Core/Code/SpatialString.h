@@ -185,6 +185,7 @@ public:
 	STDMETHOD(GetPseudoSpatialFromHybrid)(ISpatialString** ppResultString);
 	STDMETHOD(AppendToFile)(BSTR bstrOutputFile, VARIANT_BOOL vbCheckForExistingPages);
 	STDMETHOD(LoadPageFromFile)(BSTR bstrInputFile, long nPage);
+	STDMETHOD(LoadPagesFromFile)(BSTR bstrInputFile, IIUnknownVector** pVal);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown **pObject);

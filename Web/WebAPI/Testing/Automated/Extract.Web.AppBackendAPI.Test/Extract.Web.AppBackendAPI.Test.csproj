@@ -249,8 +249,15 @@
   <ItemGroup>
     <None Include="app.config" />
     <EmbeddedResource Include="Resources\Demo_IDShield.bak" />
+    <EmbeddedResource Include="Resources\TestImage001.tif" />
+    <EmbeddedResource Include="Resources\TestImage001.tif.uss" />
+    <EmbeddedResource Include="Resources\TestImage002.tif" />
+    <EmbeddedResource Include="Resources\TestImage003.tif" />
     <EmbeddedResource Include="Resources\TestImage003.tif.uss" />
     <EmbeddedResource Include="Resources\TestImage003.tif.voa" />
+    <EmbeddedResource Include="Resources\TestImage004.tif" />
+    <EmbeddedResource Include="Resources\01000pages.tif" />
+    <EmbeddedResource Include="Resources\01000pages.tif.uss" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -383,9 +390,6 @@
       <Project>{16007c96-12dc-416b-998a-e4584a651458}</Project>
       <Name>AppBackendAPI</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\TestImage003.tif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -352,7 +352,7 @@ bool MERSFinder::findMERSKeyword(const string& strInput, int& nStartPos, int& nE
 	string strPattern;
 	// if the pattern is found, that means the MERS is in the strInput
 	IIUnknownVectorPtr ipFoundMatch = ipParser->Find(_bstr_t(strInput.c_str()), VARIANT_TRUE,
-		VARIANT_FALSE);
+		VARIANT_FALSE, VARIANT_FALSE);
 
 	if (ipFoundMatch->Size() > 0)
 	{

@@ -115,7 +115,7 @@ STDMETHODIMP CPersonNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 		// period(.), forward slash(/), backward slash(\) and apostrophe(')
 		ipParser->Pattern = "[A-Za-z0-9\\-_\\./\\\\']+";
 		IIUnknownVectorPtr ipMatches = ipParser->Find( 
-			ipEntity->String, VARIANT_FALSE, VARIANT_FALSE );
+			ipEntity->String, VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE );
 
 		// Check if the first word is a title ("Mr.", "Ms.", etc.)
 		if (ipMatches->Size() >= 2) 

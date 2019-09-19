@@ -1,5 +1,9 @@
 ﻿using Extract.Testing.Utilities;
+using Extract.Utilities;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
+using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 
 
@@ -84,6 +88,56 @@ namespace Extract.AttributeFinder.Test
 
             // Confirm that there are the expected number of pages
             Assert.AreEqual(2, ss.GetPages(false, "").Size());
+        }
+
+        /// <summary>
+        /// Test that loading pages from file works the same as loading whole file and then getting pages
+        /// </summary>
+        [Test, Category("SpatialString")]        
+        public static void LoadPagesFromFile()
+        {
+            string ussPath = _testFiles.GetFile(_BLANK_PAGE_GCV_FILE);
+            var ss = new SpatialStringClass();
+
+            ss.LoadFrom(ussPath, false);
+            var pagesFromMem = ss.GetPages(false, "").ToIEnumerable<IComparableObject>().ToList();
+            var pagesFromFile = ss.LoadPagesFromFile(ussPath).ToIEnumerable<IComparableObject>().ToList();
+
+            Assert.AreEqual(2, pagesFromMem.Count);
+            Assert.AreEqual(2, pagesFromFile.Count);
+            for (int i = 0; i < 2; i++)
+            {
+                Assert.That(pagesFromMem[i].IsEqualTo(pagesFromFile[i]));
+            }
+        }
+
+        /// <summary>
+        /// Tests that loading from one file simultaneously from many threads doesn't cause any problems
+        /// </summary>
+        [Test, Category("SpatialString")]        
+        public static void LoadSameFileManyTimesAtOnce()
+        {
+            string ussPath = _testFiles.GetFile(_BLANK_PAGE_GCV_FILE);
+            List<(int size, int page)> sizeForEveryAttempt = Enumerable.Range(1, 200)
+                .AsParallel()
+                .Select(i =>
+                {
+                    var ss = new SpatialStringClass();
+                    var page = i % 2 == 0 ? 1 : 3;
+                    ss.LoadPageFromFile(ussPath, page);
+                    return (ss.Size, page);
+                })
+                .ToList();
+
+            var pageOnes = sizeForEveryAttempt.Where(x => x.page == 1).ToList();
+            var pageThrees = sizeForEveryAttempt.Where(x => x.page == 3).ToList();
+
+            // Confirm that there are the expected sizes for each attempt
+            Assert.AreEqual(1828, pageOnes[0].size);
+            Assert.That(pageOnes.TrueForAll(p => p.size == pageOnes[0].size));
+
+            Assert.AreEqual(295, pageThrees[0].size);
+            Assert.That(pageThrees.TrueForAll(p => p.size == pageThrees[0].size));
         }
 
         #endregion Public Test Functions

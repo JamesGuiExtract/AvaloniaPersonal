@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
@@ -31,10 +32,28 @@ namespace Extract.Web.WebAPI.Test
     {
         #region Constants
 
-        static readonly string _TEST_FILE1 = "Resources.TestImage003.tif";
-        static readonly string _TEST_FILE1_USS = "Resources.TestImage003.tif.uss";
-        static readonly string _TEST_FILE1_VOA = "Resources.TestImage003.tif.voa";
-        static readonly string _COMPUTE_ACTION = "Compute";
+        static readonly string _TEST_FILE1 = "Resources.TestImage001.tif";
+        static readonly string _TEST_FILE2 = "Resources.TestImage002.tif";
+        static readonly string _TEST_FILE3 = "Resources.TestImage003.tif";
+        static readonly string _TEST_FILE4 = "Resources.TestImage004.tif";
+        static readonly string _TEST_FILE_1000Pages = "Resources.01000pages.tif";
+
+        static readonly string[] _testFileArray = new string[] { _TEST_FILE1, _TEST_FILE2, _TEST_FILE3, _TEST_FILE4, _TEST_FILE_1000Pages };
+        static readonly string[] _testFileOriginalNames = new string[]
+        {
+            @"C:\Demo_IDShield\Input\TestImage001.tif",
+            @"C:\Demo_IDShield\Input\TestImage002.tif",
+            @"C:\Demo_IDShield\Input\TestImage003.tif",
+            @"C:\Demo_IDShield\Input\TestImage004.tif",
+            ""
+        };
+        static readonly string[] _testFileNames = new string[_testFileArray.Length];
+        static readonly bool[] _testFileInDB = new bool[] { true, true, true, true, false };
+        static readonly bool[] _testFileHasUSS = new bool[] { true, false, true, false, true };
+        static readonly bool[] _testFileHasVOA = new bool[] { false, false, true, false, false };
+        
+
+        //static readonly string _COMPUTE_ACTION = "Compute";
         static readonly string _VERIFY_ACTION = "Verify";
 
         #endregion Constants
@@ -51,21 +70,6 @@ namespace Extract.Web.WebAPI.Test
         /// to the local database server. 
         /// </summary>
         static FAMTestDBManager<TestBackendAPI> _testDbManager;
-
-        /// <summary>
-        /// Represents a file processingdb
-        /// </summary>
-        private static FileProcessingDB fileProcessingDb;
-
-        /// <summary>
-        /// Represents a user.
-        /// </summary>
-        private static User user;
-
-        /// <summary>
-        /// Represents a fake controller to call.
-        /// </summary>
-        private static AppBackendController controller;
 
         #endregion Fields
 
@@ -103,13 +107,13 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_LoginLogout()
+        public static void LoginLogout()
         {
             string dbName = "AppBackendAPI_Test_LoginLogout";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -135,13 +139,13 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_LoginBlankUserName()
+        public static void LoginBlankUserName()
         {
             string dbName = "AppBackendAPI_Test_LoginBlankUserName";
 
             try
             {
-                InitialzeDBAndUser(dbName, "", "123");
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, "", "123");
 
                 Assert.AreEqual(((ErrorResult)(((ObjectResult)controller.Login(user)).Value)).Error.Message, "Username is empty");
             }
@@ -155,16 +159,17 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_SetMetadataValue()
+        public static void SetMetadataValue()
         {
             string dbName = "AppBackendAPI_Test_SetMetadataValue";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
                 fileProcessingDb.AddMetadataField("DocumentType");
 
-                var openDocumentResult = loginToWebapp(controller, user, true);
+                LogInToWebApp(controller, user);
+                var openDocumentResult = OpenDocument(controller, 1);
 
                 var documenttype = controller.SetMetadataField(openDocumentResult.Id, "DocumentType", "IgnoreTheAlien");
 
@@ -182,16 +187,17 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_GetNullMetadataValue()
+        public static void GetNullMetadataValue()
         {
             string dbName = "AppBackendAPI_Test_GetNullMetadataValue";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
                 fileProcessingDb.AddMetadataField("DocumentType");
 
-                var openDocumentResult = loginToWebapp(controller, user, true);
+                LogInToWebApp(controller, user);
+                var openDocumentResult = OpenDocument(controller, 1);
 
                 var documenttype = controller.GetMetadataField(openDocumentResult.Id, "DocumentType").AssertGoodResult<MetadataFieldResult>().Value;
                 Assert.AreEqual(null, documenttype, "DocumentType should default to null");
@@ -206,13 +212,13 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_LoginBlankPassword()
+        public static void LoginBlankPassword()
         {
             string dbName = "AppBackendAPI_Test_LoginBlankUserName";
 
             try
             {
-                InitialzeDBAndUser(dbName, "jane_doe","");
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, "jane_doe","");
 
                 Assert.AreEqual(((ErrorResult)(((ObjectResult)controller.Login(user)).Value)).Error.Message,"Password is empty");
             }
@@ -226,13 +232,13 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_SessionLoginLogout()
+        public static void SessionLoginLogout()
         {
             string dbName = "AppBackendAPI_Test_SessionLoginLogout";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
 
                 // Test that SessionLogin requires a logged in user
                 controller.SessionLogin().AssertResultCode(500, "User should be logged in before logging into to session");
@@ -279,7 +285,7 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_GetSettings()
+        public static void GetSettings()
         {
             string dbName = "AppBackendAPI_Test_GetSettings";
             var temporaryDocType = Path.GetTempFileName();
@@ -287,7 +293,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 File.WriteAllText(temporaryDocType, "Ambulance - Encounter \nAmbulance - Patient \nAnesthesia \nAppeal Request");
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
                 var newSettings = $"{{ \"InactivityTimeout\": 5, \"RedactionTypes\": [\"SSN\", \"DOB\"], \"DocumentTypes\": \"{temporaryDocType.Replace(@"\", @"\\")}\" }}";
                 fileProcessingDb.ExecuteCommandQuery($"UPDATE [dbo].[WebAppConfig] SET SETTINGS = '{newSettings}' WHERE TYPE = 'RedactionVerificationSettings'");
                 var result = controller.Login(user);
@@ -325,13 +331,13 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_OpenDocument_NoID()
+        public static void OpenDocument_NoID()
         {
             string dbName = "AppBackendAPI_Test_OpenDocument_NoID";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -379,13 +385,13 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_OpenDocument_WithID()
+        public static void OpenDocument_WithID()
         {
             string dbName = "AppBackendAPI_Test_OpenDocument_WithID";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -433,13 +439,14 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_GetQueueStatus()
+        public static void GetQueueStatus()
         {
             string dbName = "AppBackendAPI_Test_GetQueueStatus";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var pendingDocuments = _testFileArray.Length;
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -449,7 +456,7 @@ namespace Extract.Web.WebAPI.Test
                 result = controller.GetQueueStatus();
                 var queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(0, queueStatus.ActiveUsers);
-                Assert.AreEqual(4, queueStatus.PendingDocuments);
+                Assert.AreEqual(pendingDocuments, queueStatus.PendingDocuments);
 
                 // ... as well as with a session login
                 var sessionResult = controller.SessionLogin();
@@ -459,15 +466,16 @@ namespace Extract.Web.WebAPI.Test
                 result = controller.GetQueueStatus();
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(1, queueStatus.ActiveUsers);
-                Assert.AreEqual(4, queueStatus.PendingDocuments);
+                Assert.AreEqual(pendingDocuments, queueStatus.PendingDocuments);
 
                 result = controller.OpenDocument();
                 var openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
+                pendingDocuments--;
 
                 result = controller.GetQueueStatus();
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(1, queueStatus.ActiveUsers);
-                Assert.AreEqual(3, queueStatus.PendingDocuments);
+                Assert.AreEqual(pendingDocuments, queueStatus.PendingDocuments);
 
                 User user2 = ApiTestUtils.CreateUser("jon_doe", "123");
                 var controller2 = ApiTestUtils.CreateController<AppBackendController>(user2);
@@ -482,35 +490,38 @@ namespace Extract.Web.WebAPI.Test
                 result = controller.GetQueueStatus();
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(2, queueStatus.ActiveUsers);
-                Assert.AreEqual(3, queueStatus.PendingDocuments);
+                Assert.AreEqual(pendingDocuments, queueStatus.PendingDocuments);
 
                 controller.CloseDocument(openDocumentResult.Id, commit: true)
                     .AssertGoodResult<NoContentResult>();
 
                 result = controller.OpenDocument();
                 result.AssertGoodResult<DocumentIdResult>();
+                pendingDocuments--;
 
                 result = controller2.GetQueueStatus();
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(2, queueStatus.ActiveUsers);
-                Assert.AreEqual(2, queueStatus.PendingDocuments);
+                Assert.AreEqual(pendingDocuments, queueStatus.PendingDocuments);
 
                 controller2.ApplyTokenClaimPrincipalToContext(sessionToken);
                 result = controller2.OpenDocument();
                 result.AssertGoodResult<DocumentIdResult>();
+                pendingDocuments--;
 
                 result = controller2.GetQueueStatus();
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(2, queueStatus.ActiveUsers);
-                Assert.AreEqual(1, queueStatus.PendingDocuments);
+                Assert.AreEqual(pendingDocuments, queueStatus.PendingDocuments);
 
                 controller.Logout()
                     .AssertGoodResult<NoContentResult>();
+                pendingDocuments++;
 
                 result = controller2.GetQueueStatus();
                 queueStatus = result.AssertGoodResult<QueueStatusResult>();
                 Assert.AreEqual(1, queueStatus.ActiveUsers);
-                Assert.AreEqual(2, queueStatus.PendingDocuments);
+                Assert.AreEqual(pendingDocuments, queueStatus.PendingDocuments);
 
                 controller2.Logout()
                     .AssertGoodResult<NoContentResult>();
@@ -525,15 +536,16 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_ReOpenDocument()
+        public static void ReOpenDocument()
         {
             string dbName = "AppBackendAPI_Test_ReOpenDocument";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
 
-                var openDocumentResult = loginToWebapp(controller, user, true);
+                LogInToWebApp(controller, user);
+                var openDocumentResult = OpenDocument(controller, 1);
                 
                 controller.CloseDocument(openDocumentResult.Id, commit: false)
                     .AssertGoodResult<NoContentResult>();
@@ -576,15 +588,16 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_LogoutClosesDocument()
+        public static void LogoutClosesDocument()
         {
             string dbName = "AppBackendAPI_Test_LogoutClosesDocument";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
 
-                loginToWebapp(controller, user, true);
+                LogInToWebApp(controller, user);
+                OpenDocument(controller, 1);
 
                 Assert.AreEqual(EActionStatus.kActionProcessing, fileProcessingDb.GetFileStatus(1, _VERIFY_ACTION, false));
 
@@ -603,13 +616,13 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_AbandonedSession()
+        public static void AbandonedSession()
         {
             string dbName = "AppBackendAPI_Test_AbandonedSession";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
 
                 // Login to register an active FAM.
                 var result = controller.Login(user);
@@ -674,23 +687,18 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_GetPageInfo_NoUSS()
+        public static void GetPageInfo_NoUSS()
         {
             string dbName = "AppBackendAPI_Test_GetPageInfo_NoUSS";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                _testFiles.RemoveFile(_TEST_FILE3 + ".uss");
 
-                string testFileName = _testFiles.GetFile(_TEST_FILE1);
-
-                var fileRecord = fileProcessingDb.AddFile(
-                    testFileName, _VERIFY_ACTION, 1, EFilePriority.kPriorityHigh, false, false,
-                    EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
-                int fileId = fileRecord.FileID;
-
-                var openDocumentResult = loginToWebapp(controller, user, true);
-                Assert.AreEqual(fileId, openDocumentResult.Id);
+                LogInToWebApp(controller, user);
+                var openDocumentResult = OpenDocument(controller, 3);
+                Assert.AreEqual(3, openDocumentResult.Id);
 
                 var result = controller.GetPageInfo(openDocumentResult.Id);
                 var pagesInfo = result.AssertGoodResult<PagesInfoResult>();
@@ -715,40 +723,31 @@ namespace Extract.Web.WebAPI.Test
             {
                 FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
-
-                _testFiles.RemoveFile(_TEST_FILE1);
             }
         }
 
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_ProcessAnnotation()
+        public static void ProcessAnnotation()
         {
             string dbName = "AppBackendAPI_Test_ProcessAnnotation";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
 
-                string testFileName = _testFiles.GetFile(_TEST_FILE1);
-                _testFiles.GetFile(_TEST_FILE1_USS);
+                LogInToWebApp(controller, user);
+                var openDocumentResult = OpenDocument(controller, 3);
+                Assert.AreEqual(3, openDocumentResult.Id);
 
-                var fileRecord = fileProcessingDb.AddFile(
-                    testFileName, _VERIFY_ACTION, 1, EFilePriority.kPriorityHigh, false, false,
-                    EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
-                int fileId = fileRecord.FileID;
-
-                var openDocumentResult = loginToWebapp(controller, user, true);
-                Assert.AreEqual(fileId, openDocumentResult.Id);
-
-                string voaFile = _testFiles.GetFile(_TEST_FILE1_VOA);
+                string voaFile = _testFileNames[2] + ".voa";
                 var voa = new IUnknownVectorClass();
                 voa.LoadFrom(voaFile, false);
                 var mapper = new AttributeMapper(voa, EWorkflowType.kExtraction);
                 var documentAttribute = mapper.MapAttribute((IAttribute)voa.At(1), true);
 
-                var processAnnotationResult = controller.ProcessAnnotation(openDocumentResult.Id, 1, new ProcessAnnotationParameters() { Annotation = documentAttribute, Definition = "{ AutoShrinkRedactionZones: {} }", OperationType = "modify" });//WebApi.Models.ProcessAnnotationParameters
+                var processAnnotationResult = controller.ProcessAnnotation(openDocumentResult.Id, 1, new ProcessAnnotationParameters() { Annotation = documentAttribute, Definition = "{ AutoShrinkRedactionZones: {} }", OperationType = "modify" });
                 processAnnotationResult.AssertResultCode(200, "ProcessAnnotation is failing");
 
                 controller.Logout()
@@ -758,33 +757,22 @@ namespace Extract.Web.WebAPI.Test
             {
                 FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
-
-                _testFiles.RemoveFile(_TEST_FILE1);
-                _testFiles.RemoveFile(_TEST_FILE1_USS);
             }
         }
 
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_GetPageInfo_WithUSS()
+        public static void GetPageInfo_WithUSS()
         {
             string dbName = "AppBackendAPI_Test_GetPageInfo_WithUSS";
 
             try
             {
-                InitialzeDBAndUser(dbName);
-
-                string testFileName = _testFiles.GetFile(_TEST_FILE1);
-                _testFiles.GetFile(_TEST_FILE1_USS);
-
-                var fileRecord = fileProcessingDb.AddFile(
-                    testFileName, _VERIFY_ACTION, 1, EFilePriority.kPriorityHigh, false, false,
-                    EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
-                int fileId = fileRecord.FileID;
-
-                var openDocumentResult = loginToWebapp(controller, user, true);
-                Assert.AreEqual(fileId, openDocumentResult.Id);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                LogInToWebApp(controller, user);
+                var openDocumentResult = OpenDocument(controller, 3);
+                Assert.AreEqual(3, openDocumentResult.Id);
 
                 var result = controller.GetPageInfo(openDocumentResult.Id);
                 var pagesInfo = result.AssertGoodResult<PagesInfoResult>();
@@ -809,9 +797,6 @@ namespace Extract.Web.WebAPI.Test
             {
                 FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
-
-                _testFiles.RemoveFile(_TEST_FILE1);
-                _testFiles.RemoveFile(_TEST_FILE1_USS);
             }
         }
 
@@ -821,21 +806,16 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_GetPageImage()
+        public static void GetPageImage()
         {
             string dbName = "AppBackendAPI_Test_GetPageImage";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
 
-                string testFileName = _testFiles.GetFile(_TEST_FILE1);
-
-                var fileRecord = fileProcessingDb.AddFile(
-                    testFileName, _VERIFY_ACTION, 1, EFilePriority.kPriorityHigh, false, false,
-                    EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
-
-                var openDocumentResult = loginToWebapp(controller, user, true);
+                LogInToWebApp(controller, user);
+                var openDocumentResult = OpenDocument(controller, 3);
 
                 using (var codecs = new ImageCodecs())
                     for (int page = 1; page <= 4; page++)
@@ -878,22 +858,23 @@ namespace Extract.Web.WebAPI.Test
                 FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
 
-                _testFiles.RemoveFile(_TEST_FILE1);
+                _testFiles.RemoveFile(_TEST_FILE3);
             }
         }
 
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_GetDocumentData()
+        public static void GetDocumentData()
         {
             string dbName = "AppBackendAPI_Test_GetDocumentData";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
 
-                loginToWebapp(controller, user, true);
+                LogInToWebApp(controller, user);
+                OpenDocument(controller, 1);
 
                 var result = controller.GetDocumentData(1);
                 var attributeSet = result.AssertGoodResult<DocumentDataResult>();
@@ -918,39 +899,16 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_SaveDocumentData()
+        public static void SaveDocumentData()
         {
             string dbName = "AppBackendAPI_Test_SaveDocumentData";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
 
-                // Since the uss file will need to be used to translate the saved data into a VOA,
-                // we can't use pre-existing files in the database that may or may not actually
-                // exist on disk.
-                string testFileName = _testFiles.GetFile(_TEST_FILE1);
-                _testFiles.GetFile(_TEST_FILE1_USS);
-                _testFiles.GetFile(_TEST_FILE1_VOA);
-
-                var fileRecord = fileProcessingDb.AddFile(
-                    testFileName, _COMPUTE_ACTION, 1, EFilePriority.kPriorityHigh, false, false,
-                    EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
-                int fileId = fileRecord.FileID;
-
-                var taskConfig = new StoreAttributesInDBTask();
-                taskConfig.AttributeSetName = "Attr";
-                var task = (IFileProcessingTask)taskConfig;
-
-                using (var famSession = new FAMProcessingSession(
-                    fileProcessingDb, _COMPUTE_ACTION, ApiTestUtils.CurrentApiContext.WorkflowName, task))
-                {
-                    famSession.WaitForProcessingToComplete();
-                }
-
-                fileProcessingDb.SetFileStatusToPending(fileId, _VERIFY_ACTION, false);
-
-                var openDocumentResult = loginToWebapp(controller, user, true);
+                LogInToWebApp(controller, user);
+                var openDocumentResult = OpenDocument(controller, 3);
 
                 var result = controller.GetDocumentData(openDocumentResult.Id);
                 var attributeSet = result.AssertGoodResult<DocumentDataResult>();
@@ -978,36 +936,25 @@ namespace Extract.Web.WebAPI.Test
             {
                 FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
-
-                _testFiles.RemoveFile(_TEST_FILE1);
-                _testFiles.RemoveFile(_TEST_FILE1_USS);
-                _testFiles.RemoveFile(_TEST_FILE1_VOA);
             }
         }
 
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_GetDocumentWordZones()
+        public static void GetDocumentWordZones()
         {
             string dbName = "AppBackendAPI_Test_GetDocumentWordZones";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
 
-                string testFileName = _testFiles.GetFile(_TEST_FILE1);
-                string ussFileName = _testFiles.GetFile(_TEST_FILE1_USS);
-
-                var fileRecord = fileProcessingDb.AddFile(
-                    testFileName, _VERIFY_ACTION, 1, EFilePriority.kPriorityHigh, false, false,
-                    EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
-                int fileId = fileRecord.FileID;
-
-                var openDocumentResult = loginToWebapp(controller, user, true);
+                LogInToWebApp(controller, user);
+                var openDocumentResult = OpenDocument(controller, 3);
 
                 var documentText = new SpatialString();
-                documentText.LoadFrom(ussFileName, false);
+                documentText.LoadFrom(_testFileNames[2] + ".uss", false);
 
                 var documentPages = documentText.GetPages(false, "");
 
@@ -1050,24 +997,22 @@ namespace Extract.Web.WebAPI.Test
             {
                 FileApiMgr.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
-
-                _testFiles.RemoveFile(_TEST_FILE1);
-                _testFiles.RemoveFile(_TEST_FILE1_USS);
             }
         }
 
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_AddGetComment()
+        public static void AddGetComment()
         {
             string dbName = "AppBackendAPI_Test_AddGetComment";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
 
-                var openDocumentResult = loginToWebapp(controller, user, true);
+                 LogInToWebApp(controller, user);
+                 var openDocumentResult = OpenDocument(controller, 1);
 
                 CommentData commentData = new CommentData()
                 {
@@ -1094,15 +1039,16 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void Test_SkipDocument()
+        public static void SkipDocument()
         {
             string dbName = "AppBackendAPI_Test_SkipDocument";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
 
-                var openDocumentResult = loginToWebapp(controller, user, true);
+                LogInToWebApp(controller, user);
+                var openDocumentResult = OpenDocument(controller, 1);
 
                 SkipDocumentData skipDocumentData = new SkipDocumentData()
                 {
@@ -1131,15 +1077,16 @@ namespace Extract.Web.WebAPI.Test
         }
 
         [Test, Category("Automated")]
-        public static void Test_FailDocument()
+        public static void FailDocument()
         {
             string dbName = "AppBackendAPI_Test_FailDocument";
 
             try
             {
-                InitialzeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
 
-                var openDocumentResult = loginToWebapp(controller,user,true);
+                LogInToWebApp(controller, user);
+                var openDocumentResult = OpenDocument(controller, 1);
 
                 var result = controller.FailDocument(openDocumentResult.Id);
                 result.AssertGoodResult<NoContentResult>();
@@ -1158,10 +1105,225 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
+        /// <summary>
+        /// Test search results on first IDShield document. Combined what _ought_ to be multiple tests to save run time (setup/teardown are costly because of DB)
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void PostSearch()
+        {
+            string dbName = "AppBackendAPI_Test_PostSearch";
+
+            try
+            {
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var docID = 1;
+
+                LogInToWebApp(controller, user);
+                OpenDocument(controller, docID);
+
+                // Literal, ignore case
+                var result = controller.PostSearch(docID, new SearchParameters { Query = "DOE", QueryType = QueryType.Literal, CaseSensitive = false, PageNumber = null, ResultType = "Name" });
+                var res = result.AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual(6, res.Attributes.Count);
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.HasPositionInfo == true));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.Type == "Name"));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.ConfidenceLevel == "Manual"));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.Value == "DOE" || attribute.Value == "Doe"));
+
+                // Literal, case sensitive
+                result = controller.PostSearch(docID, new SearchParameters { Query = "DOE", QueryType = QueryType.Literal, CaseSensitive = true, PageNumber = null, ResultType = "Name" });
+                res = result.AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual(1, res.Attributes.Count);
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.HasPositionInfo == true));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.Type == "Name"));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.ConfidenceLevel == "Manual"));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.Value == "DOE"));
+
+                // Regex, ignore case
+                result = controller.PostSearch(docID, new SearchParameters { Query = "D.E", QueryType = QueryType.Regex, CaseSensitive = false, PageNumber = null, ResultType = null });
+                res = result.AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual(7, res.Attributes.Count);
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.HasPositionInfo == true));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.Type == ""));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.ConfidenceLevel == "Manual"));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.Value == "DOE" || attribute.Value == "Doe" || attribute.Value == "due"));
+
+                // Regex, case sensitive
+                result = controller.PostSearch(docID, new SearchParameters { Query = "[Dd].e", QueryType = QueryType.Regex, CaseSensitive = true, PageNumber = null, ResultType = "NameRegex" });
+                res = result.AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual(6, res.Attributes.Count);
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.HasPositionInfo == true));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.Type == "NameRegex"));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.ConfidenceLevel == "Manual"));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.Value == "Doe" || attribute.Value == "due"));
+
+                controller.Logout().AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        /// <summary>
+        /// Test search results on bad page number
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void PostSearchBadPage()
+        {
+            string dbName = "AppBackendAPI_Test_PostSearch_BadPage";
+
+            try
+            {
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var docID = 1;
+
+                LogInToWebApp(controller, user);
+                OpenDocument(controller, docID);
+
+                var result = controller.PostSearch(docID, new SearchParameters { Query = "DOE", QueryType = QueryType.Literal, CaseSensitive = false, PageNumber = 2, ResultType = "Name" });
+                result.AssertResultCode(404, "Searching on page 2 of document 1 should be an error. See ISSUE-16673");
+
+                result = controller.PostSearch(docID, new SearchParameters { Query = "DOE", QueryType = QueryType.Literal, CaseSensitive = false, PageNumber = 0, ResultType = "Name" });
+                result.AssertResultCode(404, "Searching on page 0 should be an error. See ISSUE-16673");
+
+                result = controller.PostSearch(docID, new SearchParameters { Query = "DOE", QueryType = QueryType.Literal, CaseSensitive = false, PageNumber = -2, ResultType = "Name" });
+                result.AssertResultCode(404, "Searching on page -2 should be an error. See ISSUE-16673");
+
+                controller.Logout().AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        /// <summary>
+        /// Test search results on bad page number
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void PostSearchBadResultType()
+        {
+            string dbName = "AppBackendAPI_Test_PostSearch_BadResultType";
+
+            try
+            {
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var docID = 1;
+
+                LogInToWebApp(controller, user);
+                OpenDocument(controller, docID);
+
+                var result = controller.PostSearch(docID, new SearchParameters { Query = "DOE", QueryType = QueryType.Literal, CaseSensitive = false, PageNumber = 1, ResultType = "123" });
+                result.AssertResultCode(400, "Searching with invalid result type should be a 400 error. See ISSUE-16673");
+
+                controller.Logout().AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        /// <summary>
+        /// Test search results with bad query
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void PostSearchBadQuery()
+        {
+            string dbName = "AppBackendAPI_Test_PostSearch_BadQuery";
+
+            try
+            {
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var docID = 1;
+
+                LogInToWebApp(controller, user);
+                OpenDocument(controller, docID);
+
+                var result = controller.PostSearch(docID, new SearchParameters { Query = "NotFoundOnDocument", QueryType = QueryType.Literal, CaseSensitive = false, PageNumber = null, ResultType = null });
+                var res = result.AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual(0, res.Attributes.Count);
+
+                result = controller.PostSearch(docID, new SearchParameters { Query = "", QueryType = QueryType.Literal, CaseSensitive = false, PageNumber = null, ResultType = null });
+                result.AssertResultCode(400, "Searching with empty pattern should be a 400 error. See ISSUE-16673");
+
+                result = controller.PostSearch(docID, new SearchParameters { Query = null, QueryType = QueryType.Literal, CaseSensitive = false, PageNumber = null, ResultType = null });
+                result.AssertResultCode(400, "Searching with null pattern should be a 400 error. See ISSUE-16673");
+
+                result = controller.PostSearch(docID, new SearchParameters { Query = @"(", QueryType = QueryType.Regex, CaseSensitive = false, PageNumber = null, ResultType = null });
+                result.AssertResultCode(400, "Searching with bad regex pattern should be a 400 error. See ISSUE-16673");
+
+                controller.Logout().AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+
+        /// <summary>
+        /// Test search results on 1000 page document
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void PostSearch1kPage()
+        {
+            string dbName = "AppBackendAPI_Test_PostSearch_1k";
+
+            try
+            {
+                var (db, user, controller) = InitializeDBAndUser(dbName);
+                var docID = 5;
+
+                LogInToWebApp(controller, user);
+                OpenDocument(controller, docID);
+
+                // Literal, ignore case, first page
+                var result = controller.PostSearch(docID, new SearchParameters { Query = "DOE", QueryType = QueryType.Literal, CaseSensitive = false, PageNumber = 500, ResultType = "Name" });
+                var res = result.AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual(6, res.Attributes.Count);
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.HasPositionInfo == true));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.Type == "Name"));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.ConfidenceLevel == "Manual"));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.Value == "DOE" || attribute.Value == "Doe"));
+
+                // Literal, ignore case, all pages
+                result = controller.PostSearch(docID, new SearchParameters { Query = "DOE", QueryType = QueryType.Literal, CaseSensitive = false, PageNumber = null, ResultType = "Name" });
+                res = result.AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual(6000, res.Attributes.Count);
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.HasPositionInfo == true));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.Type == "Name"));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.ConfidenceLevel == "Manual"));
+                Assert.That(res.Attributes.TrueForAll(attribute => attribute.Value == "DOE" || attribute.Value == "Doe"));
+
+                controller.Logout().AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
         #endregion Public Test Functions
 
         
-        private static DocumentIdResult loginToWebapp(AppBackendController controller, User user, bool openDocument)
+        private static void LogInToWebApp(AppBackendController controller, User user)
         {
             var result = controller.Login(user);
             var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -1170,19 +1332,50 @@ namespace Extract.Web.WebAPI.Test
             var sessionResult = controller.SessionLogin();
             var sessionToken = sessionResult.AssertGoodResult<JwtSecurityToken>();
             controller.ApplyTokenClaimPrincipalToContext(sessionToken);
-            if(openDocument)
-            {
-                result = controller.OpenDocument();
-                return result.AssertGoodResult<DocumentIdResult>();
-            }
-            return null;
         }
 
-        private static void InitialzeDBAndUser(string dbName, string username = "jane_doe", string password = "123")
+        private static DocumentIdResult OpenDocument(AppBackendController controller, int docID)
         {
-            (fileProcessingDb, user, controller) =
+            var result = controller.OpenDocument(docID);
+            return result.AssertGoodResult<DocumentIdResult>();
+        }
+
+        private static (FileProcessingDB, User, AppBackendController) InitializeDBAndUser(string dbName, string username = "jane_doe", string password = "123")
+        {
+            var (fileProcessingDb, user, controller) =
                 _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
                         ("Resources.Demo_IDShield.bak", dbName, username, password);
+
+
+            var actionID = fileProcessingDb.GetActionIDForWorkflow(_VERIFY_ACTION, fileProcessingDb.GetWorkflowID("CourtOffice"));
+
+            for (int i = 0; i < _testFileArray.Length; i++)
+            {
+                string testFileName = _testFiles.GetFile(_testFileArray[i]);
+                _testFileNames[i] = testFileName;
+                if (_testFileInDB[i])
+                {
+                    fileProcessingDb.RenameFile(new FileRecordClass { ActionID = actionID, FileID = i + 1, Name = _testFileOriginalNames[i] }, testFileName);
+                }
+                else
+                {
+                    fileProcessingDb.AddFile(
+                        testFileName, _VERIFY_ACTION, 1, EFilePriority.kPriorityNormal, false, false,
+                        EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
+                }
+
+                if (_testFileHasUSS[i])
+                {
+                    _testFiles.GetFile(_testFileArray[i] + ".uss", testFileName + ".uss");
+                }
+
+                if (_testFileHasVOA[i])
+                {
+                    _testFiles.GetFile(_testFileArray[i] + ".voa", testFileName + ".voa");
+                }
+            }
+
+            return (fileProcessingDb, user, controller);
         }
     }
 }

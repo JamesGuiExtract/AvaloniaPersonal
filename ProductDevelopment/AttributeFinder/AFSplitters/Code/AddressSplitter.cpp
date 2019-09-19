@@ -430,7 +430,7 @@ void CAddressSplitter::divideRecipientAddress(ISpatialStringPtr ipText,
 
 	// "Tokenize" the string into whole words
 	m_ipParser->Pattern = "\\S+";
-	IIUnknownVectorPtr ipMatches = m_ipParser->Find( ipText->String, VARIANT_FALSE, VARIANT_FALSE );
+	IIUnknownVectorPtr ipMatches = m_ipParser->Find( ipText->String, VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE );
 
 	// Check word count
 	long lCount = ipMatches->Size();
@@ -539,7 +539,7 @@ long CAddressSplitter::doCityStateZip(ISpatialStringPtr ipText, IIUnknownVectorP
 
 	// "Tokenize" the string, i.e. find all "whole lines"	
 	m_ipParser->Pattern = "[^\\r\\n]+";
-	IIUnknownVectorPtr ipMatches = m_ipParser->Find( ipText->String, VARIANT_FALSE, VARIANT_FALSE );
+	IIUnknownVectorPtr ipMatches = m_ipParser->Find( ipText->String, VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE );
 	ASSERT_RESOURCE_ALLOCATION("ELI24894", ipMatches != __nullptr);
 
 	long lLastLineFullyProcessed = ipMatches->Size();
@@ -834,7 +834,7 @@ void CAddressSplitter::doNameAddress(ISpatialStringPtr ipText, IIUnknownVectorPt
 
 	// "Tokenize" the string, i.e. find all "whole lines"	
 	m_ipParser->Pattern = "[^\\r\\n]+";
-	IIUnknownVectorPtr ipMatches = m_ipParser->Find( ipText->String, VARIANT_FALSE, VARIANT_FALSE );
+	IIUnknownVectorPtr ipMatches = m_ipParser->Find( ipText->String, VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE );
 
 	if (ipMatches->Size() == 1)
 	{
@@ -1237,7 +1237,7 @@ long CAddressSplitter::evaluateStringForAddress(std::string strTest, long *plSta
 
 	// "Tokenize" the string, i.e. find the first "word"	
 	m_ipParser->Pattern = "\\S+";
-	IIUnknownVectorPtr ipMatches = m_ipParser->Find( ipLine->String, VARIANT_TRUE, VARIANT_FALSE );
+	IIUnknownVectorPtr ipMatches = m_ipParser->Find( ipLine->String, VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE );
 
 	// If no match found just return [FlexIDSCore #3576]
 	if (ipMatches->Size() == 0)
@@ -1264,7 +1264,7 @@ long CAddressSplitter::evaluateStringForAddress(std::string strTest, long *plSta
 	// Define pattern for PO Box
 	// Note that "Box" is optional and not included in the pattern
 	m_ipParser->Pattern = "\\bP(\\s*(\\.\\s*)?)?O\\b(\\s*(\\.\\s*)?)?";
-	ipMatches = m_ipParser->Find( ipLine->String, VARIANT_TRUE, VARIANT_FALSE );
+	ipMatches = m_ipParser->Find( ipLine->String, VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE );
 
 	// Check count of matches
 	if (ipMatches->Size() > 0)
@@ -1391,7 +1391,7 @@ bool CAddressSplitter::evaluateStringForCity(std::string strText, long *plStartP
 		// Parse the string into words
 		ipLocalParser->Pattern = "\\S+";
 		IIUnknownVectorPtr ipMatches = ipLocalParser->Find( 
-			_bstr_t( strLocal.c_str() ), VARIANT_FALSE, VARIANT_FALSE );
+			_bstr_t( strLocal.c_str() ), VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE );
 
 		// Check word count
 		long lCount = ipMatches->Size();
@@ -1624,7 +1624,7 @@ bool CAddressSplitter::evaluateStringForState(std::string strText, long *plStart
 	// Use regular expression to find State name
 	m_ipParser->Pattern = _bstr_t( "\\b(Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|Delaware|District\\s*of\\s*Columbia|(North|South)\\s*(Carolina|Dakota)|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|Mississippi|Missouri|Montana|Nebraska|New\\s*Hampshire|New\\s*Jersey|New\\s*Mexico|New\\s*York|Nevada|Ohio|Oklahoma|Oregon|Pennsylvania|Rhode\\s+Island|Tennessee|Texas|Utah|Vermont|Washington|Wisconsin|Wyoming|(West\\s*)?Virginia|Guam|Puerto\\s*Rico|Virgin\\s*Islands)\\b" );
 	_bstr_t	bstrLocal( strText.c_str() );
-	IIUnknownVectorPtr ipNameMatches = m_ipParser->Find( bstrLocal, VARIANT_FALSE, VARIANT_FALSE );
+	IIUnknownVectorPtr ipNameMatches = m_ipParser->Find( bstrLocal, VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE );
 	if (ipNameMatches->Size() > 0)
 	{
 		// Retrieve last token
@@ -1646,7 +1646,7 @@ bool CAddressSplitter::evaluateStringForState(std::string strText, long *plStart
 		// Use regular expression to find State code
 		m_ipParser->Pattern = _bstr_t( "\\b(AL|AK|AZ|AR|CA|CO|CT|DE|DC|NC|ND|SC|SD|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NH|NJ|NM|NY|NV|OH|OK|OR|PA|RI|TN|TX|UT|VT|WA|WI|WY|VA|WV|GU|PR|VI)\\b" );
 
-		IIUnknownVectorPtr ipCodeMatches = m_ipParser->Find( bstrLocal, VARIANT_FALSE, VARIANT_FALSE );
+		IIUnknownVectorPtr ipCodeMatches = m_ipParser->Find( bstrLocal, VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE );
 		if (ipCodeMatches->Size() > 0)
 		{
 			// Retrieve last token
@@ -1682,7 +1682,7 @@ bool CAddressSplitter::evaluateStringForZipCode(std::string strText, long *plSta
 	// Use regular expression to find zip code
 	m_ipParser->Pattern = _bstr_t( "\\d{5}(\\s*(-)?\\s*\\d{4})?" );
 	_bstr_t	bstrLocal( strText.c_str() );
-	IIUnknownVectorPtr ipMatches = m_ipParser->Find( bstrLocal, VARIANT_FALSE, VARIANT_FALSE );
+	IIUnknownVectorPtr ipMatches = m_ipParser->Find( bstrLocal, VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE );
 	if (ipMatches->Size() > 0)
 	{
 		// Retrieve last token

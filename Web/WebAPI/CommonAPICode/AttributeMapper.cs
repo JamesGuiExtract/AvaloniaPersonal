@@ -170,6 +170,50 @@ namespace WebAPI
         }
 
         /// <summary>
+        /// Creates a DocumentAttribute from a spatial substring
+        /// </summary>
+        /// <param name="token">The start and end indexes that define the substring</param>
+        /// <param name="name">The name of the attribute (HCData, MCData, LCData, Clues)</param>
+        /// <param name="type">The data type (e.g., SSN)</param>
+        /// <param name="source">The <see cref="ISpatialString"/> to extract the substring from</param>
+        /// <param name="verboseSpatialData"><c>false</c> to include only the spatial data needed for
+        /// extract software to represent spatial strings; <c>true</c> to include data that may be
+        /// useful to 3rd party integrators.</param>
+        public DocumentAttribute MapTokenToAttribute(IToken token, string name, string type, ISpatialString source, bool verboseSpatialData)
+        {
+            var docAttr = new DocumentAttribute();
+
+            try
+            {
+                docAttr.ID = Guid.NewGuid().ToString();
+                docAttr.Name = DetermineName(name);
+                docAttr.Type = type;
+
+                int start = 0, end = 0;
+                token.GetStartAndEndPosition(ref start, ref end);
+                SpatialString spatialString = source.GetSubString(start, end);
+                docAttr.Value = spatialString.String;
+
+                int minConf = 0;
+                int maxConf = 0;
+                int avgConf = 0;
+                spatialString.GetCharConfidence(ref minConf, ref maxConf, ref avgConf);
+                docAttr.AverageCharacterConfidence = avgConf;
+
+                docAttr.ConfidenceLevel = DetermineRedactionConfidence(name);
+                docAttr.HasPositionInfo = spatialString.HasSpatialInfo();
+
+                docAttr.SpatialPosition = spatialString.SetSpatialPosition(verboseSpatialData);
+
+                return docAttr;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI48307");
+            }
+        }
+
+        /// <summary>
         /// map IUnknownVector (of iAttribute) to a document attribute set.
         /// </summary>
         /// <param name="includeNonSpatial"><c>true</c> to include non-spatial attributes in the resulting data;

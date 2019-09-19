@@ -3579,7 +3579,7 @@ void CSpatialString::findFirstItemInRegExpVector(IVariantVectorPtr ipList, bool 
 
             // Search for the item
             IIUnknownVectorPtr ipMatches = ipRegExprParser->Find( 
-                get_bstr_t( strSearch.c_str() ), VARIANT_TRUE, VARIANT_FALSE );
+                get_bstr_t( strSearch.c_str() ), VARIANT_TRUE, VARIANT_FALSE, VARIANT_FALSE );
             ASSERT_RESOURCE_ALLOCATION("ELI06827", ipMatches != __nullptr);
 
             // If match is found

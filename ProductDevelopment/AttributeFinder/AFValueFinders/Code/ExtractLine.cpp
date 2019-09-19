@@ -95,7 +95,7 @@ STDMETHODIMP CExtractLine::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *p
 		IRegularExprParserPtr ipParser = getParser("[\\s\\S]*?(\\r\\n|\\n|\\r|(?=\\r*$))");
 
 		// all lines are stored separated in the vector
-		IIUnknownVectorPtr ipLines = ipParser->Find( _bstrText, VARIANT_FALSE, VARIANT_FALSE );
+		IIUnknownVectorPtr ipLines = ipParser->Find( _bstrText, VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE );
 		long nNumOfLines = ipLines->Size();
 
 		long nStart, nEnd;
@@ -592,7 +592,7 @@ void CExtractLine::parseLineNumbers(const string& strLineNumbers)
 				  "|\\b0");				// any word starts with 0
 
 	IIUnknownVectorPtr ipNonDigitChars = 
-		ipParser->Find(_bstr_t(strLineNumbers.c_str()), VARIANT_FALSE, VARIANT_FALSE);
+		ipParser->Find(_bstr_t(strLineNumbers.c_str()), VARIANT_FALSE, VARIANT_FALSE, VARIANT_FALSE);
 	if (ipNonDigitChars != __nullptr && ipNonDigitChars->Size() > 0)
 	{
 		UCLIDException ue("ELI05834", "Invalid line numbers are defined.");
@@ -604,7 +604,7 @@ void CExtractLine::parseLineNumbers(const string& strLineNumbers)
 	ipParser->Pattern = "(?'a'\\d+)(?'b'\\s?-\\s?(?'c'\\d+))?";
 	// get top matches, which might be some numbers and some number ranges
 	IIUnknownVectorPtr ipTopMatches = 
-		ipParser->Find(_bstr_t(strLineNumbers.c_str()), VARIANT_FALSE, VARIANT_TRUE);
+		ipParser->Find(_bstr_t(strLineNumbers.c_str()), VARIANT_FALSE, VARIANT_TRUE, VARIANT_FALSE);
 	if (ipTopMatches != __nullptr)
 	{
 		// look at each top match's sub matches
