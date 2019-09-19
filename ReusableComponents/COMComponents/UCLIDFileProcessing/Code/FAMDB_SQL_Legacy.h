@@ -307,3 +307,12 @@ static const string gstrCREATE_WORKFLOWFILE_V145 =
 "	[WorkflowID] INT NOT NULL, "
 "	[FileID] INT NOT NULL, "
 "	CONSTRAINT [PK_WorkflowFile] PRIMARY KEY CLUSTERED ([WorkflowID], [FileID]));";
+
+static const std::string gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW_LEGACY_166 =
+"IF OBJECT_ID('[dbo].[vFAMUserInputEventsTimeLegacy]', 'V') IS NULL "
+"	EXECUTE('CREATE VIEW[dbo].[vFAMUserInputEventsTimeLegacy] "
+"		AS "
+"		SELECT        FAMUserID, CAST(TimeStamp AS DATE) AS InputDate, COUNT(ID) AS TotalMinutes "
+"		FROM            dbo.InputEvent "
+"		GROUP BY FAMUserID, CAST(TimeStamp AS DATE)'"
+"	)";

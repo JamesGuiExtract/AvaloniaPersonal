@@ -4,6 +4,7 @@
 #include "FileProcessingDB.h"
 #include "FAMDB_SQL.h"
 #include "FAMDB_SQL_80.h"
+#include "FAMDB_SQL_Legacy.h"
 #include "FPCategories.h"
 #include "FAMDBHelperFunctions.h"
 
@@ -1779,6 +1780,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW);
 		vecQueries.push_back(gstrCREATE_PAGINATION_DATA_WITH_RANK_VIEW);
 		vecQueries.push_back(gstrCREATE_PROCESSING_DATA_VIEW);
+		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW_LEGACY_166);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);

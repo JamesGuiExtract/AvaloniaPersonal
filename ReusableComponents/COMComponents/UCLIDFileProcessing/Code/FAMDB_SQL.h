@@ -2275,14 +2275,36 @@ static const std::string gstrCREATE_USERS_WITH_ACTIVE_VIEW =
 	"			RIGHT OUTER JOIN dbo.FAMUser ON dbo.FAMSession.FAMUserID = dbo.FAMUser.ID '"
 	"	)";
 
+static const std::string gstrVIEW_DEFINITION_FOR_FAMUSER_INPUT_EVENTS_TIME =
+"			SELECT[FAMSession].[FAMUserID]															"
+"				, CAST([FileTaskSession].[DateTimeStamp] AS DATE) AS [InputDate]					"
+"				, SUM([FileTaskSession].[ActivityTime] / 60.0) AS           TotalMinutes			"
+"			FROM[FAMSession]																		"
+"			INNER JOIN[FileTaskSession] ON[FAMSession].[ID] =										"
+"			[FileTaskSession].[FAMSessionID]														"
+"			inner join TaskClass on FileTaskSession.TaskClassID = TaskClass.ID						"
+"			where([TaskClass].GUID IN																"
+"				(''FD7867BD-815B-47B5-BAF4-243B8C44AABB'',											"
+"				 ''59496DF7-3951-49B7-B063-8C28F4CD843F'',											"
+"				 ''AD7F3F3F-20EC-4830-B014-EC118F6D4567'',											"
+"				 ''DF414AD2-742A-4ED7-AD20-C1A1C4993175'',											"
+"				 ''8ECBCC95-7371-459F-8A84-A2AFF7769800''))											"
+"				AND																					"
+"					FileTaskSession.DateTimeStamp IS NOT NULL										"
+"			GROUP BY[FAMSession].[FAMUserID]														"
+"				, CAST([FileTaskSession].[DateTimeStamp] AS DATE)									";
+
 static const std::string gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW = 
 	"IF OBJECT_ID('[dbo].[vFAMUserInputEventsTime]', 'V') IS NULL "
 	"	EXECUTE('CREATE VIEW[dbo].[vFAMUserInputEventsTime] "
-	"		AS "
-	"		SELECT        FAMUserID, CAST(TimeStamp AS DATE) AS InputDate, COUNT(ID) AS TotalMinutes "
-	"		FROM            dbo.InputEvent "
-	"		GROUP BY FAMUserID, CAST(TimeStamp AS DATE)'"
-	"	)";
+	"		AS " + gstrVIEW_DEFINITION_FOR_FAMUSER_INPUT_EVENTS_TIME +
+	"'	)";
+
+static const std::string gstrALTER_FAMUSER_INPUT_EVENTS_TIME_VIEW =
+"IF OBJECT_ID('[dbo].[vFAMUserInputEventsTime]', 'V') IS NOT NULL "
+"	EXECUTE('ALTER VIEW[dbo].[vFAMUserInputEventsTime] "
+"		AS " + gstrVIEW_DEFINITION_FOR_FAMUSER_INPUT_EVENTS_TIME +
+"'	)";
 
 static const std::string gstrCREATE_PAGINATION_DATA_WITH_RANK_VIEW =
 	"IF OBJECT_ID('[dbo].[vPaginationDataWithRank]', 'V') IS NULL \r\n"
