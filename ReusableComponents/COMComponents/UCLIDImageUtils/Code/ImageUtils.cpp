@@ -93,13 +93,13 @@ STDMETHODIMP CImageUtils::CreateMultiPageImage(IVariantVector *pvecSinglePageIma
 		LicenseManagement::verifyFileTypeLicensedRW(  strOutputFileName );
 		// Create the Multipage image file
 		createMultiPageImage(vecImages, strOutputFileName, false);
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09059")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CImageUtils::IsMultiPageImage( BSTR strImageFileName, VARIANT_BOOL *pResult )
+STDMETHODIMP CImageUtils::IsMultiPageImage(BSTR strImageFileName, VARIANT_BOOL* pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -110,19 +110,38 @@ STDMETHODIMP CImageUtils::IsMultiPageImage( BSTR strImageFileName, VARIANT_BOOL 
 		validateLicense();
 
 		string strImage = asString(strImageFileName);
-		
-		// Get number of pages in image file
-		int nPages = getNumberOfPagesInImage( strImage );
-		
-		// if number of pages is > 1 return true
-		*pResult = asVariantBool(nPages > 1 ) ;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09167")
 
-	return S_OK;
+		// Get number of pages in image file
+		int nPages = getNumberOfPagesInImage(strImage);
+
+		// if number of pages is > 1 return true
+		*pResult = asVariantBool(nPages > 1);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI48428")
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CImageUtils::GetImagePageNumbers(BSTR strImageFileName, 
+STDMETHODIMP CImageUtils::GetPageCount(BSTR bstrImageFileName, long* pnPageCount)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI48340", pnPageCount != __nullptr);
+
+		validateLicense();
+
+		string strImageFileName = asString(bstrImageFileName);
+
+		*pnPageCount = getNumberOfPagesInImage(strImageFileName);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI48341")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CImageUtils::GetImagePageNumbers(BSTR strImageFileName,
 											  BSTR strSpecificPages, 
 											  IVariantVector **pvecPageNumbers)
 {
@@ -156,10 +175,10 @@ STDMETHODIMP CImageUtils::GetImagePageNumbers(BSTR strImageFileName,
 		}
 
 		*pvecPageNumbers = ipVecPageNumbers.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10265")
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CImageUtils::IsTextInZone( IImageStats *pImageStats, long nConsecutiveRows, 
@@ -200,10 +219,10 @@ STDMETHODIMP CImageUtils::IsTextInZone( IImageStats *pImageStats, long nConsecut
 				nCurrConsecutiveRows = 0;
 			}
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13286");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CImageUtils::GetImageStats(BSTR strImage, IRasterZone * pRaster, 
@@ -269,10 +288,10 @@ STDMETHODIMP CImageUtils::GetImageStats(BSTR strImage, IRasterZone * pRaster,
 		}
 
 		*ppImageStats = (IImageStats*) ipImageStats.Detach();
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13297");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CImageUtils::GetSpatialPageInfos(BSTR bstrFileName, IIUnknownVector **pvecSpatialPageInfos)
@@ -354,10 +373,10 @@ STDMETHODIMP CImageUtils::raw_IsLicensed(VARIANT_BOOL * pbValue)
 		{
 			*pbValue = VARIANT_FALSE;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18694");
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -8,6 +8,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_IMAGEUTILSLib;
@@ -31,10 +33,16 @@ namespace WebAPI.Models
         ApiContext _apiContext;
         AttributeDBMgr _attributeDbMgr;
         FileApi _fileApi;
-        ImageUtils _imageUtils;
-        ImageConverter _imageConverter;
         ClaimsPrincipal _user;
         bool _endSessionOnDispose;
+
+        // To be used for FAM DB operations that occur outside the context of a given DocumentData instance.
+        static FileProcessingDB _utilityFileProcessingDB;
+        static object _lock = new object();
+
+        static ThreadLocal<MiscUtils> _miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtils());
+        static ThreadLocal<ImageUtils> _imageUtils = new ThreadLocal<ImageUtils>(() => new ImageUtils());
+        static ThreadLocal<ImageConverter> _imageConverter = new ThreadLocal<ImageConverter>(() => new ImageConverter());
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DocumentData"/> class.
@@ -79,16 +87,6 @@ namespace WebAPI.Models
         /// </summary>
         public void Dispose()
         {
-            if (_imageUtils != null)
-            {
-                _imageUtils = null;
-            }
-
-            if (_imageConverter != null)
-            {
-                _imageConverter = null;
-            }
-
             if (_attributeDbMgr != null)
             {
                 _attributeDbMgr = null;
@@ -461,7 +459,7 @@ namespace WebAPI.Models
                     ? duration / 1000.0
                     : (DateTime.Now - FileApi.DocumentSession.StartTime).TotalSeconds;
 
-                FileApi.FileProcessingDB.UpdateFileTaskSession(FileApi.DocumentSession.Id,
+                FileApi.FileProcessingDB.EndFileTaskSession(FileApi.DocumentSession.Id,
                     durationInSeconds, 0, 0);
 
                 int fileId = FileApi.DocumentSession.FileId;
@@ -773,8 +771,31 @@ namespace WebAPI.Models
             try
             {
                 HTTPError.AssertRequest("ELI46420",
-                        page > 0, "Invalid page number",
-                        ("Page", page, true), ("Test", "value", false));
+                    page > 0, "Invalid page number",
+                    ("Page", page, true));
+
+                string wordZoneDataJson = null;
+                try
+                {
+                    // First, check to see if word zone data is cached.
+                    FileApi.FileProcessingDB.GetCachedFileTaskSessionData(FileApi.DocumentSession.Id, page,
+                        ECachedDataRequest.kCachedWordZone,
+                        out _, out _, out _, out _, out wordZoneDataJson, out _);
+                }
+                catch (Exception ex)
+                {
+                    // A failure retrieving cached data shouldn't be cause to report back to caller with a
+                    // failure; log the error, then instead retrieve the data from the source files.
+                    var ee = new ExtractException("ELI49459", "Failed to retrieve cached data", ex);
+                    ee.Log();
+                }
+
+                if (!string.IsNullOrWhiteSpace(wordZoneDataJson))
+                {
+                    // Surprisingly, returning the JSON directly appeared to be slower than serializing here
+                    // (which will be de-serialized for transport).
+                    return JsonConvert.DeserializeObject<WordZoneDataResult>(wordZoneDataJson);
+                }
 
                 pageData = GetUssData(fileId, page);
 
@@ -1097,7 +1118,7 @@ namespace WebAPI.Models
                     Path.GetExtension(fileName) != ".txt",
                     "Page info does not exist for text documents");
 
-                IIUnknownVector spatialPageInfos = ImageUtils.GetSpatialPageInfos(fileName);
+                IIUnknownVector spatialPageInfos = _imageUtils.Value.GetSpatialPageInfos(fileName);
                 int count = spatialPageInfos.Size();
                 for (int i = 0; i < count; i++)
                 {
@@ -1116,6 +1137,8 @@ namespace WebAPI.Models
 
         /// <summary>
         /// Gets the page image.
+        /// <para><b>Note</b></para>
+        /// This call has the side-effect of triggering the caching of data for the subsequent document page.
         /// </summary>
         /// <param name="pageNum">The page number.</param>
         /// <param name="fileId">The file identifier.</param>
@@ -1131,9 +1154,75 @@ namespace WebAPI.Models
                 AssertRequestFilePage("ELI45174", fileId, pageNum);
 
                 var fileName = GetSourceFileName(fileId);
-                byte[] imageData = (byte[])ImageConverter.GetPDFImage(fileName, pageNum, true);
 
-                return imageData;
+                // First, check the cache.
+                Array cachedPages = new int[0];
+                Array cachedImageData = new byte[0];
+                try
+                {
+                    FileApi.FileProcessingDB.GetCachedFileTaskSessionData(FileApi.DocumentSession.Id, pageNum,
+                        ECachedDataRequest.kCachedPageList | ECachedDataRequest.kCachedImage,
+                        out cachedPages, out cachedImageData, out _, out _, out _, out _);
+                }
+                catch (Exception ex)
+                {
+                    // A failure retrieving cached data shouldn't be cause to report back to caller with a
+                    // failure; log the error, then instead retrieve the data from the source files.
+                    var ee = new ExtractException("ELI49460", "Failed to retrieve cached data", ex);
+                    ee.Log();
+                }
+
+                // Set sessionId variables for closure of the Task.Run lamda
+                int sessionId = FileApi.DocumentSession.Id;
+
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        // Trigger data cache for the first page and also for the subsequent page
+                        // (if not already cached)
+                        int[] pagesToCache = (pageNum == 1)
+                            ? new[] { 2, 1 }   // Prioritize caching 2nd page over the first as the second would be need first.
+                            : new[] { pageNum + 1 };
+                        int pageCount = _imageUtils.Value.GetPageCount(fileName);
+                        pagesToCache = pagesToCache
+                            .Where(p => p <= pageCount)
+                            .Except((int[])cachedPages)
+                            .ToArray();
+
+                        foreach (int page in pagesToCache)
+                        {
+                            CachePageData(sessionId, fileId, page);
+                        }
+                    }
+                    catch (Exception cacheException)
+                    {
+                        // Since the ability to access cached data is not critical, log the
+                        // exception but otherwise ignore.
+                        // If needed, exceptions will be stored in the cache table where the
+                        // data would have been.
+                        var eeAppTrace = new ExtractException("ELI49468",
+                            "Application Trace: Cache operation did not succeed.", cacheException);
+                        eeAppTrace.AddDebugData("Session ID", sessionId, false);
+                        eeAppTrace.AddDebugData("File ID", fileId, false);
+                        eeAppTrace.AddDebugData("Page", pageNum, false);
+                        eeAppTrace.AddDebugData("Note",
+                            "If logged during unit test execution, this is not likely an indication of a problem.",
+                            true);
+                        eeAppTrace.Log();
+                    }
+                });
+
+                if (cachedImageData != null)
+                {
+                    return (byte[])cachedImageData;
+                }
+                else
+                {
+                    byte[] imageData = (byte[])_imageConverter.Value.GetPDFImage(fileName, pageNum, true);
+
+                    return imageData;
+                }
             }
             catch (Exception ex)
             {
@@ -1418,6 +1507,19 @@ namespace WebAPI.Models
         }
 
         /// <summary>
+        /// The document session file identifier
+        /// </summary>
+        public int DocumentSessionId
+        {
+            get
+            {
+                AssertDocumentSession("ELI49439");
+
+                return FileApi.DocumentSession.Id;
+            }
+        }
+
+        /// <summary>
         /// Gets the workflow type
         /// </summary>
         public EWorkflowType WorkflowType => FileApi.Workflow.Type;
@@ -1519,6 +1621,51 @@ namespace WebAPI.Models
             }
         }
 
+        /// <summary>
+        /// Request page image, uss and word zone data to be cached for the specified page.
+        /// </summary>
+        /// <param name="documentSessionId">The document session for which the data is to be cached.
+        /// If the document session is not open by the time of data storage, the call will be ignored
+        /// (have no effect).</param>
+        /// <param name="fileId">The file identifier.</param>
+        /// <param name="pageNum">The page number for which data should be cached.</param>
+        public static async Task CachePageDataAsync(int documentSessionId, int fileId, int pageNum)
+        {
+            try
+            {
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        // Check to be sure cache data doesn't already exist before re-caching.
+                        Array cachedPages;
+                        UtilityFileProcessingDB.GetCachedFileTaskSessionData(documentSessionId, pageNum,
+                            ECachedDataRequest.kCachedPageList,
+                            out cachedPages, out _, out _, out _, out _, out _);
+
+                        if (!Array.Exists((int[])cachedPages, x => x == pageNum))
+                        {
+                            CachePageData(documentSessionId, fileId, pageNum);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // We don't know if caller will await result of the operation; log before
+                        // throwing to guarantee we have record of the error.
+                        var ee = new ExtractException("ELI49461", "Failed to cache data", ex);
+                        ee.Log();
+                        throw ee;
+                    }
+
+                    return;
+                }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI48423");
+            }
+        }
+
         #region Private Members
 
         FileApi FileApi
@@ -1543,6 +1690,41 @@ namespace WebAPI.Models
             }
         }
 
+        /// <summary>
+        /// A FileProcessingDB to be used for FAM DB operations that occur outside the context
+        /// of a given DocumentData instance.
+        /// </summary>
+        static FileProcessingDB UtilityFileProcessingDB
+        {
+            get
+            {
+                var context = CurrentApiContext;
+
+                // While in a production scenario the database shouldn't ever change in a given
+                // process, for unit tests it will change.
+                if (_utilityFileProcessingDB == null ||
+                    _utilityFileProcessingDB.DatabaseServer != context.DatabaseServerName ||
+                    _utilityFileProcessingDB.DatabaseName != context.DatabaseName)
+                {
+                    lock (_lock)
+                    {
+                        if (_utilityFileProcessingDB == null ||
+                            _utilityFileProcessingDB.DatabaseServer != context.DatabaseServerName ||
+                            _utilityFileProcessingDB.DatabaseName != context.DatabaseName)
+                        {
+                            _utilityFileProcessingDB = new FileProcessingDB();
+                            _utilityFileProcessingDB.DatabaseServer = context.DatabaseServerName;
+                            _utilityFileProcessingDB.DatabaseName = context.DatabaseName;
+                            _utilityFileProcessingDB.NumberOfConnectionRetries = context.NumberOfConnectionRetries;
+                            _utilityFileProcessingDB.ConnectionRetryTimeout = context.ConnectionRetryTimeout;
+                        }
+                    }
+                }
+
+                return _utilityFileProcessingDB;
+            }
+        }
+
         AttributeDBMgr AttributeDbMgr
         {
             get
@@ -1561,52 +1743,6 @@ namespace WebAPI.Models
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI45023");
-                }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        ImageUtils ImageUtils
-        {
-            get
-            {
-                try
-                {
-                    if (_imageUtils == null)
-                    {
-                        _imageUtils = new ImageUtils();
-                    }
-
-                    return _imageUtils;
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI45023");
-                }
-            }
-        }
-
-        /// <summary>
-        /// The image converter
-        /// </summary>
-        ImageConverter ImageConverter
-        {
-            get
-            {
-                try
-                {
-                    if (_imageConverter == null)
-                    {
-                        _imageConverter = new ImageConverter();
-                    }
-
-                    return _imageConverter;
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI0");
                 }
             }
         }
@@ -1657,7 +1793,7 @@ namespace WebAPI.Models
         /// </param>
         /// <param name="page">The page number to retrieve. -1 to retrieve the entire string.</param>
         /// <returns>A <see cref="SpatialString"/> representing the OCR data.</returns>
-        SpatialString GetUssData(string fileName, int page = -1)
+        static SpatialString GetUssData(string fileName, int page = -1)
         {
             var ussFileName = fileName + ".uss";
             if (File.Exists(ussFileName))
@@ -1700,6 +1836,75 @@ namespace WebAPI.Models
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Caches page image, uss and word zone data to the database for faster response when loading the
+        /// specified page.
+        /// </summary>
+        /// <param name="documentSessionId">The document session ID (FileTaskSessionID) that serves as context
+        /// for this cache; the cached data will be deleted once this session ends.</param>
+        /// <param name="docID">The currently open document ID</param>
+        /// <param name="page">The page for which to cache data.</param>
+        static void CachePageData(int documentSessionId, int docID, int page)
+        {
+            try
+            {
+                // Don't bother trying to gather data for caching for a session that has already closed.
+                ADODB.Recordset adoRecordset = UtilityFileProcessingDB.GetResultsForQuery(
+                    Inv($"SELECT TOP 1 [ID] FROM [FileTaskSession] WHERE [ID] = {documentSessionId} AND [DateTimeStamp] IS NULL"));
+                try
+                {
+                    if (adoRecordset.EOF)
+                    {
+                        return;
+                    }
+                }
+                finally
+                {
+                    adoRecordset.Close();
+                }
+
+                string fileName = UtilityFileProcessingDB.GetFileNameFromFileID(docID);
+                int pageCount = _imageUtils.Value.GetPageCount(fileName);
+
+                HTTPError.Assert("ELI48418", StatusCodes.Status404NotFound, page > 0 && page <= pageCount,
+                    "Page not found");
+
+                var image = (byte[])_imageConverter.Value.GetPDFImage(fileName, page, true);
+                string stringizedPageUss = null;
+                string wordZoneJson = null;
+                var pageUSS = GetUssData(fileName, page);
+                if (pageUSS != null)
+                {
+                    stringizedPageUss = _miscUtils.Value.GetObjectAsStringizedByteStream(pageUSS);
+                    var wordZoneData = pageUSS.MapSpatialStringToWordZoneData();
+                    var wordZoneDataResult = new WordZoneDataResult
+                    {
+                        Zones = wordZoneData
+                    };
+                    wordZoneJson = JsonConvert.SerializeObject(wordZoneDataResult, Formatting.None);
+                }
+
+                UtilityFileProcessingDB.CacheFileTaskSessionData(documentSessionId, page,
+                    image, stringizedPageUss, null, wordZoneJson, null);
+            }
+            catch (Exception ex)
+            {
+                var stringizedException = ex.AsExtract("ELI48415").AsStringizedByteStream();
+
+                try
+                {
+                    UtilityFileProcessingDB.CacheFileTaskSessionData(documentSessionId, page,
+                        null, null, null, null, stringizedException);
+                }
+                catch (Exception ex2)
+                {
+                    ex2.ExtractLog("ELI48426");
+                }
+
+                throw ex;
+            }
         }
 
         #endregion Private Members

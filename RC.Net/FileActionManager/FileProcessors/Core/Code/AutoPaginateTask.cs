@@ -853,7 +853,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 var sessionSeconds = (DateTime.Now - sessionStartTime).TotalSeconds;
-                _fileProcessingDB.UpdateFileTaskSession(fileTaskSessionID, sessionSeconds, 0, 0);
+                _fileProcessingDB.EndFileTaskSession(fileTaskSessionID, sessionSeconds, 0, 0);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }

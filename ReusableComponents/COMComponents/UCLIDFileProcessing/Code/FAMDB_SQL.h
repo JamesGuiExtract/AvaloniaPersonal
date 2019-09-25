@@ -363,6 +363,18 @@ static const string gstrCREATE_FILE_TASK_SESSION =
 	" [OverheadTime] [float] NULL, "
 	" [ActivityTime] [float] NULL)";
 
+static const string gstrCREATE_FILE_TASK_SESSION_CACHE =
+	"CREATE TABLE [dbo].[FileTaskSessionCache] ( "
+	"[ID] BIGINT IDENTITY(1, 1) NOT NULL CONSTRAINT[PK_FileTaskSessionCache] PRIMARY KEY CLUSTERED, "
+	"[ActiveFAMID] INT NOT NULL, "
+	"[FileTaskSessionID] INT NOT NULL, "
+	"[Page] INT NOT NULL, "
+	"[ImageData] VARBINARY(MAX) NULL, "
+	"[USSData] NVARCHAR(MAX) NULL, "
+	"[VOAData] NVARCHAR(MAX) NULL, "
+	"[WordZoneData] NVARCHAR(MAX) NULL, "
+	"[Exception] NVARCHAR(MAX) NULL)";
+
 static const string gstrCREATE_SECURE_COUNTER =
 	"CREATE TABLE dbo.[SecureCounter] ( "
 	"   [ID] int NOT NULL CONSTRAINT [PK_SecureCounter] PRIMARY KEY CLUSTERED, "
@@ -1228,6 +1240,14 @@ static const string gstrADD_WEB_APP_CONFIG_WORKFLOW_FK =
 	"ALTER TABLE dbo.[WebAppConfig] "
 	"WITH CHECK ADD CONSTRAINT[FK_WebAppConfig_Workflow] FOREIGN KEY([WorkflowID]) "
 	"REFERENCES[Workflow]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+// ActiveFAM FK with cascade deletes ensures cached data gets cleaned up if a session is lost.
+static const string gstrADD_FILE_TASK_SESSION_CACHE_ACTIVEFAM_FK =
+	"ALTER TABLE dbo.[FileTaskSessionCache] "
+	"WITH CHECK ADD CONSTRAINT [FK_FileTaskSessionCache_ActiveFAM] FOREIGN KEY ([ActiveFAMID]) "
+	"REFERENCES [ActiveFAM]([ID]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
@@ -2240,7 +2260,6 @@ static const string gstrCREATE_REPORTING_VERIFICATION_RATES =
 	"	[ActivityTime][float] NOT NULL CONSTRAINT [DF_ActivityTime] DEFAULT(0.0) "
 	"   CONSTRAINT [IX_ReportingVerificationRatesFileActionTask] UNIQUE CLUSTERED([FileID],[ActionID],[TaskClassID],[DatabaseServiceID]))";
 
-
 static const std::string gstrADD_REPORTING_VERIFICATION_RATES_FAMFILE_FK =
 	"ALTER TABLE[dbo].[ReportingVerificationRates]  "
 	"	WITH CHECK ADD  CONSTRAINT [FK_ReportingVerificationRates_FAMFile] FOREIGN KEY([FileID]) "
@@ -2429,3 +2448,41 @@ static const string gstr_CLEAR_DATABASE_SERVICE_STATUS_FIELDS =
 		"[ActiveServiceMachineID] = NULL,\r\n"
 		"[NextScheduledRunTime] = NULL,\r\n"
 		"[ActiveFAMID] = NULL;\r\n";
+
+static const string gstrGET_OR_CREATE_FILE_TASK_SESSION_CACHE_ROW =
+"DECLARE @rowID TABLE ([ID] BIGINT)\r\n"
+// SET NOCOUNT ON is needed to prevent "operation is not allowed when the object is closed"
+"SET NOCOUNT ON \r\n"
+"IF EXISTS(SELECT[ID] FROM [FileTaskSession] WHERE [ID] = <FileTaskSessionID> AND [DateTimeStamp] IS NULL)\r\n"
+"BEGIN\r\n"
+"	INSERT INTO @rowID\r\n"
+"		SELECT [ID]\r\n"
+"		FROM [FileTaskSessionCache]\r\n"
+"		WHERE [FileTaskSessionID] = <FileTaskSessionID> AND [Page] = <Page>\r\n"
+"	IF NOT EXISTS(SELECT * FROM @rowID)\r\n"
+"	BEGIN\r\n"
+"	INSERT INTO dbo.[FileTaskSessionCache] ([ActiveFAMID], [FileTaskSessionID], [Page])\r\n"
+"		OUTPUT INSERTED.ID INTO @rowID\r\n"
+"		SELECT [ActiveFAM].[ID], <FileTaskSessionID>, <Page>\r\n"
+"		FROM [ActiveFAM]\r\n"
+"			INNER JOIN [FAMSession] ON [ActiveFAM].[FAMSessionID] = [FAMSession].[ID]\r\n"
+"			INNER JOIN [FileTaskSession] ON [FileTaskSession].[FAMSessionID] = [FAMSession].[ID]\r\n"
+"		WHERE [FileTaskSession].[ID] = <FileTaskSessionID>\r\n"
+"	END\r\n"
+"END\r\n"
+"SELECT COALESCE(MIN([ID]), -1) AS [ID] FROM @rowID";
+
+static const string gstrGET_FILE_TASK_SESSION_CACHE_ROWS =
+	"SELECT [Page] FROM [FileTaskSessionCache] \r\n"
+	"	WHERE [FileTaskSessionID] = <FileTaskSessionID>";
+
+static const string gstrGET_FILE_TASK_SESSION_CACHE_DATA_BY_PAGE =
+"SELECT <FieldList> FROM [FileTaskSessionCache] \r\n"
+"	WHERE [FileTaskSessionID] = <FileTaskSessionID> AND [Page] = <Page>";
+
+static const string gstrGET_FILE_TASK_SESSION_CACHE_DATA_BY_ID =
+	"SELECT <FieldList> FROM [FileTaskSessionCache] \r\n"
+	"	WHERE [ID] = <ID>";
+
+
+

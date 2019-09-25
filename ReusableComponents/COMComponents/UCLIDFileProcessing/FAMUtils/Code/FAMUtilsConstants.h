@@ -104,6 +104,7 @@ static const string gstrMAIN_DB_LOCK = "Main";
 static const string gstrUSER_COUNTER_DB_LOCK = "UserCounter";
 static const string gstrWORKITEM_DB_LOCK = "WorkItem";
 static const string gstrSECURE_COUNTER_DB_LOCK = "SecureCounter";
+static const string gstrCACHE_LOCK = "CacheLock";
 
 // Special-purpose FAM tag names
 const string gstrDATABASE_SERVER_TAG = "<DatabaseServer>";

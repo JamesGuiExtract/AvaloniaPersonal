@@ -20,6 +20,11 @@ namespace Extract.Testing.Utilities
         Dictionary<string, TemporaryFile> _files = new Dictionary<string, TemporaryFile>();
 
         /// <summary>
+        /// The name of a subdirectory in the temp directory where any test files should be placed
+        /// </summary>
+        string _subdirectoryName;
+
+        /// <summary>
         /// The assembly that this <see cref="TestFileManager{T}"/> is associated with.
         /// This is the assembly that will be used to retrieve the embedded resource images.
         /// </summary>
@@ -32,8 +37,12 @@ namespace Extract.Testing.Utilities
         /// <summary>
         /// Initializes a new instance of the <see cref="TestFileManager{T}"/> class.
         /// </summary>
-        public TestFileManager()
+        /// <param name="subdirectoryName">The name of a subdirectory in the temp directory where
+        /// any test files should be placed (when an explicit file path is not specified). If
+        /// <c>null</c>, files will be placed into the root of the user's temp directory.</param>
+        public TestFileManager(string subdirectoryName = null)
         {
+            _subdirectoryName = subdirectoryName;
         }
 
         #endregion TestFileManager Constructors
@@ -165,14 +174,17 @@ namespace Extract.Testing.Utilities
                 if (string.IsNullOrWhiteSpace(fileName))
                 {
                     tempFile = GeneralMethods.WriteEmbeddedResourceToTemporaryFile<T>(
-                        _assembly, resource);
+                        _assembly, resource, _subdirectoryName);
                 }
                 else
                 {
+                    var directory = Path.GetDirectoryName(fileName);
+                    Directory.CreateDirectory(directory);
+
                     // Create a new TemporaryFile associated with the specified file name
                     FileInfo fileInfo = new FileInfo(fileName);
                     tempFile = new TemporaryFile(fileInfo, false);
-
+                    
                     GeneralMethods.WriteEmbeddedResourceToFile<T>(
                         _assembly, resource, tempFile.FileName);
                 }
@@ -230,7 +242,14 @@ namespace Extract.Testing.Utilities
                 }
             }
 
-            // No unmanaged resources
+            if (!string.IsNullOrWhiteSpace(_subdirectoryName))
+            {
+                string directory = Path.Combine(Path.GetTempPath(), _subdirectoryName);
+                if (Directory.Exists(directory))
+                {
+                    Directory.Delete(directory);
+                }
+            }
         }
 
         #endregion IDisposable Members

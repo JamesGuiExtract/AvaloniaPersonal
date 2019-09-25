@@ -120,12 +120,15 @@ namespace Extract.Testing.Utilities
         /// <typeparam name="T">The type used to resolve the resource location.</typeparam>
         /// <param name="assembly">The assembly containing the embedded resource.</param>
         /// <param name="resourceName">Name of the resource.</param>
+        /// <param name="subdirectoryName">The name of a subdirectory in the temp directory where
+        /// the resource file should be written. If <c>null</c>, files will be placed into the root
+        /// of the user's temp directory.</param>
         /// <returns>A <see cref="TemporaryFile"/> instance to manage the </returns>
         // User needs to supply the type parameter since it is used to get the calling assembly
         // and find the embedded resource to export.
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
         public static TemporaryFile WriteEmbeddedResourceToTemporaryFile<T>(Assembly assembly,
-            string resourceName)
+            string resourceName, string subdirectoryName = null)
         {
             // Get the type
             Type type = typeof(T);
@@ -147,7 +150,18 @@ namespace Extract.Testing.Utilities
                     string outputFileName = Regex.Replace(resourceName,
                         @"^(Properties\.)?Resources\.", "", RegexOptions.IgnoreCase);
 
-                    outputFileName = Path.Combine(Path.GetTempPath(), outputFileName);
+                    string path = Path.GetTempPath();
+
+                    if (!string.IsNullOrWhiteSpace(subdirectoryName))
+                    {
+                        path = Path.Combine(path, subdirectoryName);
+                        if (!Directory.Exists(path))
+                        {
+                            Directory.CreateDirectory(path);
+                        }
+                    }
+
+                    outputFileName = Path.Combine(path, outputFileName);
 
                     // Since a static filename is being specified (and TemporaryFile will not be
                     // able to guarantee uniqueness), delete any existing instance of the file so

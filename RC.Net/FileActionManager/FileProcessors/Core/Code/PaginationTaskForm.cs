@@ -1926,7 +1926,7 @@ namespace Extract.FileActionManager.FileProcessors
                 var duration = sessionData.DurationStopwatch.Elapsed.TotalSeconds;
                 var overhead = sessionData.OverheadStopwatch.Elapsed.TotalSeconds;
 
-                _fileProcessingDB.UpdateFileTaskSession(sessionData.SessionID,
+                _fileProcessingDB.EndFileTaskSession(sessionData.SessionID,
                     duration, overhead, sessionData.ActiveSeconds);
             }
             catch (Exception ex)

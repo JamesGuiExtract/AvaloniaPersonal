@@ -41,6 +41,7 @@ public:
 	STDMETHOD(CreateMultiPageImage)(IVariantVector *pvecSinglePageImages, 
 		BSTR strOutputImageFileName);
 	STDMETHOD(IsMultiPageImage)( BSTR strImageFileName, VARIANT_BOOL *pResult );
+	STDMETHOD(GetPageCount)(BSTR bstrImageFileName, long* pnPageCount);
 	STDMETHOD(GetImagePageNumbers)(BSTR strImageFileName, BSTR strSpecificPages, 
 		IVariantVector **pvecPageNumbers);
 	STDMETHOD(IsTextInZone)( IImageStats *pImageStats, long nConsecutiveRows, long nMinPercent, 

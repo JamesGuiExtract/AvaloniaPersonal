@@ -1,17 +1,17 @@
 ﻿using Extract.FileActionManager.Database.Test;
-using Extract.FileActionManager.FileProcessors;
 using Extract.Imaging;
 using Extract.Testing.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -23,6 +23,7 @@ using WebAPI.Models;
 using static WebAPI.Utils;
 
 using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
+
 
 namespace Extract.Web.WebAPI.Test
 {
@@ -113,7 +114,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -145,7 +146,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, "", "123");
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles, "", "123");
 
                 Assert.AreEqual(((ErrorResult)(((ObjectResult)controller.Login(user)).Value)).Error.Message, "Username is empty");
             }
@@ -165,7 +166,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
                 fileProcessingDb.AddMetadataField("DocumentType");
 
                 LogInToWebApp(controller, user);
@@ -193,7 +194,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 LogInToWebApp(controller, user);
 
@@ -220,7 +221,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 controller.Login(user);
 
@@ -244,7 +245,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 LogInToWebApp(controller, user);
 
@@ -267,7 +268,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
                 fileProcessingDb.AddMetadataField("DocumentType");
 
                 LogInToWebApp(controller, user);
@@ -292,7 +293,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, "jane_doe","");
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles, "jane_doe","");
 
                 Assert.AreEqual(((ErrorResult)(((ObjectResult)controller.Login(user)).Value)).Error.Message,"Password is empty");
             }
@@ -312,7 +313,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 // Test that SessionLogin requires a logged in user
                 controller.SessionLogin().AssertResultCode(500, "User should be logged in before logging into to session");
@@ -367,7 +368,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 File.WriteAllText(temporaryDocType, "Ambulance - Encounter \nAmbulance - Patient \nAnesthesia \nAppeal Request");
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
                 var newSettings = $"{{ \"InactivityTimeout\": 5, \"RedactionTypes\": [\"SSN\", \"DOB\"], \"DocumentTypes\": \"{temporaryDocType.Replace(@"\", @"\\")}\" }}";
                 fileProcessingDb.ExecuteCommandQuery($"UPDATE [dbo].[WebAppConfig] SET SETTINGS = '{newSettings}' WHERE TYPE = 'RedactionVerificationSettings'");
                 var result = controller.Login(user);
@@ -411,7 +412,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -465,7 +466,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -519,7 +520,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
                 var pendingDocuments = _testFileArray.Length;
 
                 var result = controller.Login(user);
@@ -616,7 +617,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 LogInToWebApp(controller, user);
                 var openDocumentResult = OpenDocument(controller, 1);
@@ -668,7 +669,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 LogInToWebApp(controller, user);
                 OpenDocument(controller, 1);
@@ -696,7 +697,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 // Login to register an active FAM.
                 var result = controller.Login(user);
@@ -767,7 +768,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
                 _testFiles.RemoveFile(_TEST_FILE3 + ".uss");
 
                 LogInToWebApp(controller, user);
@@ -809,7 +810,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 LogInToWebApp(controller, user);
                 var openDocumentResult = OpenDocument(controller, 3);
@@ -843,7 +844,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
                 LogInToWebApp(controller, user);
                 var openDocumentResult = OpenDocument(controller, 3);
                 Assert.AreEqual(3, openDocumentResult.Id);
@@ -886,7 +887,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 LogInToWebApp(controller, user);
                 var openDocumentResult = OpenDocument(controller, 3);
@@ -945,7 +946,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 LogInToWebApp(controller, user);
                 OpenDocument(controller, 1);
@@ -979,7 +980,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 LogInToWebApp(controller, user);
                 var openDocumentResult = OpenDocument(controller, 3);
@@ -1022,7 +1023,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 LogInToWebApp(controller, user);
                 var openDocumentResult = OpenDocument(controller, 3);
@@ -1083,7 +1084,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                  LogInToWebApp(controller, user);
                  var openDocumentResult = OpenDocument(controller, 1);
@@ -1119,7 +1120,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 LogInToWebApp(controller, user);
                 var openDocumentResult = OpenDocument(controller, 1);
@@ -1157,7 +1158,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 LogInToWebApp(controller, user);
                 var openDocumentResult = OpenDocument(controller, 1);
@@ -1191,7 +1192,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
                 var docID = 1;
 
                 LogInToWebApp(controller, user);
@@ -1251,7 +1252,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
                 var docID = 2;
 
                 LogInToWebApp(controller, user);
@@ -1280,7 +1281,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
                 var docID = 1;
 
                 LogInToWebApp(controller, user);
@@ -1316,7 +1317,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
                 var docID = 1;
 
                 LogInToWebApp(controller, user);
@@ -1346,7 +1347,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
                 var docID = 1;
 
                 LogInToWebApp(controller, user);
@@ -1374,7 +1375,6 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
-
         /// <summary>
         /// Test search results on 1000 page document
         /// </summary>
@@ -1387,7 +1387,7 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (db, user, controller) = InitializeDBAndUser(dbName);
+                var (db, user, controller) = InitializeDBAndUser(dbName, _testFiles);
                 var docID = 5;
 
                 LogInToWebApp(controller, user);
@@ -1420,9 +1420,531 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
+        /// <summary>
+        /// Tests that page data can be cached and that the cached data is used.
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void CachePageData()
+        {
+            CachePageDataAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        public static async Task CachePageDataAsync()
+        {
+            string dbName = "AppBackendAPI_Test_CachePageData";
+            TestFileManager<TestBackendAPI> testSpecficFiles = new TestFileManager<TestBackendAPI>(dbName);
+
+            try
+            {
+                var (db, user, controller) = InitializeDBAndUser(dbName, testSpecficFiles);
+                int docID = 3;
+                // NOTE: GetDocumentPage will trigger caching of page 1 (when openend) as well as any
+                // subsequent page. To isoloate behavior of CachePageDataAsync, all testing here will
+                // be for page 2.
+                int page = 2;
+
+                LogInToWebApp(controller, user);
+                OpenDocument(controller, docID);
+
+                // Currently GetDocumentPage and GetPageWordZones will utilize cached data.
+                // Retrieve data before caching for later comparison.
+                var pageData1 = new PageData(controller, docID, page);
+
+                // Request for page 2 data to be cached; and allow up to 3 seconds.
+                var cacheTask = controller.CachePageDataAsync(docID, page);
+                if (await Task.WhenAny(cacheTask, Task.Delay(3000)) == cacheTask)
+                {
+                    var result = await cacheTask;
+                    result.AssertGoodResult<NoContentResult>();
+                }
+                else
+                {
+                    Assert.Fail("Failed to cache data");
+                }
+
+                // Replace image + uss file to confirm API is retrieving cached data from DB instead of from the files on disk.
+                string targetFileName = _testFileNames[docID - 1];
+                string targetUssFileName = targetFileName + ".uss";
+                string differentFileName = _testFileNames[docID + 1];
+                string differentUssFileName = differentFileName + ".uss";
+                File.Copy(differentFileName, targetFileName, true);
+                File.Copy(differentUssFileName, targetUssFileName, true);
+
+                var pageData2 = new PageData(controller, docID, page);
+                Assert.IsTrue(pageData1.Equals(pageData2), "Page data is different");
+
+                // Closing a document will clear the cached data. Confirm this is the case
+                controller.CloseDocument(docID, false);
+
+                Assert.IsFalse(controller.GetCachedPages(db).Any(), "Cache was not cleared");
+
+                // Since the files on disk were replaced, trying again to get the document image and word zones should
+                // now yield different results than we got on the initial read or from cache.
+                OpenDocument(controller, docID);
+                var pageData3 = new PageData(controller, docID, page);
+                Assert.IsFalse(pageData1.Equals(pageData3), "Page data was expected to differ");
+
+                controller.Logout().AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                testSpecficFiles.Dispose();
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        /// <summary>
+        /// Test that trying to cache a non-existant page fails with an appropriate 404 error.
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void CacheNonExistentPage()
+        {
+            CacheNonExistentPageAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        public static async Task CacheNonExistentPageAsync()
+        {
+            string dbName = "AppBackendAPI_Test_CacheNonExistentPage";
+
+            try
+            {
+                var (db, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+                var docID = 1;
+
+                LogInToWebApp(controller, user);
+                OpenDocument(controller, docID);
+
+                var result = await controller.CachePageDataAsync(docID, 2);
+                result.AssertResultCode(404, "Expected page not found.");
+
+                controller.Logout().AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        /// <summary>
+        /// Test that trying to cache a corrupt uss file generates a 500 error that is logged to the
+        /// cache table.
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void CacheCorruptUssFile()
+        {
+            CacheCorruptUssFileAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        public static async Task CacheCorruptUssFileAsync()
+        {
+            string dbName = "AppBackendAPI_Test_CacheCorruptUssFile";
+            TestFileManager<TestBackendAPI> testSpecficFiles = new TestFileManager<TestBackendAPI>(dbName);
+
+            try
+            {
+                var (db, user, controller) = InitializeDBAndUser(dbName, testSpecficFiles);
+                var docID = 1;
+
+                string targetFileName = _testFileNames[docID - 1];
+                string targetUssFileName = targetFileName + ".uss";
+
+                File.Copy(targetFileName, targetUssFileName, true);
+
+                LogInToWebApp(controller, user);
+                OpenDocument(controller, docID);
+
+                var result = await controller.CachePageDataAsync(docID, 1);
+                result.AssertResultCode(500, "Expected error caching corrupt uss");
+
+                // Confirm that the cache exception has been recorded in the db for the page.
+                Assert.Throws<ExtractException>(() => controller.IsPageDataCached(db, 1, checkForWordZoneData: true));
+
+                controller.Logout().AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                testSpecficFiles.Dispose();
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        /// <summary>
+        /// Test that retrieving a document page automatically triggers data for the next page to be cached.
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void AutoPageCache()
+        {
+            string dbName = "AppBackendAPI_Test_AutoPageCache";
+
+            try
+            {
+                var (db, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+                var docID = 3;
+
+                LogInToWebApp(controller, user);
+                OpenDocument(controller, docID);
+
+                // GetDocumentPage should trigger caching of the subsequent page in all cases and
+                // also the current page only if the current page is 1
+                var result = controller.GetDocumentPage(docID, 1);
+                result.AssertGoodResult<FileContentResult>();
+
+                // Wait for up to 3 seconds for page 1 and 2 to be cached (page 2 should be cached first)
+                bool dataIsCached = false;
+                for (int i = 0; !dataIsCached && i < 30; i++)
+                {
+                    if (controller.GetCachedPages(db).SequenceEqual(new[] { 2, 1 }))
+                    {
+                        dataIsCached = true;
+                    }
+                    else
+                    {
+                        Thread.Sleep(100);
+                    }
+                }
+
+                Assert.IsTrue(dataIsCached, "Failed to cache data");
+
+                result = controller.GetDocumentPage(docID, 3);
+                result.AssertGoodResult<FileContentResult>();
+
+                // Wait for up to 3 seconds for page 4 to be cached (page 3 should not be cached)
+                dataIsCached = false;
+                for (int i = 0; !dataIsCached && i < 30; i++)
+                {
+                    if (controller.GetCachedPages(db).SequenceEqual(new[] { 2, 1, 4 }))
+                    {
+                        dataIsCached = true;
+                    }
+                    else
+                    {
+                        Thread.Sleep(100);
+                    }
+                }
+
+                controller.Logout().AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        /// <summary>
+        /// Test that closing a session in the midst of caching does not cause errors.
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void CacheSessionCloseWhileInProgress()
+        {
+            string dbName = "AppBackendAPI_Test_CacheSessionCloseWhileInProgress";
+
+            try
+            {
+                var (db, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+                var docID = 3;
+
+                // Looping this test originally caused cursor errors in CacheFileTaskSessionData;
+                // While CacheSimultaneousOperations has been added to test still more complex
+                // scenarios, confirm the issue discovered looping here remains resolved.
+                for (int i = 0; i < 100; i++)
+                {
+                    LogInToWebApp(controller, user);
+                
+                    OpenDocument(controller, docID);
+                    var documentSessionId = controller.GetActiveDocumentSessionId();
+
+                    var cacheTasks = new Task<IActionResult>[] {
+                        controller.CachePageDataAsync(docID, 1),
+                        controller.CachePageDataAsync(docID, 2),
+                        controller.CachePageDataAsync(docID, 3),
+                        controller.CachePageDataAsync(docID, 4)
+                    };
+
+                    var completedIndex = Task.WaitAny(cacheTasks);
+                    cacheTasks[completedIndex].Result.AssertGoodResult<NoContentResult>();
+
+                    // Caching should be continuing asynchronously and should not have cached
+                    // all pages by this point.
+                    var cachedPageCount = db.GetCachedPages(documentSessionId).Length;
+                    Assert.True(cachedPageCount >= 1 && cachedPageCount < 4,
+                        "Unexpected number of cached pages.");
+
+                    controller.CloseDocument(docID, false).AssertGoodResult<NoContentResult>();
+
+                    // Closing the document should wipe out all existing cache rows.
+                    Assert.AreEqual(0, db.GetCachedPages(documentSessionId).Length);
+
+                    Task.WaitAll(cacheTasks);
+                    foreach (var task in cacheTasks)
+                    {
+                        task.Result.AssertGoodResult<NoContentResult>();
+                    }
+
+                    controller.Logout().AssertGoodResult<NoContentResult>();
+                }
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        /// <summary>
+        /// Test caching and retrieving page data from multiple documents simultaneously under
+        /// a number of different circumstances including cases where sessions are closed before
+        /// async cache operations complete.
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void CacheSimultaneousOperations()
+        {
+            string dbName = "AppBackendAPI_Test_CacheSimultaneousOperations";
+
+            try
+            {
+                var (db, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+
+                using (var testFiles1 = new TestFileManager<TestBackendAPI>(dbName + "_1"))
+                using (var testFiles2 = new TestFileManager<TestBackendAPI>(dbName + "_2"))
+                using (var testFiles3 = new TestFileManager<TestBackendAPI>(dbName + "_3"))
+                using (var testFiles4 = new TestFileManager<TestBackendAPI>(dbName + "_4"))
+                {
+                    var set1FileIDs = AddFilesToDB(testFiles1, db, 1, addAdditionalSet: true);
+                    var set2FileIDs = AddFilesToDB(testFiles2, db, 1, addAdditionalSet: true);
+                    var set3FileIDs = AddFilesToDB(testFiles3, db, 1, addAdditionalSet: true);
+                    var set4FileIDs = AddFilesToDB(testFiles4, db, 1, addAdditionalSet: true);
+
+                    // 10 loops of letting each specific type of test run concurrently
+                    for (int i = 0; i < 10; i++)
+                    {
+                        var testTasks = new[]
+                        {
+                            // Each of the following tests opens all 5 documents in the test set,
+                            // initializes caching of the first 10 pages of each doc (only one has > 4 pages),
+                            // then checks that data was properly cached for either all the pages, or just the first.
+                            // The LongRunning flag used for each task below is to help ensure each task be run
+                            // on a separate thread.
+
+                            // The first two tests use separate sessions to load all documents in parallel.
+                            Task.Factory.StartNew(() =>
+                                TestCacheWithParallelSessions(db, set1FileIDs,
+                                maxPages: 10,
+                                waitAll: true), // Check that all pages were cached correctly
+                                TaskCreationOptions.LongRunning),
+                            Task.Factory.StartNew(() =>
+                                TestCacheWithParallelSessions(db, set2FileIDs,
+                                maxPages: 10,
+                                waitAll: false), // Check that the first page was cached correctly, close doc before caching completes.
+                                TaskCreationOptions.LongRunning),
+
+                            // The second two tests use a single session to test each document sequentially.
+                            Task.Factory.StartNew(() =>
+                                TestCacheSequentiallySameSession(db, set3FileIDs,
+                                maxPages: 10, 
+                                waitAll: true), // Check that all pages were cached correctly
+                                TaskCreationOptions.LongRunning),
+                            Task.Factory.StartNew(() =>
+                                TestCacheSequentiallySameSession(db, set4FileIDs,
+                                maxPages: 10,
+                                waitAll: false), // Check that the first page was cached correctly, close doc before caching completes.
+                                TaskCreationOptions.LongRunning)
+                        };
+
+                        Task.WaitAll(testTasks);
+                    }
+                }
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        /// <summary>
+        /// <para><b>Helper method for CacheSimultaneousOperations.</b></para>
+        /// Uses separate sessions to test each document in <see paramref="fileSet"/> in parallel.
+        /// </summary>
+        /// <param name="db">The <see cref="FileProcessingDB"/> being used for the test.</param>
+        /// <param name="fileSet">The IDs of the files to test.</param>
+        /// <param name="maxPages">The number of pages to try caching (except for documents with
+        /// fewer pages than specified here.</param>
+        /// <param name="waitAll"><c>true</c> to wait until all pages have been cached and to
+        /// verify data was correctly cached for each; <c>false</c> to cancel all further caching
+        /// that was started after verifying data was cached correctly for the first page.</param>
+        static void TestCacheWithParallelSessions(FileProcessingDB db, IEnumerable<int> fileSet, int maxPages, bool waitAll)
+        {
+            Parallel.ForEach(fileSet, docID =>
+            {
+                TestCacheWithParallelSessions(db, docID, maxPages, waitAll);
+            });
+        }
+
+        /// <summary>
+        /// <para><b>Helper method for CacheSimultaneousOperations.</b></para>
+        /// Uses separate session to test the specified <see paramref="docID"/>.
+        /// </summary>
+        /// <param name="db">The <see cref="FileProcessingDB"/> being used for the test.</param>
+        /// <param name="docID">The ID of the file to test.</param>
+        /// <param name="maxPages">The number of pages to try caching (except for documents with
+        /// fewer pages than specified here.</param>
+        /// <param name="waitAll"><c>true</c> to wait until all pages have been cached and to
+        /// verify data was correctly cached for each; <c>false</c> to cancel all further caching
+        /// that was started after verifying data was cached correctly for the first page.</param>
+        static void TestCacheWithParallelSessions(FileProcessingDB db, int docID, int maxPages, bool waitAll)
+        {
+            AppBackendController controller = null;
+
+            try
+            {
+                User user = ApiTestUtils.CreateUser("jon_doe", "123");
+                controller = ApiTestUtils.CreateController<AppBackendController>(user);
+                LogInToWebApp(controller, user);
+                OpenDocument(controller, docID);
+
+                Assert.AreEqual(0, controller.GetCachedPages(db).Length, "Document pages not cleared from cache");
+
+                bool fileHasUSS = _testFileHasUSS[(docID - 1) % _testFileHasUSS.Length];
+
+                // Currently GetDocumentPage and GetPageWordZones will utilize cached data.
+                // Retrieve data before caching for later comparison.
+                var pageData = new PageData(controller, docID, 1, getWordZoneData: fileHasUSS);
+                var cacheTasks = StartCachingPages(controller, docID, maxPages, expectedFirstPageData: pageData);
+                if (waitAll)
+                {
+                    CheckAllPages(controller, db, cacheTasks, checkForWordZoneData: fileHasUSS);
+                }
+            }
+            finally
+            {
+                controller?.Logout().AssertGoodResult<NoContentResult>();
+            }
+        }
+
+        /// <summary>
+        /// <para><b>Helper method for CacheSimultaneousOperations.</b></para>
+        /// Use single session to test each document sequentially.
+        /// </summary>
+        /// <param name="db">The <see cref="FileProcessingDB"/> being used for the test.</param>
+        /// <param name="fileSet">The IDs of the files to test.</param>
+        /// <param name="maxPages">The number of pages to try caching (except for documents with
+        /// fewer pages than specified here.</param>
+        /// <param name="waitAll"><c>true</c> to wait until all pages have been cached and to
+        /// verify data was correctly cached for each; <c>false</c> to cancel all further caching
+        /// that was started after verifying data was cached correctly for the first page.</param>
+        static void TestCacheSequentiallySameSession(FileProcessingDB db, IEnumerable<int> fileSet, int maxPages, bool waitAll)
+        {
+            AppBackendController controller = null;
+            User user = ApiTestUtils.CreateUser("jon_doe", "123");
+            controller = ApiTestUtils.CreateController<AppBackendController>(user);
+            LogInToWebApp(controller, user);
+
+            try
+            {
+                foreach(int docID in fileSet)
+                {
+                    OpenDocument(controller, docID);
+
+                    Assert.AreEqual(0, controller.GetCachedPages(db).Length, "Document pages not cleared from cache");
+
+                    bool hasUssFile = _testFileHasUSS[(docID - 1) % _testFileHasUSS.Length];
+                    
+                    // Currently GetDocumentPage and GetPageWordZones will utilize cached data.
+                    // Retrieve data before caching for later comparison.
+                    var pageData = new PageData(controller, docID, 1, getWordZoneData: hasUssFile);
+                    var cacheTasks = StartCachingPages(controller, docID, maxPages, expectedFirstPageData: pageData);
+                    if (waitAll)
+                    {
+                        CheckAllPages(controller, db, cacheTasks, checkForWordZoneData: hasUssFile);
+                    }
+
+                    controller.CloseDocument(docID, false).AssertGoodResult<NoContentResult>();
+                }
+            }
+            finally
+            {
+                controller?.Logout().AssertGoodResult<NoContentResult>();
+            }
+        }
+
+        /// <summary>
+        /// <para><b>Helper method for CacheSimultaneousOperations.</b></para>
+        /// Starts asynchronous calls to cache the pages of the specified <see paramref="docID"/>.
+        /// </summary>
+        /// <param name="controller">The <see cref="AppBackendController"/> being tested.</param>
+        /// <param name="docID">The document ID for which pages should be cached.</param>
+        /// <param name="maxPages">This method will start caching pages from the beginning of the
+        /// document up to this value unless the document does not have this many pages.</param>
+        /// <param name="expectedFirstPageData">Specifies the expected data for the first page.
+        /// The cached data for the first page will be compared against this before returning.</param>
+        /// <returns>An array of tasks for each page's cache operation.</returns>
+        static Task<IActionResult>[] StartCachingPages(AppBackendController controller, int docID, int maxPages, PageData expectedFirstPageData)
+        {
+            var result = controller.GetPageInfo(docID);
+            var pagesInfo = result.AssertGoodResult<PagesInfoResult>();
+
+            var pages = Enumerable.Range(1, Math.Min(pagesInfo.PageCount, maxPages));
+
+            var documentSessionId = controller.GetActiveDocumentSessionId();
+
+            var cacheTasks = pages.Select(page =>
+                controller.CachePageDataAsync(docID, page))
+                .ToArray();
+
+            var completedIndex = Task.WaitAny(cacheTasks);
+            result = cacheTasks[completedIndex].Result;
+            result.AssertGoodResult<NoContentResult>();
+
+            var pageData = new PageData(controller, docID, 1,
+                getWordZoneData: !string.IsNullOrWhiteSpace(expectedFirstPageData.WordZoneJson));
+            Assert.IsTrue(pageData.Equals(expectedFirstPageData), "Page data is different");
+
+            return cacheTasks;
+        }
+
+        /// <summary>
+        /// <para><b>Helper method for CacheSimultaneousOperations.</b></para>
+        /// Validates that each of the specified <see paramref="cacheTasks"/> completes successfully
+        /// and that corresponding cached data can be found in the database.
+        /// </summary>
+        /// <param name="controller">The <see cref="AppBackendController"/> being tested.</param>
+        /// <param name="db">The <see cref="FileProcessingDB"/> into which data is being cached.</param>
+        /// <param name="cacheTasks">The tasks for each cache operation to check.</param>
+        /// <param name="checkForWordZoneData"><c>true</c> to check that word zone data is cached; 
+        /// <c>false</c> to check for image data only.</param>
+        static void CheckAllPages(AppBackendController controller, FileProcessingDB db,
+            Task<IActionResult>[] cacheTasks, bool checkForWordZoneData)
+        {
+            Task.WaitAll(cacheTasks);
+            for (int page = 1; page <= cacheTasks.Length; page++)
+            {
+                var task = cacheTasks[page - 1];
+                task.Result.AssertGoodResult<NoContentResult>();
+                Assert.IsTrue(controller.IsPageDataCached(db, page, checkForWordZoneData),
+                    "Page was not cached");
+            }
+        }
+
         #endregion Public Test Functions
 
-        
+        #region Private Members
+
         private static void LogInToWebApp(AppBackendController controller, User user)
         {
             var result = controller.Login(user);
@@ -1440,42 +1962,145 @@ namespace Extract.Web.WebAPI.Test
             return result.AssertGoodResult<DocumentIdResult>();
         }
 
-        private static (FileProcessingDB, User, AppBackendController) InitializeDBAndUser(string dbName, string username = "jane_doe", string password = "123")
+        private static (FileProcessingDB, User, AppBackendController) InitializeDBAndUser(string dbName, 
+            TestFileManager<TestBackendAPI> testFiles,
+            string username = "jane_doe", string password = "123")
         {
             var (fileProcessingDb, user, controller) =
                 _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
                         ("Resources.Demo_IDShield.bak", dbName, username, password);
 
-
             var actionID = fileProcessingDb.GetActionIDForWorkflow(_VERIFY_ACTION, fileProcessingDb.GetWorkflowID("CourtOffice"));
+            AddFilesToDB(testFiles, fileProcessingDb, actionID);
+
+            return (fileProcessingDb, user, controller);
+        }
+
+        private static List<int> AddFilesToDB(TestFileManager<TestBackendAPI> testFiles, FileProcessingDB fileProcessingDb, int actionID,
+            bool addAdditionalSet = false)
+        {
+            var fileIDs = new List<int>();
 
             for (int i = 0; i < _testFileArray.Length; i++)
             {
-                string testFileName = _testFiles.GetFile(_testFileArray[i]);
-                _testFileNames[i] = testFileName;
-                if (_testFileInDB[i])
+                int fileID = -1;
+                string testFileName = testFiles.GetFile(_testFileArray[i]);
+
+                if (!addAdditionalSet)
                 {
-                    fileProcessingDb.RenameFile(new FileRecordClass { ActionID = actionID, FileID = i + 1, Name = _testFileOriginalNames[i] }, testFileName);
+                    _testFileNames[i] = testFileName;
+
+                    if (_testFileInDB[i])
+                    {
+                        fileID = fileProcessingDb.GetFileID(_testFileOriginalNames[i]);
+                        fileProcessingDb.RenameFile(new FileRecordClass { ActionID = actionID, FileID = fileID, Name = _testFileOriginalNames[i] }, testFileName);
+                        fileIDs.Add(fileID);
+                    }
                 }
-                else
+
+                if (fileID == -1)
                 {
-                    fileProcessingDb.AddFile(
+                    FileRecord fileRecord = fileProcessingDb.AddFile(
                         testFileName, _VERIFY_ACTION, 1, EFilePriority.kPriorityNormal, false, false,
-                        EActionStatus.kActionPending, false, out bool t1, out EActionStatus t2);
+                        EActionStatus.kActionPending, false, out _, out _);
+
+                    fileIDs.Add(fileRecord.FileID);
                 }
 
                 if (_testFileHasUSS[i])
                 {
-                    _testFiles.GetFile(_testFileArray[i] + ".uss", testFileName + ".uss");
+                    testFiles.GetFile(_testFileArray[i] + ".uss", testFileName + ".uss");
                 }
 
                 if (_testFileHasVOA[i])
                 {
-                    _testFiles.GetFile(_testFileArray[i] + ".voa", testFileName + ".voa");
+                    testFiles.GetFile(_testFileArray[i] + ".voa", testFileName + ".voa");
                 }
             }
 
-            return (fileProcessingDb, user, controller);
+            return fileIDs;
+        }
+
+        #endregion Private Members
+    }
+
+    /// <summary>
+    /// Helper class to assist in validating cached page data matches expected page data.
+    /// </summary>
+    public class PageData
+    {
+        /// <summary>
+        /// Reads page data for the specified document page. Will read from cache if data has been
+        /// cached; otherwise data will be read from the source files.
+        /// </summary>
+        /// <param name="controller">The <see cref="AppBackendController"/> being tested.</param>
+        /// <param name="docID">The document ID for which data should be read.</param>
+        /// <param name="page">The page number for which data should be read.</param>
+        /// <param name="getWordZoneData"><c>true</c> to read word zone data; <c>false</c> to
+        /// read image data only.</param>
+        public PageData(AppBackendController controller, int docID, int page, bool getWordZoneData = true)
+        {
+            try
+            {
+                var result = controller.GetDocumentPage(docID, page);
+                var fileContentResult = result.AssertGoodResult<FileContentResult>();
+                Assert.Greater(fileContentResult.FileContents.Length, 0);
+                ImageSize = fileContentResult.FileContents.Length;
+
+                if (getWordZoneData)
+                {
+                    result = controller.GetPageWordZones(docID, page);
+                    var wordZoneResult = result.AssertGoodResult<WordZoneDataResult>();
+                    Assert.Greater(wordZoneResult.Zones.Count, 0);
+                    WordZoneJson = JsonConvert.SerializeObject(wordZoneResult);
+                }
+            }
+            catch (Exception ex)
+            {
+                var ee = new ExtractException("ELI49454", "Error getting page data", ex);
+                ee.AddDebugData("DocID", docID, false);
+                ee.AddDebugData("Page", page, false);
+                throw ee;
+            }
+        }
+
+        public int ImageSize { get; private set; }
+        public string WordZoneJson { get; private set; } 
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object obj)
+        {
+            if (base.Equals(obj))
+            {
+                return true;
+            }
+
+            if (!(obj is PageData other))
+            {
+                return false;
+            }
+
+            // It appears the PDF image generated by GetDocumentPage can end up producing different bytes at the end of the
+            // file that sometimes cause the files to be a byte or two different in length. I don't see any evidence in any
+            // case that the images are invalid. Allow for some difference in file length.
+            int imageDataLenDiff = Math.Abs(ImageSize - other.ImageSize);
+
+            return (imageDataLenDiff < 5) && WordZoneJson == other.WordZoneJson;
+        }
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        /// <returns>A 32-bit signed integer hash code.</returns>
+        public override int GetHashCode()
+        {
+            return
+                ImageSize.GetHashCode()
+                ^ WordZoneJson.GetHashCode();
         }
     }
 }

@@ -4679,7 +4679,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     double activityTime = _inputEventTracker?.StopActivityTimer() ?? 0.0;
 
-                    _fileProcessingDb.UpdateFileTaskSession(
+                    _fileProcessingDb.EndFileTaskSession(
                         _fileTaskSessionID.Value, elapsedSeconds, _overheadElapsedTime.Value, activityTime);
                 }
             }

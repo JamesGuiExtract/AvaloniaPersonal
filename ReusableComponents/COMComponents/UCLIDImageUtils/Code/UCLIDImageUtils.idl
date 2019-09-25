@@ -79,6 +79,9 @@ library UCLID_IMAGEUTILSLib
 		//-----------------------------------------------------------------------------------------
 		[id(11), helpstring("method GetSpatialPageInfos")] HRESULT GetSpatialPageInfos(
 			[in] BSTR bstrFileName, [out, retval] IIUnknownVector **pvecSpatialPageInfos);
+		//-----------------------------------------------------------------------------------------
+		[id(12), helpstring("method GetPageCount")] HRESULT GetPageCount(
+			[in] BSTR bstrImageFileName, [out, retval] long* pnPageCount);
 	};
 
 	[

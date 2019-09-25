@@ -193,6 +193,23 @@ library UCLID_FILEPROCESSINGLib
 		kClassification = 3
 	} EWorkflowType;
 
+
+	typedef
+		[
+			uuid(401CF6D0-95DD-40E2-AC56-35E48C4A2027),
+			helpstring("Extract ECachedDataRequest")
+		]
+	// Intended as flag values to be able to combine requests for multiple items.
+	enum ECachedDataRequest
+	{
+		kCachedPageList = 1,	// Request a list of pages that have been cached.
+		kCachedImage = 2,		// Request the cached image
+		kCachedUss = 4,			// Request the stringized version of the uss data for a page.
+		kCachedWordZone = 8,	// Request the JSON representation of a page's word zone data.
+		kCachedVOA = 16,		// Request the stringized version of a page's voa data.
+		kCacheException = 32	// Request an exception recorded while trying to cache the data.
+	}ECachedDataRequest;
+
 	//----------------------------------------------------------------------------------------------
 	//-I N T E R F A C E S -------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------------------
@@ -1865,9 +1882,9 @@ library UCLID_FILEPROCESSINGLib
 			[in] long nOutputFileID, [in] IIUnknownVector* pSourcePageInfo,
 			IIUnknownVector* pDeletedSourcePageInfo, [in] long nFileTaskSessionID);
 		// -----------------------------------------------------------------------------------------------
-		// PROMISE: Applies the specified durations to the specified FileTaskSession row. The
+		// PROMISE: Ends the current file task session and apply specified durations to the FileTaskSession row. The
 		//			DateTimeStamp will also be applied.
-		[id(161), helpstring("methods UpdateFileTaskSession")] HRESULT UpdateFileTaskSession(
+		[id(161), helpstring("methods EndFileTaskSession")] HRESULT EndFileTaskSession(
 			[in] long nFileTaskSessionID, [in] double dDuration, [in] double dOverheadTime, [in] double dActivityTime);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Adds a new workflow to the database
@@ -2071,6 +2088,29 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// Change the password of a user
 		[id(202), helpstring("method ChangePassword")] HRESULT ChangePassword([in] BSTR userName, BSTR oldPassword, [in] BSTR newPassword);
+		// -----------------------------------------------------------------------------------------------
+		// Caches page data for the specified file task session. This data will be available until the file task session
+		// (or FAM session to which it belongs) ends. All fields need not be specified; any fields left null will maintain any
+		// previously cached data.
+		// NOTE: It is not required that the specified FileTaskSessionID be open at the time of the call, nor for this instance
+		// to be associated with that FileTaskSession or the FAMSession running it. If the FileTaskSession is closed, this call
+		// will have no effect.
+		[id(203), helpstring("method CacheFileTaskSessionData")] HRESULT CacheFileTaskSessionData([in] long nFileTaskSessionID, [in] long nPage,
+			[in] SAFEARRAY(unsigned char) arrayImageData, [in] BSTR bstrUssData, [in] BSTR bstrVoaData, [in] BSTR bstrWordZoneData, [in] BSTR bstrException);
+		// -----------------------------------------------------------------------------------------------
+		// Retrieves cached page data for the specified file task session and, optionally, a list of all pages for which data has been cached in the current
+		// document. ECachedDataRequest values may be treated as flags to be able to retrieve either any one specific field, or multiple fields at once.
+		// NOTE: It is not required that the specified FileTaskSessionID be open at the time of the call, nor for this instance
+		// to be associated with that FileTaskSession or the FAMSession running it. If the FileTaskSession is closed, this call
+		// will return pbFoundCacheData = VARIANT_FALSE.
+		// NOTE: page can be -1 for all pages if:
+		//		 1) Checking only the list of cached pages or
+		//		 2) Checking only the returned boolean indicating whether cache data is present.
+		[id(204), helpstring("method GetCachedFileTaskSessionData")] HRESULT GetCachedFileTaskSessionData([in] long nFileTaskSessionID, [in] long nPage,
+			[in] ECachedDataRequest eCacheRequest,
+			[out] SAFEARRAY(long)* parrayCachedPages,
+			[out] SAFEARRAY(unsigned char)* parrayImageData, [out] BSTR* pbstrUssData, [out] BSTR* pbstrVoaData, [out] BSTR* pbstrWordZoneData, [out] BSTR* pbstrException,
+			[out, retval] VARIANT_BOOL* pbFoundCacheData);
 	};
 
 	[

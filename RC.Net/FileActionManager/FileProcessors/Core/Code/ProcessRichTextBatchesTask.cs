@@ -453,11 +453,11 @@ namespace Extract.FileActionManager.FileProcessors
                 }
                 catch (OperationCanceledException)
                 {
-                    pDB.UpdateFileTaskSession(fileTaskSessionID, (DateTime.Now - sessionStartTime).TotalSeconds, 0, 0);
+                    pDB.EndFileTaskSession(fileTaskSessionID, (DateTime.Now - sessionStartTime).TotalSeconds, 0, 0);
                     return EFileProcessingResult.kProcessingCancelled;
                 }
 
-                pDB.UpdateFileTaskSession(fileTaskSessionID, (DateTime.Now - sessionStartTime).TotalSeconds, 0, 0);
+                pDB.EndFileTaskSession(fileTaskSessionID, (DateTime.Now - sessionStartTime).TotalSeconds, 0, 0);
                 return EFileProcessingResult.kProcessingSuccessful;
             }
             catch (Exception ex)

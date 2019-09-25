@@ -79,6 +79,7 @@ static const string gstrMETADATA_FIELD="MetadataField";
 static const string gstrFILE_METADATA_FIELD_VALUE="FileMetadataFieldValue";
 static const string gstrTASK_CLASS="TaskClass";
 static const string gstrFILE_TASK_SESSION="FileTaskSession";
+static const string gstrFILE_TASK_SESSION_CACHE = "FileTaskSessionCache";
 static const string gstrSECURE_COUNTER="SecureCounter";
 static const string gstrSECURE_COUNTER_VALUE_CHANGE="SecureCounterValueChange";
 static const string gstrPAGINATION="Pagination";
@@ -305,7 +306,7 @@ public:
 	STDMETHOD(get_ActiveFAMID)(long *pnActiveFAMID);
 	STDMETHOD(get_FAMSessionID)(long *pnFAMSessionID);
 	STDMETHOD(StartFileTaskSession)(BSTR bstrTaskClassGuid, long nFileID, long nActionID, long *pnFileTaskSessionID);
-	STDMETHOD(UpdateFileTaskSession)(long nFileTaskSessionID, double dDuration, double dOverheadTime, double dActivityTime);
+	STDMETHOD(EndFileTaskSession)(long nFileTaskSessionID, double dDuration, double dOverheadTime, double dActivityTime);
 	STDMETHOD(GetFileNameFromFileID)( /*[in]*/ long fileID, /*[out, retval]*/ BSTR* pbstrFileName );
 	STDMETHOD(GetSecureCounters)(VARIANT_BOOL vbRefresh, IIUnknownVector** ppSecureCounters);
 	STDMETHOD(GetSecureCounterName)(long nCounterID, BSTR *pstrCounterName);
@@ -366,6 +367,13 @@ public:
 	STDMETHOD(SuspendWebSession)();
 	STDMETHOD(IsFAMSessionOpen)(long nFAMSessionID, VARIANT_BOOL* pbIsFAMSessionOpen);
 	STDMETHOD(GetNumberSkippedForUser)(BSTR bstrUserName, long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, long* pnFilesSkipped);
+	STDMETHOD(CacheFileTaskSessionData)(long nFileTaskSessionID, long nPage, 
+		SAFEARRAY *parrayImageData, BSTR bstrUssData, BSTR bstrVoaData, BSTR bstrWordZoneData, BSTR bstrException);
+	STDMETHOD(GetCachedFileTaskSessionData)(long nFileTaskSessionID, long nPage,
+		ECachedDataRequest eCacheRequest,
+		SAFEARRAY** pparrayCachedPages,
+		SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrVoaData, BSTR* pbstrWordZoneData, BSTR* pbstrException,
+		VARIANT_BOOL* pbFoundCacheData);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1446,7 +1454,7 @@ private:
 	bool DeleteMetadataField_Internal(bool bDBLocked, BSTR bstrMetadataFieldName);
 	bool RenameMetadataField_Internal(bool bDBLocked, BSTR bstrOldMetadataFieldName, BSTR bstrNewMetadataFieldName);
 	bool StartFileTaskSession_Internal(bool bDBLocked, BSTR bstrTaskClassGuid, long nFileID, long nActionID, long *pnFileTaskSessionID);
-	bool UpdateFileTaskSession_Internal(bool bDBLocked, long nFileTaskSessionID, double dDuration, double dOverheadTime, double dActivityTime);
+	bool EndFileTaskSession_Internal(bool bDBLocked, long nFileTaskSessionID, double dDuration, double dOverheadTime, double dActivityTime);
 	bool GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL vbRefresh, IIUnknownVector** ppSecureCounters);
 	bool GetSecureCounterName_Internal(bool bDBLocked, long nCounterID, BSTR *pstrCounterName);
 	bool ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BSTR strUpdateCode, BSTR *pbstrResult);
@@ -1489,6 +1497,9 @@ private:
 	bool GetActiveUsers_Internal(bool bDBLocked, BSTR bstrAction, IVariantVector** ppvecUserNames);
 	bool AbortFAMSession_Internal(bool bDBLocked, long nFAMSessionID);
 	bool MarkFileDeleted_Internal(bool bDBLocked, long nFileID, long nWorkflowID);
+	bool CacheFileTaskSessionData_Internal(bool bDBLocked, long nFileTaskSessionID,
+		long nPage, SAFEARRAY* parrayImageData, BSTR bstrUssData, BSTR bstrVoaData, BSTR bstrWordZoneData,
+		BSTR bstrException);
 	void InvalidatePreviousCachedInfoIfNecessary();
 	void setDefaultSessionMemberValues();
 };

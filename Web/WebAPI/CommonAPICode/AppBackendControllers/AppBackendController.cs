@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Globalization;
 using System.Net;
+using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI.Models;
 
@@ -64,8 +65,7 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// API call to change a user's password.
-        
+        /// API call to change a user's password.        
         /// </summary>
         /// <param name="oldPassword">The old password</param>
         /// <param name="newPassword">The New password</param>
@@ -823,6 +823,52 @@ namespace WebAPI.Controllers
             catch (Exception ex)
             {
                 return this.GetAsHttpError(ex, "ELI48306");
+            }
+        }
+
+        /// <summary>
+        /// Caches image and OCR data for the specified page in the database. The cached data will remain
+        /// in the database until this document or verification session are closed.
+        /// <para><b>Note</b></para>
+        /// GET DocumentPage will automatically trigger the data of the page subsequent to the
+        /// requested page to be cached without use of this method.
+        /// </summary>
+        /// <param name="docID">The currently open document ID</param>
+        /// <param name="page">The page for which data should be cached.</param>
+        /// <returns></returns>
+        [HttpPost("CachePageDataAsync/{docID}/{pageNumber}")]
+        [Authorize]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404, Type = typeof(ErrorResult))]
+        public async Task<IActionResult> CachePageDataAsync(int docID, int page)
+        {
+            try
+            {
+                int documentSessionID;
+
+                // While data caching occurs asynchronously and does not require an instance with an
+                // active open document sesssion, a document session ID is required. That ID needs
+                // to be retrieved from the FAMDB, so we do need an instance with a session to get
+                // that ID.
+                using (var data = new DocumentData(User, requireSession: true))
+                {
+                    documentSessionID = data.DocumentSessionId;
+                }
+
+                HTTPError.Assert("ELI49438", "No document session active", documentSessionID > 0);
+
+                // The caching thread won't be confined to time the session is active. If another
+                // API call closes the session before the caching completes, FileProcessingDB will
+                // simply ignore the cache request.
+                await DocumentData.CachePageDataAsync(documentSessionID, docID, page);
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI48389");
             }
         }
     }

@@ -580,7 +580,7 @@ namespace Extract.FileActionManager.FileProcessors
                                                                       StoreEmptyAttributes,
                                                                       false);
 
-                    pDB.UpdateFileTaskSession(fileTaskSessionID, timer.ElapsedSeconds, 0, 0);
+                    pDB.EndFileTaskSession(fileTaskSessionID, timer.ElapsedSeconds, 0, 0);
                 }
                 else
                 {

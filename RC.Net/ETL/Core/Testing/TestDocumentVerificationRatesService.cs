@@ -198,7 +198,7 @@ namespace Extract.ETL.Test
 
                 int fileTaskSessionID = fileProcessingDb.StartFileTaskSession(taskGuid, fileRecord1.FileID, actionID1);
 
-                fileProcessingDb.UpdateFileTaskSession(fileTaskSessionID, 10.0, 1.0, 10.0);
+                fileProcessingDb.EndFileTaskSession(fileTaskSessionID, 10.0, 1.0, 10.0);
                 fileProcessingDb.UnregisterActiveFAM();
                 fileProcessingDb.RecordFAMSessionStop();
 
@@ -226,7 +226,7 @@ namespace Extract.ETL.Test
                 Assert.AreEqual(status.LastFileTaskSessionIDProcessed, 1, "LastFileTaskSessionIDProcessed is 1.");
                 Assert.That(status.SetOfActiveFileTaskIds.Count == 0, "SetOfActiveFileTaskIds is no longer used.");
 
-                fileProcessingDb.UpdateFileTaskSession(fileTaskSessionID, 20.0, 2.0, 20.0);
+                fileProcessingDb.EndFileTaskSession(fileTaskSessionID, 20.0, 2.0, 20.0);
                 rates.Process(_noCancel);
 
                 status = rates.Status as DocumentVerificationStatus;
@@ -247,7 +247,7 @@ namespace Extract.ETL.Test
 
                 fileTaskSessionID = fileProcessingDb.StartFileTaskSession(taskGuid, fileRecord2.FileID, actionID1);
 
-                fileProcessingDb.UpdateFileTaskSession(fileTaskSessionID, 30.0, 3.0, 30.0);
+                fileProcessingDb.EndFileTaskSession(fileTaskSessionID, 30.0, 3.0, 30.0);
                 fileProcessingDb.UnregisterActiveFAM();
                 fileProcessingDb.RecordFAMSessionStop();
 

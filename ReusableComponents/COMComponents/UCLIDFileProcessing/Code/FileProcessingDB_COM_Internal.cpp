@@ -25,6 +25,8 @@
 #include <ValueRestorer.h>
 #include <DateUtil.h>
 
+#include <atlsafe.h>
+
 #include <string>
 #include <stack>
 
@@ -36,7 +38,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 176;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 177;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2590,6 +2592,32 @@ int UpdateToSchemaVersion176(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI48385");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion177(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 177;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_CACHE);
+		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_CACHE_ACTIVEFAM_FK);
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI48411");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -7709,7 +7737,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 173:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion174);
 				case 174:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion175);
 				case 175:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion176);
-				case 176:
+				case 176:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion177);
+				case 177:
 					break;
 
 				default:
@@ -9882,7 +9911,7 @@ bool CFileProcessingDB::StartFileTaskSession_Internal(bool bDBLocked, BSTR bstrT
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::UpdateFileTaskSession_Internal(bool bDBLocked, long nFileTaskSessionID,
+bool CFileProcessingDB::EndFileTaskSession_Internal(bool bDBLocked, long nFileTaskSessionID,
 	double dDuration, double dOverheadTime, double dActivityTime)
 {
 	try
@@ -9906,6 +9935,10 @@ bool CFileProcessingDB::UpdateFileTaskSession_Internal(bool bDBLocked, long nFil
 			replaceVariable(strUpdateSQL, "<ActivityTime>", asString(dActivityTime));
 
 			executeCmdQuery(ipConnection, strUpdateSQL);
+
+			string strDeleteCachedData = "DELETE FROM [FileTaskSessionCache] WHERE [FileTaskSessionID] = "
+				+ asString(nFileTaskSessionID);
+			executeCmdQuery(ipConnection, strDeleteCachedData);
 			
 			END_CONNECTION_RETRY(ipConnection, "ELI39694");
 		}
@@ -12407,6 +12440,125 @@ bool CFileProcessingDB::MarkFileDeleted_Internal(bool bDBLocked, long nFileID, l
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46301");
 	}
 	catch (UCLIDException &ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::CacheFileTaskSessionData_Internal(bool bDBLocked, long nFileTaskSessionID,
+	long nPage, SAFEARRAY* parrayImageData, BSTR bstrUssData, BSTR bstrVoaData, BSTR bstrWordZoneData,
+	BSTR bstrException)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			// BEGIN_CONNECTION_RETRY is intentionally not used. If the DB connection is lost, this
+			// data will simply not be cached. In unit tests, this prevents cache threads from hanging
+			// around doing retries after the databases have been closed.
+
+			ipConnection = getDBConnection();
+
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+			string strCreateCacheRowQuery = gstrGET_OR_CREATE_FILE_TASK_SESSION_CACHE_ROW;
+			replaceVariable(strCreateCacheRowQuery, "<FileTaskSessionID>", asString(nFileTaskSessionID));
+			replaceVariable(strCreateCacheRowQuery, "<Page>", asString(nPage));
+
+			long long llCacheRowID = -1;
+			executeCmdQuery(ipConnection, strCreateCacheRowQuery, "ID", false, &llCacheRowID);
+
+			// If the file task session has closed do not cache the data.
+			if (llCacheRowID > 0)
+			{
+				vector<string> vecFields;
+				if (parrayImageData != __nullptr)
+				{
+					vecFields.push_back("[ImageData]");
+				}
+				if (bstrUssData != __nullptr)
+				{
+					vecFields.push_back("[USSData]");
+				}
+				if (bstrVoaData != __nullptr)
+				{
+					vecFields.push_back("[VOAData]");
+				}
+				if (bstrWordZoneData != __nullptr)
+				{
+					vecFields.push_back("[WordZoneData]");
+				}
+				if (bstrException != __nullptr)
+				{
+					vecFields.push_back("[Exception]");
+				}
+
+				string strCursorQuery = gstrGET_FILE_TASK_SESSION_CACHE_DATA_BY_ID;
+				replaceVariable(strCursorQuery, "<ID>", asString(llCacheRowID));
+				replaceVariable(strCursorQuery, "<FieldList>", asString(vecFields, true, ","));
+
+				_RecordsetPtr ipCachedDataRow(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI48308", ipCachedDataRow != __nullptr);
+
+				// adLockPessimistic is necessary to prevent cursor errors here during concurrent
+				// cache operations. Tested by CacheSessionCloseWhileInProgress and 
+				ipCachedDataRow->Open(strCursorQuery.c_str(),
+					_variant_t((IDispatch*)ipConnection, true), adOpenDynamic,
+					adLockOptimistic, adCmdText);
+				if (ipCachedDataRow->adoEOF == VARIANT_TRUE)
+				{
+					throw UCLIDException("ELI48309", "Failed to acquire cache");
+				}
+
+				if (parrayImageData != __nullptr)
+				{
+					FieldPtr ipItem = ipCachedDataRow->Fields->Item["ImageData"];
+					ASSERT_RESOURCE_ALLOCATION("ELI48336", ipItem != __nullptr);
+
+					CComSafeArray<BYTE> saData(parrayImageData);
+					_variant_t variantData;
+					variantData.vt = VT_ARRAY | VT_UI1;
+					variantData.parray = saData;
+					ipItem->Value = variantData;
+				}
+
+				if (bstrUssData != __nullptr)
+				{
+					setStringField(ipCachedDataRow->Fields, "USSData", asString(bstrUssData));
+				}
+
+				if (bstrVoaData != __nullptr)
+				{
+					setStringField(ipCachedDataRow->Fields, "VOAData", asString(bstrVoaData));
+				}
+
+				if (bstrWordZoneData != __nullptr)
+				{
+					setStringField(ipCachedDataRow->Fields, "WordZoneData", asString(bstrWordZoneData));
+				}
+
+				if (bstrException != __nullptr)
+				{
+					setStringField(ipCachedDataRow->Fields, "Exception", asString(bstrException));
+				}
+
+				ipCachedDataRow->Update();
+				ipCachedDataRow->Close();
+			}
+			
+			tg.CommitTrans();
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49443");
+	}
+	catch (UCLIDException & ue)
 	{
 		if (!bDBLocked)
 		{

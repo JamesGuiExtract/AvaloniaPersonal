@@ -1724,6 +1724,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_FAM_SESSION_FK);
 		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_TASK_CLASS_FK);
 		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_CACHE_ACTIVEFAM_FK);
 		vecQueries.push_back(gstrADD_SECURE_COUNTER_VALUE_CHANGE_FAM_SESSION_FK);
 		vecQueries.push_back(gstrADD_PAGINATION_SOURCEFILE_FAMFILE_FK);
 		vecQueries.push_back(gstrADD_PAGINATION_DESTFILE_FAMFILE_FK);
@@ -1925,6 +1926,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_FILE_METADATA_FIELD_VALUE_TABLE);
 	vecQueries.push_back(gstrCREATE_TASK_CLASS);
 	vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION);
+	vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_CACHE);
 	vecQueries.push_back(gstrCREATE_PAGINATION);
 	vecQueries.push_back(gstrCREATE_WORKFLOWFILE);
 	vecQueries.push_back(gstrCREATE_WORKFLOWCHANGE);
@@ -3436,6 +3438,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrFILE_METADATA_FIELD_VALUE);
 	vecTables.push_back(gstrTASK_CLASS);
 	vecTables.push_back(gstrFILE_TASK_SESSION);
+	vecTables.push_back(gstrFILE_TASK_SESSION_CACHE);
 	vecTables.push_back(gstrSECURE_COUNTER);
 	vecTables.push_back(gstrSECURE_COUNTER_VALUE_CHANGE);
 	vecTables.push_back(gstrPAGINATION);
@@ -4660,6 +4663,8 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 		}
 
 		// Delete the record from the ActiveFAM table
+		// By virtue of an FK with cascading deletes, this ensures files associated with the session
+		// can't be left behind in LockedFile or FileTaskSessionCache.
 		string strQuery = "DELETE FROM [ActiveFAM] WHERE [ID] = " + asString(nActiveFAMID);
 		executeCmdQuery(ipConnection, strQuery);
 

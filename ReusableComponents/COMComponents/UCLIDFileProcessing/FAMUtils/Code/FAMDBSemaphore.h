@@ -38,9 +38,11 @@ private:
 	static CSemaphore ms_semaphoreCounterLock;
 	static CSemaphore ms_semaphoreWorkItemLock;
 	static CSemaphore ms_semaphoreSecureCounterLock;
+	static CSemaphore ms_semaphoreCacheLock;
 
 	static DWORD ms_dwMainLockThread;
 	static DWORD ms_dwCounterLockThread;
 	static DWORD ms_dwWorkItemLockThread;
 	static DWORD ms_dwSecureCounterLockThread;
+	static DWORD ms_dwCacheLockThread;
 };

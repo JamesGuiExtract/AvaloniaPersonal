@@ -2493,7 +2493,7 @@ namespace Extract.AttributeFinder.Test
                 attributeDBMgr.CreateNewAttributeSetForFile(fileTaskSessionID, eavAttributeSetName, voaData, false, true, true,
                     closeConnection: i == (files.Length - 1));
 
-                fileProcessingDB.UpdateFileTaskSession(fileTaskSessionID, 0, 0, 0);
+                fileProcessingDB.EndFileTaskSession(fileTaskSessionID, 0, 0, 0);
             }
             fileProcessingDB.CloseAllDBConnections();
         }

@@ -11,11 +11,13 @@ DWORD FAMDBSemaphore::ms_dwMainLockThread = 0;
 DWORD FAMDBSemaphore::ms_dwCounterLockThread = 0;
 DWORD FAMDBSemaphore::ms_dwWorkItemLockThread = 0;
 DWORD FAMDBSemaphore::ms_dwSecureCounterLockThread = 0;
+DWORD FAMDBSemaphore::ms_dwCacheLockThread = 0;
 
 CSemaphore FAMDBSemaphore::ms_semaphoreMainLock(1);
 CSemaphore FAMDBSemaphore::ms_semaphoreCounterLock(1);
 CSemaphore FAMDBSemaphore::ms_semaphoreWorkItemLock(1);
 CSemaphore FAMDBSemaphore::ms_semaphoreSecureCounterLock(1);
+CSemaphore FAMDBSemaphore::ms_semaphoreCacheLock(1);
 
 //--------------------------------------------------------------------------------------------------
 // FAMDBSemaphore
@@ -96,6 +98,11 @@ void FAMDBSemaphore::getSyncObjects(const string &strLockName, CSemaphore *&pSem
 	{
 		pSemaphore = &ms_semaphoreSecureCounterLock;
 		pdwLockThreadId = &ms_dwSecureCounterLockThread;
+	}
+	else if (strLockName == gstrCACHE_LOCK)
+	{
+		pSemaphore = &ms_semaphoreCacheLock;
+		pdwLockThreadId = &ms_dwCacheLockThread;
 	}
 	else 
 	{
