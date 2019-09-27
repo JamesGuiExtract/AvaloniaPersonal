@@ -1,64 +1,19 @@
 ﻿using System;
 using System.Data.SqlClient;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Extract;
 
 namespace Extract.Process.Logger
 {
     /// <summary>
-    /// Interface definition for the ILogDBLocks
-    /// </summary>
-    [ComVisible(true)]
-    [Guid("2E4D9915-EB29-4205-90ED-126608E28219")]
-    //[CLSCompliant(false)]
-    public interface ILogDBLocks
-    {
-        /// <summary>
-        /// Database server to log
-        /// </summary>
-        string DatabaseServer { get; set; }
-
-        /// <summary>
-        /// Database on database server to log
-        /// </summary>
-        string DatabaseName { get; set; }
-
-        /// <summary>
-        /// Directory for the log file 
-        /// </summary>
-        string LogDirectory { get; set; }
-
-        /// <summary>
-        /// Polling time between calls to log locks
-        /// </summary>
-        int PollingTime { get; set; }
-
-        /// <summary>
-        /// Start the logging process
-        /// </summary>
-        void StartLogging();
-
-        /// <summary>
-        /// Stop the logging process
-        /// </summary>
-        void StopLogging();
-    }
-
-    /// <summary>
-    /// Com
+    /// Com LogDBLogs class
     /// </summary>
     [ComVisible(true)]
     [Guid("0ED53D5C-F26F-465E-8E0E-A3FC33C640C3")]
-    [ProgId("Extract.Database.Logger.LogDBLocks")]
-    public class LogDBLocks : ILogDBLocks, IDisposable
+    [ProgId("Extract.Process.Logger.LogDBLocks")]
+    [CLSCompliant(false)]
+    public class LogDBLocks : LogDBInfoBase
     {
-
         #region Constants
 
         static readonly string LockQuery = @"
@@ -115,15 +70,7 @@ SELECT
 
         static readonly string LockCountQuery = @"WITH DBLocks AS (" + LockQuery +
             @")
-SELECT COUNT(SessionId) NumberBlockedQueries FROM DBLocks";
-
-        #endregion
-
-        #region Fields
-
-        CancellationTokenSource _CancellationTokenSource = new CancellationTokenSource();
-
-        Task _loggingTask;
+SELECT GETDATE() TimeStamp, COUNT(SessionId) LockCount FROM DBLocks";
 
         #endregion
 
@@ -132,7 +79,8 @@ SELECT COUNT(SessionId) NumberBlockedQueries FROM DBLocks";
         /// <summary>
         /// Default contructor
         /// </summary>
-        public LogDBLocks()
+        public LogDBLocks() :
+            base()
         {
         }
 
@@ -143,149 +91,28 @@ SELECT COUNT(SessionId) NumberBlockedQueries FROM DBLocks";
         /// <param name="databaseServer">The Database server containing the database to log locks from</param>
         /// <param name="databaseName">The database on the server to log the locks</param>
         /// <param name="pollingTime">Time between log entries</param>
-        public LogDBLocks(string logDirectory, string databaseServer, string databaseName, int pollingTime)
+        public LogDBLocks(string logDirectory, string logFileName, string databaseServer, string databaseName, int pollingTime) :
+            base(logDirectory, logFileName, databaseServer, databaseName, pollingTime)
         {
-            LogDirectory = logDirectory;
-            DatabaseName = databaseName;
-            DatabaseServer = databaseServer;
-            PollingTime = pollingTime;
         }
 
         #endregion
 
-        #region ILogDBLocks implementation
+        #region Overrides
 
         /// <summary>
-        /// Database server to log
+        /// Query that returns the data to be logged
+        /// NOTE: All columns returned should be logged
         /// </summary>
-        public string DatabaseServer { get; set; }
-
-        /// <summary>
-        /// Database on database server to log
-        /// </summary>
-        public string DatabaseName { get; set; }
-
-        /// <summary>
-        /// Directory for the log file 
-        /// </summary>
-        public string LogDirectory { get; set; }
-
-        /// <summary>
-        /// Polling time between calls to log locks
-        /// </summary>
-        public int PollingTime { get; set; } = 10000; // Default to 10 sec
-
-        /// <summary>
-        /// Start the logging process
-        /// </summary>
-        public void StartLogging()
+        protected override string InfoQuery
         {
-            try
+            get
             {
-                string fileName = Path.Combine(LogDirectory, "DBLocks.csv");
-                if (File.Exists(fileName))
-                {
-                    File.Delete(fileName);
-                }
-                var outputFile = File.CreateText(fileName);
-                outputFile.WriteLine("TimeStamp, LockCount");
-                _loggingTask = Task.Factory.StartNew(() =>
-                {
-                    while (!_CancellationTokenSource.IsCancellationRequested)
-                    {
-                        using (var connection = GetSqlConnection())
-                        {
-                            connection.Open();
-                            var cmd = connection.CreateCommand();
-                            cmd.CommandText = LockCountQuery;
-
-                            var reader = cmd.ExecuteReader();
-
-                            Object[] items = new Object[reader.FieldCount];
-                            StringBuilder stringBuilder = new StringBuilder();
-                            string timeValue = DateTime.Now.ToString("G", CultureInfo.InvariantCulture);
-                            while (reader.Read())
-                            {
-                                stringBuilder.Append(timeValue);
-                                reader.GetValues(items);
-                                foreach (var item in items)
-                                {
-                                    stringBuilder.Append(",");
-                                    stringBuilder.Append(item.ToString());
-                                }
-                                stringBuilder.Append("\r\n");
-                            }
-
-                            reader.Close();
-                            outputFile.Write(stringBuilder.ToString());
-                            outputFile.Flush();
-                        }
-                        _CancellationTokenSource.Token.WaitHandle.WaitOne(PollingTime);
-                    }
-                    outputFile.Close();
-                });
-            }
-            catch (Exception exception)
-            {
-                throw exception.CreateComVisible("ELI46814", "Database lock logging failed to start.");
-            }
-        }
-
-        /// <summary>
-        /// Stop the logging process
-        /// </summary>
-        public void StopLogging()
-        {
-            try
-            {
-                _CancellationTokenSource.Cancel();
-                _loggingTask?.Wait(PollingTime * 2);
-            }
-            catch(Exception exception)
-            {
-                throw exception.CreateComVisible("ELI46815", "Error stopping database lock logging.");
+                return LockCountQuery;
             }
         }
 
         #endregion
 
-        #region IDisposable Implementation
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (_CancellationTokenSource != null)
-                {
-                    if (!_CancellationTokenSource.IsCancellationRequested)
-                    {
-                        StopLogging();
-                    }
-                    _CancellationTokenSource.Dispose();
-                    _CancellationTokenSource = null;
-                }
-            }
-        }
-        #endregion
-
-        #region Private Methods
-        SqlConnection GetSqlConnection()
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = DatabaseServer;
-            sqlConnectionBuild.InitialCatalog = DatabaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
-        }
-
-        #endregion
     }
 }

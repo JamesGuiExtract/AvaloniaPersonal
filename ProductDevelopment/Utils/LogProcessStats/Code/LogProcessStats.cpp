@@ -458,7 +458,8 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 
 					cout << "Beginning logging - Ctrl+C to end. " << endl;
 
-					ILogDBLocksPtr ipDbLocksLogger = __nullptr;
+					ILogDBInfoPtr ipDbLocksLogger = __nullptr;
+					ILogDBInfoPtr ipDbConnectionsLogger = __nullptr;
 
 					// if /d and /s where specified start the logging
 					if (!databaseName.empty() && !databaseServer.empty())
@@ -469,8 +470,19 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
 						ipDbLocksLogger->DatabaseName = databaseName.c_str();
 						ipDbLocksLogger->PollingTime = lRefreshInterval;
 						ipDbLocksLogger->LogDirectory = strWorkingDirectory.c_str();
+						ipDbLocksLogger->LogFileName = "DBLocks.csv";
 
 						ipDbLocksLogger->StartLogging();
+
+						ipDbConnectionsLogger.CreateInstance(CLSID_LogDBConnections);
+						ASSERT_RESOURCE_ALLOCATION("ELI48334", ipDbLocksLogger != __nullptr);
+						ipDbConnectionsLogger->DatabaseServer = databaseServer.c_str();
+						ipDbConnectionsLogger->DatabaseName = databaseName.c_str();
+						ipDbConnectionsLogger->PollingTime = lRefreshInterval;
+						ipDbConnectionsLogger->LogDirectory = strWorkingDirectory.c_str();
+						ipDbConnectionsLogger->LogFileName = "DBConnections.csv";
+
+						ipDbConnectionsLogger->StartLogging();
 					}
 
 					// start logging
