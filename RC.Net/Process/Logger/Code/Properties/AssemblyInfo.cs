@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Extract.Database.Logger")]
+[assembly: AssemblyTitle("Extract.Process.Logger")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems, LLC.")]
-[assembly: AssemblyProduct("Extract.Database.Logger")]
+[assembly: AssemblyProduct("Extract.Process.Logger")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

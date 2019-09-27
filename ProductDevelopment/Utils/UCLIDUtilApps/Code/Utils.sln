@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.645
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29324.140
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AutoIncrementVssLabel", "..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcxproj", "{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}"
 EndProject
@@ -227,7 +227,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Code.Attributes", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NuanceUtils", "..\..\..\..\ReusableComponents\VendorSpecificUtils\NuanceUtils\Code\NuanceUtils.vcxproj", "{48E97F8F-C697-4FCD-9928-6B9370EAB3DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Database.Logger", "..\..\..\..\RC.Net\Database\Logger\Code\Extract.Database.Logger.csproj", "{F54C2B01-3777-4EE0-8C0E-FCAE11459949}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Process.Logger", "..\..\..\..\RC.Net\Process\Logger\Code\Extract.Process.Logger.csproj", "{F54C2B01-3777-4EE0-8C0E-FCAE11459949}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

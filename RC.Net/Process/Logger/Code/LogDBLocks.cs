@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Extract;
 
-namespace Extract.Database.Logger
+namespace Extract.Process.Logger
 {
     /// <summary>
     /// Interface definition for the ILogDBLocks
