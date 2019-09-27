@@ -392,6 +392,25 @@ library UCLID_COMUTILSLib
 			[in] VARIANT_BOOL newVal);
 		
 	};
+
+	[
+		object,
+		uuid(AAD80A70-1DFC-4DA7-BBFD-992CF799ADCA),
+		dual,
+		helpstring("IRichTextExtractor Interface"),
+		pointer_default(unique)
+	]
+	interface IRichTextExtractor : IDispatch
+	{
+		// Parse RTF code and return the plain text (not including destinations) and the indexes and lengths of the characters into the original code,
+		// encoded as ten bytes per character as a string (1st byte is char, next 8 bytes are the index as hex string, 10th is the length as hex)
+		//	input: The rich text code to parse
+		//	sourceDocName: The name to use as debug data for any exceptions
+		//	throwParseExceptions: Whether to throw or only log parse exceptions
+		[id(1), helpstring("method GetIndexedTextFromFile")] HRESULT GetIndexedTextFromFile([in] BSTR strFileName, 
+			VARIANT_BOOL bThrowParseExceptions, [out, retval] BSTR *pVal);
+	};
+
 	[
 		object,
 		uuid(59074414-D48F-48A9-8AA2-5C515AA9EC35),

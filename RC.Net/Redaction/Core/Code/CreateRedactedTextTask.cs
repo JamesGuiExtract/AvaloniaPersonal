@@ -1,7 +1,9 @@
-﻿using Extract.FileActionManager.Forms;
+﻿using Extract.AttributeFinder;
+using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
+using Extract.Utilities.Parsers;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -295,6 +297,8 @@ namespace Extract.Redaction
                 LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI31641",
                     _COMPONENT_DESCRIPTION);
 
+                bool isRTF = pFileRecord.Name.EndsWith(".rtf", StringComparison.OrdinalIgnoreCase);
+
                 // Load the redactions
                 FileActionManagerPathTags pathTags =
                     new FileActionManagerPathTags(pFAMTM, pFileRecord.Name);
@@ -310,59 +314,27 @@ namespace Extract.Redaction
                 _voaLoader.LoadFrom(voaFile, pFileRecord.Name);
 
                 // Load the "spatial" string containing the text index data.
-                SpatialString source = new SpatialString();
+                SpatialString displayString = new SpatialString();
                 string ussFileName = pFileRecord.Name + ".uss";
                 if (File.Exists(ussFileName))
                 {
-                    source.LoadFrom(ussFileName, false);
+                    displayString.LoadFrom(ussFileName, false);
                 }
                 else
                 {
-                    source.LoadFrom(pFileRecord.Name, false);
+                    displayString.LoadFrom(pFileRecord.Name, false);
                 }
+                displayString.ReportMemoryUsage();
 
                 // [FlexIDSCore:4598]
                 // Throw an exception if the OCR data isn't text index data.
-                LongRectangle textBounds = source.GetOCRImageBounds();
-                if (textBounds.Top != 0 ||
-                    textBounds.Bottom != 2)
+                LongRectangle bounds = displayString.GetOCRImageBounds();
+                if (bounds.Top != 0 ||
+                    bounds.Bottom != 2)
                 {
                     throw new ExtractException("ELI32207",
                         "\"" + _COMPONENT_DESCRIPTION + "\" task can be used only on text files.");
                 }
-
-                // Build up a list of redaction zones where each redaction zone may encompass 2 or
-                // more overlapping redactions. Item1 of each <see cref="Tuple(int, int)"/> in this
-                // list is the starting index of the zone and Item2 is the ending index of the zone.
-                List<Tuple<int, int>> redactionZones = new List<Tuple<int, int>>();
-
-                var bounds = source.GetOCRImageBounds();
-
-                // Loop through each attribute to redact
-                foreach (SpatialString value in _voaLoader.Items
-                    .Where(sensitiveItem =>
-                        sensitiveItem.Attribute.Redacted &&
-                        sensitiveItem.Attribute.ComAttribute.Value.HasSpatialInfo())
-                    .Select(sensitiveItem => sensitiveItem.Attribute.ComAttribute.Value))
-                {
-                    // Loop through each raster zone in the attribute.
-                    foreach (RasterZone rasterZone in
-                        value.GetOCRImageRasterZones().ToIEnumerable<RasterZone>())
-                    {
-                        // Text is "indexed" by storing the index of each character as the "left"
-                        // coordinate in the attribute's spatial string.
-                        ILongRectangle boundingRect =
-                            rasterZone.GetRectangularBounds(bounds);
-                        int startIndex = boundingRect.Left;
-                        int endIndex = boundingRect.Right;
-
-                        // Combine this range of indexes with indexes previously slated for redaction.
-                        MergeWithExistingRedactionZones(redactionZones, startIndex, endIndex);
-                    }
-                }
-
-                // Sort the redaction zones by starting index
-                redactionZones.Sort(SortZones);
 
                 // https://extract.atlassian.net/browse/ISSUE-12345
                 // In order to avoid problems with assumptions about character encoding leading to
@@ -370,11 +342,21 @@ namespace Extract.Redaction
                 // has been modified to use byte arrays as input and output.
                 byte[] sourceFileBytes = File.ReadAllBytes(pFileRecord.Name);
 
-                // Create a redacted version of sourceFileBytes using the calculated redaction zones.
-                byte[] redactedBytes = CreateRedactions(sourceFileBytes, redactionZones);
+                IEnumerable<IRasterZone> redactionZones =
+                    from sensitiveItem in _voaLoader.Items
+                    where sensitiveItem.Attribute.Redacted
+                    let value = sensitiveItem.Attribute.ComAttribute.Value
+                    where value.HasSpatialInfo()
+                    from rasterZone in value.GetOCRImageRasterZones().ToIEnumerable<IRasterZone>()
+                    select rasterZone;
+
+                byte[] redactedBytes = GetRedactedBytes(sourceFileBytes, displayString, redactionZones, bounds, isRTF);
 
                 // Generate the output file.
                 string outputFileName = pathTags.Expand(_settings.OutputFileName);
+
+                // Create the directory if it's missing
+                Directory.CreateDirectory(Path.GetDirectoryName(outputFileName));
 
                 File.WriteAllBytes(outputFileName, redactedBytes);
 
@@ -387,7 +369,43 @@ namespace Extract.Redaction
             }
         }
 
+
         #endregion IFileProcessingTask Members
+
+        #region Public Methods
+
+        /// <summary>
+        /// Redact input using the provided raster zones
+        /// </summary>
+        /// <param name="sourceText">The full source text as a byte array</param>
+        /// <param name="displayString">The spatial info of the visible text (what a user would see in verification and what rules would operate on)</param>
+        /// <param name="redactionZones">The <see cref="RasterZone"/>s that describe the redactions to be made</param>
+        /// <param name="sourceIsRichText">Whether the source is a rich text file</param>
+        /// <returns>A byte array where the bytes specified by the redaction zones have been replaced</returns>
+        [CLSCompliant(false)]
+        public byte[] RedactBytes(byte[] sourceText, SpatialString displayString, IEnumerable<IRasterZone> redactionZones, bool sourceIsRichText)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldCoreObjects, "ELI48344",
+                    _COMPONENT_DESCRIPTION);
+
+                // [FlexIDSCore:4598]
+                // Throw an exception if the OCR data isn't text index data.
+                LongRectangle pageBounds = displayString.GetOCRImageBounds();
+                ExtractException.Assert("ELI48345", "Unexpected page bounds for text-based SpatialString",
+                    pageBounds.Top == 0 && pageBounds.Bottom == 2);
+
+                return GetRedactedBytes(sourceText, displayString, redactionZones, pageBounds, sourceIsRichText);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI48343");
+            }
+        }
+
+        #endregion Public Methods
 
         #region IConfigurableObject Members
 
@@ -712,9 +730,18 @@ namespace Extract.Redaction
         /// <param name="redactionZones">The character indexes to redact where Item1 of each
         /// <see cref="Tuple"/> is the starting index of each zone to redact and
         /// Item2 is the ending index of the zone.</param>
+        /// <param name="isRTF">Whether the input is rich text</param>
         /// <returns>A redacted version of <see paramref="sourceFileBytes"/>.</returns>
-        byte[] CreateRedactions(byte[] sourceFileBytes, List<Tuple<int, int>> redactionZones)
+        byte[] CreateRedactions(byte[] sourceFileBytes, List<Tuple<int, int>> redactionZones, bool isRTF)
         {
+            // If input is rich text, get a string version of it in order to test the 'safety' of redactions
+            // (whether a redaction could change the meaning of preceding codes)
+            string sourceFileText = null;
+            if (isRTF)
+            {
+                sourceFileText = Encoding.GetEncoding("windows-1252").GetString(sourceFileBytes);
+            }
+
             // Set the initial capacity of the SB to the 110% of the source string length. This
             // will reduce the number of times the SB needs to increase its length
             List<byte> redactedOutput = new List<byte>(
@@ -756,7 +783,7 @@ namespace Extract.Redaction
                                         replacementLength += GetNumberCharactersToAdd();
                                     }
 
-                                    replacementText = Enumerable.Repeat<byte>(
+                                    replacementText = Enumerable.Repeat(
                                         (byte)_settings.ReplacementCharacter[0], replacementLength)
                                             .ToArray();
                                 }
@@ -806,6 +833,12 @@ namespace Extract.Redaction
                 }
 
                 ExtractException.Assert("ELI37176", "Internal logic error.", replacementText != null);
+
+                // Insert a space if there is danger of breaking an RTF code otherwise
+                if (isRTF && RichTextUtilities.CouldRichTextRedactionChangePrecedingCode(sourceFileText, redactionZone.Item1, (char)replacementText[0]))
+                {
+                    redactedOutput.Add((byte)' ');
+                }
 
                 // Replace the text
                 redactedOutput.AddRange(replacementText);
@@ -865,6 +898,145 @@ namespace Extract.Redaction
                     return left.Item1.CompareTo(right.Item1);
                 }
             }
+        }
+
+        // Redact input using the provided raster zones
+        byte[] GetRedactedBytes(byte[] sourceFileBytes, SpatialString displayString, IEnumerable<IRasterZone> redactionZones, LongRectangle pageBounds, bool isRTF)
+        {
+            // Build up a list of redaction zones where each redaction zone may encompass 2 or
+            // more overlapping redactions. Item1 of each <see cref="Tuple(int, int)"/> in this
+            // list is the starting index of the zone and Item2 is the ending index of the zone.
+            List<Tuple<int, int>> redactionSpans = new List<Tuple<int, int>>();
+
+            // Loop through each raster zone in the attribute.
+            foreach (RasterZone rasterZone in redactionZones)
+            {
+                // Text is "indexed" by storing the index of each character as the "left"
+                // coordinate in the attribute's spatial string.
+                ILongRectangle boundingRect =
+                    rasterZone.GetRectangularBounds(pageBounds);
+                int startIndex = boundingRect.Left;
+                int endIndex = boundingRect.Right;
+
+                // Combine this range of indexes with indexes previously slated for redaction.
+                MergeWithExistingRedactionZones(redactionSpans, startIndex, endIndex);
+            }
+
+            var (redactableIndexes, rightIndexIsExclusive) = GetRedactableIndexes(displayString);
+
+            redactionSpans = redactionSpans
+                .SelectMany(span => SplitSpans(span, redactableIndexes, rightIndexIsExclusive))
+                .ToList();
+
+            // Sort the redaction zones by starting index
+            redactionSpans.Sort(SortZones);
+
+            // Create a redacted version of sourceFileBytes using the calculated redaction spans.
+            byte[] redactedBytes = CreateRedactions(sourceFileBytes, redactionSpans, isRTF);
+
+            // Validate RTF format and throw an exception if the result is not valid
+            if (isRTF)
+            {
+                try
+                {
+                    // Validate RTF groups with RichTextExtractor
+                    string rtfString = Encoding.GetEncoding("windows-1252").GetString(redactedBytes);
+                    RichTextExtractor.GetTextPositions(rtfString, displayString.SourceDocName, throwParseExceptions: true);
+                }
+                catch (Exception ex)
+                {
+                    throw new ExtractException("ELI48335", "Invalid rich text after redaction", ex);
+                }
+            }
+
+            return redactedBytes;
+        }
+
+        // Split zones into pieces so that they don't cover up control words or other text that wasn't part of the text shown to users/rules
+        static IEnumerable<Tuple<int, int>> SplitSpans(Tuple<int, int> span, HashSet<int> redactableIndexes, bool rightIndexIsExclusive)
+        {
+            int start = span.Item1;
+            int end = span.Item2;
+            if (rightIndexIsExclusive)
+            {
+                end--;
+            }
+
+            // Trim start
+            while (start <= end && !redactableIndexes.Contains(start))
+            {
+                start++;
+            }
+
+            for (int splitEnd = start + 1; splitEnd <= end; splitEnd++)
+            {
+                if (!redactableIndexes.Contains(splitEnd))
+                {
+                    // Found a gap so output the first span if it is valid
+                    if (redactableIndexes.Contains(start))
+                    {
+                        yield return new Tuple<int, int>(start, splitEnd - 1);
+                    }
+
+                    // Skip the gap
+                    start = splitEnd;
+                    while (start <= end && !redactableIndexes.Contains(start))
+                    {
+                        start++;
+                    }
+
+                    // Setup next iteration
+                    splitEnd = start - 1;
+                }
+            }
+
+            // Trim end
+            while (end >= start && !redactableIndexes.Contains(end))
+            {
+                end--;
+            }
+
+            // Output trimmed span if it is valid
+            if (redactableIndexes.Contains(start))
+            {
+                yield return new Tuple<int, int>(start, end);
+            }
+        }
+
+        // Get collection of indexes into the full source text that are also in the display text (text shown to users in verify redactions task or to rules)
+        static (HashSet<int> redactableIndexes, bool rightIndexIsExclusive) GetRedactableIndexes(SpatialString displayString)
+        {
+            bool rightIndexIsExclusive = true;
+            HashSet<int> redactableIndexes = new HashSet<int>();
+            int len = displayString.Size;
+            for (int i = 0; i < len; i++)
+            {
+                var letter = displayString.GetOCRImageLetter(i);
+
+                // Don't redact newlines because that would make the output ugly
+                char letterChar = (char)letter.Guess1;
+                if (letterChar == '\r' || letterChar == '\n')
+                {
+                    continue;
+                }
+
+                var left = letter.Left;
+                var right = letter.Right;
+                // Adjust right index to be exclusive.
+                // (Right index of text-based letters are exclusive in 11.3.1 but used to be inclusive)
+                if (left == right)
+                {
+                    right++;
+                    rightIndexIsExclusive = false;
+                }
+                // Allow for multi-byte escape sequences for one display char
+                for (int j = letter.Left; j < right; j++)
+                {
+                    redactableIndexes.Add(j);
+                }
+            }
+
+            return (redactableIndexes, rightIndexIsExclusive);
         }
 
         #endregion Private Members

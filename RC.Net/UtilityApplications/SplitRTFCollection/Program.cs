@@ -32,14 +32,6 @@ namespace SplitRTFCollection
                     SplitFile(file, outputDir);
                 }
             }
-            else if (args.Length == 1 && File.Exists(args[0]))
-            {
-                ExtractText(args[0]);
-            }
-            else if (args.Length == 1 && Directory.Exists(args[0]))
-            {
-                ExtractText(args);
-            }
         }
 
         private static void SplitFile(string inputFile, string outputDir)
@@ -114,7 +106,6 @@ namespace SplitRTFCollection
                 string ext = isRTF ? "rtf" : "txt";
                 var fileName = UtilityMethods.FormatInvariant($"{fileNameBase}.sub-{idx:D3}.sublabel-{label}.{ext}");
                 File.WriteAllText(fileName, contents, _encoding);
-                ExtractText(fileName);
                 idx++;
             }
         }
@@ -169,42 +160,6 @@ namespace SplitRTFCollection
             }
 
             return subFiles;
-        }
-
-        private static void ExtractText(string[] args)
-        {
-            foreach(var fileName in Directory.GetFiles(args[0], "*.txt", SearchOption.AllDirectories))
-            {
-                ExtractText(fileName);
-            }
-        }
-
-        private static void ExtractText(string fileName)
-        {
-            var contentString = File.ReadAllText(fileName, _encoding);
-            var (pos, txt) = RichTextExtractor.GetTextPositions(contentString, fileName, false);
-            if (pos.Length == txt.Length)
-            {
-                StringBuilder builder = new StringBuilder();
-                byte[] bytes = new byte[txt.Length * 10];
-                for (int i = 0; i < pos.Length; i++)
-                {
-                    bytes[i*10] = Convert.ToByte(txt[i]);
-                    string position = pos[i].index.ToString("X8");
-                    string length = pos[i].length.ToString("X");
-                    for (int j = 0; j < 8; j++)
-                    {
-                        bytes[i * 10 + j + 1] = Convert.ToByte(position[j]);
-                    }
-                    bytes[i * 10 + 9] = Convert.ToByte(length[0]);
-                }
-
-                File.WriteAllBytes(fileName + ".itxt", bytes);
-            }
-            else
-            {
-                Console.Error.WriteLine(UtilityMethods.FormatInvariant($"Mismatch on file {fileName}"));
-            }
         }
     }
 }

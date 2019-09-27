@@ -1677,3 +1677,30 @@ EXPORT_BaseUtils char getWindows1252FromUTF8(const string& strCharacter)
 			return '^';
 	}
 }
+//--------------------------------------------------------------------------------------------------
+EXPORT_BaseUtils string normalizeNewlines(const string& strInput)
+{
+	if (strInput.empty())
+	{
+		return strInput;
+	}
+
+	bool endsInNewline = strInput.back() == '\n';
+	stringstream source(strInput);
+	string line;
+	stringstream dest;
+	while (std::getline(source, line, '\n'))
+	{
+		dest << line;
+		if (!source.eof() || endsInNewline)
+		{
+			if (line.empty() || line.back() != '\r')
+			{
+				dest << '\r';
+			}
+			dest << '\n';
+		}
+	}
+
+	return dest.str();
+}

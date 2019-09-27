@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -37,7 +38,16 @@ namespace Extract.Utilities.Parsers
           "objdata", "object", "objname", "objsect", "objtime", "oldcprops", "oldpprops", "oldsprops", "oldtprops", "oleclsid", "operator", "panose", "password", "passwordhash", "pgp", "pgptbl", "picprop", "pict", "pn", "pnseclvl",
           "pntext", "pntxta", "pntxtb", "printim", "private", "propname", "protend", "protstart", "protusertbl", "pxe", "result", "revtbl", "revtim", "rsidtbl", "rxe", "shp", "shpgrp", "shpinst", "shppict", "shprslt", "shptxt",
           "sn", "sp", "staticval", "stylesheet", "subject", "sv", "svb", "tc", "template", "themedata", "title", "txe", "ud", "upr", "userprops", "wgrffmtfilter", "windowcaption", "writereservation", "writereservhash", "xe",
-          "xform", "xmlattrname", "xmlattrvalue", "xmlclose", "xmlname", "xmlnstbl", "xmlopen",
+          "xform", "xmlattrname", "xmlattrvalue", "xmlclose", "xmlname", "xmlnstbl", "xmlopen", "v",
+        };
+
+        static readonly HashSet<string> OUTPUT_DESTINATIONS = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "field",
+            "fldrslt",
+            "tc",
+            "footnote",
+            "xe",
         };
 
         // Special chars
@@ -69,8 +79,13 @@ namespace Extract.Utilities.Parsers
         /// <param name="input">The rich text code to parse</param>
         /// <param name="sourceDocName">The name to use as debug data for any exceptions</param>
         /// <param name="throwParseExceptions">Whether to throw or only log parse exceptions</param>
-        public static ((int index, int length)[], string) GetTextPositions(string input, string sourceDocName, bool throwParseExceptions)
+        public static ((int index, int length)[], string) GetTextPositions(string input, string sourceDocName, bool throwParseExceptions, HashSet<string> destinationsToOutput = null)
         {
+            if (destinationsToOutput == null)
+            {
+                destinationsToOutput = OUTPUT_DESTINATIONS;
+            }
+
             Stack<(int, bool)> stack = new Stack<(int, bool)>();
             List<(int, int)> positions = new List<(int, int)>();
 
@@ -138,7 +153,10 @@ namespace Extract.Utilities.Parsers
                         curskip = 0;
                         if (DESTINATIONS.Contains(word.Value))
                         {
-                            ignorable = true;
+                            if (!destinationsToOutput.Contains(word.Value))
+                            {
+                                ignorable = true;
+                            }
                         }
                         else if (ignorable)
                         {
@@ -154,11 +172,11 @@ namespace Extract.Utilities.Parsers
                         }
                         else if (word.Value == "uc" && arg.Success)
                         {
-                            ucskip = int.Parse(arg.Value, System.Globalization.CultureInfo.InvariantCulture);
+                            ucskip = int.Parse(arg.Value, CultureInfo.InvariantCulture);
                         }
                         else if (word.Value == "u" && arg.Success)
                         {
-                            int c = int.Parse(arg.Value, System.Globalization.CultureInfo.InvariantCulture);
+                            int c = int.Parse(arg.Value, CultureInfo.InvariantCulture);
                             if (c < 0) // "mid-dot unicode char
                             {
                                 c += 0x10000;
@@ -179,7 +197,7 @@ namespace Extract.Utilities.Parsers
                         }
                         else if (!ignorable)
                         {
-                            int c = int.Parse(hex.Value, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture);
+                            int c = int.Parse(hex.Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                             char ch = Convert.ToChar(c);
                             builder.Append(ch);
                             positions.Add((hex.Index - 2, 4));
@@ -231,6 +249,38 @@ namespace Extract.Utilities.Parsers
             }
 
             return (positions.ToArray(), builder.ToString());
+        }
+
+        /// <summary>
+        /// Parse RTF code and return the plain text (not including destinations) and the indexes and lengths of the characters into the original code encoded as ten bytes per character
+        /// </summary>
+        /// <param name="input">The rich text code to parse</param>
+        /// <param name="sourceDocName">The name to use as debug data for any exceptions</param>
+        /// <param name="throwParseExceptions">Whether to throw or only log parse exceptions</param>
+        public static byte[] GetIndexedText(string text, string sourceDocName, bool throwParseExceptions)
+        {
+            try
+            {
+                var (positions, txt) = GetTextPositions(text, sourceDocName, throwParseExceptions);
+                byte[] bytes = new byte[txt.Length * 10];
+                for (int i = 0; i < positions.Length; i++)
+                {
+                    bytes[i * 10] = Convert.ToByte(txt[i]);
+                    string position = positions[i].index.ToString("X8", CultureInfo.InvariantCulture);
+                    string length = positions[i].length.ToString("X", CultureInfo.InvariantCulture);
+                    for (int j = 0; j < 8; j++)
+                    {
+                        bytes[i * 10 + j + 1] = Convert.ToByte(position[j]);
+                    }
+                    bytes[i * 10 + 9] = Convert.ToByte(length[0]);
+                }
+
+                return bytes;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI48355");
+            }
         }
     }
 }

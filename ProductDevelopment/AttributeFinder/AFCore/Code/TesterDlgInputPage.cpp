@@ -440,8 +440,10 @@ void TesterDlgInputPage::OnSelchangeComboInput()
 		}
 
 		// set the text of the edit box to the appropriate content
-		_bstr_t _bstrText = ipDoc->Text->String;
-		string strText = _bstrText;
+		// Rich-text-derived spatial strings don't have \r in them
+		// (iirc using \r\n screwed up the indexes for the RichTextViewer)
+		// This CEdit control needs \r\n to display correctly
+		string strText = normalizeNewlines(asString(ipDoc->Text->String));
 		m_editInput.SetWindowText(strText.c_str());
 
 		// The text input box should be read only if ipDoc has spatial info or if file input
@@ -582,7 +584,7 @@ ISpatialStringPtr TesterDlgInputPage::openFile(const string& strFileName)
 	
 	// If the extension is txt get the file into a buffer and set the 
 	// text into the edit control
-	if (strExtension == ".TXT" || strExtension == ".USS" || strExtension == ".XML")
+	if (strExtension == ".TXT" || strExtension == ".USS" || strExtension == ".XML" || strExtension == ".RTF")
 	{
 		ipText->LoadFrom(get_bstr_t(strFileName.c_str()), VARIANT_FALSE);
 		return ipText;

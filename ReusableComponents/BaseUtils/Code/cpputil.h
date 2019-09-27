@@ -53,8 +53,7 @@ enum EFileType
     kEAVFile,
     kXMLFile,
     kCSVFile,
-	kRichTextFile,
-	kIndexedTXTFile
+	kRichTextFile
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -1107,3 +1106,6 @@ namespace Util
 }		// end of namespace Util
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils char getWindows1252FromUTF8(const string& strCharacter);
+//-------------------------------------------------------------------------------------------------
+// Result will use '\r\n' for newlines if input uses either '\r\n' or '\n' or both
+EXPORT_BaseUtils string normalizeNewlines(const string& strInput);

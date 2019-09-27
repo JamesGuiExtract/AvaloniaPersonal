@@ -18,27 +18,41 @@ namespace Extract.Utilities.Parsers
         /// <returns><c>true</c> if the replacement could possibly affect the meaning of the preceding code. <c>false</c> if the meaning of preceding text would definitely not be changed</returns>
         public static bool CouldRichTextRedactionChangePrecedingCode(string sourceText, int redactionStartIndex, char redactionFirstCharacter)
         {
-            bool replacementTextCanDefinitelyBeDelimiter = !Char.IsLetterOrDigit(redactionFirstCharacter) && redactionFirstCharacter != '-';
-            if (replacementTextCanDefinitelyBeDelimiter)
+            try
             {
+                ExtractException.Assert("ELI48357", "Index outside the bounds of the source text", redactionStartIndex >= 0 && redactionStartIndex < sourceText.Length);
+
+                if (redactionStartIndex < 2)
+                {
+                    return false;
+                }
+
+                bool replacementTextCanDefinitelyBeDelimiter = !Char.IsLetterOrDigit(redactionFirstCharacter) && redactionFirstCharacter != '-';
+                if (replacementTextCanDefinitelyBeDelimiter)
+                {
+                    return false;
+                }
+
+                bool followsSpecialCode = _specialCodeEndsHere.IsMatch(sourceText, redactionStartIndex);
+                if (followsSpecialCode)
+                {
+                    char lastChar = sourceText[redactionStartIndex - 1];
+                    if (Char.IsDigit(lastChar) && Char.IsDigit(redactionFirstCharacter))
+                    {
+                        return true;
+                    }
+                    if (Char.IsLetter(lastChar) && (Char.IsLetterOrDigit(redactionFirstCharacter) || redactionFirstCharacter == '-'))
+                    {
+                        return true;
+                    }
+                }
+
                 return false;
             }
-
-            bool followsSpecialCode = _specialCodeEndsHere.IsMatch(sourceText, redactionStartIndex);
-            if (followsSpecialCode)
+            catch (Exception ex)
             {
-                char lastChar = sourceText[redactionStartIndex - 1];
-                if (Char.IsDigit(lastChar) && Char.IsDigit(redactionFirstCharacter))
-                {
-                    return true;
-                }
-                if (Char.IsLetter(lastChar) && (Char.IsLetterOrDigit(redactionFirstCharacter) || redactionFirstCharacter == '-'))
-                {
-                    return true;
-                }
+                throw ex.AsExtract("ELI48356");
             }
-
-            return false;
         }
     }
 }

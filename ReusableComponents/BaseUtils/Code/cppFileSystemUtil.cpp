@@ -1723,10 +1723,6 @@ EFileType getFileType(const string& strFileName)
 	{
 		return kRichTextFile;
 	}
-	else if (strExt == ".itxt")
-	{
-		return kIndexedTXTFile;
-	}
 	else if (strExt == ".uss")
 	{
 		return kUSSFile;

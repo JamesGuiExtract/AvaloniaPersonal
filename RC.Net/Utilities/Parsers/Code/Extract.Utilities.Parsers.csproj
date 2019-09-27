@@ -75,6 +75,7 @@
     <Compile Include="FuzzySearchRegexBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RichTextExtractor.cs" />
+    <Compile Include="RichTextExtractorClass.cs" />
     <Compile Include="RichTextUtilities.cs" />
   </ItemGroup>
   <ItemGroup>

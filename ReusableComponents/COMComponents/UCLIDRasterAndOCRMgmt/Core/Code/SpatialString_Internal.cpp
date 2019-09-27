@@ -1105,19 +1105,32 @@ void CSpatialString::saveToTXTFile(const string& strFileName)
     waitForFileToBeReadable(strFileName);
 }
 //-------------------------------------------------------------------------------------------------
-void CSpatialString::loadTextWithPositionalData(const string& strFileName, bool hasExplicitPositionalData)
+void CSpatialString::loadTextWithPositionalData(const string& strFileName, EFileType eFileType)
 {
-	// Load the file as text.
-	string text = getTextFileContentsAsString(strFileName);
-	size_t inputLength = text.length();
-	size_t length = inputLength;
-	
-	if (hasExplicitPositionalData)
+	bool hasExplicitPositionalData = false;
+	string text = "";
+	size_t inputLength;
+	size_t length;
+
+	if (eFileType == kRichTextFile)
 	{
+		// Extract visible text with positional data
+		hasExplicitPositionalData = true;
+		IRichTextExtractorPtr ipExtractor("Extract.Utilities.Parsers.RichTextExtractorClass");
+		ASSERT_RESOURCE_ALLOCATION("ELI48359", ipExtractor != __nullptr);
+
+		text = ipExtractor->GetIndexedTextFromFile(get_bstr_t(strFileName.c_str()), VARIANT_FALSE);
+		inputLength = text.length();
 		length = inputLength / 10;
 		ASSERT_RUNTIME_CONDITION("ELI46643", length * 10 == inputLength, "Invalid file length for indexed text!")
 	}
-
+	else
+	{
+		// Load the file as text.
+		text = getTextFileContentsAsString(strFileName);
+		length = inputLength = text.length();
+	}
+	
 	// Check for an empty string
 	if (text.empty())
 	{

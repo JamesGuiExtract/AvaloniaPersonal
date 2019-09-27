@@ -230,23 +230,13 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(IFileRecord* pFileRecord, long n
 		
 		EFileType eFileType = getFileType(strInputFileName);
 		if (eFileType == kTXTFile || eFileType == kXMLFile || eFileType == kCSVFile
-			|| eFileType == kRichTextFile || eFileType == kIndexedTXTFile)
+			|| eFileType == kRichTextFile)
 		{
 			// If a text file, load as "indexed" text.
 			ipSS.CreateInstance(CLSID_SpatialString);
 			ASSERT_RESOURCE_ALLOCATION("ELI31683", ipSS != __nullptr);
 
-			// If there is a file with index info stored with the characters use that
-			string strITextName = strInputFileName + ".itxt";
-			if (isValidFile(strITextName))
-			{
-				ipSS->LoadFrom(strITextName.c_str(), VARIANT_FALSE);
-				ipSS->SourceDocName = strInputFileName.c_str();
-			}
-			else
-			{
-				ipSS->LoadFrom(strInputFileName.c_str(), VARIANT_FALSE);
-			}
+			ipSS->LoadFrom(strInputFileName.c_str(), VARIANT_FALSE);
 
 			if (ipSS != __nullptr && ipSS->Size == 0)
 			{
