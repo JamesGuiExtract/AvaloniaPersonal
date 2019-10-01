@@ -21,7 +21,7 @@ namespace Extract.AttributeFinder.Test
         /// <summary>
         /// Manages the test files used by this test
         /// </summary>
-        static TestFileManager<TestSpatialPageInfo> _testFiles;
+        static TestFileManager<TestSpatialString> _testFiles;
 
         const string _EXAMPLE05_TIF_FILE = "Resources.Example05.tif";
         const string _BLANK_PAGE_GCV_FILE = "Resources.BlankPage.tif.gcv.uss";
@@ -36,7 +36,7 @@ namespace Extract.AttributeFinder.Test
         public static void Setup()
         {
             GeneralMethods.TestSetup();
-            _testFiles = new TestFileManager<TestSpatialPageInfo>();
+            _testFiles = new TestFileManager<TestSpatialString>();
         }
 
         /// <summary>

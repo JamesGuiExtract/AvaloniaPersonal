@@ -364,6 +364,12 @@ private:
 	// end of a line.
 	bool getIsEndOfLine(long nIndex);
 	//----------------------------------------------------------------------------------------------
+	// Returns true if the letter at nIndex is the last letter of a zone. Considers only the char
+	// properties unless bTreatGapsAsZoneBoundaries is true.
+	// If bTreatGapsAsZoneBoundaries is true then true if right of this letter is less than left of
+	// the next letter
+	bool getIsEndOfZone(long nIndex, bool bTreatGapsAsZoneBoundaries);
+	//----------------------------------------------------------------------------------------------
 	// Returns true if the letter at nIndex is the last letter of a line. Considers the spatial info
 	// for the line up to index (specified by rectCurrentLineZone) to determine if a new line should
 	// be started based upon the location of the next character compared to rectCurrentLineZone.
@@ -590,6 +596,10 @@ private:
 	// PURPOSE: To return a vector of pairs containing the begin and end characters for the string
 	//			divided at line boundaries
 	void getLines(vector<pair<long, long>>& rvecLines);
+	//----------------------------------------------------------------------------------------------
+	// PURPOSE: To return a vector of pairs containing the begin and end characters for the string
+	//			divided at line and zone boundaries
+	void getLinesOrZones(vector<pair<long, long>>& rvecLines);
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: To return an IUnknownVector of spatial strings containing the current spatial
 	//			string divided by lines.

@@ -88,6 +88,7 @@
     <Compile Include="TestFKB.cs" />
     <Compile Include="TestClassWeights.cs" />
     <Compile Include="TestMICRFinder.cs" />
+    <Compile Include="TestRichTextAttributes.cs" />
     <Compile Include="TestSpatialString.cs" />
     <Compile Include="TestSpatialPageInfo.cs" />
     <Compile Include="TestOCRParameters.cs" />
@@ -111,6 +112,14 @@
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\DataCaptureStats\Core\Code\Extract.DataCaptureStats.csproj">
+      <Project>{32679A70-BC10-4DD9-9155-9B3E08586EE9}</Project>
+      <Name>Extract.DataCaptureStats</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ETL\Core\Code\Extract.ETL.csproj">
+      <Project>{E26B63CD-4948-43AC-A726-8B46C420F152}</Project>
+      <Name>Extract.ETL</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj">
       <Project>{6B284A4D-132C-4FE4-858F-06A9C476B19B}</Project>
@@ -173,8 +182,35 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
+    <COMReference Include="UCLID_AFOUTPUTHANDLERSLib">
+      <Guid>{F8F1F33C-B4CE-4171-8855-7DE5AEC361B8}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="UCLID_AFUTILSLib">
       <Guid>{AC966E48-1A26-40C7-B61E-AC4C09C9D565}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFVALUEFINDERSLib">
+      <Guid>{55A9DE56-080B-43E0-AC99-02B815C1DF6C}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFVALUEMODIFIERSLib">
+      <Guid>{C5230183-3ACC-4C4F-8D91-745FFB3C018E}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
@@ -563,6 +599,9 @@
     <EmbeddedResource Include="Resources\BlankPage.tif" />
     <EmbeddedResource Include="Resources\BlankPage.tif.gcv.uss" />
     <EmbeddedResource Include="Resources\BlankPage.tif.uss" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Example01.rtf" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

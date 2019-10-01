@@ -455,8 +455,13 @@ STDMETHODIMP CRasterZone::CreateFromLongRectangle(ILongRectangle *pRectangle, lo
 		m_nEndY = m_nStartY;
 		m_nHeight = lBottom - lTop + 1;
 
-		// Ensure height is odd
-		if (m_nHeight % 2 == 0)
+		// Ensure height is at least 5 and an odd number
+		// This corresponds to the requirements used elsewhere, e.g., in SpatialString_Internal.cpp
+		if (m_nHeight < 5)
+		{
+			m_nHeight = 5;
+		}
+		else if (m_nHeight % 2 == 0)
 		{
 			m_nHeight++;
 		}

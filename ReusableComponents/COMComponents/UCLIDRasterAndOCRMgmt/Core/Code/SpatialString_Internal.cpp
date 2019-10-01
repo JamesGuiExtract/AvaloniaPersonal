@@ -1214,6 +1214,17 @@ void CSpatialString::loadTextWithPositionalData(const string& strFileName, EFile
 		{
 			pLastNonWhitespaceLetter = &letter;
 		}
+
+		// Make sure the previous letter is marked as end of zone if there has been a gap
+		// https://extract.atlassian.net/browse/ISSUE-16678
+		if (i > 0)
+		{
+			CPPLetter& prevLetter = vecLetters[i - 1];
+			if (prevLetter.m_ulRight < letter.m_ulLeft)
+			{
+				prevLetter.m_bIsEndOfZone = true;
+			}
+		}
 	}
 
 	// The page info should be as many pixels wide as the max position and 1 pixel
@@ -1628,6 +1639,31 @@ bool CSpatialString::getIsEndOfLine(long nIndex)
             return false;
         }
     }
+}
+//-------------------------------------------------------------------------------------------------
+bool CSpatialString::getIsEndOfZone(long nIndex, bool bTreatGapsAsZoneBoundaries)
+{
+	// Invalid index
+	if (nIndex < 0 || (unsigned long)nIndex >= m_strString.size())
+	{
+		return false;
+	}
+
+	// Last letter
+	else if (nIndex == m_strString.size() - 1)
+	{
+		return true;
+	}
+
+	// Marked as end of zone
+	CPPLetter& thisLetter = m_vecLetters[nIndex];
+	if (thisLetter.m_bIsEndOfZone)
+	{
+		return true;
+	}
+
+	// Check for gap (right index assumed to be exclusive)
+	return bTreatGapsAsZoneBoundaries && thisLetter.m_ulRight < m_vecLetters[nIndex + 1].m_ulLeft;
 }
 //-------------------------------------------------------------------------------------------------
 bool CSpatialString::getIsEndOfLine(size_t index, CRect rectCurrentLineZone)
@@ -2947,6 +2983,55 @@ void CSpatialString::getLines(vector<pair<long, long>>& rvecLines)
     CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25832");
 }
 //-------------------------------------------------------------------------------------------------
+void CSpatialString::getLinesOrZones(vector<pair<long, long>>& rvecLines)
+{
+    try
+    {
+        // Clear the vector first
+        rvecLines.clear();
+
+		bool bIsTextBased = std::all_of(m_vecLetters.begin(), m_vecLetters.end(), [] (const CPPLetter &letter)
+			{
+				return !letter.m_bIsSpatial
+					|| letter.m_ulTop == 0
+					&& letter.m_ulBottom <= 5 // Starts as 1 but allow for inflation (not sure if this happens...)
+					&& (letter.m_ulRight - letter.m_ulLeft) == 1;
+			});
+
+        long nStartPos = 0;
+        long nNumLetters = m_strString.size();
+        for (long i = 0; i < nNumLetters; i++)
+        {
+            if (getIsEndOfLine(i) || (bIsTextBased && getIsEndOfZone(i, true))) 
+            {
+                // get the line beginning ending with current letter
+                rvecLines.push_back(pair<long, long>(nStartPos, i));
+
+                // Move the Start position of next line to after end of this line
+                nStartPos = i + 1;
+            }
+            else
+            {
+                char cLetter = m_strString[i];
+
+                if (cLetter == '\r' || cLetter == '\n')
+                {
+                    // skip this letter
+                    nStartPos = i + 1;
+                }
+            }
+        }
+
+        // Check for case last letter not marked as end of line
+        if (nStartPos < nNumLetters) 
+        {
+            // get the line beginning at nStartPos and ending with last letter
+            rvecLines.push_back(pair<long, long>(nStartPos, nNumLetters - 1));
+        }
+    }
+    CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI48354");
+}
+//-------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CSpatialString::getLinesUnknownVector()
 {
     try
@@ -3204,7 +3289,7 @@ vector<UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr> CSpatialString::getOCRImageRas
         {
             // Handle kSpatialMode objects. Create a raster zone for each line.
             vector<pair<long, long>> vecLines;
-            getLines(vecLines);
+            getLinesOrZones(vecLines);
 
             long lLettersSize = m_vecLetters.size();
             for (vector<pair<long, long>>::iterator it = vecLines.begin();
