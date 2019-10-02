@@ -30,11 +30,12 @@ namespace Extract.Dashboard.Utilities
                 // The axis points for the row are all in a linked list with the top level parent countaining all the
                 // rows so want to go to the first child
                 var axisPoint = startingAxisPoint;
-                while (axisPoint.Parent?.Parent != null)
+                do
                 {
                     dict[axisPoint.Dimension.DataMember] = axisPoint.GetDimensionValue(axisPoint.Dimension).Value;
                     axisPoint = axisPoint.Parent;
                 }
+                while (axisPoint?.Parent != null);
 
                 return dict;
             }
