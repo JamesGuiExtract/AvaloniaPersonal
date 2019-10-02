@@ -179,11 +179,6 @@ namespace Extract.FileActionManager.Utilities
         List<string> _listOfEnabledServices;
 
         /// <summary>
-        /// Timer to periodically check for changes in the enabled DatabaseServices
-        /// </summary>
-        System.Timers.Timer _checkForETLChangesTimer;
-
-        /// <summary>
         /// FAM database used by the ETL Polling
         /// </summary>
         FileProcessingDB _etlFAMDB;
@@ -1030,54 +1025,51 @@ namespace Extract.FileActionManager.Utilities
                         _etlFAMDB.DatabaseServer = _etlDatabaseServer;
                     }
 
-                    _checkForETLChangesTimer?.Dispose();
-                    _checkForETLChangesTimer = null;
-
-                    _checkForETLChangesTimer = new System.Timers.Timer(30000);
-                    _checkForETLChangesTimer.Elapsed += (o, e) =>
+                    // Changed this from using a timer to a thread because timer
+                    // would fire on different thread and cause lots of connections 
+                    // to be created in _etlFAMDB
+                    // https://extract.atlassian.net/browse/ISSUE-16675
+                    new Thread(() =>
                     {
                         try
                         {
-                            _checkForETLChangesTimer.Stop();
-
-                            // Check the FAM still active
-                            if (_etlFAMDB.ActiveFAMID == 0 && _etlFAMDB.IsConnected)
+                            do
                             {
-                                ExtractException lostActiveFAM = new ExtractException("ELI46691", "Application Trace: ETL Polling ActiveFAM was lost");
-                                lostActiveFAM.Log();
-                                _etlFAMDB.RegisterActiveFAM();
-                                ExtractException restroredActiveFAM = new ExtractException("ELI46692", "Application Trace: ETL Polling ActiveFAM was restored.");
-                                restroredActiveFAM.Log();
-                            }
+                                // Check the FAM still active
+                                if (_etlFAMDB.ActiveFAMID == 0 && _etlFAMDB.IsConnected)
+                                {
+                                    ExtractException lostActiveFAM = new ExtractException("ELI46691", "Application Trace: ETL Polling ActiveFAM was lost");
+                                    lostActiveFAM.Log();
+                                    _etlFAMDB.RegisterActiveFAM();
+                                    ExtractException restroredActiveFAM = new ExtractException("ELI46692", "Application Trace: ETL Polling ActiveFAM was restored.");
+                                    restroredActiveFAM.Log();
+                                }
 
-                            string restartSetting = _etlFAMDB.GetDBInfoSetting("ETLRestart", false);
-                            DateTime restartTime;
-                            if (!DateTime.TryParse(restartSetting, out restartTime))
-                            {
-                                ExtractException restartInvalid = new ExtractException("ELI46424",
-                                    "ETLRestart value in DBInfo should be a date time string");
-                                restartInvalid.AddDebugData("ETLRestart", restartSetting, false);
-                                throw restartInvalid;
-                            }
+                                string restartSetting = _etlFAMDB.GetDBInfoSetting("ETLRestart", false);
+                                DateTime restartTime;
+                                if (!DateTime.TryParse(restartSetting, out restartTime))
+                                {
+                                    ExtractException restartInvalid = new ExtractException("ELI46424",
+                                        "ETLRestart value in DBInfo should be a date time string");
+                                    restartInvalid.AddDebugData("ETLRestart", restartSetting, false);
+                                    throw restartInvalid;
+                                }
 
-                            if (_checkForETLChangesTimer is null || restartTime <= _lastETLStart)
-                            {
-                                _checkForETLChangesTimer?.Start();
-                                return;
-                            }
+                                if (restartTime > _lastETLStart)
+                                {
+                                    StopAndRestartETL();
+                                    break;
+                                }
 
-                            StopAndRestartETL();
+                            }
+                            while (!_stopProcessing.WaitOne(30000));
                         }
                         catch (Exception ex)
                         {
                             ex.ExtractLog("ELI46302");
                         }
-                    };
-                    _checkForETLChangesTimer?.Start();
-                    if (_checkForETLChangesTimer is null)
-                    {
-                        return;
-                    }
+                    }).Start();
+
                     _etlFAMDB.RecordFAMSessionStart("ETL Polling", string.Empty, false, false);
                     _etlFAMDB.RegisterActiveFAM();
                 }).Start();
@@ -1382,11 +1374,6 @@ namespace Extract.FileActionManager.Utilities
 
                 // Signal the threads to stop
                 _stopProcessing.Set();
-
-                // Stop the Check for ETL changes timer
-                _checkForETLChangesTimer?.Stop();
-                _checkForETLChangesTimer?.Dispose();
-                _checkForETLChangesTimer = null;
 
                 foreach (var dbServiceManager in _databaseServiceManagers)
                 {

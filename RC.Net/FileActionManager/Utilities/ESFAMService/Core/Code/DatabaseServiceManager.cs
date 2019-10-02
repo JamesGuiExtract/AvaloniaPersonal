@@ -303,6 +303,7 @@ namespace Extract.FileActionManager.Utilities
                             finally
                             {
                                 fileProcessingDB.CloseAllDBConnections();
+                                fileProcessingDB = null;
                             }
                         }
                     }
