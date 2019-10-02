@@ -99,16 +99,16 @@ namespace Extract.Dashboard.Forms
             try
             {
                 InitializeComponent();
+                ServerName = serverName;
+                DatabaseName = databaseName;
+                _gridDetailConfiguration = configuration;
+                _columnValues = columnValues;
+                
                 if (columnValues.ContainsKey(_gridDetailConfiguration.DataMemberUsedForFileName))
                 {
                     _imageViewer.OpenImage((string)columnValues[_gridDetailConfiguration.DataMemberUsedForFileName], false);
                     Text = "Data for " + (string)columnValues[_gridDetailConfiguration.DataMemberUsedForFileName];
                 }
-
-                ServerName = serverName;
-                DatabaseName = databaseName;
-                _gridDetailConfiguration = configuration;
-                _columnValues = columnValues;
             }
             catch (Exception ex)
             {
