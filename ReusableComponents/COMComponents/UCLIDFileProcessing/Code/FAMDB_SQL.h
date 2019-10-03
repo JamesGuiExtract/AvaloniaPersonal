@@ -1918,6 +1918,14 @@ static const string gstrINSERT_AUTO_PAGINATE_TASK_CLASS =
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
 	"	('8ECBCC95-7371-459F-8A84-A2AFF7769800', 'Pagination: Auto-Paginate') \r\n";
 
+static const string gstrINSERT_RTF_SPLIT_BATCHES_TASK_CLASS =
+	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
+	"	('5F37ABA6-7D18-4AB9-9ABE-79CE0F49C903', 'RTF: Split batches') \r\n";
+
+static const string gstrINSERT_RTF_UPDATE_BATCHES_TASK_CLASS =
+	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
+	"	('4FF8821E-D98A-4B45-AD1A-5E7F62621581', 'RTF: Update batches') \r\n";
+
 static const string gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE = 
 	"	SELECT [sc].[ID] "
 	"		,[sc].[CounterName] "

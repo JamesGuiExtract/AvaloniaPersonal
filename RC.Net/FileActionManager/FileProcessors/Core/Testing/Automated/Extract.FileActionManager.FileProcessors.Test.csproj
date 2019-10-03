@@ -68,6 +68,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestProcessRichTextBatchesTask.cs" />
     <Compile Include="TestDisplaysUI.cs" />
     <Compile Include="FileProcessingTaskTester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -216,27 +217,20 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\LabDE-Inline-BadSchema.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\LabDE-Inline.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\FlexIndex-BadSyntax.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\FlexIndex-Inline-WrongSchema.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\FlexIndex.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\LabDE-Inline-BadSchema.xml" />
+    <EmbeddedResource Include="Resources\LabDE-Inline.xml" />
+    <EmbeddedResource Include="Resources\FlexIndex-BadSyntax.xml" />
+    <EmbeddedResource Include="Resources\FlexIndex-Inline-WrongSchema.xml" />
+    <EmbeddedResource Include="Resources\FlexIndex.xml" />
     <EmbeddedResource Include="Resources\TestSplitMultipageFile.bak" />
     <EmbeddedResource Include="Resources\C413.tif.uss" />
     <EmbeddedResource Include="Resources\C413.tif.voa" />
-  </ItemGroup>
-  <ItemGroup>
+    <EmbeddedResource Include="Resources\BatchWithSimpleContent.txt" />
+    <EmbeddedResource Include="Resources\BatchWithPipeInContent.txt" />
+    <EmbeddedResource Include="Resources\BatchWithInvalidContent.txt" />
     <EmbeddedResource Include="Resources\C413.tif" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

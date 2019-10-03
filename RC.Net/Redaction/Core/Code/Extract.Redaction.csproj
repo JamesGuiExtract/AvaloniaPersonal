@@ -68,6 +68,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Extract.Licensing" />
+    <Reference Include="protobuf-net, Version=2.4.0.0, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <HintPath>..\..\..\APIs\protobuf-net.2.4.0\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -80,6 +83,8 @@
   <ItemGroup>
     <Compile Include="AutoTool.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Davidson.BatchFileItem.cs" />
+    <Compile Include="Davidson.RichTextFormatBatchProcessor.cs" />
     <Compile Include="VerificationModeSetting.cs" />
     <Compile Include="VOAFileMergeTaskSettings.cs" />
     <Compile Include="VOAFileMergeTaskSettingsDialog.cs">

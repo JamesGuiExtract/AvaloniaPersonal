@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Extract.Utilities.Parsers
 {
@@ -19,6 +20,8 @@ namespace Extract.Utilities.Parsers
             | (?'CloseBrace'[}])
             | [\r\n]+
             | (?'Literal'.)";
+
+        static readonly ThreadLocal<Regex> _tokenMatcher = new ThreadLocal<Regex>(() => new Regex(_TOKEN));
 
         // "destination" control words
         static readonly HashSet<string> DESTINATIONS = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -95,7 +98,7 @@ namespace Extract.Utilities.Parsers
             int curskip = 0;// Number of ASCII characters left to skip
             StringBuilder builder = new StringBuilder();
 
-            foreach (Match match in Regex.Matches(input, _TOKEN))
+            foreach (Match match in _tokenMatcher.Value.Matches(input))
             {
                 try
                 {

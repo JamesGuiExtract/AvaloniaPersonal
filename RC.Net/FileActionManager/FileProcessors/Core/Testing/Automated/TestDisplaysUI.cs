@@ -47,6 +47,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             { "Core: Modify PDF file", "Extract.FileActionManager.FileProcessors.ModifyPdfFileTask" },
             { "Core: Extract image area", "Extract.FileActionManager.FileProcessors.ExtractImageAreaTask" },
             { "Core: Encrypt/decrypt file", "Extract.FileActionManager.FileProcessors.EncryptDecryptFileTask" },
+            { "RTF: Process batches", "Extract.FileActionManager.FileProcessors.ProcessRichTextBatchesTask" },
             { "Redaction: Create metadata XML", "Extract.Redaction.MetadataTask" },
             { "Redaction: Filter ID Shield data file", "RedactionCustomComponents.FilterIDShieldDataFileTask.1" },
             { "Core: Apply Bates number", "Extract.FileActionManager.FileProcessors.ApplyBatesNumberTask" },

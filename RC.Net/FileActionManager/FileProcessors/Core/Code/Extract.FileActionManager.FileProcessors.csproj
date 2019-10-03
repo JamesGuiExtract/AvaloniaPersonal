@@ -92,6 +92,7 @@
       <HintPath>..\..\..\..\APIs\Divelements\SandDock\bin\SandDock.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -162,6 +163,13 @@
     </Compile>
     <Compile Include="SetMetadataTaskSettingsDialog.Designer.cs">
       <DependentUpon>SetMetadataTaskSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProcessRichTextBatchesTask.cs" />
+    <Compile Include="ProcessRichTextBatchesTaskSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProcessRichTextBatchesTaskSettingsDialog.Designer.cs">
+      <DependentUpon>ProcessRichTextBatchesTaskSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="StoreAttributesInDBTask.cs" />
     <Compile Include="SplitMultipageDocumentTaskSettingsDialog.cs">
@@ -337,6 +345,10 @@
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Redaction\Core\Code\Extract.Redaction.csproj">
+      <Project>{44b108a6-5a58-4f2c-8126-baf763a304bf}</Project>
+      <Name>Extract.Redaction</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
@@ -489,6 +501,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SplitMultipageDocumentTaskSettingsDialog.resx">
       <DependentUpon>SplitMultipageDocumentTaskSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProcessRichTextBatchesTaskSettingsDialog.resx">
+      <DependentUpon>ProcessRichTextBatchesTaskSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="StoreAttributesInDBTaskSettingsDialog.resx">
       <DependentUpon>StoreAttributesInDBTaskSettingsDialog.cs</DependentUpon>

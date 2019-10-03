@@ -1982,6 +1982,8 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 		vecQueries.push_back(gstrSPLIT_MULTI_PAGE_DOCUMENT_TASK_CLASS);
 		vecQueries.push_back(gstrINSERT_TASKCLASS_WEB_VERIFICATION);
 		vecQueries.push_back(gstrINSERT_AUTO_PAGINATE_TASK_CLASS);
+		vecQueries.push_back(gstrINSERT_RTF_SPLIT_BATCHES_TASK_CLASS);
+		vecQueries.push_back(gstrINSERT_RTF_UPDATE_BATCHES_TASK_CLASS);
 
 		// Initialize the DB Info settings if necessary
 		if (bInitializeUserTables)
