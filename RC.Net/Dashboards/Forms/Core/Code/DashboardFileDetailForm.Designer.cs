@@ -47,7 +47,7 @@
             this._loadingLabel = new System.Windows.Forms.TextBox();
             this._loadProgressBar = new System.Windows.Forms.ProgressBar();
             this.dataGridView = new System.Windows.Forms.DataGridView();
-            this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
+            this._imageViewer = new Extract.Imaging.Forms.DocumentViewer();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._searchForImagesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -1006,7 +1006,7 @@
         #endregion
 
         private System.Windows.Forms.ToolStripContainer _toolStripContainer;
-        private Extract.Imaging.Forms.ImageViewer _imageViewer;
+        private Extract.Imaging.Forms.DocumentViewer _imageViewer;
         private System.Windows.Forms.MenuStrip _menuStrip;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
