@@ -379,7 +379,7 @@ namespace Extract.ETL
                 }
 
                 // Get the maximum File task session id available
-                Int32 maxFileTaskSession = MaxReportableFileTaskSessionId();
+                Int32 maxFileTaskSession = MaxReportableFileTaskSessionId(false);
 
                 cancelToken.ThrowIfCancellationRequested();
 

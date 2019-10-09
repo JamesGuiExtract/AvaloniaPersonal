@@ -762,8 +762,9 @@ namespace Extract.ETL
         /// This is either 1 less than the minimum row belonging to an ActiveFAM that does not have
         /// a DateTimeStamp assigned, or the maximum FileTaskSession ID if no active session exists.
         /// </summary>
+        /// <param name="onlyTasksStoringAttributes">This will restrict the file task sessions to those for the Store/Retrieve task and web verification</param>
         /// <returns></returns>
-        protected int MaxReportableFileTaskSessionId(bool storeTaskOnly = false)
+        protected int MaxReportableFileTaskSessionId(bool onlyTasksStoringAttributes)
         {
             try
             {
@@ -782,9 +783,10 @@ namespace Extract.ETL
                                 LEFT JOIN ActiveFAM ON FAMSession.ID = ActiveFAM.FAMSessionID 
                         ";
 
-                        if (storeTaskOnly)
+                        if (onlyTasksStoringAttributes)
                         {
-                            cmd.CommandText += "WHERE TaskClass.GUID = 'B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006'";
+                            cmd.CommandText += 
+                                "WHERE TaskClass.GUID in ('B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006', 'FD7867BD-815B-47B5-BAF4-243B8C44AABB')";
                         }
                         var result = cmd.ExecuteScalar();
                         

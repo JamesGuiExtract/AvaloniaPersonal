@@ -108,7 +108,7 @@ namespace Extract.ETL
                 	SELECT FileTaskSession.ID FileTaskSessionID, FileID, FileTaskSession.DateTimeStamp
                 	FROM FileTaskSession INNER JOIN TaskClass ON FileTaskSession.TaskClassID = TaskClass.ID
                 	WHERE FileTaskSession.ID > @LastProcessedID AND FileTaskSession.ID <= @LastInBatchID
-                        AND TaskClass.GUID = 'B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006'
+                        AND TaskClass.GUID IN ('B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006', 'FD7867BD-815B-47B5-BAF4-243B8C44AABB')
                 )
                 
                 INSERT INTO @FilesTable

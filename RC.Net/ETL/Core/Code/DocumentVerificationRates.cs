@@ -220,7 +220,7 @@ namespace Extract.ETL
                 {
                     ResetStatistics();
                 }
-                int maxFileTaskSession = MaxReportableFileTaskSessionId();
+                int maxFileTaskSession = MaxReportableFileTaskSessionId(false);
 
 
                 while (_status.LastFileTaskSessionIDProcessed < maxFileTaskSession)

@@ -219,7 +219,7 @@ namespace Extract.ETL
                 RefreshStatus();
                 ExtractException.Assert("ELI46586", "Status cannot be null", _status != null);
 
-                int maxReportableFileTaskSession = MaxReportableFileTaskSessionId();
+                int maxReportableFileTaskSession = MaxReportableFileTaskSessionId(true);
 
                 while (LastFileTaskSessionIDProcessed < maxReportableFileTaskSession)
                 {
