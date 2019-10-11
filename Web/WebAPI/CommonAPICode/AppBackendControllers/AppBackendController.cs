@@ -64,6 +64,41 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
+        /// API call to change a user's password.
+        
+        /// </summary>
+        /// <param name="oldPassword">The old password</param>
+        /// <param name="newPassword">The New password</param>
+        /// <returns>Returns status OK if successful</returns>
+        [HttpPost("ChangePassword")]
+        [Authorize]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        public IActionResult ChangePassword(string oldPassword, string newPassword)
+        {
+            try
+            {
+                var requireSession = User.GetClaim(_FAM_SESSION_ID) != "0";
+                using (var data = new DocumentData(User, requireSession))
+                {
+                    if (requireSession)
+                    {
+                        data.ChangePassword(User.GetUsername(), oldPassword, newPassword);
+                        return Ok();
+                    }
+                    else
+                    {
+                        throw new HTTPError("ELI48437", "A session token is required to change your password");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI48436");
+            }
+        }
+
+        /// <summary>
         /// Logs out, thereby ending the session established by Login.
         /// </summary>
         [HttpPost("Logout")]

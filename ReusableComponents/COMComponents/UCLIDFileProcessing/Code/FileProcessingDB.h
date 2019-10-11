@@ -168,6 +168,7 @@ public:
 	STDMETHOD(GetActionID)(BSTR bstrActionName, long* pnActionID);
 	STDMETHOD(ResetDBConnection)(VARIANT_BOOL bResetCredentials, VARIANT_BOOL vbCheckForUnnaffiliatedFiles);
 	STDMETHOD(SetNotificationUIWndHandle)(long nHandle);
+	STDMETHOD(ChangePassword)(BSTR userName, BSTR oldPassword, BSTR newPassword);
 	STDMETHOD(ShowLogin)(VARIANT_BOOL bShowAdmin, VARIANT_BOOL* pbLoginCancelled, 
 		VARIANT_BOOL* pbLoginValid);
 	STDMETHOD(get_DBSchemaVersion)(LONG* pVal);

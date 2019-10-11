@@ -745,6 +745,29 @@ STDMETHODIMP CFileProcessingDB::SetNotificationUIWndHandle(long nHandle)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14989")
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::ChangePassword(BSTR userName, BSTR oldPassword, BSTR newPassword)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		bool LoginValid = isPasswordValid(asString(oldPassword), false);
+
+		if (!LoginValid)
+		{
+			UCLIDException uex("ELI48433",
+				"The provided password was invalid.");
+			uex.addDebugInfo("User Name", userName);
+			throw uex;
+		}
+		
+		encryptAndStoreUserNamePassword(asString(userName), asString(newPassword), false);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI48434");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL* pbLoginCancelled, 
 											   VARIANT_BOOL* pbLoginValid)
 {

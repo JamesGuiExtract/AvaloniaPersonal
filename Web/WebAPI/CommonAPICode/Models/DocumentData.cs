@@ -241,6 +241,21 @@ namespace WebAPI.Models
         }
 
         /// <summary>
+        /// Allows a user to change their password.
+        /// </summary>
+        public void ChangePassword(string userName, string oldPassword, string newPassword)
+        {
+            try
+            {
+                FileApi.FileProcessingDB.ChangePassword(userName, oldPassword, newPassword);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
         /// Gets a page of queued/skipped files for the workflow's Edit action
         /// </summary>
         /// <param name="userName">The currently logged in user's name</param>
@@ -1447,10 +1462,9 @@ namespace WebAPI.Models
                     pages = uss == null ? null : Enumerable.Repeat(uss, 1);
                 }
 
-                if (pages == null)
-                {
-                    return new DocumentDataResult();
-                }
+                HTTPError.Assert("ELI48438", StatusCodes.Status404NotFound,
+                    pages != null,
+                    "No USS file found for the file: " + GetSourceFileName(docID));
 
                 var query = searchParameters.Query;
                 if (searchParameters.QueryType == QueryType.Literal)

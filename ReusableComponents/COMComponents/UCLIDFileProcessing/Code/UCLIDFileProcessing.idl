@@ -2068,6 +2068,9 @@ library UCLID_FILEPROCESSINGLib
 		// Returns the number of skipped files for the user
 		[id(201), helpstring("method GetNumberSkippedForUser")] HRESULT GetNumberSkippedForUser([in] BSTR bstrUserName, [in] long nActionID,
 			[in] VARIANT_BOOL bRevertTimedOutFAMs, [out, retval] long* pnFilesSkipped);
+		// -----------------------------------------------------------------------------------------------
+		// Change the password of a user
+		[id(202), helpstring("method ChangePassword")] HRESULT ChangePassword([in] BSTR userName, BSTR oldPassword, [in] BSTR newPassword);
 	};
 
 	[

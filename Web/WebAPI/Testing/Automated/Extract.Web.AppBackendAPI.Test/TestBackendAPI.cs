@@ -187,6 +187,80 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
+        public static void ChangePassword()
+        {
+            string dbName = "AppBackendAPI_Test_ChangePassword";
+
+            try
+            {
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+
+                LogInToWebApp(controller, user);
+
+                var result = controller.ChangePassword("123", "F1234567");
+                result.AssertResultCode(200, "Failed to change password");
+                controller.Logout();
+                user.Password = "F1234567";
+
+                LogInToWebApp(controller, user);
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void ChangePasswordNoSessionToken()
+        {
+            string dbName = "AppBackendAPI_Test_ChangePassword";
+
+            try
+            {
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+
+                controller.Login(user);
+
+                var result = controller.ChangePassword("123", "F1234567");
+                result.AssertResultCode(500, "You should not be able to change your password without a session token");
+                controller.Logout();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void ChangePasswordInvalidPassword()
+        {
+            string dbName = "AppBackendAPI_Test_ChangePasswordInvalidPassword";
+
+            try
+            {
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+
+                LogInToWebApp(controller, user);
+
+                var result = controller.ChangePassword("a", "F1234567");
+                result.AssertResultCode(500, "Attempting to change a password with an invalid password should yield a failure");
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
         public static void GetNullMetadataValue()
         {
             string dbName = "AppBackendAPI_Test_GetNullMetadataValue";
@@ -1160,6 +1234,32 @@ namespace Extract.Web.WebAPI.Test
                 Assert.That(res.Attributes.TrueForAll(attribute => attribute.Value == "Doe" || attribute.Value == "due"));
 
                 controller.Logout().AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void PostSearchNoUSS()
+        {
+            string dbName = "AppBackendAPI_Test_PostSearch";
+
+            try
+            {
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName);
+                var docID = 2;
+
+                LogInToWebApp(controller, user);
+                OpenDocument(controller, docID);
+
+                // Literal, ignore case
+                var result = controller.PostSearch(docID, new SearchParameters { Query = "DOE", QueryType = QueryType.Literal, CaseSensitive = false, PageNumber = null, ResultType = "Name" });
+                result.AssertResultCode(400, "An error is expected with no uss file");
             }
             finally
             {
