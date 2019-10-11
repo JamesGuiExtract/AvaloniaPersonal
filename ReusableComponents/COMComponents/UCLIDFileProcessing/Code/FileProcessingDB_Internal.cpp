@@ -1646,6 +1646,8 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_ACTION_INDEX);
 		vecQueries.push_back(gstrCREATE_PAGINATION_DESTFILE_INDEX);
 		vecQueries.push_back(gstrCREATE_PAGINATION_SOURCEFILE_INDEX);
+		vecQueries.push_back(gstrCREATE_FAMSESSION_ID_FAMUSERID_INDEX);
+		vecQueries.push_back(gstrCREATE_FILETASKSESSION_DATETIMESTAMP_WITH_INCLUDES_INDEX);
 
 		// Add user-table specific indices if necessary.
 		if (bAddUserTables)
@@ -1982,7 +1984,7 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 		vecQueries.push_back(gstrSPLIT_MULTI_PAGE_DOCUMENT_TASK_CLASS);
 		vecQueries.push_back(gstrINSERT_TASKCLASS_WEB_VERIFICATION);
 		vecQueries.push_back(gstrINSERT_AUTO_PAGINATE_TASK_CLASS);
-		vecQueries.push_back(gstrINSERT_RTF_SPLIT_BATCHES_TASK_CLASS);
+		vecQueries.push_back(gstrINSERT_RTF_DIVIDE_BATCHES_TASK_CLASS);
 		vecQueries.push_back(gstrINSERT_RTF_UPDATE_BATCHES_TASK_CLASS);
 
 		// Initialize the DB Info settings if necessary

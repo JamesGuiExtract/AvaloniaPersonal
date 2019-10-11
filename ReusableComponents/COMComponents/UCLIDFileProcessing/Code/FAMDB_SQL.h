@@ -606,6 +606,28 @@ static const string gstrCREATE_WORKFLOWCHANGEFILE_INDEX =
 "CREATE UNIQUE NONCLUSTERED INDEX [IX_WorkflowChangeFileUnique] "
 	"ON [dbo].[WorkflowChangeFile] ([FileID] ASC, [WorkflowChangeID] ASC, [SourceActionID] ASC)";
 
+static const string gstrCREATE_FAMSESSION_ID_FAMUSERID_INDEX =
+"IF EXISTS(SELECT * FROM sys.indexes WHERE name = 'IX_FAMSession_ID_FAMUserID' AND object_id = OBJECT_ID('FAMSession')) \r\n"
+"BEGIN \r\n"
+"	DROP INDEX [IX_FAMSession_ID_FAMUserID] ON [dbo].[FAMSession] \r\n"
+"END \r\n"
+"CREATE NONCLUSTERED INDEX [IX_FAMSession_ID_FAMUserID] ON [dbo].[FAMSession] ( \r\n"
+"	[ID] ASC \r\n"
+"	, [FAMUserID] ASC \r\n"
+") \r\n";
+
+static const string gstrCREATE_FILETASKSESSION_DATETIMESTAMP_WITH_INCLUDES_INDEX =
+"IF EXISTS(SELECT * FROM sys.indexes WHERE name = 'IX_FileTaskSession_DateTimeStamp_withIncludes ' AND object_id = OBJECT_ID('FileTaskSession')) \r\n"
+"BEGIN \r\n"
+"	DROP INDEX [IX_FileTaskSession_DateTimeStamp_withIncludes ] ON [dbo].[FileTaskSession] \r\n"
+"END \r\n"
+"CREATE NONCLUSTERED INDEX IX_FileTaskSession_DateTimeStamp_withIncludes ON[dbo].[FileTaskSession]([DateTimeStamp]) \r\n"
+"INCLUDE( \r\n"
+"	[FAMSessionID] \r\n"
+"	, [TaskClassID] \r\n"
+"	, [ActivityTime] \r\n"
+") \r\n";
+
 // Add foreign keys SQL
 static const string gstrADD_ACTION_WORKFLOW_FK =
 	"ALTER TABLE dbo.[Action] "
@@ -1918,9 +1940,9 @@ static const string gstrINSERT_AUTO_PAGINATE_TASK_CLASS =
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
 	"	('8ECBCC95-7371-459F-8A84-A2AFF7769800', 'Pagination: Auto-Paginate') \r\n";
 
-static const string gstrINSERT_RTF_SPLIT_BATCHES_TASK_CLASS =
+static const string gstrINSERT_RTF_DIVIDE_BATCHES_TASK_CLASS =
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
-	"	('5F37ABA6-7D18-4AB9-9ABE-79CE0F49C903', 'RTF: Split batches') \r\n";
+	"	('5F37ABA6-7D18-4AB9-9ABE-79CE0F49C903', 'RTF: Divide batches') \r\n";
 
 static const string gstrINSERT_RTF_UPDATE_BATCHES_TASK_CLASS =
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
