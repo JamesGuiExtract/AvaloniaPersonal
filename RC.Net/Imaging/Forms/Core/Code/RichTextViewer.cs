@@ -1108,9 +1108,6 @@ namespace Extract.Imaging.Forms
         /// </returns>
         public Cursor GetSelectionCursor(int mouseX, int mouseY)
         {
-            // Get the point for the mouse position
-            Point mousePoint = new Point(mouseX, mouseY);
-
             // The mouse is not over any layer object
             return Cursors.Default;
         }
