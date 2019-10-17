@@ -1259,7 +1259,7 @@ namespace Extract.Web.WebAPI.Test
 
                 // Literal, ignore case
                 var result = controller.PostSearch(docID, new SearchParameters { Query = "DOE", QueryType = QueryType.Literal, CaseSensitive = false, PageNumber = null, ResultType = "Name" });
-                result.AssertResultCode(400, "An error is expected with no uss file");
+                result.AssertResultCode(404, "An error is expected with no uss file");
             }
             finally
             {
