@@ -1234,6 +1234,10 @@ namespace Extract.Imaging.Forms
         // Suspend painting while updating text/background colors to make these operations quick and smooth
         private void Draw(Action drawAction)
         {
+            // Don't do any updating if this control isn't supposed to be doing things
+            // https://extract.atlassian.net/browse/ISSUE-16707
+            if (!Visible) return;
+
             try
             {
                 Suspend();
@@ -1331,7 +1335,7 @@ namespace Extract.Imaging.Forms
             }
             else
             {
-                throw new ExtractException("ELI48363", "Logic error, string lengths don't match");
+                throw new ExtractException("ELI48363", "Logic error: Spatial string text doesn't match original text");
             }
 
             // Get letters all at once because getting a COM class for each letter is very slow, resulting in long load times for large text files
