@@ -18,7 +18,6 @@ namespace WebAPI.Controllers
     /// Backed API support for web verification applications.
     /// </summary>
     [Route("api/[controller]")]
-    [EnableCors("AllowAll")]
     [BindRequired]
     public class AppBackendController : Controller
     {
@@ -63,9 +62,40 @@ namespace WebAPI.Controllers
             }
         }
 
+        [HttpPost("WindowsLogin")]
+        [ProducesResponseType(200, Type = typeof(LoginToken))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        public IActionResult WindowsLogin([FromBody] User user)
+        {
+            try
+            {
+                user.Username = this.User.Identity.Name;
+                HTTPError.AssertRequest("ELI45183", !string.IsNullOrEmpty(user.Username), "Username is empty");
+
+                // The user may have specified a workflow - if so then ensure that the API context uses
+                // the specified workflow.
+                var context = LoginContext(user.WorkflowName);
+                using (var userData = new UserData(context))
+                using (var data = new DocumentData(context))
+                {
+                    userData.CheckIfUserExists(user);
+
+                    // Token is specific to user and FAMSessionId
+                    var token = AuthUtils.GenerateToken(user, context);
+
+                    return Ok(token);
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI45188");
+            }
+        }
+
         /// <summary>
         /// API call to change a user's password.
-        
+
         /// </summary>
         /// <param name="oldPassword">The old password</param>
         /// <param name="newPassword">The New password</param>
