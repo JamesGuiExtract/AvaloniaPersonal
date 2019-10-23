@@ -535,6 +535,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
+                Text = "";
                 ImageFile = "";
                 LayerObjects = LayerObjectsCollection.CreateLayerObjectsWithSelection();
                 ImageFileChanged?.Invoke(this, new ImageFileChangedEventArgs(""));
