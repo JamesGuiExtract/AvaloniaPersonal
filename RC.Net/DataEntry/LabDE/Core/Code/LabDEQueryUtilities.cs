@@ -500,7 +500,9 @@ namespace Extract.DataEntry.LabDE
                     }
                 }
 
-                return resultsTable.ToStringArray(", ");
+                // Use checkForExistingSeparators=true so that values with commas in them get quoted
+                // https://extract.atlassian.net/browse/ISSUE-16734
+                return resultsTable.ToStringArray(", ", checkForExistingSeparators: true);
             }
             catch (Exception ex)
             {
