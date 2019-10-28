@@ -66,6 +66,19 @@ namespace WebAPI
         {
             try
             {
+                // In order to allow one web page (such as a web application) to in turn call this
+                // web-service, cross-origin requests (CORS) are required.
+                // https://docs.microsoft.com/en-us/aspnet/core/security/cors
+                // https://stackoverflow.com/questions/44379560/how-to-enable-cors-in-asp-net-core-webapi
+                // https://extract.atlassian.net/browse/ISSUE-15077
+                services.AddCors(
+                    options => options.AddPolicy("AllowAll",
+                        builder => builder
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials()));
+
                 // The ApplicationPartManager and ActionContextAccessor are need by Swashbuckle/Swagger
                 var manager = new ApplicationPartManager();
                 manager.ApplicationParts.Add(new AssemblyPart(typeof(Startup).Assembly));
