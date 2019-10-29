@@ -655,6 +655,41 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
+        /// Saves the document data.
+        /// </summary>
+        /// <param name="docID">The document ID that the data is for</param>
+        /// <param name="page"></param>
+        /// <param name="documentData">The document data.</param>
+        /// <returns></returns>
+        [HttpPut("DocumentData/{docID}")]
+        [Authorize]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        public IActionResult SaveDocumentData(int docID, [FromBody] DocumentDataInput documentData)
+        {
+            try
+            {
+                ExtractException.Assert("ELI46734", "SaveDocumentData requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
+                using (var data = new DocumentData(User, requireSession: true))
+                {
+                    ExtractException.Assert("ELI46699", "The supplied document ID doesn't match the open session's document ID",
+                        docID == data.DocumentSessionFileId);
+
+                    data.PutDocumentResultSet(data.DocumentSessionFileId, documentData);
+
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI45271");
+            }
+        }
+
+        /// <summary>
         /// Gets the metadata field for a document.
         /// </summary>
         /// <param name="docID">The document to obtain the metadatafield for</param>
@@ -758,40 +793,6 @@ namespace WebAPI.Controllers
             catch (Exception ex)
             {
                 return this.GetAsHttpError(ex, "ELI46750");
-            }
-        }
-
-        /// <summary>
-        /// Saves the document data.
-        /// </summary>
-        /// <param name="docID">The document ID that the data is for</param>
-        /// <param name="documentData">The document data.</param>
-        /// <returns></returns>
-        [HttpPut("DocumentData/{docID}")]
-        [Authorize]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400, Type = typeof(ErrorResult))]
-        [ProducesResponseType(401)]
-        public IActionResult SaveDocumentData(int docID, [FromBody] DocumentDataInput documentData)
-        {
-            try
-            {
-                ExtractException.Assert("ELI46734", "SaveDocumentData requires an active Session Login token.",
-                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
-
-                using (var data = new DocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI46699", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
-
-                    data.PutDocumentResultSet(data.DocumentSessionFileId, documentData);
-
-                    return NoContent();
-                }
-            }
-            catch (Exception ex)
-            {
-                return this.GetAsHttpError(ex, "ELI45271");
             }
         }
 

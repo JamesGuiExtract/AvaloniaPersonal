@@ -202,9 +202,14 @@ namespace WebAPI
             {
                 yield return attribute;
 
-                foreach (var descendant in Enumerate(attribute.ChildAttributes))
+                // https://extract.atlassian.net/browse/ISSUE-16747
+                // Don't require input JSON to specify childAttributes.
+                if (attribute.ChildAttributes != null)
                 {
-                    yield return descendant;
+                    foreach (var descendant in Enumerate(attribute.ChildAttributes))
+                    {
+                        yield return descendant;
+                    }
                 }
             }
         }

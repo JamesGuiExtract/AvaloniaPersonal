@@ -368,12 +368,13 @@ public:
 	STDMETHOD(IsFAMSessionOpen)(long nFAMSessionID, VARIANT_BOOL* pbIsFAMSessionOpen);
 	STDMETHOD(GetNumberSkippedForUser)(BSTR bstrUserName, long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, long* pnFilesSkipped);
 	STDMETHOD(CacheFileTaskSessionData)(long nFileTaskSessionID, long nPage, 
-		SAFEARRAY *parrayImageData, BSTR bstrUssData, BSTR bstrVoaData, BSTR bstrWordZoneData, BSTR bstrException);
+		SAFEARRAY *parrayImageData, BSTR bstrUssData, BSTR bstrWordZoneData, BSTR bstrAttributeData, BSTR bstrException,
+		VARIANT_BOOL* pbWroteData);
 	STDMETHOD(GetCachedFileTaskSessionData)(long nFileTaskSessionID, long nPage,
-		ECachedDataRequest eCacheRequest,
-		SAFEARRAY** pparrayCachedPages,
-		SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrVoaData, BSTR* pbstrWordZoneData, BSTR* pbstrException,
+		ECacheDataType eDataType,
+		SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* bstrAttributeData, BSTR* pbstrException,
 		VARIANT_BOOL* pbFoundCacheData);
+	STDMETHOD(GetCachedPageNumbers)(long nFileTaskSessionID, ECacheDataType eDataType, SAFEARRAY** parrayCachedPages);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1498,8 +1499,8 @@ private:
 	bool AbortFAMSession_Internal(bool bDBLocked, long nFAMSessionID);
 	bool MarkFileDeleted_Internal(bool bDBLocked, long nFileID, long nWorkflowID);
 	bool CacheFileTaskSessionData_Internal(bool bDBLocked, long nFileTaskSessionID,
-		long nPage, SAFEARRAY* parrayImageData, BSTR bstrUssData, BSTR bstrVoaData, BSTR bstrWordZoneData,
-		BSTR bstrException);
+		long nPage, SAFEARRAY* parrayImageData, BSTR bstrUssData, BSTR bstrWordZoneData, BSTR bstrAttributeData,
+		BSTR bstrException, VARIANT_BOOL* pbWroteData);
 	void InvalidatePreviousCachedInfoIfNecessary();
 	void setDefaultSessionMemberValues();
 };

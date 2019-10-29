@@ -3,6 +3,7 @@ using Extract.Testing.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -237,7 +238,7 @@ namespace Extract.Web.WebAPI.Test
                 for (int i = 1; i <= 10; ++i)
                 {
                     var statusResult = controller.GetStatus(i).AssertGoodResult<ProcessingStatusResult>();
-                    Assert.IsTrue(statusResult.DocumentStatus == DocumentProcessingStatus.Processing, 
+                    Assert.IsTrue(statusResult.DocumentStatus == DocumentProcessingStatus.Processing,
                         "Unexpected processing state");
                 }
             }
@@ -470,7 +471,7 @@ namespace Extract.Web.WebAPI.Test
             string dbName = "DocumentAPI_Test_GetTextResult";
 
             try
-            {   
+            {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
                     InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
@@ -510,13 +511,13 @@ namespace Extract.Web.WebAPI.Test
                     {
                         case 6:
                         case 8:
-                        Assert.IsTrue(Utils.IsEquivalent(textResult.Text, "NonLab"),
-                            "Document type expected to be NonLab, is: {0}", textResult.Text);
+                            Assert.IsTrue(Utils.IsEquivalent(textResult.Text, "NonLab"),
+                                "Document type expected to be NonLab, is: {0}", textResult.Text);
                             break;
 
                         default:
-                        Assert.IsTrue(Utils.IsEquivalent(textResult.Text, "Unknown"),
-                            "Document type expected to be Unknown, is: {0}", textResult.Text);
+                            Assert.IsTrue(Utils.IsEquivalent(textResult.Text, "Unknown"),
+                                "Document type expected to be Unknown, is: {0}", textResult.Text);
                             break;
                     }
                 }
@@ -682,6 +683,46 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual(1450, bounds.Top, "Incorrect top boundary");
                 Assert.AreEqual(2000, bounds.Right, "Incorrect right boundary");
                 Assert.AreEqual(1550, bounds.Bottom, "Incorrect bottom boundary");
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        /// <summary>
+        /// Test IDShield documents
+        /// Tests https://extract.atlassian.net/browse/ISSUE-16747
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void Test_PutMinimalDocumentData()
+        {
+            string dbName = "DocumentAPI_Test_PutMinimalDocumentData";
+
+            try
+            {
+                (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
+                    InitializeAndLogin("Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
+
+                var testFilename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001);
+                var ussFilename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001_USS);
+
+                int fileId = 1;
+
+                var minimalAttributeData = JsonConvert.DeserializeObject<DocumentDataInput>(
+                    "{\"attributes\": [ {\"name\": \"DocumentType\",\"value\": \"Minimal\"}]}");
+
+                controller.PutDocumentData(fileId, minimalAttributeData)
+                    .AssertGoodResult<NoContentResult>();
+
+                var data = controller.GetDocumentData(fileId)
+                    .AssertGoodResult<DocumentDataResult>();
+
+                Assert.AreEqual("Minimal", data.Attributes
+                    .Single()
+                    .Value, 
+                    "Incorrect attribute value");
             }
             finally
             {

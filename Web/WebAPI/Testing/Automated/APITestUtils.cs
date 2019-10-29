@@ -186,34 +186,31 @@ namespace Extract.Web.WebAPI.Test
         }
 
         /// <summary>
-        /// Gets a list of pages that have been cached
+        /// Gets an array of pages numbers for which image data has been cached.
         /// </summary>
-        /// <param name="controller">The controller for which the cached page list should be retrieved.</param>
+        /// <param name="controller">The controller for which the cached page array should be retrieved.</param>
         /// <param name="fileProcessingDB">The database hosting the cache.</param>
         /// <returns>An array of the page numbers for which data has been cached.</returns>
-        public static int[] GetCachedPages(this ControllerBase controller,
-            FileProcessingDB fileProcessingDB)
+        public static int[] GetCachedImagePageNumbers(this ControllerBase controller, FileProcessingDB fileProcessingDB)
         {
             int fileTaskSessionId = controller.GetActiveDocumentSessionId();
 
-            fileProcessingDB.GetCachedFileTaskSessionData(fileTaskSessionId, -1,
-                ECachedDataRequest.kCachedPageList,
-                    out Array cachedPages, out _, out _, out _, out _, out string stringizedException);
+            var cachedPages = fileProcessingDB.GetCachedPageNumbers(fileTaskSessionId,
+                ECacheDataType.kImage);
 
             return (int[])cachedPages;
         }
 
         /// <summary>
-        /// Gets a list of pages that have been cached
+        /// Gets an array of page numbers for which image data has been cached
         /// </summary>
         /// <param name="fileProcessingDB">The database hosting the cache.</param>
         /// <param name="fileTaskSessionId">The document session ID for which to check for cached data.</param>
         /// <returns>An array of the page numbers for which data has been cached.</returns>
-        public static int[] GetCachedPages(this FileProcessingDB fileProcessingDB, int fileTaskSessionId)
+        public static int[] GetCachedImagePageNumbers(this FileProcessingDB fileProcessingDB, int fileTaskSessionId)
         {
-            fileProcessingDB.GetCachedFileTaskSessionData(fileTaskSessionId, -1,
-                ECachedDataRequest.kCachedPageList,
-                    out Array cachedPages, out _, out _, out _, out _, out string stringizedException);
+            var cachedPages = fileProcessingDB.GetCachedPageNumbers(fileTaskSessionId,
+                ECacheDataType.kImage);
 
             return (int[])cachedPages;
         }
@@ -225,31 +222,19 @@ namespace Extract.Web.WebAPI.Test
         /// <param name="controller">The controller for which the cache status should be checked.</param>
         /// <param name="fileProcessingDB">The database hosting the cache.</param>
         /// <param name="page">The page to check</param>
-        /// <param name="checkForWordZoneData"><c>true</c> to check that word zone data is cached; 
-        /// <c>false</c> to check for image data only.</param>
+        /// <param name="dataType">An <see cref="ECacheDataType"/> enum (treated as flags) that specify
+        /// all types of data to check for on the specified page.</param>
         /// <returns><c>true</c> if cached data is found; otherwise <c>false</c>.</returns>
         public static bool IsPageDataCached(this ControllerBase controller,
-            FileProcessingDB fileProcessingDB, int page, bool checkForWordZoneData)
+            FileProcessingDB fileProcessingDB, int page, ECacheDataType dataType)
         {
             try
             {
                 int fileTaskSessionId = controller.GetActiveDocumentSessionId();
 
-                bool pageIsCached = fileProcessingDB.GetCachedFileTaskSessionData(fileTaskSessionId, page,
-                    ECachedDataRequest.kCachedImage | ECachedDataRequest.kCachedWordZone,
-                        out Array cachedPages, out Array imageData, out _, out _, out string wordZoneJson, out string stringizedException);
+                var cachedPages = (int[])fileProcessingDB.GetCachedPageNumbers(fileTaskSessionId, dataType);
 
-                if (imageData == null || imageData.Length == 0)
-                {
-                    throw new ExtractException("ELI49444", "Image cache failure");
-                }
-
-                if (checkForWordZoneData && string.IsNullOrWhiteSpace(wordZoneJson))
-                {
-                    throw new ExtractException("ELI49445", "Word zone cache failure");
-                }
-
-                return pageIsCached;
+                return cachedPages.Contains(page);
             }
             catch (Exception ex)
             {

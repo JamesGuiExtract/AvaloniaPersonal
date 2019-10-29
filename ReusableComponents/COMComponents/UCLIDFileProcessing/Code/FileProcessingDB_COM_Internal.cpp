@@ -12451,13 +12451,16 @@ bool CFileProcessingDB::MarkFileDeleted_Internal(bool bDBLocked, long nFileID, l
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::CacheFileTaskSessionData_Internal(bool bDBLocked, long nFileTaskSessionID,
-	long nPage, SAFEARRAY* parrayImageData, BSTR bstrUssData, BSTR bstrVoaData, BSTR bstrWordZoneData,
-	BSTR bstrException)
+	long nPage, SAFEARRAY* parrayImageData, BSTR bstrUssData, BSTR bstrWordZoneData, BSTR bstrAttributeData,
+	BSTR bstrException, VARIANT_BOOL *pbWroteData)
 {
 	try
 	{
 		try
 		{
+			ASSERT_ARGUMENT("ELI49464", pbWroteData != __nullptr);
+			*pbWroteData = VARIANT_FALSE;
+
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
@@ -12488,18 +12491,21 @@ bool CFileProcessingDB::CacheFileTaskSessionData_Internal(bool bDBLocked, long n
 				{
 					vecFields.push_back("[USSData]");
 				}
-				if (bstrVoaData != __nullptr)
-				{
-					vecFields.push_back("[VOAData]");
-				}
 				if (bstrWordZoneData != __nullptr)
 				{
 					vecFields.push_back("[WordZoneData]");
+				}
+				if (bstrAttributeData != __nullptr)
+				{
+					vecFields.push_back("[AttributeData]");
 				}
 				if (bstrException != __nullptr)
 				{
 					vecFields.push_back("[Exception]");
 				}
+
+				ASSERT_RUNTIME_CONDITION("ELI49501", vecFields.size() > 0,
+					"No data has been provided for cache");
 
 				string strCursorQuery = gstrGET_FILE_TASK_SESSION_CACHE_DATA_BY_ID;
 				replaceVariable(strCursorQuery, "<ID>", asString(llCacheRowID));
@@ -12508,8 +12514,7 @@ bool CFileProcessingDB::CacheFileTaskSessionData_Internal(bool bDBLocked, long n
 				_RecordsetPtr ipCachedDataRow(__uuidof(Recordset));
 				ASSERT_RESOURCE_ALLOCATION("ELI48308", ipCachedDataRow != __nullptr);
 
-				// adLockPessimistic is necessary to prevent cursor errors here during concurrent
-				// cache operations. Tested by CacheSessionCloseWhileInProgress and 
+				// Concurrent behavior tested by CacheSimultaneousOperations
 				ipCachedDataRow->Open(strCursorQuery.c_str(),
 					_variant_t((IDispatch*)ipConnection, true), adOpenDynamic,
 					adLockOptimistic, adCmdText);
@@ -12535,14 +12540,14 @@ bool CFileProcessingDB::CacheFileTaskSessionData_Internal(bool bDBLocked, long n
 					setStringField(ipCachedDataRow->Fields, "USSData", asString(bstrUssData));
 				}
 
-				if (bstrVoaData != __nullptr)
-				{
-					setStringField(ipCachedDataRow->Fields, "VOAData", asString(bstrVoaData));
-				}
-
 				if (bstrWordZoneData != __nullptr)
 				{
 					setStringField(ipCachedDataRow->Fields, "WordZoneData", asString(bstrWordZoneData));
+				}
+
+				if (bstrAttributeData != __nullptr)
+				{
+					setStringField(ipCachedDataRow->Fields, "AttributeData", asString(bstrAttributeData));
 				}
 
 				if (bstrException != __nullptr)
@@ -12552,6 +12557,8 @@ bool CFileProcessingDB::CacheFileTaskSessionData_Internal(bool bDBLocked, long n
 
 				ipCachedDataRow->Update();
 				ipCachedDataRow->Close();
+
+				*pbWroteData = VARIANT_TRUE;
 			}
 			
 			tg.CommitTrans();

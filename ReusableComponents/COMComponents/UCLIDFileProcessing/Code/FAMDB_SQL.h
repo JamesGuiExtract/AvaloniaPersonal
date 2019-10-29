@@ -371,8 +371,8 @@ static const string gstrCREATE_FILE_TASK_SESSION_CACHE =
 	"[Page] INT NOT NULL, "
 	"[ImageData] VARBINARY(MAX) NULL, "
 	"[USSData] NVARCHAR(MAX) NULL, "
-	"[VOAData] NVARCHAR(MAX) NULL, "
 	"[WordZoneData] NVARCHAR(MAX) NULL, "
+	"[AttributeData] NVARCHAR(MAX) NULL, "
 	"[Exception] NVARCHAR(MAX) NULL)";
 
 static const string gstrCREATE_SECURE_COUNTER =
@@ -2477,8 +2477,12 @@ static const string gstrGET_FILE_TASK_SESSION_CACHE_ROWS =
 	"	WHERE [FileTaskSessionID] = <FileTaskSessionID>";
 
 static const string gstrGET_FILE_TASK_SESSION_CACHE_DATA_BY_PAGE =
-"SELECT <FieldList> FROM [FileTaskSessionCache] \r\n"
-"	WHERE [FileTaskSessionID] = <FileTaskSessionID> AND [Page] = <Page>";
+	"SELECT <FieldList> FROM [FileTaskSessionCache] \r\n"
+	"	WHERE [FileTaskSessionID] = <FileTaskSessionID> AND [Page] = <Page>";
+
+static const string gstrGET_FILE_TASK_SESSION_CACHE_DATA =
+	"SELECT <FieldList> FROM [FileTaskSessionCache] \r\n"
+	"	WHERE [FileTaskSessionID] = <FileTaskSessionID>";
 
 static const string gstrGET_FILE_TASK_SESSION_CACHE_DATA_BY_ID =
 	"SELECT <FieldList> FROM [FileTaskSessionCache] \r\n"

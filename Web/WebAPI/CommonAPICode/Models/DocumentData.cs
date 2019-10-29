@@ -557,6 +557,7 @@ namespace WebAPI.Models
 
                 var results = GetAttributeSetForFile(fileId);
                 var mapper = new AttributeMapper(results, FileApi.Workflow.Type);
+
                 return mapper.MapAttributesToDocumentAttributeSet(
                     includeNonSpatial, verboseSpatialData, splitMultiPageAttributes);
             }
@@ -607,7 +608,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI44889");
+                throw ex.AsExtract("ELI49500");
             }
         }
 
@@ -779,8 +780,8 @@ namespace WebAPI.Models
                 {
                     // First, check to see if word zone data is cached.
                     FileApi.FileProcessingDB.GetCachedFileTaskSessionData(FileApi.DocumentSession.Id, page,
-                        ECachedDataRequest.kCachedWordZone,
-                        out _, out _, out _, out _, out wordZoneDataJson, out _);
+                        ECacheDataType.kWordZone,
+                        out _, out _, out wordZoneDataJson, out _, out _);
                 }
                 catch (Exception ex)
                 {
@@ -1156,13 +1157,12 @@ namespace WebAPI.Models
                 var fileName = GetSourceFileName(fileId);
 
                 // First, check the cache.
-                Array cachedPages = new int[0];
                 Array cachedImageData = new byte[0];
                 try
                 {
                     FileApi.FileProcessingDB.GetCachedFileTaskSessionData(FileApi.DocumentSession.Id, pageNum,
-                        ECachedDataRequest.kCachedPageList | ECachedDataRequest.kCachedImage,
-                        out cachedPages, out cachedImageData, out _, out _, out _, out _);
+                        ECacheDataType.kImage,
+                        out cachedImageData, out _, out _, out _, out _);
                 }
                 catch (Exception ex)
                 {
@@ -1179,6 +1179,9 @@ namespace WebAPI.Models
                 {
                     try
                     {
+                        var cachedPages = UtilityFileProcessingDB.GetCachedPageNumbers(
+                            sessionId, ECacheDataType.kImage);
+
                         // Trigger data cache for the first page and also for the subsequent page
                         // (if not already cached)
                         int[] pagesToCache = (pageNum == 1)
@@ -1213,7 +1216,7 @@ namespace WebAPI.Models
                     }
                 });
 
-                if (cachedImageData != null)
+                if (cachedImageData != null && cachedImageData.Length > 0)
                 {
                     return (byte[])cachedImageData;
                 }
@@ -1638,10 +1641,8 @@ namespace WebAPI.Models
                     try
                     {
                         // Check to be sure cache data doesn't already exist before re-caching.
-                        Array cachedPages;
-                        UtilityFileProcessingDB.GetCachedFileTaskSessionData(documentSessionId, pageNum,
-                            ECachedDataRequest.kCachedPageList,
-                            out cachedPages, out _, out _, out _, out _, out _);
+                        Array cachedPages = UtilityFileProcessingDB.GetCachedPageNumbers(
+                            documentSessionId, ECacheDataType.kImage);
 
                         if (!Array.Exists((int[])cachedPages, x => x == pageNum))
                         {
@@ -1887,7 +1888,7 @@ namespace WebAPI.Models
                 }
 
                 UtilityFileProcessingDB.CacheFileTaskSessionData(documentSessionId, page,
-                    image, stringizedPageUss, null, wordZoneJson, null);
+                    image, stringizedPageUss, wordZoneJson, null, null);
             }
             catch (Exception ex)
             {

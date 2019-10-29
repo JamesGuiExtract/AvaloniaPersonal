@@ -20,6 +20,7 @@
 #include <ADOUtils.h>
 #include <StopWatch.h>
 #include <stringCSIS.h>
+#include <StringTokenizer.h>
 
 #include <atlsafe.h>
 
@@ -4871,20 +4872,21 @@ STDMETHODIMP CFileProcessingDB::GetNumberSkippedForUser(BSTR bstrUserName, long 
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::CacheFileTaskSessionData(long nFileTaskSessionID, long nPage,
-	SAFEARRAY *parrayImageData, BSTR bstrUssData, BSTR bstrVoaData, BSTR bstrWordZoneData, BSTR bstrException)
+	SAFEARRAY *parrayImageData, BSTR bstrUssData, BSTR bstrWordZoneData, BSTR bstrAttributeData, BSTR bstrException,
+	VARIANT_BOOL* pbWroteData)
 {
 	try
 	{
 		validateLicense();
 
 		if (!CacheFileTaskSessionData_Internal(false, nFileTaskSessionID, nPage,
-				parrayImageData, bstrUssData, bstrVoaData, bstrWordZoneData, bstrException))
+				parrayImageData, bstrUssData, bstrWordZoneData, bstrAttributeData, bstrException, pbWroteData))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrCACHE_LOCK);
 
 			CacheFileTaskSessionData_Internal(true, nFileTaskSessionID, nPage,
-				parrayImageData, bstrUssData, bstrVoaData, bstrWordZoneData, bstrException);
+				parrayImageData, bstrUssData, bstrWordZoneData, bstrAttributeData, bstrException, pbWroteData);
 		}
 
 		return S_OK;
@@ -4893,13 +4895,12 @@ STDMETHODIMP CFileProcessingDB::CacheFileTaskSessionData(long nFileTaskSessionID
 }
 //-------------------------------------------------------------------------------------------------
 // Helper function for GetCachedFileTaskSessionData
-bool queryCachedData(_ConnectionPtr ipConnection, long nFileTaskSessionID, long nPage, ECachedDataRequest eCacheRequest,
-	SAFEARRAY** pparrayCachedPages, SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* pbstrVoaData, BSTR* pbstrException);
+bool queryCachedData(_ConnectionPtr ipConnection, long nFileTaskSessionID, long nPage, ECacheDataType eDataType,
+	SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* pbstrAttributeData, BSTR* pbstrException);
 
 STDMETHODIMP CFileProcessingDB::GetCachedFileTaskSessionData(long nFileTaskSessionID, long nPage,
-	ECachedDataRequest eCacheRequest,
-	SAFEARRAY** pparrayCachedPages,
-	SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrVoaData, BSTR* pbstrWordZoneData, BSTR* pbstrException,
+	ECacheDataType eDataType,
+	SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* pbstrAttributeData, BSTR* pbstrException,
 	VARIANT_BOOL* pbFoundCacheData)
 {
 	try
@@ -4922,58 +4923,19 @@ STDMETHODIMP CFileProcessingDB::GetCachedFileTaskSessionData(long nFileTaskSessi
 
 		bool bQueryData = false;
 		bool bFoundCachedData = false;
-		bool bGetCachedPageList = (eCacheRequest & (int)kCachedPageList) != 0;
+		_bstr_t bstrAttributeData("");
 
-		if (nPage < 0 || bGetCachedPageList)
+		ASSERT_RUNTIME_CONDITION("ELI49497", nPage > 0 || eDataType == kAttributes,
+			"Multi-page attribute data valid for attribute data only");
+
+		if (nPage < 0)
 		{
-			string strCursorQuery = gstrGET_FILE_TASK_SESSION_CACHE_ROWS;
-			replaceVariable(strCursorQuery, "<FileTaskSessionID>", asString(nFileTaskSessionID));
-
-			_RecordsetPtr ipCachedDataRows(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI48308", ipCachedDataRows != __nullptr);
-
-			ipCachedDataRows->Open(strCursorQuery.c_str(),
-				_variant_t((IDispatch*)ipConnection, true), adOpenForwardOnly,
-				adLockReadOnly, adCmdText);
-
-			CComSafeArray<long> saCachedPages((ULONG)0);
-
-			while (ipCachedDataRows->adoEOF == VARIANT_FALSE)
-			{
-				long nCachedPage = getLongField(ipCachedDataRows->Fields, "Page");
-				saCachedPages.Add(nCachedPage);
-
-				if (nPage < 0)
-				{
-					*pbFoundCacheData = VARIANT_TRUE;
-
-					// If we only care whether there are any pages cached at all, break after finding
-					// the first cached page.
-					if (!bGetCachedPageList)
-					{
-						break;
-					}
-				}
-				else if (nPage == nCachedPage)
-				{
-					bQueryData = true;
-				}
-
-				ipCachedDataRows->MoveNext();
-			}
-
-			*pparrayCachedPages = (LPSAFEARRAY)saCachedPages.Detach();
+			ASSERT_RUNTIME_CONDITION("ELI49494", false, "Not yet implemented");
 		}
-		else // Specific page number specified and not populating pparrayCachedPages.
+		else
 		{
-			bQueryData = true;
-			*pparrayCachedPages = __nullptr;
-		}
-
-		if (bQueryData)
-		{
-			bFoundCachedData = queryCachedData(ipConnection, nFileTaskSessionID, nPage, eCacheRequest,
-				pparrayCachedPages, pparrayImageData, pbstrUssData, pbstrWordZoneData, pbstrVoaData, pbstrException);
+			bFoundCachedData = queryCachedData(ipConnection, nFileTaskSessionID, nPage, eDataType,
+				pparrayImageData, pbstrUssData, pbstrWordZoneData, pbstrAttributeData, pbstrException);
 
 			*pbFoundCacheData = asVariantBool(bFoundCachedData);
 		}
@@ -4981,9 +4943,9 @@ STDMETHODIMP CFileProcessingDB::GetCachedFileTaskSessionData(long nFileTaskSessi
 		if (!bFoundCachedData)
 		{
 			*pparrayImageData = __nullptr;
-			*pbstrUssData = __nullptr;
-			*pbstrVoaData = __nullptr;
+			*pbstrUssData = __nullptr;			
 			*pbstrWordZoneData = __nullptr;
+			*pbstrAttributeData = __nullptr;
 			*pbstrException = __nullptr;
 		}
 
@@ -4994,15 +4956,15 @@ STDMETHODIMP CFileProcessingDB::GetCachedFileTaskSessionData(long nFileTaskSessi
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI48422");
 }
 // Helper function for GetCachedFileTaskSessionData
-bool queryCachedData(_ConnectionPtr ipConnection, long nFileTaskSessionID, long nPage, ECachedDataRequest eCacheRequest,
-	SAFEARRAY** pparrayCachedPages, SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* pbstrVoaData, BSTR* pbstrException)
+bool queryCachedData(_ConnectionPtr ipConnection, long nFileTaskSessionID, long nPage, ECacheDataType eDataType,
+	SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* pbstrAttributeData, BSTR* pbstrException)
 {
 	bool bFoundCacheData = false;
-	bool bGetCachedImage = (eCacheRequest & (int)kCachedImage) != 0;
-	bool bGetCachedUSS = (eCacheRequest & (int)kCachedUss) != 0;
-	bool bGetCachedWordZones = (eCacheRequest & (int)kCachedWordZone) != 0;
-	bool bGetCachedVOA = (eCacheRequest & (int)kCachedVOA) != 0;
-	bool bGetCacheException = (eCacheRequest & (int)kCacheException) != 0;
+	bool bGetCachedImage = (eDataType & (int)kImage) != 0;
+	bool bGetCachedUSS = (eDataType & (int)kUss) != 0;
+	bool bGetCachedWordZones = (eDataType & (int)kWordZone) != 0;
+	bool bGetCachedAttributes = (eDataType & (int)kAttributes) != 0;
+	bool bGetCacheException = (eDataType & (int)kException) != 0;
 
 	vector<string> vecFields;
 	if (bGetCachedImage)
@@ -5013,13 +4975,13 @@ bool queryCachedData(_ConnectionPtr ipConnection, long nFileTaskSessionID, long 
 	{
 		vecFields.push_back("[USSData]");
 	}
-	if (bGetCachedVOA)
-	{
-		vecFields.push_back("[VOAData]");
-	}
 	if (bGetCachedWordZones)
 	{
 		vecFields.push_back("[WordZoneData]");
+	}
+	if (bGetCachedAttributes)
+	{
+		vecFields.push_back("[AttributeData]");
 	}
 
 	// Always look for an exception logged while caching data. If found, throw the
@@ -5072,13 +5034,13 @@ bool queryCachedData(_ConnectionPtr ipConnection, long nFileTaskSessionID, long 
 					{
 						*pbstrUssData = get_bstr_t(getStringField(ipCachedDataRow->Fields, "USSData")).Detach();
 					}
-					if (bGetCachedVOA)
-					{
-						*pbstrVoaData = get_bstr_t(getStringField(ipCachedDataRow->Fields, "VOAData")).Detach();
-					}
 					if (bGetCachedWordZones)
 					{
 						*pbstrWordZoneData = get_bstr_t(getStringField(ipCachedDataRow->Fields, "WordZoneData")).Detach();
+					}
+					if (bGetCachedAttributes)
+					{
+						*pbstrAttributeData = get_bstr_t(getStringField(ipCachedDataRow->Fields, "AttributeData")).Detach();
 					}
 					if (bGetCacheException)
 					{
@@ -5102,6 +5064,100 @@ bool queryCachedData(_ConnectionPtr ipConnection, long nFileTaskSessionID, long 
 	}
 
 	return bFoundCacheData;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetCachedPageNumbers(long nFileTaskSessionID, ECacheDataType eCacheDataType,
+	SAFEARRAY** pparrayCachedPages)
+{
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI49486", pparrayCachedPages != __nullptr);
+		ASSERT_ARGUMENT("ELI49487", eCacheDataType != 0);
+
+		ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		vector<string> vecFieldRestrictions;
+		if (eCacheDataType & ECacheDataType::kImage)
+		{
+			vecFieldRestrictions.push_back("ImageData");
+		}
+		if (eCacheDataType & ECacheDataType::kUss)
+		{
+			vecFieldRestrictions.push_back("USSData");
+		}
+		if (eCacheDataType & ECacheDataType::kWordZone)
+		{
+			vecFieldRestrictions.push_back("WordZoneData");
+		}
+		if (eCacheDataType & ECacheDataType::kAttributes)
+		{
+			vecFieldRestrictions.push_back("AttributeData");
+		}
+		if (eCacheDataType & ECacheDataType::kException)
+		{
+			vecFieldRestrictions.push_back("Exception");
+		}
+
+		// Retrieve pages all pages as a single scaler value to avoid having to iterate all cache rows with a cursor.
+		string strQuery =
+			"SELECT\r\n"
+			"(\r\n"
+			"	SELECT(CAST([Page] AS NVARCHAR) + ',')\r\n"
+			"		FROM [FileTaskSessionCache]\r\n"
+			"		WHERE [FileTaskSessionID] = <FileTaskSessionID>\r\n"
+			"		AND <TargetFields>\r\n"
+			"		FOR XML PATH('')\r\n"
+			"	) AS [Pages]";
+		string strFieldClause = "["
+			+ asString(vecFieldRestrictions, false, "] IS NOT NULL\r\n		AND [")
+			+ "] IS NOT NULL";
+		replaceVariable(strQuery, "<FileTaskSessionID>", asString(nFileTaskSessionID));
+		replaceVariable(strQuery, "<TargetFields>", strFieldClause);
+
+		_RecordsetPtr ipCachedPages(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI49496", ipCachedPages != __nullptr);
+
+		ipCachedPages->Open(strQuery.c_str(), 
+			_variant_t((IDispatch*)ipConnection, true), adOpenStatic,
+			adLockReadOnly, adCmdText);
+
+		// Parse out the string representation of the pages into a vector
+		vector<string> vecPages;
+		if (!isNULL(ipCachedPages->Fields, "Pages"))
+		{
+			string strPageList = getStringField(ipCachedPages->Fields, "Pages");
+			strPageList = trim(strPageList, "", ",");
+			StringTokenizer::sGetTokens(strPageList, ',', vecPages);
+		}
+
+		// Convert to an integer and store in a map in order to sort pages (which otherwise may appear
+		// in the the FileTaskSessionCache table out of order).
+		map<long, void*> mapPages;
+		for each (string strPage in vecPages)
+		{
+			mapPages[asLong(strPage)] = __nullptr;
+		}
+
+		CComSafeArray<long> saCachedPages((ULONG)0);
+		for (auto iter = mapPages.begin(); iter != mapPages.end(); iter++)
+		{
+			saCachedPages.Add(iter->first);
+		}
+
+		*pparrayCachedPages = (LPSAFEARRAY)saCachedPages.Detach();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI49490")
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49495");
 }
 
 //-------------------------------------------------------------------------------------------------

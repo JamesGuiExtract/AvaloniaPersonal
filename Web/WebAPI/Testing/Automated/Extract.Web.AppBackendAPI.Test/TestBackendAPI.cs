@@ -1478,7 +1478,7 @@ namespace Extract.Web.WebAPI.Test
                 // Closing a document will clear the cached data. Confirm this is the case
                 controller.CloseDocument(docID, false);
 
-                Assert.IsFalse(controller.GetCachedPages(db).Any(), "Cache was not cleared");
+                Assert.IsFalse(controller.GetCachedImagePageNumbers(db).Any(), "Cache was not cleared");
 
                 // Since the files on disk were replaced, trying again to get the document image and word zones should
                 // now yield different results than we got on the initial read or from cache.
@@ -1565,7 +1565,7 @@ namespace Extract.Web.WebAPI.Test
                 result.AssertResultCode(500, "Expected error caching corrupt uss");
 
                 // Confirm that the cache exception has been recorded in the db for the page.
-                Assert.Throws<ExtractException>(() => controller.IsPageDataCached(db, 1, checkForWordZoneData: true));
+                Assert.IsFalse(controller.IsPageDataCached(db, 1, ECacheDataType.kImage | ECacheDataType.kWordZone));
 
                 controller.Logout().AssertGoodResult<NoContentResult>();
             }
@@ -1604,7 +1604,7 @@ namespace Extract.Web.WebAPI.Test
                 bool dataIsCached = false;
                 for (int i = 0; !dataIsCached && i < 30; i++)
                 {
-                    if (controller.GetCachedPages(db).SequenceEqual(new[] { 2, 1 }))
+                    if (controller.GetCachedImagePageNumbers(db).SequenceEqual(new[] { 1, 2 }))
                     {
                         dataIsCached = true;
                     }
@@ -1623,7 +1623,7 @@ namespace Extract.Web.WebAPI.Test
                 dataIsCached = false;
                 for (int i = 0; !dataIsCached && i < 30; i++)
                 {
-                    if (controller.GetCachedPages(db).SequenceEqual(new[] { 2, 1, 4 }))
+                    if (controller.GetCachedImagePageNumbers(db).SequenceEqual(new[] { 1, 2, 4 }))
                     {
                         dataIsCached = true;
                     }
@@ -1679,14 +1679,14 @@ namespace Extract.Web.WebAPI.Test
 
                     // Caching should be continuing asynchronously and should not have cached
                     // all pages by this point.
-                    var cachedPageCount = db.GetCachedPages(documentSessionId).Length;
+                    var cachedPageCount = db.GetCachedImagePageNumbers(documentSessionId).Length;
                     Assert.True(cachedPageCount >= 1 && cachedPageCount < 4,
                         "Unexpected number of cached pages.");
 
                     controller.CloseDocument(docID, false).AssertGoodResult<NoContentResult>();
 
                     // Closing the document should wipe out all existing cache rows.
-                    Assert.AreEqual(0, db.GetCachedPages(documentSessionId).Length);
+                    Assert.AreEqual(0, db.GetCachedImagePageNumbers(documentSessionId).Length);
 
                     Task.WaitAll(cacheTasks);
                     foreach (var task in cacheTasks)
@@ -1756,7 +1756,7 @@ namespace Extract.Web.WebAPI.Test
                             // The second two tests use a single session to test each document sequentially.
                             Task.Factory.StartNew(() =>
                                 TestCacheSequentiallySameSession(db, set3FileIDs,
-                                maxPages: 10, 
+                                maxPages: 10,
                                 waitAll: true), // Check that all pages were cached correctly
                                 TaskCreationOptions.LongRunning),
                             Task.Factory.StartNew(() =>
@@ -1769,6 +1769,11 @@ namespace Extract.Web.WebAPI.Test
                         Task.WaitAll(testTasks);
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI49466");
+                throw ex;
             }
             finally
             {
@@ -1792,7 +1797,15 @@ namespace Extract.Web.WebAPI.Test
         {
             Parallel.ForEach(fileSet, docID =>
             {
-                TestCacheWithParallelSessions(db, docID, maxPages, waitAll);
+                try
+                {
+                    TestCacheWithParallelSessions(db, docID, maxPages, waitAll);
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractLog("ELI49488");
+                    throw ex;
+                }
             });
         }
 
@@ -1818,7 +1831,7 @@ namespace Extract.Web.WebAPI.Test
                 LogInToWebApp(controller, user);
                 OpenDocument(controller, docID);
 
-                Assert.AreEqual(0, controller.GetCachedPages(db).Length, "Document pages not cleared from cache");
+                Assert.AreEqual(0, controller.GetCachedImagePageNumbers(db).Length, "Document pages not cleared from cache");
 
                 bool fileHasUSS = _testFileHasUSS[(docID - 1) % _testFileHasUSS.Length];
 
@@ -1828,7 +1841,12 @@ namespace Extract.Web.WebAPI.Test
                 var cacheTasks = StartCachingPages(controller, docID, maxPages, expectedFirstPageData: pageData);
                 if (waitAll)
                 {
-                    CheckAllPages(controller, db, cacheTasks, checkForWordZoneData: fileHasUSS);
+                    var dataToCheck = ECacheDataType.kImage;
+                    if (fileHasUSS)
+                    {
+                        dataToCheck |= ECacheDataType.kWordZone;
+                    }
+                    CheckAllPages(controller, db, cacheTasks, dataToCheck);
                 }
             }
             finally
@@ -1861,7 +1879,7 @@ namespace Extract.Web.WebAPI.Test
                 {
                     OpenDocument(controller, docID);
 
-                    Assert.AreEqual(0, controller.GetCachedPages(db).Length, "Document pages not cleared from cache");
+                    Assert.AreEqual(0, controller.GetCachedImagePageNumbers(db).Length, "Document pages not cleared from cache");
 
                     bool hasUssFile = _testFileHasUSS[(docID - 1) % _testFileHasUSS.Length];
                     
@@ -1871,11 +1889,21 @@ namespace Extract.Web.WebAPI.Test
                     var cacheTasks = StartCachingPages(controller, docID, maxPages, expectedFirstPageData: pageData);
                     if (waitAll)
                     {
-                        CheckAllPages(controller, db, cacheTasks, checkForWordZoneData: hasUssFile);
+                        var dataToCheck = ECacheDataType.kImage;
+                        if (hasUssFile)
+                        {
+                            dataToCheck |= ECacheDataType.kWordZone;
+                        }
+                        CheckAllPages(controller, db, cacheTasks, dataToCheck);
                     }
 
                     controller.CloseDocument(docID, false).AssertGoodResult<NoContentResult>();
                 }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI49489");
+                throw ex;
             }
             finally
             {
@@ -1926,17 +1954,17 @@ namespace Extract.Web.WebAPI.Test
         /// <param name="controller">The <see cref="AppBackendController"/> being tested.</param>
         /// <param name="db">The <see cref="FileProcessingDB"/> into which data is being cached.</param>
         /// <param name="cacheTasks">The tasks for each cache operation to check.</param>
-        /// <param name="checkForWordZoneData"><c>true</c> to check that word zone data is cached; 
-        /// <c>false</c> to check for image data only.</param>
+        /// <param name="dataType">This call will check for the existence of all types of data indicated
+        /// by the <see cref="ECacheDataType"/> flag values specified here.</param>
         static void CheckAllPages(AppBackendController controller, FileProcessingDB db,
-            Task<IActionResult>[] cacheTasks, bool checkForWordZoneData)
+            Task<IActionResult>[] cacheTasks, ECacheDataType dataType)
         {
             Task.WaitAll(cacheTasks);
             for (int page = 1; page <= cacheTasks.Length; page++)
             {
                 var task = cacheTasks[page - 1];
                 task.Result.AssertGoodResult<NoContentResult>();
-                Assert.IsTrue(controller.IsPageDataCached(db, page, checkForWordZoneData),
+                Assert.IsTrue(controller.IsPageDataCached(db, page, dataType),
                     "Page was not cached");
             }
         }

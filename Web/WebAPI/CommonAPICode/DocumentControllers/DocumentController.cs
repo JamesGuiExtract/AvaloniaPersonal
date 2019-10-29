@@ -386,6 +386,8 @@ namespace WebAPI.Controllers
 
         /// <summary>
         /// Replaces the data for the specified document.
+        /// Workflow admin note: To be used, the post/verify action must be configured and the
+        /// specified file must be pending in the configured action.
         /// </summary>
         /// <param name="Id">The document ID</param>
         /// <param name="documentData">The replacement data for the document</param>
@@ -447,6 +449,8 @@ namespace WebAPI.Controllers
 
         /// <summary>
         /// Adds, updates or deletes specified document data attributes.
+        /// Workflow admin note: To be used, the post/verify action must be configured and the
+        /// specified file must be pending in the configured action.
         /// </summary>
         /// <param name="Id">The document ID</param>
         /// <param name="documentData">The changes to apply to the document data</param>

@@ -141,12 +141,15 @@ namespace WebAPI.Models
     public class SpatialLine
     {
         /// <summary>
-        /// A rectangle that may be skewed with respect to the page
+        /// A rectangle that may be skewed with respect to the page. Only one of SpatialLineZone and SpatialLineBounds
+        /// need be specified for added attributes; if both were to be specified, SpatialLineZone would be used.
         /// </summary>
         public SpatialLineZone SpatialLineZone { get; set; }
 
         /// <summary>
-        /// The smallest non-skewed rectangular boundary that completely encloses text
+        /// The smallest non-skewed rectangular boundary that completely encloses text. Only one of SpatialLineZone
+        /// and SpatialLineBounds need be specified for added attributes; if both were to be specified, SpatialLineZone
+        /// would be used.
         /// </summary>
         public SpatialLineBounds SpatialLineBounds { get; set; }
     }
@@ -261,7 +264,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// The attribute ID
+        /// The attribute ID in the form of a GUID. Does not need to be specified for new attributes.
         /// </summary>
         public string ID { get; set; } = Guid.NewGuid().ToString();
 
@@ -293,7 +296,7 @@ namespace WebAPI.Models
 
         /// <summary>
         /// The spatial position information of the attribute, including the page number,
-        /// bounding rect, and zonal information (bounds plus skew)
+        /// bounding rect, and zonal information (bounds plus skew). Not required if HasPositionInfo is false.
         /// </summary>
         public Position SpatialPosition { get; set; }
     }
