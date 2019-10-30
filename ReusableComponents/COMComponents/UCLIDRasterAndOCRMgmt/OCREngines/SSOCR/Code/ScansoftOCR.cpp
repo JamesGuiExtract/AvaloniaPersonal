@@ -365,6 +365,9 @@ STDMETHODIMP CScansoftOCR::raw_CreateOutputImage(BSTR bstrImageFileName, BSTR bs
 		IScansoftOCR2Ptr ipOcrEngine = getOCREngine();
 		ASSERT_RESOURCE_ALLOCATION("ELI46464", ipOcrEngine != __nullptr);
 
+		// Set output format so that all settings are available for SetOCRParameters
+		ipOcrEngine->SetOutputFormat(bstrFormat);
+
 		// Set the parameters (either from registry or parameters object)
 		// Re-apply the settings in case they have changed since the engine was created
 		ipOcrEngine->SetOCRParameters(pOCRParameters, VARIANT_TRUE);

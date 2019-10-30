@@ -8,6 +8,7 @@ using Extract.Licensing;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Collections.Concurrent;
+using UCLID_COMUTILSLib;
 
 namespace Extract.Utilities
 {
@@ -310,6 +311,37 @@ namespace Extract.Utilities
             {
                 throw ex.AsExtract("ELI47092");
             }
+        }
+
+        /// <summary>
+        /// Enumerate a <see cref="LongToObjectMap"/>
+        /// </summary>
+        /// <typeparam name="TValue">The type of the objects in the map</typeparam>
+        /// <param name="map">The map to enumerate</param>
+        [CLSCompliant(false)]
+        public static IEnumerable<KeyValuePair<int, TValue>> ToIEnumerable<TValue>(this LongToObjectMap map)
+        {
+            for (int i = 0, size = map.Size; i < size; i++)
+            {
+                map.GetKeyValue(i, out int key, out object obj);
+                yield return new KeyValuePair<int, TValue>(key, (TValue)obj);
+            }
+        }
+
+        /// <summary>
+        /// Creates a <see cref="LongToObjectMap"/> from enumeration of int-to-object pairs
+        /// </summary>
+        /// <typeparam name="TValue">The type of the objects in the pairs</typeparam>
+        /// <param name="intsToObjects">The key-value pairs for the map</param>
+        [CLSCompliant(false)]
+        public static LongToObjectMap ToLongToObjectMap<TValue>(this IEnumerable<KeyValuePair<int, TValue>> intsToObjects)
+        {
+            var map = new LongToObjectMapClass();
+            foreach (var intToObject in intsToObjects)
+            {
+                map.Set(intToObject.Key, intToObject.Value);
+            }
+            return map;
         }
 
         #endregion Methods

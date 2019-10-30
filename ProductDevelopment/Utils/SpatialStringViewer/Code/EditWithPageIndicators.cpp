@@ -195,7 +195,7 @@ void CEditWithPageIndicators::UpdatePageRuler()
 		}
 		
 		// Only get the locations for the displayed pages
-		while ( nNextPagePos <= nLastPos && nNextPagePos > 0 && nCurrPage != nLastPage)
+		while ( nNextPagePos <= nLastPos && nNextPagePos > 0 && nCurrPage < nLastPage)
 		{
 			nCurrPage++;
 			pageLocations[nCurrPage] = LineFromChar(nNextPagePos) - nFirstVisibleLine;
@@ -251,7 +251,10 @@ long CEditWithPageIndicators::getPageAtPos(long position)
 			{
 				m_ipSpatialString->GetNextOCRImageSpatialLetter(position, &ipLetter);
 			}
-			pageNumber = ipLetter->GetPageNumber();
+			if (ipLetter != __nullptr)
+			{
+				pageNumber = ipLetter->GetPageNumber();
+			}
 		}
 		return pageNumber;
 	}

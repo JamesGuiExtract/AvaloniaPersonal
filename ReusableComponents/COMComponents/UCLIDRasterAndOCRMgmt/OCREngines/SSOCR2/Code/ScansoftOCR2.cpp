@@ -302,26 +302,27 @@ STDMETHODIMP CScansoftOCR2::CreateOutputImage(BSTR bstrImageFileName, BSTR bstrF
 	
 	try
 	{
-#ifndef InitializeRecAPIPlusForSSOCR2
-		throw UCLIDException("ELI46494", "This method requires RecAPIPlus to be initialized");
-#else
 		// validate the license
 		validateLicense();
+
+		THROW_UE_ON_ERROR("ELI46466", "Unable to set output format",
+			RecSetOutputFormat(0, get_bstr_t(bstrFormat)));
 
 		HDOC hDoc;
 		HIMGFILE hFile;
 		HPAGE hPage;
 		int nPageCount;
 
-		THROW_UE_ON_ERROR("ELI46466", "Unable to set output format",
-			RecSetOutputFormat(0, get_bstr_t(bstrFormat)));
-
 		THROW_UE_ON_ERROR("ELI46467", "Unable to create doc",
 			RecCreateDoc(0, "", &hDoc, DOC_NORMAL));
+		// Ensure document gets closed
+		RecMemoryReleaser<RECDOCSTRUCT> DocumentMemoryReleaser(hDoc);
 
 		_bstr_t bstrtImageFileName = get_bstr_t(bstrImageFileName);
 		THROW_UE_ON_ERROR("ELI46468", "Unable to open input file",
 			kRecOpenImgFile(bstrtImageFileName, &hFile, IMGF_READ, FF_SIZE));
+		// Ensure image gets closed
+		RecMemoryReleaser<tagIMGFILEHANDLE> ImageFileMemoryReleaser(hFile);
 
 		THROW_UE_ON_ERROR("ELI46469", "Unable to get image page count",
 			kRecGetImgFilePageCount(hFile, &nPageCount));
@@ -341,6 +342,9 @@ STDMETHODIMP CScansoftOCR2::CreateOutputImage(BSTR bstrImageFileName, BSTR bstrF
 			}
 			try
 			{
+				THROW_UE_ON_ERROR("ELI49484", "Unable to preprocess image page",
+					kRecPreprocessImg(0, hPage));
+
 				THROW_UE_ON_ERROR("ELI46471", "Unable to recognize image page",
 					kRecRecognize(0, hPage, NULL));
 			}
@@ -353,15 +357,31 @@ STDMETHODIMP CScansoftOCR2::CreateOutputImage(BSTR bstrImageFileName, BSTR bstrF
 
 			THROW_UE_ON_ERROR("ELI46472", "Unable to insert page",
 				RecInsertPage(0, hDoc, hPage, -1));
-
-			THROW_UE_ON_ERROR("ELI46473", "Unable convert document",
-				RecConvert2Doc(0, hDoc, get_bstr_t(bstrOutputFileName)));
 		}
 
+		THROW_UE_ON_ERROR("ELI46473", "Unable convert document",
+			RecConvert2Doc(0, hDoc, get_bstr_t(bstrOutputFileName)));
+
 		return S_OK;
-#endif
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46479");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CScansoftOCR2::SetOutputFormat(BSTR bstrFormat)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+	
+	try
+	{
+		// validate the license
+		validateLicense();
+
+		THROW_UE_ON_ERROR("ELI49535", "Unable to set output format",
+			RecSetOutputFormat(0, get_bstr_t(bstrFormat)));
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49511");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CScansoftOCR2::GetPID(long* pPID)
@@ -1190,12 +1210,8 @@ void CScansoftOCR2::initEngineAndLicense()
 		}
 
 		// Initialization of OCR engine	
-#ifdef InitializeRecAPIPlusForSSOCR2
 		// Use this to make CreateOutputImage, and thus CreateHtmlFromImage.exe, work:
 		rc = RecInitPlus("Extract Systems", "SSOCR2");
-#else
-		rc = kRecInit("Extract Systems", "SSOCR2");
-#endif
 
 		if (rc != REC_OK && rc != API_INIT_WARN)
 		{
@@ -3188,4 +3204,23 @@ CScansoftOCR2::RecMemoryReleaser<Win32Event>::~RecMemoryReleaser()
 		m_pMemoryType->signal();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI19906");
+}
+//-------------------------------------------------------------------------------------------------
+template<>
+CScansoftOCR2::RecMemoryReleaser<RECDOCSTRUCT>::~RecMemoryReleaser()
+{
+	try
+	{
+		RECERR rc = RecCloseDoc(0, m_pMemoryType);
+
+		// log any errors
+		if (rc != REC_OK)
+		{
+			UCLIDException ue("ELI49533", 
+				"Application trace: Unable to close document. Possible memory leak.");
+			loadScansoftRecErrInfo(ue, rc);
+			ue.log();
+		}
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI49534");
 }

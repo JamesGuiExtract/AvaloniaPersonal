@@ -138,8 +138,14 @@ library UCLID_SSOCR2Lib
 		// PURPOSE: To write OCR parameters to a file in order to verify which settings have been set
 		[id(11), helpstring("method WriteOCRSettingsToFile")] HRESULT WriteOCRSettingsToFile(
 			[in] BSTR bstrFileName, VARIANT_BOOL vbWriteDefaults, VARIANT_BOOL vbWriteExtractImplementedSettings);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To create a document via OCR (see RecAPI: Document in FKA Nuance documentation)
 		[id(12), helpstring("method CreateOutputImage")] HRESULT CreateOutputImage([in] BSTR bstrImageFileName, 
 			[in] BSTR bstrFormat, [in] BSTR bstrOutputFileName);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set the output format that will be used by CreateOutputImage
+    // This must be done prior to the call to SetOCRParameters if output-specific settings are to be used
+		[id(13), helpstring("method SetOutputFormat")] HRESULT SetOutputFormat([in] BSTR bstrFormat);
 	};
 
 	//----------------------------------------------------------------------------------------------

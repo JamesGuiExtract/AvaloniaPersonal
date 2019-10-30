@@ -380,6 +380,7 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@COPY /v "$(BinariesFolder)\StatisticsReporter.exe.config" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v "$(BinariesFolder)\zstdlib_x86.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v "$(BinariesFolder)\OpenNLP.IKVM.exe" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /v "$(BinariesFolder)\Tabula.IKVM.exe" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY "$(LEADTOOLS_API_DOTNET)\*.*"  "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY "$(RCNETDir)\APIs\ScintillaNET v2.4\Dist\*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	
@@ -418,6 +419,7 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 # Copy WindowsAPICodePack to DotNetGAC for installshield
 	@XCOPY "$(RCNETDir)\APIs\WindowsAPICodePack.1.1.0\lib\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC" /v /s /e /y
 	@COPY /V "$(BinariesFolder)\OpenNLP.IKVM.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V "$(BinariesFolder)\Tabula.IKVM.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V "$(BinariesFolder)\YamlDotNet.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	
     @COPY /V "$(BinariesFolder)\ImageEdit.ocx" "$(AFCoreInstallFilesRootDir)\SelfRegFiles"
