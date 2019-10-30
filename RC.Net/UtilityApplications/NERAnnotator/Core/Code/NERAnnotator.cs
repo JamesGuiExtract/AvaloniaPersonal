@@ -1103,7 +1103,11 @@ namespace Extract.UtilityApplications.NERAnnotation
                 var endOfEntity = token.EndExclusive - 1;
                 if (startOfEntity <= endOfEntity)
                 {
-                    return page.GetSubString(startOfEntity, endOfEntity);
+                    var substring = page.GetSubString(startOfEntity, endOfEntity);
+                    if (substring.HasSpatialInfo())
+                    {
+                        return substring;
+                    }
                 }
                 return null;
             })
@@ -1275,9 +1279,8 @@ namespace Extract.UtilityApplications.NERAnnotation
         static IEnumerable<RasterZone> GetZonesTranslatedToPage(SpatialString spatialString,
             SpatialString translateToPage)
         {
-            if (spatialString.HasSpatialInfo())
+            if (spatialString.HasSpatialInfo() && translateToPage.HasSpatialInfo())
             {
-                spatialString.GetPages(false, "").ToIEnumerable<SpatialString>();
                 // Loop through each page of the attribute.
                 foreach (SpatialString pageText in
                     spatialString.GetPages(false, "").ToIEnumerable<SpatialString>())
