@@ -80,23 +80,29 @@ namespace WebAPI.Models
             }
         }
 
+        /// <summary>
+        /// Simply checks if the user exists in the famdb
+        /// Only really useful for windows login.
+        /// </summary>
+        /// <param name="user"></param>
         public void CheckIfUserExists(User user)
         {
             try
             {
                 var fileProcessingDB = _fileApi.FileProcessingDB;
-                ExtractException.Assert("ELI49440",
+                ExtractException.Assert("ELI49477",
                     "Database connection failure",
                     !string.IsNullOrWhiteSpace(fileProcessingDB.DatabaseID));
 
-                HTTPError.Assert("ELI49441", StatusCodes.Status401Unauthorized,
+                HTTPError.Assert("ELI49478", StatusCodes.Status401Unauthorized,
                     !user.Username.Equals("Admin", StringComparison.OrdinalIgnoreCase),
                     "Unknown user or password");
 
                 try
                 {
-                    var keys = fileProcessingDB.GetLoginUsers().GetKeys().ToIEnumerable<string>().ToList();
-                    if (!keys.Select(m => m.ToLower()).Contains(user.Username.ToLower()))
+                    var userNames = fileProcessingDB.GetLoginUsers().GetKeys().ToIEnumerable<string>().ToList();
+                    // Compares lowercase usernames
+                    if (!userNames.Select(m => m.ToLower()).Contains(user.Username.ToLower()))
                     {
                         throw new ExtractException("ELI48414", "User does not have a domain login");
                     }

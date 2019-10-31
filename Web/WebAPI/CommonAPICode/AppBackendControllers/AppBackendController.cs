@@ -63,6 +63,11 @@ namespace WebAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Decrypts the username from the authorization api, and checks to see if the user has an account
+        /// </summary>
+        /// <param name="user">A user with an encrypted username, and possible workflow</param>
+        /// <returns></returns>
         [HttpPost("WindowsLogin")]
         [ProducesResponseType(200, Type = typeof(LoginToken))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
@@ -72,7 +77,7 @@ namespace WebAPI.Controllers
             try
             {
                 user.Username = Encryption.AESThenHMAC.SimpleDecryptWithPassword(user.Username);
-                HTTPError.AssertRequest("ELI45183", !string.IsNullOrEmpty(user.Username), "Username is empty");
+                HTTPError.AssertRequest("ELI49476", !string.IsNullOrEmpty(user.Username), "Username is empty");
 
                 // The user may have specified a workflow - if so then ensure that the API context uses
                 // the specified workflow.
@@ -85,12 +90,12 @@ namespace WebAPI.Controllers
                     // Token is specific to user and FAMSessionId
                     var token = AuthUtils.GenerateToken(user, context);
 
-                    return Ok(token);
+                    return Ok(new { token, user.Username });
                 }
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI45188");
+                return this.GetAsHttpError(ex, "ELI49475");
             }
         }
 
