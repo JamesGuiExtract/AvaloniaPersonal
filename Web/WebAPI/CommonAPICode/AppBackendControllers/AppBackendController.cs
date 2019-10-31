@@ -65,7 +65,47 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// API call to change a user's password.        
+        /// Decrypts the username from the authorization api, and checks to see if the user has an account
+        /// </summary>
+        /// <param name="user">A user with an encrypted username, and possible workflow</param>
+        /// <returns></returns>
+        [HttpPost("WindowsLogin")]
+        [ProducesResponseType(200, Type = typeof(LoginToken))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        public IActionResult WindowsLogin([FromBody] User user)
+        {
+            try
+            {
+                var decryptedText = Encryption.AESThenHMAC.SimpleDecryptWithPassword(user.Username);
+                var tokenTime = DateTime.Parse(decryptedText.Split('|')[1]);
+                if (! (tokenTime  > DateTime.Now))
+                {
+                    throw new HTTPError("ELI49485", "This token has expired and is therefore invalid. Please try again");
+                }
+
+                user.Username = decryptedText.Split('|')[0];
+                HTTPError.AssertRequest("ELI49476", !string.IsNullOrEmpty(user.Username), "Username is empty");
+
+                // The user may have specified a workflow - if so then ensure that the API context uses
+                // the specified workflow.
+                var context = LoginContext(user.WorkflowName);
+                using (var data = new DocumentData(context))
+                {
+                    // Token is specific to user and FAMSessionId
+                    var token = AuthUtils.GenerateToken(user, context);
+
+                    return Ok(new { token, user.Username });
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI49475");
+            }
+        }
+
+        /// <summary>
+        /// API call to change a user's password.
         /// </summary>
         /// <param name="oldPassword">The old password</param>
         /// <param name="newPassword">The New password</param>
