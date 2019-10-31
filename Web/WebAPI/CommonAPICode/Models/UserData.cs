@@ -1,8 +1,6 @@
 ﻿using Extract;
 using Microsoft.AspNetCore.Http;
 using System;
-using Extract.Utilities;
-using System.Linq;
 
 namespace WebAPI.Models
 {
@@ -65,47 +63,6 @@ namespace WebAPI.Models
                 try
                 {
                     fileProcessingDB.LoginUser(user.Username, user.Password);
-                }
-                catch (Exception ex)
-                {
-                    throw new HTTPError("ELI45178", StatusCodes.Status401Unauthorized,
-                        "Unknown user or password", ex);
-                }
-
-                // The workflow will have already been validated by FileApi constructor.
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI43409");
-            }
-        }
-
-        /// <summary>
-        /// Simply checks if the user exists in the famdb
-        /// Only really useful for windows login.
-        /// </summary>
-        /// <param name="user"></param>
-        public void CheckIfUserExists(User user)
-        {
-            try
-            {
-                var fileProcessingDB = _fileApi.FileProcessingDB;
-                ExtractException.Assert("ELI49477",
-                    "Database connection failure",
-                    !string.IsNullOrWhiteSpace(fileProcessingDB.DatabaseID));
-
-                HTTPError.Assert("ELI49478", StatusCodes.Status401Unauthorized,
-                    !user.Username.Equals("Admin", StringComparison.OrdinalIgnoreCase),
-                    "Unknown user or password");
-
-                try
-                {
-                    var userNames = fileProcessingDB.GetLoginUsers().GetKeys().ToIEnumerable<string>().ToList();
-                    // Compares lowercase usernames
-                    if (!userNames.Select(m => m.ToLower()).Contains(user.Username.ToLower()))
-                    {
-                        throw new ExtractException("ELI48414", "User does not have a domain login");
-                    }
                 }
                 catch (Exception ex)
                 {
