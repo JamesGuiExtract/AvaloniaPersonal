@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <iterator>
 using namespace std;
 
 //--------------------------------------------------------------------------------------------------
@@ -161,7 +162,7 @@ private:
 	struct AttributeInfo
 	{
 		set<long> setPages;
-		map<long, vector<CRect> > mapRasterZones;
+		map<long, vector<CRect>> mapRasterZones;
 	};
 
 	// A cache of spatial information for all eligible attributes.
@@ -171,6 +172,9 @@ private:
 	// page rather than for all attributes in the document at once.
 	map<long, IIUnknownVectorPtr> m_mapSet1AttributesPerPage;
 	map<long, IIUnknownVectorPtr> m_mapSet2AttributesPerPage;
+
+	// Set of all pages represented by all attributes
+	set<long> m_setPages;
 
 	// The set of qualified merges that have been found via FindQualifiedMerges.
 	IIUnknownVectorPtr m_ipQualifiedMerges;

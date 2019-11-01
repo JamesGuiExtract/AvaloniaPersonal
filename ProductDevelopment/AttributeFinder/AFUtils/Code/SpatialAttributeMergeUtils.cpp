@@ -58,6 +58,7 @@ CSpatialAttributeMergeUtils::~CSpatialAttributeMergeUtils()
 		m_mapSet1AttributesPerPage.clear();
 		m_mapSet2AttributesPerPage.clear();
 		m_mapSpatialInfos.clear();
+		m_setPages.clear();
 		m_ipValueMergePriority = __nullptr;
 		m_ipTypeMergePriority = __nullptr;
 		m_ipMergeExclusionQueries = __nullptr;
@@ -84,6 +85,7 @@ void CSpatialAttributeMergeUtils::FinalRelease()
 		m_mapSet1AttributesPerPage.clear();
 		m_mapSet2AttributesPerPage.clear();
 		m_mapSpatialInfos.clear();
+		m_setPages.clear();
 		m_ipValueMergePriority = __nullptr;
 		m_ipTypeMergePriority = __nullptr;
 		m_ipMergeExclusionQueries = __nullptr;
@@ -915,6 +917,12 @@ void CSpatialAttributeMergeUtils::initialize(IIUnknownVectorPtr ipAttributeSet1,
 			}
 		}
 	}
+
+	// Calculate union of all pages to save some work (for the common case of per-page processing)
+	for (auto& a : m_mapSet1AttributesPerPage)
+		m_setPages.insert(a.first);
+	for (auto& a : m_mapSet2AttributesPerPage)
+		m_setPages.insert(a.first);
 }
 //-------------------------------------------------------------------------------------------------
 void CSpatialAttributeMergeUtils::findQualifiedMerges(IIUnknownVectorPtr ipAttributeSet1,
@@ -1023,7 +1031,8 @@ void CSpatialAttributeMergeUtils::findQualifiedMerges(IIUnknownVectorPtr ipAttri
 
 		// Restart the iteration in case an previous attributes qualify to be merged
 		// with this result.
-		if (bAttribute1Merged)
+		// (This could happen if merges are for bounds instead of individual raster zones)
+		if (bAttribute1Merged && m_bCreateMergedRegion)
 		{
 			i = -1;
 		}
@@ -1116,7 +1125,9 @@ set<long> CSpatialAttributeMergeUtils::getPagesWithOverlap(IAttributePtr ipAttri
 	set<long> setPagesWithOverlap;
 
 	// Retrieve the set of pages that are common to these attributes.
-	set<long> setPages = getAttributePages(ipAttribute1, ipAttribute2);
+	set<long>& setPages = m_setPages.size() == 1
+		? m_setPages
+		: getAttributePages(ipAttribute1, ipAttribute2);
 
 	for each (long nPage in setPages)
 	{
@@ -1265,26 +1276,12 @@ set<long> CSpatialAttributeMergeUtils::getAttributePages(IAttributePtr ipAttribu
 	ASSERT_ARGUMENT("ELI22953", ipAttribute2 != __nullptr);
 
 	set<long> setPages;
-
-	if (m_mapAttributeInfo[ipAttribute1].setPages.empty() ||
-		m_mapAttributeInfo[ipAttribute2].setPages.empty())
-	{
-		// If either attribute has no pages, return an empty set.
-		return setPages;
-	}
-
-	// Get the first & last page of each attribute
-	long nFirst1 = *(m_mapAttributeInfo[ipAttribute1].setPages.begin());
-	long nFirst2 = *(m_mapAttributeInfo[ipAttribute2].setPages.begin());
-	long nLast1 = *(--m_mapAttributeInfo[ipAttribute1].setPages.end());
-	long nLast2 = *(--m_mapAttributeInfo[ipAttribute2].setPages.end());
-
-	// Return every page starting with the greater of the "first" page values
-	// and ending with the lesser of the "last" page values.
-	for (int i = max(nFirst1, nFirst2); i <= min(nLast1, nLast2); i++)
-	{
-		setPages.insert(i);
-	}
+	auto& s1 = m_mapAttributeInfo[ipAttribute1].setPages;
+	auto& s2 = m_mapAttributeInfo[ipAttribute2].setPages;
+	std::set_intersection(
+		s1.begin(), s1.end(),
+		s2.begin(), s2.end(),
+		std::inserter(setPages, setPages.begin()));
 
 	return setPages;
 }
