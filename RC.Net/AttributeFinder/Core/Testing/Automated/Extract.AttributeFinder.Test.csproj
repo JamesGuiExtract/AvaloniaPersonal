@@ -100,6 +100,7 @@
     <Compile Include="TestCreateAttribute.cs" />
     <Compile Include="TestRuleSetRunMode.cs" />
     <Compile Include="TestTrainableClassifiers.cs" />
+    <Compile Include="TestMergeAttributes.cs" />
     <Compile Include="TestXPathQueries.cs" />
     <EmbeddedResource Include="Resources\A418.tif.voa" />
     <EmbeddedResource Include="Resources\EmptyAttribute.voa" />
@@ -314,6 +315,7 @@
     <EmbeddedResource Include="Resources\TestImage013.tif.voa" />
     <EmbeddedResource Include="Resources\A418.tif" />
     <EmbeddedResource Include="Resources\A418.tif.uss" />
+    <EmbeddedResource Include="Resources\A418.tif.numbers-in-triplicate.voa" />
     <EmbeddedResource Include="Resources\Example02.tif" />
     <EmbeddedResource Include="Resources\TestImage013.tif" />
     <EmbeddedResource Include="Resources\CreateTopLevelAttrIdShield_testImage013.rsd" />
