@@ -362,10 +362,12 @@ namespace WebAPI.Models
         /// <param name="id">The identifier.</param>
         /// <param name="processSkipped">If <paramref name="id"/> is -1, if this is <c>true</c> then the document to open
         /// will be the next one in the skipped queue for the user, if <c>false</c> the next document in the pending queue will be opend</param>
+        /// <param name="dataUpdateOnly"><c>true</c> if the session is being opened only for updating data, in which case the session
+        /// will be allowed for completed/failed files; otherwise, <c>false</c>.</param>
         /// <param name="userName"> The username of the user who is making the call. Only required for the recursive version </param>
         /// <param name="retries"> the number of times to retry. </param>
         /// <returns></returns>
-        public DocumentIdResult OpenDocument(int id, bool processSkipped = false, string userName = "", int retries = 10)
+        public DocumentIdResult OpenDocument(int id, bool processSkipped = false, bool dataUpdateOnly = false, string userName = "", int retries = 10)
         {
             try
             {
@@ -391,6 +393,17 @@ namespace WebAPI.Models
                     fileRecord = FileApi.FileProcessingDB.GetFileToProcess(id, FileApi.Workflow.EditAction,
                         processSkipped ? "S":"P");
 
+                    // https://extract.atlassian.net/browse/ISSUE-16748
+                    // If the session is being opened only for a put/patch data call, allow the session for completed and failed files.
+                    if (dataUpdateOnly && fileRecord == null)
+                    {
+                        fileRecord = FileApi.FileProcessingDB.GetFileToProcess(id, FileApi.Workflow.EditAction, "C");
+                    }
+                    if (dataUpdateOnly && fileRecord == null)
+                    {
+                        fileRecord = FileApi.FileProcessingDB.GetFileToProcess(id, FileApi.Workflow.EditAction, "F");
+                    }
+
                     HTTPError.Assert("ELI46297", StatusCodes.Status423Locked, fileRecord != null,
                         "Document is not in the current queue.", ("FileId", id, true));
                 }
@@ -408,7 +421,7 @@ namespace WebAPI.Models
                                 retryException.AddDebugData("Remaining Retries", retries);
                                 retryException.Log();
 
-                                return OpenDocument(id, processSkipped, userName, --retries);
+                                return OpenDocument(id, processSkipped, false, userName, --retries);
                             }
                         }
 

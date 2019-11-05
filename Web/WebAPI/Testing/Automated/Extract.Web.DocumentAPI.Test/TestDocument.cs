@@ -692,7 +692,7 @@ namespace Extract.Web.WebAPI.Test
         }
 
         /// <summary>
-        /// Test IDShield documents
+        /// Tests putting an attibute with minimal data and, specifically, with no childAttributes field specified in the json.
         /// Tests https://extract.atlassian.net/browse/ISSUE-16747
         /// </summary>
         [Test, Category("Automated")]
@@ -723,6 +723,158 @@ namespace Extract.Web.WebAPI.Test
                     .Single()
                     .Value, 
                     "Incorrect attribute value");
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        /// <summary>
+        /// Tests that document data can be updated via put and patch when documents are in P/S, C and F.
+        /// Tests https://extract.atlassian.net/browse/ISSUE-16748
+        [Test, Category("Automated")]
+
+        public static void Test_PutPatchNonPendingFile()
+        {
+            string dbName = "DocumentAPI_Test_PutPatchNonPendingFile";
+
+            try
+            {
+                (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
+                    InitializeAndLogin("Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
+
+                var workflowId = fileProcessingDb.GetWorkflowID(ApiTestUtils.CurrentApiContext.WorkflowName);
+                var workflow = fileProcessingDb.GetWorkflowDefinition(workflowId);
+
+                var testFilename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001);
+                var ussFilename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001_USS);
+
+                int fileId = 1;
+
+                var testInput = new DocumentDataInput
+                {
+                    Attributes = new[]
+                    {
+                        new DocumentAttribute
+                        {
+                            Name = "Data",
+                            Value = "Pending",
+                            HasPositionInfo = false
+                        }
+                    }.ToList()
+                };
+
+                var testAttribute = testInput.Attributes.Single();
+
+                controller.PutDocumentData(fileId, testInput)
+                    .AssertGoodResult<NoContentResult>();
+
+                var data = controller.GetDocumentData(fileId)
+                    .AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual("Pending", data.Attributes
+                    .Single()
+                    .Value,
+                    "Incorrect attribute value");
+
+                testAttribute.Value = "Complete";
+                controller.PutDocumentData(fileId, testInput)
+                    .AssertGoodResult<NoContentResult>();
+
+                data = controller.GetDocumentData(fileId)
+                    .AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual("Complete", data.Attributes
+                    .Single()
+                    .Value,
+                    "Incorrect attribute value");
+
+                fileProcessingDb.SetStatusForFile(
+                    fileId, _IDS_VERIFY_ACTION, workflowId, EActionStatus.kActionFailed, false, false, out _);
+                var status = fileProcessingDb.GetFileStatus(fileId, _IDS_VERIFY_ACTION, false);
+                Assert.AreEqual(EActionStatus.kActionFailed, status);
+
+                testAttribute.Value = "Failed";
+                controller.PutDocumentData(fileId, testInput)
+                    .AssertGoodResult<NoContentResult>();
+
+                data = controller.GetDocumentData(fileId)
+                    .AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual("Failed", data.Attributes
+                    .Single()
+                    .Value,
+                    "Incorrect attribute value");
+
+                fileProcessingDb.SetFileStatusToUnattempted(fileId, _IDS_VERIFY_ACTION, false);
+                status = fileProcessingDb.GetFileStatus(fileId, _IDS_VERIFY_ACTION, false);
+                Assert.AreEqual(EActionStatus.kActionUnattempted, status);
+
+                testAttribute.Value = "Unattempted";
+                controller.PutDocumentData(fileId, testInput)
+                    .AssertResultCode(StatusCodes.Status423Locked);
+
+                fileProcessingDb.SetFileStatusToPending(fileId, _IDS_VERIFY_ACTION, false);
+                status = fileProcessingDb.GetFileStatus(fileId, _IDS_VERIFY_ACTION, false);
+                Assert.AreEqual(EActionStatus.kActionPending, status);
+
+                var testPatch = new DocumentDataPatch
+                {
+                    Attributes = new[]
+                    {
+                        new DocumentAttributePatch(PatchOperation.Update)
+                        {
+                            ID = testAttribute.ID,
+                            Value = "PatchPending"
+                        }
+                    }.ToList()
+                };
+
+                var patchAttribute = testPatch.Attributes.Single();
+
+                controller.PatchDocumentData(fileId, testPatch)
+                    .AssertGoodResult<NoContentResult>();
+
+                data = controller.GetDocumentData(fileId)
+                    .AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual("PatchPending", data.Attributes
+                    .Single()
+                    .Value,
+                    "Incorrect attribute value");
+
+                patchAttribute.Value = "PatchComplete";
+                controller.PatchDocumentData(fileId, testPatch)
+                    .AssertGoodResult<NoContentResult>();
+
+                data = controller.GetDocumentData(fileId)
+                    .AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual("PatchComplete", data.Attributes
+                    .Single()
+                    .Value,
+                    "Incorrect attribute value");
+
+                fileProcessingDb.SetStatusForFile(
+                    fileId, _IDS_VERIFY_ACTION, workflowId, EActionStatus.kActionFailed, false, false, out _);
+                status = fileProcessingDb.GetFileStatus(fileId, _IDS_VERIFY_ACTION, false);
+                Assert.AreEqual(EActionStatus.kActionFailed, status);
+
+                patchAttribute.Value = "Failed";
+                controller.PatchDocumentData(fileId, testPatch)
+                    .AssertGoodResult<NoContentResult>();
+
+                data = controller.GetDocumentData(fileId)
+                    .AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual("Failed", data.Attributes
+                    .Single()
+                    .Value,
+                    "Incorrect attribute value");
+
+                fileProcessingDb.SetFileStatusToUnattempted(fileId, _IDS_VERIFY_ACTION, false);
+                status = fileProcessingDb.GetFileStatus(fileId, _IDS_VERIFY_ACTION, false);
+                Assert.AreEqual(EActionStatus.kActionUnattempted, status);
+
+                patchAttribute.Value = "Unattempted";
+                controller.PatchDocumentData(fileId, testPatch)
+                    .AssertResultCode(StatusCodes.Status423Locked);
             }
             finally
             {

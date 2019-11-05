@@ -411,7 +411,7 @@ namespace WebAPI.Controllers
                     string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
                     
                     data.OpenSession(User, ipAddress, true);
-                    data.OpenDocument(Id);
+                    data.OpenDocument(Id, processSkipped: false, dataUpdateOnly: true);
 
                     try
                     {
@@ -474,7 +474,7 @@ namespace WebAPI.Controllers
                     string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
 
                     data.OpenSession(User, ipAddress, true);
-                    data.OpenDocument(Id);
+                    data.OpenDocument(Id, processSkipped: false, dataUpdateOnly: true);
 
                     try
                     {
