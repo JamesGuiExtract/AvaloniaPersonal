@@ -3084,9 +3084,12 @@ bool CFileProcessingDB::getEncryptedPWFromDB(string &rstrEncryptedPW, bool bUseA
 		_RecordsetPtr ipLoginSet(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI15103", ipLoginSet != __nullptr);
 
+		string username = m_strFAMUserName;
+		replaceVariable(username, "'", "''");
+
 		// setup the SQL Query to get the encrypted combo for admin or user
 		string strSQL = "SELECT * FROM LOGIN WHERE UserName = '" + 
-			((bUseAdmin) ? gstrADMIN_USER : m_strFAMUserName) + "'";
+			((bUseAdmin) ? gstrADMIN_USER : username) + "'";
 
 		// Open the set for the user being logged in
 		ipLoginSet->Open(strSQL.c_str(), _variant_t((IDispatch *)getDBConnection(), true), 
