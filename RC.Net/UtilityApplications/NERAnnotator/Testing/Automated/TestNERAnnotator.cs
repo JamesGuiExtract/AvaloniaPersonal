@@ -1051,6 +1051,48 @@ PreprocessingFunctionName: AFDoc.sortText
             Assert.That(Regex.IsMatch(recordsWithoutSort, "Notary Public.*My Commission Expires"));
         }
 
+        /// <summary>
+        /// Allow preprocessing to remove pages
+        /// https://extract.atlassian.net/browse/ISSUE-16738
+        /// </summary>
+        [Test, Category("NERAnnotator")]
+        public static void ClearPagePreprocessor()
+        {
+            SetFiles();
+            var serializedSettings = @"
+TypesVoaFunction: <SourceDocName>.evoa
+PercentUninterestingPagesToInclude: 100
+RandomSeedForPageInclusion: 0
+Format: OpenNLP
+SplitIntoSentences: true
+SentenceDetectionModelPath: en-sent.nlp.etf
+TokenizerType: WhitespaceTokenizer
+EntityDefinitions:
+- Category: '@Type'
+  CategoryIsXPath: true
+  RootQuery: /*/HCData|/*/MCData|/*/LCData|/*/Manual
+RunPreprocessingFunction: false
+PreprocessingScript: NERUtils.fsx
+PreprocessingFunctionName: AFDoc.getFirstPage
+";
+            var settings = NERAnnotatorSettings.Load(serializedSettings);
+            settings.WorkingDir = _inputFolder.Last();
+
+            var ussFile = Path.Combine(_inputFolder.Last(), "Train", "Example06.tif.uss");
+
+            var maybeRecordsWithAllPages = NERAnnotator.GetRecordsForPages(settings, ussFile, 1, 2);
+            Assert.That(FSharpOption<(string, string)>.get_IsSome(maybeRecordsWithAllPages));
+            var recordsWithAllPages = maybeRecordsWithAllPages.Value.data;
+
+            settings.RunPreprocessingFunction = true;
+            var maybeRecordsWithMissingPage = NERAnnotator.GetRecordsForPages(settings, ussFile, 1, 2);
+            Assert.That(FSharpOption<(string, string)>.get_IsSome(maybeRecordsWithMissingPage));
+            var recordsWithMissingPage = maybeRecordsWithMissingPage.Value.data;
+
+            Assert.Less(recordsWithMissingPage.Length, recordsWithAllPages.Length);
+        }
+
+
         // Tests that the character replace function is applied
         [Test, Category("NERAnnotator")]
         public static void CharacterReplace()

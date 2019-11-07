@@ -2,6 +2,7 @@ module NERUtils
 #I @"C:\Engineering\Binaries\Debug"
 #I @"C:\Program Files (x86)\Extract Systems\CommonComponents"
 #r "Extract.AttributeFinder.dll"
+#r "Extract.Imaging.dll"
 #r "Extract.Utilities.FSharp.NERAnnotation.dll"
 #r "Extract.Utilities.Parsers.dll"
 #r "Interop.UCLID_AFCORELib.dll"
@@ -15,45 +16,6 @@ open Extract.Utilities.FSharp.NERAnnotation
 open UCLID_AFCORELib
 open UCLID_AFVALUEFINDERSLib
 open UCLID_RASTERANDOCRMGMTLib
-
-module Seq =
-  open UCLID_COMUTILSLib
-  open System.Collections
-
-  let ofUV<'t> (uv : IIUnknownVector) =
-    seq { for i in 0 .. (uv.Size()-1) -> uv.At(i)} |> Seq.cast<'t>
-
-  let ofVOA = ofUV<IAttribute>
-
-  let toGenericList<'t> (x : 't seq) =
-    Generic.List<'t>(x)
-
-  let toUV (x : 'a seq when 'a :> obj) =
-      let uv = IUnknownVectorClass()
-      x |> Seq.iter (fun li -> uv.PushBack li)
-      uv
-
-module Regex =
-  open System.Text.RegularExpressions
-
-  let replace pat rep inp =
-    Regex.Replace(input=inp, pattern=pat, replacement=rep)
-
-module AFDoc =
-  let sortText (doc: AFDocument): AFDocument =
-    let lines = doc.Text.GetLines();
-    if lines.Size() > 0
-    then
-      let sorter = SpatiallyCompareStringsClass()
-      lines.Sort(sorter)
-      doc.Text.CreateFromSpatialStrings(lines, true);
-    doc
-
-module CharReplacement =
-  let makeDatesGeneric (text: string): string =
-    text
-    |> Regex.replace "[0-8]" "9"
-    |> Regex.replace "-" "/"
 
 type NoCase(value) =
   member val Value = value
@@ -82,6 +44,107 @@ type MaybeBuilder() =
 
 let maybe = new MaybeBuilder()
 
+(*
+  __  __           _       _         
+ |  \/  |         | |     | |        
+ | \  / | ___   __| |_   _| | ___    
+ | |\/| |/ _ \ / _` | | | | |/ _ \   
+ | |  | | (_) | (_| | |_| | |  __/   
+ |_|  |_|\___/ \__,_|\__,_|_|\___|   
+  ______ ______ ______ ______ ______ 
+ |______|______|______|______|______|
+*)
+module Seq =
+  open UCLID_COMUTILSLib
+  open System.Collections
+
+  let ofUV<'t> (uv : IIUnknownVector) =
+    seq { for i in 0 .. (uv.Size()-1) -> uv.At(i)} |> Seq.cast<'t>
+
+  let ofVOA = ofUV<IAttribute>
+
+  let toGenericList<'t> (x : 't seq) =
+    Generic.List<'t>(x)
+
+  let toUV (x : 'a seq when 'a :> obj) =
+      let uv = IUnknownVectorClass()
+      x |> Seq.iter (fun li -> uv.PushBack li)
+      uv
+
+(*
+  __  __           _       _         
+ |  \/  |         | |     | |        
+ | \  / | ___   __| |_   _| | ___    
+ | |\/| |/ _ \ / _` | | | | |/ _ \   
+ | |  | | (_) | (_| | |_| | |  __/   
+ |_|  |_|\___/ \__,_|\__,_|_|\___|   
+  ______ ______ ______ ______ ______ 
+ |______|______|______|______|______|
+*)
+module Regex =
+  open System.Text.RegularExpressions
+
+  let replace pat rep inp =
+    Regex.Replace(input=inp, pattern=pat, replacement=rep)
+
+  let isMatch pat inp =
+    Regex.IsMatch(input=inp, pattern=pat)
+
+(*
+  __  __           _       _         
+ |  \/  |         | |     | |        
+ | \  / | ___   __| |_   _| | ___    
+ | |\/| |/ _ \ / _` | | | | |/ _ \   
+ | |  | | (_) | (_| | |_| | |  __/   
+ |_|  |_|\___/ \__,_|\__,_|_|\___|   
+  ______ ______ ______ ______ ______ 
+ |______|______|______|______|______|
+*)
+module AFDoc =
+  open Extract.AttributeFinder
+  open Extract.Utilities.Parsers
+
+  let sortText (doc: AFDocument): AFDocument =
+    let lines = doc.Text.GetLines();
+    if lines.Size() > 0
+    then
+      let sorter = SpatiallyCompareStringsClass()
+      lines.Sort(sorter)
+      doc.Text.CreateFromSpatialStrings(lines, true);
+    doc
+
+  let getFirstPage (doc: AFDocument): AFDocument =
+    if doc.Text.HasSpatialInfo ()
+    then
+      doc.Text <- doc.Text.GetSpecifiedPages(1, 1)
+    doc
+
+(*
+  __  __           _       _         
+ |  \/  |         | |     | |        
+ | \  / | ___   __| |_   _| | ___    
+ | |\/| |/ _ \ / _` | | | | |/ _ \   
+ | |  | | (_) | (_| | |_| | |  __/   
+ |_|  |_|\___/ \__,_|\__,_|_|\___|   
+  ______ ______ ______ ______ ______ 
+ |______|______|______|______|______|
+*)
+module CharReplacement =
+  let makeDatesGeneric (text: string): string =
+    text
+    |> Regex.replace "[0-8]" "9"
+    |> Regex.replace "-" "/"
+
+(*
+  __  __           _       _         
+ |  \/  |         | |     | |        
+ | \  / | ___   __| |_   _| | ___    
+ | |\/| |/ _ \ / _` | | | | |/ _ \   
+ | |  | | (_) | (_| | |_| | |  __/   
+ |_|  |_|\___/ \__,_|\__,_|_|\___|   
+  ______ ______ ______ ______ ______ 
+ |______|______|______|______|______|
+*)
 module Names =
   open System.Text.RegularExpressions
 
@@ -399,6 +462,16 @@ module Names =
     { entitiesAndPage with Entities = finishable }
 // End of Names module
 
+(*
+  __  __           _       _         
+ |  \/  |         | |     | |        
+ | \  / | ___   __| |_   _| | ___    
+ | |\/| |/ _ \ / _` | | | | |/ _ \   
+ | |  | | (_) | (_| | |_| | |  __/   
+ |_|  |_|\___/ \__,_|\__,_|_|\___|   
+  ______ ______ ______ ______ ______ 
+ |______|______|______|______|______|
+*)
 module Dates =
   open Extract.Utilities.Parsers
 
@@ -557,15 +630,50 @@ module Dates =
 // End of Dates module
 
 (*
-  **************************************************************************************************** 
-  Helper functions to handle delegating all categories
-  ------------------------------------------------------------------------------------------------
+  __  __           _       _         
+ |  \/  |         | |     | |        
+ | \  / | ___   __| |_   _| | ___    
+ | |\/| |/ _ \ / _` | | | | |/ _ \   
+ | |  | | (_) | (_| | |_| | |  __/   
+ |_|  |_|\___/ \__,_|\__,_|_|\___|   
+  ______ ______ ______ ______ ______ 
+ |______|______|______|______|______|
 *)
-let private (|DocumentDate|DOB|PatientName|Unknown|) categoryString =
+module Currency =
+  // Return all entities that aren't 0
+  let limitToFinishableCurrency (entitiesAndPage: EntitiesAndPage): EntitiesAndPage =
+    let finishable =
+      entitiesAndPage.Entities
+      |> Seq.choose (fun entity ->
+          match entity.SpatialString with
+          | None -> None
+          | Some str -> 
+              let number = str.String |> Regex.replace @"\D+" ""
+              let zero = number |> Regex.isMatch @"\A0*\z"
+              if zero then None else Some entity
+      )
+      |> Seq.toList
+
+    { entitiesAndPage with Entities = finishable }
+// End of Currency module
+
+(*
+  _   _ ______ _____ 
+ | \ | |  ____|  __ \
+ |  \| | |__  | |__) |
+ | . ` |  __| |  _  /
+ | |\  | |____| | \ \
+ |_| \_|______|_|  \_\
+  ______ ______ ______ 
+ |______|______|______|
+*)
+// Helper functions to handle delegating all categories
+let private (|DocumentDate|DOB|PatientName|Currency|Unknown|) categoryString =
   match categoryString with
   | "DocumentDate" -> DocumentDate
   | "DOB" -> DOB
   | "PatientName" -> PatientName
+  | "Currency" -> Currency
   | _ -> Unknown
 
 let private getByGroup (enp: EntitiesAndPage) =
@@ -599,16 +707,17 @@ let private setExpectedValuesToConcatenation (entitiesAndPage: EntitiesAndPage):
   { entitiesAndPage with Entities = entities }
 
 (*
-**************************************************************************************************** 
-  Top-level functions for NERAnntotor (NERUtils module)
-  ------------------------------------------------------------------------------------------------
+  _   _ ______ _____                              _        _             
+ | \ | |  ____|  __ \     /\                     | |      | |            
+ |  \| | |__  | |__) |   /  \   _ __  _ __   ___ | |_ __ _| |_ ___  _ __ 
+ | . ` |  __| |  _  /   / /\ \ | '_ \| '_ \ / _ \| __/ _` | __/ _ \| '__|
+ | |\  | |____| | \ \  / ____ \| | | | | | | (_) | || (_| | || (_) | |   
+ |_| \_|______|_|  \_\/_/    \_\_| |_|_| |_|\___/ \__\__,_|\__\___/|_|   
+  ______ ______ ______ ______ ______ ______ ______ ______ ______ ______  
+ |______|______|______|______|______|______|______|______|______|______|
 *)
 
-(*
-**************************************************************************************************** 
-  Create canonical format of name from its attributes.
-  ------------------------------------------------------------------------------------------------
-*)
+// Create canonical format of name from its attributes.
 let setExpectedValuesFromDefinitions (entitiesAndPage: EntitiesAndPage): EntitiesAndPage =
   let funs enp = function
     | PatientName -> Some(Names.setExpectedValuesFromNameDefinitions enp)
@@ -616,30 +725,24 @@ let setExpectedValuesFromDefinitions (entitiesAndPage: EntitiesAndPage): Entitie
   let processed = processGroups entitiesAndPage funs
   { entitiesAndPage with Entities = processed }
 
-(*
-**************************************************************************************************** 
-  Search for the expected value on the supplied page
-  ------------------------------------------------------------------------------------------------
-*)
+// Search for the expected value on the supplied page
 let resolveToPage entitiesAndPage =
   let funs enp = function
     | DocumentDate -> Some(Dates.resolveDatesToPage enp)
     | DOB -> Some(Dates.resolveDatesToPage enp)
     | PatientName -> Some(Names.resolveNamesToPage enp)
+    | Currency -> None
     | Unknown -> None
   let processed = processGroups entitiesAndPage funs
   { entitiesAndPage with Entities = processed }
 
-(*
-**************************************************************************************************** 
-  Return all entities that match the expected value after processing
-  ------------------------------------------------------------------------------------------------
-*)
+// Return all entities that match the expected value after processing
 let limitToFinishable entitiesAndPage =
   let funs enp = function
     | DocumentDate -> Some(Dates.limitToFinishableDates enp)
     | DOB -> Some(Dates.limitToFinishableDates enp)
     | PatientName -> Some(Names.limitToFinishableNames enp)
+    | Currency -> Some(Currency.limitToFinishableCurrency enp)
     | Unknown -> None
   let processed = processGroups entitiesAndPage funs
   { entitiesAndPage with Entities = processed }
