@@ -2687,30 +2687,17 @@ namespace Extract.AttributeFinder
                     .SelectMany((voa, i) =>
                     {
                         var labels = CollectLabelsFromLabeledCandidateAttributesFile(voa);
-                        if (i % LearningMachineMethods.UpdateFrequency == 0)
+                        updateStatus(new StatusArgs
                         {
-                            updateStatus(new StatusArgs
-                            {
-                                StatusMessage = "Files processed: {0:N0}",
-                                Int32Value = LearningMachineMethods.UpdateFrequency,
-                                Indent = 1
-                            });
-                        }
+                            StatusMessage = "Files processed: {0:N0}",
+                            Int32Value = 1,
+                            Indent = 1
+                        });
 
                         return labels;
                     })
                     .Distinct(StringComparer.OrdinalIgnoreCase) // https://extract.atlassian.net/browse/ISSUE-14761
                     .ToList();
-
-                if (answers.Count % LearningMachineMethods.UpdateFrequency > 0)
-                {
-                    updateStatus(new StatusArgs
-                    {
-                        StatusMessage = "Files processed: {0:N0}",
-                        Int32Value = answers.Count % LearningMachineMethods.UpdateFrequency,
-                        Indent = 1
-                    });
-                }
             }
 
             if (labeledCandidateAttributesFiles.Length > 0)

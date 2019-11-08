@@ -911,14 +911,14 @@ namespace LearningMachineTrainer
                             .Select(s => double.TryParse(s, out var d) ? d : 0).ToArray();
                         features.Add(featureVector);
 
-                        if (csvReader.EndOfData || answers.Count % UpdateFrequency == 0)
+                        if (csvReader.EndOfData || (answers.Count + 1) % UpdateFrequency == 0)
                         {
                             updateStatus(new StatusArgs
                             {
                                 StatusMessage = "Getting input data: {0:N0} records",
                                 Int32Value = csvReader.EndOfData
                                   ? answers.Count % UpdateFrequency
-                                  : UpdateFrequency
+                                  : UpdateFrequency - 1
                             });
                         }
 
@@ -1093,14 +1093,14 @@ namespace LearningMachineTrainer
                                     streamWriter.WriteLine(csvReader.ReadLine());
                                 }
 
-                                if (csvReader.EndOfData || dataIndex % UpdateFrequency == 0)
+                                if (csvReader.EndOfData || (dataIndex + 1) % UpdateFrequency == 0)
                                 {
                                     updateStatus(new StatusArgs
                                     {
                                         StatusMessage = "Updating CSV: {0:N0} records",
                                         Int32Value = csvReader.EndOfData
                                             ? dataIndex % UpdateFrequency
-                                            : UpdateFrequency
+                                            : UpdateFrequency - 1
                                     });
                                 }
 

@@ -1103,12 +1103,12 @@ namespace Extract.AttributeFinder
                     }
 
                     // This count need not be precise, nor be updated for every word
-                    if (i % LearningMachineMethods.UpdateFrequency == 0)
+                    if ((i + 1) % LearningMachineMethods.UpdateFrequency == 0)
                     {
                         updateStatus(new StatusArgs
                         {
                             StatusMessage = "Scoring Terms... Terms processed: {0:N0}",
-                            Int32Value = LearningMachineMethods.UpdateFrequency
+                            Int32Value = LearningMachineMethods.UpdateFrequency - 1
                         });
                     }
 
