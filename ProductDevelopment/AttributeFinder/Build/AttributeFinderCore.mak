@@ -589,6 +589,7 @@ MakeExtractFlexCommonMergeModule: MakeExtractCommonMergeModule
     @ECHO.
 	
 CopyFKB:
+	!IF "$(FKBBuildNeeded)"=="True"
 	@ECHO Copy FKB update
 	@ECHO.
 	@DATE /T
@@ -600,6 +601,10 @@ CopyFKB:
 	@DATE /T
 	@TIME /T
 	@ECHO.
+	!ELSE
+	@ECHO No FKB update to copy
+	@ECHO.
+	!ENDIF
 	
 BuildAFCoreMergeModule: CleanupPreviousBuildFolders MakeExtractFlexCommonMergeModule CopyFilesToInstallFolder  
     @ECHO Buliding the UCLIDFlexIndex Merge Module installation...
