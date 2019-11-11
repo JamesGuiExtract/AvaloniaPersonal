@@ -77,7 +77,7 @@ namespace Extract.AttributeFinder
             _pageNumber = 0;
             _endOfParagraph = _endOfZone = _spatial = false;
             _fontSize = 0;
-            _charConfidence = 1;
+            _charConfidence = 100;
             _font = 0;
         }
 

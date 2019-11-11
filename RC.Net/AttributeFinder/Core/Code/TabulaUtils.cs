@@ -61,11 +61,11 @@ namespace Extract.AttributeFinder
         /// <summary>
         /// Generic method to do boring stuff and delegate table finding/processing for each page to the supplied classes
         /// </summary>
-        /// <typeparam name="TResult">The result of the the table processor</typeparam>
+        /// <typeparam name="TResult">The result of the table processor</typeparam>
         /// <param name="inputFile">The PDF or image to search for tables</param>
         /// <param name="tableProcessor">The <see cref="ITabulaTableProcessor{TResult}"/> used for processing each table</param>
         /// <param name="pageNumbers">Optional set of pages to search (pass null for all pages)</param>
-        /// <param name="tableFinder">Optional <see cref="ITabulaTableFinder"/> implemenation to find the tables</param>
+        /// <param name="tableFinder">Optional <see cref="ITabulaTableFinder"/> implementation to find the tables</param>
         /// <param name="pdfFile">Optional path to load or write the intermediate, text-based PDF file to. If null then a temp file will be used.</param>
         /// <returns>A nested collection of tables where the outer layer has one entry per page searched</returns>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]

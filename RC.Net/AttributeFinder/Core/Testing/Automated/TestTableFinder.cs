@@ -179,6 +179,24 @@ namespace Extract.AttributeFinder.Test
         }
 
         /// <summary>
+        /// Test getting spatial string version of tables from one page of a PDF
+        /// </summary>
+        [Test]
+        public static void TablesFromSinglePage()
+        {
+            var inputFile = _testFiles.GetFile("Resources.Tabula.us-005.pdf");
+            var expectedFile = inputFile + ".byPage.byColumn.voa";
+            var expectedAttributes = new IUnknownVectorClass();
+            expectedAttributes.LoadFrom(expectedFile, false);
+            var table = TabulaUtils.GetTablesAsSpatialString(inputFile, 1, byRow: false);
+
+            var expectedText = ConcatAttributeText(expectedAttributes);
+            var foundText = table.String;
+            Assert.AreEqual(expectedText, foundText);
+        }
+
+
+        /// <summary>
         /// Test using GetTableCellsAsSpatialStrings from a script for use with attribute classification
         /// </summary>
         [Test]
