@@ -28,5 +28,8 @@ TagRepos:
 	cd %BUILD_VSS_ROOT%\Engineering\Rules
 	$(GitPath) tag $(GitTagFlexIndexVersion) -m "$(FlexIndexVersion)"
 	@ECHO FKBBuildNeeded  = $(FKBBuildNeeded)
-	@IF "$(FKBBuildNeeded)"=="True"  $(GitPath) tag $(GitTagFKBVersion) -m "$(FKBVersion)"
+	@IF "$(FKBBuildNeeded)"=="True" (
+		$(GitPath) commit -a -m "Updated FKB Version $(FKBVersion)"
+		$(GitPath) tag $(GitTagFKBVersion) -m "$(FKBVersion)"
+	)
 	

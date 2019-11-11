@@ -132,9 +132,6 @@ IF "%FKBBuildNeeded%"=="True" (
 		Echo.
 		goto ExitWithError
 	)
-    FOR /F "tokens=2 delims==" %%F IN ('findstr FKBVersion FKBVersion.mak') DO SET FKBVersionToBuild=%%F
-
-    %GitPath% commit -a -m "Updated FKB Version %FKBVersionToBuild%" 2>&1 | tee "%TAGLOGFILE%" -Append
 )
 
 cd %BUILD_VSS_ROOT%\Engineering\ProductDevelopment\Common
