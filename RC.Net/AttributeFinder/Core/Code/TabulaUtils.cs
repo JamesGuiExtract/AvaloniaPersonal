@@ -72,6 +72,10 @@ namespace Extract.AttributeFinder
         public static IEnumerable<IEnumerable<TResult>> GetTablesOnEveryPage<TResult>(string inputFile, ITabulaTableProcessor<TResult> tableProcessor,
             IEnumerable<int> pageNumbers = null, ITabulaTableFinder tableFinder = null, string pdfFile = null)
         {
+            HashSet<int> specifiedPageNumbers = pageNumbers == null
+                ? null
+                : new HashSet<int>(pageNumbers);
+
             TemporaryFile tmpFile = null;
             try
             {
@@ -110,10 +114,25 @@ namespace Extract.AttributeFinder
                         "Page count from getNumberOfPages", numberOfPages);
 
                     IEnumerable<int> pagesToSearch = Enumerable.Range(1, numberOfPages);
-                    if (pageNumbers != null)
+                    if (specifiedPageNumbers != null && specifiedPageNumbers.Count > 0)
                     {
-                        pagesToSearch = pagesToSearch.Intersect(pageNumbers);
+                        var intersect = pagesToSearch.Intersect(specifiedPageNumbers).ToList();
+                        if (intersect.Count == specifiedPageNumbers.Count)
+                        {
+                            pagesToSearch = intersect;
+                        }
+                        else
+                        {
+                            var missingPages = specifiedPageNumbers.Except(intersect);
+                            var uex = new ExtractException("ELI49537", "Page not found!");
+                            foreach (var page in missingPages)
+                            {
+                                uex.AddDebugData("Missing page", page);
+                            }
+                            throw uex;
+                        }
                     }
+
                     var pagesOfTables = pagesToSearch
                         .Select(pageNumber =>
                         {

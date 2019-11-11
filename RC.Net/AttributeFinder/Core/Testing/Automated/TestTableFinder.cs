@@ -195,6 +195,15 @@ namespace Extract.AttributeFinder.Test
             Assert.AreEqual(expectedText, foundText);
         }
 
+        /// <summary>
+        /// Test that there is an exception when getting tables from non-existent page
+        /// </summary>
+        [Test]
+        public static void TablesFromMissingPage()
+        {
+            var inputFile = _testFiles.GetFile("Resources.Tabula.us-005.pdf");
+            Assert.Throws<ExtractException>(() => TabulaUtils.GetTablesAsSpatialString(inputFile, 100, byRow: false));
+        }
 
         /// <summary>
         /// Test using GetTableCellsAsSpatialStrings from a script for use with attribute classification
