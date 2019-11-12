@@ -94,16 +94,7 @@ namespace Extract.AttributeFinder
                     // Create text-based PDF file for input to Tabula unless one has already been supplied
                     if (!File.Exists(pdfFile) || new FileInfo(pdfFile).Length == 0)
                     {
-                        var ocrParams = new List<OCRParam>
-                        {
-                            // Turn off external fonts to make the file size smaller
-                            new OCRParam(("Converters.Text.PDF.AdditionalFonts", 0)),
-                            // Use original DPI for pictures
-                            new OCRParam(("Converters.Text.PDF.Pictures", 1)),
-                        }
-                        .ToOCRParameters();
-
-                        _ocrEngine.Value.CreateOutputImage(inputFile, "PDF", pdfFile, ocrParams);
+                        CreateTextPdf(inputFile, pdfFile);
                     }
 
                     pdDoc = PDDocument.load(new java.io.File(pdfFile));
@@ -181,7 +172,6 @@ namespace Extract.AttributeFinder
                 tmpFile?.Dispose();
             }
         }
-
 
         /// <summary>
         /// Find tables and make one spatial string per page with each table on the page delimited by keywords
@@ -284,6 +274,32 @@ namespace Extract.AttributeFinder
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI49507");
+            }
+        }
+
+        /// <summary>
+        /// Create a text-based PDF file from a PDF or image
+        /// </summary>
+        /// <param name="inputFile">The PDF or image to convert</param>
+        /// <param name="pdfFile">The path to write the text-based PDF to</param>
+        public static void CreateTextPdf(string inputFile, string pdfFile)
+        {
+            try
+            {
+                var ocrParams = new List<OCRParam>
+                {
+                    // Turn off external fonts to make the file size smaller
+                    new OCRParam(("Converters.Text.PDF.AdditionalFonts", 0)),
+                    // Use original DPI for pictures
+                    new OCRParam(("Converters.Text.PDF.Pictures", 1)),
+                }
+                .ToOCRParameters();
+
+                _ocrEngine.Value.CreateOutputImage(inputFile, "PDF", pdfFile, ocrParams);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49538");
             }
         }
 
