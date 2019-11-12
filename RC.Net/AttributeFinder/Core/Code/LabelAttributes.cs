@@ -204,7 +204,12 @@ namespace Extract.AttributeFinder
                 var imagePathsAndMaybeAnswers = inputConfig.GetImagePaths(updateStatus, cancellationToken);
                 string[] imageFiles = imagePathsAndMaybeAnswers.Item1;
 
-                Parallel.For(0, imageFiles.Length, (i, loopState) =>
+                var opts = new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = Environment.ProcessorCount
+                };
+
+                Parallel.For(0, imageFiles.Length, opts, (i, loopState) =>
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
