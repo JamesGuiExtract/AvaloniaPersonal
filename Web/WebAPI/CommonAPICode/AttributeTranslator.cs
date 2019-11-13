@@ -13,7 +13,7 @@ using WebAPI.Models;
 namespace WebAPI
 {
     /// <summary>
-    /// Used to provide translation between attributes represented via <see cref="DocumentDataInput"/> 
+    /// Used to provide translation between attributes represented via the input DocumentAttributes
     /// or <see cref="DocumentDataPatch"/> and COM <see cref="IAttribute"/>s.
     /// </summary>
     public class AttributeTranslator
@@ -40,22 +40,17 @@ namespace WebAPI
         /// existing attribute data for the document.
         /// </summary>
         /// <param name="sourceDocName">Name of the source document.</param>
-        /// <param name="inputDocumentData">The data that should replace the document's exising
-        /// attribute data.</param>
-        public AttributeTranslator(string sourceDocName, DocumentDataInput inputDocumentData)
+        public AttributeTranslator(string sourceDocName, List<DocumentAttribute> inputDocumentData)
         {
             try
             {
-                bool spatialInfoRequired = inputDocumentData
-                    .Attributes
-                    .Enumerate()
-                    .Any(a => a.HasPositionInfo ?? false);
+                bool spatialInfoRequired = inputDocumentData.Any(a => a.HasPositionInfo ?? false);
 
                 InitializeSourceDocument(sourceDocName, spatialInfoRequired);
 
                 _attributes = new IUnknownVector();
 
-                foreach (var attribute in inputDocumentData.Attributes)
+                foreach (var attribute in inputDocumentData)
                 {
                     IAttribute comAttribute = ConvertAttribute(attribute);
 

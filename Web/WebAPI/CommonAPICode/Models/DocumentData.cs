@@ -558,11 +558,14 @@ namespace WebAPI.Models
         /// useful to 3rd party integrators.</param>
         /// <param name="splitMultiPageAttributes"><c>true</c> to split multi-page attributes into a separate
         /// attribute for every page; <c>false</c> to map multi-page attributes as they are.</param>
-        /// <returns>corresponding DocumentAttributeSet</returns>
+        /// <param name="cacheData">Specifies if the attribute data for this file should be cached
+        /// as a side effect of the call. Caching is required if data is to be edited via <see cref="EditPageData"/>
+        /// and <see cref="CommitCachedDocumentData"/>. In order to be cached,
+        /// <see cref="splitMultiPageAttributes"/> must be <c>true</c>.</param>
         /// <returns>DocumentAttributeSet instance, including error info iff there is an error</returns>
-        /// <remarks>The DocumentData CTOR must be constructed with useAttributeDbMgr = true</remarks>
         public DocumentDataResult GetDocumentData(int fileId, 
-            bool includeNonSpatial, bool verboseSpatialData, bool splitMultiPageAttributes)
+            bool includeNonSpatial, bool verboseSpatialData, bool splitMultiPageAttributes,
+            bool cacheData)
         {
             try
             {
@@ -571,8 +574,37 @@ namespace WebAPI.Models
                 var results = GetAttributeSetForFile(fileId);
                 var mapper = new AttributeMapper(results, FileApi.Workflow.Type);
 
-                return mapper.MapAttributesToDocumentAttributeSet(
+                var documentData = mapper.MapAttributesToDocumentAttributeSet(
                     includeNonSpatial, verboseSpatialData, splitMultiPageAttributes);
+
+                if (cacheData)
+                {
+                    ExtractException.Assert("ELI49513", "Attribute data caching supported by page only.",
+                        splitMultiPageAttributes);
+
+                    var pagesOfAttributes = documentData.Attributes
+                        .Where(attribute => attribute.HasPositionInfo == true)
+                        .GroupBy(attribute => attribute.SpatialPosition.Pages.Single())
+                        .ToDictionary(group => group.Key, group => group.ToList());
+
+                    var mapOfAttributes = new StrToStrMap();
+                    var fileName = GetSourceFileName(fileId);
+                    var pageCount = _imageUtils.Value.GetPageCount(fileName);
+                    for (int page = 1; page <= pageCount; page++)
+                    {
+                        string attributeJSON = "";
+                        if (pagesOfAttributes.TryGetValue(page, out var attributes))
+                        {
+                            attributeJSON = JsonConvert.SerializeObject(attributes);
+                        }
+
+                        mapOfAttributes.Set(page.ToString(), attributeJSON);
+                    }
+
+                    FileApi.FileProcessingDB.CacheAttributeData(FileApi.DocumentSession.Id, mapOfAttributes);
+                }
+
+                return documentData;
             }
             catch (Exception ex)
             {
@@ -592,13 +624,147 @@ namespace WebAPI.Models
                 AssertRequestFileId("ELI46349", fileId);
 
                 string fileName = AttributeDbMgr.FAMDB.GetFileNameFromFileID(fileId);
-                var translator = new AttributeTranslator(fileName, inputData);
+                var translator = new AttributeTranslator(fileName, inputData.Attributes);
 
                 UpdateDocumentData(fileId, translator.ComAttributes);
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI44889");
+            }
+        }
+
+        /// <summary>
+        /// Edits a given page of a document by replacing the existing attributes with the specified
+        /// <see paramref="inputData"/>.
+        /// <para><b>Note</b></para>
+        /// Edits made via this call will only become part of a new attribute set after calling
+        /// <see cref="CommitCachedDocumentData"/>.
+        /// </summary>
+        /// <param name="fileId">The ID of the file for which to edit data.</param>
+        /// <param name="page">The page number for which data is to be edited.</param>
+        /// <param name="inputData">The new <see cref="DocumentAttribute"/>s to apply to the page.</param>
+        public void EditPageData(int fileId, int page, List<DocumentAttribute> inputData)
+        {
+            try
+            {
+                AssertDocumentSession("ELI49465");
+                AssertRequestFileId("ELI46349", fileId);
+
+                FileApi.FileProcessingDB.CacheFileTaskSessionData(FileApi.DocumentSession.Id, page,
+                    null, null, null, JsonConvert.SerializeObject(inputData), null, vbCrucialUpdate: true);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49512");
+            }
+        }
+
+        /// <summary>
+        /// Commits all document data edits made via <see cref="EditPageData"/> to a new attribute
+        /// set for the file.
+        /// </summary>
+        /// <param name="fileId">The ID of the file for which edited data should be committed.</param>
+        public void CommitCachedDocumentData(int fileId)
+        {
+            try
+            {
+                AssertRequestFileId("ELI49553", fileId);
+                AssertDocumentSession("ELI49554");
+
+                AttributeDbMgr.FAMDB.GetCachedFileTaskSessionData(FileApi.DocumentSession.Id, -1,
+                    ECacheDataType.kAttributes, true,
+                    out _, out _, out _, out string cachedData, out _);
+
+                string fileName = AttributeDbMgr.FAMDB.GetFileNameFromFileID(fileId);
+                var documentData = JsonConvert.DeserializeObject<List<DocumentAttribute>>(cachedData);
+                var translator = new AttributeTranslator(fileName, documentData);
+
+                UpdateDocumentData(fileId, translator.ComAttributes);
+                FileApi.FileProcessingDB.MarkAttributeDataUnmodified(FileApi.DocumentSession.Id);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49555");
+            }
+        }
+
+        /// <summary>
+        /// Gets all pages of uncommitted data edits from document sessions other than this one
+        /// so long as a new attribute set has not been stored for the document more recently than
+        /// the edits were made.
+        /// </summary>
+        /// <param name="fileId">The ID of the file for which uncommitted edits should be retrieved.</param>
+        /// <returns>A <see cref="UncommittedDocumentDataResult"/> representing the uncommitted edits.</returns>
+        public UncommittedDocumentDataResult GetUncommittedDocumentData(int fileId)
+        {
+            try
+            {
+                AssertRequestFileId("ELI49521", fileId);
+                AssertDocumentSession("ELI49542");
+
+                var result = new UncommittedDocumentDataResult();
+                var mostRecentDateTime = new DateTime(0);
+
+                int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.EditAction);
+                var attrSetName = FileApi.Workflow.OutputAttributeSet;
+                var uncommittedDocumentData = FileApi.FileProcessingDB.GetUncommittedAttributeData(
+                    fileId, actionId, FileApi.DocumentSession.Id, attrSetName);
+                int nCount = uncommittedDocumentData.Size();
+
+                // Each item in uncommittedDocumentData is a variant vector with the following fields:
+                // 0 FullUserName: (user that applied edit)
+                // 1 AttributeDataModifiedTime: (time of the edit)
+                // 2 Page: page number that was edited
+                // 3 AttributeData: JSON representation of the attributes.
+                var pageDictionary = new Dictionary<int, List<DocumentAttribute>>();
+                for (int i = 0; i < nCount; i++)
+                {
+                    var pageData = (IVariantVector)uncommittedDocumentData.At(i);
+
+                    if (i == 0)
+                    {
+                        result.UserName = (string)pageData[0];
+                    }
+                    var pageModifiedTime = (DateTime)pageData[1];
+                    mostRecentDateTime = new DateTime(Math.Max(mostRecentDateTime.Ticks, pageModifiedTime.Ticks));
+                    int pageNum = (int)pageData[2];
+                    var pageAttributes = JsonConvert.DeserializeObject<List<DocumentAttribute>>((string)pageData[3]);
+                    pageDictionary[pageNum] = pageAttributes;
+                }
+
+                // Use the most recently edited page to represent the 
+                result.ModifiedDateTime = mostRecentDateTime.ToString("dddd, MMMM dd yyyy HH:mm tt");
+
+                result.UncommittedPagesOfAttributes = pageDictionary
+                    .Select(page => new PageOfAttributes() { PageNumber = page.Key, Attributes = page.Value })
+                    .ToList();
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49529");
+            }
+        }
+
+        /// <summary>
+        /// Deletes all cache data rows that are not associated with this document session.
+        /// </summary>
+        /// <param name="fileId">The ID of the file for which cache data is to be deleted.</param>
+        public void DiscardOldCacheData(int fileId)
+        {
+            try
+            {
+                AssertRequestFileId("ELI49556", fileId);
+                AssertDocumentSession("ELI49557");
+
+                int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.EditAction);
+                FileApi.FileProcessingDB.DiscardOldCacheData(fileId, actionId, FileApi.DocumentSession.Id);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49558");
             }
         }
 
@@ -621,7 +787,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI49500");
+                throw ex.AsExtract("ELI44889");
             }
         }
 
@@ -717,7 +883,6 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="fileId">file id</param>
         /// <returns>IUnknownVector (attribute)</returns>
-        /// <remarks>The DocumentData CTOR must be constructed with useAttributeDbMgr = true</remarks>
         IUnknownVector GetAttributeSetForFile(int fileId)
         {
             try
@@ -793,7 +958,7 @@ namespace WebAPI.Models
                 {
                     // First, check to see if word zone data is cached.
                     FileApi.FileProcessingDB.GetCachedFileTaskSessionData(FileApi.DocumentSession.Id, page,
-                        ECacheDataType.kWordZone,
+                        ECacheDataType.kWordZone, false,
                         out _, out _, out wordZoneDataJson, out _, out _);
                 }
                 catch (Exception ex)
@@ -1156,8 +1321,10 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="pageNum">The page number.</param>
         /// <param name="fileId">The file identifier.</param>
-        /// <returns></returns>
-        public byte[] GetPageImage(int fileId, int pageNum)
+        /// <param name="cacheData"><c>true</c> to cache the image and uss data for the next page as
+        /// a side effect of this call.</param>
+        /// <returns>An array of bytes representing a PDF image of the page.</returns>
+        public byte[] GetPageImage(int fileId, int pageNum, bool cacheData)
         {
             try
             {
@@ -1174,7 +1341,7 @@ namespace WebAPI.Models
                 try
                 {
                     FileApi.FileProcessingDB.GetCachedFileTaskSessionData(FileApi.DocumentSession.Id, pageNum,
-                        ECacheDataType.kImage,
+                        ECacheDataType.kImage, false,
                         out cachedImageData, out _, out _, out _, out _);
                 }
                 catch (Exception ex)
@@ -1188,46 +1355,49 @@ namespace WebAPI.Models
                 // Set sessionId variables for closure of the Task.Run lamda
                 int sessionId = FileApi.DocumentSession.Id;
 
-                Task.Run(() =>
+                if (cacheData)
                 {
-                    try
+                    Task.Run(() =>
                     {
-                        var cachedPages = UtilityFileProcessingDB.GetCachedPageNumbers(
-                            sessionId, ECacheDataType.kImage);
-
-                        // Trigger data cache for the first page and also for the subsequent page
-                        // (if not already cached)
-                        int[] pagesToCache = (pageNum == 1)
-                            ? new[] { 2, 1 }   // Prioritize caching 2nd page over the first as the second would be need first.
-                            : new[] { pageNum + 1 };
-                        int pageCount = _imageUtils.Value.GetPageCount(fileName);
-                        pagesToCache = pagesToCache
-                            .Where(p => p <= pageCount)
-                            .Except((int[])cachedPages)
-                            .ToArray();
-
-                        foreach (int page in pagesToCache)
+                        try
                         {
-                            CachePageData(sessionId, fileId, page);
+                            var cachedPages = UtilityFileProcessingDB.GetCachedPageNumbers(
+                                sessionId, ECacheDataType.kImage);
+
+                            // Trigger data cache for the first page and also for the subsequent page
+                            // (if not already cached)
+                            int[] pagesToCache = (pageNum == 1)
+                                ? new[] { 2, 1 }   // Prioritize caching 2nd page over the first as the second would be need first.
+                                : new[] { pageNum + 1 };
+                            int pageCount = _imageUtils.Value.GetPageCount(fileName);
+                            pagesToCache = pagesToCache
+                                .Where(p => p <= pageCount)
+                                .Except((int[])cachedPages)
+                                .ToArray();
+
+                            foreach (int page in pagesToCache)
+                            {
+                                CachePageData(sessionId, fileId, page);
+                            }
                         }
-                    }
-                    catch (Exception cacheException)
-                    {
-                        // Since the ability to access cached data is not critical, log the
-                        // exception but otherwise ignore.
-                        // If needed, exceptions will be stored in the cache table where the
-                        // data would have been.
-                        var eeAppTrace = new ExtractException("ELI49468",
-                            "Application Trace: Cache operation did not succeed.", cacheException);
-                        eeAppTrace.AddDebugData("Session ID", sessionId, false);
-                        eeAppTrace.AddDebugData("File ID", fileId, false);
-                        eeAppTrace.AddDebugData("Page", pageNum, false);
-                        eeAppTrace.AddDebugData("Note",
-                            "If logged during unit test execution, this is not likely an indication of a problem.",
-                            true);
-                        eeAppTrace.Log();
-                    }
-                });
+                        catch (Exception cacheException)
+                        {
+                            // Since the ability to access cached data is not critical, log the
+                            // exception but otherwise ignore.
+                            // If needed, exceptions will be stored in the cache table where the
+                            // data would have been.
+                            var eeAppTrace = new ExtractException("ELI49468",
+                                "Application Trace: Cache operation did not succeed.", cacheException);
+                            eeAppTrace.AddDebugData("Session ID", sessionId, false);
+                            eeAppTrace.AddDebugData("File ID", fileId, false);
+                            eeAppTrace.AddDebugData("Page", pageNum, false);
+                            eeAppTrace.AddDebugData("Note",
+                                "If logged during unit test execution, this is not likely an indication of a problem.",
+                                true);
+                            eeAppTrace.Log();
+                        }
+                    });
+                }
 
                 if (cachedImageData != null && cachedImageData.Length > 0)
                 {
@@ -1766,7 +1936,6 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="attributes">UnknwonVector containing atribute</param>
         /// <returns>returns the value of the DocumentType attribute, or "Unknown"</returns>
-        /// <remarks>The DocumentData CTOR must be constructed with useAttributeDbMgr = true</remarks>
         static string GetDocumentType(IIUnknownVector attributes)
         {
             try
@@ -1901,7 +2070,7 @@ namespace WebAPI.Models
                 }
 
                 UtilityFileProcessingDB.CacheFileTaskSessionData(documentSessionId, page,
-                    image, stringizedPageUss, wordZoneJson, null, null);
+                    image, stringizedPageUss, wordZoneJson, null, null, vbCrucialUpdate: false);
             }
             catch (Exception ex)
             {
@@ -1910,7 +2079,7 @@ namespace WebAPI.Models
                 try
                 {
                     UtilityFileProcessingDB.CacheFileTaskSessionData(documentSessionId, page,
-                        null, null, null, null, stringizedException);
+                        null, null, null, null, stringizedException, vbCrucialUpdate: false);
                 }
                 catch (Exception ex2)
                 {

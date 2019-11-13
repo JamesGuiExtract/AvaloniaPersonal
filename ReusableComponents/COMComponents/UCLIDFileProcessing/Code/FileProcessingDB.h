@@ -367,14 +367,19 @@ public:
 	STDMETHOD(SuspendWebSession)();
 	STDMETHOD(IsFAMSessionOpen)(long nFAMSessionID, VARIANT_BOOL* pbIsFAMSessionOpen);
 	STDMETHOD(GetNumberSkippedForUser)(BSTR bstrUserName, long nActionID, VARIANT_BOOL bRevertTimedOutFAMs, long* pnFilesSkipped);
-	STDMETHOD(CacheFileTaskSessionData)(long nFileTaskSessionID, long nPage, 
+	STDMETHOD(CacheFileTaskSessionData)(long nFileTaskSessionID, long nPage,
 		SAFEARRAY *parrayImageData, BSTR bstrUssData, BSTR bstrWordZoneData, BSTR bstrAttributeData, BSTR bstrException,
-		VARIANT_BOOL* pbWroteData);
+		VARIANT_BOOL vbCrucialUpdate, VARIANT_BOOL* pbWroteData);
 	STDMETHOD(GetCachedFileTaskSessionData)(long nFileTaskSessionID, long nPage,
-		ECacheDataType eDataType,
+		ECacheDataType eDataType, VARIANT_BOOL vbCrucialData,
 		SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* bstrAttributeData, BSTR* pbstrException,
 		VARIANT_BOOL* pbFoundCacheData);
 	STDMETHOD(GetCachedPageNumbers)(long nFileTaskSessionID, ECacheDataType eDataType, SAFEARRAY** parrayCachedPages);
+	STDMETHOD(CacheAttributeData)(long nFileTaskSessionID, IStrToStrMap* pmapAttributeData);
+	STDMETHOD(MarkAttributeDataUnmodified)(long nFileTaskSessionID);
+	STDMETHOD(GetUncommittedAttributeData)(long nFileID, long nActionID, long nExceptFileTaskSessionID,
+		BSTR bstrExceptIfMoreRecentAttributeSetName, IIUnknownVector** ppUncommittedPagesOfData);
+	STDMETHOD(DiscardOldCacheData)(long nFileID, long nActionID, long nExceptFileTaskSessionID);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -1498,9 +1503,27 @@ private:
 	bool GetActiveUsers_Internal(bool bDBLocked, BSTR bstrAction, IVariantVector** ppvecUserNames);
 	bool AbortFAMSession_Internal(bool bDBLocked, long nFAMSessionID);
 	bool MarkFileDeleted_Internal(bool bDBLocked, long nFileID, long nWorkflowID);
-	bool CacheFileTaskSessionData_Internal(bool bDBLocked, long nFileTaskSessionID,
+	bool CacheFileTaskSessionData_Internal(bool bDBLocked, long nFileTaskSessionID, long nPage,
+		SAFEARRAY* parrayImageData, BSTR bstrUssData, BSTR bstrWordZoneData, BSTR bstrAttributeData,
+		BSTR bstrException, VARIANT_BOOL vbCrucialUpdate, VARIANT_BOOL* pbWroteData);
+	void CacheFileTaskSessionData_InternalHelper(ADODB::_ConnectionPtr ipConnection, long nFileTaskSessionID,
 		long nPage, SAFEARRAY* parrayImageData, BSTR bstrUssData, BSTR bstrWordZoneData, BSTR bstrAttributeData,
-		BSTR bstrException, VARIANT_BOOL* pbWroteData);
+		BSTR bstrException, bool bCrucialUpdate, VARIANT_BOOL* pbWroteData);
+	bool GetCachedFileTaskSessionData_Internal(bool bDBLocked, long nFileTaskSessionID, long nPage,
+		ECacheDataType eDataType, VARIANT_BOOL vbCrucialData, SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, 
+		BSTR* pbstrWordZoneData, BSTR* pbstrAttributeData, BSTR* pbstrException, VARIANT_BOOL* pbFoundCacheData);
+	bool GetCachedFileTaskSessionData_InternalHelper(ADODB::_ConnectionPtr ipConnection,
+		long nFileTaskSessionID, long nPage, ECacheDataType eDataType,
+		SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* pbstrAttributeData, BSTR* pbstrException);
+	bool GetCachedFileTaskSessionData_QueryCachedData(_ConnectionPtr ipConnection, long nFileTaskSessionID, long nPage,
+		ECacheDataType eDataType, SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* pbstrAttributeData,
+		BSTR* pbstrException);
+	bool CacheAttributeData_Internal(bool bDBLocked, long nFileTaskSessionID, IStrToStrMap* pmapAttributeData);
+	bool MarkAttributeDataUnmodified_Internal(bool bDBLocked, long nFileTaskSessionID);
+	bool GetUncommittedAttributeData_Internal(bool bDBLocked, long nFileID, long nActionID, long nExceptFileTaskSessionID,
+		BSTR bstrExceptIfMoreRecentAttributeSetName, IIUnknownVector** ppUncommitedPagesOfData);
+	bool DiscardOldCacheData_Internal(bool bDBLocked, long nFileID, long nActionID, long nExceptFileTaskSessionID);
+
 	void InvalidatePreviousCachedInfoIfNecessary();
 	void setDefaultSessionMemberValues();
 };

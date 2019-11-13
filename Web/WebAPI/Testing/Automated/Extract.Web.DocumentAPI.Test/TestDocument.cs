@@ -238,7 +238,7 @@ namespace Extract.Web.WebAPI.Test
                 for (int i = 1; i <= 10; ++i)
                 {
                     var statusResult = controller.GetStatus(i).AssertGoodResult<ProcessingStatusResult>();
-                    Assert.IsTrue(statusResult.DocumentStatus == DocumentProcessingStatus.Processing,
+                    Assert.IsTrue(statusResult.DocumentStatus == DocumentProcessingStatus.Processing, 
                         "Unexpected processing state");
                 }
             }
@@ -471,7 +471,7 @@ namespace Extract.Web.WebAPI.Test
             string dbName = "DocumentAPI_Test_GetTextResult";
 
             try
-            {
+            {   
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
                     InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
@@ -511,13 +511,13 @@ namespace Extract.Web.WebAPI.Test
                     {
                         case 6:
                         case 8:
-                            Assert.IsTrue(Utils.IsEquivalent(textResult.Text, "NonLab"),
-                                "Document type expected to be NonLab, is: {0}", textResult.Text);
+                        Assert.IsTrue(Utils.IsEquivalent(textResult.Text, "NonLab"),
+                            "Document type expected to be NonLab, is: {0}", textResult.Text);
                             break;
 
                         default:
-                            Assert.IsTrue(Utils.IsEquivalent(textResult.Text, "Unknown"),
-                                "Document type expected to be Unknown, is: {0}", textResult.Text);
+                        Assert.IsTrue(Utils.IsEquivalent(textResult.Text, "Unknown"),
+                            "Document type expected to be Unknown, is: {0}", textResult.Text);
                             break;
                     }
                 }
@@ -753,6 +753,7 @@ namespace Extract.Web.WebAPI.Test
 
                 int fileId = 1;
 
+                // First try using PutDocumentData for a document in various documents states
                 var testInput = new DocumentDataInput
                 {
                     Attributes = new[]
@@ -817,6 +818,8 @@ namespace Extract.Web.WebAPI.Test
                 status = fileProcessingDb.GetFileStatus(fileId, _IDS_VERIFY_ACTION, false);
                 Assert.AreEqual(EActionStatus.kActionPending, status);
 
+
+                // Next try using PatchDocumentData for a document in various documents states
                 var testPatch = new DocumentDataPatch
                 {
                     Attributes = new[]
@@ -1144,8 +1147,8 @@ namespace Extract.Web.WebAPI.Test
                 using (var data = new DocumentData(Utils.CurrentApiContext))
                 {
                     Assert.IsTrue(data != null, "null DocumentData reference");
-                    return data.GetDocumentData(
-                        fileId, includeNonSpatial: true, verboseSpatialData: true, splitMultiPageAttributes: false);
+                    return data.GetDocumentData(fileId, includeNonSpatial: true,
+                        verboseSpatialData: true, splitMultiPageAttributes: false, cacheData: false);
                 }
             }
             finally

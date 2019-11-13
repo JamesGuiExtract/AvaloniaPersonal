@@ -2091,27 +2091,69 @@ library UCLID_FILEPROCESSINGLib
 		// Caches attribute data for the specified file task session. This data will be available until the file task session
 		// (or FAM session to which it belongs) ends. All fields need not be specified; any fields left null will maintain any
 		// previously cached data. Return value indicates whether all data specified was successfully cached.
+		// vbCrucialUpdate indicates whether it is crucial this data will be cached. If specified, it is expected
+		// there is a pre-existing cache row (created by CacheAttributeData, for instance), retries and locking will
+		// be used and an exception will be thrown if caching does not succeed. If vbCrucialUpdate is false,
+		// no retries or locking will be used and no pre-existing cache row is required; pbWroteData will indicate
+		// if data could not be written (as opposed to throwing an exception)
+		// NOTE: If bstrAttributeData is specified, this cache row will be marked with the time of the update and allowed
+		// to persist after the session is lost or closed. MarkAttributeDataUnmodified can be used to clear this designation
+		// or DiscardUncommittedAttributeData can be used to explicitly remove these cache rows.
 		// NOTE: It is not required that the specified FileTaskSessionID be open at the time of the call, nor for this instance
 		// to be associated with that FileTaskSession or the FAMSession running it. If the FileTaskSession is closed, this call
 		// will have no effect.
-		[id(203), helpstring("method CacheFileTaskSessionData")] HRESULT CacheFileTaskSessionData([in] long nFileTaskSessionID, [in] long nPage,
-			[in] SAFEARRAY(unsigned char) arrayImageData, [in] BSTR bstrUssData, [in] BSTR bstrWordZoneData, [in] BSTR bstrAttributeData, [in] BSTR bstrException,
-			[out, retval] VARIANT_BOOL* pbWroteData);
+		[id(203), helpstring("method CacheFileTaskSessionData")] HRESULT CacheFileTaskSessionData(
+			[in] long nFileTaskSessionID, [in] long nPage,
+			[in] SAFEARRAY(unsigned char) arrayImageData, [in] BSTR bstrUssData, [in] BSTR bstrWordZoneData, [in] BSTR bstrAttributeData,
+			[in] BSTR bstrException, [in] VARIANT_BOOL vbCrucialUpdate, [out, retval] VARIANT_BOOL* pbWroteData);
 		// -----------------------------------------------------------------------------------------------
 		// Retrieves cached page data of the type indicated by eCacheDataType for the specified file task session. ECacheDataType
 		// values may be treated as flags to be able to retrieve either any one specific field, or multiple fields at once.
+		// nPage can be -1 to specified to retrieve the cached data for all pages in the case of eCacheDataType == kAttributes only.
+		// For all other types, data must be retrieved one page at a time.
+		// vbCrucialData indicates whether it is crucial this data be retrieved. If specified, retries and locking will
+		// be used and an exception will be thrown if cached data cannot be retrievd. If vbCrucialData is false,
+		// no retries or locking will be used; pbFoundCacheData will indicate if data was found (as opposed to throwing an exception)
 		// NOTE: It is not required that the specified FileTaskSessionID be open at the time of the call, nor for this instance
 		// to be associated with that FileTaskSession or the FAMSession running it. If the FileTaskSession is closed, this call
 		// will return pbFoundCacheData = VARIANT_FALSE.
-		[id(204), helpstring("method GetCachedFileTaskSessionData")] HRESULT GetCachedFileTaskSessionData([in] long nFileTaskSessionID, [in] long nPage,
-			[in] ECacheDataType eCacheDataType,
-			[out] SAFEARRAY(unsigned char)* parrayImageData, [out] BSTR* pbstrUssData, [out] BSTR* pbstrWordZoneData, [out] BSTR* pbstrAttributeData, [out] BSTR* pbstrException,
-			[out, retval] VARIANT_BOOL* pbFoundCacheData);
+		[id(204), helpstring("method GetCachedFileTaskSessionData")] HRESULT GetCachedFileTaskSessionData(
+			[in] long nFileTaskSessionID, [in] long nPage, [in] ECacheDataType eCacheDataType, [in] VARIANT_BOOL vbCrucialData,
+			[out] SAFEARRAY(unsigned char)* parrayImageData, [out] BSTR* pbstrUssData, [out] BSTR* pbstrWordZoneData,
+			[out] BSTR* pbstrAttributeData, [out] BSTR* pbstrException, [out, retval] VARIANT_BOOL* pbFoundCacheData);
 		// -----------------------------------------------------------------------------------------------
 		// Gets an array of page numbers for which data of the specified type has been cached.  ECacheDataType
 		// values may be treated as flags to ensure the returned pages have multiple data types cached.
+		// NOTE: This call is always treated as non-crucial; no database retries or locking will be attempted
 		[id(205), helpstring("method GetCachedPageNumbers")] HRESULT GetCachedPageNumbers([in] long nFileTaskSessionID,
 			[in] ECacheDataType eCacheDataType, [out, retval] SAFEARRAY(long)* parrayCachedPages);
+		// -----------------------------------------------------------------------------------------------
+		// Creates/ensures cache rows exist for all pages and populates attribute cache with data from pmapAttributeData
+		// pmapAttributeData is a map of page numbers (represented as strings) to the JSON representation of the attributes
+		// on each successive page. Retries and locking will be used; if all attributes cannot be cached for whatever
+		// reason, this call will result in an exception.
+		[id(206), helpstring("method CacheAttributeData")] HRESULT CacheAttributeData([in] long nFileTaskSessionID, [in] IStrToStrMap* pmapAttributeData);
+		// -----------------------------------------------------------------------------------------------
+		// Clears the attribute modified status of all cache rows for this session; this allows the cache rows to
+		// be cleaned up when the session is closed/lost.
+		[id(207), helpstring("method MarkAttributeDataUnmodified")] HRESULT MarkAttributeDataUnmodified([in] long nFileTaskSessionID);
+		// -----------------------------------------------------------------------------------------------
+		// Retrieves cached attribute data rows marked as modified, except for rows associated with nExceptFileTaskSessionID
+		// and except if there is a more recent attribute set for file stored under the name bstrExceptIfMoreRecentAttributeSetName.
+		// The result is an IUnknownVector of IVariantVectors where each IVariantVector represents a page of uncommitted data. The fields
+		// for each page vector will be:
+		// FullUserName: (user that applied edit)
+		// AttributeDataModifiedTime: (time of the edit)
+		// Page: page number that was edited
+		// AttributeData: JSON representation of the attributes. These are attributes that would completely replace all attributes
+		// on the page, not just the specific attributes that were edited.
+		[id(208), helpstring("method GetUncommittedAttributeData")] HRESULT GetUncommittedAttributeData([in] long nFileID, [in] long nActionID,
+			[in] long nExceptFileTaskSessionID, [in] BSTR bstrExceptIfMoreRecentAttributeSetName, [out, retval] IIUnknownVector** ppUncommittedPagesOfData);
+		// -----------------------------------------------------------------------------------------------
+		// Deletes cache data rows (whether marked as modified or not), except for rows associated with nExceptFileTaskSessionID
+		[id(209), helpstring("method DiscardOldCacheDataData")] HRESULT DiscardOldCacheData(
+			[in] long nFileID, [in] long nActionID, [in] long nExceptFileTaskSessionID);
+		
 	};
 
 	[

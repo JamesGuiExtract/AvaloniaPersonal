@@ -1,7 +1,46 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace WebAPI.Models
 {
+    /// <summary>
+    /// The attributes on a given page of a document
+    /// </summary>
+    public class PageOfAttributes
+    {
+        /// <summary>
+        /// The page to which the attributes belong
+        /// </summary>
+        public int PageNumber { get; set; }
+
+        /// <summary>
+        /// The attributes for this page
+        /// </summary>
+        public List<DocumentAttribute> Attributes { get; set; }
+    }
+
+    /// <summary>
+    /// Represents pages for which attributes were edited without being posted/committed.
+    /// </summary>
+    public class UncommittedDocumentDataResult
+    {
+        /// <summary>
+        /// The user that made the edits
+        /// </summary>
+        public string UserName { get; set; }
+
+        /// <summary>
+        /// The time of the most recent edit
+        /// </summary>
+        public string ModifiedDateTime { get; set; }
+
+        /// <summary>
+        /// A list of pages of edited attributes
+        /// </summary>
+        public List<PageOfAttributes> UncommittedPagesOfAttributes { get; set; } = new List<PageOfAttributes>();
+    }
+
     /// <summary>
     /// A result containing the data for a document
     /// </summary>

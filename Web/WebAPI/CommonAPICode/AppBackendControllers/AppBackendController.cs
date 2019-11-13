@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Threading.Tasks;
@@ -601,7 +602,7 @@ namespace WebAPI.Controllers
                     ExtractException.Assert("ELI46704", "The supplied document ID doesn't match the open session's document ID",
                         docID == data.DocumentSessionFileId);
 
-                    var imageData = data.GetPageImage(docID, page);
+                    var imageData = data.GetPageImage(docID, page, cacheData: true);
 
                     return File(imageData, "application/pdf", $"{docID}-{page}.pdf");
                 }
@@ -643,7 +644,7 @@ namespace WebAPI.Controllers
                     // per page so the front-end doesn't need code to deal with multi-page attributes.
                     var result = data.GetDocumentData(
                         data.DocumentSessionFileId, includeNonSpatial: false, verboseSpatialData: false,
-                        splitMultiPageAttributes: true);
+                        splitMultiPageAttributes: true, cacheData: true);
 
                     return Ok(result);
                 }
@@ -655,18 +656,19 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Saves the document data.
+        /// Updates the document data for the specified page. Edits via this call are not applied to
+        /// the document data set as a whole until POST DocumentData is invoked.
         /// </summary>
-        /// <param name="docID">The document ID that the data is for</param>
-        /// <param name="page"></param>
-        /// <param name="documentData">The document data.</param>
-        /// <returns></returns>
-        [HttpPut("DocumentData/{docID}")]
+        /// <param name="docID">The currently open document ID</param>
+        /// <param name="page">The page for which data is being edited</param>
+        /// <param name="documentData">The new document data for the page (this completely replaces
+        /// the previous document data for the page.</param>
+        [HttpPut("DocumentData/{docID}/{page}")]
         [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
-        public IActionResult SaveDocumentData(int docID, [FromBody] DocumentDataInput documentData)
+        public IActionResult EditPageData(int docID, int page, [FromBody] List<DocumentAttribute> documentData)
         {
             try
             {
@@ -678,7 +680,7 @@ namespace WebAPI.Controllers
                     ExtractException.Assert("ELI46699", "The supplied document ID doesn't match the open session's document ID",
                         docID == data.DocumentSessionFileId);
 
-                    data.PutDocumentResultSet(data.DocumentSessionFileId, documentData);
+                    data.EditPageData(data.DocumentSessionFileId, page, documentData);
 
                     return NoContent();
                 }
@@ -686,6 +688,95 @@ namespace WebAPI.Controllers
             catch (Exception ex)
             {
                 return this.GetAsHttpError(ex, "ELI45271");
+            }
+        }
+
+        /// <summary>
+        /// Commits all edits applied via PUT DocumentData/{docID}/{page} to a new data set for the
+        /// document as a whole.
+        /// </summary>
+        /// <param name="docID">The currently open document ID</param>
+        [HttpPost("DocumentData/{docID}")]
+        [Authorize]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        public IActionResult CommitDocumentData(int docID)
+        {
+            try
+            {
+                ExtractException.Assert("ELI49550", "SaveDocumentData requires an active Session Login token.",
+                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
+
+                using (var data = new DocumentData(User, requireSession: true))
+                {
+                    ExtractException.Assert("ELI49551", "The supplied document ID doesn't match the open session's document ID",
+                        docID == data.DocumentSessionFileId);
+
+                    data.CommitCachedDocumentData(docID);
+
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI49552");
+            }
+        }
+
+        /// <summary>
+        /// Gets edited pages of data for the document that were made in previous sessions but were
+        /// never POSTed to create a new document data set.
+        /// </summary>
+        /// <param name="docID">The document for which the data is requested</param>
+        /// <returns>The json representation of the uncommitted pages of data. Only those pages that
+        /// were editied will be included; data will not be returned for unedited pages.</returns>
+        [HttpGet("UncommittedDocumentData/{docID}")]
+        [Authorize]
+        [ProducesResponseType(200, Type = typeof(UncommittedDocumentDataResult))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        public IActionResult GetUncommittedDocumentData(int docID)
+        {
+            try
+            {
+                using (var data = new DocumentData(User, requireSession: true))
+                {
+                    var uncommittedData = data.GetUncommittedDocumentData(docID);
+
+                    return Ok(uncommittedData);
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI45271");
+            }
+        }
+
+        /// <summary>
+        /// Deletes all cache data for this document not associated with this session including
+        /// edited page data never committed.
+        /// </summary>
+        /// <param name="docID">The document for which the data is to be deleted</param>
+        [HttpDelete("UncommittedDocumentData/{docID}")]
+        [Authorize]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        public IActionResult DeleteOldCacheData(int docID)
+        {
+            try
+            {
+                using (var data = new DocumentData(User, requireSession: true))
+                {
+                    data.DiscardOldCacheData(docID);
+
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI49532");
             }
         }
 

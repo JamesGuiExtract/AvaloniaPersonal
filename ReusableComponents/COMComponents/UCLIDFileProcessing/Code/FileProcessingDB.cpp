@@ -4873,20 +4873,21 @@ STDMETHODIMP CFileProcessingDB::GetNumberSkippedForUser(BSTR bstrUserName, long 
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::CacheFileTaskSessionData(long nFileTaskSessionID, long nPage,
 	SAFEARRAY *parrayImageData, BSTR bstrUssData, BSTR bstrWordZoneData, BSTR bstrAttributeData, BSTR bstrException,
-	VARIANT_BOOL* pbWroteData)
+	VARIANT_BOOL vbCrucialUpdate, VARIANT_BOOL* pbWroteData)
 {
 	try
 	{
 		validateLicense();
 
 		if (!CacheFileTaskSessionData_Internal(false, nFileTaskSessionID, nPage,
-				parrayImageData, bstrUssData, bstrWordZoneData, bstrAttributeData, bstrException, pbWroteData))
+				parrayImageData, bstrUssData, bstrWordZoneData, bstrAttributeData, bstrException, vbCrucialUpdate, pbWroteData)
+			&& asCppBool(vbCrucialUpdate))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrCACHE_LOCK);
 
 			CacheFileTaskSessionData_Internal(true, nFileTaskSessionID, nPage,
-				parrayImageData, bstrUssData, bstrWordZoneData, bstrAttributeData, bstrException, pbWroteData);
+				parrayImageData, bstrUssData, bstrWordZoneData, bstrAttributeData, bstrException, vbCrucialUpdate, pbWroteData);
 		}
 
 		return S_OK;
@@ -4894,176 +4895,31 @@ STDMETHODIMP CFileProcessingDB::CacheFileTaskSessionData(long nFileTaskSessionID
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI48311");
 }
 //-------------------------------------------------------------------------------------------------
-// Helper function for GetCachedFileTaskSessionData
-bool queryCachedData(_ConnectionPtr ipConnection, long nFileTaskSessionID, long nPage, ECacheDataType eDataType,
-	SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* pbstrAttributeData, BSTR* pbstrException);
-
 STDMETHODIMP CFileProcessingDB::GetCachedFileTaskSessionData(long nFileTaskSessionID, long nPage,
-	ECacheDataType eDataType,
-	SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* pbstrAttributeData, BSTR* pbstrException,
-	VARIANT_BOOL* pbFoundCacheData)
+	ECacheDataType eDataType, VARIANT_BOOL vbCrucialData,
+	SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* pbstrAttributeData,
+	BSTR* pbstrException, VARIANT_BOOL* pbFoundCacheData)
 {
 	try
 	{
-		// NOTE: There are not retries with locks here since caching should not be critical to application
-		// behavior and retries with locking are likely to erase performance gains from caching.
-		// Applications that employ caching should fall back on traditional data access retrieval of
-		// cached data fails.
-
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI48431", pbFoundCacheData != __nullptr);
-
-		ADODB::_ConnectionPtr ipConnection = __nullptr;
-
-		BEGIN_CONNECTION_RETRY();
-
-		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
-
-		bool bQueryData = false;
-		bool bFoundCachedData = false;
-		_bstr_t bstrAttributeData("");
-
-		ASSERT_RUNTIME_CONDITION("ELI49497", nPage > 0 || eDataType == kAttributes,
-			"Multi-page attribute data valid for attribute data only");
-
-		if (nPage < 0)
+		if (!GetCachedFileTaskSessionData_Internal(false, nFileTaskSessionID, nPage, eDataType, vbCrucialData,
+			pparrayImageData, pbstrUssData, pbstrWordZoneData, pbstrAttributeData, pbstrException,
+			pbFoundCacheData)
+			&& asCppBool(vbCrucialData))
 		{
-			ASSERT_RUNTIME_CONDITION("ELI49494", false, "Not yet implemented");
-		}
-		else
-		{
-			bFoundCachedData = queryCachedData(ipConnection, nFileTaskSessionID, nPage, eDataType,
-				pparrayImageData, pbstrUssData, pbstrWordZoneData, pbstrAttributeData, pbstrException);
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrCACHE_LOCK);
 
-			*pbFoundCacheData = asVariantBool(bFoundCachedData);
+			GetCachedFileTaskSessionData_Internal(true, nFileTaskSessionID, nPage, eDataType, vbCrucialData,
+				pparrayImageData, pbstrUssData, pbstrWordZoneData, pbstrAttributeData, pbstrException,
+				pbFoundCacheData);
 		}
-
-		if (!bFoundCachedData)
-		{
-			*pparrayImageData = __nullptr;
-			*pbstrUssData = __nullptr;			
-			*pbstrWordZoneData = __nullptr;
-			*pbstrAttributeData = __nullptr;
-			*pbstrException = __nullptr;
-		}
-
-		END_CONNECTION_RETRY(ipConnection, "ELI48421")
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI48422");
-}
-// Helper function for GetCachedFileTaskSessionData
-bool queryCachedData(_ConnectionPtr ipConnection, long nFileTaskSessionID, long nPage, ECacheDataType eDataType,
-	SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* pbstrAttributeData, BSTR* pbstrException)
-{
-	bool bFoundCacheData = false;
-	bool bGetCachedImage = (eDataType & (int)kImage) != 0;
-	bool bGetCachedUSS = (eDataType & (int)kUss) != 0;
-	bool bGetCachedWordZones = (eDataType & (int)kWordZone) != 0;
-	bool bGetCachedAttributes = (eDataType & (int)kAttributes) != 0;
-	bool bGetCacheException = (eDataType & (int)kException) != 0;
-
-	vector<string> vecFields;
-	if (bGetCachedImage)
-	{
-		vecFields.push_back("[ImageData]");
-	}
-	if (bGetCachedUSS)
-	{
-		vecFields.push_back("[USSData]");
-	}
-	if (bGetCachedWordZones)
-	{
-		vecFields.push_back("[WordZoneData]");
-	}
-	if (bGetCachedAttributes)
-	{
-		vecFields.push_back("[AttributeData]");
-	}
-
-	// Always look for an exception logged while caching data. If found, throw the
-	// exception without retrieving any of the cached data.
-	vecFields.push_back("[Exception]");
-
-	if (vecFields.size() > 0)
-	{
-		ASSERT_RUNTIME_CONDITION("ELI48432", nPage > 0, "Cannot query data for multiple pages");
-
-		string strCursorQuery = gstrGET_FILE_TASK_SESSION_CACHE_DATA_BY_PAGE;
-		replaceVariable(strCursorQuery, "<FieldList>", asString(vecFields, true, ","));
-		replaceVariable(strCursorQuery, "<FileTaskSessionID>", asString(nFileTaskSessionID));
-		replaceVariable(strCursorQuery, "<Page>", asString(nPage));
-
-		_RecordsetPtr ipCachedDataRow(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI48362", ipCachedDataRow != __nullptr);
-
-		ipCachedDataRow->Open(strCursorQuery.c_str(),
-			_variant_t((IDispatch*)ipConnection, true), adOpenForwardOnly,
-			adLockReadOnly, adCmdText);
-
-		if (ipCachedDataRow->adoEOF == VARIANT_FALSE)
-		{
-			string strException = getStringField(ipCachedDataRow->Fields, "Exception");
-			// Unless caller is specifically asking for a recorded exception, throw any recorded
-			// exception from the cache operation when trying to retrieve any other data.
-			if (!strException.empty() && !bGetCacheException)
-			{
-				UCLIDException ue;
-				ue.createFromString("ELI49456", strException);
-				throw ue;
-			}
-
-			try
-			{
-				try
-				{
-					if (bGetCachedImage)
-					{
-						FieldPtr ipImageData = ipCachedDataRow->Fields->Item["ImageData"];
-						// If parray is null, CComSafeArray will assert in a way that displays a debug dialog.
-						// Assert ourselves here to avoid that.
-						ASSERT_RESOURCE_ALLOCATION("ELI49458", ipImageData->Value.parray != __nullptr);
-
-						CComSafeArray<BYTE> saData(ipImageData->Value.parray);
-						*pparrayImageData = saData.Detach();
-					}
-					if (bGetCachedUSS)
-					{
-						*pbstrUssData = get_bstr_t(getStringField(ipCachedDataRow->Fields, "USSData")).Detach();
-					}
-					if (bGetCachedWordZones)
-					{
-						*pbstrWordZoneData = get_bstr_t(getStringField(ipCachedDataRow->Fields, "WordZoneData")).Detach();
-					}
-					if (bGetCachedAttributes)
-					{
-						*pbstrAttributeData = get_bstr_t(getStringField(ipCachedDataRow->Fields, "AttributeData")).Detach();
-					}
-					if (bGetCacheException)
-					{
-						*pbstrException = get_bstr_t(strException).Detach();
-					}
-				}
-				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49448");
-			}
-			catch (UCLIDException & ue)
-			{
-				UCLIDException ueOuter("ELI49447", "Failed to read cached data", ue);
-				ueOuter.addDebugInfo("Session ID", nFileTaskSessionID);
-				ueOuter.addDebugInfo("Page", nPage);
-				throw ueOuter;
-			}
-
-			bFoundCacheData = true;
-		}
-
-		ipCachedDataRow->Close();
-	}
-
-	return bFoundCacheData;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::GetCachedPageNumbers(long nFileTaskSessionID, ECacheDataType eCacheDataType,
@@ -5071,14 +4927,16 @@ STDMETHODIMP CFileProcessingDB::GetCachedPageNumbers(long nFileTaskSessionID, EC
 {
 	try
 	{
+		// NOTE: There are not retries with locks here since caching should not be critical to application
+		// behavior and retries with locking may erase performance gains from caching; if existing
+		// cache data is not found, at worst the data will be re-cached.
+
 		validateLicense();
 
 		ASSERT_ARGUMENT("ELI49486", pparrayCachedPages != __nullptr);
 		ASSERT_ARGUMENT("ELI49487", eCacheDataType != 0);
 
 		ADODB::_ConnectionPtr ipConnection = __nullptr;
-
-		BEGIN_CONNECTION_RETRY();
 
 		// Get the connection for the thread and save it locally.
 		ipConnection = getDBConnection();
@@ -5105,7 +4963,7 @@ STDMETHODIMP CFileProcessingDB::GetCachedPageNumbers(long nFileTaskSessionID, EC
 			vecFieldRestrictions.push_back("Exception");
 		}
 
-		// Retrieve pages all pages as a single scaler value to avoid having to iterate all cache rows with a cursor.
+		// Retrieve pages all pages as a single comma-delimited scaler value to avoid having to iterate all cache rows with a cursor.
 		string strQuery =
 			"SELECT\r\n"
 			"(\r\n"
@@ -5124,7 +4982,7 @@ STDMETHODIMP CFileProcessingDB::GetCachedPageNumbers(long nFileTaskSessionID, EC
 		_RecordsetPtr ipCachedPages(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI49496", ipCachedPages != __nullptr);
 
-		ipCachedPages->Open(strQuery.c_str(), 
+		ipCachedPages->Open(strQuery.c_str(),
 			_variant_t((IDispatch*)ipConnection, true), adOpenStatic,
 			adLockReadOnly, adCmdText);
 
@@ -5153,11 +5011,88 @@ STDMETHODIMP CFileProcessingDB::GetCachedPageNumbers(long nFileTaskSessionID, EC
 
 		*pparrayCachedPages = (LPSAFEARRAY)saCachedPages.Detach();
 
-		END_CONNECTION_RETRY(ipConnection, "ELI49490")
-
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49495");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::CacheAttributeData(long nFileTaskSessionID, IStrToStrMap* pmapAttributeData)
+{
+	try
+	{
+		validateLicense();
+
+		if (!CacheAttributeData_Internal(false, nFileTaskSessionID, pmapAttributeData))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrCACHE_LOCK);
+
+			CacheAttributeData_Internal(true, nFileTaskSessionID, pmapAttributeData);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49472");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::MarkAttributeDataUnmodified(long nFileTaskSessionID)
+{
+	try
+	{
+		validateLicense();
+
+		if (!MarkAttributeDataUnmodified_Internal(false, nFileTaskSessionID))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrCACHE_LOCK);
+
+			MarkAttributeDataUnmodified_Internal(true, nFileTaskSessionID);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49514");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetUncommittedAttributeData(long nFileID, long nActionID, long nExceptFileTaskSessionID,
+	BSTR bstrExceptIfMoreRecentAttributeSetName, IIUnknownVector** ppUncommittedPagesOfData)
+{
+	try
+	{
+		validateLicense();
+
+		if (!GetUncommittedAttributeData_Internal(false, nFileID, nActionID, nExceptFileTaskSessionID,
+				bstrExceptIfMoreRecentAttributeSetName, ppUncommittedPagesOfData))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrCACHE_LOCK);
+
+			GetUncommittedAttributeData_Internal(true, nFileID, nActionID, nExceptFileTaskSessionID,
+				bstrExceptIfMoreRecentAttributeSetName, ppUncommittedPagesOfData);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49522");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::DiscardOldCacheData(long nFileID, long nActionID, long nExceptFileTaskSessionID)
+{
+	try
+	{
+		validateLicense();
+
+		if (!DiscardOldCacheData_Internal(false, nFileID, nActionID, nExceptFileTaskSessionID))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrCACHE_LOCK);
+
+			DiscardOldCacheData_Internal(true, nFileID, nActionID, nExceptFileTaskSessionID);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49517");
 }
 
 //-------------------------------------------------------------------------------------------------

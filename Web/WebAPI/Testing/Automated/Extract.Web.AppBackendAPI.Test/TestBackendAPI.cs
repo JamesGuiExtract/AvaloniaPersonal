@@ -1,4 +1,5 @@
 ﻿using Extract.FileActionManager.Database.Test;
+using Extract.FileActionManager.FileProcessors;
 using Extract.Imaging;
 using Extract.Testing.Utilities;
 using Microsoft.AspNetCore.Http;
@@ -52,9 +53,10 @@ namespace Extract.Web.WebAPI.Test
         static readonly bool[] _testFileInDB = new bool[] { true, true, true, true, false };
         static readonly bool[] _testFileHasUSS = new bool[] { true, false, true, false, true };
         static readonly bool[] _testFileHasVOA = new bool[] { false, false, true, false, false };
-        
 
-        //static readonly string _COMPUTE_ACTION = "Compute";
+        static readonly string _STORE_ATTRIBUTE_GUID = typeof(StoreAttributesInDBTask).GUID.ToString();
+
+        static readonly string _COMPUTE_ACTION = "Compute";
         static readonly string _VERIFY_ACTION = "Verify";
 
         #endregion Constants
@@ -974,38 +976,265 @@ namespace Extract.Web.WebAPI.Test
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]
-        public static void SaveDocumentData()
+        public static void UpdateDocumentData()
         {
-            string dbName = "AppBackendAPI_Test_SaveDocumentData";
+            string dbName = "AppBackendAPI_Test_GetDocumentData";
+            string attributeSetName = "Attr";
+            int docID = 3;
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+                var (db, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 LogInToWebApp(controller, user);
-                var openDocumentResult = OpenDocument(controller, 3);
+                OpenDocument(controller, docID);
 
-                var result = controller.GetDocumentData(openDocumentResult.Id);
+                var result = controller.GetDocumentData(3);
                 var attributeSet = result.AssertGoodResult<DocumentDataResult>();
 
-                var updatedAttributes = attributeSet.Attributes.Skip(1);
-                Assert.AreEqual(updatedAttributes.Count() + 1, attributeSet.Attributes.Count());
+                var originalAttributeIDs = attributeSet.Attributes
+                    .Select(attribute => new Guid(attribute.ID))
+                    .ToList();
 
-                var updateAttributeSet = new DocumentDataInput()
-                {
-                    Attributes = new List<DocumentAttribute>(updatedAttributes)
-                };
+                var page1Data = new List<DocumentAttribute>(attributeSet.Attributes
+                    .Where(attribute => attribute.HasPositionInfo == true
+                        && attribute.SpatialPosition.Pages.SequenceEqual(new[] { 1 })));
+                Assert.AreEqual(2, page1Data.Count);
 
-                controller.SaveDocumentData(openDocumentResult.Id, updateAttributeSet)
+                // Tests the following changes by editing data per-page, then committing:
+                // 1) Delete the 1st of the two attributes on page 1
+                // 2) Edit the name and type of the remaining attribute
+                // 3) Add a new attribute on page 3
+
+                page1Data.RemoveAt(0);
+
+                var attributeToEdit = page1Data.Single();
+                attributeToEdit.Value = dbName;
+                attributeToEdit.Type = dbName;
+
+                var updatedAttributeIDs = new List<Guid>();
+                updatedAttributeIDs.Add(new Guid(attributeToEdit.ID));
+
+                controller.EditPageData(docID, 1, page1Data)
                     .AssertGoodResult<NoContentResult>();
 
-                result = controller.GetDocumentData(openDocumentResult.Id);
-                attributeSet = result.AssertGoodResult<DocumentDataResult>();
+                var page3Data = new List<DocumentAttribute>()
+                {
+                    ApiTestUtils.CreateDocumentAttribute(dbName, dbName, 3, 100, 100, 200, 100, 100)
+                };
+                updatedAttributeIDs.Add(new Guid(page3Data.Single().ID));
 
-                Assert.AreEqual(attributeSet.Attributes.Count(), updatedAttributes.Count());
+                controller.EditPageData(docID, 3, page3Data)
+                    .AssertGoodResult<NoContentResult>();
+
+                var attributeMgr = db.GetAttributeDBMgr();
+                var storedAttributes = attributeMgr.GetAttributeSetForFile(
+                        docID, attributeSetName, -1, true)
+                    .ToIEnumerable<IAttribute>()
+                    .ToList();
+
+                var storedAttributeIDs = storedAttributes
+                    .OfType<IAttribute>()
+                    .Where(attribute => attribute.Value.HasSpatialInfo())
+                    .OfType<IIdentifiableObject>()
+                    .Select(storedAttribute => storedAttribute.InstanceGUID);
+
+                // At this point official attribute set in db should still be un-edited attributes.
+                Assert.IsTrue(storedAttributeIDs.SequenceEqual(originalAttributeIDs));
+
+                controller.CommitDocumentData(docID)
+                    .AssertGoodResult<NoContentResult>();
+
+                storedAttributes = attributeMgr.GetAttributeSetForFile(
+                        docID, attributeSetName, -1, true)
+                    .ToIEnumerable<IAttribute>()
+                    .ToList();
+
+                storedAttributeIDs = storedAttributes
+                    .OfType<IAttribute>()
+                    .Where(attribute => attribute.Value.HasSpatialInfo())
+                    .OfType<IIdentifiableObject>()
+                    .Select(storedAttribute => storedAttribute.InstanceGUID);
+
+                // Following CommitDocumentData, we should instead find the updatedAttributeIDs in the database.
+                Assert.IsTrue(storedAttributeIDs.SequenceEqual(updatedAttributeIDs));
+
+                // Ensure there is only one attribute on the first page and that the edits are there.
+                var storedPage1Attribute = storedAttributes
+                    .Where(attribute => attribute.Value.HasSpatialInfo()
+                        && attribute.Value.GetFirstPageNumber() == 1)
+                    .Single();
+                Assert.AreEqual(dbName, storedPage1Attribute.Value.String);
+                Assert.AreEqual(dbName, storedPage1Attribute.Type);
+
+                // Ensure we find the attribute added to the 3rd page with the correct spatial info.
+                var storedPage3Attribute = storedAttributes
+                    .Where(attribute => attribute.Value.HasSpatialInfo()
+                        && attribute.Value.GetFirstPageNumber() == 3)
+                    .Single();
+                var rasterZone = storedPage3Attribute.Value.GetOCRImageRasterZones()
+                    .ToIEnumerable<IRasterZone>()
+                    .Single();
+                Assert.AreEqual(100, rasterZone.StartX);
+                Assert.AreEqual(100, rasterZone.StartY);
+                Assert.AreEqual(200, rasterZone.EndX);
+                Assert.AreEqual(100, rasterZone.EndY);
+                Assert.AreEqual(100, rasterZone.Height);
 
                 controller.Logout()
                     .AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void UncommittedData()
+        {
+            string dbName = "AppBackendAPI_Test_UncommittedData";
+            string attributeSetName = "Attr";
+            int docID = 3;
+
+            try
+            {
+                var (db, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+
+                // Tests several scenarios involving pages updated via EditDocumentData where data
+                // is not applied via CommitDocumentData before the document is closed:
+                // 1) Edit page 1 and 3 with out committing. Confirm edits not applied to result of
+                //      GetDocumentData, but edits can be retrieved via GetUncommittedDocumentData
+                // 2) Confirm uncommitted edits can be deleted via DeleteUncommittedDocumentData
+                // 3) Confirm uncommitted edits retrieved from GetUncommittedDocumentData
+                //      can be applied/committed later.
+                // 4) Confirm GetUncommittedDocumentData ignores edits made prior to a new
+                //      attribute set being stored for the document.
+
+                LogInToWebApp(controller, user);
+                OpenDocument(controller, docID);
+
+                var uncommittedData = controller.GetUncommittedDocumentData(docID)
+                    .AssertGoodResult<UncommittedDocumentDataResult>();
+                Assert.AreEqual(0, uncommittedData.UncommittedPagesOfAttributes.Count);
+
+                var result = controller.GetDocumentData(docID);
+                var attributeSet = result.AssertGoodResult<DocumentDataResult>();
+
+                var page1Data = new List<DocumentAttribute>(attributeSet.Attributes
+                    .Where(attribute => attribute.HasPositionInfo == true
+                        && attribute.SpatialPosition.Pages.SequenceEqual(new[] { 1 })));
+                Assert.AreEqual(2, page1Data.Count);
+
+                page1Data.RemoveAt(0);
+
+                var attributeToEdit = page1Data.Single();
+                attributeToEdit.Value = dbName;
+                attributeToEdit.Type = dbName;
+
+                controller.EditPageData(docID, 1, page1Data)
+                    .AssertGoodResult<NoContentResult>();
+
+                var page3Data = new List<DocumentAttribute>()
+                {
+                    ApiTestUtils.CreateDocumentAttribute(dbName, dbName, 3, 100, 100, 200, 100, 100)
+                };
+
+                controller.EditPageData(docID, 3, page3Data)
+                    .AssertGoodResult<NoContentResult>();
+
+                controller.CloseDocument(docID, false)
+                    .AssertGoodResult<NoContentResult>();
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
+
+                User user2 = ApiTestUtils.CreateUser("jon_doe", "123");
+                var controller2 = ApiTestUtils.CreateController<AppBackendController>(user2);
+                LogInToWebApp(controller2, user2);
+                OpenDocument(controller2, docID);
+
+                var documentData = controller2.GetDocumentData(docID)
+                    .AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual(2, documentData.Attributes.Count);
+                Assert.AreNotEqual(dbName, documentData.Attributes.First().Value);
+
+                uncommittedData = controller2.GetUncommittedDocumentData(docID)
+                    .AssertGoodResult<UncommittedDocumentDataResult>();
+                Assert.AreEqual(2, uncommittedData.UncommittedPagesOfAttributes.Count);
+                var firstUncommittedPage = uncommittedData.UncommittedPagesOfAttributes[0];
+                Assert.AreEqual(1, firstUncommittedPage.PageNumber);
+                Assert.AreEqual(dbName, firstUncommittedPage.Attributes.Single().Value);
+                var secondUncommittedPage = uncommittedData.UncommittedPagesOfAttributes[1];
+                Assert.AreEqual(3, secondUncommittedPage.PageNumber);
+                Assert.AreEqual(page3Data.Single().ID, secondUncommittedPage.Attributes.Single().ID);
+
+                // 2) Confirm uncommitted edits can be deleted via DeleteUncommittedDocumentData
+
+                controller2.DeleteOldCacheData(docID)
+                    .AssertGoodResult<NoContentResult>();
+
+                uncommittedData = controller2.GetUncommittedDocumentData(docID)
+                    .AssertGoodResult<UncommittedDocumentDataResult>();
+                Assert.AreEqual(0, uncommittedData.UncommittedPagesOfAttributes.Count);
+
+                // 3) Confirm uncommitted edits retrieved from GetUncommittedDocumentData
+                //      can be applied/committed later.
+
+                controller2.EditPageData(docID, 1, firstUncommittedPage.Attributes)
+                    .AssertGoodResult<NoContentResult>();
+
+                controller2.CommitDocumentData(docID)
+                    .AssertGoodResult<NoContentResult>();
+
+                controller2.CloseDocument(docID, false);
+                OpenDocument(controller2, docID);
+
+                documentData = controller2.GetDocumentData(docID)
+                    .AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual(dbName, documentData.Attributes.Single().Value);
+
+                // 3) Confirm uncommitted edits retrieved from GetUncommittedDocumentData
+                //      can be applied/committed later.
+
+                controller2.EditPageData(docID, 3, secondUncommittedPage.Attributes)
+                    .AssertGoodResult<NoContentResult>();
+
+                controller2.CloseDocument(docID, false);
+
+                LogInToWebApp(controller, user);
+                OpenDocument(controller, docID);
+
+                documentData = controller.GetDocumentData(docID)
+                    .AssertGoodResult<DocumentDataResult>();
+                Assert.AreEqual(dbName, documentData.Attributes[0].Value);
+
+                // 4) Confirm GetUncommittedDocumentData ignores edits made prior to a new
+                //      attribute set being stored for the document.
+
+                uncommittedData = controller.GetUncommittedDocumentData(docID)
+                    .AssertGoodResult<UncommittedDocumentDataResult>();
+                Assert.AreEqual(3, uncommittedData.UncommittedPagesOfAttributes.Single().PageNumber);
+
+                var attributeMgr = db.GetAttributeDBMgr();
+                var actionId = db.GetActionID(_COMPUTE_ACTION);
+                db.RecordFAMSessionStart("", _COMPUTE_ACTION, false, true);
+                int sessionId = db.StartFileTaskSession(_STORE_ATTRIBUTE_GUID, docID, actionId);
+                var storedAttributes = attributeMgr.GetAttributeSetForFile(docID, attributeSetName, -1, true);
+                attributeMgr.CreateNewAttributeSetForFile(sessionId, attributeSetName, storedAttributes, false, false, false, false);
+                db.EndFileTaskSession(sessionId, 0, 0, 0);
+                db.RecordFAMSessionStop();
+
+                uncommittedData = controller.GetUncommittedDocumentData(docID)
+                    .AssertGoodResult<UncommittedDocumentDataResult>();
+                Assert.AreEqual(0, uncommittedData.UncommittedPagesOfAttributes.Count);
+
+                controller.Logout()
+                   .AssertGoodResult<NoContentResult>();
+                controller2.Logout()
+                   .AssertGoodResult<NoContentResult>();
             }
             finally
             {

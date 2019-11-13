@@ -1,4 +1,5 @@
-﻿using Extract.FileActionManager.Database.Test;
+﻿using AttributeDbMgrComponentsLib;
+using Extract.FileActionManager.Database.Test;
 using Extract.Imaging.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -126,6 +127,27 @@ namespace Extract.Web.WebAPI.Test
         }
 
         /// <summary>
+        /// Gets a <see cref="AttributeDBMgr"/> instance to store/retrieve attributes sets to/from
+        /// <see paramref="FileProcessingDB"/>.
+        /// </summary>
+        /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> for which data will be
+        /// stored/retrieved.</param>
+        public static AttributeDBMgr GetAttributeDBMgr(this FileProcessingDB fileProcessingDB)
+        {
+            try
+            {
+                var attributeDbMgr = new AttributeDBMgr();
+                attributeDbMgr.FAMDB = fileProcessingDB;
+
+                return attributeDbMgr;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49469");
+            }
+        }
+
+        /// <summary>
         /// Creates a <see cref="User"/> instance.
         /// </summary>
         /// <param name="username">The username.</param>
@@ -240,6 +262,49 @@ namespace Extract.Web.WebAPI.Test
             {
                 throw ex.AsExtract("ELI49462");
             }
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="DocumentAttribute"/>.
+        /// </summary>
+        /// <param name="value">The attribute value</param>
+        /// <param name="type">The attribute type</param>
+        /// <param name="page">The page the attribute is on.</param>
+        /// <param name="startX">SpatialLineZone coordinate</param>
+        /// <param name="startY">SpatialLineZone coordinate</param>
+        /// <param name="endX">SpatialLineZone coordinate</param>
+        /// <param name="endY">SpatialLineZone coordinate</param>
+        /// <param name="height">SpatialLineZone coordinate</param>
+        public static DocumentAttribute CreateDocumentAttribute(string value, string type,
+            int page, int startX, int startY, int endX, int endY, int height)
+        {
+            return new DocumentAttribute()
+            {
+                ID = Guid.NewGuid().ToString(),
+                Name = "Data",
+                Value = value,
+                Type = type,
+                HasPositionInfo = true,
+                SpatialPosition = new Position()
+                {
+                    Pages = new[] { page }.ToList(),
+                    LineInfo = new[]
+                    {
+                        new SpatialLine()
+                        {
+                            SpatialLineZone = new SpatialLineZone()
+                            {
+                                PageNumber = page,
+                                StartX = startX,
+                                StartY = startY,
+                                EndX = endX,
+                                EndY = endY,
+                                Height = height
+                            }
+                        }
+                    }.ToList()
+                }
+            };
         }
 
         /// <summary>

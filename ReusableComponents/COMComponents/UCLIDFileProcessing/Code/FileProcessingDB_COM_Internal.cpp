@@ -38,7 +38,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 177;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 178;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2618,6 +2618,34 @@ int UpdateToSchemaVersion177(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI48411");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion178(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 178;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		// Column names/order changed; 177 was an internal build and data here is not expected, simply re-create.
+		vecQueries.push_back("DROP TABLE [FileTaskSessionCache]");
+		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_CACHE);
+		vecQueries.push_back(gstrADD_FILE_TASK_SESSION_CACHE_ACTIVEFAM_FK);
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49541");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -7738,7 +7766,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 174:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion175);
 				case 175:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion176);
 				case 176:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion177);
-				case 177:
+				case 177:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion178);
+				case 178:
 					break;
 
 				default:
@@ -9936,8 +9965,8 @@ bool CFileProcessingDB::EndFileTaskSession_Internal(bool bDBLocked, long nFileTa
 
 			executeCmdQuery(ipConnection, strUpdateSQL);
 
-			string strDeleteCachedData = "DELETE FROM [FileTaskSessionCache] WHERE [FileTaskSessionID] = "
-				+ asString(nFileTaskSessionID);
+			string strDeleteCachedData = "DELETE FROM [FileTaskSessionCache] \r\n"
+				"WHERE [AutoDeleteWithActiveFAMID] IS NOT NULL AND [FileTaskSessionID] = "+ asString(nFileTaskSessionID);
 			executeCmdQuery(ipConnection, strDeleteCachedData);
 			
 			END_CONNECTION_RETRY(ipConnection, "ELI39694");
@@ -12450,9 +12479,9 @@ bool CFileProcessingDB::MarkFileDeleted_Internal(bool bDBLocked, long nFileID, l
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::CacheFileTaskSessionData_Internal(bool bDBLocked, long nFileTaskSessionID,
-	long nPage, SAFEARRAY* parrayImageData, BSTR bstrUssData, BSTR bstrWordZoneData, BSTR bstrAttributeData,
-	BSTR bstrException, VARIANT_BOOL *pbWroteData)
+bool CFileProcessingDB::CacheFileTaskSessionData_Internal(bool bDBLocked, 
+	long nFileTaskSessionID, long nPage, SAFEARRAY* parrayImageData, BSTR bstrUssData,
+	BSTR bstrWordZoneData, BSTR bstrAttributeData, BSTR bstrException, VARIANT_BOOL vbCrucialUpdate, VARIANT_BOOL* pbWroteData)
 {
 	try
 	{
@@ -12464,106 +12493,635 @@ bool CFileProcessingDB::CacheFileTaskSessionData_Internal(bool bDBLocked, long n
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
-			// BEGIN_CONNECTION_RETRY is intentionally not used. If the DB connection is lost, this
-			// data will simply not be cached. In unit tests, this prevents cache threads from hanging
-			// around doing retries after the databases have been closed.
+			bool bCrucialUpdate = asCppBool(vbCrucialUpdate);
+			if (bCrucialUpdate)
+			{
+				BEGIN_CONNECTION_RETRY();
+
+				ipConnection = getDBConnection();
+
+				CacheFileTaskSessionData_InternalHelper(ipConnection, nFileTaskSessionID,
+					nPage, parrayImageData, bstrUssData, bstrWordZoneData, bstrAttributeData,
+					bstrException, bCrucialUpdate, pbWroteData);
+
+				END_CONNECTION_RETRY(ipConnection, "ELI49510");
+			}
+			else
+			{
+				// BEGIN_CONNECTION_RETRY not used for non-crucial updates. If the DB connection is lost, this
+				// data will simply not be cached. In unit tests, this prevents cache threads from hanging
+				// around doing retries after the databases have been closed.
+				
+				ipConnection = getDBConnection();
+
+				CacheFileTaskSessionData_InternalHelper(ipConnection, nFileTaskSessionID,
+					nPage, parrayImageData, bstrUssData, bstrWordZoneData, bstrAttributeData,
+					bstrException, bCrucialUpdate, pbWroteData);
+			}
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49443");
+	}
+	catch (UCLIDException & ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::CacheFileTaskSessionData_InternalHelper(ADODB::_ConnectionPtr ipConnection,
+	long nFileTaskSessionID, long nPage, SAFEARRAY* parrayImageData, BSTR bstrUssData, BSTR bstrWordZoneData, BSTR bstrAttributeData,
+	BSTR bstrException, bool bCrucialUpdate, VARIANT_BOOL* pbWroteData)
+{
+	TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+	string strCreateCacheRowQuery = gstrGET_OR_CREATE_FILE_TASK_SESSION_CACHE_ROW;
+	replaceVariable(strCreateCacheRowQuery, "<FileTaskSessionID>", asString(nFileTaskSessionID));
+	replaceVariable(strCreateCacheRowQuery, "<Page>", asString(nPage));
+	// bCrucialUpdate indicates it is unexepected for a row not to be available. Before writing
+	// attribute data updates, CacheAttributeData should have been used to populate cache for
+	// all pages. If not all pages were present in cache, incomplete document data would be
+	// available when compiling output document data from the cache.
+	replaceVariable(strCreateCacheRowQuery, "<CrucialUpdate>", bCrucialUpdate ? "1" : "0");
+
+	long long llCacheRowID = -1;
+	executeCmdQuery(ipConnection, strCreateCacheRowQuery, "ID", false, &llCacheRowID);
+
+	if (llCacheRowID <= 0 && bCrucialUpdate)
+	{
+		UCLIDException ue("ELI49539",
+			"Unable to apply crucial cache update as appropriate cache row does not exist");
+		ue.addDebugInfo("SessionID", asString(nFileTaskSessionID), false);
+		ue.addDebugInfo("Page", asString(nPage), false);
+		throw ue;
+	}
+
+	// If the file task session has closed do not cache the data.
+	if (llCacheRowID > 0)
+	{
+		vector<string> vecFields;
+		if (parrayImageData != __nullptr)
+		{
+			vecFields.push_back("[ImageData]");
+		}
+		if (bstrUssData != __nullptr)
+		{
+			vecFields.push_back("[USSData]");
+		}
+		if (bstrWordZoneData != __nullptr)
+		{
+			vecFields.push_back("[WordZoneData]");
+		}
+		if (bstrAttributeData != __nullptr)
+		{
+			vecFields.push_back("[AttributeData]");
+			vecFields.push_back("[AutoDeleteWithActiveFAMID]");
+		}
+		if (bstrException != __nullptr)
+		{
+			vecFields.push_back("[Exception]");
+		}
+
+		ASSERT_RUNTIME_CONDITION("ELI49501", vecFields.size() > 0,
+			"No data has been provided for cache");
+
+		string strCursorQuery = gstrGET_FILE_TASK_SESSION_CACHE_DATA_BY_ID;
+		replaceVariable(strCursorQuery, "<ID>", asString(llCacheRowID));
+		replaceVariable(strCursorQuery, "<FieldList>", asString(vecFields, true, ","));
+
+		_RecordsetPtr ipCachedDataRow(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI48308", ipCachedDataRow != __nullptr);
+
+		// Concurrent behavior tested by CacheSimultaneousOperations
+		ipCachedDataRow->Open(strCursorQuery.c_str(),
+			_variant_t((IDispatch*)ipConnection, true), adOpenDynamic,
+			adLockOptimistic, adCmdText);
+		if (ipCachedDataRow->adoEOF == VARIANT_TRUE)
+		{
+			throw UCLIDException("ELI48309", "Failed to acquire cache");
+		}
+
+		if (parrayImageData != __nullptr)
+		{
+			FieldPtr ipItem = ipCachedDataRow->Fields->Item["ImageData"];
+			ASSERT_RESOURCE_ALLOCATION("ELI48336", ipItem != __nullptr);
+
+			CComSafeArray<BYTE> saData(parrayImageData);
+			_variant_t variantData;
+			variantData.vt = VT_ARRAY | VT_UI1;
+			variantData.parray = saData;
+			ipItem->Value = variantData;
+		}
+
+		if (bstrUssData != __nullptr)
+		{
+			setStringField(ipCachedDataRow->Fields, "USSData", asString(bstrUssData));
+		}
+
+		if (bstrWordZoneData != __nullptr)
+		{
+			setStringField(ipCachedDataRow->Fields, "WordZoneData", asString(bstrWordZoneData));
+		}
+			
+		if (bstrAttributeData != __nullptr)
+		{
+			setStringField(ipCachedDataRow->Fields, "AttributeData", asString(bstrAttributeData));
+			setFieldToNull(ipCachedDataRow->Fields, "AutoDeleteWithActiveFAMID");
+			// AttributeDataModifiedTime needs to be set as well, but if updated via a variant, it loses
+			// millisecond granularity; A separate query is used below to update the timestamp
+			// using GetDate()
+		}
+
+		if (bstrException != __nullptr)
+		{
+			setStringField(ipCachedDataRow->Fields, "Exception", asString(bstrException));
+		}
+
+		ipCachedDataRow->Update();
+		ipCachedDataRow->Close();
+
+		if (bstrAttributeData != __nullptr)
+		{
+			// Use GetDate() to update AttributeDataModifiedTime with millisecond granularity if attribute
+			// data was updated.
+			executeCmdQuery(ipConnection, "UPDATE [FileTaskSessionCache] SET [AttributeDataModifiedTime] = GetDate() WHERE [ID] = " + asString(llCacheRowID));
+		}
+
+		*pbWroteData = VARIANT_TRUE;
+	}
+
+	tg.CommitTrans();
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetCachedFileTaskSessionData_Internal(bool bDBLocked, long nFileTaskSessionID,
+	long nPage, ECacheDataType eDataType, VARIANT_BOOL vbCrucialData,
+	SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* pbstrAttributeData,
+	BSTR* pbstrException, VARIANT_BOOL* pbFoundCacheData)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI49545", pbFoundCacheData != __nullptr);
+			bool bFoundCacheData = false;
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			bool bCrucialData = asCppBool(vbCrucialData);
+			if (bCrucialData)
+			{
+				BEGIN_CONNECTION_RETRY();
+
+				ipConnection = getDBConnection();
+
+				bFoundCacheData = GetCachedFileTaskSessionData_InternalHelper(
+					ipConnection, nFileTaskSessionID, nPage,
+					eDataType, pparrayImageData, pbstrUssData, pbstrWordZoneData, pbstrAttributeData,
+					pbstrException);
+
+				END_CONNECTION_RETRY(ipConnection, "ELI49546");
+
+				if (!bFoundCacheData)
+				{
+					UCLIDException ue("ELI49539", "Unable to retrieve crucial cached data");
+					ue.addDebugInfo("SessionID", asString(nFileTaskSessionID), false);
+					ue.addDebugInfo("Page", asString(nPage), false);
+					throw ue;
+				}
+			}
+			else
+			{
+				// BEGIN_CONNECTION_RETRY not used for non-crucial retrieval. If the DB connection is lost, this
+				// data will simply not be retrieved. 
+
+				ipConnection = getDBConnection();
+
+				bFoundCacheData = GetCachedFileTaskSessionData_InternalHelper(
+					ipConnection, nFileTaskSessionID, nPage,
+					eDataType, pparrayImageData, pbstrUssData, pbstrWordZoneData, pbstrAttributeData,
+					pbstrException);
+			}
+
+			*pbFoundCacheData = asVariantBool(bFoundCacheData);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49544");
+	}
+	catch (UCLIDException & ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetCachedFileTaskSessionData_InternalHelper(ADODB::_ConnectionPtr ipConnection,
+	long nFileTaskSessionID, long nPage, ECacheDataType eDataType,
+	SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* pbstrAttributeData,
+	BSTR* pbstrException)
+{
+	bool bFoundCachedData = false;
+	_bstr_t bstrAttributeData("");
+
+	ASSERT_RUNTIME_CONDITION("ELI49509", nPage > 0 || eDataType == kAttributes,
+		"Multi-page data valid for attribute data only");
+
+	if (nPage < 0)
+	{
+		string strCursorQuery = gstrGET_FILE_TASK_SESSION_CACHE_ROWS;
+		replaceVariable(strCursorQuery, "<FileTaskSessionID>", asString(nFileTaskSessionID));
+
+		_RecordsetPtr ipCachedDataRows(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI48308", ipCachedDataRows != __nullptr);
+
+		ipCachedDataRows->Open(strCursorQuery.c_str(),
+			_variant_t((IDispatch*)ipConnection, true), adOpenForwardOnly,
+			adLockReadOnly, adCmdText);
+
+		// Store page data to map to allow page output to be ordered by page.
+		long nPageCount = 0;
+		map<long, _bstr_t> mapPageAttributes;
+
+		while (ipCachedDataRows->adoEOF == VARIANT_FALSE)
+		{
+			long nPage = getLongField(ipCachedDataRows->Fields, "Page");
+			nPageCount = max(nPageCount, nPage);
+
+			// Some manipulation of bstrPageAttributes is necessary to create a proper JSON representing
+			// multiple pages; store page-specific JSON separate for now.
+			_bstr_t bstrPageAttributes;
+			if (GetCachedFileTaskSessionData_QueryCachedData(ipConnection, nFileTaskSessionID, nPage, eDataType,
+				pparrayImageData, pbstrUssData, pbstrWordZoneData, &(bstrPageAttributes.GetBSTR()), pbstrException))
+			{
+				mapPageAttributes[nPage] = bstrPageAttributes;
+			}
+
+			ipCachedDataRows->MoveNext();
+		}
+
+		// Consider data found only if no pages between 1 and the max page number found are missing
+		bFoundCachedData = (mapPageAttributes.size() == nPageCount);
+
+		if (bFoundCachedData)
+		{
+			// Merge all page-specific attribute JSON into a proper JSON array representing all pages.
+			for (long nPage = 1; nPage <= nPageCount; nPage++)
+			{
+				_bstr_t bstrPageAttributes = mapPageAttributes[nPage];
+				if (bstrPageAttributes.length() > 0)
+				{
+					if (bstrAttributeData.length() > 0)
+					{
+						bstrAttributeData += ",";
+					}
+
+					bstrAttributeData += bstrPageAttributes;
+				}
+			}
+
+			bstrAttributeData = _bstr_t("[") + bstrAttributeData + "]";
+			*pbstrAttributeData = bstrAttributeData.Detach();
+		}
+	}
+	else // Specific page number specified
+	{
+		bFoundCachedData = GetCachedFileTaskSessionData_QueryCachedData(ipConnection,
+			nFileTaskSessionID, nPage, eDataType, pparrayImageData, pbstrUssData,
+			pbstrWordZoneData, pbstrAttributeData, pbstrException);
+	}
+
+	if (!bFoundCachedData)
+	{
+		*pparrayImageData = __nullptr;
+		*pbstrUssData = __nullptr;
+		*pbstrWordZoneData = __nullptr;
+		*pbstrAttributeData = __nullptr;
+		*pbstrException = __nullptr;
+	}
+
+	return bFoundCachedData;
+}
+//-------------------------------------------------------------------------------------------------
+// Helper function for GetCachedFileTaskSessionData
+bool CFileProcessingDB::GetCachedFileTaskSessionData_QueryCachedData(_ConnectionPtr ipConnection, long nFileTaskSessionID, long nPage,
+	ECacheDataType eDataType, SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* pbstrAttributeData,
+	BSTR* pbstrException)
+{
+	bool bFoundCacheData = false;
+	bool bGetCachedImage = (eDataType & (int)kImage) != 0;
+	bool bGetCachedUSS = (eDataType & (int)kUss) != 0;
+	bool bGetCachedWordZones = (eDataType & (int)kWordZone) != 0;
+	bool bGetCachedAttributes = (eDataType & (int)kAttributes) != 0;
+	bool bGetCacheException = (eDataType & (int)kException) != 0;
+
+	vector<string> vecFields;
+	if (bGetCachedImage)
+	{
+		vecFields.push_back("[ImageData]");
+	}
+	if (bGetCachedUSS)
+	{
+		vecFields.push_back("[USSData]");
+	}
+	if (bGetCachedWordZones)
+	{
+		vecFields.push_back("[WordZoneData]");
+	}
+	if (bGetCachedAttributes)
+	{
+		vecFields.push_back("[AttributeData]");
+	}
+
+	// Always look for an exception logged while caching data. If found, throw the
+	// exception without retrieving any of the cached data.
+	vecFields.push_back("[Exception]");
+
+	if (vecFields.size() > 0)
+	{
+		ASSERT_RUNTIME_CONDITION("ELI48432", nPage > 0, "Cannot query data for multiple pages");
+
+		string strCursorQuery = gstrGET_FILE_TASK_SESSION_CACHE_DATA_BY_PAGE;
+		replaceVariable(strCursorQuery, "<FieldList>", asString(vecFields, true, ","));
+		replaceVariable(strCursorQuery, "<FileTaskSessionID>", asString(nFileTaskSessionID));
+		replaceVariable(strCursorQuery, "<Page>", asString(nPage));
+
+		_RecordsetPtr ipCachedDataRow(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI48362", ipCachedDataRow != __nullptr);
+
+		ipCachedDataRow->Open(strCursorQuery.c_str(),
+			_variant_t((IDispatch*)ipConnection, true), adOpenForwardOnly,
+			adLockReadOnly, adCmdText);
+
+		if (ipCachedDataRow->adoEOF == VARIANT_FALSE)
+		{
+			string strException = getStringField(ipCachedDataRow->Fields, "Exception");
+			// Unless caller is specifically asking for a recorded exception, throw any recorded
+			// exception from the cache operation when trying to retrieve any other data.
+			if (!strException.empty() && !bGetCacheException)
+			{
+				UCLIDException ue;
+				ue.createFromString("ELI49456", strException);
+				throw ue;
+			}
+
+			try
+			{
+				try
+				{
+					if (bGetCachedImage)
+					{
+						FieldPtr ipImageData = ipCachedDataRow->Fields->Item["ImageData"];
+						// If parray is null, CComSafeArray will assert in a way that displays a debug dialog.
+						// Assert ourselves here to avoid that.
+						ASSERT_RESOURCE_ALLOCATION("ELI49458", ipImageData->Value.parray != __nullptr);
+
+						CComSafeArray<BYTE> saData(ipImageData->Value.parray);
+						*pparrayImageData = saData.Detach();
+					}
+					if (bGetCachedUSS)
+					{
+						*pbstrUssData = get_bstr_t(getStringField(ipCachedDataRow->Fields, "USSData")).Detach();
+					}
+					if (bGetCachedWordZones)
+					{
+						*pbstrWordZoneData = get_bstr_t(getStringField(ipCachedDataRow->Fields, "WordZoneData")).Detach();
+					}
+					if (bGetCachedAttributes)
+					{
+						string strAttributeList = getStringField(ipCachedDataRow->Fields, "AttributeData");
+						// Each page will contain an array of attributes; in case the call will want many pages of attributes,
+						// trim off the JSON array brackets so they can be re-added around requested pages.
+						strAttributeList = trim(strAttributeList, "[", "]");
+						*pbstrAttributeData = get_bstr_t(strAttributeList).Detach();
+					}
+					if (bGetCacheException)
+					{
+						*pbstrException = get_bstr_t(strException).Detach();
+					}
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49448");
+			}
+			catch (UCLIDException & ue)
+			{
+				UCLIDException ueOuter("ELI49447", "Failed to read cached data", ue);
+				ueOuter.addDebugInfo("Session ID", nFileTaskSessionID);
+				ueOuter.addDebugInfo("Page", nPage);
+				throw ueOuter;
+			}
+
+			bFoundCacheData = true;
+		}
+
+		ipCachedDataRow->Close();
+	}
+
+	return bFoundCacheData;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::CacheAttributeData_Internal(bool bDBLocked, long nFileTaskSessionID,
+													 IStrToStrMap* pmapAttributeData)
+{
+	try
+	{
+		try
+		{
+			IStrToStrMapPtr ipDataByPage(pmapAttributeData);
+			ASSERT_RESOURCE_ALLOCATION("ELI49473", ipDataByPage != __nullptr);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
 
 			ipConnection = getDBConnection();
 
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
-			string strCreateCacheRowQuery = gstrGET_OR_CREATE_FILE_TASK_SESSION_CACHE_ROW;
-			replaceVariable(strCreateCacheRowQuery, "<FileTaskSessionID>", asString(nFileTaskSessionID));
-			replaceVariable(strCreateCacheRowQuery, "<Page>", asString(nPage));
+			long nPageCount = pmapAttributeData->Size;
 
-			long long llCacheRowID = -1;
-			executeCmdQuery(ipConnection, strCreateCacheRowQuery, "ID", false, &llCacheRowID);
+			string strCreateCacheRowsQuery = gstrCREATE_FILE_TASK_SESSION_CACHE_ROWS;
+			replaceVariable(strCreateCacheRowsQuery, "<FileTaskSessionID>", asString(nFileTaskSessionID));
+			replaceVariable(strCreateCacheRowsQuery, "<PageCount>", asString(nPageCount));
 
-			// If the file task session has closed do not cache the data.
-			if (llCacheRowID > 0)
+			long nCacheRowCount = -1;
+			executeCmdQuery(ipConnection, strCreateCacheRowsQuery, "CacheRowCount", false, &nCacheRowCount);
+
+			ASSERT_RUNTIME_CONDITION("ELI49474", nPageCount == nCacheRowCount, "Failed to initialize document data.");
+
+			_RecordsetPtr ipCachedDataRow(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI49493", ipCachedDataRow != __nullptr);
+
+			string strCursorQuery = gstrGET_FILE_TASK_SESSION_CACHE_DATA;
+			replaceVariable(strCursorQuery, "<FileTaskSessionID>", asString(nFileTaskSessionID));
+			replaceVariable(strCursorQuery, "<FieldList>", "[Page], [AttributeData]");
+
+			ipCachedDataRow->Open(strCursorQuery.c_str(),
+				_variant_t((IDispatch*)ipConnection, true), adOpenDynamic,
+				adLockOptimistic, adCmdText);
+			int nRowCount = 0;
+			while (ipCachedDataRow->adoEOF == VARIANT_FALSE)
 			{
-				vector<string> vecFields;
-				if (parrayImageData != __nullptr)
+				long nPage = getLongField(ipCachedDataRow->Fields, "Page");
+				_bstr_t bstrPage = _bstr_t(asString(nPage).c_str());
+				if (asCppBool(pmapAttributeData->Contains(bstrPage)))
 				{
-					vecFields.push_back("[ImageData]");
-				}
-				if (bstrUssData != __nullptr)
-				{
-					vecFields.push_back("[USSData]");
-				}
-				if (bstrWordZoneData != __nullptr)
-				{
-					vecFields.push_back("[WordZoneData]");
-				}
-				if (bstrAttributeData != __nullptr)
-				{
-					vecFields.push_back("[AttributeData]");
-				}
-				if (bstrException != __nullptr)
-				{
-					vecFields.push_back("[Exception]");
+					string btrPageData = asString(pmapAttributeData->GetValue(bstrPage));
+					setStringField(ipCachedDataRow->Fields, "AttributeData", btrPageData);
 				}
 
-				ASSERT_RUNTIME_CONDITION("ELI49501", vecFields.size() > 0,
-					"No data has been provided for cache");
-
-				string strCursorQuery = gstrGET_FILE_TASK_SESSION_CACHE_DATA_BY_ID;
-				replaceVariable(strCursorQuery, "<ID>", asString(llCacheRowID));
-				replaceVariable(strCursorQuery, "<FieldList>", asString(vecFields, true, ","));
-
-				_RecordsetPtr ipCachedDataRow(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI48308", ipCachedDataRow != __nullptr);
-
-				// Concurrent behavior tested by CacheSimultaneousOperations
-				ipCachedDataRow->Open(strCursorQuery.c_str(),
-					_variant_t((IDispatch*)ipConnection, true), adOpenDynamic,
-					adLockOptimistic, adCmdText);
-				if (ipCachedDataRow->adoEOF == VARIANT_TRUE)
-				{
-					throw UCLIDException("ELI48309", "Failed to acquire cache");
-				}
-
-				if (parrayImageData != __nullptr)
-				{
-					FieldPtr ipItem = ipCachedDataRow->Fields->Item["ImageData"];
-					ASSERT_RESOURCE_ALLOCATION("ELI48336", ipItem != __nullptr);
-
-					CComSafeArray<BYTE> saData(parrayImageData);
-					_variant_t variantData;
-					variantData.vt = VT_ARRAY | VT_UI1;
-					variantData.parray = saData;
-					ipItem->Value = variantData;
-				}
-
-				if (bstrUssData != __nullptr)
-				{
-					setStringField(ipCachedDataRow->Fields, "USSData", asString(bstrUssData));
-				}
-
-				if (bstrWordZoneData != __nullptr)
-				{
-					setStringField(ipCachedDataRow->Fields, "WordZoneData", asString(bstrWordZoneData));
-				}
-
-				if (bstrAttributeData != __nullptr)
-				{
-					setStringField(ipCachedDataRow->Fields, "AttributeData", asString(bstrAttributeData));
-				}
-
-				if (bstrException != __nullptr)
-				{
-					setStringField(ipCachedDataRow->Fields, "Exception", asString(bstrException));
-				}
-
-				ipCachedDataRow->Update();
-				ipCachedDataRow->Close();
-
-				*pbWroteData = VARIANT_TRUE;
+				nRowCount++;
+				ipCachedDataRow->MoveNext();
 			}
-			
+
+			ASSERT_RUNTIME_CONDITION("ELI49480", nRowCount == nPageCount, "Failed to initialize document data.");
+
 			tg.CommitTrans();
+
+			END_CONNECTION_RETRY(ipConnection, "ELI49481");
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49443");
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49492");
+	}
+	catch (UCLIDException & ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::MarkAttributeDataUnmodified_Internal(bool bDBLocked, long nFileTaskSessionID)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			ipConnection = getDBConnection();
+
+			string strMarkAttributeUnmodifiedQuery = gstrMARK_TASK_SESSION_ATTRIBUTE_DATA_UNMODIFIED;
+			replaceVariable(strMarkAttributeUnmodifiedQuery, "<FileTaskSessionID>", asString(nFileTaskSessionID));
+
+			executeCmdQuery(ipConnection, strMarkAttributeUnmodifiedQuery);
+
+			END_CONNECTION_RETRY(ipConnection, "ELI49515");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49516");
+	}
+	catch (UCLIDException & ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::GetUncommittedAttributeData_Internal(bool bDBLocked, long nFileID, long nActionID,
+	long nExceptFileTaskSessionID, BSTR bstrExceptIfMoreRecentAttributeSetName, IIUnknownVector** ppUncommittedPagesOfData)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI41990", ppUncommittedPagesOfData != __nullptr);
+
+			IIUnknownVectorPtr ipUncommittedPagesOfData(CLSID_IUnknownVector);
+			ASSERT_RESOURCE_ALLOCATION("ELI49526", ipUncommittedPagesOfData != __nullptr);
+
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			ipConnection = getDBConnection();
+
+			_RecordsetPtr ipCachedDataRow(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI49523", ipCachedDataRow != __nullptr);
+
+			string strCursorQuery = gstrGET_UNCOMMITTED_ATTRIBUTE_DATA;
+			replaceVariable(strCursorQuery, "<FileID>", asString(nFileID));
+			replaceVariable(strCursorQuery, "<ActionID>", asString(nActionID));
+			replaceVariable(strCursorQuery, "<ExceptIfMoreRecentAttributeSetName>",
+				asString(bstrExceptIfMoreRecentAttributeSetName));
+			replaceVariable(strCursorQuery, "<ExceptFileTaskSessionID>",
+				asString(nExceptFileTaskSessionID));
+
+			ipCachedDataRow->Open(strCursorQuery.c_str(),
+				_variant_t((IDispatch*)ipConnection, true), adOpenStatic, adLockReadOnly, adCmdText);
+			while (ipCachedDataRow->adoEOF == VARIANT_FALSE)
+			{
+				IVariantVectorPtr ipRowData(CLSID_VariantVector);
+				ASSERT_RESOURCE_ALLOCATION("ELI49527", ipRowData != __nullptr);
+
+				FieldsPtr ipFields = ipCachedDataRow->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI49528", ipFields != __nullptr);
+
+				ipRowData->PushBack(ipFields->Item["FullUserName"]->Value);
+				ipRowData->PushBack(ipFields->Item["AttributeDataModifiedTime"]->Value);
+				ipRowData->PushBack(ipFields->Item["Page"]->Value);
+				ipRowData->PushBack(ipFields->Item["AttributeData"]->Value);
+
+				ipUncommittedPagesOfData->PushBack(ipRowData);
+
+				ipCachedDataRow->MoveNext();
+			}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI49524");
+
+			*ppUncommittedPagesOfData = ipUncommittedPagesOfData.Detach();
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49525");
+	}
+	catch (UCLIDException & ue)
+	{
+		if (!bDBLocked)
+		{
+			return false;
+		}
+		throw ue;
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::DiscardOldCacheData_Internal(bool bDBLocked, long nFileID, long nActionID,
+																 long nExceptFileTaskSessionID)
+{
+	try
+	{
+		try
+		{
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			BEGIN_CONNECTION_RETRY();
+
+			ipConnection = getDBConnection();
+
+			string strDiscardQuery = gstrDISCARD_OLD_CACHE_DATA;
+			replaceVariable(strDiscardQuery, "<FileID>", asString(nFileID));
+			replaceVariable(strDiscardQuery, "<ActionID>", asString(nActionID));
+			replaceVariable(strDiscardQuery, "<ExceptFileTaskSessionID>", asString(nExceptFileTaskSessionID));
+
+			executeCmdQuery(ipConnection, strDiscardQuery);
+
+			END_CONNECTION_RETRY(ipConnection, "ELI49530");
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49531");
 	}
 	catch (UCLIDException & ue)
 	{

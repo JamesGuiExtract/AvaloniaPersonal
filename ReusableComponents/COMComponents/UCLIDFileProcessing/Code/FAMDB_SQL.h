@@ -365,14 +365,17 @@ static const string gstrCREATE_FILE_TASK_SESSION =
 
 static const string gstrCREATE_FILE_TASK_SESSION_CACHE =
 	"CREATE TABLE [dbo].[FileTaskSessionCache] ( "
-	"[ID] BIGINT IDENTITY(1, 1) NOT NULL CONSTRAINT[PK_FileTaskSessionCache] PRIMARY KEY CLUSTERED, "
-	"[ActiveFAMID] INT NOT NULL, "
+	"[ID] BIGINT IDENTITY(1, 1) NOT NULL CONSTRAINT [PK_FileTaskSessionCache] PRIMARY KEY CLUSTERED, "
+	// NOTE: When attribute data has been updated, AutoDeleteWithActiveFAMID will be set to NULL to
+	// prevent deletion so subsequent sessions can use it.
+	"[AutoDeleteWithActiveFAMID] INT NULL, "
 	"[FileTaskSessionID] INT NOT NULL, "
 	"[Page] INT NOT NULL, "
 	"[ImageData] VARBINARY(MAX) NULL, "
 	"[USSData] NVARCHAR(MAX) NULL, "
 	"[WordZoneData] NVARCHAR(MAX) NULL, "
 	"[AttributeData] NVARCHAR(MAX) NULL, "
+	"[AttributeDataModifiedTime] DATETIME NULL, "
 	"[Exception] NVARCHAR(MAX) NULL)";
 
 static const string gstrCREATE_SECURE_COUNTER =
@@ -1246,7 +1249,7 @@ static const string gstrADD_WEB_APP_CONFIG_WORKFLOW_FK =
 // ActiveFAM FK with cascade deletes ensures cached data gets cleaned up if a session is lost.
 static const string gstrADD_FILE_TASK_SESSION_CACHE_ACTIVEFAM_FK =
 	"ALTER TABLE dbo.[FileTaskSessionCache] "
-	"WITH CHECK ADD CONSTRAINT [FK_FileTaskSessionCache_ActiveFAM] FOREIGN KEY ([ActiveFAMID]) "
+	"ADD CONSTRAINT [FK_FileTaskSessionCache_ActiveFAM] FOREIGN KEY ([AutoDeleteWithActiveFAMID]) "
 	"REFERENCES [ActiveFAM]([ID]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
@@ -2459,9 +2462,9 @@ static const string gstrGET_OR_CREATE_FILE_TASK_SESSION_CACHE_ROW =
 "		SELECT [ID]\r\n"
 "		FROM [FileTaskSessionCache]\r\n"
 "		WHERE [FileTaskSessionID] = <FileTaskSessionID> AND [Page] = <Page>\r\n"
-"	IF NOT EXISTS(SELECT * FROM @rowID)\r\n"
+"	IF NOT EXISTS(SELECT * FROM @rowID) AND <CrucialUpdate> = 0\r\n"
 "	BEGIN\r\n"
-"	INSERT INTO dbo.[FileTaskSessionCache] ([ActiveFAMID], [FileTaskSessionID], [Page])\r\n"
+"	INSERT INTO dbo.[FileTaskSessionCache] ([AutoDeleteWithActiveFAMID], [FileTaskSessionID], [Page])\r\n"
 "		OUTPUT INSERTED.ID INTO @rowID\r\n"
 "		SELECT [ActiveFAM].[ID], <FileTaskSessionID>, <Page>\r\n"
 "		FROM [ActiveFAM]\r\n"
@@ -2471,6 +2474,25 @@ static const string gstrGET_OR_CREATE_FILE_TASK_SESSION_CACHE_ROW =
 "	END\r\n"
 "END\r\n"
 "SELECT COALESCE(MIN([ID]), -1) AS [ID] FROM @rowID";
+
+static const string gstrCREATE_FILE_TASK_SESSION_CACHE_ROWS =
+// SET NOCOUNT ON is needed to prevent "operation is not allowed when the object is closed"
+"SET NOCOUNT ON\r\n"
+";WITH AllPages(Page) AS(\r\n"
+"	SELECT 1\r\n"
+"	UNION ALL\r\n"
+"	SELECT Page + 1 FROM AllPages WHERE Page < <PageCount>\r\n"
+")\r\n"
+"INSERT INTO [FileTaskSessionCache] ([AutoDeleteWithActiveFAMID], [FileTaskSessionID], [Page])\r\n"
+"	SELECT [ActiveFAM].[ID], <FileTaskSessionID>, [AllPages].[Page]\r\n"
+"		FROM [AllPages]\r\n"
+"		LEFT JOIN [FileTaskSessionCache] ON [FileTaskSessionCache].[FileTaskSessionID] = <FileTaskSessionID>\r\n"
+"			AND [FileTaskSessionCache].[Page] = [AllPages].[Page]\r\n"
+"		INNER JOIN [FileTaskSession] ON <FileTaskSessionID> = [FileTaskSession].[ID]\r\n"
+"		INNER JOIN [ActiveFAM] ON [FileTaskSession].[FAMSessionID] = [ActiveFAM].[FAMSessionID]\r\n"
+"		WHERE [FileTaskSessionCache].[Page] IS NULL\r\n"
+"		OPTION (MAXRECURSION 0);\r\n" // Max recursion on CTEs (AllPages in this case) is 100 by default; turn off limit
+"SELECT COUNT(*) AS [CacheRowCount] FROM [FileTaskSessionCache] WHERE [FileTaskSessionID] = <FileTaskSessionID>";
 
 static const string gstrGET_FILE_TASK_SESSION_CACHE_ROWS =
 	"SELECT [Page] FROM [FileTaskSessionCache] \r\n"
@@ -2485,8 +2507,54 @@ static const string gstrGET_FILE_TASK_SESSION_CACHE_DATA =
 	"	WHERE [FileTaskSessionID] = <FileTaskSessionID>";
 
 static const string gstrGET_FILE_TASK_SESSION_CACHE_DATA_BY_ID =
-	"SELECT <FieldList> FROM [FileTaskSessionCache] \r\n"
+	"SELECT <FieldList>, GetDate() FROM [FileTaskSessionCache] \r\n"
 	"	WHERE [ID] = <ID>";
 
+static const string gstrMARK_TASK_SESSION_ATTRIBUTE_DATA_UNMODIFIED =
+	"UPDATE [FileTaskSessionCache] \r\n"
+	"	SET [AttributeDataModifiedTime] = NULL, [FileTaskSessionCache].[AutoDeleteWithActiveFAMID] = [ActiveFAM].[ID] \r\n"
+	"	FROM [FileTaskSessionCache] \r\n"
+	"	INNER JOIN [FileTaskSession] ON [FileTaskSessionID] = [FileTaskSession].[ID] \r\n"
+	"	INNER JOIN [FAMSession] ON [FileTaskSession].[FAMSessionID] = [FAMSession].[ID] \r\n"
+	"	INNER JOIN [ActiveFAM] ON [ActiveFAM].[FAMSessionID] = [FAMSession].[ID] \r\n"
+	"	WHERE [FileTaskSessionID] = <FileTaskSessionID> \r\n"
+	"		AND[AttributeDataModifiedTime] IS NOT NULL \r\n";
 
+static const string gstrDISCARD_OLD_CACHE_DATA = "DELETE [FileTaskSessionCache] \r\n"
+	"	FROM [FileTaskSessionCache] T \r\n"
+	"	INNER JOIN [FileTaskSession] ON [FileTaskSessionID] = [FileTaskSession].[ID] \r\n"
+	"	INNER JOIN [FAMSession] ON [FileTaskSession].[FAMSessionID] = [FAMSession].[ID] \r\n"
+	"	WHERE [FileID] = <FileID> \r\n"
+	"		AND (<ActionID> < 0 OR [FileTaskSession].[ActionID] = <ActionID>) \r\n"
+	"		AND (<ExceptFileTaskSessionID> < 0 OR [FileTaskSessionID] <> <ExceptFileTaskSessionID>)";
 
+static const string gstrGET_UNCOMMITTED_ATTRIBUTE_DATA =
+	// SET NOCOUNT ON is needed to prevent "operation is not allowed when the object is closed"
+	"SET NOCOUNT ON \r\n"
+	";WITH [UncommittedSessions]([FileTaskSessionID], [FullUserName], [CacheOrder]) AS \r\n"
+	"( \r\n"
+	"	SELECT [FileTaskSessionID], COALESCE([FullUserName], [UserName]), \r\n"
+	"			ROW_NUMBER() OVER(ORDER BY [AttributeDataModifiedTime] DESC) AS [CacheOrder] \r\n"
+	"		FROM [FileTaskSessionCache]\r\n"
+	"		INNER JOIN [FileTaskSession] ON [FileTaskSessionID] = [FileTaskSession].[ID] \r\n"
+	"		INNER JOIN [FAMSession] ON [FAMSessionID] = [FAMSession].[ID] \r\n"
+	"		INNER JOIN [FAMUser] ON [FAMUserID] = [FAMUser].[ID] \r\n"
+	"		WHERE [FileID] = <FileID> \r\n"
+	"			AND (<ActionID> < 0 OR [FileTaskSession].[ActionID] = <ActionID>) \r\n"
+	"			AND [AttributeDataModifiedTime] IS NOT NULL \r\n"
+	"			AND (<ExceptFileTaskSessionID> < 0 OR [FileTaskSessionID] <> <ExceptFileTaskSessionID>) \r\n"
+	") \r\n"
+	"SELECT [FullUserName], [AttributeDataModifiedTime], [Page], [AttributeData] \r\n"
+	"	FROM [FileTaskSessionCache]\r\n"
+	"	INNER JOIN [UncommittedSessions] ON [FileTaskSessionCache].[FileTaskSessionID] = [UncommittedSessions].[FileTaskSessionID] \r\n"
+	"		AND [UncommittedSessions].[CacheOrder] = 1 \r\n"
+	"	WHERE [AttributeDataModifiedTime] IS NOT NULL \r\n"
+	"	AND(LEN('<ExceptIfMoreRecentAttributeSetName>') = 0 OR NOT EXISTS \r\n"
+	"	( \r\n"
+	"		SELECT * FROM [AttributeSetForFile] \r\n"
+	"		INNER JOIN [FileTaskSession] ON [FileTaskSessionID] = [FileTaskSession].[ID] \r\n"
+	"		INNER JOIN [AttributeSetName] ON [AttributeSetForFile].[AttributeSetNameID] = [AttributeSetName].[ID] \r\n"
+	"		WHERE [FileID] = <FileID> \r\n"
+	"		AND [AttributeSetName].[Description] = '<ExceptIfMoreRecentAttributeSetName>' \r\n"
+	"		AND [FileTaskSession].[DateTimeStamp] > [AttributeDataModifiedTime] \r\n"
+	"	)) \r\n";
