@@ -743,6 +743,13 @@ namespace Extract.AttributeFinder
 #pragma warning restore CS0618 // Type or member is obsolete
             }
 
+            // Instantiate the lazy BoW so that the vocab is viewable
+            // https://extract.atlassian.net/browse/ISSUE-15553
+            if (FeatureType == FeatureVectorizerType.DiscreteTerms)
+            {
+                if (_nonSerializedBagOfWords.Value != null) { }
+            }
+
             _version = _CURRENT_VERSION;
         }
 
