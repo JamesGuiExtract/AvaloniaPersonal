@@ -319,7 +319,7 @@ namespace Extract.Dashboard.Utilities
                 var selectRowsDimensions = GetSelectedRowsDimensions(e.DashboardItemName);
                 if (selectRowsDimensions.Count() == 1)
                 {
-                    var dimensions = selectRowsDimensions?.FirstOrDefault();
+                    var dimensions = selectRowsDimensions.FirstOrDefault();
                     if (dimensions != null)
                     {
                         _dashboardForm.CurrentFilteredDimensions.AddRange(dimensions);
@@ -1392,17 +1392,16 @@ namespace Extract.Dashboard.Utilities
         /// <returns><see cref="IEnumerable{String}"/> that containsthe selected files</returns>
         IEnumerable<string> GetSelectedFiles(string gridName)
         {
-            GridDetailConfiguration configuration;
+            string dataMember = "FileName";
 
-            if (CustomGridValues.TryGetValue(gridName, out configuration)
+            if (CustomGridValues.TryGetValue(gridName, out GridDetailConfiguration configuration)
                 && !string.IsNullOrWhiteSpace(configuration.DataMemberUsedForFileName))
             {
-                return GetSelectedRowsDimensions(gridName)
-                    .Where(row => row.ContainsKey(configuration.DataMemberUsedForFileName))
-                    .Select(row => row[configuration.DataMemberUsedForFileName].ToString());
+                dataMember = configuration.DataMemberUsedForFileName;
             }
-
-            return new List<string>();
+            return GetSelectedRowsDimensions(gridName)
+                .Where(row => row.ContainsKey(dataMember))
+                .Select(row => row[dataMember].ToString());
         }
 
         /// <summary>
@@ -1414,7 +1413,7 @@ namespace Extract.Dashboard.Utilities
         {
             var axisPointTuples = _dashboardForm.GetCurrentFilterValues(gridName);
 
-            return axisPointTuples.Select(at => at.ToDictionary())?
+            return axisPointTuples.Select(at => at.ToDictionary())
                 .Where(v => v != null);
         }
 
