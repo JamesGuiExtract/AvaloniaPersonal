@@ -11,7 +11,7 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Provides the <see langword="abstract"/> base class for a
     /// prepopulated <see cref="ToolStrip"/> containing specific
-    /// <see cref="DocumentViewer"/> commands and tools.
+    /// <see cref="ImageViewer"/> commands and tools.
     /// </summary>
     public abstract partial class ImageViewerPrePopulatedToolStrip : ToolStrip
     {

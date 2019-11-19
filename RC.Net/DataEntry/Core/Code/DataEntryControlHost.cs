@@ -240,7 +240,7 @@ namespace Extract.DataEntry
         /// Use this field in place of the property in cases where an extending class should not be
         /// allowed the opportunity to try to provide the ImageViewer on-demand.
         /// </summary>
-        IDocumentViewer _imageViewer;
+        ImageViewer _imageViewer;
 
         /// <summary>
         /// Indicates whether this DEP should be monitoring events from the
@@ -1479,7 +1479,7 @@ namespace Extract.DataEntry
         /// if no connections are established.</returns>
         /// <seealso cref="IImageViewerControl"/>
         [Browsable(false)]
-        public virtual IDocumentViewer ImageViewer
+        public virtual ImageViewer ImageViewer
         {
             get
             {
@@ -1539,7 +1539,7 @@ namespace Extract.DataEntry
                 {
                     ExtractException ee = new ExtractException("ELI23665",
                         "Unable to establish connection to image viewer.", e);
-                    ee.AddDebugData("Image viewer", value.ToString(), false);
+                    ee.AddDebugData("Image viewer", value, false);
                     throw ee;
                 }
             }
@@ -1674,12 +1674,11 @@ namespace Extract.DataEntry
                     // [DataEntry:302]
                     // If the mouse is over the image viewer, select the image viewer and allow it to 
                     // handle the mouse wheel event instead.
-                    var imageViewerControl = _imageViewer as Control;
-                    if (_imageViewer != null && _imageViewer.IsImageAvailable && !imageViewerControl.Focused &&
-                            imageViewerControl.ClientRectangle.Contains(
-                                imageViewerControl.PointToClient(MousePosition)))
+                    if (_imageViewer != null && _imageViewer.IsImageAvailable && !_imageViewer.Focused &&
+                            _imageViewer.ClientRectangle.Contains(
+                                _imageViewer.PointToClient(MousePosition)))
                     {
-                        imageViewerControl.Focus();
+                        _imageViewer.Focus();
 
                         // So that the input tracker is able to track this input
                         OnMessageHandled(new MessageHandledEventArgs(m));
@@ -4067,8 +4066,8 @@ namespace Extract.DataEntry
                 // reason... exempt F10 from being handled here.
                 // [DataEntry:335] Don't handle tab key either since that already has special
                 // handling in PreFilterMessage.
-                bool sendKeyToActiveControl = !((Control)ImageViewer).Capture && activeControl != null && 
-                    !activeControl.Focused && e.KeyCode != Keys.F10 && e.KeyCode != Keys.Tab;
+                bool sendKeyToActiveControl = (!ImageViewer.Capture && activeControl != null && 
+                    !activeControl.Focused && e.KeyCode != Keys.F10 && e.KeyCode != Keys.Tab);
 
                 // If the image viewer is in a separate form which has focus, DataEntryApplication's
                 // ProcessCmdKey (which enables shortcuts to be processed) will not receive
@@ -6677,7 +6676,7 @@ namespace Extract.DataEntry
                 // during the toggle of enabled.
                 if (ImageViewer != null)
                 {
-                    ((Control)ImageViewer).Focus();
+                    ImageViewer.Focus();
                 }
 
                 Control control = (Control)_activeDataControl;
@@ -8201,13 +8200,13 @@ namespace Extract.DataEntry
             // Since the angular highlight cursor extends above the cursor position and would
             // otherwise be drawn on top of the tooltip, shift the tooltip below the cursor
             // position if the angular highlight cursor tool is active.
-            Point toolTipPosition = ((Control)ImageViewer).TopLevelControl.PointToClient(MousePosition);
+            Point toolTipPosition = ImageViewer.TopLevelControl.PointToClient(MousePosition);
             if (ImageViewer.CursorTool == CursorTool.AngularHighlight)
             {
                 toolTipPosition.Offset(0, 35);
             }
 
-            _userNotificationTooltip.Show(message, ((Control)ImageViewer).TopLevelControl, toolTipPosition, 5000);
+            _userNotificationTooltip.Show(message, ImageViewer.TopLevelControl, toolTipPosition, 5000);
         }
 
         /// <summary>
@@ -8218,8 +8217,8 @@ namespace Extract.DataEntry
             _imageViewer.CursorToolChanged += HandleCursorToolChanged;
             _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
             _imageViewer.OcrTextHighlighted += HandleOcrTextHighlighted;
-            ((Control)_imageViewer).PreviewKeyDown += HandleImageViewerPreviewKeyDown;
-            ((Control)_imageViewer).MouseDown += HandleImageViewerMouseDown;
+            _imageViewer.PreviewKeyDown += HandleImageViewerPreviewKeyDown;
+            _imageViewer.MouseDown += HandleImageViewerMouseDown;
             _imageViewer.ZoomChanged += HandleImageViewerZoomChanged;
             _imageViewer.ScrollPositionChanged += HandleImageViewerScrollPositionsChanged;
             _imageViewer.PageChanged += HandleImageViewerPageChanged;
@@ -8249,8 +8248,8 @@ namespace Extract.DataEntry
                 _imageViewer.CursorToolChanged -= HandleCursorToolChanged;
                 _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
                 _imageViewer.OcrTextHighlighted -= HandleOcrTextHighlighted;
-                ((Control)_imageViewer).PreviewKeyDown -= HandleImageViewerPreviewKeyDown;
-                ((Control)_imageViewer).MouseDown -= HandleImageViewerMouseDown;
+                _imageViewer.PreviewKeyDown -= HandleImageViewerPreviewKeyDown;
+                _imageViewer.MouseDown -= HandleImageViewerMouseDown;
                 _imageViewer.ZoomChanged -= HandleImageViewerZoomChanged;
                 _imageViewer.ScrollPositionChanged -= HandleImageViewerScrollPositionsChanged;
                 _imageViewer.PageChanged -= HandleImageViewerPageChanged;

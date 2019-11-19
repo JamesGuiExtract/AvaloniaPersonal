@@ -39,8 +39,9 @@ namespace Extract.Imaging.Forms
         /// May be <see langword="null"/> if no keys are associated with the menu item.</returns>
         protected override Keys[] GetKeys()
         {
-            var imageViewer = base.ImageViewer;
-            return imageViewer?.Shortcuts.GetKeys(imageViewer.BlockFitSelectedZones);
+            ImageViewer imageViewer = base.ImageViewer;
+            return imageViewer == null ? null :
+                imageViewer.Shortcuts.GetKeys(imageViewer.BlockFitSelectedZones);
         }
 
         /// <summary>
@@ -68,7 +69,7 @@ namespace Extract.Imaging.Forms
 
             try
             {
-                var imageViewer = base.ImageViewer;
+                ImageViewer imageViewer = base.ImageViewer;
                 if (imageViewer != null && imageViewer.IsImageAvailable)
                 {
                     imageViewer.BlockFitSelectedZones();
@@ -138,8 +139,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer to which the <see cref="BlockFitSelectionToolStripMenuItem"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        [CLSCompliant(false)]
-        public override IDocumentViewer ImageViewer
+        public override ImageViewer ImageViewer
         {
             get
             {
@@ -172,7 +172,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI30085",
                         "Unable to establish connection to image viewer.", ex);
-                    ee.AddDebugData("Image viewer", value.ToString(), false);
+                    ee.AddDebugData("Image viewer", value, false);
                     throw ee;
                 }
             }

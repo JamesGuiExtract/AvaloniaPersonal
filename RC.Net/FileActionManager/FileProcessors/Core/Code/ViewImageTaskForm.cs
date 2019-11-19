@@ -575,12 +575,12 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         /// <summary>
-        /// Handles the <see cref="DocumentViewer.ImageFileChanged"/> event.
+        /// Handles the <see cref="ImageViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="DocumentViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="ImageViewer.ImageFileChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="DocumentViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="ImageViewer.ImageFileChanged"/> event.</param>
         void HandleImageViewerImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             try

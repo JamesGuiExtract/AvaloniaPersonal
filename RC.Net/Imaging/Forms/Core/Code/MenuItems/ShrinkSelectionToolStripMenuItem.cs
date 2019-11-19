@@ -39,7 +39,8 @@ namespace Extract.Imaging.Forms
         /// May be <see langword="null"/> if no keys are associated with the menu item.</returns>
         protected override Keys[] GetKeys()
         {
-            return ImageViewer?.Shortcuts.GetKeys(ImageViewer.ShrinkSelectedZones);
+            return ImageViewer == null ? null :
+                ImageViewer.Shortcuts.GetKeys(ImageViewer.ShrinkSelectedZones);
         }
 
         /// <summary>
@@ -136,8 +137,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer to which the <see cref="ShrinkSelectionToolStripMenuItem"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        [CLSCompliant(false)]
-        public override IDocumentViewer ImageViewer
+        public override ImageViewer ImageViewer
         {
             get
             {
@@ -170,7 +170,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI31605",
                         "Unable to establish connection to image viewer.", ex);
-                    ee.AddDebugData("Image viewer", value.ToString(), false);
+                    ee.AddDebugData("Image viewer", value, false);
                     throw ee;
                 }
             }

@@ -201,7 +201,7 @@ namespace Extract.Redaction.Verification
             this._magnifierControl = new Extract.Imaging.Forms.MagnifierControl();
             this._sandDockManager = new TD.SandDock.SandDockManager();
             this._imageViewerStatusStrip = new Extract.Imaging.Forms.ImageViewerStatusStrip();
-            this._imageViewer = new Extract.Imaging.Forms.DocumentViewer();
+            this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
             this._imageViewerContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this._zoomPreviousToolStripMenuItem1 = new Extract.Imaging.Forms.ZoomPreviousToolStripMenuItem();
             this._zoomWindowToolStripMenuItem1 = new Extract.Imaging.Forms.ZoomWindowToolStripMenuItem();
@@ -1868,7 +1868,7 @@ namespace Extract.Redaction.Verification
 
         private TD.SandDock.SandDockManager _sandDockManager;
         private TD.SandDock.DockableWindow _dataWindowDockableWindow;
-        private Extract.Imaging.Forms.DocumentViewer _imageViewer;
+        private Extract.Imaging.Forms.ImageViewer _imageViewer;
         private System.Windows.Forms.ToolStrip _basicImageViewerToolStrip;
         private Extract.Imaging.Forms.PrintImageToolStripButton _printImageToolStripButton;
         private Extract.Imaging.Forms.ZoomWindowToolStripButton _zoomWindowToolStripButton;

@@ -42,7 +42,7 @@ namespace Extract.Imaging.Forms
         protected override void SetEnabledState()
         {
             // Get the image viewer this control is attached to
-            var imageViewer = base.ImageViewer;
+            ImageViewer imageViewer = base.ImageViewer;
 
             // Enable this button if an image is open and it is not on the last page.
             base.Enabled = imageViewer != null && imageViewer.IsImageAvailable &&
@@ -74,7 +74,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                var imageViewer = base.ImageViewer;
+                ImageViewer imageViewer = base.ImageViewer;
 
                 if (imageViewer != null && imageViewer.IsImageAvailable
                     && imageViewer.PageNumber < imageViewer.PageCount)
@@ -99,12 +99,12 @@ namespace Extract.Imaging.Forms
         #region NextPageToolStripMenuItem Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.PageChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.PageChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.PageChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.PageChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.PageChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.PageChanged"/> event.</param>
         private void HandlePageChanged(object sender, PageChangedEventArgs e)
         {
             try
@@ -132,8 +132,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer to which the <see cref="NextPageToolStripMenuItem"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        [CLSCompliant(false)]
-        public override IDocumentViewer ImageViewer
+        public override ImageViewer ImageViewer
         {
             get
             {
@@ -162,7 +161,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI21835",
                         "Unable to establish connection to image viewer.", ex);
-                    ee.AddDebugData("Image viewer", value.ToString(), false);
+                    ee.AddDebugData("Image viewer", value, false);
                     throw ee;
                 }
             }

@@ -43,7 +43,7 @@ namespace Extract.Imaging.Forms
         protected override void SetEnabledState()
         {
             // Get the image viewer this control is attached to
-            var imageViewer = base.ImageViewer;
+            ImageViewer imageViewer = base.ImageViewer;
 
             // Enable this button if an image is open and has more than 1 page 
             base.Enabled = imageViewer != null && imageViewer.IsImageAvailable
@@ -75,13 +75,13 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Get the image viewer
-                var imageViewer = base.ImageViewer;
+                ImageViewer imageViewer = base.ImageViewer;
 
                 if (imageViewer != null && imageViewer.IsImageAvailable
                     && imageViewer.PageCount > 1)
                 {
                     // Get the parent form
-                    Control parent = ((Control)imageViewer).Parent;
+                    Control parent = imageViewer.Parent;
                     while (parent != null && !(parent is Form))
                     {
                         parent = parent.Parent;

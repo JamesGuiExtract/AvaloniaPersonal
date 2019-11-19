@@ -32,7 +32,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Image viewer with which this status label connects.
         /// </summary>
-        IDocumentViewer _imageViewer;
+        ImageViewer _imageViewer;
 
         #endregion Fields
 
@@ -82,8 +82,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer to which the <see cref="BackgroundProcessStatusLabel"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        [CLSCompliant(false)]
-        public IDocumentViewer ImageViewer
+        public ImageViewer ImageViewer
         {
             get
             {
@@ -112,7 +111,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI32621",
                         "Unable to establish connection to image viewer.", ex);
-                    ee.AddDebugData("Image viewer", value.ToString(), false);
+                    ee.AddDebugData("Image viewer", value, false);
                     throw ee;
                 }
             }

@@ -154,7 +154,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="imageViewer"></param>
         /// <returns>The <see cref="PaginationDocumentData"/> instance.</returns>
         PaginationDocumentData GetDocumentData(IUnknownVector attributes, string sourceDocName,
-            FileProcessingDB fileProcessingDB, DocumentViewer imageViewer);
+            FileProcessingDB fileProcessingDB, ImageViewer imageViewer);
 
         /// <summary>
         /// Gets a <see cref="PaginationDocumentData" /> instance based on the provided
@@ -171,7 +171,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// The <see cref="PaginationDocumentData" /> instance.
         /// </returns>
         PaginationDocumentData GetDocumentData(IAttribute documentDataAttribute, string sourceDocName,
-            FileProcessingDB fileProcessingDB, DocumentViewer imageViewer);
+            FileProcessingDB fileProcessingDB, ImageViewer imageViewer);
 
         /// <summary>
         /// Updates the document data.

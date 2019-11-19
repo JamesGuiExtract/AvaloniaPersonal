@@ -78,7 +78,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
             this._zoomNextContextMenuItem = new Extract.Imaging.Forms.ZoomNextToolStripMenuItem();
             this._angularHighlightContextMenuItem = new Extract.Imaging.Forms.AngularHighlightToolStripMenuItem();
             this._rectangularHighlightContextMenuItem = new Extract.Imaging.Forms.RectangularHighlightToolStripMenuItem();
-            this._imageViewer = new Extract.Imaging.Forms.DocumentViewer();
+            this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._openImageToolStripMenuItem = new Extract.Imaging.Forms.OpenImageToolStripMenuItem();
@@ -1130,7 +1130,7 @@ namespace Extract.Imaging.Utilities.ExtractImageViewer
         #endregion
 
         private System.Windows.Forms.ToolStripContainer _toolStripContainer;
-        private Extract.Imaging.Forms.DocumentViewer _imageViewer;
+        private Extract.Imaging.Forms.ImageViewer _imageViewer;
         private System.Windows.Forms.MenuStrip _menuStrip;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;

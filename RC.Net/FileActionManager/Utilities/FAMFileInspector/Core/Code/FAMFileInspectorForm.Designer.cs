@@ -90,7 +90,7 @@
             this._zoomLevelToolStripStatusLabel = new Extract.Imaging.Forms.ZoomLevelToolStripStatusLabel();
             this._resolutionToolStripStatusLabel = new Extract.Imaging.Forms.ResolutionToolStripStatusLabel();
             this._mousePositionToolStripStatusLabel = new Extract.Imaging.Forms.MousePositionToolStripStatusLabel();
-            this._imageViewer = new Extract.Imaging.Forms.DocumentViewer();
+            this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
             this._navigationToolsImageViewerToolStrip = new Extract.Imaging.Forms.NavigationToolsImageViewerToolStrip();
             this._viewCommandsImageViewerToolStrip = new Extract.Imaging.Forms.ViewCommandsImageViewerToolStrip();
             this._highlightNavigationToolStrip = new System.Windows.Forms.ToolStrip();
@@ -1341,7 +1341,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn _textSearchTermsColumn;
         private System.Windows.Forms.Button _searchButton;
         private System.Windows.Forms.Button _clearButton;
-        private Extract.Imaging.Forms.DocumentViewer _imageViewer;
+        private Extract.Imaging.Forms.ImageViewer _imageViewer;
         private System.Windows.Forms.DataGridView _dataSearchTermsDataGridView;
         private System.Windows.Forms.DataGridViewTextBoxColumn _dataSearchFieldColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _dataSearchValueColumn;

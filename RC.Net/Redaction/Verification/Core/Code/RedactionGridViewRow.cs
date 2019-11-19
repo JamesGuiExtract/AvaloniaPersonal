@@ -17,7 +17,6 @@ namespace Extract.Redaction.Verification
     /// <summary>
     /// Represents the row of a <see cref="RedactionGridView"/>.
     /// </summary>
-    [CLSCompliant(false)]
     public class RedactionGridViewRow
     {
         #region Fields
@@ -550,7 +549,7 @@ namespace Extract.Redaction.Verification
         /// <returns>A <see cref="RedactionGridViewRow"/> with information from the specified 
         /// <paramref name="item"/>.</returns>
         public static RedactionGridViewRow FromSensitiveItem(SensitiveItem item, 
-            IDocumentViewer imageViewer, MasterExemptionCodeList masterCodes)
+            ImageViewer imageViewer, MasterExemptionCodeList masterCodes)
         {
             try
             {
@@ -736,7 +735,7 @@ namespace Extract.Redaction.Verification
         /// <paramref name="spatialString"/>.</param>
         /// <returns>Layer objects that correspond to <paramref name="spatialString"/>.</returns>
         static List<LayerObject> GetLayerObjectsFromSpatialString(SpatialString spatialString,
-            IDocumentViewer imageViewer, SensitiveItem item)
+            ImageViewer imageViewer, SensitiveItem item)
         {
             // Get the raster zones of the spatial string, organized by page
             Dictionary<int, List<RasterZone>> pagesToZones = GetRasterZonesByPage(spatialString);
@@ -794,7 +793,7 @@ namespace Extract.Redaction.Verification
         /// <returns>A <see cref="List{T}"/> of <see cref="LayerObject"/> created from the 
         /// specified raster zones, one for each page of <paramref name="pagesToZones"/>.</returns>
         static List<LayerObject> CreateLayerObjects(Dictionary<int, List<RasterZone>> pagesToZones,
-            IDocumentViewer imageViewer, SensitiveItem item)
+            ImageViewer imageViewer, SensitiveItem item)
         {
             // Iterate over each raster zone
             LayerObject previous = null;

@@ -213,7 +213,7 @@ namespace Extract.Utilities.Forms
                 {
                     // Raise the message handled event.
                     OnMessageHandled(new MessageHandledEventArgs(m));
-                    //return true;
+                    return true;
                 }
 
                 return false;

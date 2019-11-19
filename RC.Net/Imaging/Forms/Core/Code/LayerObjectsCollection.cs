@@ -13,7 +13,6 @@ namespace Extract.Imaging.Forms
     /// Represents a collection of <see cref="LayerObject"/> classes.
     /// </summary>
     /// <seealso cref="LayerObject"/>
-    [CLSCompliant(false)]
     public class LayerObjectsCollection : IEnumerable<LayerObject>, IDisposable
     {
         #region Constants
@@ -80,10 +79,10 @@ namespace Extract.Imaging.Forms
 
         /// <summary>
         /// Occurs when layer objects are about to be removed from the 
-        /// <see cref="DocumentViewer.LayerObjects"/> collection.
+        /// <see cref="ImageViewer.LayerObjects"/> collection.
         /// </summary>
         /// <remarks>This event is not raised by a <see cref="LayerObjectsCollection"/> that is 
-        /// not connected to an <see cref="DocumentViewer"/> or by the 
+        /// not connected to an <see cref="ImageViewer"/> or by the 
         /// <see cref="LayerObjectsCollection.Selection"/> property.</remarks>
         public event EventHandler<DeletingLayerObjectsEventArgs> DeletingLayerObjects;
 
@@ -953,7 +952,10 @@ namespace Extract.Imaging.Forms
         /// <seealso cref="Add(LayerObject, bool)"/>
         protected virtual void OnLayerObjectAdded(LayerObjectAddedEventArgs e)
         {
-            LayerObjectAdded?.Invoke(this, e);
+            if (LayerObjectAdded != null)
+            {
+                LayerObjectAdded(this, e);
+            }
         }
 
         /// <summary>
@@ -967,7 +969,10 @@ namespace Extract.Imaging.Forms
             // Resort the sorted collection based on the change
             _sortedCollection.Sort();
 
-            LayerObjectChanged?.Invoke(this, e);
+            if (LayerObjectChanged != null)
+            {
+                LayerObjectChanged(this, e);
+            }
         }
 
         /// <summary>
@@ -977,7 +982,10 @@ namespace Extract.Imaging.Forms
         /// event.</param>
         protected virtual void OnDeletingLayerObjects(DeletingLayerObjectsEventArgs e)
         {
-            DeletingLayerObjects?.Invoke(this, e);
+            if (DeletingLayerObjects != null)
+            {
+                DeletingLayerObjects(this, e);
+            }
         }
 
         /// <summary>
@@ -989,7 +997,10 @@ namespace Extract.Imaging.Forms
         /// <seealso cref="Remove(LayerObject, bool, bool)"/>
         protected virtual void OnLayerObjectDeleted(LayerObjectDeletedEventArgs e)
         {
-            LayerObjectDeleted?.Invoke(this, e);
+            if (LayerObjectDeleted != null)
+            {
+                LayerObjectDeleted(this, e);
+            }
         }
 
         /// <summary>
@@ -1007,7 +1018,10 @@ namespace Extract.Imaging.Forms
             }
 
             // Raise the event if there is a listener
-            LayerObjectVisibilityChanged?.Invoke(this, e);
+            if (LayerObjectVisibilityChanged != null)
+            {
+                LayerObjectVisibilityChanged(this, e);
+            }
         }
 
         #endregion

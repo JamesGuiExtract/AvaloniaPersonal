@@ -30,7 +30,7 @@ namespace Extract.FileActionManager.FileProcessors
             System.Windows.Forms.ToolStripSeparator toolStripSeparator10;
             TD.SandDock.DockContainer dockContainer1;
             this._imageViewerStatusStrip = new Extract.Imaging.Forms.ImageViewerStatusStrip();
-            this._imageViewer = new Extract.Imaging.Forms.DocumentViewer();
+            this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
             this._imageViewerContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this._zoomPreviousToolStripMenuItem1 = new Extract.Imaging.Forms.ZoomPreviousToolStripMenuItem();
             this._zoomWindowToolStripMenuItem1 = new Extract.Imaging.Forms.ZoomWindowToolStripMenuItem();
@@ -1083,7 +1083,7 @@ namespace Extract.FileActionManager.FileProcessors
         #endregion
 
         private TD.SandDock.SandDockManager _sandDockManager;
-        private Extract.Imaging.Forms.DocumentViewer _imageViewer;
+        private Extract.Imaging.Forms.ImageViewer _imageViewer;
         private System.Windows.Forms.ToolStrip _basicImageViewerToolStrip;
         private Extract.Imaging.Forms.PrintImageToolStripButton _printImageToolStripButton;
         private Extract.Imaging.Forms.ZoomWindowToolStripButton _zoomWindowToolStripButton;

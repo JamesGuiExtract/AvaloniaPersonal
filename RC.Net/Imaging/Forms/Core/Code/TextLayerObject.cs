@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
-using System.Windows.Forms;
 using System.Xml;
 
 namespace Extract.Imaging.Forms
@@ -13,8 +12,8 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Represents an <see cref="AnchoredObject"/> that contains text.
     /// </summary>
-    [CLSCompliant(false)]
-    public class TextLayerObject : AnchoredObject {
+    public class TextLayerObject : AnchoredObject
+    {
         #region Constants
 
         /// <summary>
@@ -99,8 +98,7 @@ namespace Extract.Imaging.Forms
         /// </param>
         /// <param name="anchorAlignment">The alignment of <paramref name="anchorPoint"/> relative 
         /// to the <see cref="TextLayerObject"/>.</param>
-        [CLSCompliant(false)]
-        public TextLayerObject(IDocumentViewer imageViewer, int pageNumber, string comment, 
+        public TextLayerObject(ImageViewer imageViewer, int pageNumber, string comment, 
             string text, Font font, Point anchorPoint, AnchorAlignment anchorAlignment,
             Color? backgroundColor, Color? borderColor)
             : this(imageViewer, pageNumber, comment, text, font, anchorPoint, anchorAlignment,
@@ -132,8 +130,7 @@ namespace Extract.Imaging.Forms
         /// </param>
         /// <param name="orientation">The angle in degrees the <see cref="TextLayerObject"/> should
         /// be drawn at in respect to the image coordinates.</param>
-        [CLSCompliant(false)]
-        public TextLayerObject(IDocumentViewer imageViewer, int pageNumber, string comment,
+        public TextLayerObject(ImageViewer imageViewer, int pageNumber, string comment,
             string text, Font font, Point anchorPoint, AnchorAlignment anchorAlignment,
             Color? backgroundColor, Color? borderColor, float orientation)
             : base(imageViewer, pageNumber, comment, anchorPoint, anchorAlignment)
@@ -267,8 +264,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <value>The image viewer associated with the <see cref="TextLayerObject"/>.</value>
         /// <returns>The image viewer associated with the <see cref="TextLayerObject"/>.</returns>
-        [CLSCompliant(false)]
-        public override IDocumentViewer ImageViewer
+        public override ImageViewer ImageViewer
         {
             get
             {
@@ -490,7 +486,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Ensure the text layer is on the active page            
-                var imageViewer = base.ImageViewer;
+                ImageViewer imageViewer = base.ImageViewer;
                 return imageViewer != null && imageViewer.PageNumber == PageNumber &&
                     GetBounds().Contains(point);
             }
@@ -718,7 +714,7 @@ namespace Extract.Imaging.Forms
         private void UpdateBounds()
         {
             // Calculate the size and position of the text layer object's bounds.
-            using (Graphics graphics = ((Control)base.ImageViewer).CreateGraphics())
+            using (Graphics graphics = base.ImageViewer.CreateGraphics())
             {
                 // Update the bounds
                 _bounds = DrawingMethods.ComputeStringBounds(_text, graphics, GetPixelFont(),

@@ -1,6 +1,5 @@
 ﻿using Extract.DataCaptureStats;
 using Extract.ETL;
-using Extract.Imaging.Forms;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
@@ -101,85 +100,6 @@ namespace Extract.AttributeFinder.Test
 
             Assert.AreEqual(_ALL_THREE_CORRECT, results);
         }
-
-        /// <summary>
-        /// Compare selection from viewer with rules
-        /// </summary>
-        [Test]
-        public static void CompareUserRedactionWithRules()
-        {
-            string rtfPath = _testFiles.GetFile(_EXAMPLE01_RTF_FILE);
-            string ssnPattern = @"\b\d{3}-\d{2}-\d{4}\b";
-
-            SpatialString inputText = new SpatialStringClass();
-            inputText.LoadFrom(rtfPath, false);
-            var doc = new AFDocumentClass { Text = inputText };
-            var rule = new RegExprRuleClass { Pattern = ssnPattern };
-            var foundAttributes = rule.ParseText(doc, null);
-            SetAttributeName(foundAttributes, "Jo");
-
-            RichTextViewer richTextViewer = new RichTextViewer();
-            richTextViewer.OpenImage(rtfPath, false);
-            var matches = Regex.Matches(richTextViewer.Text, ssnPattern);
-            foreach (Match match in matches)
-            {
-                richTextViewer.Select(match.Index, match.Length);
-                richTextViewer.CreateRedaction();
-            }
-            IUnknownVector expectedAttributes = GetRedactionsFromViewer(richTextViewer, inputText);
-
-            string results = GetComparisonResults(expectedAttributes, foundAttributes);
-
-            Assert.AreEqual(_ALL_THREE_CORRECT, results);
-        }
-
-        /// <summary>
-        /// Compare overlapping selections from viewer with rules
-        /// </summary>
-        [Test]
-        public static void CompareUserOverlappingRedactionWithRules()
-        {
-            string rtfPath = _testFiles.GetFile(_EXAMPLE01_RTF_FILE);
-            string ssnPattern = @"\b\d{3}-\d{2}-\d{4}\b";
-
-            SpatialString inputText = new SpatialStringClass();
-            inputText.LoadFrom(rtfPath, false);
-            var doc = new AFDocumentClass { Text = inputText };
-            var rule = new RegExprRuleClass { Pattern = ssnPattern };
-            var foundAttributes = rule.ParseText(doc, null);
-            SetAttributeName(foundAttributes, "Jo");
-
-            RichTextViewer richTextViewer = new RichTextViewer();
-            richTextViewer.OpenImage(rtfPath, false);
-            var matches = Regex.Matches(richTextViewer.Text, ssnPattern);
-            foreach (Match match in matches)
-            {
-                richTextViewer.Select(match.Index, match.Length * 2 / 3);
-                Assert.That(Regex.IsMatch(richTextViewer.SelectedText, @"\A\d{3}-\d{2}-\z"), "This should be the first 2/3 of an SSN");
-
-                richTextViewer.CreateRedaction();
-
-                // Add an overlapping region
-                var redaction = richTextViewer.LayerObjects.OfType<Redaction>().Last();
-                redaction.Selected = true;
-                richTextViewer.Select(match.Index + match.Length / 3 + 1, match.Length * 2 / 3);
-                Assert.That(Regex.IsMatch(richTextViewer.SelectedText, @"\A\d{2}-\d{4}\z"), "This should be the last 2/3 of an SSN");
-                
-                richTextViewer.AppendToRedaction();
-                redaction.Selected = false;
-            }
-            IUnknownVector expectedAttributes = GetRedactionsFromViewer(richTextViewer, inputText);
-            Assert.That(
-                expectedAttributes
-                .ToIEnumerable<IAttribute>()
-                .All(attribute => GetOCRImageRasterZones(attribute).Count() > 1),
-                "There should be multiple zones for all of these");
-
-            string results = GetComparisonResults(expectedAttributes, foundAttributes);
-
-            Assert.AreEqual(_ALL_THREE_CORRECT, results);
-        }
-
 
         /// <summary>
         /// Ensure that converting to hybrid doesn't change results
@@ -446,24 +366,6 @@ namespace Extract.AttributeFinder.Test
                     .Value
                     .GetOriginalImageRasterZones()
                     .ToIEnumerable<IRasterZone>();
-        }
-
-        private static IUnknownVector GetRedactionsFromViewer(RichTextViewer richTextViewer, SpatialString source)
-        {
-            return richTextViewer
-                .LayerObjects
-                .OfType<Redaction>()
-                .Select(redaction =>
-                {
-                    var rasterZones = redaction
-                        .GetRasterZones()
-                        .Select(x => x.ToComRasterZone())
-                        .ToIUnknownVector();
-                    var value = new SpatialString();
-                    value.CreateHybridString(rasterZones, redaction.Comment, "Unknown", source.SpatialPageInfos);
-                    return new AttributeClass { Name = "Qi", Value = value };
-                })
-                .ToIUnknownVector();
         }
 
         #endregion Helper Methods

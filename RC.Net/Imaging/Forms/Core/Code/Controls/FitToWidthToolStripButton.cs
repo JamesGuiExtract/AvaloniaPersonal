@@ -107,12 +107,12 @@ namespace Extract.Imaging.Forms
         #region FitToWidthToolStripButton Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.FitModeChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.FitModeChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.FitModeChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.FitModeChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.FitModeChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.FitModeChanged"/> event.</param>
         private void HandleFitModeChanged(object sender, FitModeChangedEventArgs e)
         {
             try
@@ -138,8 +138,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer to which the <see cref="FitToWidthToolStripButton"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        [CLSCompliant(false)]
-        public override IDocumentViewer ImageViewer
+        public override ImageViewer ImageViewer
         {
             get
             {
@@ -171,7 +170,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI21346",
                         "Unable to establish connection to image viewer.", ex);
-                    ee.AddDebugData("Image viewer", value.ToString(), false);
+                    ee.AddDebugData("Image viewer", value, false);
                     throw ee;
                 }
             }

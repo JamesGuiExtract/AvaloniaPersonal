@@ -109,10 +109,6 @@
       <SpecificVersion>True</SpecificVersion>
       <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Raw.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs.Rtf, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
-      <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Rtf.dll</HintPath>
-    </Reference>
     <Reference Include="Leadtools.Codecs.Tif, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
       <HintPath>..\..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.Tif.dll</HintPath>

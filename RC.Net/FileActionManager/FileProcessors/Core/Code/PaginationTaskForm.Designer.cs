@@ -30,7 +30,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._imageViewerStatusStrip = new Extract.Imaging.Forms.ImageViewerStatusStrip();
             this._splitContainer = new System.Windows.Forms.SplitContainer();
             this._paginationPanel = new Extract.UtilityApplications.PaginationUtility.PaginationPanel();
-            this._imageViewer = new Extract.Imaging.Forms.DocumentViewer();
+            this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
             this._imageViewerContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this._zoomPreviousToolStripMenuItem1 = new Extract.Imaging.Forms.ZoomPreviousToolStripMenuItem();
             this._zoomWindowToolStripMenuItem1 = new Extract.Imaging.Forms.ZoomWindowToolStripMenuItem();
@@ -974,7 +974,7 @@ namespace Extract.FileActionManager.FileProcessors
 
         #endregion
 
-        private Extract.Imaging.Forms.DocumentViewer _imageViewer;
+        private Extract.Imaging.Forms.ImageViewer _imageViewer;
         private System.Windows.Forms.ToolStrip _basicImageViewerToolStrip;
         private Extract.Imaging.Forms.PrintImageToolStripButton _printImageToolStripButton;
         private Extract.Imaging.Forms.ZoomWindowToolStripButton _zoomWindowToolStripButton;

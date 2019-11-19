@@ -111,7 +111,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         DataEntryConfigurationManager<Properties.Settings> _configManager;
 
         /// <summary>
-        /// A <see cref="Form"/> to display the <see cref="DocumentViewer"/> in a separate window.
+        /// A <see cref="Form"/> to display the <see cref="ImageViewer"/> in a separate window.
         /// </summary>
         Form _imageViewerForm;
 
@@ -2240,12 +2240,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.LoadingNewImage"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.LoadingNewImage"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.LoadingNewImage"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.LoadingNewImage"/> event.</param>
         /// <param name="e">The event data associated with the
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.LoadingNewImage"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.LoadingNewImage"/> event.</param>
         void HandleLoadingNewImage(object sender, LoadingNewImageEventArgs e)
         {
             try
@@ -3507,7 +3507,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
         /// <summary>
         /// Gets whether highlights for all data mapped to an <see cref="IDataEntryControl"/>
-        /// should be displayed in the <see cref="DocumentViewer"/> or whether only highlights relating
+        /// should be displayed in the <see cref="ImageViewer"/> or whether only highlights relating
         /// to the currently selected fields should be displayed.
         /// </summary>
         public bool ShowAllHighlights
@@ -4374,7 +4374,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Toggles whether all data is currently highlighted in the <see cref="DocumentViewer"/> or
+        /// Toggles whether all data is currently highlighted in the <see cref="ImageViewer"/> or
         /// whether only the currently selected data is highlighted.
         /// </summary>
         void ToggleShowAllHighlights()
@@ -4428,7 +4428,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Moves the <see cref="DocumentViewer"/> and associated <see cref="ToolStrip"/>s to a
+        /// Moves the <see cref="ImageViewer"/> and associated <see cref="ToolStrip"/>s to a
         /// separate <see cref="Form"/>.
         /// </summary>
         void OpenSeparateImageWindow()
@@ -4548,7 +4548,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Moves the <see cref="DocumentViewer"/> and associated <see cref="ToolStrip"/>s from a
+        /// Moves the <see cref="ImageViewer"/> and associated <see cref="ToolStrip"/>s from a
         /// separate <see cref="Form"/> back into the main application form.
         /// </summary>
         void CloseSeparateImageWindow()

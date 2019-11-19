@@ -28,7 +28,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Image viewer with which this button connects.
         /// </summary>
-        IDocumentViewer _imageViewer;
+        ImageViewer _imageViewer;
 
         /// <summary>
         /// Tool tip text without shortcut keys text
@@ -158,12 +158,12 @@ namespace Extract.Imaging.Forms
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
         /// <param name="e">The event data associated with the
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
         void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             // Set the enabled state
@@ -239,7 +239,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Gets or sets the image viewer with which to establish a connection.
         /// If you need to handle more events than just the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event then
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event then
         /// you will need to override this method in your derived class.
         /// <para><b>NOTE:</b></para>
         /// The set will also call <see cref="SetEnabledState"/>.
@@ -277,7 +277,7 @@ namespace Extract.Imaging.Forms
         ///         {
         ///             ExtractException ee = new ExtractException("ELI00000",
         ///                 "Unable to establish connection to image viewer.", ex);
-        ///                 ee.AddDebugData("Image viewer", value.ToString(), false);
+        ///                 ee.AddDebugData("Image viewer", value, false);
         ///                 throw ee;
         ///         }
         ///     }
@@ -289,8 +289,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer with which a connection is established. 
         /// <see langword="null"/> if no image viewer is connected.</returns>
         /// <seealso cref="IImageViewerControl"/>
-        [CLSCompliant(false)]
-        public virtual IDocumentViewer ImageViewer
+        public virtual ImageViewer ImageViewer
         {
             get
             {
@@ -327,7 +326,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI21332",
                         "Unable to establish connection to image viewer.", e);
-                    ee.AddDebugData("Image viewer", value.ToString(), false);
+                    ee.AddDebugData("Image viewer", value, false);
                     throw ee;
                 }
             }

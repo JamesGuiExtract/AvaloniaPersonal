@@ -73,7 +73,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Image viewer with which this status label connects.
         /// </summary>
-        private IDocumentViewer _imageViewer;
+        private ImageViewer _imageViewer;
 
         /// <summary>
         /// How the mouse position should be displayed.
@@ -332,12 +332,12 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
         private void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             try
@@ -377,12 +377,12 @@ namespace Extract.Imaging.Forms
         }
         
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.LoadingNewImage"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.LoadingNewImage"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.LoadingNewImage"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.LoadingNewImage"/> event.</param>
         /// <param name="e">The event data associated with the
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.LoadingNewImage"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.LoadingNewImage"/> event.</param>
         private void HandleLoadingNewImage(object sender, LoadingNewImageEventArgs e)
         {
             try
@@ -410,8 +410,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer to which the <see cref="MousePositionToolStripStatusLabel"/> 
         /// is connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        [CLSCompliant(false)]
-        public IDocumentViewer ImageViewer
+        public ImageViewer ImageViewer
         {
             get
             {
@@ -424,9 +423,9 @@ namespace Extract.Imaging.Forms
                     // Unregister from previously subscribed-to events
                     if (_imageViewer != null)
                     {
-                        ((Control)_imageViewer).MouseMove -= HandleMouseMove;
+                        _imageViewer.MouseMove -= HandleMouseMove;
                         _imageViewer.ImageFileChanged -= HandleImageFileChanged;
-                        ((Control)_imageViewer).MouseLeave -= HandleMouseLeave;
+                        _imageViewer.MouseLeave -= HandleMouseLeave;
                         _imageViewer.LoadingNewImage -= HandleLoadingNewImage;
                     }
 
@@ -436,9 +435,9 @@ namespace Extract.Imaging.Forms
                     // Register for events
                     if (_imageViewer != null)
                     {
-                        ((Control)_imageViewer).MouseMove += HandleMouseMove;
+                        _imageViewer.MouseMove += HandleMouseMove;
                         _imageViewer.ImageFileChanged += HandleImageFileChanged;
-                        ((Control)_imageViewer).MouseLeave += HandleMouseLeave;
+                        _imageViewer.MouseLeave += HandleMouseLeave;
                         _imageViewer.LoadingNewImage += HandleLoadingNewImage;
                     }
                 }
@@ -446,7 +445,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI21388",
                         "Unable to establish connection to image viewer.", e);
-                    ee.AddDebugData("Image viewer", value.ToString(), false);
+                    ee.AddDebugData("Image viewer", value, false);
                     throw ee;
                 }
             }

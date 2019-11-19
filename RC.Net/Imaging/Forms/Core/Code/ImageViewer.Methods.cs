@@ -2952,56 +2952,48 @@ namespace Extract.Imaging.Forms
         /// If more than one layer object is at the point, the one with the lowest average distance 
         /// from its corners to the point is returned. <see langword="null"/> if no layer object 
         /// is at the point.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
-        public LayerObject GetLayerObjectAtPoint<T>(IEnumerable<LayerObject> layerObjects, int x, int y,
+        internal LayerObject GetLayerObjectAtPoint<T>(IEnumerable<LayerObject> layerObjects, int x, int y,
             bool onlySelectableObjects) where T : LayerObject
         {
-            try
+            // Get the mouse position in image coordinates
+            Point mousePoint = GeometryMethods.InvertPoint(_transform, new Point(x, y));
+
+            // Build the list of possible layer objects
+            List<LayerObject> possibleSelection = new List<LayerObject>();
+            foreach (LayerObject layerObject in layerObjects)
             {
-                // Get the mouse position in image coordinates
-                Point mousePoint = GeometryMethods.InvertPoint(_transform, new Point(x, y));
-
-                // Build the list of possible layer objects
-                List<LayerObject> possibleSelection = new List<LayerObject>();
-                foreach (LayerObject layerObject in layerObjects)
+                // Only check if the layer object is visible and selectable (if selectable
+                // is being checked)
+                if ((!onlySelectableObjects || layerObject.Selectable) && layerObject.Visible)
                 {
-                    // Only check if the layer object is visible and selectable (if selectable
-                    // is being checked)
-                    if ((!onlySelectableObjects || layerObject.Selectable) && layerObject.Visible)
-                    {
-                        // Check that the object is of the appropriate type
+                    // Check that the object is of the appropriate type
 
-                        if (layerObject is T && layerObject.HitTest(mousePoint))
-                        {
-                            possibleSelection.Add(layerObject);
-                        }
+                    if (layerObject is T && layerObject.HitTest(mousePoint))
+                    {
+                        possibleSelection.Add(layerObject);
                     }
                 }
+            }
 
-                LayerObject clickedObject = null;
-                if (possibleSelection.Count > 0)
+            LayerObject clickedObject = null;
+            if (possibleSelection.Count > 0)
+            {
+                // Find the best layer object [DNRCAU #352]
+                // Best layer object is defined as the one with the lowest average distance
+                // to the corners of the object
+                double shortestDistance = double.MaxValue;
+                foreach (LayerObject layerObject in possibleSelection)
                 {
-                    // Find the best layer object [DNRCAU #352]
-                    // Best layer object is defined as the one with the lowest average distance
-                    // to the corners of the object
-                    double shortestDistance = double.MaxValue;
-                    foreach (LayerObject layerObject in possibleSelection)
+                    double distance = layerObject.AverageDistanceToCorners(mousePoint);
+                    if (distance < shortestDistance)
                     {
-                        double distance = layerObject.AverageDistanceToCorners(mousePoint);
-                        if (distance < shortestDistance)
-                        {
-                            shortestDistance = distance;
-                            clickedObject = layerObject;
-                        }
+                        shortestDistance = distance;
+                        clickedObject = layerObject;
                     }
                 }
+            }
 
-                return clickedObject;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI48314");
-            }
+            return clickedObject;
         }
 
         /// <summary>
@@ -3585,7 +3577,7 @@ namespace Extract.Imaging.Forms
         /// <see cref="CompositeHighlightLayerObject"/> objects in the
         /// current selection.
         /// </summary>
-        public void BlockFitSelectedZones()
+        internal void BlockFitSelectedZones()
         {
             try
             {
@@ -3602,7 +3594,7 @@ namespace Extract.Imaging.Forms
         /// Shrinks each side of all <see cref="Highlight"/> or
         /// <see cref="CompositeHighlightLayerObject"/>s in the current selection by 1 pixel.
         /// </summary>
-        public void ShrinkSelectedZones()
+        internal void ShrinkSelectedZones()
         {
             try
             {
@@ -3619,7 +3611,7 @@ namespace Extract.Imaging.Forms
         /// Enlarges each side of all <see cref="Highlight"/> or
         /// <see cref="CompositeHighlightLayerObject"/>s in the current selection by 1 pixel.
         /// </summary>
-        public void EnlargeSelectedZones()
+        internal void EnlargeSelectedZones()
         {
             try
             {
@@ -4454,6 +4446,115 @@ namespace Extract.Imaging.Forms
             CenterAtPoint(zoomInfo.Center, false, false);
 
             UpdateZoom(updateZoomHistory, raiseZoomChanged);
+        }
+
+        /// <summary>
+        /// Loads the default shortcut keys into <see cref="_mainShortcuts"/>.
+        /// </summary>
+        void LoadDefaultShortcuts()
+        {
+            // Open an image
+            _mainShortcuts[Keys.O | Keys.Control] = SelectOpenImage;
+
+            // Close an image
+            _mainShortcuts[Keys.Control | Keys.F4] = CloseImage;
+
+            // Print an image
+            _mainShortcuts[Keys.P | Keys.Control] = SelectPrint;
+
+            // Go to the next page
+            _mainShortcuts[Keys.PageDown] = GoToNextPage;
+
+            // Go to the previous page
+            _mainShortcuts[Keys.PageUp] = GoToPreviousPage;
+
+            // Fit to page
+            _mainShortcuts[Keys.P] = ToggleFitToPageMode;
+
+            // Fit to width
+            _mainShortcuts[Keys.W] = ToggleFitToWidthMode;
+
+            // Zoom window tool
+            _mainShortcuts[Keys.Z] = SelectZoomWindowTool;
+
+            // Zoom in
+            _mainShortcuts[Keys.F7] = SelectZoomIn;
+            _mainShortcuts[Keys.Add | Keys.Control] = SelectZoomIn;
+            _mainShortcuts[Keys.Oemplus | Keys.Control] = SelectZoomIn;
+
+            // Zoom out
+            _mainShortcuts[Keys.F8] = SelectZoomOut;
+            _mainShortcuts[Keys.Subtract | Keys.Control] = SelectZoomOut;
+            _mainShortcuts[Keys.OemMinus | Keys.Control] = SelectZoomOut;
+
+            // Zoom previous
+            _mainShortcuts[Keys.Back] = SelectZoomPrevious;
+            _mainShortcuts[Keys.Left | Keys.Alt] = SelectZoomPrevious;
+
+            // Zoom next
+            _mainShortcuts[Keys.Right | Keys.Alt] = SelectZoomNext;
+
+            // Pan tool
+            _mainShortcuts[Keys.A] = SelectPanTool;
+
+            // Select layer object tool
+            _mainShortcuts[Keys.Escape] = SelectSelectLayerObjectsTool;
+
+            // Highlight tool
+            _mainShortcuts[Keys.H] = ToggleHighlightTool;
+
+            // Go to first page
+            _mainShortcuts[Keys.Control | Keys.Home] = GoToFirstPage;
+
+            // Go to last page
+            _mainShortcuts[Keys.Control | Keys.End] = GoToLastPage;
+
+            // Rotate clockwise
+            _mainShortcuts[Keys.R | Keys.Control] = SelectRotateClockwise;
+
+            // Rotate all document pages clockwise
+            _mainShortcuts[Keys.R | Keys.Alt] = SelectRotateAllDocumentPagesClockwise;
+
+            // Rotate counterclockwise
+            _mainShortcuts[Keys.R | Keys.Control | Keys.Shift] = SelectRotateCounterclockwise;
+
+            // Rotate all document pages counterclockwise
+            _mainShortcuts[Keys.R | Keys.Alt | Keys.Shift] = SelectRotateAllDocumentPagesCounterclockwise;
+
+            // Delete selected highlights
+            _mainShortcuts[Keys.Delete] = SelectRemoveSelectedLayerObjects;
+
+            // Select all highlights
+            _mainShortcuts[Keys.A | Keys.Control] = SelectSelectAllLayerObjects;
+
+            // Go to previous tile
+            _mainShortcuts[Keys.Oemcomma] = SelectPreviousTile;
+
+            // Go to next tile
+            _mainShortcuts[Keys.OemPeriod] = SelectNextTile;
+
+            // Go to next layer object
+            _mainShortcuts[Keys.F3] = GoToNextLayerObject;
+            _mainShortcuts[Keys.Control | Keys.OemPeriod] = GoToNextLayerObject;
+
+            // Go to previous layer object
+            _mainShortcuts[Keys.F3 | Keys.Shift] = GoToPreviousLayerObject;
+            _mainShortcuts[Keys.Control | Keys.Oemcomma] = GoToPreviousLayerObject;
+
+            // Fit/shrink/enlarge selected zones.
+            _mainShortcuts[Keys.K] = BlockFitSelectedZones;
+            _mainShortcuts[Keys.OemMinus] = ShrinkSelectedZones;
+            _mainShortcuts[Keys.Subtract] = ShrinkSelectedZones;
+            _mainShortcuts[Keys.Oemplus] = EnlargeSelectedZones;
+            _mainShortcuts[Keys.Add] = EnlargeSelectedZones;
+
+            // Increase highlight height
+            _captureShortcuts[Keys.Oemplus] = IncreaseHighlightHeight;
+            _captureShortcuts[Keys.Add] = IncreaseHighlightHeight;
+
+            // Decrease highlight height
+            _captureShortcuts[Keys.OemMinus] = DecreaseHighlightHeight;
+            _captureShortcuts[Keys.Subtract] = DecreaseHighlightHeight;
         }
 
         /// <summary>

@@ -10,7 +10,6 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Represents a layer object which is made up of multiple layer objects.
     /// </summary>
-    [CLSCompliant(false)]
     public class CompositeLayerObject<T> : LayerObject, IComparable<CompositeLayerObject<T>>
         where T : LayerObject, IDisposable, IComparable<T>
     {
@@ -66,8 +65,7 @@ namespace Extract.Imaging.Forms
         /// must be on the same page as <paramref name="pageNumber"/>.</param>
         /// <exception cref="ExtractException">If any <see cref="LayerObject.PageNumber"/>
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
-
-        public CompositeLayerObject(IDocumentViewer imageViewer, int pageNumber, string comment,
+        public CompositeLayerObject(ImageViewer imageViewer, int pageNumber, string comment,
             IEnumerable<T> objects)
             : base(imageViewer, pageNumber, comment)
         {
@@ -94,7 +92,7 @@ namespace Extract.Imaging.Forms
         /// must be on the same page as <paramref name="pageNumber"/>.</param>
         /// <exception cref="ExtractException">If any <see cref="LayerObject.PageNumber"/>
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
-        public CompositeLayerObject(IDocumentViewer imageViewer, int pageNumber,
+        public CompositeLayerObject(ImageViewer imageViewer, int pageNumber,
             IEnumerable<string> tags, IEnumerable<T> objects) : this(imageViewer,
             pageNumber, tags, "", objects)
         {
@@ -115,7 +113,7 @@ namespace Extract.Imaging.Forms
         /// must be on the same page as <paramref name="pageNumber"/>.</param>
         /// <exception cref="ExtractException">If any <see cref="LayerObject.PageNumber"/>
         /// in the collection does not equal <paramref name="pageNumber"/>.</exception>
-        public CompositeLayerObject(IDocumentViewer imageViewer, int pageNumber,
+        public CompositeLayerObject(ImageViewer imageViewer, int pageNumber,
             IEnumerable<string> tags, string comment, IEnumerable<T> objects)
             : base(imageViewer, pageNumber, tags, comment)
         {
@@ -179,7 +177,7 @@ namespace Extract.Imaging.Forms
         /// </value>
         /// <returns>The image viewer associated with the <see cref="CompositeLayerObject{T}"/>.
         /// </returns>
-        public override IDocumentViewer ImageViewer
+        public override ImageViewer ImageViewer
         {
             get
             {
@@ -429,7 +427,7 @@ namespace Extract.Imaging.Forms
                     gripHandleId & _GRIP_HANDLE_MASK);
 
                 // Start the tracking data
-                TrackingData = new TrackingData((Control)base.ImageViewer, mouseX, mouseY, Rectangle.Empty);
+                TrackingData = new TrackingData(base.ImageViewer, mouseX, mouseY, Rectangle.Empty);
             }
             catch (Exception ex)
             {

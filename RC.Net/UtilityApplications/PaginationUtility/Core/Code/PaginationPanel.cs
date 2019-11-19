@@ -126,7 +126,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// The <see cref="ImageViewer"/> to be used by this instance.
         /// </summary>
-        IDocumentViewer _imageViewer;
+        ImageViewer _imageViewer;
 
         /// <summary>
         /// The <see cref="ShortcutsManager"/> managing all keyboard shortcuts for this instance.
@@ -2166,7 +2166,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <value>The <see cref="ImageViewer"/> this instance should use.</value>
         [Browsable(false)]
-        public IDocumentViewer ImageViewer
+        public ImageViewer ImageViewer
         {
             get
             {
@@ -2181,9 +2181,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_imageViewer != null)
                         {
                             _imageViewer.ImageFileClosing -= HandleImageViewer_ImageFileClosing;
-                            ((Control)_imageViewer).Enter -= HandleImageViewer_Enter;
-                            ((Control)_imageViewer).Leave -= HandleImageViewer_Leave;
-                            ((Control)_imageViewer).PreviewKeyDown -= HandleImageViewer_PreviewKeyDown;
+                            _imageViewer.Enter -= HandleImageViewer_Enter;
+                            _imageViewer.Leave -= HandleImageViewer_Leave;
+                            _imageViewer.PreviewKeyDown -= HandleImageViewer_PreviewKeyDown;
                         }
 
                         _imageViewer = value;
@@ -2191,9 +2191,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (_imageViewer != null)
                         {
                             _imageViewer.ImageFileClosing += HandleImageViewer_ImageFileClosing;
-                            ((Control)_imageViewer).Enter += HandleImageViewer_Enter;
-                            ((Control)_imageViewer).Leave += HandleImageViewer_Leave;
-                            ((Control)_imageViewer).PreviewKeyDown += HandleImageViewer_PreviewKeyDown;
+                            _imageViewer.Enter += HandleImageViewer_Enter;
+                            _imageViewer.Leave += HandleImageViewer_Leave;
+                            _imageViewer.PreviewKeyDown += HandleImageViewer_PreviewKeyDown;
                         }
                     }
                 }
@@ -2800,7 +2800,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="IDocumentViewer.ImageFileClosing"/> event of the
+        /// Handles the <see cref="ImageViewer.ImageFileClosing"/> event of the
         /// <see cref="ImageViewer"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>

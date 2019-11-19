@@ -33,7 +33,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._dockContainer1 = new TD.SandDock.DockContainer();
             this._thumbnailDockableWindow = new TD.SandDock.DockableWindow();
             this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
-            this._imageViewer = new Extract.Imaging.Forms.DocumentViewer();
+            this._imageViewer = new Extract.Imaging.Forms.ImageViewer();
             this._toolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -1279,7 +1279,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #endregion
 
         private System.Windows.Forms.SplitContainer _splitContainer;
-        private Extract.Imaging.Forms.DocumentViewer _imageViewer;
+        private Extract.Imaging.Forms.ImageViewer _imageViewer;
         private System.Windows.Forms.ToolStripContainer _toolStripContainer;
         private Extract.Imaging.Forms.FileCommandsImageViewerToolStrip _fileCommandsToolStrip;
         private System.Windows.Forms.ToolStripButton _saveAndCommitButton;

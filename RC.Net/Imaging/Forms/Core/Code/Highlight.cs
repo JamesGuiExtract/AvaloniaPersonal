@@ -23,15 +23,14 @@ namespace Extract.Imaging.Forms
     /// <remarks>
     /// <para>A highlight is 'live' in the sense that changes made to it are instantly reflected 
     /// in the <see cref="ImageViewer"/> control to which it is associated. To delay the update, 
-    /// use the <see cref="Forms.IDocumentViewer.BeginUpdate"/> and 
-    /// <see cref="Forms.IDocumentViewer.EndUpdate"/> methods of the <see cref="ImageViewer"/>.</para>
+    /// use the <see cref="Forms.ImageViewer.BeginUpdate"/> and 
+    /// <see cref="Forms.ImageViewer.EndUpdate"/> methods of the <see cref="ImageViewer"/>.</para>
     /// <para>A highlight is described spatially by its <see cref="StartPoint"/>, 
     /// <see cref="EndPoint"/>, and <see cref="Height"/> properties. The <see cref="StartPoint"/> 
     /// and <see cref="EndPoint"/> describe the endpoints of a line segment that bisects the 
     /// highlight. The <see cref="Height"/> is the distance between the sides of the highlight, 
     /// measured perpendicular to the bisecting line.</para>
     /// </remarks>
-    [CLSCompliant(false)]
     public sealed class Highlight : LayerObject, IComparable<Highlight>
     {
         #region Constants
@@ -179,15 +178,15 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <remarks>
         /// <para>The default page number is value of the <paramref name="imageViewer"/>'s 
-        /// <see cref="Forms.IDocumentViewer.PageNumber"/> property.</para>
+        /// <see cref="Forms.ImageViewer.PageNumber"/> property.</para>
         /// <para>The default text is the empty <see cref="string"/> if 
-        /// <paramref name="imageViewer"/>'s <see cref="Forms.IDocumentViewer.RecognizeHighlightText"/> 
+        /// <paramref name="imageViewer"/>'s <see cref="Forms.ImageViewer.RecognizeHighlightText"/> 
         /// property is <see langword="false"/> or recognized text if the 
-        /// <see cref="Forms.IDocumentViewer.RecognizeHighlightText"/> property is 
+        /// <see cref="Forms.ImageViewer.RecognizeHighlightText"/> property is 
         /// <see langword="true"/>.
         /// </para>
         /// <para>The default <see cref="System.Drawing.Color"/> is the value of the 
-        /// <paramref name="imageViewer"/>'s <see cref="Forms.IDocumentViewer.DefaultHighlightColor"/> 
+        /// <paramref name="imageViewer"/>'s <see cref="Forms.ImageViewer.DefaultHighlightColor"/> 
         /// property.</para>
         /// </remarks>
         /// <param name="imageViewer">Image viewer on which this highlight appears. Cannot be
@@ -205,10 +204,10 @@ namespace Extract.Imaging.Forms
         /// <see langword="null"/>.</exception>
         /// <exception cref="ExtractException"><paramref name="imageViewer"/> does not contain an 
         /// open image.</exception>
-        /// <seealso cref="Forms.IDocumentViewer.PageNumber"/>
-        /// <seealso cref="Forms.IDocumentViewer.RecognizeHighlightText"/>
-        /// <seealso cref="Forms.IDocumentViewer.DefaultHighlightColor"/>
-        public Highlight(IDocumentViewer imageViewer, string comment, Point start, Point end, int height)
+        /// <seealso cref="Forms.ImageViewer.PageNumber"/>
+        /// <seealso cref="Forms.ImageViewer.RecognizeHighlightText"/>
+        /// <seealso cref="Forms.ImageViewer.DefaultHighlightColor"/>
+        public Highlight(ImageViewer imageViewer, string comment, Point start, Point end, int height)
             : this(imageViewer, comment, start, end, height, imageViewer.PageNumber, null,
                 imageViewer.DefaultHighlightColor)
         {
@@ -221,13 +220,13 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <remarks>
         /// <para>The default text is the empty <see cref="string"/> if 
-        /// <paramref name="imageViewer"/>'s <see cref="Forms.IDocumentViewer.RecognizeHighlightText"/> 
+        /// <paramref name="imageViewer"/>'s <see cref="Forms.ImageViewer.RecognizeHighlightText"/> 
         /// property is <see langword="false"/> or recognized text if the 
-        /// <see cref="Forms.IDocumentViewer.RecognizeHighlightText"/> property is 
+        /// <see cref="Forms.ImageViewer.RecognizeHighlightText"/> property is 
         /// <see langword="true"/>.
         /// </para>
         /// <para>The default <see cref="System.Drawing.Color"/> is the value of the 
-        /// <paramref name="imageViewer"/>'s <see cref="Forms.IDocumentViewer.DefaultHighlightColor"/> 
+        /// <paramref name="imageViewer"/>'s <see cref="Forms.ImageViewer.DefaultHighlightColor"/> 
         /// property.</para>
         /// </remarks>
         /// <param name="imageViewer">Image viewer on which this highlight appears. Cannot be
@@ -246,9 +245,9 @@ namespace Extract.Imaging.Forms
         /// <see langword="null"/>.</exception>
         /// <exception cref="ExtractException"><paramref name="imageViewer"/> does not contain an 
         /// open image.</exception>
-        /// <seealso cref="Forms.IDocumentViewer.RecognizeHighlightText"/>
-        /// <seealso cref="Forms.IDocumentViewer.DefaultHighlightColor"/>
-        public Highlight(IDocumentViewer imageViewer, string comment, Point start, Point end,
+        /// <seealso cref="Forms.ImageViewer.RecognizeHighlightText"/>
+        /// <seealso cref="Forms.ImageViewer.DefaultHighlightColor"/>
+        public Highlight(ImageViewer imageViewer, string comment, Point start, Point end,
             int height, int pageNumber)
             : this(imageViewer, comment, start, end, height, pageNumber, null,
                 imageViewer.DefaultHighlightColor)
@@ -262,13 +261,13 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <remarks>
         /// <para>The default text is the empty <see cref="string"/> if 
-        /// <paramref name="imageViewer"/>'s <see cref="Forms.IDocumentViewer.RecognizeHighlightText"/> 
+        /// <paramref name="imageViewer"/>'s <see cref="Forms.ImageViewer.RecognizeHighlightText"/> 
         /// property is <see langword="false"/> or recognized text if the 
-        /// <see cref="Forms.IDocumentViewer.RecognizeHighlightText"/> property is 
+        /// <see cref="Forms.ImageViewer.RecognizeHighlightText"/> property is 
         /// <see langword="true"/>.
         /// </para>
         /// <para>The default <see cref="System.Drawing.Color"/> is the value of the 
-        /// <paramref name="imageViewer"/>'s <see cref="Forms.IDocumentViewer.DefaultHighlightColor"/> 
+        /// <paramref name="imageViewer"/>'s <see cref="Forms.ImageViewer.DefaultHighlightColor"/> 
         /// property.</para>
         /// </remarks>
         /// <param name="imageViewer">Image viewer on which this highlight appears. Cannot be
@@ -290,8 +289,8 @@ namespace Extract.Imaging.Forms
         /// <see langword="null"/>.</exception>
         /// <exception cref="ExtractException"><paramref name="imageViewer"/> does not contain an 
         /// open image.</exception>
-        /// <seealso cref="Forms.IDocumentViewer.RecognizeHighlightText"/>
-        public Highlight(IDocumentViewer imageViewer, string comment, PointF start, PointF end,
+        /// <seealso cref="Forms.ImageViewer.RecognizeHighlightText"/>
+        public Highlight(ImageViewer imageViewer, string comment, PointF start, PointF end,
             float height, int pageNumber, string text, Color color)
             : base(imageViewer, pageNumber, comment)
         {
@@ -319,7 +318,7 @@ namespace Extract.Imaging.Forms
                     _height = MinSize.Height;
                 }
 
-                if (SpotIRCompatible && MinSize.Equals(DefaultMinSize))
+                if (SpotIRCompatible)
                 {
                     // Create a temporary raster zone to ensure that highlight
                     // will be rendered and saved the same way (ie. WYSIWYG)
@@ -339,7 +338,7 @@ namespace Extract.Imaging.Forms
             {
                 ExtractException ee = new ExtractException("ELI21125",
                     "Unable to create highlight.", e);
-                ee.AddDebugData("Image viewer", imageViewer.ToString(), false);
+                ee.AddDebugData("Image viewer", imageViewer, false);
                 ee.AddDebugData("Start point", start, false);
                 ee.AddDebugData("End point", end, false);
                 ee.AddDebugData("Height", height, false);
@@ -356,12 +355,12 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <remarks>
         /// <para>The default text is the empty <see cref="string"/> if 
-        /// <paramref name="imageViewer"/>'s <see cref="Forms.IDocumentViewer.RecognizeHighlightText"/> 
+        /// <paramref name="imageViewer"/>'s <see cref="Forms.ImageViewer.RecognizeHighlightText"/> 
         /// property is <see langword="false"/> or recognized text if the 
-        /// <see cref="Forms.IDocumentViewer.RecognizeHighlightText"/> property is 
+        /// <see cref="Forms.ImageViewer.RecognizeHighlightText"/> property is 
         /// <see langword="true"/>.</para>
         /// <para>The default <see cref="System.Drawing.Color"/> is the value of the 
-        /// <paramref name="imageViewer"/>'s <see cref="Forms.IDocumentViewer.DefaultHighlightColor"/> 
+        /// <paramref name="imageViewer"/>'s <see cref="Forms.ImageViewer.DefaultHighlightColor"/> 
         /// property.</para>
         /// </remarks>
         /// <param name="imageViewer">Image viewer on which this highlight appears. Cannot be
@@ -374,9 +373,9 @@ namespace Extract.Imaging.Forms
         /// <see langword="null"/>.</exception>
         /// <exception cref="ExtractException"><paramref name="imageViewer"/> does not contain an 
         /// open image.</exception>
-        /// <seealso cref="Forms.IDocumentViewer.RecognizeHighlightText"/>
-        /// <seealso cref="Forms.IDocumentViewer.DefaultHighlightColor"/>
-        public Highlight(IDocumentViewer imageViewer, string comment, RasterZone rasterZone)
+        /// <seealso cref="Forms.ImageViewer.RecognizeHighlightText"/>
+        /// <seealso cref="Forms.ImageViewer.DefaultHighlightColor"/>
+        public Highlight(ImageViewer imageViewer, string comment, RasterZone rasterZone)
             : this(imageViewer, comment, rasterZone.Start, rasterZone.End,
                 rasterZone.Height, rasterZone.PageNumber, null, imageViewer.DefaultHighlightColor)
         {
@@ -389,13 +388,13 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <remarks>
         /// <para>The default text is the empty <see cref="string"/> if 
-        /// <paramref name="imageViewer"/>'s <see cref="Forms.IDocumentViewer.RecognizeHighlightText"/> 
+        /// <paramref name="imageViewer"/>'s <see cref="Forms.ImageViewer.RecognizeHighlightText"/> 
         /// property is <see langword="false"/> or recognized text if the 
-        /// <see cref="Forms.IDocumentViewer.RecognizeHighlightText"/> property is 
+        /// <see cref="Forms.ImageViewer.RecognizeHighlightText"/> property is 
         /// <see langword="true"/>.
         /// </para>
         /// <para>The default <see cref="System.Drawing.Color"/> is the value of the 
-        /// <paramref name="imageViewer"/>'s <see cref="Forms.IDocumentViewer.DefaultHighlightColor"/> 
+        /// <paramref name="imageViewer"/>'s <see cref="Forms.ImageViewer.DefaultHighlightColor"/> 
         /// property.</para>
         /// </remarks>
         /// <param name="imageViewer">Image viewer on which this highlight appears. Cannot be
@@ -411,8 +410,8 @@ namespace Extract.Imaging.Forms
         /// <see langword="null"/>.</exception>
         /// <exception cref="ExtractException"><paramref name="imageViewer"/> does not contain an 
         /// open image.</exception>
-        /// <seealso cref="Forms.IDocumentViewer.RecognizeHighlightText"/>
-        public Highlight(IDocumentViewer imageViewer, string comment, RasterZone rasterZone,
+        /// <seealso cref="Forms.ImageViewer.RecognizeHighlightText"/>
+        public Highlight(ImageViewer imageViewer, string comment, RasterZone rasterZone,
             string text, Color color)
             : this(imageViewer, comment, rasterZone.Start, rasterZone.End, rasterZone.Height,
                 rasterZone.PageNumber, text, color)
@@ -546,7 +545,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <value>The <see cref="System.Drawing.Color"/> of the highlight.</value>
         /// <returns>The <see cref="System.Drawing.Color"/> of the highlight. The default value is 
-        /// the <see cref="Forms.IDocumentViewer.DefaultHighlightColor"/> value of its 
+        /// the <see cref="Forms.ImageViewer.DefaultHighlightColor"/> value of its 
         /// <see cref="ImageViewer"/>.</returns>
         public Color Color
         {
@@ -602,9 +601,9 @@ namespace Extract.Imaging.Forms
         /// </value>
         /// <returns>The text associated with the highlight.</returns>
         /// <remarks> The default text is the empty <see cref="string"/> if 
-        /// <see cref="Forms.IDocumentViewer.RecognizeHighlightText"/> 
+        /// <see cref="Forms.ImageViewer.RecognizeHighlightText"/> 
         /// property is <see langword="false"/> or recognized text if the 
-        /// <see cref="Forms.IDocumentViewer.RecognizeHighlightText"/> property is 
+        /// <see cref="Forms.ImageViewer.RecognizeHighlightText"/> property is 
         /// <see langword="true"/>.
         /// </remarks>
         public string Text
@@ -818,7 +817,7 @@ namespace Extract.Imaging.Forms
             RasterDrawMode drawMode)
         {
             // Check if this highlight is attached to an image viewer
-            IDocumentViewer imageViewer = base.ImageViewer;
+            ImageViewer imageViewer = base.ImageViewer;
             if (imageViewer != null)
             {
                 // Paint the highlight's region
@@ -895,7 +894,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Ensure the highlight is on the active page            
-                IDocumentViewer imageViewer = base.ImageViewer;
+                ImageViewer imageViewer = base.ImageViewer;
                 return imageViewer != null && imageViewer.PageNumber == PageNumber &&
                        _region.IsVisible(point);
             }
@@ -1109,10 +1108,10 @@ namespace Extract.Imaging.Forms
                 // Get the clipping area in client coordinates.
                 // [DotNetRCAndUtils #92]
                 Rectangle clip = Rectangle.Union(base.ImageViewer.PhysicalViewRectangle,
-                    ((Control)base.ImageViewer).ClientRectangle);
+                    base.ImageViewer.ClientRectangle);
 
                 // Start the tracking event
-                TrackingData = new TrackingData((Control)base.ImageViewer,
+                TrackingData = new TrackingData(base.ImageViewer,
                     trackingPoint.X, trackingPoint.Y,
                     base.ImageViewer.GetTransformedRectangle(clip, true));
 
@@ -1229,7 +1228,7 @@ namespace Extract.Imaging.Forms
             {
                 base.UpdateTracking(mouseX, mouseY);
 
-                IDocumentViewer imageViewer = base.ImageViewer;
+                ImageViewer imageViewer = base.ImageViewer;
 
                 // Get the mouse position as a point in image coordinates
                 PointF mouse =
@@ -1707,7 +1706,7 @@ namespace Extract.Imaging.Forms
         /// Gets the image viewer associated with the <see cref="Highlight"/>.
         /// </summary>
         /// <value>The image viewer associated with the <see cref="Highlight"/>.</value>
-        public override IDocumentViewer ImageViewer
+        public override ImageViewer ImageViewer
         {
             get
             {

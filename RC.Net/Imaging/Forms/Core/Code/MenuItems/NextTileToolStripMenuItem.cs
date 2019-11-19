@@ -39,7 +39,7 @@ namespace Extract.Imaging.Forms
         protected override void SetEnabledState()
         {
             // Get the image viewer to which this control is attached
-            var imageViewer = base.ImageViewer;
+            ImageViewer imageViewer = base.ImageViewer;
 
             // Enable this menu item if an image is open and it is not on the last tile.
             base.Enabled = imageViewer != null && imageViewer.IsImageAvailable &&
@@ -98,12 +98,12 @@ namespace Extract.Imaging.Forms
         #region NextTileToolStripMenuItem Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.ZoomChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ZoomChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ZoomChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.ZoomChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ZoomChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.ZoomChanged"/> event.</param>
         private void HandleZoomChanged(object sender, ZoomChangedEventArgs e)
         {
             try
@@ -119,12 +119,12 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.OrientationChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.OrientationChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.OrientationChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.OrientationChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.OrientationChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.OrientationChanged"/> event.</param>
         private void HandleOrientationChanged(object sender, OrientationChangedEventArgs e)
         {
             try
@@ -172,8 +172,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer to which the <see cref="NextTileToolStripMenuItem"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        [CLSCompliant(false)]
-        public override IDocumentViewer ImageViewer
+        public override ImageViewer ImageViewer
         {
             get
             {
@@ -206,7 +205,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI21881",
                         "Unable to establish connection to image viewer.", ex);
-                    ee.AddDebugData("Image viewer", value.ToString(), false);
+                    ee.AddDebugData("Image viewer", value, false);
                     throw ee;
                 }
             }

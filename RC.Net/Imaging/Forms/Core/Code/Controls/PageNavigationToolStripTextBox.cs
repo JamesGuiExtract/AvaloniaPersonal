@@ -25,7 +25,7 @@ namespace Extract.Imaging.Forms
         /// The image viewer control with which the <see cref="PageNavigationToolStripTextBox"/> 
         /// is associated.
         /// </summary>
-        IDocumentViewer _imageViewer;
+        ImageViewer _imageViewer;
 
         /// <summary>
         /// Regular expression used to validate the user input.
@@ -177,12 +177,12 @@ namespace Extract.Imaging.Forms
         #region PageNavigationToolStripTextBox Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.PageChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.PageChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.PageChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.PageChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.PageChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.PageChanged"/> event.</param>
         private void HandlePageChanged(object sender, PageChangedEventArgs e)
         {
             try
@@ -198,12 +198,12 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.LoadingNewImage"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.LoadingNewImage"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.LoadingNewImage"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.LoadingNewImage"/> event.</param>
         /// <param name="e">The event data associated with the
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.LoadingNewImage"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.LoadingNewImage"/> event.</param>
         private void HandleLoadingNewImage(object sender, LoadingNewImageEventArgs e)
         {
             try
@@ -219,10 +219,10 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
         /// <param name="e">The event data associated with the event.</param>
         private void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
@@ -251,8 +251,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer to which the <see cref="PageNavigationToolStripTextBox"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        [CLSCompliant(false)]
-        public IDocumentViewer ImageViewer
+        public ImageViewer ImageViewer
         {
             get
             {
@@ -296,7 +295,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI21508",
                         "Unable to establish connection to image viewer.", ex);
-                    ee.AddDebugData("Image viewer", value.ToString(), false);
+                    ee.AddDebugData("Image viewer", value, false);
                     throw ee;
                 }
             }

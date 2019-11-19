@@ -43,7 +43,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The image viewer associated with the <see cref="ThumbnailViewer"/>.
         /// </summary>
-        IDocumentViewer _imageViewer;
+        ImageViewer _imageViewer;
 
         /// <summary>
         /// Loads the pages of an image in a separate thread.
@@ -345,7 +345,7 @@ namespace Extract.Imaging.Forms
 
                             _originalViewPerspectives[i] = item.Image.ViewPerspective;
 
-                            if (ImageViewer.IsImageAvailable && (ImageViewer.ImagePageData?.Count ?? 0) > i)
+                            if (ImageViewer.IsImageAvailable)
                             {
                                 var pageData = ImageViewer.ImagePageData[i];
                                 item.Image.RotateViewPerspective(pageData.Orientation);
@@ -437,12 +437,12 @@ namespace Extract.Imaging.Forms
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
         void HandleImageViewerImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             try
@@ -456,12 +456,12 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Handles the <see cref="Forms.DocumentViewer.PageChanged"/> event.
+        /// Handles the <see cref="Forms.ImageViewer.PageChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Forms.DocumentViewer.PageChanged"/> event.</param>
+        /// <see cref="Forms.ImageViewer.PageChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Forms.DocumentViewer.PageChanged"/> event.</param>
+        /// <see cref="Forms.ImageViewer.PageChanged"/> event.</param>
         void HandleImageViewerPageChanged(object sender, PageChangedEventArgs e)
         {
             try
@@ -625,8 +625,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The image viewer to which the <see cref="ThumbnailViewer"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        [CLSCompliant(false)]
-        public IDocumentViewer ImageViewer
+        public ImageViewer ImageViewer
         {
             get
             {
@@ -671,7 +670,7 @@ namespace Extract.Imaging.Forms
                 {
                     ExtractException ee = new ExtractException("ELI27922",
                         "Unable to establish connection to image viewer.", ex);
-                    ee.AddDebugData("Image viewer", value.ToString(), false);
+                    ee.AddDebugData("Image viewer", value, false);
                     throw ee;
                 }
             }

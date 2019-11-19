@@ -65,7 +65,7 @@ namespace Extract.Rules
         /// <summary>
         /// The image viewer on which the results will be displayed.
         /// </summary>
-        readonly DocumentViewer _imageViewer;
+        readonly ImageViewer _imageViewer;
 
         /// <summary>
         /// The search results collection. 
@@ -177,7 +177,7 @@ namespace Extract.Rules
         /// this find/redact form.</param>
         [CLSCompliant(false)]
         public RuleForm(string titleText, IRule rule,
-            DocumentViewer imageViewer, IRuleFormHelper helper, Form owner)
+            ImageViewer imageViewer, IRuleFormHelper helper, Form owner)
         {
             try
             {
@@ -407,7 +407,7 @@ namespace Extract.Rules
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="DocumentViewer.ImageFileChanged"/> event.
+        /// Handles the <see cref="ImageViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The <see cref="object"/> which sent the event.</param>
         /// <param name="e">An <see cref="ImageFileChangedEventArgs"/>

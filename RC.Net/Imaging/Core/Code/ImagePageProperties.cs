@@ -12,14 +12,6 @@ namespace Extract.Imaging
     {
         #region Constructors
 
-        public ImagePageProperties(int width, int height, int xResolution, int yResolution)
-        {
-            Width = width;
-            Height = height;
-            XResolution = xResolution;
-            YResolution = yResolution;
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ImagePageProperties"/> class.
         /// </summary>

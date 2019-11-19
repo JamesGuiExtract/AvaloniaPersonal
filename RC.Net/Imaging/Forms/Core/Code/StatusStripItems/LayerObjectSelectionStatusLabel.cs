@@ -39,7 +39,7 @@ namespace Extract.Imaging.Forms.StatusStripItems
         /// <summary>
         /// Image viewer with which this status label connects.
         /// </summary>
-        IDocumentViewer _imageViewer;
+        ImageViewer _imageViewer;
 
         #endregion Fields
 
@@ -113,8 +113,7 @@ namespace Extract.Imaging.Forms.StatusStripItems
         /// <returns>The image viewer to which the <see cref="LayerObjectSelectionStatusLabel"/> is 
         /// connected. <see langword="null"/> if no connections are established.</returns>
         [Browsable(false)]
-        [CLSCompliant(false)]
-        public IDocumentViewer ImageViewer
+        public ImageViewer ImageViewer
         {
             get
             {
@@ -157,7 +156,7 @@ namespace Extract.Imaging.Forms.StatusStripItems
                 {
                     ExtractException ee = new ExtractException("ELI35778",
                         "Unable to establish connection to image viewer.", ex);
-                    ee.AddDebugData("Image viewer", value.ToString(), false);
+                    ee.AddDebugData("Image viewer", value, false);
                     throw ee;
                 }
             }
@@ -168,12 +167,12 @@ namespace Extract.Imaging.Forms.StatusStripItems
         #region Event Handlers
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ImageFileChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.</param>
         void Handle_ImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             try
@@ -187,12 +186,12 @@ namespace Extract.Imaging.Forms.StatusStripItems
         }
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.PageChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.PageChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.PageChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.PageChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.PageChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.PageChanged"/> event.</param>
         void Handle_PageChanged(object sender, PageChangedEventArgs e)
         {
             try
@@ -206,12 +205,12 @@ namespace Extract.Imaging.Forms.StatusStripItems
         }
 
         /// <summary>
-        /// Handles the <see cref="Extract.Imaging.Forms.DocumentViewer.ZoomChanged"/> event.
+        /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ZoomChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ZoomChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.ZoomChanged"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Extract.Imaging.Forms.DocumentViewer.ZoomChanged"/> event.</param>
+        /// <see cref="Extract.Imaging.Forms.ImageViewer.ZoomChanged"/> event.</param>
         void Handle_ZoomChanged(object sender, ZoomChangedEventArgs e)
         {
             try

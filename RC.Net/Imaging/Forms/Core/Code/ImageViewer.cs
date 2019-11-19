@@ -28,8 +28,7 @@ namespace Extract.Imaging.Forms
     /// Represents a control that can display and interact with image files.
     /// </summary>
     [ToolboxBitmap(typeof(ImageViewer), ToolStripButtonConstants._IMAGE_VIEWER_ICON_IMAGE)]
-    [CLSCompliant(false)]
-    public sealed partial class ImageViewer : RasterImageViewer, IDocumentViewer
+    public sealed partial class ImageViewer : RasterImageViewer
     {
         #region Constants
 
@@ -258,6 +257,27 @@ namespace Extract.Imaging.Forms
         /// Indicates whether images should be displayed with inverted colors.
         /// </summary>
         bool  _invertColors = false;
+
+        /// <summary>
+        /// The collection of shortcut keys and shortcut handlers during times when no interactive 
+        /// mouse event is occurring.
+        /// </summary>
+        /// <seealso cref="Shortcuts"/>
+        readonly ShortcutsManager _mainShortcuts = new ShortcutsManager();
+
+        /// <summary>
+        /// The collection of shortcut keys and shortcut handlers during an interactive mouse 
+        /// event (e.g. drawing a highlight).
+        /// </summary>
+        /// <seealso cref="Shortcuts"/>
+        /// <seealso cref="Control.Capture"/>
+        readonly ShortcutsManager _captureShortcuts = new ShortcutsManager();
+
+        /// <summary>
+        /// Whether to load the default shortcuts.
+        /// </summary>
+        /// <seealso cref="UseDefaultShortcuts"/>
+        bool _useDefaultShortcuts;
 
         /// <summary>
         /// The collection of <see cref="LayerObject"/> items.
@@ -670,8 +690,6 @@ namespace Extract.Imaging.Forms
         /// </summary>
         public event EventHandler<OcrTextEventArgs> OcrTextHighlighted;
 
-        public IHasShortcuts ShortcutsManagerManager { get; set; }
-
         #endregion
 
         #region Image Viewer Constructors
@@ -686,12 +704,6 @@ namespace Extract.Imaging.Forms
                 // LoadLicenseFilesFromFolder for design mode is now called in 
                 // LoadCursorsForCursorTools (i.e., the static constructor)
                 InitializeComponent();
-
-                bool designMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
-                if (designMode)
-                {
-                    return;
-                }
 
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23109",
                     _OBJECT_NAME);
@@ -2096,7 +2108,7 @@ namespace Extract.Imaging.Forms
         {
             get
             {
-                return ShortcutsManagerManager?.Shortcuts;
+                return Capture ? _captureShortcuts : _mainShortcuts;
             }
         }
 
@@ -2114,13 +2126,28 @@ namespace Extract.Imaging.Forms
         {
             get
             {
-                return ShortcutsManagerManager?.UseDefaultShortcuts ?? false;
+                return _useDefaultShortcuts;
             }
             set
             {
-                if (ShortcutsManagerManager != null)
+                try
                 {
-                    ShortcutsManagerManager.UseDefaultShortcuts = value;
+                    // Clear the shortcuts
+                    _mainShortcuts.Clear();
+                    _captureShortcuts.Clear();
+
+                    // Load default shortcuts if requested
+                    if (value)
+                    {
+                        LoadDefaultShortcuts();
+                    }
+
+                    // Store whether default shortcuts were loaded
+                    _useDefaultShortcuts = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26538", ex);
                 }
             }
         }
@@ -3195,78 +3222,71 @@ namespace Extract.Imaging.Forms
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
         /// <returns>The cursor for the select layerObject tool based on the mouse position.
         /// </returns>
-        public Cursor GetSelectionCursor(int mouseX, int mouseY)
+        internal Cursor GetSelectionCursor(int mouseX, int mouseY)
         {
-            try
+            // Get the point for the mouse position
+            Point mousePoint = new Point(mouseX, mouseY);
+
+            // Check if the mouse is over one of the link arrows
+            if (_activeLinkedLayerObject != null && 
+                _activeLinkedLayerObject.GetLinkArrowId(mousePoint) >= 0)
             {
-                // Get the point for the mouse position
-                Point mousePoint = new Point(mouseX, mouseY);
-
-                // Check if the mouse is over one of the link arrows
-                if (_activeLinkedLayerObject != null &&
-                    _activeLinkedLayerObject.GetLinkArrowId(mousePoint) >= 0)
-                {
-                    return Cursors.Hand;
-                }
-
-                // Iterate through all selected layer object
-                foreach (LayerObject layerObject in _layerObjects.Selection)
-                {
-                    // Skip this layer object if it is not moveable or on a different page
-                    if (!layerObject.Movable || layerObject.PageNumber != _pageNumber)
-                    {
-                        continue;
-                    }
-
-                    // Check if the mouse cursor is over one of the grip handles
-                    int gripHandleId = layerObject.GetGripHandleId(mousePoint);
-                    if (gripHandleId >= 0)
-                    {
-                        return layerObject.GetGripCursor(gripHandleId);
-                    }
-                }
-
-                // If _layerObjectsUnderCursor is initialized we can use its members
-                // rather than iterating all layer objects to find one which should change the cursor.
-                if (_layerObjectsUnderCursor != null)
-                {
-                    foreach (LayerObject layerObject in _layerObjectsUnderCursor)
-                    {
-                        if (layerObject.Selectable && layerObject.Movable && layerObject.Visible)
-                        {
-                            // Return the sizing mouse cursor
-                            return Cursors.SizeAll;
-                        }
-                    }
-                }
-                // If _layerObjectsUnderCursor is null, search all layer objects to find any that should
-                // change the cursor.
-                else
-                {
-                    // Convert the mouse click to image coordinates
-                    Point hitPoint = GeometryMethods.InvertPoint(_transform, mousePoint);
-
-                    // Iterate through all layer objects
-                    foreach (LayerObject layerObject in _layerObjects)
-                    {
-                        // Check if the mouse cursor is over a layer object
-                        // Only perform hit test if object is selectable, moveable and visible
-                        if (layerObject.Selectable && layerObject.Movable && layerObject.Visible
-                            && layerObject.HitTest(hitPoint))
-                        {
-                            // Return the sizing mouse cursor
-                            return Cursors.SizeAll;
-                        }
-                    }
-                }
-
-                // The mouse is not over any layer object
-                return Cursors.Default;
+                return Cursors.Hand;
             }
-            catch (Exception ex)
+
+            // Iterate through all selected layer object
+            foreach (LayerObject layerObject in _layerObjects.Selection)
             {
-                throw ex.AsExtract("ELI48315");
+                // Skip this layer object if it is not moveable or on a different page
+                if (!layerObject.Movable || layerObject.PageNumber != _pageNumber)
+                {
+                    continue;
+                }
+
+                // Check if the mouse cursor is over one of the grip handles
+                int gripHandleId = layerObject.GetGripHandleId(mousePoint);
+                if (gripHandleId >= 0)
+                {
+                    return layerObject.GetGripCursor(gripHandleId);
+                }
             }
+
+            // If _layerObjectsUnderCursor is initialized we can use its members
+            // rather than iterating all layer objects to find one which should change the cursor.
+            if (_layerObjectsUnderCursor != null)
+            {
+                foreach (LayerObject layerObject in _layerObjectsUnderCursor)
+                {
+                    if (layerObject.Selectable && layerObject.Movable && layerObject.Visible)
+                    {
+                        // Return the sizing mouse cursor
+                        return Cursors.SizeAll;
+                    }
+                }
+            }
+            // If _layerObjectsUnderCursor is null, search all layer objects to find any that should
+            // change the cursor.
+            else
+            {
+                // Convert the mouse click to image coordinates
+                Point hitPoint = GeometryMethods.InvertPoint(_transform, mousePoint);
+
+                // Iterate through all layer objects
+                foreach (LayerObject layerObject in _layerObjects)
+                {
+                    // Check if the mouse cursor is over a layer object
+                    // Only perform hit test if object is selectable, moveable and visible
+                    if (layerObject.Selectable && layerObject.Movable && layerObject.Visible
+                        && layerObject.HitTest(hitPoint))
+                    {
+                        // Return the sizing mouse cursor
+                        return Cursors.SizeAll;
+                    }
+                }
+            }
+
+            // The mouse is not over any layer object
+            return Cursors.Default;
         }
 
         /// <summary>

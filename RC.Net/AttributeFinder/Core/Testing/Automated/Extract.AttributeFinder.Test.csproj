@@ -144,10 +144,6 @@
       <Project>{b2d07de4-9192-4531-8854-de03ce9b0b57}</Project>
       <Name>Extract.Imaging</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
-      <Project>{9d9996e1-50be-4506-b4a6-08f6b9d3f839}</Project>
-      <Name>Extract.Imaging.Forms</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj">
       <Project>{e610e652-0891-40d4-b5ca-a622b87c7979}</Project>
       <Name>Extract.Imaging.Utilities</Name>

@@ -32,10 +32,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         Page _page;
 
         /// <summary>
-        /// The <see cref="IDocumentViewer"/> being used to display the active page or
+        /// The <see cref="ImageViewer"/> being used to display the active page or
         /// <see langword="null"/> if the page is not currently being displayed.
         /// </summary>
-        IDocumentViewer _activeImageViewer;
+        ImageViewer _activeImageViewer;
 
         /// <summary>
         /// Keeps track of the last tooltip message displayed for this control.
@@ -117,7 +117,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Events
 
         /// <summary>
-        /// Occurs when the image associated with this control is closed or changed in the <see cref="IDocumentViewer"/>.
+        /// Occurs when the image associated with this control is closed or changed in the <see cref="ImageViewer"/>.
         /// </summary>
         public event EventHandler<EventArgs> ImageClosed;
 
@@ -128,11 +128,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Displays or closed the <see cref="Page"/> in the specified <see paramref="ImageViewer"/>.
         /// </summary>
-        /// <param name="imageViewer">The <see cref="IDocumentViewer"/> that should display or close the
+        /// <param name="imageViewer">The <see cref="ImageViewer"/> that should display or close the
         /// page.</param>
         /// <param name="display"><see langword="true"/> to display the image;
         /// <see langword="false"/> to close it.</param>
-        public bool DisplayPage(IDocumentViewer imageViewer, bool display)
+        public bool DisplayPage(ImageViewer imageViewer, bool display)
         {
             try
             {
@@ -148,7 +148,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // refresh is in place of locking the entire form which can cause the form to
                     // fall behind other open applications when clicked.
                     LockControlUpdates toolStripLocker = null;
-                    for (Control control = imageViewer as Control; control != null; control = control.Parent)
+                    for (Control control = imageViewer; control != null; control = control.Parent)
                     {
                         var toolStripContainer = control as ToolStripContainer;
                         if (toolStripContainer != null)
@@ -541,7 +541,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="IDocumentViewer.OrientationChanged"/> event of the
+        /// Handles the <see cref="ImageViewer.OrientationChanged"/> event of the
         /// <see cref="_activeImageViewer"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
