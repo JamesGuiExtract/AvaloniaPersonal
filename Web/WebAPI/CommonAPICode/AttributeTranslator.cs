@@ -40,6 +40,8 @@ namespace WebAPI
         /// existing attribute data for the document.
         /// </summary>
         /// <param name="sourceDocName">Name of the source document.</param>
+        /// <param name="inputDocumentData">The <see cref="DocumentAttribute"/>s to be converted to
+        /// <see cref="IAttribute"/>s.</param>
         public AttributeTranslator(string sourceDocName, List<DocumentAttribute> inputDocumentData)
         {
             try

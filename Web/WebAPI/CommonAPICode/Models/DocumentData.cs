@@ -561,7 +561,7 @@ namespace WebAPI.Models
         /// <param name="cacheData">Specifies if the attribute data for this file should be cached
         /// as a side effect of the call. Caching is required if data is to be edited via <see cref="EditPageData"/>
         /// and <see cref="CommitCachedDocumentData"/>. In order to be cached,
-        /// <see cref="splitMultiPageAttributes"/> must be <c>true</c>.</param>
+        /// <see paramref="splitMultiPageAttributes"/> must be <c>true</c>.</param>
         /// <returns>DocumentAttributeSet instance, including error info iff there is an error</returns>
         public DocumentDataResult GetDocumentData(int fileId, 
             bool includeNonSpatial, bool verboseSpatialData, bool splitMultiPageAttributes,

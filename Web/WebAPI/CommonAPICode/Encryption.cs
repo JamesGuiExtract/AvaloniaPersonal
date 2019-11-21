@@ -12,10 +12,10 @@ using System.Text;
 
 namespace Encryption
 {
-    public static class AESThenHMAC
+    internal static class AESThenHMAC
     {
         private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();
-
+        
         //Preconfigured Encryption Parameters
         public static readonly int BlockBitSize = 128;
         public static readonly int KeyBitSize = 256;
