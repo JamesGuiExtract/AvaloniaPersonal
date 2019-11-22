@@ -994,7 +994,7 @@ namespace WebAPI.Controllers
                 // The caching thread won't be confined to time the session is active. If another
                 // API call closes the session before the caching completes, FileProcessingDB will
                 // simply ignore the cache request.
-                await DocumentData.CachePageDataAsync(documentSessionID, docID, page);
+                await DocumentData.CachePageDataAsync(documentSessionID, docID, page).ConfigureAwait(false);
 
                 return NoContent();
             }

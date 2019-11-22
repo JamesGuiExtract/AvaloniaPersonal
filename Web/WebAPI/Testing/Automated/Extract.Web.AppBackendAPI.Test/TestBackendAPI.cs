@@ -1683,9 +1683,9 @@ namespace Extract.Web.WebAPI.Test
 
                 // Request for page 2 data to be cached; and allow up to 3 seconds.
                 var cacheTask = controller.CachePageDataAsync(docID, page);
-                if (await Task.WhenAny(cacheTask, Task.Delay(3000)) == cacheTask)
+                if (await Task.WhenAny(cacheTask, Task.Delay(3000)).ConfigureAwait(false) == cacheTask)
                 {
-                    var result = await cacheTask;
+                    var result = await cacheTask.ConfigureAwait(false);
                     result.AssertGoodResult<NoContentResult>();
                 }
                 else
@@ -1748,7 +1748,7 @@ namespace Extract.Web.WebAPI.Test
                 LogInToWebApp(controller, user);
                 OpenDocument(controller, docID);
 
-                var result = await controller.CachePageDataAsync(docID, 2);
+                var result = await controller.CachePageDataAsync(docID, 2).ConfigureAwait(false);
                 result.AssertResultCode(404, "Expected page not found.");
 
                 controller.Logout().AssertGoodResult<NoContentResult>();
@@ -1790,7 +1790,7 @@ namespace Extract.Web.WebAPI.Test
                 LogInToWebApp(controller, user);
                 OpenDocument(controller, docID);
 
-                var result = await controller.CachePageDataAsync(docID, 1);
+                var result = await controller.CachePageDataAsync(docID, 1).ConfigureAwait(false);
                 result.AssertResultCode(500, "Expected error caching corrupt uss");
 
                 // Confirm that the cache exception has been recorded in the db for the page.
