@@ -482,114 +482,118 @@ namespace Extract.ETL
             using (CountdownEvent threadCountDown = new CountdownEvent(1))
             using (Semaphore threadSemaphore = new Semaphore(NumberOfProcessingThreads, NumberOfProcessingThreads))
             using (SqlDataReader ExpectedAndFoundReader = cmd.ExecuteReader())
+            using (CancellationTokenSource exceptionCancel = new CancellationTokenSource())
+            using (CancellationTokenSource multipleCancel = CancellationTokenSource.CreateLinkedTokenSource(exceptionCancel.Token, cancelToken))
             {
-                // Get the ordinal for the FoundVOA and ExpectedVOA columns
-                int foundVOAColumn = ExpectedAndFoundReader.GetOrdinal("FoundVOA");
-                int expectedVOAColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedVOA");
-                int foundAttributeForFileSetColumn = ExpectedAndFoundReader.GetOrdinal("FoundAttributeSetFileID");
-                int expectedAttributeForFileSetColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedAttributeSetFileID");
-                int fileIDColumn = ExpectedAndFoundReader.GetOrdinal("FileID");
-                int foundDateTimeStampColumn = ExpectedAndFoundReader.GetOrdinal("FoundDateTimeStamp");
-                int foundActionIDColumn = ExpectedAndFoundReader.GetOrdinal("FoundActionID");
-                int foundFAMUserIDColumn = ExpectedAndFoundReader.GetOrdinal("FoundFAMUserID");
-                int expectedDateTimeStampColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedDateTimeStamp");
-                int expectedActionIDColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedActionID");
-                int expectedFAMUserIDColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedFAMUserID");
-
-                // Process the found records
-                while (ExpectedAndFoundReader.Read())
+                try
                 {
-                    cancelToken.ThrowIfCancellationRequested();
+                    // Get the ordinal for the FoundVOA and ExpectedVOA columns
+                    int foundVOAColumn = ExpectedAndFoundReader.GetOrdinal("FoundVOA");
+                    int expectedVOAColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedVOA");
+                    int foundAttributeForFileSetColumn = ExpectedAndFoundReader.GetOrdinal("FoundAttributeSetFileID");
+                    int expectedAttributeForFileSetColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedAttributeSetFileID");
+                    int fileIDColumn = ExpectedAndFoundReader.GetOrdinal("FileID");
+                    int foundDateTimeStampColumn = ExpectedAndFoundReader.GetOrdinal("FoundDateTimeStamp");
+                    int foundActionIDColumn = ExpectedAndFoundReader.GetOrdinal("FoundActionID");
+                    int foundFAMUserIDColumn = ExpectedAndFoundReader.GetOrdinal("FoundFAMUserID");
+                    int expectedDateTimeStampColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedDateTimeStamp");
+                    int expectedActionIDColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedActionID");
+                    int expectedFAMUserIDColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedFAMUserID");
 
-                    // Get the streams for the expected and found voa data (the thread will read the voa from the stream
-                    Stream expectedStream = ExpectedAndFoundReader.GetStream(expectedVOAColumn);
-                    Stream foundStream = ExpectedAndFoundReader.GetStream(foundVOAColumn);
-                    Int64 foundID = ExpectedAndFoundReader.GetInt64(foundAttributeForFileSetColumn);
-                    Int64 expectedID = ExpectedAndFoundReader.GetInt64(expectedAttributeForFileSetColumn);
-                    Int32 fileID = ExpectedAndFoundReader.GetInt32(fileIDColumn);
-                    DateTime foundDateTime = ExpectedAndFoundReader.GetDateTime(foundDateTimeStampColumn);
-                    Int32 foundActionID = ExpectedAndFoundReader.GetInt32(foundActionIDColumn);
-                    Int32 foundFAMUserID = ExpectedAndFoundReader.GetInt32(foundFAMUserIDColumn);
-                    DateTime expectedDateTime = ExpectedAndFoundReader.GetDateTime(expectedDateTimeStampColumn);
-                    Int32 expectedActionID = ExpectedAndFoundReader.GetInt32(expectedActionIDColumn);
-                    Int32 expectedFAMUserID = ExpectedAndFoundReader.GetInt32(expectedFAMUserIDColumn);
-
-                    // Get Semaphore before creating the thread
-                    threadSemaphore.WaitOne();
-                    threadCountDown.AddCount();
-
-                    // Create a thread pool thread to do the comparison
-                    ThreadPool.QueueUserWorkItem(delegate
+                    // Process the found records
+                    while (ExpectedAndFoundReader.Read())
                     {
-                        try
+                        multipleCancel.Token.ThrowIfCancellationRequested();
+
+                        // Get the streams for the expected and found voa data (the thread will read the voa from the stream
+                        Stream expectedStream = ExpectedAndFoundReader.GetStream(expectedVOAColumn);
+                        Stream foundStream = ExpectedAndFoundReader.GetStream(foundVOAColumn);
+                        Int64 foundID = ExpectedAndFoundReader.GetInt64(foundAttributeForFileSetColumn);
+                        Int64 expectedID = ExpectedAndFoundReader.GetInt64(expectedAttributeForFileSetColumn);
+                        Int32 fileID = ExpectedAndFoundReader.GetInt32(fileIDColumn);
+                        DateTime foundDateTime = ExpectedAndFoundReader.GetDateTime(foundDateTimeStampColumn);
+                        Int32 foundActionID = ExpectedAndFoundReader.GetInt32(foundActionIDColumn);
+                        Int32 foundFAMUserID = ExpectedAndFoundReader.GetInt32(foundFAMUserIDColumn);
+                        DateTime expectedDateTime = ExpectedAndFoundReader.GetDateTime(expectedDateTimeStampColumn);
+                        Int32 expectedActionID = ExpectedAndFoundReader.GetInt32(expectedActionIDColumn);
+                        Int32 expectedFAMUserID = ExpectedAndFoundReader.GetInt32(expectedFAMUserIDColumn);
+
+                        // Get Semaphore before creating the thread
+                        threadSemaphore.WaitOne();
+                        threadCountDown.AddCount();
+
+                        // Create a thread pool thread to do the comparison
+                        ThreadPool.QueueUserWorkItem(delegate
                         {
-                            // Put the expected and found streams in usings so they will be disposed
-                            using (expectedStream)
-                            using (foundStream)
+                            try
                             {
-                                // Get the VOAs from the streams
-                                IUnknownVector ExpectedAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(expectedStream);
-                                ExpectedAttributes.ReportMemoryUsage();
-                                IUnknownVector FoundAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(foundStream);
-                                FoundAttributes.ReportMemoryUsage();
-
-                                // Compare the VOAs
-                                var output = IDShieldAttributeComparer.CompareAttributes(ExpectedAttributes, FoundAttributes,
-                                        XPathOfSensitiveAttributes, cancelToken).ToList();
-
-                                // process output for each page
-                                foreach (var pageKeyPair in output)
+                                // Put the expected and found streams in usings so they will be disposed
+                                using (expectedStream)
+                                using (foundStream)
                                 {
-                                    int page = pageKeyPair.Key;
+                                    // Get the VOAs from the streams
+                                    IUnknownVector ExpectedAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(expectedStream);
+                                    ExpectedAttributes.ReportMemoryUsage();
+                                    IUnknownVector FoundAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(foundStream);
+                                    FoundAttributes.ReportMemoryUsage();
 
-                                    // Add the comparison results to the Results
-                                    var statsToSave = pageKeyPair.Value.AggregateStatistics(cancelToken).ToList();
+                                    // Compare the VOAs
+                                    var output = IDShieldAttributeComparer.CompareAttributes(ExpectedAttributes, FoundAttributes,
+                                                XPathOfSensitiveAttributes, multipleCancel.Token).ToList();
 
-                                    var lookup = statsToSave.ToLookup(a => new { a.Path, a.Label });
-
-                                    var attributePaths = statsToSave
-                                        .Select(a => a.Path)
-                                        .Distinct()
-                                        .OrderBy(p => p)
-                                        .ToList();
-
-                                    List<string> valuesToAdd = new List<string>();
-                                    foreach (var p in attributePaths)
+                                    // process output for each page
+                                    foreach (var pageKeyPair in output)
                                     {
-                                        int expected = lookup[new { Path = p, Label = AccuracyDetailLabel.Expected }].Sum(a => a.Value);
-                                        int found = lookup[new { Path = p, Label = AccuracyDetailLabel.Found }].Sum(a => a.Value);
-                                        int correct = lookup[new { Path = p, Label = AccuracyDetailLabel.Correct }].Sum(a => a.Value);
-                                        int falsePositives = lookup[new { Path = p, Label = AccuracyDetailLabel.FalsePositives }].Sum(a => a.Value);
-                                        int overRedacted = lookup[new { Path = p, Label = AccuracyDetailLabel.OverRedacted }].Sum(a => a.Value);
-                                        int underRedacted = lookup[new { Path = p, Label = AccuracyDetailLabel.UnderRedacted }].Sum(a => a.Value);
-                                        int missed = lookup[new { Path = p, Label = AccuracyDetailLabel.Missed }].Sum(a => a.Value);
+                                        int page = pageKeyPair.Key;
 
-                                        valuesToAdd.Add(string.Format(CultureInfo.InvariantCulture,
-                                            @"({0}, {1}, {2}, {3}, {4}, '{5}', {6}, {7}, {8}, {9}, {10}, {11}, {12}, '{13:s}', {14}, {15}, '{16:s}', {17}, {18} )"
-                                            , DatabaseServiceID
-                                            , foundID
-                                            , expectedID
-                                            , fileID
-                                            , page
-                                            , p
-                                            , expected
-                                            , found
-                                            , correct
-                                            , falsePositives
-                                            , overRedacted
-                                            , underRedacted
-                                            , missed
-                                            , foundDateTime
-                                            , foundFAMUserID
-                                            , foundActionID
-                                            , expectedDateTime
-                                            , expectedFAMUserID
-                                            , expectedActionID
-                                            ));
-                                    }
+                                        // Add the comparison results to the Results
+                                        var statsToSave = pageKeyPair.Value.AggregateStatistics(multipleCancel.Token).ToList();
 
-                                    queriesToRunInBatch.Enqueue(string.Format(CultureInfo.InvariantCulture,
-                                        @"
+                                        var lookup = statsToSave.ToLookup(a => new { a.Path, a.Label });
+
+                                        var attributePaths = statsToSave
+                                            .Select(a => a.Path)
+                                            .Distinct()
+                                            .OrderBy(p => p)
+                                            .ToList();
+
+                                        List<string> valuesToAdd = new List<string>();
+                                        foreach (var p in attributePaths)
+                                        {
+                                            int expected = lookup[new { Path = p, Label = AccuracyDetailLabel.Expected }].Sum(a => a.Value);
+                                            int found = lookup[new { Path = p, Label = AccuracyDetailLabel.Found }].Sum(a => a.Value);
+                                            int correct = lookup[new { Path = p, Label = AccuracyDetailLabel.Correct }].Sum(a => a.Value);
+                                            int falsePositives = lookup[new { Path = p, Label = AccuracyDetailLabel.FalsePositives }].Sum(a => a.Value);
+                                            int overRedacted = lookup[new { Path = p, Label = AccuracyDetailLabel.OverRedacted }].Sum(a => a.Value);
+                                            int underRedacted = lookup[new { Path = p, Label = AccuracyDetailLabel.UnderRedacted }].Sum(a => a.Value);
+                                            int missed = lookup[new { Path = p, Label = AccuracyDetailLabel.Missed }].Sum(a => a.Value);
+
+                                            valuesToAdd.Add(string.Format(CultureInfo.InvariantCulture,
+                                                @"({0}, {1}, {2}, {3}, {4}, '{5}', {6}, {7}, {8}, {9}, {10}, {11}, {12}, '{13:s}', {14}, {15}, '{16:s}', {17}, {18} )"
+                                                , DatabaseServiceID
+                                                , foundID
+                                                , expectedID
+                                                , fileID
+                                                , page
+                                                , p
+                                                , expected
+                                                , found
+                                                , correct
+                                                , falsePositives
+                                                , overRedacted
+                                                , underRedacted
+                                                , missed
+                                                , foundDateTime
+                                                , foundFAMUserID
+                                                , foundActionID
+                                                , expectedDateTime
+                                                , expectedFAMUserID
+                                                , expectedActionID
+                                                ));
+                                        }
+
+                                        queriesToRunInBatch.Enqueue(string.Format(CultureInfo.InvariantCulture,
+                                            @"
                                         INSERT INTO [dbo].[ReportingRedactionAccuracy]
                                                 ([DatabaseServiceID]
                                                 ,[FoundAttributeSetForFileID]
@@ -612,25 +616,37 @@ namespace Extract.ETL
                                                 ,[ExpectedActionID])
                                                 VALUES
                                                     {3};", DatabaseServiceID, fileID, page, string.Join(",\r\n", valuesToAdd)));
+                                    }
                                 }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            ex.AsExtract("ELI45383").Log();
-                        }
-                        finally
-                        {
-                            // Release semaphore after thread has been created
-                            threadSemaphore.Release();
+                            catch (Exception ex)
+                            {
+                                ex.AsExtract("ELI45383").Log();
+                            }
+                            finally
+                            {
+                                // Release semaphore after thread has been created
+                                threadSemaphore.Release();
 
-                            // Decrement the number of pending threads
-                            threadCountDown.Signal();
-                        }
-                    });
+                                // Decrement the number of pending threads
+                                threadCountDown.Signal();
+                            }
+                        });
+                    }
                 }
-                threadCountDown.Signal();
-                WaitHandle.WaitAny(new WaitHandle[] { threadCountDown.WaitHandle, cancelToken.WaitHandle });
+                catch
+                {
+                    if (!exceptionCancel.IsCancellationRequested)
+                    {
+                        exceptionCancel.Cancel();
+                    }
+                    throw;
+                }
+                finally
+                {
+                    threadCountDown.Signal();
+                    threadCountDown.Wait();
+                }
             }
         }
 

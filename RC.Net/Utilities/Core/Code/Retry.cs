@@ -69,7 +69,7 @@ namespace Extract.Utilities
         /// <summary>
         /// Optional event to wait for
         /// </summary>
-        EventWaitHandle _eventToWaitFor;
+        WaitHandle _handleToWaitFor;
 
         #endregion Fields
 
@@ -96,7 +96,7 @@ namespace Extract.Utilities
         {
             _retryCount = retryCount;
             _timeBetweenRetries = timeBetweenRetries;
-            _eventToWaitFor = null;
+            _handleToWaitFor = null;
         }
 
         /// <summary>
@@ -104,13 +104,13 @@ namespace Extract.Utilities
         /// </summary>
         /// <param name="retryCount">Number of time to attempt a method call</param>
         /// <param name="timeBetweenRetries">Number of milliseconds to wait between method call attempts</param>
-        /// <param name="eventToWaitFor">Event to wait for between method call attempts and if signalled
+        /// <param name="handleToWaitFor">Event to wait for between method call attempts and if signalled
         /// will cause no further attempts to be made.</param>
-        public Retry(int retryCount, int timeBetweenRetries, EventWaitHandle eventToWaitFor)
+        public Retry(int retryCount, int timeBetweenRetries, WaitHandle handleToWaitFor)
         {
             _retryCount = retryCount;
             _timeBetweenRetries = timeBetweenRetries;
-            _eventToWaitFor = eventToWaitFor;
+            _handleToWaitFor = handleToWaitFor;
         }
 
         #endregion
@@ -168,6 +168,10 @@ namespace Extract.Utilities
                     }
                     return returnObect;
                 }
+                catch(OperationCanceledException)
+                {
+                    throw;
+                }
                 catch (TExceptionType ex)
                 {
                     // This is intentionally not wrapped in a try/catch block. Any exceptions in the
@@ -196,11 +200,11 @@ namespace Extract.Utilities
                     }
 
                     numberOfRetries++;
-                    if (_eventToWaitFor == null)
+                    if (_handleToWaitFor == null)
                     {
                         Thread.Sleep(_timeBetweenRetries);
                     }
-                    else if (_eventToWaitFor.WaitOne(_timeBetweenRetries))
+                    else if (_handleToWaitFor.WaitOne(_timeBetweenRetries))
                     {
                         ExtractException ee = new ExtractException("ELI32546",
                             "Application Trace: Event signaled while waiting to retry.", ex);

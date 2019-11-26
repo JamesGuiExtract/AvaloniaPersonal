@@ -54,7 +54,7 @@ namespace Extract.ETL
                 DECLARE @affectedFiles TABLE (FileID INT)
 				INSERT INTO @affectedFiles
 				SELECT DISTINCT FileID
-					FROM AttributeSetForFile
+					FROM AttributeSetForFile 
 					INNER JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
 					INNER JOIN FileTaskSession ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID 
                         AND FileTaskSession.ID >= @StartFileTaskSessionSetID AND FileTaskSession.ID <= @EndFileTaskSessionSetID
@@ -220,14 +220,14 @@ namespace Extract.ETL
                 ExtractException.Assert("ELI46586", "Status cannot be null", _status != null);
 
                 int maxReportableFileTaskSession = MaxReportableFileTaskSessionId(true);
-
+                Retry<Exception> retryBatch = new Retry<Exception>(5, 200, cancelToken.WaitHandle);
                 while (LastFileTaskSessionIDProcessed < maxReportableFileTaskSession)
                 {
                     cancelToken.ThrowIfCancellationRequested();
                     var endFileTaskSessionID =
                         Math.Min(LastFileTaskSessionIDProcessed + PROCESS_BATCH_SIZE, maxReportableFileTaskSession);
 
-                    ProcessBatch(cancelToken, endFileTaskSessionID);
+                    retryBatch.DoRetry(()=> ProcessBatch(cancelToken, endFileTaskSessionID));
                 }
             }
             catch (Exception ex)
@@ -264,89 +264,73 @@ namespace Extract.ETL
                 cmd.CommandText = UPDATE_ACCURACY_DATA_SQL;
 
                 addParametersToCommand(cmd, endFileTaskSessionID);
-                
-                
+
                 // Keep track of active threads
-                using (CountdownEvent threadCountdown = new CountdownEvent(1))
+                using (CountdownEvent threadCountDown = new CountdownEvent(1))
                 using (Semaphore threadSemaphore = new Semaphore(NumberOfProcessingThreads, NumberOfProcessingThreads))
                 using (SqlDataReader ExpectedAndFoundReader = cmd.ExecuteReader())
+                using(CancellationTokenSource exceptionCancelSource = new CancellationTokenSource())
+                using(CancellationTokenSource multipleCancel = CancellationTokenSource.CreateLinkedTokenSource(exceptionCancelSource.Token, cancelToken))
                 {
-                    // Get VOA and other relevant data for each file needed to calculate capture statistics.
-                    while (ReadDataAccuracyQueryData(ExpectedAndFoundReader, cancelToken, out var queryResultRow))
+                    try
                     {
-                        // Increment the number of pending threads
-                        threadCountdown.AddCount();
+						multipleCancel.Token.ThrowIfCancellationRequested();
 
-                        // Get Semaphore before creating the thread
-                        threadSemaphore.WaitOne();
-
-                        // Create a thread pool thread to do the comparison
-                        ThreadPool.QueueUserWorkItem(delegate
+                        // Get VOA and other relevant data for each file needed to calculate capture statistics.
+                        while (ReadDataAccuracyQueryData(ExpectedAndFoundReader, cancelToken, out var queryResultRow))
                         {
-                            try
+                            // Increment the number of pending threads
+                            threadCountDown.AddCount();
+
+                            // Get Semaphore before creating the thread
+                            threadSemaphore.WaitOne();
+
+                            // Create a thread pool thread to do the comparison
+                            ThreadPool.QueueUserWorkItem(delegate
                             {
-                                // Put the expected and found streams in usings so they will be disposed
-                                using (queryResultRow.ExpectedStream)
-                                using (queryResultRow.FoundStream)
+                                try
                                 {
-                                    // Get the VOAs from the streams
-                                    IUnknownVector expectedAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(queryResultRow.ExpectedStream);
-                                    expectedAttributes.ReportMemoryUsage();
-                                    IUnknownVector foundAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(queryResultRow.FoundStream);
-                                    foundAttributes.ReportMemoryUsage();
-
-                                    // If the original file ID differs from the expected file ID, search the
-                                    // original file's attribute hierarchy to find the comparison attributes
-                                    // in a proposed document pagination hierarchy.
-                                    // We know to be searching the pagination source document data because
-                                    // if manual pagination had triggered rule execution on the expected file
-                                    // (or even rules had been run after-the-fact on the expected file), the
-                                    // more recent storage of the found attribute set would trigger that to
-                                    // be used as the comparison.
-                                    if (queryResultRow.ExpectedFileID != queryResultRow.OriginalFileID)
-                                    {
-                                        foundAttributes = GetFoundAttributesFromPaginationSource(foundAttributes, queryResultRow);
-                                    }
-
-                                    // Compare the VOAs
-                                    var output = AttributeTreeComparer.CompareAttributes(
-                                        expected: expectedAttributes,
-                                        found: foundAttributes,
-                                        ignoreXPath: XPathOfAttributesToIgnore,
-                                        containerXPath: XPathOfContainerOnlyAttributes,
-                                        cancelToken: cancelToken)
-                                    .ToList();
-
-                                    // Add the comparison results to the Results
-                                    var statsToStore = output.AggregateStatistics(cancelToken).ToList();
-
-                                    queriesToRunInBatch.Enqueue(AddAccuracyDataQueryToList(statsToStore, queryResultRow));
+                                    multipleCancel.Token.ThrowIfCancellationRequested();
+                                    CalculateStats(queriesToRunInBatch, queryResultRow, multipleCancel.Token);
                                 }
-                            }
-                            catch (Exception ex)
-                            {
-                                ex.AsExtract("ELI41544").Log();
-                            }
-                            finally
-                            {
-                                // Release semaphore after thread has been created
-                                threadSemaphore.Release();
+                                catch(OperationCanceledException)
+                                {
+                                    throw;
+                                }
+                                catch (Exception ex)
+                                {
+                                    ex.AsExtract("ELI41544").Log();
+                                }
+                                finally
+                                {
+                                    // Release semaphore after thread has been created
+                                    threadSemaphore.Release();
 
-                                // Decrement the number of pending threads
-                                threadCountdown.Signal();
-                            }
-                        });
+                                    // Decrement the number of pending threads
+                                    threadCountDown.Signal();
+                                }
+                            });
+                        }
                     }
+                    catch
+                    {
+                       	exceptionCancelSource.Cancel();
+                        throw;
+                    }
+                    finally
+                    {
+                        threadCountDown.Signal();
 
-                    threadCountdown.Signal();
-                    WaitHandle.WaitAny(new WaitHandle[] { threadCountdown.WaitHandle, cancelToken.WaitHandle });
+                        // Don't need to wait on CancelToken because the threads will be stopped when there is a cancel and
+                        // need to make sure all the threads exit.
+                        threadCountDown.Wait();
+                    }
                 }
             }
 
+            cancelToken.ThrowIfCancellationRequested();
             AddTheDataToTheDatabase(queriesToRunInBatch, endFileTaskSessionID, cancelToken);
         }
-
-
         /// <summary>
         /// Deletes the old records and adds the new data by executing the queries in queriesToRunInBatch
         /// </summary>
@@ -740,6 +724,55 @@ namespace Extract.ETL
         #endregion IHasConfigurableDatabaseServiceStatus
 
         #region Private Methods
+
+        /// <summary>
+        /// Calculates the stats and creates query to add data to database
+        /// </summary>
+        /// <param name="queriesToRunInBatch">Queue of queries to be to add stats to database</param>
+        /// <param name="queryResultRow">Current data to calculate stats on</param>
+        /// <param name="cancelToken">Cancelation token to check for cancelation</param>
+        private void CalculateStats(ConcurrentQueue<string> queriesToRunInBatch, UpdateQueryResultRow queryResultRow, CancellationToken cancelToken)
+        {
+            // Put the expected and found streams in usings so they will be disposed
+            using (queryResultRow.ExpectedStream)
+            using (queryResultRow.FoundStream)
+            {
+                // Get the VOAs from the streams
+                IUnknownVector expectedAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(queryResultRow.ExpectedStream);
+                expectedAttributes.ReportMemoryUsage();
+                IUnknownVector foundAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(queryResultRow.FoundStream);
+                foundAttributes.ReportMemoryUsage();
+
+                cancelToken.ThrowIfCancellationRequested();
+
+                // If the original file ID differs from the expected file ID, search the
+                // original file's attribute hierarchy to find the comparison attributes
+                // in a proposed document pagination hierarchy.
+                // We know to be searching the pagination source document data because
+                // if manual pagination had triggered rule execution on the expected file
+                // (or even rules had been run after-the-fact on the expected file), the
+                // more recent storage of the found attribute set would trigger that to
+                // be used as the comparison.
+                if (queryResultRow.ExpectedFileID != queryResultRow.OriginalFileID)
+                {
+                    foundAttributes = GetFoundAttributesFromPaginationSource(foundAttributes, queryResultRow);
+                }
+
+                // Compare the VOAs
+                var output = AttributeTreeComparer.CompareAttributes(
+                        expected: expectedAttributes,
+                        found: foundAttributes,
+                        ignoreXPath: XPathOfAttributesToIgnore,
+                        containerXPath: XPathOfContainerOnlyAttributes,
+                        cancelToken: cancelToken)
+                    .ToList();
+
+                // Add the comparison results to the Results
+                var statsToStore = output.AggregateStatistics(cancelToken).ToList();
+
+                queriesToRunInBatch.Enqueue(AddAccuracyDataQueryToList(statsToStore, queryResultRow));
+            }
+        }
 
         /// <summary>
         /// Called after this instance is deserialized.
