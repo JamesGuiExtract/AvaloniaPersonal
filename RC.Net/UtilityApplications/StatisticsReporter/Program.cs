@@ -104,7 +104,7 @@ namespace StatisticsReporter
                 dcSettings.FileSettings.TypeOfStatistics = ReportSettings.Settings.TypeOfStatistics;
                 dcSettings.FileSettings.XPathToIgnore = ReportSettings.Settings.XPathOfAttributesToIgnore;
                 dcSettings.FileSettings.XPathOfContainerOnlyAttributes = ReportSettings.Settings.XPathOfContainerOnlyAttributes;
-                dcSettings.FileSettings.PathsRequiredToBeCorrect = ReportSettings.Settings.PathsRequiredToBeCorrect.Cast<string>();
+                dcSettings.FileSettings.PathsRequiredToBeCorrect = ReportSettings.Settings.PathsRequiredToBeCorrect?.Cast<string>();
                 dcSettings.ExpectedAttributeSetName = ReportSettings.Settings.ExpectedAttributeSetName;
                 dcSettings.FoundAttributeSetName = ReportSettings.Settings.FoundAttributeSetName;
 
