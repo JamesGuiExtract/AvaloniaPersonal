@@ -11,6 +11,7 @@ using System.Transactions;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace Extract.UtilityApplications.MachineLearning
 {
@@ -41,7 +42,8 @@ namespace Extract.UtilityApplications.MachineLearning
             JOIN FileTaskSession ON FileTaskSessionID = FileTaskSession.ID
                 WHERE Description = @AttributeSetName
                 AND AttributeSetForFile.ID > @LastIDProcessed
-                AND FileTaskSession.DateTimeStamp >= @StartDate";
+                AND FileTaskSession.DateTimeStamp >= @StartDate
+            ORDER BY AttributeSetForFile.ID";
 
         static readonly string _GET_NEW_DATA_COUNT =
             @"SELECT COUNT(*)
@@ -51,6 +53,9 @@ namespace Extract.UtilityApplications.MachineLearning
                 WHERE Description = @AttributeSetName
                 AND AttributeSetForFile.ID > @LastIDProcessed
                 AND FileTaskSession.DateTimeStamp >= @StartDate";
+
+        static readonly string _TRAINING_DATA_COLLECTOR_APPLICATION =
+            Path.Combine(FileSystemMethods.CommonComponentsPath, "TrainingDataCollector.exe");
 
         #endregion Constants
 
@@ -159,6 +164,17 @@ namespace Extract.UtilityApplications.MachineLearning
         [DataMember]
         public TimeSpan LimitProcessingToMostRecent { get; set; } = TimeSpan.FromDays(30);
 
+        /// <summary>
+        /// Maximum number of documents to process in a batch. If less than 1 then a heuristic will be used.
+        /// </summary>
+        [DataMember]
+        public int MaxBatchSize { get; set; } = 0;
+
+        /// <summary>
+        /// Use the random number generator seed value from the .lm or .annotator file to divide data into training/testing sets. Useful for nunit tests.
+        /// </summary>
+        public bool UseRandomSeedFromDataGenerator { get; set; } = false;
+
         #endregion Properties
 
         #region Constructors
@@ -203,7 +219,7 @@ namespace Extract.UtilityApplications.MachineLearning
                     }
                 }
 
-                AppendToLog(UtilityMethods.FormatCurrent($"{availableIDs.Count} records to process"));
+                AppendToLog(UtilityMethods.FormatCurrent($"{availableIDs.Count} files to process"));
 
                 // If no new data since last processed, return
                 if (availableIDs.Count == 0)
@@ -211,64 +227,84 @@ namespace Extract.UtilityApplications.MachineLearning
                     return;
                 }
 
-                if (ModelType == ModelType.NamedEntityRecognition)
-                {
-                    var settings = NERAnnotation.NERAnnotatorSettings.LoadFrom(QualifiedDataGeneratorPath);
-                    settings.UseDatabase = true;
-                    settings.DatabaseServer = DatabaseServer;
-                    settings.DatabaseName = DatabaseName;
-                    settings.AttributeSetName = AttributeSetName;
-                    settings.ModelName = QualifiedModelName;
-                    settings.UseAttributeSetForTypes = UseAttributeSetForExpectedValues;
-                    if (OverrideTrainingTestingSplit)
-                    {
-                        settings.PercentToUseForTestingSet = 100 - TrainingPercent;
-                    }
+                var (maxBatchSize, testingPercent, randomSeed) = GetMaxBatchSizeTestingPercentAndRandomSeed();
 
+                using (var settingsFile = new TemporaryFile(false))
+                using (var outputFile = new TemporaryFile(false))
+                {
+                    File.WriteAllText(settingsFile.FileName, ToJson());
+
+                    List<string[]> data = null;
+                    IEnumerable<string[]> trainingData = null;
+                    IEnumerable<string[]> testingData = null;
                     ProcessInVariableBatches(availableIDs,
                         executeBeforeTransaction: (lowestIDToProcess, highestIDToProcess) =>
                         {
-                            settings.FirstIDToProcess = lowestIDToProcess;
-                            settings.LastIDToProcess = highestIDToProcess;
+                            // Make sure the output file is empty
+                            File.WriteAllText(outputFile.FileName, "");
+
+                            var args = new[]
+                            {
+                                settingsFile.FileName,
+                                "/databaseServer", DatabaseServer,
+                                "/databaseName", DatabaseName,
+                                "/rootDir", string.IsNullOrEmpty(RootDir) ? Directory.GetCurrentDirectory() : Path.GetFullPath(RootDir),
+                                "/processSingleBatch",
+                                UtilityMethods.FormatInvariant($"{lowestIDToProcess}"),
+                                UtilityMethods.FormatInvariant($"{highestIDToProcess}"),
+                                outputFile.FileName
+                            };
+
+                            AppendToLog(UtilityMethods.FormatCurrent($"Processing from AttributeSetForFile ID {lowestIDToProcess} to {highestIDToProcess}"));
+
+                            int exitCode = SystemMethods.RunExtractExecutable(_TRAINING_DATA_COLLECTOR_APPLICATION, args,
+                                out string outputMessage, out string _,
+                                cancelToken, cancelToken != default(CancellationToken));
+
+                            if (exitCode != 0)
+                            {
+                                throw new ExtractException("ELI49562", "Data collector exited unexpectedly");
+                            }
+
+                            data = new List<string[]>();
+                            using (var csvReader = new Microsoft.VisualBasic.FileIO.TextFieldParser(outputFile.FileName))
+                            {
+                                csvReader.Delimiters = new[] { "," };
+                                csvReader.CommentTokens = new[] { "//", "#" };
+                                while (!csvReader.EndOfData)
+                                {
+                                    data.Add(csvReader.ReadFields());
+                                }
+                            }
+
+                            var rng = randomSeed is int seed ? new Random(seed) : null;
+                            CollectionMethods.Shuffle(data, rng); 
+                            int testingCount = testingPercent * data.Count / 100;
+                            testingData = data.Take(testingCount);
+                            trainingData = data.Skip(testingCount);
+
+                            var updatedSettings = FromJson(File.ReadAllText(settingsFile.FileName));
+                            UpdateFromStatus(updatedSettings.Status);
+                            if (!string.IsNullOrWhiteSpace(outputMessage))
+                            {
+                                AppendToLog(outputMessage);
+                            }
                         },
                         executeInTransaction: () =>
                         {
-                            NERAnnotation.NERAnnotator.Process(settings, _ => { }, cancelToken, false);
+                            var rowsAdded = WriteCsvToDB(testingData, false);
+                            rowsAdded += WriteCsvToDB(trainingData, true);
+                            if (rowsAdded != data.Count)
+                            {
+                                AppendToLog(UtilityMethods.FormatCurrent($"Attempted to write {data.Count} MLData records for {QualifiedModelName} but {rowsAdded} were added"));
+                            }
+                            else
+                            {
+                                AppendToLog(UtilityMethods.FormatCurrent($"Wrote {rowsAdded} MLData records for {QualifiedModelName}"));
+                            }
                         },
-                        cancellationToken: cancelToken);
-                }
-                else if (ModelType == ModelType.LearningMachine)
-                {
-                    using (var machine = LearningMachine.Load(QualifiedDataGeneratorPath))
-                    {
-                        if (OverrideTrainingTestingSplit)
-                        {
-                            machine.InputConfig.TrainingSetPercentage = TrainingPercent;
-                        }
-
-                        IEnumerable<IEnumerable<string>> trainingData = null;
-                        IEnumerable<IEnumerable<string>> testingData = null;
-
-                        ProcessInVariableBatches(availableIDs,
-                            executeBeforeTransaction: (lowestIDToProcess, highestIDToProcess) =>
-                            {
-                                (trainingData, testingData) = machine.GetDataToWriteToDatabase(cancelToken,
-                                    DatabaseServer, DatabaseName, AttributeSetName,
-                                    lowestIDToProcess, highestIDToProcess, UseAttributeSetForExpectedValues,
-                                    RunRuleSetForCandidateOrFeatures, RunRuleSetIfVoaIsMissing,
-                                    QualifiedFeatureRuleSetPath);
-                            },
-                            executeInTransaction: () =>
-                            {
-                                WriteCsvToDB(trainingData, true);
-                                WriteCsvToDB(testingData, false);
-                            },
-                            cancellationToken: cancelToken);
-                    }
-                }
-                else
-                {
-                    throw new ExtractException("ELI45434", "Unknown model type");
+                        cancellationToken: cancelToken,
+                        maxBatchSize: maxBatchSize);
                 }
             }
             catch (Exception ex)
@@ -279,6 +315,139 @@ namespace Extract.UtilityApplications.MachineLearning
             finally
             {
                 _processing = false;
+            }
+        }
+
+        private List<long> GetAvailableIDs()
+        {
+            var availableIDs = new List<long>();
+            using (var connection = NewSqlDBConnection())
+            {
+                connection.Open();
+
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = _GET_AVAILABLE_IDS;
+                    cmd.Parameters.AddWithValue("@AttributeSetName", AttributeSetName);
+                    cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
+                    cmd.Parameters.AddWithValue("@StartDate", DateTime.Now.Add(-LimitProcessingToMostRecent));
+
+                    var reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        availableIDs.Add(reader.GetInt64(0));
+                    }
+                }
+            }
+            return availableIDs;
+        }
+
+        private (int maxBatchSize, int testingPercent, int? randomSeed) GetMaxBatchSizeTestingPercentAndRandomSeed()
+        {
+            int testingPercent = -1;
+
+            bool isBatchSizeSet = MaxBatchSize > 0;
+            int maxBatchSize = isBatchSizeSet ? MaxBatchSize : 500;
+            int? randomSeed = null;
+
+            if (OverrideTrainingTestingSplit)
+            {
+                testingPercent = (100 - TrainingPercent);
+                if (isBatchSizeSet && !UseRandomSeedFromDataGenerator)
+                {
+                    return (maxBatchSize, testingPercent, randomSeed);
+                }
+            }
+
+            if (ModelType == ModelType.LearningMachine)
+            {
+                using (var machine = LearningMachine.Load(QualifiedDataGeneratorPath))
+                {
+                    if (machine.Encoder.MachineUsage == LearningMachineUsage.AttributeCategorization)
+                    {
+                        maxBatchSize = 5;
+                    }
+                    if (!OverrideTrainingTestingSplit)
+                    {
+                        testingPercent = 100 - machine.InputConfig.TrainingSetPercentage;
+                    }
+                    if (UseRandomSeedFromDataGenerator)
+                    {
+                        randomSeed = machine.RandomNumberSeed;
+                    }
+                }
+            }
+            else if (!OverrideTrainingTestingSplit || UseRandomSeedFromDataGenerator)
+            {
+                var settings = NERAnnotation.NERAnnotatorSettings.LoadFrom(QualifiedDataGeneratorPath);
+                if (!OverrideTrainingTestingSplit)
+                {
+                    testingPercent = settings.PercentToUseForTestingSet;
+                }
+                if (UseRandomSeedFromDataGenerator)
+                {
+                    randomSeed = settings.RandomSeedForSetDivision;
+                }
+            }
+
+            return (maxBatchSize, testingPercent, randomSeed);
+        }
+
+        public void ProcessSingleBatch(long lowestIDToProcess, long highestIDToProcess, string outputCsvPath, CancellationToken cancelToken)
+        {
+            try
+            {
+                if (ModelType == ModelType.NamedEntityRecognition)
+                {
+                    var settings = NERAnnotation.NERAnnotatorSettings.LoadFrom(QualifiedDataGeneratorPath);
+                    settings.UseDatabase = true;
+                    settings.DatabaseServer = DatabaseServer;
+                    settings.DatabaseName = DatabaseName;
+                    settings.AttributeSetName = AttributeSetName;
+                    settings.ModelName = null; // Write to CSV file, not the database
+                    settings.UseAttributeSetForTypes = UseAttributeSetForExpectedValues;
+                    settings.FirstIDToProcess = lowestIDToProcess;
+                    settings.LastIDToProcess = highestIDToProcess;
+                    settings.FailIfOutputFileExists = false;
+
+                    // Write all files to one explicit file
+                    settings.PercentToUseForTestingSet = 0;
+                    settings.TrainingOutputFileName = outputCsvPath;
+
+                    NERAnnotation.NERAnnotator.Process(settings, _ => { }, cancelToken, false);
+                }
+                else if (ModelType == ModelType.LearningMachine)
+                {
+                    using (var machine = LearningMachine.Load(QualifiedDataGeneratorPath))
+                    {
+                        machine.InputConfig.TrainingSetPercentage = 0; // Get all data in one list
+
+                        var (_, testingData) =
+                            machine.GetDataToWriteToDatabase(
+                                cancelToken: cancelToken,
+                                databaseServer: DatabaseServer,
+                                databaseName: DatabaseName,
+                                attributeSetName: AttributeSetName,
+                                lowestIDToProcess: lowestIDToProcess,
+                                highestIDToProcess: highestIDToProcess,
+                                useAttributeSetForExpected: UseAttributeSetForExpectedValues,
+                                runRuleSetForFeatures: RunRuleSetForCandidateOrFeatures,
+                                runRuleSetIfFeaturesAreMissing: RunRuleSetIfVoaIsMissing,
+                                featureRuleSetName: QualifiedFeatureRuleSetPath
+                                );
+                        var data = testingData.Select(record => string.Join(",", record.Select(s => s.QuoteIfNeeded("\"", ","))));
+
+                        File.WriteAllLines(outputCsvPath, data);
+                    }
+                }
+                else
+                {
+                    throw new ExtractException("ELI45434", "Unknown model type");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49563");
             }
         }
 
@@ -495,17 +664,19 @@ namespace Extract.UtilityApplications.MachineLearning
             }
         }
 
+
         /// <summary>
         /// Runs data collection and storage actions for batches of files,
         /// retrying with small batch size if there is a failure
         /// </summary>
         private void ProcessInVariableBatches(List<long> availableIDs,
             Action<long, long> executeBeforeTransaction, Action executeInTransaction,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken, int maxBatchSize)
         {
-            // Collect/add data in batches of 500 records at a time to mitigate memory issues
-            int batchSize = 500;
-            for (int i = 0; i < availableIDs.Count; i += batchSize)
+            // Collect/add data in batches to mitigate memory issues
+            int batchSize = maxBatchSize;
+            int i = 0;
+            while (i < availableIDs.Count)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -532,48 +703,73 @@ namespace Extract.UtilityApplications.MachineLearning
 
                         ts.Complete();
                     }
+                    i += batchSize;
+
+                    // In case batch size has been decreased unnecessarily much,
+                    // increase it for the next iteration
+                    if (batchSize < maxBatchSize)
+                    {
+                        batchSize = Math.Min(batchSize * 2, maxBatchSize);
+                    }
                 }
 
                 try
                 {
                     Run();
-
-                    // In case batch size has been decreased unnecessarily much,
-                    // increase it for the next iteration
-                    if (batchSize < 500)
-                    {
-                        batchSize = Math.Min(batchSize * 2, 500);
-                    }
                 }
                 // In case some giant file has caused a transaction to timeout
                 // retry with smaller batch size
                 catch (Exception ex)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    var uex = new ExtractException("ELI46425", UtilityMethods.FormatCurrent(
-                            $"Application trace: Error processing with batch size of {batchSize}. ",
-                            $"Retrying with batch size of 1"),
-                        ex);
-                    uex.Log();
-                    batchSize = 1;
-
                     try
                     {
-                        Run();
+                        if (batchSize > 1)
+                        {
+                            var uex = new ExtractException("ELI46425", UtilityMethods.FormatCurrent(
+                                    $"Application trace: Error processing with batch size of {batchSize}. ",
+                                    $"Retrying with batch size of 1"),
+                                ex);
+                            uex.Log();
+                            AppendToLog(uex.Message);
+                            batchSize = 1;
+
+                            Run();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
                     catch (Exception ex2)
                     {
                         cancellationToken.ThrowIfCancellationRequested();
-                        var uex2 = new ExtractException("ELI46427", UtilityMethods.FormatCurrent(
+                        var uex = new ExtractException("ELI46427", UtilityMethods.FormatCurrent(
                                 $"Application trace: Error processing with batch size of {batchSize}. ",
                                 $"Skipping file"),
                             ex2);
-                        uex2.Log();
+                        uex.Log();
+                        AppendToLog(uex.Message);
 
                         // Since batch size of 1 failed, the first file may just be impossible to process
                         // so skip it and try with normal batch size
+                        using (var ts = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions
+                        {
+                            IsolationLevel = IsolationLevel.ReadCommitted,
+                            Timeout = TransactionManager.MaximumTimeout
+                        }))
+                        {
+                            // Save status to the DB each loop
+                            LastIDProcessed = lowestIDToProcess;
+                            SaveStatus();
+
+                            ts.Complete();
+                        }
                         i++;
-                        batchSize = 500;
+                        batchSize = maxBatchSize;
+
+                        // Run here so that a failure this time will end the loop
+                        // (e.g., don't skip all the files if there is some temporary issue that needs to be manually resolved)
                         Run();
                     }
                 }
@@ -583,7 +779,7 @@ namespace Extract.UtilityApplications.MachineLearning
         /// <summary>
         /// Writes LearningMachine data to DB
         /// </summary>
-        private void WriteCsvToDB(IEnumerable<IEnumerable<string>> data, bool isTrainingSet)
+        private int WriteCsvToDB(IEnumerable<IEnumerable<string>> data, bool isTrainingSet)
         {
             using (var connection = NewSqlDBConnection())
             {
@@ -591,7 +787,9 @@ namespace Extract.UtilityApplications.MachineLearning
 
                 var cmdText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
                 SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
-                FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName";
+                FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName
+                SELECT @@ROWCOUNT";
+                int rowsAdded = 0;
                 foreach (var record in data)
                 {
                     using (var cmd = new SqlCommand(cmdText, connection))
@@ -599,11 +797,18 @@ namespace Extract.UtilityApplications.MachineLearning
                         cmd.Parameters.AddWithValue("@IsTrainingData", isTrainingSet.ToString());
                         cmd.Parameters.AddWithValue("@ModelName", QualifiedModelName);
                         var ussPath = record.First();
-                        cmd.Parameters.AddWithValue("@Data", string.Join(",", record.Skip(2).Select(s => s.QuoteIfNeeded("\"", ","))));
+                        var featureData = record.Skip(2); // Second item is index in the file and isn't needed
+                        // Data for NER is a single blob of text, not a CSV, so doesn't need escaping
+                        if (ModelType != ModelType.NamedEntityRecognition)
+                        {
+                            featureData = featureData.Select(s => s.QuoteIfNeeded("\"", ","));
+                        }
+                        cmd.Parameters.AddWithValue("@Data", string.Join(",", featureData));
                         cmd.Parameters.AddWithValue("@FileName", ussPath.Substring(0, ussPath.Length - 4));
-                        cmd.ExecuteNonQuery();
+                        rowsAdded += (int)cmd.ExecuteScalar();
                     }
                 }
+                return rowsAdded;
             }
         }
 

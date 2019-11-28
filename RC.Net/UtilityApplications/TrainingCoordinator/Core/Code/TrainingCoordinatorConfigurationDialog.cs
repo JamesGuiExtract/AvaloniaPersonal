@@ -429,17 +429,6 @@ namespace Extract.UtilityApplications.MachineLearning
                 }
                 else
                 {
-                    // https://extract.atlassian.net/browse/ISSUE-15775
-                    if (Process.GetCurrentProcess().MainModule.FileName.EndsWith("FAMDBAdmin.exe", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var result = MessageBox.Show("There are known issues with running rules from the DB Admin. Are you sure?",
-                            "Confirm bad decision", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
-                        if (result == DialogResult.No)
-                        {
-                            return;
-                        }
-                    }
-
                     _globalSettingsGroupBox.Enabled =
                         _mlServicesTabPage.Enabled =
                         _okButton.Enabled =

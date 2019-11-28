@@ -1234,7 +1234,11 @@ namespace Extract.AttributeFinder
                         {
                             spatialString.Value.LoadFrom(ussPath, false);
                             spatialString.Value.ReportMemoryUsage();
-                            var doc = new AFDocument { Text = spatialString.Value };
+                            var doc = new AFDocument
+                            {
+                                Text = spatialString.Value,
+                                ParallelRunMode = EParallelRunMode.kNoParallelization
+                            };
                             var voa = ruleset.Value.ExecuteRulesOnText(doc, null, alternateComponentDataDir, null);
                             voa.ReportMemoryUsage();
 

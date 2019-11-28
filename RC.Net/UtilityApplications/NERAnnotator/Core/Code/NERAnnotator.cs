@@ -122,25 +122,23 @@ namespace Extract.UtilityApplications.NERAnnotation
                     !string.IsNullOrWhiteSpace(_settings.AttributeSetName));
 
             }
+
+            if (string.IsNullOrEmpty(_settings.TrainingOutputFileName))
+            {
+                _trainingOutputFile = _settings.OutputFileBaseName + ".train.txt";
+            }
             else
             {
-                if (string.IsNullOrEmpty(_settings.TrainingOutputFileName))
-                {
-                    _trainingOutputFile = _settings.OutputFileBaseName + ".train.txt";
-                }
-                else
-                {
-                    _trainingOutputFile = _settings.TrainingOutputFileName;
-                }
+                _trainingOutputFile = _settings.TrainingOutputFileName;
+            }
 
-                if (string.IsNullOrEmpty(_settings.TestingOutputFileName))
-                {
-                    _testingOutputFile = _settings.OutputFileBaseName + ".test.txt";
-                }
-                else
-                {
-                    _testingOutputFile = _settings.TestingOutputFileName;
-                }
+            if (string.IsNullOrEmpty(_settings.TestingOutputFileName))
+            {
+                _testingOutputFile = _settings.OutputFileBaseName + ".test.txt";
+            }
+            else
+            {
+                _testingOutputFile = _settings.TestingOutputFileName;
             }
 
             _updateStatus = updateStatus;
@@ -168,6 +166,10 @@ namespace Extract.UtilityApplications.NERAnnotation
                 {
                     annotator.Process(processPagesInParallel);
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -443,6 +445,10 @@ namespace Extract.UtilityApplications.NERAnnotation
                     ProcessInput(testingFiles, appendToTrainingSet: false, processPagesInParallel: processPagesInParallel);
                 }
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI44860");
@@ -588,19 +594,29 @@ namespace Extract.UtilityApplications.NERAnnotation
         /// <param name="appendToTrainingSet">Whether to append to the training output file (if true) or the testing output file (if false)</param>
         void ProcessInput((string ussPath, int page)[] files, bool appendToTrainingSet, bool processPagesInParallel)
         {
-            try
+            _cancellationToken.ThrowIfCancellationRequested();
+
+            var outputFile = appendToTrainingSet ? _trainingOutputFile : _testingOutputFile;
+            var statusMessage = appendToTrainingSet
+                ? "Files processed/skipped for training set: {0:N0} / {1:N0}"
+                : "Files processed/skipped for testing set:  {0:N0} / {1:N0}";
+
+            var records = processPagesInParallel ? GetRecordsForInputParallel(files, statusMessage) : GetRecordsForInput(files, statusMessage);
+            if (_settings.UseDatabase)
             {
-                _cancellationToken.ThrowIfCancellationRequested();
-
-                var outputFile = appendToTrainingSet ? _trainingOutputFile : _testingOutputFile;
-                var statusMessage = appendToTrainingSet
-                    ? "Files processed/skipped for training set: {0:N0} / {1:N0}"
-                    : "Files processed/skipped for testing set:  {0:N0} / {1:N0}";
-
-                var records = processPagesInParallel ? GetRecordsForInputParallel(files, statusMessage) : GetRecordsForInput(files, statusMessage);
-                if (_settings.UseDatabase)
+                // If model name is null then write to a file
+                if (string.IsNullOrEmpty(_settings.ModelName))
                 {
-                    var recordsList = records.ToList();
+                    File.AppendAllLines(outputFile, records.Select(t =>
+                        // Format data with an empty index field to match LearningMachine output
+                        t.fileName.QuoteIfNeeded("\"", ",") + ",," + t.data.QuoteIfNeeded("\"", ",")
+                    ));
+                }
+                else
+                {
+                    // If processing pages in parallel then records will already be a list but otherwise it will be an enumerable
+                    // Ensure all processing is completed before opening the connection
+                    var recordsList = processPagesInParallel ? (List<(string fileName, string data)>) records : records.ToList();
 
                     using (var connection = NewSqlDBConnection())
                     {
@@ -612,8 +628,8 @@ namespace Extract.UtilityApplications.NERAnnotation
                                 using (var cmd = connection.CreateCommand())
                                 {
                                     cmd.CommandText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
-                                    SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
-                                    FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName";
+                                SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
+                                FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName";
                                     cmd.Parameters.AddWithValue("@IsTrainingData", appendToTrainingSet.ToString());
                                     cmd.Parameters.AddWithValue("@Data", data);
                                     cmd.Parameters.AddWithValue("@ModelName", _settings.ModelName);
@@ -628,31 +644,27 @@ namespace Extract.UtilityApplications.NERAnnotation
                         }
                     }
                 }
-                else if (processPagesInParallel)
-                {
-                    // Write extra line as a document separator
-                    File.AppendAllLines(outputFile, records.Select(t => t.data));
-
-                    // Write out again with filename as separator for debugging purposes
-                    File.AppendAllLines(outputFile + ".WithFileNames.txt", records.Select(t => t.data.TrimEnd() + Environment.NewLine + t.fileName));
-                }
-                else
-                {
-                    // Write out results as they are available and save for second file
-                    List<(string fileName, string data)> cached = new List<(string fileName, string data)>();
-                    File.AppendAllLines(outputFile, records.Select(t =>
-                    {
-                        cached.Add(t);
-                        return t.data;
-                    }));
-
-                    // Write out again with filename as separator for debugging purposes
-                    File.AppendAllLines(outputFile + ".WithFileNames.txt", cached.Select(t => t.data.TrimEnd() + Environment.NewLine + t.fileName));
-                }
             }
-            catch (OperationCanceledException)
+            else if (processPagesInParallel) // records is a List so there is no problem iterating it twice
             {
-                return;
+                // Write extra line as a document separator
+                File.AppendAllLines(outputFile, records.Select(t => t.data));
+
+                // Write out again with filename as separator for debugging purposes
+                File.AppendAllLines(outputFile + ".WithFileNames.txt", records.Select(t => t.data.TrimEnd() + Environment.NewLine + t.fileName));
+            }
+            else
+            {
+                // Write out results as they are available and save for second file
+                List<(string fileName, string data)> cached = new List<(string fileName, string data)>();
+                File.AppendAllLines(outputFile, records.Select(t =>
+                {
+                    cached.Add(t);
+                    return t.data;
+                }));
+
+                // Write out again with filename as separator for debugging purposes
+                File.AppendAllLines(outputFile + ".WithFileNames.txt", cached.Select(t => t.data.TrimEnd() + Environment.NewLine + t.fileName));
             }
         }
 

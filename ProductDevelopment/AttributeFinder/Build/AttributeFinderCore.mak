@@ -249,7 +249,11 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.DataCaptureStats.dll" /mapout:"$(BinariesFolder)\Map\Extract.DataCaptureStats.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\ZstdNet.dll" /mapout:"$(BinariesFolder)\Map\ZstdNet.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\NERAnnotator.exe" /mapout:"$(BinariesFolder)\Map\mapNERAnnotator.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	editbin.exe /largeaddressaware "$(BinariesFolder)\Obfuscated\NERAnnotator.exe"
+	sn -Ra "$(BinariesFolder)\Obfuscated\NERAnnotator.exe" "$(StrongNameKeyDir)\ExtractInternalKey.snk"
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\TrainingDataCollector.exe" /mapout:"$(BinariesFolder)\Map\mapTrainingDataCollector.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	editbin.exe /largeaddressaware "$(BinariesFolder)\Obfuscated\TrainingDataCollector.exe"
+	sn -Ra "$(BinariesFolder)\Obfuscated\TrainingDataCollector.exe" "$(StrongNameKeyDir)\ExtractInternalKey.snk"
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\TrainingCoordinator.exe" /mapout:"$(BinariesFolder)\Map\mapTrainingCoordinator.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\LearningMachineTrainer.exe" /mapout:"$(BinariesFolder)\Map\mapLMTrainer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\MLModelTrainer.exe" /mapout:"$(BinariesFolder)\Map\mapMLModelTrainer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml

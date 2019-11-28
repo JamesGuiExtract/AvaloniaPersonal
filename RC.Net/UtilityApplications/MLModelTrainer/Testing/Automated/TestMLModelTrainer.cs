@@ -26,7 +26,6 @@ namespace Extract.UtilityApplications.MachineLearning.Test
     /// Unit tests for MLModelTrainer class
     /// </summary>
     [TestFixture]
-    [NUnit.Framework.Category("MLModelTrainer")]
     public class TestMLModelTrainer
     {
         #region Fields
@@ -452,7 +451,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     trainer.Process(CancellationToken.None);
 
                     var trainingOutput = File.ReadAllText(dest.FileName);
-                    Assert.AreEqual(18324, trainingOutput.Length);
+                    Assert.AreEqual(17721, trainingOutput.Length);
                     Assert.AreEqual("Washington County , Oregon 1 000 123456 ", trainingOutput.Substring(0, 40));
                 }
             }
@@ -512,11 +511,11 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             try
             {
                 TestTrainingDataCollector.Setup();
-                TestTrainingDataCollector.CreateDatabase();
+                // With change to divide data without duplicating it when there is only one example of a doc type
+                // this training set will not work (there is only one of everything) without modification.
+                // See https://extract.atlassian.net/browse/ISSUE-16813
+                TestTrainingDataCollector.CreateDatabase(duplicateData: true);
                 TestTrainingDataCollector.Process(learningMachine: true);
-
-                _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-                Directory.CreateDirectory(_inputFolder.Last());
 
                 var dest = _testFiles.GetFile("Resources.docClassifier.lm");
                 LearningMachine lm = LearningMachine.Load(dest);
@@ -555,11 +554,11 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             try
             {
                 TestTrainingDataCollector.Setup();
-                TestTrainingDataCollector.CreateDatabase();
+                // With change to divide data without duplicating it when there is only one example of a doc type
+                // this training set will not work (there is only one of everything) without modification.
+                // See https://extract.atlassian.net/browse/ISSUE-16813
+                TestTrainingDataCollector.CreateDatabase(duplicateData: true);
                 TestTrainingDataCollector.Process(learningMachine: true);
-
-                _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-                Directory.CreateDirectory(_inputFolder.Last());
 
                 var dest = _testFiles.GetFile("Resources.docClassifier.lm");
                 LearningMachine lm = LearningMachine.Load(dest);
@@ -615,11 +614,11 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             try
             {
                 TestTrainingDataCollector.Setup();
-                TestTrainingDataCollector.CreateDatabase();
+                // With change to divide data without duplicating it when there is only one example of a doc type
+                // this training set will not work (there is only one of everything) without modification.
+                // See https://extract.atlassian.net/browse/ISSUE-16813
+                TestTrainingDataCollector.CreateDatabase(duplicateData: true);
                 TestTrainingDataCollector.Process(learningMachine: true);
-
-                _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-                Directory.CreateDirectory(_inputFolder.Last());
 
                 var dest = _testFiles.GetFile("Resources.docClassifier.lm");
                 var uss = _testFiles.GetFile("Resources.Example02.tif.uss");
@@ -805,7 +804,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         // Test unacceptable result: f1 score drops more than the allowable amount or drops below the minimum allowed
         // train.bat will write the word "Training" to the <TempModelPath>
         // if the testing result is deemed acceptable, this file will be copied to the destination
-        [Test, Category("Interactive")]
+        [Test, Category("Interactive_MLModelTrainer")]
         public static void Interactive_UnacceptableResult()
         {
             try

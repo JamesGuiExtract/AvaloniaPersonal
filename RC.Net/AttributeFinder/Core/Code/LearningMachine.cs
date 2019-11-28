@@ -1049,7 +1049,7 @@ namespace Extract.AttributeFinder
                 }
 
                 var (trainingData, testingData) = CombineFeatureVectorsAndAnswers(featureVectors, answerCodes, ussPathsPerExample, _ => { }, cancelToken);
-                return (trainingData?.ToArray() ?? new IList<string>[0], testingData?.ToArray() ?? new IList<string>[0]);
+                return (trainingData?.ToList() ?? new List<IList<string>>(), testingData?.ToList() ?? new List<IList<string>>());
             }
             catch (Exception ex)
             {

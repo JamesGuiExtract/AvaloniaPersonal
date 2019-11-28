@@ -100,8 +100,9 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         /// <summary>
         /// Put resource test files into a DB. These images are from Demo_FlexIndex
         /// </summary>
+        /// <param name="duplicateData">Make a copy of each file so that there are duplicates</param>
         /// <returns>The path to the temp dir of documents in the DB</returns>
-        public static void CreateDatabase()
+        public static void CreateDatabase(bool duplicateData = false)
         {
             try
             {
@@ -156,6 +157,34 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                         closeConnection: i == numFiles);
 
                     fileProcessingDB.EndFileTaskSession(fileTaskSessionID, 0, 0, 0);
+                }
+
+                if (duplicateData)
+                {
+                    var dups = new List<string>();
+                    foreach (var fileName in Directory.GetFiles(_inputFolder.Last()))
+                    {
+                        var newName = Path.Combine(Path.GetDirectoryName(fileName), "Copy_" + Path.GetFileName(fileName));
+                        File.Copy(fileName, newName);
+
+                        if (newName.EndsWith(".tif"))
+                        {
+                            dups.Add(newName);
+                        }
+                    }
+                    foreach (var (tif, i) in dups.Select((path, i) => (path, i + numFiles)))
+                    {
+                        var rec = fileProcessingDB.AddFile(tif, "a", -1, EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false,
+                            out var _, out var _);
+
+                        var voa = tif + ".evoa";
+                        var voaData = afutility.GetAttributesFromFile(voa);
+                        int fileTaskSessionID = fileProcessingDB.StartFileTaskSession(_STORE_ATTRIBUTE_GUID, rec.FileID, rec.ActionID);
+                        attributeDBMgr.CreateNewAttributeSetForFile(fileTaskSessionID, _ATTRIBUTE_SET_NAME, voaData, false, true, true,
+                            closeConnection: i == numFiles * 2);
+
+                        fileProcessingDB.EndFileTaskSession(fileTaskSessionID, 0, 0, 0);
+                    }
                 }
 
                 fileProcessingDB.RecordFAMSessionStop();
@@ -280,6 +309,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     collector.ModelType = ModelType.LearningMachine;
                     collector.DatabaseServer = "(local)";
                     collector.DatabaseName = DBName;
+                    collector.UseRandomSeedFromDataGenerator = true;
 
                     collector.Process(System.Threading.CancellationToken.None);
                 }
@@ -294,6 +324,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     collector.DataGeneratorPath = annotatorSettingsPath;
                     collector.DatabaseServer = "(local)";
                     collector.DatabaseName = DBName;
+                    collector.UseRandomSeedFromDataGenerator = true;
 
                     collector.Process(System.Threading.CancellationToken.None);
                 }
@@ -505,14 +536,12 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 Process(learningMachine: true);
 
                 var expectedFile = _testFiles.GetFile("Resources.learningMachine.train.txt");
-                var expected = File.ReadAllText(expectedFile);
                 string trainingOutput = GetDataFromDB(trainingData: true);
-                CollectionAssert.AreEqual(expected, trainingOutput);
+                CompareExpectedFileToFoundText(expectedFile, trainingOutput);
 
                 expectedFile = _testFiles.GetFile("Resources.learningMachine.test.txt");
-                expected = File.ReadAllText(expectedFile);
                 string testingOutput = GetDataFromDB(trainingData: false);
-                CollectionAssert.AreEqual(expected, testingOutput);
+                CompareExpectedFileToFoundText(expectedFile, testingOutput);
             }
             finally
             {

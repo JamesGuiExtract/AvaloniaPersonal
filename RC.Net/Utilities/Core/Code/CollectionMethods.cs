@@ -442,19 +442,21 @@ namespace Extract.Utilities
         /// <param name="randomNumberGenerator">An instance of <see cref="System.Random"/> to be used
         /// to generate the permutation. If <see langword="null"/> then a thread-local, static instance
         /// will be used.</param>
-        public static void Shuffle<T>(T[] array, Random randomNumberGenerator=null)
+        public static void Shuffle<T>(IList<T> array, Random randomNumberGenerator=null)
         {
             try
             {
                 var rng = randomNumberGenerator ?? _shuffleRandom.Value;
 
-                int length = array.Length;
+                int length = array.Count;
 
                 for (int i = 0; i < length - 1; i++)
                 {
                     // Don't select from the entire array length on subsequent loops or the result will be biased
                     int j = rng.Next(i, length);
-                    UtilityMethods.Swap(ref array[i], ref array[j]);
+                    T tmp = array[i];
+                    array[i] = array[j];
+                    array[j] = tmp;
                 }
             }
             catch (Exception ex)
