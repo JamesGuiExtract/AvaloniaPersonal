@@ -216,7 +216,13 @@ open Fake.DotNet
 
 let numRetries = 3
 let mutable buildMode = "Debug"
-Environment.setEnvironVar "DevEnvDir" @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\"
+
+let vs2017Path = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\"
+let vs2019Path = @"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\"
+if System.IO.Directory.Exists vs2019Path
+then Environment.setEnvironVar "DevEnvDir" vs2019Path
+elif System.IO.Directory.Exists vs2017Path
+then Environment.setEnvironVar "DevEnvDir" vs2017Path
 
 // Targets
 Target.create "All.Clean" ignore
