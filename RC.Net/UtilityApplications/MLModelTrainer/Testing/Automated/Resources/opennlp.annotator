@@ -1,0 +1,21 @@
+TrainingInput: ''
+TestingInput: ''
+TestingSet: RandomlyPickedFromTrainingSet
+PercentToUseForTestingSet: 50
+RandomSeedForSetDivision: 0
+TypesVoaFunction: ''
+OutputFileBaseName: ''
+PercentUninterestingPagesToInclude: 0
+RandomSeedForPageInclusion: 0
+OutputSeparateFileForEachCategory: false
+FailIfOutputFileExists: true
+Format: OpenNLP
+SplitIntoSentences: true
+SentenceDetectionModelPath: en-sent.nlp.etf
+TokenizerType: LearnableTokenizer
+TokenizerModelPath: en-token.nlp.etf
+UseDatabase: true
+EntityDefinitions:
+- Category: '@Type'
+  CategoryIsXPath: true
+  RootQuery: /*/HCData|/*/MCData|/*/LCData|/*/Manual

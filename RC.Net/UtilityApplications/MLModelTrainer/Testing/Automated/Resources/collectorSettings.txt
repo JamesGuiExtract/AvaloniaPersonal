@@ -1,0 +1,1 @@
+{ "$type":"Extract.UtilityApplications.TrainingDataCollector.TrainingDataCollector, TrainingDataCollector", "ModelName":"Test", "AttributeSetName":"Expected", "LastIDProcessed":0, "Version":1, "ModelType": 0, "Description":"", "Schedule":null, UseAttributeSetForExpecteds:true, OverrideTrainingTestingSplit:false }

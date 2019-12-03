@@ -1,0 +1,4 @@
+Algorithm = MAXENT
+Cutoff = 5
+Iterations = 200
+Threads = 8

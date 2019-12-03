@@ -39,6 +39,24 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
+    <COMReference Include="ADODB">
+      <Guid>{2A75196C-D9EB-4129-B803-931327F72D5C}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="AttributeDbMgrComponentsLib">
+      <Guid>{0DF6DB5B-F788-42FC-AE9E-EF19CAA78D38}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
       <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -111,6 +129,9 @@
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
@@ -176,8 +197,45 @@
     <EmbeddedResource Include="Resources\copy.bat" />
     <EmbeddedResource Include="Resources\MLModelTrainerSettings.txt" />
     <EmbeddedResource Include="Resources\docClassifier.lm" />
-    <EmbeddedResource Include="Resources\Example02.tif.uss" />
     <EmbeddedResource Include="Resources\ComponentTrainingTestingData.txt" />
+    <EmbeddedResource Include="Resources\myFeatureGen.xml" />
+    <EmbeddedResource Include="Resources\myParams.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Example01.tif" />
+    <EmbeddedResource Include="Resources\Example01.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example01.tif.uss" />
+    <EmbeddedResource Include="Resources\Example02.tif" />
+    <EmbeddedResource Include="Resources\Example02.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example02.tif.uss" />
+    <EmbeddedResource Include="Resources\Example03.tif" />
+    <EmbeddedResource Include="Resources\Example03.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example03.tif.uss" />
+    <EmbeddedResource Include="Resources\Example04.tif" />
+    <EmbeddedResource Include="Resources\Example04.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example04.tif.uss" />
+    <EmbeddedResource Include="Resources\Example05.tif" />
+    <EmbeddedResource Include="Resources\Example05.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example05.tif.uss" />
+    <EmbeddedResource Include="Resources\Example06.tif" />
+    <EmbeddedResource Include="Resources\Example06.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example06.tif.uss" />
+    <EmbeddedResource Include="Resources\Example07.tif" />
+    <EmbeddedResource Include="Resources\Example07.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example07.tif.uss" />
+    <EmbeddedResource Include="Resources\Example08.tif" />
+    <EmbeddedResource Include="Resources\Example08.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example08.tif.uss" />
+    <EmbeddedResource Include="Resources\Example09.tif" />
+    <EmbeddedResource Include="Resources\Example09.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example09.tif.uss" />
+    <EmbeddedResource Include="Resources\Example10.tif" />
+    <EmbeddedResource Include="Resources\Example10.tif.evoa" />
+    <EmbeddedResource Include="Resources\Example10.tif.uss" />
+    <EmbeddedResource Include="Resources\opennlp.annotator" />
+    <EmbeddedResource Include="Resources\en-token.nlp.etf" />
+    <EmbeddedResource Include="Resources\en-sent.nlp.etf" />
+    <EmbeddedResource Include="Resources\collectorSettings.txt" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

@@ -1,0 +1,22 @@
+<generators>
+  <cache> 
+    <generators>
+      <window prevLength = "10" nextLength = "0">                
+        <token/>
+      </window>
+      <window prevLength = "4" nextLength = "2">                
+        <tokenclass/>
+      </window>
+      <definition/>
+      <prevmap/>
+      <bigram/>
+      <sentence begin="true" end="false"/>
+      <charngram min="2" max="6"/>
+      <window prevLength = "4" nextLength = "2">                
+        <tokenpattern/>
+      </window>
+      <prefix/>
+      <suffix/>
+    </generators>
+  </cache> 
+</generators>

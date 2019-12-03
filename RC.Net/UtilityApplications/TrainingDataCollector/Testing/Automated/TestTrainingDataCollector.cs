@@ -13,6 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.UtilityApplications.MachineLearning.Test
@@ -37,7 +38,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         /// </summary>
         static FAMTestDBManager<TestTrainingDataCollector> _testDbManager;
 
-        public static readonly string DBName = "_TestTrainingDataCollector_2DB1BD2B-2352-4F4D-AA62-AB215603B1C3";
+        static readonly string _DB_NAME = "_TestTrainingDataCollector_2DB1BD2B-2352-4F4D-AA62-AB215603B1C3";
         static readonly string _ATTRIBUTE_SET_NAME = "Expected";
         static readonly string _STORE_ATTRIBUTE_GUID = typeof(StoreAttributesInDBTask).GUID.ToString();
         static readonly string _MODEL_NAME = "Test";
@@ -100,14 +101,15 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         /// <summary>
         /// Put resource test files into a DB. These images are from Demo_FlexIndex
         /// </summary>
-        /// <param name="duplicateData">Make a copy of each file so that there are duplicates</param>
-        /// <returns>The path to the temp dir of documents in the DB</returns>
-        public static void CreateDatabase(bool duplicateData = false)
+        /// <returns>The name of the created database</returns>
+        public static string CreateDatabase([CallerMemberName] string dbSuffix = "")
         {
+            string dbName = _DB_NAME + dbSuffix;
+            var fileProcessingDB = _testDbManager.GetNewDatabase(dbName);
+
             try
             {
                 // Create DB
-                var fileProcessingDB = _testDbManager.GetNewDatabase(DBName);
                 fileProcessingDB.DefineNewAction("a");
                 fileProcessingDB.DefineNewMLModel(_MODEL_NAME);
                 var attributeDBMgr = new AttributeDBMgr
@@ -159,34 +161,6 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     fileProcessingDB.EndFileTaskSession(fileTaskSessionID, 0, 0, 0);
                 }
 
-                if (duplicateData)
-                {
-                    var dups = new List<string>();
-                    foreach (var fileName in Directory.GetFiles(_inputFolder.Last()))
-                    {
-                        var newName = Path.Combine(Path.GetDirectoryName(fileName), "Copy_" + Path.GetFileName(fileName));
-                        File.Copy(fileName, newName);
-
-                        if (newName.EndsWith(".tif"))
-                        {
-                            dups.Add(newName);
-                        }
-                    }
-                    foreach (var (tif, i) in dups.Select((path, i) => (path, i + numFiles)))
-                    {
-                        var rec = fileProcessingDB.AddFile(tif, "a", -1, EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false,
-                            out var _, out var _);
-
-                        var voa = tif + ".evoa";
-                        var voaData = afutility.GetAttributesFromFile(voa);
-                        int fileTaskSessionID = fileProcessingDB.StartFileTaskSession(_STORE_ATTRIBUTE_GUID, rec.FileID, rec.ActionID);
-                        attributeDBMgr.CreateNewAttributeSetForFile(fileTaskSessionID, _ATTRIBUTE_SET_NAME, voaData, false, true, true,
-                            closeConnection: i == numFiles * 2);
-
-                        fileProcessingDB.EndFileTaskSession(fileTaskSessionID, 0, 0, 0);
-                    }
-                }
-
                 fileProcessingDB.RecordFAMSessionStop();
                 fileProcessingDB.CloseAllDBConnections();
 
@@ -208,6 +182,8 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                         cmd.ExecuteNonQuery();
                     }
                 }
+
+                return dbName;
             }
             catch (Exception ex)
             {
@@ -218,14 +194,14 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         /// <summary>
         /// Modifies the date stamp of the stored data
         /// </summary>
-        public static void ModifyDateAttributesStored(DateTime date)
+        public static void ModifyDateAttributesStored(string dbName, DateTime date)
         {
             try
             {
                 SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
                 {
                     DataSource = "(local)",
-                    InitialCatalog = DBName,
+                    InitialCatalog = dbName,
                     IntegratedSecurity = true,
                     NetworkLibrary = "dbmssocn"
                 };
@@ -251,14 +227,14 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         /// Retrieves MLData
         /// </summary>
         /// <param name="trainingData">Whether to retrieve training data (if <c>true</c>) or testing data (if <c>false</c>)</param>
-        private static string GetDataFromDB(bool trainingData)
+        private static string GetDataFromDB(string dbName, bool trainingData)
         {
             string recordSeparator = "\r\n";
             // Build the connection string from the settings
             SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
             {
                 DataSource = "(local)",
-                InitialCatalog = DBName,
+                InitialCatalog = dbName,
                 IntegratedSecurity = true,
                 NetworkLibrary = "dbmssocn"
             };
@@ -293,7 +269,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         /// <summary>
         /// Runs the data collector process
         /// </summary>
-        public static void Process(bool learningMachine = false)
+        public static void Process(string dbName, bool learningMachine = false)
         {
             try
             {
@@ -308,7 +284,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     collector.DataGeneratorPath = learningMachinePath;
                     collector.ModelType = ModelType.LearningMachine;
                     collector.DatabaseServer = "(local)";
-                    collector.DatabaseName = DBName;
+                    collector.DatabaseName = dbName;
                     collector.UseRandomSeedFromDataGenerator = true;
 
                     collector.Process(System.Threading.CancellationToken.None);
@@ -323,7 +299,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     var collector = TrainingDataCollector.FromJson(File.ReadAllText(collectorSettings));
                     collector.DataGeneratorPath = annotatorSettingsPath;
                     collector.DatabaseServer = "(local)";
-                    collector.DatabaseName = DBName;
+                    collector.DatabaseName = dbName;
                     collector.UseRandomSeedFromDataGenerator = true;
 
                     collector.Process(System.Threading.CancellationToken.None);
@@ -349,25 +325,24 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("TrainingDataCollector")]
         public static void AllFilesExist()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
-
-                Process();
+                Process(dbName);
 
                 // Verify tags
                 var expectedFile = _testFiles.GetFile("Resources.opennlp.train.txt");
 
-                string trainingOutput = GetDataFromDB(trainingData: true);
+                string trainingOutput = GetDataFromDB(dbName, trainingData: true);
                 CompareExpectedFileToFoundText(expectedFile, trainingOutput);
 
                 expectedFile = _testFiles.GetFile("Resources.opennlp.test.txt");
-                var testingOutput = GetDataFromDB(trainingData: false);
+                var testingOutput = GetDataFromDB(dbName, trainingData: false);
                 CompareExpectedFileToFoundText(expectedFile, testingOutput);
             }
             finally
             {
-                _testDbManager.RemoveDatabase(DBName);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -375,30 +350,29 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("TrainingDataCollector")]
         public static void NoImageFilesExist()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
                 foreach(var fileName in Directory.GetFiles(_inputFolder.Last(), "*.tif"))
                 {
                     File.Delete(fileName);
                 }
 
-                Process();
+                Process(dbName);
 
                 // Verify tags
                 var expectedFile = _testFiles.GetFile("Resources.opennlp.train.txt");
 
-                string trainingOutput = GetDataFromDB(trainingData: true);
+                string trainingOutput = GetDataFromDB(dbName, trainingData: true);
                 CompareExpectedFileToFoundText(expectedFile, trainingOutput);
 
                 expectedFile = _testFiles.GetFile("Resources.opennlp.test.txt");
-                var testingOutput = GetDataFromDB(trainingData: false);
+                var testingOutput = GetDataFromDB(dbName, trainingData: false);
                 CompareExpectedFileToFoundText(expectedFile, testingOutput);
             }
             finally
             {
-                _testDbManager.RemoveDatabase(DBName);
-
+                _testDbManager.RemoveDatabase(dbName);
 
                 // Reset test files object to avoid complaints about deleted files
                 _testFiles.Dispose();
@@ -411,28 +385,28 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "USS")]
         public static void NoUSSFilesExist()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
                 foreach(var fileName in Directory.GetFiles(_inputFolder.Last(), "*.uss"))
                 {
                     File.Delete(fileName);
                 }
 
-                Process();
+                Process(dbName);
 
                 // Verify empty data
                 var expected = "";
 
-                string trainingOutput = GetDataFromDB(trainingData: true);
+                string trainingOutput = GetDataFromDB(dbName, trainingData: true);
                 Assert.AreEqual(expected, trainingOutput);
 
-                var testingOutput = GetDataFromDB(trainingData: false);
+                var testingOutput = GetDataFromDB(dbName, trainingData: false);
                 Assert.AreEqual(expected, testingOutput);
             }
             finally
             {
-                _testDbManager.RemoveDatabase(DBName);
+                _testDbManager.RemoveDatabase(dbName);
                 // Reset test files object to avoid complaints about deleted files
                 _testFiles.Dispose();
                 _testFiles = new TestFileManager<TestTrainingDataCollector>();
@@ -445,9 +419,9 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "USS")]
         public static void NoUSSFilesExist2()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
                 foreach(var fileName in Directory.GetFiles(_inputFolder.Last(), "*.uss"))
                 {
                     File.Delete(fileName);
@@ -466,19 +440,19 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 var collector = TrainingDataCollector.FromJson(File.ReadAllText(collectorSettings));
                 collector.DataGeneratorPath = annotatorSettingsPath;
                 collector.DatabaseServer = "(local)";
-                collector.DatabaseName = DBName;
+                collector.DatabaseName = dbName;
 
                 collector.Process(System.Threading.CancellationToken.None);
 
                 // Verify empty data
                 var expected = "";
 
-                string trainingOutput = GetDataFromDB(trainingData: true);
+                string trainingOutput = GetDataFromDB(dbName, trainingData: true);
                 Assert.AreEqual(expected, trainingOutput);
             }
             finally
             {
-                _testDbManager.RemoveDatabase(DBName);
+                _testDbManager.RemoveDatabase(dbName);
                 // Reset test files object to avoid complaints about deleted files
                 _testFiles.Dispose();
                 _testFiles = new TestFileManager<TestTrainingDataCollector>();
@@ -490,9 +464,9 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "USS")]
         public static void SomeUSSFilesExist()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
                 var files = Directory.GetFiles(_inputFolder.Last(), "*.uss");
                 CollectionMethods.Shuffle(files, new Random(0));
                 foreach(var fileName in files.Take(5))
@@ -500,25 +474,25 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     File.Delete(fileName);
                 }
 
-                Process();
+                Process(dbName);
 
                 // Verify that there is some data, but less than if all files existed
                 var expectedFile = _testFiles.GetFile("Resources.opennlp.train.txt");
                 var expected = File.ReadAllText(expectedFile);
 
-                string trainingOutput = GetDataFromDB(trainingData: true);
+                string trainingOutput = GetDataFromDB(dbName, trainingData: true);
                 Assert.Less(0, trainingOutput.Length);
                 Assert.Greater(expected.Length, trainingOutput.Length);
 
                 expectedFile = _testFiles.GetFile("Resources.opennlp.test.txt");
                 expected = File.ReadAllText(expectedFile);
-                var testingOutput = GetDataFromDB(trainingData: false);
+                var testingOutput = GetDataFromDB(dbName, trainingData: false);
                 Assert.Less(0, testingOutput.Length);
                 Assert.Greater(expected.Length, testingOutput.Length);
             }
             finally
             {
-                _testDbManager.RemoveDatabase(DBName);
+                _testDbManager.RemoveDatabase(dbName);
                 // Reset test files object to avoid complaints about deleted files
                 _testFiles.Dispose();
                 _testFiles = new TestFileManager<TestTrainingDataCollector>();
@@ -529,23 +503,22 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("TrainingDataCollector")]
         public static void LearningMachineDataCollection()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
-
-                Process(learningMachine: true);
+                Process(dbName, learningMachine: true);
 
                 var expectedFile = _testFiles.GetFile("Resources.learningMachine.train.txt");
-                string trainingOutput = GetDataFromDB(trainingData: true);
+                string trainingOutput = GetDataFromDB(dbName, trainingData: true);
                 CompareExpectedFileToFoundText(expectedFile, trainingOutput);
 
                 expectedFile = _testFiles.GetFile("Resources.learningMachine.test.txt");
-                string testingOutput = GetDataFromDB(trainingData: false);
+                string testingOutput = GetDataFromDB(dbName, trainingData: false);
                 CompareExpectedFileToFoundText(expectedFile, testingOutput);
             }
             finally
             {
-                _testDbManager.RemoveDatabase(DBName);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -580,22 +553,21 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("TrainingDataCollector")]
         public static void SkipOldFiles()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
-
-                Process();
+                Process(dbName);
 
                 // Verify that there is data
-                string trainingOutput = GetDataFromDB(trainingData: true);
+                string trainingOutput = GetDataFromDB(dbName, trainingData: true);
                 Assert.Greater(trainingOutput.Length, 0);
 
-                var testingOutput = GetDataFromDB(trainingData: false);
+                var testingOutput = GetDataFromDB(dbName, trainingData: false);
                 Assert.Greater(testingOutput.Length, 0);
 
                 var collector = new TrainingDataCollector
                 {
-                    DatabaseName = DBName,
+                    DatabaseName = dbName,
                     DatabaseServer = "(local)",
                     ModelName = _MODEL_NAME
                 };
@@ -604,49 +576,49 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 collector.MarkAllDataForDeletion();
 
                 // Verify that there is no data
-                trainingOutput = GetDataFromDB(trainingData: true);
+                trainingOutput = GetDataFromDB(dbName, trainingData: true);
                 Assert.AreEqual(0, trainingOutput.Length);
 
-                testingOutput = GetDataFromDB(trainingData: false);
+                testingOutput = GetDataFromDB(dbName, trainingData: false);
                 Assert.AreEqual(0, testingOutput.Length);
 
                 // Change date data stored so that it will be ignored
-                ModifyDateAttributesStored(DateTime.Now.Subtract(TimeSpan.FromDays(30)));
+                ModifyDateAttributesStored(dbName, DateTime.Now.Subtract(TimeSpan.FromDays(30)));
 
-                Process();
+                Process(dbName);
 
                 // Verify that there is no data
-                trainingOutput = GetDataFromDB(trainingData: true);
+                trainingOutput = GetDataFromDB(dbName, trainingData: true);
                 Assert.AreEqual(0, trainingOutput.Length);
 
-                testingOutput = GetDataFromDB(trainingData: false);
+                testingOutput = GetDataFromDB(dbName, trainingData: false);
                 Assert.AreEqual(0, testingOutput.Length);
 
                 // Change date stored so that it will not be ignored
-                ModifyDateAttributesStored(DateTime.Now.Subtract(TimeSpan.FromDays(29)));
+                ModifyDateAttributesStored(dbName, DateTime.Now.Subtract(TimeSpan.FromDays(29)));
 
-                Process();
+                Process(dbName);
 
                 // Verify that there is data
-                trainingOutput = GetDataFromDB(trainingData: true);
+                trainingOutput = GetDataFromDB(dbName, trainingData: true);
                 Assert.Greater(trainingOutput.Length, 0);
 
-                testingOutput = GetDataFromDB(trainingData: false);
+                testingOutput = GetDataFromDB(dbName, trainingData: false);
                 Assert.Greater(testingOutput.Length, 0);
 
                 // Confirm that marking data for deletion doesn't affect the data if the model name is different
                 collector.ModelName = _MODEL_NAME + "_";
                 collector.MarkAllDataForDeletion();
-                trainingOutput = GetDataFromDB(trainingData: true);
+                trainingOutput = GetDataFromDB(dbName, trainingData: true);
                 Assert.Greater(trainingOutput.Length, 0);
 
-                testingOutput = GetDataFromDB(trainingData: false);
+                testingOutput = GetDataFromDB(dbName, trainingData: false);
                 Assert.Greater(testingOutput.Length, 0);
 
             }
             finally
             {
-                _testDbManager.RemoveDatabase(DBName);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -655,17 +627,16 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("TrainingDataCollector")]
         public static void StatusColumn()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
-
                 var collector = new TrainingDataCollector
                 {
                     ModelName = _MODEL_NAME,
                     LastIDProcessed = 5,
                 };
 
-                int id = collector.AddToDatabase("(local)", DBName);
+                int id = collector.AddToDatabase("(local)", dbName);
 
                 string statusJson = collector.Status.ToJson();
 
@@ -687,7 +658,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
                 {
                     DataSource = "(local)",
-                    InitialCatalog = DBName,
+                    InitialCatalog = dbName,
                     IntegratedSecurity = true,
                     NetworkLibrary = "dbmssocn"
                 };
@@ -731,7 +702,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase(DBName);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 

@@ -254,11 +254,19 @@ namespace Extract.UtilityApplications.MachineLearning
         /// </summary>
         public override void Process(CancellationToken cancelToken)
         {
+            string previousDirectory = null;
             try
             {
                 _processing = true;
                 int firstIDTrained = 0;
                 int firstIDTested = 0;
+
+                // Set the working directory so that relative paths can be used for -resources and -params arguments to the OpenNLP TokenNameFinderTrainer 
+                previousDirectory = Directory.GetCurrentDirectory();
+                if (!string.IsNullOrEmpty(RootDir))
+                {
+                    Directory.SetCurrentDirectory(RootDir);
+                }
 
                 using (_tempModelFile = new TemporaryFile(true))
                 using (var tempExceptionLog = new TemporaryFile(".uex", false))
@@ -438,6 +446,15 @@ namespace Extract.UtilityApplications.MachineLearning
             finally
             {
                 _processing = false;
+
+                if (previousDirectory != null)
+                {
+                    try
+                    {
+                        Directory.SetCurrentDirectory(previousDirectory);
+                    }
+                    catch { }
+                }
             }
         }
 

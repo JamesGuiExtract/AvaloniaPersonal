@@ -1,6 +1,8 @@
-﻿using Extract.AttributeFinder;
+﻿using AttributeDbMgrComponentsLib;
+using Extract.AttributeFinder;
 using Extract.AttributeFinder.Rules;
 using Extract.FileActionManager.Database.Test;
+using Extract.FileActionManager.FileProcessors;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using LearningMachineTrainer;
@@ -10,9 +12,11 @@ using opennlp.tools.namefind;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
@@ -43,6 +47,8 @@ namespace Extract.UtilityApplications.MachineLearning.Test
 
         static readonly string _DB_NAME = "_TestMLModelTrainer_14394B59-A748-4418-B11A-A5682E3C5A5B";
         static readonly string _MODEL_NAME = "Test";
+        static readonly string _ATTRIBUTE_SET_NAME = "Expected";
+        static readonly string _STORE_ATTRIBUTE_GUID = typeof(StoreAttributesInDBTask).GUID.ToString();
 
         #endregion Fields
 
@@ -88,61 +94,6 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             }
         }
 
-        // Helper function to put resource test files into a DB
-        // These images are from Demo_FlexIndex
-        private static void CreateDatabase(IEnumerable<string> data = null)
-        {
-            // Create DB
-            var fileProcessingDB = _testDbManager.GetNewDatabase(_DB_NAME);
-            fileProcessingDB.DefineNewAction("a");
-            fileProcessingDB.DefineNewMLModel(_MODEL_NAME);
-            fileProcessingDB.AddFileNoQueue("dummy", 0, 0, EFilePriority.kPriorityNormal, -1);
-            fileProcessingDB.CloseAllDBConnections();
-
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
-            {
-                DataSource = fileProcessingDB.DatabaseServer,
-                InitialCatalog = fileProcessingDB.DatabaseName,
-                IntegratedSecurity = true,
-                NetworkLibrary = "dbmssocn"
-            };
-
-            var connection = new SqlConnection(sqlConnectionBuild.ConnectionString);
-            connection.Open();
-
-            // Add record for DatabaseService so that there's a valid ID
-            using (var cmd = connection.CreateCommand())
-            {
-                cmd.CommandText = "INSERT DatabaseService (Description, Settings) VALUES('ML Model Trainer test', '')";
-                cmd.ExecuteNonQuery();
-            }
-
-            var rng = new Random();
-            if (data == null)
-            {
-                data = Enumerable.Range(0, 100).Select(i => UtilityMethods.FormatInvariant($"{i}\r\n"));
-            }
-
-            foreach (string s in data)
-            {
-                using (var cmd = connection.CreateCommand())
-                {
-                    cmd.CommandText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
-                    SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
-                    FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName";
-                    cmd.Parameters.AddWithValue("@IsTrainingData", (rng.Next(2) == 0));
-                    cmd.Parameters.AddWithValue("@Data", s);
-                    cmd.Parameters.AddWithValue("@ModelName", _MODEL_NAME);
-                    cmd.Parameters.AddWithValue("@FileName", "dummy");
-
-                    cmd.ExecuteNonQuery();
-                }
-            }
-
-            _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-            Directory.CreateDirectory(_inputFolder.Last());
-        }
-
         #endregion Overhead
 
         #region Tests
@@ -151,9 +102,9 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("MLModelTrainer")]
         public static void DummyTrainingCommand()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
 
                 var trainingExe = Path.Combine(_inputFolder.Last(), "train.bat");
                 _testFiles.GetFile("Resources.train.bat", trainingExe);
@@ -167,7 +118,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                         TestingCommand = null,
                         MaximumTrainingRecords = 10000,
                         DatabaseServer = "(local)",
-                        DatabaseName = _DB_NAME
+                        DatabaseName = dbName
                     };
 
                     trainer.Process(CancellationToken.None);
@@ -179,7 +130,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -187,10 +138,9 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("MLModelTrainer")]
         public static void DummyTestingCommand()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
-
                 var testingExe = Path.Combine(_inputFolder.Last(), "test1.bat");
                 _testFiles.GetFile("Resources.test1.bat", testingExe);
                 using (var dest = new TemporaryFile(false))
@@ -203,7 +153,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                         TestingCommand = testingExe.Quote() + " \"<TempModelPath>\"",
                         MaximumTestingRecords = 10000,
                         DatabaseServer = "(local)",
-                        DatabaseName = _DB_NAME
+                        DatabaseName = dbName
                     };
 
                     trainer.Process(CancellationToken.None);
@@ -215,7 +165,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -223,11 +173,11 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("MLModelTrainer")]
         public static void NERTrainingAndTesting()
         {
+            var dataFile = _testFiles.GetFile("Resources.ComponentTrainingTestingData.txt");
+            var data = File.ReadAllLines(dataFile);
+            string dbName = CreateDatabase(data);
             try
             {
-                var dataFile = _testFiles.GetFile("Resources.ComponentTrainingTestingData.txt");
-                var data = File.ReadAllLines(dataFile);
-                CreateDatabase(data);
 
                 using (var dest = new TemporaryFile(false))
                 {
@@ -238,7 +188,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                         MaximumTrainingRecords = 10000,
                         MaximumTestingRecords = 10000,
                         DatabaseServer = "(local)",
-                        DatabaseName = _DB_NAME,
+                        DatabaseName = dbName,
                         MinimumF1Score = 0.5,
                         LastF1Score = 0
                     };
@@ -254,7 +204,161 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        // Container class to simulate how this will work with ETL (or from command line)
+        class FakeContainer : ETL.ITrainingCoordinator
+        {
+            public string ProjectName => "";
+            public string RootDir { get; set; }
+            public int NumberOfBackupModelsToKeep { get; set; }
+        }
+        // Test that relative paths can be used for feature gen xml and params file
+        [Test, Category("MLModelTrainer")]
+        public static void AllowRelativePaths()
+        {
+            var dataFile = _testFiles.GetFile("Resources.ComponentTrainingTestingData.txt");
+            var data = File.ReadAllLines(dataFile);
+            string dbName = CreateDatabase(data);
+
+            try
+            {
+                var featureGenFile = "myFeatureGen.xml";
+                _testFiles.GetFile("Resources.myFeatureGen.xml", Path.Combine(_inputFolder.Last(), featureGenFile));
+                // Confirm this file doesn't exist in current dir
+                Assert.False(File.Exists(featureGenFile));
+
+                var paramsFile = "myParams.txt";
+                _testFiles.GetFile("Resources.myParams.txt", Path.Combine(_inputFolder.Last(), paramsFile));
+                // Confirm this file doesn't exist in current dir
+                Assert.False(File.Exists(paramsFile));
+
+                var exe = @"<CommonComponentsDir>\opennlp.ikvm.exe";
+                var modelTag = @"<TempModelPath>";
+                var dataFileTag = @"<DataFile>";
+                var trainingCommand = UtilityMethods.FormatInvariant(
+                    $"\"{exe}\" TokenNameFinderTrainer -model \"{modelTag}\"",
+                    $" -lang en -data \"{dataFileTag}\" -resources . -featuregen {featureGenFile}",
+                    $" -params {paramsFile}");
+
+                // This dir will be made the current dir when the training command is run
+                var container = new FakeContainer { RootDir = _inputFolder.Last() };
+
+                // This is not the current dir now
+                var currentDir = Directory.GetCurrentDirectory();
+                Assert.AreNotEqual(container.RootDir, currentDir);
+
+                using (var dest = new TemporaryFile(false))
+                {
+                    var trainer = new MLModelTrainer
+                    {
+                        Container = container,
+                        ModelType = ModelType.NamedEntityRecognition,
+                        TrainingCommand = trainingCommand,
+                        ModelName = _MODEL_NAME,
+                        ModelDestination = dest.FileName,
+                        MaximumTrainingRecords = 10000,
+                        MaximumTestingRecords = 10000,
+                        DatabaseServer = "(local)",
+                        DatabaseName = dbName,
+                        MinimumF1Score = 0.5,
+                        LastF1Score = 0
+                    };
+
+                    trainer.Process(CancellationToken.None);
+
+                    using (var zipArchive = ZipFile.Open(dest.FileName, ZipArchiveMode.Read))
+                    {
+                        var model = zipArchive.GetEntry("nameFinder.model");
+                        Assert.NotNull(model);
+                    }
+
+                    // The directory has been changed back to prev dir
+                    Assert.AreEqual(currentDir, Directory.GetCurrentDirectory());
+                }
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        // Test that it is possible, if a little convoluted, to pass in a path other than '.' for the resources dir
+        // It is necessary to give a resources dir for some types of features that depend on other files.
+        // When a resources dir is specified, then the featuregen xml file and its dependencies will be resolved based on that dir.
+        // OpenNLP requires this path to be quoted and end in a backslash and since this command line gets split and rebuilt it is necessary
+        // to escape the quotes, e.g., \".\res\\"
+        [Test, Category("MLModelTrainer")]
+        public static void AllowRelativePaths2()
+        {
+            var dataFile = _testFiles.GetFile("Resources.ComponentTrainingTestingData.txt");
+            var data = File.ReadAllLines(dataFile);
+            string dbName = CreateDatabase(data);
+
+            try
+            {
+                var featureGenFile = "myFeatureGen.xml";
+                var resourceDir = Path.Combine(_inputFolder.Last(), "res");
+                Directory.CreateDirectory(resourceDir);
+                _testFiles.GetFile("Resources.myFeatureGen.xml", Path.Combine(resourceDir, featureGenFile));
+                // Confirm this file doesn't exist in current dir
+                Assert.False(File.Exists(featureGenFile));
+                Assert.False(File.Exists("res\\" + featureGenFile));
+
+                var paramsFile = "myParams.txt";
+                _testFiles.GetFile("Resources.myParams.txt", Path.Combine(_inputFolder.Last(), paramsFile));
+                // Confirm this file doesn't exist in current dir
+                Assert.False(File.Exists(paramsFile));
+
+                var exe = @"<CommonComponentsDir>\opennlp.ikvm.exe";
+                var modelTag = @"<TempModelPath>";
+                var dataFileTag = @"<DataFile>";
+                var trainingCommand = UtilityMethods.FormatInvariant(
+                    $@"""{exe}"" TokenNameFinderTrainer -model ""{modelTag}""",
+                    $@" -lang en -data ""{dataFileTag}"" -resources \"".\res\\"" -featuregen {featureGenFile}",
+                    $@" -params {paramsFile}");
+
+                // This dir will be made the current dir when the training command is run
+                var container = new FakeContainer { RootDir = _inputFolder.Last() };
+
+                // This is not the current dir now
+                var currentDir = Directory.GetCurrentDirectory();
+                Assert.AreNotEqual(container.RootDir, currentDir);
+
+                using (var dest = new TemporaryFile(false))
+                {
+                    var trainer = new MLModelTrainer
+                    {
+                        Container = container,
+                        ModelType = ModelType.NamedEntityRecognition,
+                        TrainingCommand = trainingCommand,
+                        ModelName = _MODEL_NAME,
+                        ModelDestination = dest.FileName,
+                        MaximumTrainingRecords = 10000,
+                        MaximumTestingRecords = 10000,
+                        DatabaseServer = "(local)",
+                        DatabaseName = dbName,
+                        MinimumF1Score = 0.5,
+                        LastF1Score = 0
+                    };
+
+                    trainer.Process(CancellationToken.None);
+
+                    using (var zipArchive = ZipFile.Open(dest.FileName, ZipArchiveMode.Read))
+                    {
+                        var model = zipArchive.GetEntry("nameFinder.model");
+                        Assert.NotNull(model);
+                    }
+
+                    // The directory has been changed back to prev dir
+                    Assert.AreEqual(currentDir, Directory.GetCurrentDirectory());
+                }
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -263,10 +367,9 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("MLModelTrainer")]
         public static void StatusColumn()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
-
                 var trainer = new MLModelTrainer
                 {
                     ModelName = _MODEL_NAME,
@@ -277,7 +380,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     LastIDProcessed = 5
                 };
 
-                int id = trainer.AddToDatabase("(local)", _DB_NAME);
+                int id = trainer.AddToDatabase("(local)", dbName);
 
                 string statusJson = trainer.Status.ToJson();
 
@@ -307,7 +410,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
                 {
                     DataSource = "(local)",
-                    InitialCatalog = _DB_NAME,
+                    InitialCatalog = dbName,
                     IntegratedSecurity = true,
                     NetworkLibrary = "dbmssocn"
                 };
@@ -351,7 +454,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -359,10 +462,9 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("MLModelTrainer")]
         public static void FailedTrainingCommand()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
-
                 var trainingExe = Path.Combine(_inputFolder.Last(), "train.bad.bat");
                 _testFiles.GetFile("Resources.train.bad.bat", trainingExe);
                 var dest = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -374,7 +476,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     TestingCommand = null,
                     MaximumTrainingRecords = 10000,
                     DatabaseServer = "(local)",
-                    DatabaseName = _DB_NAME
+                    DatabaseName = dbName
                 };
 
                 var ex = Assert.Throws<ExtractException>(() => trainer.Process(CancellationToken.None));
@@ -383,7 +485,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -391,10 +493,9 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("MLModelTrainer")]
         public static void FailedTestingCommand()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
-
                 var testingExe = Path.Combine(_inputFolder.Last(), "test.bad.bat");
                 _testFiles.GetFile("Resources.test.bad.bat", testingExe);
                 var dest = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -406,7 +507,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     TestingCommand = testingExe.Quote() + " \"<TempModelPath>\"",
                     MaximumTestingRecords = 10000,
                     DatabaseServer = "(local)",
-                    DatabaseName = _DB_NAME
+                    DatabaseName = dbName
                 };
 
                 var ex = Assert.Throws<ExtractException>(() => trainer.Process(CancellationToken.None));
@@ -415,7 +516,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -423,11 +524,10 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("MLModelTrainer")]
         public static void GetDataFromDB()
         {
+            var dbName = CreateDatabaseForDataCollector(false);
             try
             {
-                TestTrainingDataCollector.Setup();
-                TestTrainingDataCollector.CreateDatabase();
-                TestTrainingDataCollector.Process();
+                CreateTrainingData(dbName, false);
 
                 _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
                 Directory.CreateDirectory(_inputFolder.Last());
@@ -444,7 +544,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                         TestingCommand = null,
                         MaximumTrainingRecords = 10000,
                         DatabaseServer = "(local)",
-                        DatabaseName = TestTrainingDataCollector.DBName,
+                        DatabaseName = dbName,
                         MinimumF1Score = 0
                     };
 
@@ -457,7 +557,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             }
             finally
             {
-                TestTrainingDataCollector.FinalCleanup();
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -465,12 +565,12 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("MLModelTrainer")]
         public static void EncryptedOutput()
         {
+            var dataFile = _testFiles.GetFile("Resources.ComponentTrainingTestingData.txt");
+            var data = File.ReadAllLines(dataFile);
+            string dbName = CreateDatabase(data);
+
             try
             {
-                var dataFile = _testFiles.GetFile("Resources.ComponentTrainingTestingData.txt");
-                var data = File.ReadAllLines(dataFile);
-                CreateDatabase(data);
-
                 using (var dest = new TemporaryFile(".etf", false))
                 {
                     var trainer = new MLModelTrainer
@@ -480,7 +580,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                         MaximumTrainingRecords = 10000,
                         MaximumTestingRecords = 10000,
                         DatabaseServer = "(local)",
-                        DatabaseName = _DB_NAME,
+                        DatabaseName = dbName,
                         MinimumF1Score = 0.5,
                         LastF1Score = 0
                     };
@@ -500,7 +600,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -508,14 +608,10 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("MLModelTrainer")]
         public static void TestLearningMachine()
         {
+            var dbName = CreateDatabaseForDataCollector(true);
             try
             {
-                TestTrainingDataCollector.Setup();
-                // With change to divide data without duplicating it when there is only one example of a doc type
-                // this training set will not work (there is only one of everything) without modification.
-                // See https://extract.atlassian.net/browse/ISSUE-16813
-                TestTrainingDataCollector.CreateDatabase(duplicateData: true);
-                TestTrainingDataCollector.Process(learningMachine: true);
+                CreateTrainingData(dbName, true);
 
                 var dest = _testFiles.GetFile("Resources.docClassifier.lm");
                 LearningMachine lm = LearningMachine.Load(dest);
@@ -529,7 +625,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     MaximumTrainingRecords = 10000,
                     MaximumTestingRecords = 10000,
                     DatabaseServer = "(local)",
-                    DatabaseName = TestTrainingDataCollector.DBName
+                    DatabaseName = dbName
                 };
 
                 trainer.Process(CancellationToken.None);
@@ -541,8 +637,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             {
                 // Remove the modified LM
                 _testFiles.RemoveFile("Resources.docClassifier.lm");
-
-                TestTrainingDataCollector.FinalCleanup();
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -551,14 +646,10 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("MLModelTrainer")]
         public static void TestLearningMachineSerialization()
         {
+            var dbName = CreateDatabaseForDataCollector(true);
             try
             {
-                TestTrainingDataCollector.Setup();
-                // With change to divide data without duplicating it when there is only one example of a doc type
-                // this training set will not work (there is only one of everything) without modification.
-                // See https://extract.atlassian.net/browse/ISSUE-16813
-                TestTrainingDataCollector.CreateDatabase(duplicateData: true);
-                TestTrainingDataCollector.Process(learningMachine: true);
+                CreateTrainingData(dbName, true);
 
                 var dest = _testFiles.GetFile("Resources.docClassifier.lm");
                 LearningMachine lm = LearningMachine.Load(dest);
@@ -575,7 +666,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                         MaximumTrainingRecords = 10000,
                         MaximumTestingRecords = 10000,
                         DatabaseServer = "(local)",
-                        DatabaseName = TestTrainingDataCollector.DBName
+                        DatabaseName = dbName
                     };
 
                     trainer.Process(CancellationToken.None);
@@ -602,7 +693,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 // Remove the modified LM
                 _testFiles.RemoveFile("Resources.docClassifier.lm");
 
-                TestTrainingDataCollector.FinalCleanup();
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -611,14 +702,10 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("MLModelTrainer")]
         public static void LearningMachineRenameDocType()
         {
+            var dbName = CreateDatabaseForDataCollector(true);
             try
             {
-                TestTrainingDataCollector.Setup();
-                // With change to divide data without duplicating it when there is only one example of a doc type
-                // this training set will not work (there is only one of everything) without modification.
-                // See https://extract.atlassian.net/browse/ISSUE-16813
-                TestTrainingDataCollector.CreateDatabase(duplicateData: true);
-                TestTrainingDataCollector.Process(learningMachine: true);
+                CreateTrainingData(dbName, true);
 
                 var dest = _testFiles.GetFile("Resources.docClassifier.lm");
                 var uss = _testFiles.GetFile("Resources.Example02.tif.uss");
@@ -634,7 +721,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     MaximumTrainingRecords = 10000,
                     MaximumTestingRecords = 10000,
                     DatabaseServer = "(local)",
-                    DatabaseName = TestTrainingDataCollector.DBName
+                    DatabaseName = dbName
                 };
 
                 trainer.Process(CancellationToken.None);
@@ -672,12 +759,11 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             {
                 // Remove the modified LM
                 _testFiles.RemoveFile("Resources.docClassifier.lm");
-
-                TestTrainingDataCollector.FinalCleanup();
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
-        static void SimulateTrainingAndTesting(double lastF1Score, double minimumF1Score, double allowableAccuracyDrop, bool expectSuccess = true, bool interactive = false)
+        static void SimulateTrainingAndTesting(string dbName, double lastF1Score, double minimumF1Score, double allowableAccuracyDrop, bool expectSuccess = true, bool interactive = false)
         {
             var trainingExe = Path.Combine(_inputFolder.Last(), "train.bat");
             _testFiles.GetFile("Resources.train.bat", trainingExe);
@@ -697,14 +783,14 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     , MaximumTrainingRecords = 10000
                     , MaximumTestingRecords = 10000
                     , DatabaseServer = "(local)"
-                    , DatabaseName = _DB_NAME
+                    , DatabaseName = dbName
                 };
 
                 if (interactive)
                 {
                     UtilityMethods.ShowMessageBox("Configure/confirm email settings with EmailFile.exe /c", "", false);
                     UtilityMethods.ShowMessageBox("Fill in email address and subject fields on the next screen and click OK", "", false);
-                    using (var form = new MLModelTrainerConfigurationDialog(trainer, "(local)", _DB_NAME))
+                    using (var form = new MLModelTrainerConfigurationDialog(trainer, "(local)", dbName))
                     {
                         Application.Run(form);
                         var result = form.DialogResult;
@@ -757,25 +843,24 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("MLModelTrainer")]
         public static void AcceptableResult()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
-
                 // Stays the same
-                SimulateTrainingAndTesting(lastF1Score: 0.5116, minimumF1Score: 0.04, allowableAccuracyDrop: 0.05);
+                SimulateTrainingAndTesting(dbName, lastF1Score: 0.5116, minimumF1Score: 0.04, allowableAccuracyDrop: 0.05);
 
                 // Drops 0.05
-                SimulateTrainingAndTesting(lastF1Score: 0.5616, minimumF1Score: 0.04, allowableAccuracyDrop: 0.05);
+                SimulateTrainingAndTesting(dbName, lastF1Score: 0.5616, minimumF1Score: 0.04, allowableAccuracyDrop: 0.05);
 
                 // Drops to minimum
-                SimulateTrainingAndTesting(lastF1Score: 0.5616, minimumF1Score: 0.5116, allowableAccuracyDrop: 0.1);
+                SimulateTrainingAndTesting(dbName, lastF1Score: 0.5616, minimumF1Score: 0.5116, allowableAccuracyDrop: 0.1);
 
                 // Increases
-                SimulateTrainingAndTesting(lastF1Score: 0.5115, minimumF1Score: 0.04, allowableAccuracyDrop: 0.05);
+                SimulateTrainingAndTesting(dbName, lastF1Score: 0.5115, minimumF1Score: 0.04, allowableAccuracyDrop: 0.05);
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -785,47 +870,45 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         [Test, Category("MLModelTrainer")]
         public static void UnacceptableResult()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
-
                 // Drops 0.051
-                SimulateTrainingAndTesting(lastF1Score: 0.5626, minimumF1Score: 0.04, allowableAccuracyDrop: 0.05, expectSuccess: false);
+                SimulateTrainingAndTesting(dbName, lastF1Score: 0.5626, minimumF1Score: 0.04, allowableAccuracyDrop: 0.05, expectSuccess: false);
 
                 // Drops below minimum
-                SimulateTrainingAndTesting(lastF1Score: 0.5116, minimumF1Score: 0.5117, allowableAccuracyDrop: 0.05, expectSuccess: false);
+                SimulateTrainingAndTesting(dbName, lastF1Score: 0.5116, minimumF1Score: 0.5117, allowableAccuracyDrop: 0.05, expectSuccess: false);
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
         // Test unacceptable result: f1 score drops more than the allowable amount or drops below the minimum allowed
         // train.bat will write the word "Training" to the <TempModelPath>
         // if the testing result is deemed acceptable, this file will be copied to the destination
-        [Test, Category("Interactive_MLModelTrainer")]
+        [Test, Category("Interactive")]
         public static void Interactive_UnacceptableResult()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
-
                 // Drops 0.051
-                SimulateTrainingAndTesting(lastF1Score: 0.5626, minimumF1Score: 0.04, allowableAccuracyDrop: 0.05, expectSuccess: false, interactive: true);
+                SimulateTrainingAndTesting(dbName, lastF1Score: 0.5626, minimumF1Score: 0.04, allowableAccuracyDrop: 0.05, expectSuccess: false, interactive: true);
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
         [Test, Category("MLModelTrainer")]
         public static void SimulateOutOfMemory()
         {
+            string dbName = CreateDatabase();
             try
             {
-                CreateDatabase();
                 using (var trainingExe = new TemporaryFile(".bat", false))
                 using (var testingExe = new TemporaryFile(".bat", false))
                 using (var dest = new TemporaryFile(false))
@@ -841,7 +924,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                         , LastIDProcessed = 50
                         , MinimumF1Score = 0.5
                         , DatabaseServer = "(local)"
-                        , DatabaseName = _DB_NAME
+                        , DatabaseName = dbName
                     };
 
                     // Simulate running out of memory if number of records is greater than 30
@@ -881,7 +964,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             }
             finally
             {
-                _testDbManager.RemoveDatabase(_DB_NAME);
+                _testDbManager.RemoveDatabase(dbName);
             }
         }
 
@@ -919,5 +1002,227 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         }
 
         #endregion Tests
+
+        #region Private Methods
+
+        // Helper function to put resource test files into a DB
+        // These images are from Demo_FlexIndex
+        private static string CreateDatabase(IEnumerable<string> data = null, [CallerMemberName] string dbSuffix = "")
+        {
+            // Create DB
+            string dbName = _DB_NAME + dbSuffix;
+            var fileProcessingDB = _testDbManager.GetNewDatabase(dbName);
+
+            try
+            {
+                fileProcessingDB.DefineNewAction("a");
+                fileProcessingDB.DefineNewMLModel(_MODEL_NAME);
+                fileProcessingDB.AddFileNoQueue("dummy", 0, 0, EFilePriority.kPriorityNormal, -1);
+                fileProcessingDB.CloseAllDBConnections();
+
+                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
+                {
+                    DataSource = fileProcessingDB.DatabaseServer,
+                    InitialCatalog = fileProcessingDB.DatabaseName,
+                    IntegratedSecurity = true,
+                    NetworkLibrary = "dbmssocn"
+                };
+
+                var connection = new SqlConnection(sqlConnectionBuild.ConnectionString);
+                connection.Open();
+
+                // Add record for DatabaseService so that there's a valid ID
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "INSERT DatabaseService (Description, Settings) VALUES('ML Model Trainer test', '')";
+                    cmd.ExecuteNonQuery();
+                }
+
+                var rng = new Random();
+                if (data == null)
+                {
+                    data = Enumerable.Range(0, 100).Select(i => UtilityMethods.FormatInvariant($"{i}\r\n"));
+                }
+
+                foreach (string s in data)
+                {
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
+                    SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
+                    FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName";
+                        cmd.Parameters.AddWithValue("@IsTrainingData", (rng.Next(2) == 0));
+                        cmd.Parameters.AddWithValue("@Data", s);
+                        cmd.Parameters.AddWithValue("@ModelName", _MODEL_NAME);
+                        cmd.Parameters.AddWithValue("@FileName", "dummy");
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
+                Directory.CreateDirectory(_inputFolder.Last());
+
+                return dbName;
+            }
+            catch
+            {
+                _testDbManager.RemoveDatabase(dbName);
+                throw;
+            }
+        }
+
+        private static string CreateDatabaseForDataCollector(bool forDocClassifier, [CallerMemberName] string dbSuffix = "")
+        {
+            string dbName = _DB_NAME + dbSuffix;
+            var fileProcessingDB = _testDbManager.GetNewDatabase(dbName);
+
+            try
+            {
+                fileProcessingDB.DefineNewAction("a");
+                fileProcessingDB.DefineNewMLModel(_MODEL_NAME);
+                var attributeDBMgr = new AttributeDBMgr
+                {
+                    FAMDB = fileProcessingDB
+                };
+                attributeDBMgr.CreateNewAttributeSetName(_ATTRIBUTE_SET_NAME);
+                var afutility = new UCLID_AFUTILSLib.AFUtility();
+                fileProcessingDB.RecordFAMSessionStart("DUMMY", "a", true, true);
+
+                // Populate DB
+                _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
+                Directory.CreateDirectory(_inputFolder.Last());
+
+                var tokenFile = Path.Combine(_inputFolder.Last(), "en-token.nlp.etf");
+                _testFiles.GetFile("Resources.en-token.nlp.etf", tokenFile);
+                var sentenceFile = Path.Combine(_inputFolder.Last(), "en-sent.nlp.etf");
+                _testFiles.GetFile("Resources.en-sent.nlp.etf", sentenceFile);
+
+                int numFiles = 10;
+                for (int i = 1; i <= numFiles; i++)
+                {
+                    var baseResourceName = "Resources.Example{0:D2}.tif{1}";
+                    var baseName = "Example{0:D2}.tif{1}";
+
+                    string resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, "");
+                    string fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, "");
+                    string path = Path.Combine(_inputFolder.Last(), fileName);
+                    _testFiles.GetFile(resourceName, path);
+
+                    var rec = fileProcessingDB.AddFile(path, "a", -1, EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false,
+                        out var _, out var _);
+
+                    resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, ".uss");
+                    fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, ".uss");
+                    path = Path.Combine(_inputFolder.Last(), fileName);
+                    _testFiles.GetFile(resourceName, path);
+
+                    resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, ".evoa");
+                    fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, ".evoa");
+                    path = Path.Combine(_inputFolder.Last(), fileName);
+                    _testFiles.GetFile(resourceName, path);
+
+                    var voaData = afutility.GetAttributesFromFile(path);
+                    int fileTaskSessionID = fileProcessingDB.StartFileTaskSession(_STORE_ATTRIBUTE_GUID, rec.FileID, rec.ActionID);
+                    attributeDBMgr.CreateNewAttributeSetForFile(fileTaskSessionID, _ATTRIBUTE_SET_NAME, voaData, false, true, true,
+                        closeConnection: i == numFiles);
+
+                    fileProcessingDB.EndFileTaskSession(fileTaskSessionID, 0, 0, 0);
+                }
+
+                if (forDocClassifier)
+                {
+                    var dups = new List<string>();
+                    foreach (var fileName in Directory.GetFiles(_inputFolder.Last()))
+                    {
+                        var newName = Path.Combine(Path.GetDirectoryName(fileName), "Copy_" + Path.GetFileName(fileName));
+                        File.Copy(fileName, newName);
+
+                        if (newName.EndsWith(".tif", StringComparison.Ordinal))
+                        {
+                            dups.Add(newName);
+                        }
+                    }
+                    foreach (var (tif, i) in dups.Select((path, i) => (path, i + numFiles)))
+                    {
+                        var rec = fileProcessingDB.AddFile(tif, "a", -1, EFilePriority.kPriorityNormal, false, false, EActionStatus.kActionPending, false,
+                            out var _, out var _);
+
+                        var voa = tif + ".evoa";
+                        var voaData = afutility.GetAttributesFromFile(voa);
+                        int fileTaskSessionID = fileProcessingDB.StartFileTaskSession(_STORE_ATTRIBUTE_GUID, rec.FileID, rec.ActionID);
+                        attributeDBMgr.CreateNewAttributeSetForFile(fileTaskSessionID, _ATTRIBUTE_SET_NAME, voaData, false, true, true,
+                            closeConnection: i == numFiles * 2);
+
+                        fileProcessingDB.EndFileTaskSession(fileTaskSessionID, 0, 0, 0);
+                    }
+                }
+
+                fileProcessingDB.RecordFAMSessionStop();
+                fileProcessingDB.CloseAllDBConnections();
+
+                // Add record for DatabaseService so that there's a valid ID
+                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
+                {
+                    DataSource = fileProcessingDB.DatabaseServer,
+                    InitialCatalog = fileProcessingDB.DatabaseName,
+                    IntegratedSecurity = true,
+                    NetworkLibrary = "dbmssocn"
+                };
+
+                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                {
+                    connection.Open();
+                    using (var cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = "INSERT DatabaseService (Description, Settings) VALUES('Unit tests'' service', '')";
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                return dbName;
+            }
+            catch (Exception ex)
+            {
+                _testDbManager.RemoveDatabase(dbName);
+                throw ex.AsExtract("ELI45129");
+            }
+        }
+
+        private static void CreateTrainingData(string dbName, bool forDocClassifier)
+        {
+            if (forDocClassifier)
+            {
+                var learningMachinePath = Path.Combine(_inputFolder.Last(), "docClassifier.lm");
+                _testFiles.GetFile("Resources.docClassifier.lm", learningMachinePath);
+
+                var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
+                _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
+                var collector = TrainingDataCollector.FromJson(File.ReadAllText(collectorSettings));
+                collector.DataGeneratorPath = learningMachinePath;
+                collector.ModelType = ModelType.LearningMachine;
+                collector.DatabaseServer = "(local)";
+                collector.DatabaseName = dbName;
+                collector.UseRandomSeedFromDataGenerator = true;
+
+                collector.Process(CancellationToken.None);
+            }
+            else
+            {
+                var annotatorSettingsPath = Path.Combine(_inputFolder.Last(), "opennlp.annotator");
+                _testFiles.GetFile("Resources.opennlp.annotator", annotatorSettingsPath);
+
+                var collectorSettings = Path.Combine(_inputFolder.Last(), "collectorSettings.txt");
+                _testFiles.GetFile("Resources.collectorSettings.txt", collectorSettings);
+                var collector = TrainingDataCollector.FromJson(File.ReadAllText(collectorSettings));
+                collector.DataGeneratorPath = annotatorSettingsPath;
+                collector.DatabaseServer = "(local)";
+                collector.DatabaseName = dbName;
+                collector.UseRandomSeedFromDataGenerator = true;
+
+                collector.Process(CancellationToken.None);
+            }
+        }
+
+        #endregion Private Methods
     }
 }
