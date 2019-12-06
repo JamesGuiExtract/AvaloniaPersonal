@@ -88,7 +88,6 @@ ByteStream::ByteStream(const string& strData)
 		{
 			// get the first char of the 2-char hex string
 			unsigned char ucFirst = strData[2*i];
-			toupper(ucFirst);
 			if (!isHexChar(ucFirst))
 			{
 				UCLIDException ue("ELI01683", "Invalid hex character!");
@@ -99,7 +98,6 @@ ByteStream::ByteStream(const string& strData)
 
 			// get the second char of the 2-char hex string
 			unsigned char ucSecond = strData[2*i + 1];
-			toupper(ucSecond);
 			if (!isHexChar(ucSecond))
 			{
 				UCLIDException ue("ELI01684", "Invalid hex character!");

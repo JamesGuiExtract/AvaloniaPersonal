@@ -174,7 +174,10 @@ unsigned char* externManipulator(const char* pszInput, unsigned long* pulLength)
 	}
 	catch(UCLIDException& ue)
 	{
-		*pulLength = 0;
+		if (pulLength != __nullptr)
+		{
+			*pulLength = 0;
+		}
 
 		// Ensure all allocated memory is cleaned up
 		if (pszOutput != __nullptr)
