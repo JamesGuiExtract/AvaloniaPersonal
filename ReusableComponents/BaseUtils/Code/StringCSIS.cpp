@@ -179,6 +179,13 @@ size_t stringCSIS::find_first_not_of( const char* _Ptr, size_t _Off ) const
 //-------------------------------------------------------------------------------------------------
 size_t stringCSIS::find_first_not_of( const char* _Ptr, size_t _Off, size_t _Count) const
 {
+	// Prevent read access violations
+	// https://extract.atlassian.net/browse/ISSUE-16822
+	if (_Count == string::npos) // = search for not any character
+	{
+		return string::npos;
+	}
+
 	// Create strFind to contain the char to search
 	string strFind;
 	unsigned long ulCharsToSearch = _Count;
@@ -237,6 +244,21 @@ size_t stringCSIS::find_first_of( const char* _Ptr, size_t _Off ) const
 //-------------------------------------------------------------------------------------------------
 size_t stringCSIS::find_first_of( const char* _Ptr, size_t _Off, size_t _Count) const
 {
+	// Prevent read access violations
+	// https://extract.atlassian.net/browse/ISSUE-16822
+	if (_Count == string::npos) // = search for any character
+	{
+		if (m_strSource.empty())
+		{
+			return string::npos;
+		}
+		if (_Off < m_strSource.length())
+		{
+			return _Off;
+		}
+		return string::npos;
+	}
+
 	// Set string find to the string passed in
 	string strFind;
 	unsigned long ulCharsToSearch = _Count;
@@ -295,6 +317,13 @@ size_t stringCSIS::find_last_not_of( const char* _Ptr, size_t _Off) const
 //-------------------------------------------------------------------------------------------------
 size_t stringCSIS::find_last_not_of( const char* _Ptr, size_t _Off, size_t _Count) const
 {
+	// Prevent read access violations
+	// https://extract.atlassian.net/browse/ISSUE-16822
+	if (_Count == string::npos) // = search for not any character
+	{
+		return string::npos;
+	}
+
 	// Set string find to the string passed in
 	string strFind;
 	unsigned long ulCharsToSearch = _Count;
@@ -354,6 +383,21 @@ size_t stringCSIS::find_last_of( const char* _Ptr, size_t _Off) const
 //-------------------------------------------------------------------------------------------------
 size_t stringCSIS::find_last_of( const char* _Ptr, size_t _Off, size_t _Count) const
 {
+	// Prevent read access violations
+	// https://extract.atlassian.net/browse/ISSUE-16822
+	if (_Count == string::npos) // = search for any character
+	{
+		if (m_strSource.empty())
+		{
+			return string::npos;
+		}
+		if (_Off < m_strSource.length())
+		{
+			return _Off;
+		}
+		return m_strSource.length() - 1;
+	}
+
 	// Set string find to the string passed in
 	string strFind;
 	unsigned long ulCharsToSearch = _Count;
@@ -468,7 +512,7 @@ size_t stringCSIS::rfind(	const char* _Ptr, size_t _Off, size_t _Count) const
 	}
 
 	// search string in reverse from _Off - _Count
-	for ( size_t i = _Off - _Count; i >= 0 ; i-- )
+	for ( size_t i = _Off - _Count + 1; i--> 0; )
 	{
 		if ( _strnicmp(&c_str()[i], _Ptr, _Count) == 0 )
 		{

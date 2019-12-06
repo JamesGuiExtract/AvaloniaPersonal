@@ -1074,6 +1074,10 @@
 <TESTCASE>|rfind|abcdefg.ABC!|true|ABC|false|BS|8
 <TESTCASE>|rfind|abcdefg.ABC!|true|ABC|true|BS|8
 
+// Test that loop stops at the beginning of the string
+// https://extract.atlassian.net/browse/ISSUE-16822
+<TESTCASE>|rfind|abcdefg.abc!|false|nope|false|BS|-1|-1
+
 // CP - char * calls
 <TESTCASE>|rfind|abcdefg.abc!|false|abc|false|CP|0|8
 <TESTCASE>|rfind|abcdefg.abc!|false|abc|true|CP|0|8
