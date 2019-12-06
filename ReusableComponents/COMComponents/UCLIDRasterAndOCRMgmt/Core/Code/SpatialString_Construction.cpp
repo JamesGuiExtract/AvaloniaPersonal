@@ -934,6 +934,10 @@ STDMETHODIMP CSpatialString::CreateFromSpatialStrings(IIUnknownVector *pStrings,
 			{
 				m_strSourceDocName = ipStr->SourceDocName;
 				m_strOCREngineVersion = ipStr->OCREngineVersion;
+
+				UCLID_RASTERANDOCRMGMTLib::IHasOCRParametersPtr ipHasOCRParameters(ipStr);
+				ASSERT_RESOURCE_ALLOCATION("ELI49564", ipHasOCRParameters != __nullptr);
+				m_ipOCRParameters = ipHasOCRParameters->OCRParameters;
 			}
 			else if (nCurrPage == nLastProcessedPage)
 			{
