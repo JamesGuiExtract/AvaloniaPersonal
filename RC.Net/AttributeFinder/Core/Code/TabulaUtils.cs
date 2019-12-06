@@ -282,7 +282,7 @@ namespace Extract.AttributeFinder
         /// </summary>
         /// <param name="inputFile">The PDF or image to convert</param>
         /// <param name="pdfFile">The path to write the text-based PDF to</param>
-        public static void CreateTextPdf(string inputFile, string pdfFile)
+        public static void CreateTextPdf(string inputFile, string pdfFile, IHasOCRParameters hasOCRParameters = null)
         {
             try
             {
@@ -292,8 +292,18 @@ namespace Extract.AttributeFinder
                     new OCRParam(("Converters.Text.PDF.AdditionalFonts", 0)),
                     // Use original DPI for pictures
                     new OCRParam(("Converters.Text.PDF.Pictures", 1)),
+
+                    new OCRParam(((int)EOCRParameter.kTradeoff, (int)EOcrTradeOff.kAccurate)),
+                    new OCRParam(("Kernel.Img.Max.Pix.X", 32000)),
+                    new OCRParam(("Kernel.Img.Max.Pix.Y", 32000)),
+                    new OCRParam(("Kernel.OcrMgr.PreferAccurateEngine", 1)),
                 }
                 .ToOCRParameters();
+
+                if (hasOCRParameters?.OCRParameters is VariantVector specifiedParams)
+                {
+                    ((VariantVector)ocrParams).Append(specifiedParams);
+                }
 
                 _ocrEngine.Value.CreateOutputImage(inputFile, "PDF", pdfFile, ocrParams);
             }

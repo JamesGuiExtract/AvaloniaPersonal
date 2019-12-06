@@ -3,16 +3,16 @@ using Extract.ETL;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
-using org.apache.pdfbox.pdmodel;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
-
-using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
+using UCLID_RASTERANDOCRMGMTLib;
+using OCRParam = Extract.Utilities.Union<(int key, int value), (int key, double value), (string key, int value), (string key, double value), (string key, string value)>;
 
 
 namespace Extract.AttributeFinder.Test
@@ -53,7 +53,23 @@ namespace Extract.AttributeFinder.Test
             "Resources.Tabula.TableScripts.fsx",
         };
 
+        static readonly string[] _testFileResourceNames_ISSUE_16821 = new string[]
+        {
+            // Test that low DPI image processes without error
+            // https://extract.atlassian.net/browse/ISSUE-16821
+            "Resources.Tabula.us-006.lowDPI.tif",
+            "Resources.Tabula.us-006.lowDPI.tif.uss",
+            "Resources.Tabula.us-006.lowDPI.tif.byPage.byColumn.voa",
+
+            // Test that really large image processes without error
+            // https://extract.atlassian.net/browse/ISSUE-16821
+            "Resources.Tabula.us-006.hugePage.tif",
+            "Resources.Tabula.us-006.hugePage.tif.uss",
+            "Resources.Tabula.us-006.hugePage.tif.byPage.byColumn.voa",
+        };
+
         static string[] _testFilePaths;
+        static string[] _testFilePaths_ISSUE_16821;
 
         /// <summary>
         /// Manages the test files used by this test
@@ -72,6 +88,8 @@ namespace Extract.AttributeFinder.Test
             GeneralMethods.TestSetup();
             _testFiles = new TestFileManager<TestTableFinder>();
             _testFilePaths = _testFileResourceNames.Select(name => _testFiles.GetFile(name)).ToArray();
+            _testFilePaths_ISSUE_16821 = _testFileResourceNames_ISSUE_16821
+                .Select(name => _testFiles.GetFile(name)).ToArray();
         }
 
         /// <summary>
@@ -153,6 +171,92 @@ namespace Extract.AttributeFinder.Test
 
                 var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
                 Assert.AreEqual("Expected||1||Found||1||Correct||1||", spatialResults);
+            }
+        }
+
+        /// <summary>
+        /// Test that very large page processes without error
+        /// </summary>
+        [Test]
+        public static void HugePage()
+        {
+            foreach (var inputFile in _testFilePaths_ISSUE_16821
+                .Where(x => x.EndsWith(".hugePage.tif", StringComparison.OrdinalIgnoreCase)))
+            {
+                var expectedFile = inputFile + ".byPage.byColumn.voa";
+                var expectedAttributes = new IUnknownVectorClass();
+                expectedAttributes.LoadFrom(expectedFile, false);
+                var tables = TabulaUtils.GetTablesAsOneAttributePerPage(inputFile, byRow: false);
+
+                var expectedText = ConcatAttributeText(expectedAttributes);
+                var foundText = ConcatAttributeText(tables);
+                Assert.AreEqual(expectedText, foundText);
+
+                var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
+                Assert.AreEqual("Expected||1||Found||1||Correct||1||", spatialResults);
+            }
+        }
+
+        /// <summary>
+        /// Test that OCRParameters can be overridden
+        /// </summary>
+        [Test]
+        public static void OverrideDefaultOCRParameters()
+        {
+            foreach (var inputFile in _testFilePaths_ISSUE_16821
+                .Where(x => x.EndsWith(".hugePage.tif", StringComparison.OrdinalIgnoreCase)))
+            {
+                // Override TabulaUtils default max image size with Nuance defaults
+                var ocrParams = new List<OCRParam>
+                {
+                    new OCRParam(("Kernel.Img.Max.Pix.X", 8400)),
+                    new OCRParam(("Kernel.Img.Max.Pix.Y", 8400)),
+                }
+                .ToOCRParameters();
+                var paramsContainer = (IHasOCRParameters)new AFDocumentClass();
+                paramsContainer.OCRParameters = ocrParams;
+                using (var tmpFile = new TemporaryFile(false))
+                {
+                    Assert.Throws<ExtractException>(() =>
+                        TabulaUtils.CreateTextPdf(inputFile, tmpFile.FileName, paramsContainer));
+                }
+
+                // Sanity check: Using larger max size works
+                ocrParams = new List<OCRParam>
+                {
+                    new OCRParam(("Kernel.Img.Max.Pix.X", 32000)),
+                    new OCRParam(("Kernel.Img.Max.Pix.Y", 32000)),
+                }
+                .ToOCRParameters();
+                paramsContainer.OCRParameters = ocrParams;
+                using (var tmpFile = new TemporaryFile(false))
+                {
+                    TabulaUtils.CreateTextPdf(inputFile, tmpFile.FileName, paramsContainer);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Test that low DPI image processes without error
+        /// </summary>
+        [Test]
+        public static void LowDpi()
+        {
+            foreach (var inputFile in _testFilePaths_ISSUE_16821
+                .Where(x => x.EndsWith(".lowDPI.tif", StringComparison.OrdinalIgnoreCase)))
+            {
+                var expectedFile = inputFile + ".byPage.byColumn.voa";
+                var expectedAttributes = new IUnknownVectorClass();
+                expectedAttributes.LoadFrom(expectedFile, false);
+                var tables = TabulaUtils.GetTablesAsOneAttributePerPage(inputFile, byRow: false);
+
+                var expectedText = ConcatAttributeText(expectedAttributes);
+                var foundText = ConcatAttributeText(tables);
+                Assert.AreEqual(expectedText, foundText);
+
+                // No tables are actually found
+                var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
+                Assert.AreEqual("Expected||0||", spatialResults);
             }
         }
 

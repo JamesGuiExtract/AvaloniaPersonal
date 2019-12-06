@@ -637,6 +637,12 @@
     <EmbeddedResource Include="Resources\Tabula\us-006.pdf.uss" />
     <EmbeddedResource Include="Resources\Tabula\us-006.pdf.tif.uss" />
     <EmbeddedResource Include="Resources\Tabula\us-006.pdf.tif.pdf.uss" />
+    <EmbeddedResource Include="Resources\Tabula\us-006.lowDPI.tif" />
+    <EmbeddedResource Include="Resources\Tabula\us-006.lowDPI.tif.uss" />
+    <EmbeddedResource Include="Resources\Tabula\us-006.lowDPI.tif.byPage.byColumn.voa" />
+    <EmbeddedResource Include="Resources\Tabula\us-006.hugePage.tif" />
+    <EmbeddedResource Include="Resources\Tabula\us-006.hugePage.tif.uss" />
+    <EmbeddedResource Include="Resources\Tabula\us-006.hugePage.tif.byPage.byColumn.voa" />
     <EmbeddedResource Include="Resources\Tabula\getTableCellsWithFeatures.rsd" />
     <EmbeddedResource Include="Resources\Tabula\TableScripts.fsx" />
   </ItemGroup>

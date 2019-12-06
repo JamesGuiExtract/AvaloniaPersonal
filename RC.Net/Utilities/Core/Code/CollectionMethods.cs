@@ -652,10 +652,10 @@ namespace Extract.Utilities
         }
 
         /// <summary>
-        /// Converts <see paramref="ocrParameters"/> into an <see cref="IEnumerable"/>.
+        /// Converts <see paramref="ocrParameters"/> into an <see cref="IOCRParameters"/>.
         /// </summary>
-        /// <param name="ocrParameters">The <see cref="IOCRParameters"/> to convert.</param>
-        /// <returns>An <see cref="IEnumerable"/> of type <see cref="OCRParam"/>.</returns>
+        /// <param name="ocrParameters">The <see cref="IEnumerable{OCRParam}"/> to convert.</param>
+        /// <returns>An <see cref="IOCRParameters"/> instance.</returns>
         [CLSCompliant(false)]
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public static IOCRParameters ToOCRParameters(this IEnumerable<OCRParam> ocrParameters)

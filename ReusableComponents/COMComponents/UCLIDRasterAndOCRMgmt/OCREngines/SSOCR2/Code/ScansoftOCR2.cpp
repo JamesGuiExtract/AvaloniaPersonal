@@ -327,12 +327,12 @@ STDMETHODIMP CScansoftOCR2::CreateOutputImage(BSTR bstrImageFileName, BSTR bstrF
 		THROW_UE_ON_ERROR("ELI46469", "Unable to get image page count",
 			kRecGetImgFilePageCount(hFile, &nPageCount));
 
+		string strImageFileName = asString(bstrtImageFileName);
 		for (int i = 0; i < nPageCount; ++i)
 		{
 			try
 			{
-				THROW_UE_ON_ERROR("ELI46470", "Unable to load image page",
-					kRecLoadImgF(0, bstrtImageFileName, &hPage, i));
+				loadPageFromImageHandle(strImageFileName, hFile, i, &hPage);
 			}
 			catch (UCLIDException ue)
 			{
@@ -350,7 +350,7 @@ STDMETHODIMP CScansoftOCR2::CreateOutputImage(BSTR bstrImageFileName, BSTR bstrF
 			}
 			catch (UCLIDException ue)
 			{
-				ue.addDebugInfo("Image", asString(bstrtImageFileName));
+				ue.addDebugInfo("Image", strImageFileName);
 				ue.addDebugInfo("Page", i + 1);
 				ue.log();
 			}
