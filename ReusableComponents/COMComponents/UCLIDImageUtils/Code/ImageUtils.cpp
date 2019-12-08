@@ -306,14 +306,22 @@ STDMETHODIMP CImageUtils::GetSpatialPageInfos(BSTR bstrFileName, IIUnknownVector
 
 		string strFileName = asString(bstrFileName);
 		string strUssFileName = strFileName + ".uss";
-		ILongToObjectMapPtr ipPageInfos = __nullptr;
+		ILongToObjectMapPtr ipPageInfos(CLSID_LongToObjectMap);
 		if (isFileOrFolderValid(strUssFileName))
 		{
 			ISpatialStringPtr ipUssData(CLSID_SpatialString);
 			ASSERT_RESOURCE_ALLOCATION("ELI45168", ipUssData != __nullptr);
 
-			ipUssData->LoadFrom(strUssFileName.c_str(), FALSE);
-			ipPageInfos = ipUssData->SpatialPageInfos;
+			IIUnknownVectorPtr ipPages = ipUssData->LoadPagesFromFile(strUssFileName.c_str());
+			for (long i = 0, len = ipPages->Size(); i < len; i++)
+			{
+				ipUssData = ipPages->At(i);
+				long pageNumber = i + 1;
+				if (ipUssData->SpatialPageInfos->Contains(pageNumber))
+				{
+					ipPageInfos->Set(pageNumber, ipUssData->SpatialPageInfos->GetValue(pageNumber));
+				}
+			}
 		}
 
 		IIUnknownVectorPtr ipSpatialPageInfos(CLSID_IUnknownVector);
