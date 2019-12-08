@@ -260,8 +260,16 @@ namespace Extract.AttributeFinder
             try
             {
                 var result = new SpatialStringClass();
-                var tables = GetTablesOnEveryPage(inputFile, new TablesToSpatialString(inputFile, byRow, "\t"),
-                    new [] { pageNumber }, tableFinder, pdfFile).First();
+                var tables =
+                    GetTablesOnEveryPage(
+                        inputFile: inputFile,
+                        tableProcessor: new TablesToSpatialString(inputFile, byRow, "\t"),
+                        pageNumbers: new [] { pageNumber },
+                        tableFinder: tableFinder,
+                        pdfFile: pdfFile
+                        )
+                    .First();
+
                 var tableVector = tables.ToIUnknownVector();
                 if (tableVector.Size() > 0)
                 {
@@ -620,7 +628,9 @@ namespace Extract.AttributeFinder
                 try
                 {
                     IEnumerable<List<LetterStruct>[][]> tables = new TablesToLetters().ProcessTables(page, spatialPageInfos);
-                    return tables.Select(table => ProcessTable(table, spatialPageInfos));
+                    return tables
+                        .Select(table => ProcessTable(table, spatialPageInfos))
+                        .Where(t => t.HasSpatialInfo());
                 }
                 catch (Exception ex)
                 {
