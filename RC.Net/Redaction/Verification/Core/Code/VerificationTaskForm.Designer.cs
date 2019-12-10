@@ -1809,7 +1809,7 @@ namespace Extract.Redaction.Verification
             // VerificationTaskForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1592, 926);
             this.Controls.Add(imageViewerToolStripContainer);
             this.Controls.Add(dockContainer1);

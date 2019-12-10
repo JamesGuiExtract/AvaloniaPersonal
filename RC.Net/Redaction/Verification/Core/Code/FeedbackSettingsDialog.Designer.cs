@@ -257,7 +257,7 @@ namespace Extract.Redaction.Verification
             // FeedbackSettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.CancelButton = this._cancelButton;
             this.ClientSize = new System.Drawing.Size(392, 366);
             this.Controls.Add(this._okButton);

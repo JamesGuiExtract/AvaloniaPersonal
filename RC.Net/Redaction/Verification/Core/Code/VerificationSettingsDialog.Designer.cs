@@ -600,7 +600,7 @@ namespace Extract.Redaction.Verification
             // 
             this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.CancelButton = this._cancelButton;
             this.ClientSize = new System.Drawing.Size(476, 376);
             this.Controls.Add(this.tabControl1);
