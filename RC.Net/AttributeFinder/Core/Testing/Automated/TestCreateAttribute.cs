@@ -1,4 +1,5 @@
-﻿using Extract.Testing.Utilities;
+﻿using Extract.AttributeFinder.Rules;
+using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
 using System.Diagnostics.CodeAnalysis;
@@ -156,6 +157,108 @@ namespace Extract.AttributeFinder.Test
                    _TEST_FOUR_RSD_FILE, 
                    _TEST_IMAGE_013_EXPECTED_VOA_FILE_FOR_TEST_4,
                    _TEST_IMAGE_013_TIF_FILE); 
+        }
+
+        /// <summary>
+        /// Tests that 'do not create if...' is ignored when value element is not XPath
+        /// https://extract.atlassian.net/browse/ISSUE-16829
+        /// </summary>
+        [Test, Category("CreateAttribute")]
+        public static void EmptyValue_Literal()
+        {
+            var creator = new CreateAttribute();
+            creator.Root = "/*";
+            creator.AddSubAttributeComponents(new AttributeNameAndTypeAndValue(
+                name: "Test",
+                type: "SSN",
+                value: "",
+                nameContainsXPath: false,
+                typeContainsXPath: false,
+                valueContainsXPath: false,
+                doNotCreateIfNameIsEmpty: true,
+                doNotCreateIfTypeIsEmpty: true,
+                doNotCreateIfValueIsEmpty: true
+                ));
+
+            var attrr = new IUnknownVectorClass();
+            creator.ProcessOutput(attrr, new AFDocumentClass(), null);
+            Assert.AreEqual(1, attrr.Size());
+        }
+
+        /// <summary>
+        /// Tests that 'do not create if...' is respected when value element is XPath
+        /// </summary>
+        [Test, Category("CreateAttribute")]
+        public static void EmptyValue_XPath()
+        {
+            var creator = new CreateAttribute();
+            creator.Root = "/*";
+            creator.AddSubAttributeComponents(new AttributeNameAndTypeAndValue(
+                name: "Test",
+                type: "SSN",
+                value: "_NON_EXISTENT_ELEMENT_",
+                nameContainsXPath: false,
+                typeContainsXPath: false,
+                valueContainsXPath: true,
+                doNotCreateIfNameIsEmpty: true,
+                doNotCreateIfTypeIsEmpty: true,
+                doNotCreateIfValueIsEmpty: true
+                ));
+
+            var attrr = new IUnknownVectorClass();
+            creator.ProcessOutput(attrr, new AFDocumentClass(), null);
+            Assert.AreEqual(0, attrr.Size());
+        }
+
+        /// <summary>
+        /// Tests that 'do not create if...' is ignored when type element is not XPath
+        /// https://extract.atlassian.net/browse/ISSUE-16829
+        /// </summary>
+        [Test, Category("CreateAttribute")]
+        public static void EmptyType_Literal()
+        {
+            var creator = new CreateAttribute();
+            creator.Root = "/*";
+            creator.AddSubAttributeComponents(new AttributeNameAndTypeAndValue(
+                name: "Test",
+                type: "",
+                value: "Val",
+                nameContainsXPath: false,
+                typeContainsXPath: false,
+                valueContainsXPath: false,
+                doNotCreateIfNameIsEmpty: true,
+                doNotCreateIfTypeIsEmpty: true,
+                doNotCreateIfValueIsEmpty: true
+                ));
+
+            var attrr = new IUnknownVectorClass();
+            creator.ProcessOutput(attrr, new AFDocumentClass(), null);
+            Assert.AreEqual(1, attrr.Size());
+        }
+
+        /// <summary>
+        /// Tests that 'do not create if...' is respected when type element is XPath
+        /// </summary>
+        [Test, Category("CreateAttribute")]
+        public static void EmptyType_XPath()
+        {
+            var creator = new CreateAttribute();
+            creator.Root = "/*";
+            creator.AddSubAttributeComponents(new AttributeNameAndTypeAndValue(
+                name: "Test",
+                type: "_NON_EXISTENT_ELEMENT",
+                value: "Val",
+                nameContainsXPath: false,
+                typeContainsXPath: true,
+                valueContainsXPath: false,
+                doNotCreateIfNameIsEmpty: true,
+                doNotCreateIfTypeIsEmpty: true,
+                doNotCreateIfValueIsEmpty: true
+                ));
+
+            var attrr = new IUnknownVectorClass();
+            creator.ProcessOutput(attrr, new AFDocumentClass(), null);
+            Assert.AreEqual(0, attrr.Size());
         }
 
         #endregion Public Test Functions

@@ -684,7 +684,6 @@ namespace Extract.AttributeFinder.Rules
                     if (!containsXPath)
                     {
                         QueryResult = query;
-                        Failed = String.IsNullOrWhiteSpace(query) && doNotCreateIfEmpty;
                         return;
                     }
 
