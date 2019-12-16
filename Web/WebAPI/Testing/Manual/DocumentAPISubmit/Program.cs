@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -6,124 +7,171 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Extract.Web.WebAPI.DocumentAPISubmit
 {
     class Program
     {
-        static Func<Task> _login;
-        static string _textFilePrefix;
+        class Settings
+        {
+            public string root = ".";
+            public string docApiUrlFile = null;
+            public string docApiUrl = null;
+            public string backendApiUrlFile = null;
+            public string backendApiUrl = null;
+            public string tokenFile = "token.txt";
+            public string token = null;
+            public int batchSize = 50;
+            public string userName = null;
+            public string pwd = null;
+            public int pollingInterval = 3000;
+            public int maxRetries = 10;
+            public int naiveAttempts = 10;
+            public bool processText = true;
+            public bool reprocessRandom = true;
+            public TimeSpan minTimeToRun = TimeSpan.FromMinutes(15);
+            public string workflow = null;
+            public bool testDocumentApi;
+            public bool testBackendApi;
+
+            public Settings(string[] args)
+            {
+                for (int i = 0; i < args.Length; i++)
+                {
+                    var arg = args[i];
+                    var flag = arg.ToUpperInvariant();
+                    if (flag.StartsWith("-") || flag.StartsWith("/")
+                        && (i + 1) < args.Length)
+                    {
+                        flag = flag.Substring(1);
+                        switch (flag)
+                        {
+                            case "DOCURLFILE":
+                                docApiUrlFile = args[++i];
+                                continue;
+
+                            case "DOCURL":
+                                docApiUrl = args[++i];
+                                continue;
+
+                            case "BACKENDURLFILE":
+                                backendApiUrlFile = args[++i];
+                                continue;
+
+                            case "BACKENDURL":
+                                backendApiUrl = args[++i];
+                                continue;
+
+                            case "TOKENFILE":
+                                tokenFile = args[++i];
+                                continue;
+
+                            case "TOKEN":
+                                token = args[++i];
+                                continue;
+
+                            case "BATCHSIZE":
+                                batchSize = int.Parse(args[++i]);
+                                continue;
+
+                            case "USER":
+                                userName = args[++i];
+                                continue;
+
+                            case "PWD":
+                                pwd = args[++i];
+                                continue;
+
+                            case "POLLINT":
+                                pollingInterval = int.Parse(args[++i]);
+                                continue;
+
+                            case "MAXRETRIES":
+                                maxRetries = int.Parse(args[++i]);
+                                continue;
+
+                            case "NAIVEATTEMPTS":
+                                naiveAttempts = int.Parse(args[++i]);
+                                continue;
+
+                            case "PROCESSTEXT":
+                                processText = bool.Parse(args[++i]);
+                                continue;
+
+                            case "REPROCESSRANDOM":
+                                reprocessRandom = bool.Parse(args[++i]);
+                                continue;
+
+                            case "MINTIME":
+                                minTimeToRun = TimeSpan.Parse(args[++i]);
+                                continue;
+
+                            case "WORKFLOW":
+                                workflow = args[++i];
+                                continue;
+                        }
+                    }
+
+                    root = arg;
+                }
+
+                testDocumentApi = !string.IsNullOrWhiteSpace(docApiUrl)
+                    || !string.IsNullOrWhiteSpace(docApiUrlFile);
+
+                testBackendApi = !string.IsNullOrWhiteSpace(backendApiUrl)
+                    || !string.IsNullOrWhiteSpace(backendApiUrlFile);
+
+                if (testDocumentApi && processText)
+                {
+                    processText = false;
+                    Log("Text processing is disabled to test backend API");
+                }
+            }
+        }
 
         static async Task Main(string[] args)
         {
-            string root = ".";
-            string urlFile = "url.txt";
-            string tokenFile = "token.txt";
-            string url = null;
-            string token = null;
-            int batchSize = 50;
-            string userName = null;
-            string pwd = null;
-            int pollingInterval = 10000;
-            TimeSpan minTimeToRun = TimeSpan.FromMinutes(15);
-            string workflow = null;
+            await new SynchronizationContextRemover();
 
-            for (int i = 0; i < args.Length; i++)
+            var _settings = new Settings(args);
+            User user = null;
+            string _auth = null;
+
+            HttpClient docHttpClient = null;
+            DocumentClient docClient = null;
+            UsersClient userClient = null;
+            WorkflowClient workflowClient = null;
+            if (_settings.testDocumentApi)
             {
-                var arg = args[i];
-                var flag = arg.ToUpperInvariant();
-                if (flag.StartsWith("-") || flag.StartsWith("/")
-                    && (i + 1) < args.Length)
-                {
-                    flag = flag.Substring(1);
-                    switch (flag)
-                    {
-                        case "URLFILE":
-                            urlFile = args[++i];
-                            continue;
-
-                        case "URL":
-                            url = args[++i];
-                            continue;
-
-                        case "TOKENFILE":
-                            tokenFile = args[++i];
-                            continue;
-
-                        case "TOKEN":
-                            token = args[++i];
-                            continue;
-
-                        case "BATCHSIZE":
-                            batchSize = int.Parse(args[++i]);
-                            continue;
-
-                        case "USER":
-                            userName = args[++i];
-                            continue;
-
-                        case "PWD":
-                            pwd = args[++i];
-                            continue;
-
-                        case "POLLINT":
-                            pollingInterval = int.Parse(args[++i]);
-                            continue;
-
-                        case "MINTIME":
-                            minTimeToRun = TimeSpan.Parse(args[++i]);
-                            continue;
-
-                        case "WORKFLOW":
-                            workflow = args[++i];
-                            continue;
-                    }
-                }
-
-                root = arg;
+                docHttpClient = CreateHttpClient(_settings.docApiUrl);
+                docClient = new DocumentClient(_settings.docApiUrl, docHttpClient);
+                userClient = new UsersClient(_settings.docApiUrl, docHttpClient);
+                workflowClient = new WorkflowClient(_settings.docApiUrl, docHttpClient);
             }
 
-            HttpClient client = new HttpClient
+            HttpClient backendHttpClient = null;
+            AppBackendClient backendClient = null;
+            if (_settings.testBackendApi)
             {
-                // Set timeout to be higher than default to avoid the occasional TaskCanceledExceptions
-                Timeout = TimeSpan.FromMinutes(5)
-            };
-			// This seems to make connections against a remote address behave like connections to localhost
-            ServicePointManager.DefaultConnectionLimit = int.MaxValue;
+                backendHttpClient = CreateHttpClient(_settings.backendApiUrl);
+                backendClient = new AppBackendClient(_settings.backendApiUrl, backendHttpClient);
+            }
 
-            url = url ?? File.ReadAllText(urlFile).Trim();
-            client.BaseAddress = new Uri(url);
-
-            client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
-
-            var docClient = new DocumentClient(url, client);
-            var userClient = new UsersClient(url, client);
-            var workflowClient = new WorkflowClient(url, client);
-
-            if (userName != null && pwd != null)
+            if (_settings.userName != null && _settings.pwd != null)
             {
-                var user = new User()
+                user = new User()
                 {
-                    Username = userName,
-                    Password = pwd,
-                    WorkflowName = workflow
+                    Username = _settings.userName,
+                    Password = _settings.pwd,
+                    WorkflowName = _settings.workflow
                 };
 
-                _login = async () =>
-                {
-                    var tokenResult = await userClient.LoginAsync(user);
-                    token = tokenResult.Access_token;
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                };
-
-                _login().GetAwaiter().GetResult();
             }
             else
             {
-                token = token ?? File.ReadAllText(tokenFile).Trim();
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                _auth = _auth ?? "Bearer " + File.ReadAllText(_settings.tokenFile).Trim();
             }
 
             var t = new Stopwatch();
@@ -132,7 +180,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
             IEnumerable<string> GetFiles(params string[] extensions)
             {
                 var extSet = new HashSet<string>(extensions, StringComparer.OrdinalIgnoreCase);
-                var files = Directory.EnumerateFiles(root, "*.*", SearchOption.AllDirectories);
+                var files = Directory.EnumerateFiles(_settings.root, "*.*", SearchOption.AllDirectories);
                 foreach (var file in files)
                 {
                     var ext = Path.GetExtension(file);
@@ -146,782 +194,158 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
             int totalTasksStarted = 0;
             int totalTasksCompleted = 0;
 
-            _textFilePrefix = Guid.NewGuid().ToString("N");
-
-            // Cache text file enumeration because otherwise the list grow exponentially
-            string[] textFiles = null;
-            while(t.Elapsed < minTimeToRun)
+            while (t.Elapsed < _settings.minTimeToRun!)
             {
-                // Process files with only one task working on any particular file
-                var (tasksStarted, tasksCompleted) = await ProcessAll(docClient, workflowClient, GetFiles(".tif", ".pdf"), batchSize, pollingInterval, false, RunTests);
+                Log($"------------ {DateTime.Now} Starting new test set ------------");
+                var t2 = new Stopwatch();
+                t2.Start();
+
+                // Process files with only one task working on any particular file at a time.
+                // NOTE: If processText, text files corresponding the document text of each source image will be 
+                // generated as a side-effect of running this process, so pre-existing text files do not need to be supplied
+                var files = _settings.processText ? GetFiles(".tif", ".pdf", ".txt") : GetFiles(".tif", ".pdf");
+                var (tasksStarted, tasksCompleted) = RunTests(
+                    user, _auth, docClient, workflowClient, backendClient, userClient, files, _settings)
+                    .GetAwaiter().GetResult();
                 totalTasksStarted += tasksStarted;
                 totalTasksCompleted += tasksCompleted;
 
-                textFiles = textFiles ?? GetFiles(".txt").Where(f => f.StartsWith(_textFilePrefix)).ToArray();
-                (tasksStarted, tasksCompleted) = await ProcessAll(docClient, workflowClient, textFiles, batchSize, pollingInterval, false, RunTests);
-                totalTasksStarted += tasksStarted;
-                totalTasksCompleted += tasksCompleted;
-
-                // Process files where random files in the valid range are processed (so that it is possible that the same
-                // file is processed by multiple threads at a time)
-                (tasksStarted, tasksCompleted) = await ProcessAll(docClient, workflowClient, GetFiles(".tif", ".pdf"), batchSize, pollingInterval, true, RunTests);
-                totalTasksStarted += tasksStarted;
-                totalTasksCompleted += tasksCompleted;
-
-                (tasksStarted, tasksCompleted) = await ProcessAll(docClient, workflowClient, textFiles, batchSize, pollingInterval, true, RunTests);
-                totalTasksStarted += tasksStarted;
-                totalTasksCompleted += tasksCompleted;
+                Log($"------------ Test set complete ------------");
+                Log($"Tasks started: {tasksStarted}");
+                Log($"Tasks completed: {tasksCompleted}");
+                Log($"Time elapsed: {t2.Elapsed}");
+                Log($"Total tasks started: {totalTasksStarted}");
+                Log($"Total tasks completed: {totalTasksCompleted}");
+                Log($"Total time elapsed: {t.Elapsed}");
             }
 
-            Log(FormattableString.Invariant($"Total tasks started: {totalTasksStarted}"));
-            Log(FormattableString.Invariant($"Total tasks completed: {totalTasksCompleted}"));
-
-            Log("Time elapsed: " + t.Elapsed);
+            Log($"Total tasks started: {totalTasksStarted}");
+            Log($"Total tasks completed: {totalTasksCompleted}");
+            Log($"Time elapsed: {t.Elapsed}");
+            Log("TESTING COMPLETE");
         }
 
-        static async Task<(int tasksStarted, int tasksCompleted)> ProcessAll(DocumentClient docClient, WorkflowClient workflowClient, IEnumerable<string> files,
-            int batchSize, int pollingInterval, bool processRandomFileIDs,
-            Func<int, string, DocumentClient, WorkflowClient, int, Task> operation)
+        static async Task<(int tasksStarted, int tasksCompleted)> RunTests(User user, string auth,
+            DocumentClient docClient, WorkflowClient workflowClient, AppBackendClient backendClient, UsersClient userClient,
+            IEnumerable<string> files, Settings settings)
         {
             int tasksStarted = 0;
             int tasksCompleted = 0;
-            Random rng = new Random();
-            var tasks = files
-                .Select(async file =>
-                {
-                    tasksStarted++;
-                    var fileName = Path.GetFullPath(file);
-                    var id = await KeepTrying(() => PostAsync(docClient, fileName), fileName, pollingInterval);
-                    var fileID = processRandomFileIDs
-                    ? rng.Next(1, tasksStarted + 1)
-                    : id;
-                    await KeepTrying(() => operation(id, fileName, docClient, workflowClient, pollingInterval), fileName, pollingInterval);
-                });
+            var taskQueue = new ConcurrentQueue<(ApiTester tester, Func<Task> task)>();
 
-            var waitingTasksEnum = tasks.GetEnumerator();
-            var runningTasks = new List<Task>();
-            for (int i = 0; i < batchSize; i++)
+            if (settings.testDocumentApi)
             {
-                if (waitingTasksEnum.MoveNext())
+                var activeDocumentAPITesters = new ConcurrentDictionary<int, DocumentAPITests>();
+                Random rng = new Random();
+                var testers = files
+                    .Select(file =>
+                    {
+                        var fileName = Path.GetFullPath(file);
+                        DocumentAPITests documentApiTester = new DocumentAPITests(
+                            fileName, user, auth, docClient, workflowClient, userClient, 
+                            settings.pollingInterval, settings.maxRetries, settings.naiveAttempts, settings.processText);
+
+                        return documentApiTester;
+                    });
+
+                foreach (var documentApiTester in testers)
                 {
-                    runningTasks.Add(waitingTasksEnum.Current);
+                    taskQueue.Enqueue((tester: documentApiTester, task: async () =>
+                    {
+                        var taskNumber = Interlocked.Increment(ref tasksStarted);
+                        await documentApiTester.PostDocument();
+
+                        activeDocumentAPITesters.TryAdd(taskNumber, documentApiTester);
+                        if (settings.reprocessRandom
+                            && activeDocumentAPITesters.TryGetValue(rng.Next(1, activeDocumentAPITesters.Count), out var randomTester))
+                        {
+                            taskQueue.Enqueue((tester: randomTester, task: async () =>
+                            {
+                                randomTester.reprocessing = true;
+                                await randomTester.RunMainSequenceTests("Reprocessing");
+                            }));
+                        }
+
+                        await documentApiTester.RunMainSequenceTests();
+                        taskQueue.Enqueue((tester: documentApiTester, task: async () =>
+                        {
+                            await documentApiTester.RunDeletionTests();
+                            Interlocked.Increment(ref tasksCompleted);
+                        }));
+                    }));
+
+                    if (settings.testBackendApi)
+                    {
+                        var backendApiTester = new AppBackendAPITests(
+                            user, auth, backendClient, settings.pollingInterval, settings.maxRetries);
+
+                        taskQueue.Enqueue((tester: backendApiTester, task: async () =>
+                        {
+                            await backendApiTester.GetSessionAsync();
+                            await backendApiTester.RunDocumentTests();
+                        }));
+                    }
                 }
-                else
+            }
+            else if (settings.testBackendApi)
+            {
+                for (int i = 0; i < settings.batchSize; i++)
                 {
-                    break;
+                    var backendApiTester = new AppBackendAPITests(
+                        user, auth, backendClient, settings.pollingInterval, settings.maxRetries);
+
+                    taskQueue.Enqueue((tester: backendApiTester, task: async () =>
+                    {
+                        Interlocked.Increment(ref tasksStarted);
+                        await backendApiTester.GetSessionAsync();
+                        await backendApiTester.RunDocumentTests();
+                        Interlocked.Increment(ref tasksCompleted);
+                    }));
                 }
+            }
+
+            var runningTasks = new List<Task>();
+            while (runningTasks.Count() < settings.batchSize && taskQueue.TryDequeue(out var task))
+            {
+                runningTasks.Add(task.task.Invoke());
             }
 
             while (runningTasks.Count > 0)
             {
                 var finished = await Task.WhenAny(runningTasks);
                 runningTasks.Remove(finished);
-                if (finished.IsFaulted)
-                {
-                    // Accept that files will be deleted when testing random file IDs
-                    if (processRandomFileIDs
-                        && finished.Exception.InnerExceptions
-                            .OfType<SwaggerException>()
-                            .Any(ex => ex.Response.Contains("File not in the workflow") || ex.Response.Contains("Attribute not found")))
-                    {
-                        Log("Exception about deleted file caught while processing random IDs");
-                        tasksCompleted++;
-                    }
-                    else
-                    {
-                        Log(FormattableString.Invariant($"FAILURE at {DateTime.Now} {finished.Exception}"), true);
-                    }
-                }
-                else if (finished.IsCanceled)
-                {
-                    Log(FormattableString.Invariant($"FAILURE, CANCELLED at {DateTime.Now}"), true);
-                }
-                else
-                {
-                    tasksCompleted++;
-                }
 
-                if (waitingTasksEnum.MoveNext())
+                if (taskQueue.TryDequeue(out var task))
                 {
-                    runningTasks.Add(waitingTasksEnum.Current);
+                    runningTasks.Add(task.task.Invoke());
                 }
             }
-            Log(FormattableString.Invariant($"Tasks started: {tasksStarted}"));
-            Log(FormattableString.Invariant($"Tasks completed: {tasksCompleted}"));
+
             return (tasksStarted, tasksCompleted);
         }
 
-        static async Task RunTests(int id, string fileName, DocumentClient docClient, WorkflowClient workflowClient, int pollingInterval)
+        static HttpClient CreateHttpClient(string url)
         {
-            bool fileIsText = Path.GetExtension(fileName).Equals(".txt", StringComparison.OrdinalIgnoreCase);
-            DocumentDataResult origData = null;
-            bool docDataAllExist = false;
-            string text = " ";
-            int docDataCount = 0;
-
-            void ResetStateVars()
+            HttpClient httpClient = new HttpClient
             {
-                docDataAllExist = false;
-                docDataCount = 0;
-            }
-
-            async Task GetDataTest()
-            {
-                DocumentDataResult data = null;
-                int attempts = 0;
-
-                Naive:
-                Log(FormattableString.Invariant($"Naive attempt {++attempts} for {fileName}"));
-                try
-                {
-                    data = await docClient.GetDocumentDataAsync(id);
-                }
-                catch (Exception)
-                {
-                    Log(FormattableString.Invariant($"Naive attempt {attempts} failed with exception"));
-                    data = null;
-                    if (attempts < 10)
-                        goto Naive;
-                }
-
-                if (data != null)
-                {
-                    Log("Successful naive get-data for " + fileName);
-                }
-                else
-                {
-                    await Log("Waiting for " + fileName, async () =>
-                        await PollForCompletion(docClient, id, pollingInterval));
-
-                    data = await Log("Getting data " + fileName, async () =>
-                        await docClient.GetDocumentDataAsync(id));
-                }
-
-                origData = data;
-                docDataCount = origData.Attributes.Count;
-            }
-
-            async Task PatchDataUpdateTest()
-            {
-                try
-                {
-                    var attr = origData.Attributes.FirstOrDefault();
-                    if (attr != null)
-                    {
-                        var attrPatch = new DocumentAttributePatch(attr) { Operation = PatchOperation.Update };
-                        attrPatch.Name = "Blah";
-                        var patch = new DocumentDataPatch
-                        {
-                            Attributes = new[] { attrPatch }
-                        };
-
-                        await Log("Patching " + fileName, async () =>
-                            await docClient.PatchDocumentDataAsync(id, patch));
-
-                        var patchedData = await Log("Getting patched data for " + fileName, async () =>
-                            await docClient.GetDocumentDataAsync(id));
-                    }
-                    else if (docDataCount == 0)
-                    {
-                        throw new Exception("No attributes to patch");
-                    }
-                }
-                catch (SwaggerException ex) when (!docDataAllExist && ex.Response.Contains("Attribute not found"))
-                {
-                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
-                }
-            }
-
-            async Task PatchDataDeleteTest()
-            {
-                try
-                {
-                    var attr = origData.Attributes.FirstOrDefault();
-                    if (attr != null)
-                    {
-                        var attrPatch = new DocumentAttributePatch
-                        {
-                            ID = attr.ID,
-                            Operation = PatchOperation.Delete
-                        };
-
-                        var patch = new DocumentDataPatch
-                        {
-                            Attributes = new[] { attrPatch }
-                        };
-
-                        await Log("Delete-patching " + fileName, async () =>
-                            await docClient.PatchDocumentDataAsync(id, patch));
-
-                        var patchedData = await Log("Getting patched data for " + fileName, async () =>
-                            await KeepTrying(() => docClient.GetDocumentDataAsync(id), fileName, pollingInterval));
-
-                        docDataAllExist = false;
-                        docDataCount--;
-
-                        if (patchedData.Attributes.Count != docDataCount)
-                        {
-                            throw new Exception("Delete patch had no effect!");
-                        }
-                    }
-                    else if (docDataCount == 0)
-                    {
-                        throw new Exception("No attributes to patch");
-                    }
-                }
-                catch (SwaggerException ex) when (!docDataAllExist && ex.Response.Contains("Attribute not found"))
-                {
-                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
-                }
-            }
-
-            async Task PatchDataCreateTest()
-            {
-                try
-                {
-                    var attrPatch = new DocumentAttributePatch
-                    {
-                        ConfidenceLevel = "High",
-                        HasPositionInfo = false,
-                        ID = Guid.NewGuid().ToString(),
-                        Name = "MyName",
-                        Type = "SSN",
-                        Value = "123-12-1234",
-                        Operation = PatchOperation.Create
-                    };
-
-                    var patch = new DocumentDataPatch
-                    {
-                        Attributes = new[] { attrPatch }
-                    };
-
-                    await Log("Create-patching " + fileName, async () =>
-                        await docClient.PatchDocumentDataAsync(id, patch));
-
-                    var patchedData = await Log("Getting patched data for " + fileName, async () =>
-                        await KeepTrying(() => docClient.GetDocumentDataAsync(id), fileName, pollingInterval));
-
-                    docDataCount++;
-
-                    if (patchedData.Attributes.Count != docDataCount)
-                    {
-                        throw new Exception(FormattableString.Invariant(
-                            $"Create patch had no effect! Expecting {docDataCount} attributes but got {patchedData.Attributes.Count}"));
-                    }
-                }
-                catch (SwaggerException ex) when (!docDataAllExist && ex.Response.Contains("Attribute not found"))
-                {
-                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
-                }
-            }
-
-            async Task PatchBadDataTest()
-            {
-                try
-                {
-                    var attrPatch = new DocumentAttributePatch
-                    {
-                        ConfidenceLevel = "High",
-                        HasPositionInfo = false,
-                        ID = Guid.NewGuid().ToString(),
-                        Name = "MyName",
-                        Type = "SSN",
-                        Value = "123-12-1234",
-                        Operation = PatchOperation.Update
-                    };
-
-                    var patch = new DocumentDataPatch
-                    {
-                        Attributes = new[] { attrPatch }
-                    };
-
-                    await Log("Patching " + fileName, async () =>
-                        await docClient.PatchDocumentDataAsync(id, patch));
-
-                    throw new Exception("Lack of exception patch-updating non-existent attribute");
-                }
-                catch (SwaggerException ex) when (ex.Response.Contains("Attribute not found"))
-                {
-                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
-                }
-            }
-
-            async Task ClearDataTest()
-            {
-                var input = new DocumentDataInput
-                {
-                    Attributes = new DocumentAttribute[0]
-                };
-
-                await Log("Clearing data for " + fileName, async () =>
-                    await docClient.PutDocumentDataAsync(id, input));
-
-                var clearedData = await Log("Getting cleared data for " + fileName, async () =>
-                    await KeepTrying(() => docClient.GetDocumentDataAsync(id), fileName, pollingInterval));
-
-                docDataCount = 0;
-                if (clearedData.Attributes.Count != docDataCount)
-                {
-                    throw new Exception(FormattableString.Invariant(
-                        $"Clear data had no effect! Expecting 0 attributes but got {clearedData.Attributes.Count}"));
-                }
-
-                docDataAllExist = false;
-            }
-
-            async Task RestoreDataTest()
-            {
-                var input = new DocumentDataInput
-                {
-                    Attributes = origData.Attributes
-                };
-
-                await Log("Restoring data for " + fileName, async () =>
-                    await docClient.PutDocumentDataAsync(id, input));
-
-                var restoredData = await Log("Getting restored data for " + fileName, async () =>
-                    await KeepTrying(() => docClient.GetDocumentDataAsync(id), fileName, pollingInterval));
-
-                docDataCount = origData.Attributes.Count;
-                docDataAllExist = true;
-
-                if (restoredData.Attributes.Count != docDataCount)
-                {
-                    throw new Exception(FormattableString.Invariant(
-                        $"Restore data failed! Expecting {docDataCount} attributes but got {restoredData.Attributes.Count}"));
-                }
-            }
-
-            async Task DeleteDocumentTest()
-            {
-                await Log("Deleting " + fileName, async () =>
-                    await docClient.DeleteDocumentAsync(id));
-            }
-
-            async Task GetDocumentTest()
-            {
-                var file = await Log("Getting document from " + fileName, async () =>
-                    await docClient.GetDocumentAsync(id));
-
-                using (var ms = new MemoryStream())
-                {
-                    file.Stream.CopyTo(ms);
-
-                    var origInfo = new FileInfo(fileName);
-                    if (origInfo.Length != ms.Length)
-                    {
-                        using (var fs = new FileStream(fileName + ".wrongSize" + Path.GetExtension(fileName), FileMode.Create))
-                        {
-                            ms.Position = 0;
-                            ms.CopyTo(fs);
-                        }
-
-                        throw new Exception(FormattableString.Invariant(
-                            $"Retrieved file size differs from original file size! (expected: {origInfo.Length} retrieved: {ms.Length})"));
-                    }
-                }
-            }
-
-            async Task GetDocumentTypeTest()
-            {
-                var docType = await Log("Getting document type from " + fileName, async () =>
-                    await docClient.GetDocumentTypeAsync(id));
-            }
-
-            async Task GetOutputFileTest()
-            {
-                var file = await Log("Getting output file for " + fileName, async () =>
-                    await docClient.GetOutputFileAsync(id));
-            }
-
-            int pageCount = 0;
-            async Task GetPageInfoTest()
-            {
-                var info = await Log("Getting page info for " + fileName, async () =>
-                    await docClient.GetPageInfoAsync(id));
-
-                if (info.PageCount == 0 || info.PageCount != info.PageInfos.Count)
-                {
-                    throw new Exception("Unexpected discrepency in page info counts");
-                }
-
-                pageCount = info.PageCount;
-            }
-
-            async Task GetPageZonesTest()
-            {
-                var pageNum = Math.Max(pageCount, 1);
-                var zones = await Log(FormattableString.Invariant($"Getting page text from page {pageCount} of {fileName}"), async () =>
-                    await docClient.GetPageWordZonesAsync(id, pageNum));
-            }
-
-            async Task GetOutputTextTest()
-            {
-                var textResult = await Log("Getting output text from " + fileName, async () =>
-                    await docClient.GetOutputTextAsync(id));
-
-                text = string.Join("\r\n\r\n", textResult.Pages.Select(p => p.Text));
-            }
-
-            async Task GetPageTextTest()
-            {
-                // Use either first or last page, depending on whether GetPageInfoTest has been run already
-                var pageNum = Math.Max(pageCount, 1);
-
-                var textResult = await Log(FormattableString.Invariant($"Getting page text from page {pageNum} of {fileName}"), async () =>
-                    await docClient.GetPageTextAsync(id, pageNum));
-
-                text = textResult.Pages.Single().Text;
-            }
-
-            async Task GetTextTest()
-            {
-                var textResult = await Log(FormattableString.Invariant($"Getting text from {fileName}"), async () =>
-                    await docClient.GetTextAsync(id));
-
-                text = string.Join("\r\n\r\n", textResult.Pages.Select(p => p.Text));
-                if (!fileIsText)
-                {
-                    Log("Writing text from " + fileName, () =>
-                        File.WriteAllText(Path.Combine(Path.GetDirectoryName(fileName), _textFilePrefix + Guid.NewGuid().ToString("N") + ".txt"), text));
-                }
-            }
-
-            async Task PostTextTest()
-            {
-                // Currently posting an empty string is an error so ensure there is at least one character
-                var textSubmittedIDResult = await Log(FormattableString.Invariant($"Posting text from {fileName}"), async () =>
-                    await docClient.PostTextAsync(text ?? " "));
-            }
-
-            async Task GetDocumentStatusesTest()
-            {
-                var docStatuses = await Log("Getting workflow document statuses", workflowClient.GetDocumentStatusesAsync);
-            }
-
-            async Task GetWorkflowStatusTest()
-            {
-                var status = await Log("Getting workflow status", workflowClient.GetWorkflowStatusAsync);
-            }
-
-            async Task LoginTest()
-            {
-                await Log("Logging in user", _login);
-            }
-
-            var generalTests = new List<(Func<Task> test, string description)>
-            {
-                (GetDataTest, "getting data from"),
-                (GetDocumentTest, "getting document from"),
-                (GetDocumentTypeTest, "getting document type from"),
-                (GetOutputFileTest, "getting output file for"),
-                (GetPageTextTest, "getting page text from"),
-                (GetPageZonesTest, "getting page zones from"),
-                (GetTextTest, "getting text from"),
-                (GetOutputTextTest, "getting output text from"),
-                (PatchDataUpdateTest, "update-patching data to"),
-                (PatchDataDeleteTest, "delete-patching data to"),
-                (PatchDataCreateTest, "create-patching data to"),
-                (PatchBadDataTest, "bad-patching data to"),
-                (RestoreDataTest, "restoring data to"),
-                (ClearDataTest, "clearing data from"),
+                // Set timeout to be higher than default to avoid the occasional TaskCanceledExceptions
+                Timeout = TimeSpan.FromMinutes(5)
             };
+            // This seems to make connections against a remote address behave like connections to localhost
+            ServicePointManager.DefaultConnectionLimit = int.MaxValue;
 
-            var imageOnlyTests = new List<(Func<Task> test, string description)>
-            {
-                (GetPageInfoTest, "getting page info for"),
-            };
+            httpClient.BaseAddress = new Uri(url);
 
-            var testsNotRequiringDocument = new List<(Func<Task> test, string description)>
-            {
-                (PostTextTest, "posting text from"),
-                (GetDocumentStatusesTest, "getting document statuses for "),
-                (GetWorkflowStatusTest, "getting workflow status for "),
-            };
+            httpClient.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
 
-            if (_login != null)
-            {
-                testsNotRequiringDocument.Add((LoginTest, "re-logging in for"));
-            }
-
-            var allButDelete = generalTests.Concat(imageOnlyTests).Concat(testsNotRequiringDocument).ToList();
-
-            // Randomly sort but make sure GetDataTest comes first so that origData has a value
-            Random rng = new Random();
-            allButDelete = allButDelete.OrderBy(pair =>
-            {
-                if (pair.test == GetDataTest)
-                {
-                    return -1;
-                }
-                else
-                {
-                    return rng.Next();
-                }
-            }).ToList();
-
-            Log(FormattableString.Invariant($"{DateTime.Now}: file: {fileName}, ID: {id}, test order: {string.Join("|", allButDelete.Select(t => SimpleName(t.test)))}"));
-
-            foreach (var pair in allButDelete)
-            {
-                bool failBecauseText = fileIsText && imageOnlyTests.Contains(pair);
-                try
-                {
-                    await KeepTrying(pair.test, fileName, pollingInterval);
-                    if (failBecauseText)
-                    {
-                        throw new Exception(FormattableString.Invariant($"Lack of exception {pair.description} posted text! File: {fileName}"));
-                    }
-                }
-                catch (SwaggerException) when (failBecauseText)
-                {
-                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
-                }
-                catch (Exception ex) when (ex.Message.Contains("No attributes to patch"))
-                {
-                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(FormattableString.Invariant($"Unexpected exception caught running {SimpleName(pair.test)} on {fileName}"), ex);
-                }
-            }
-
-            ResetStateVars();
-
-            await KeepTrying(DeleteDocumentTest, fileName, pollingInterval);
-
-            allButDelete = allButDelete.OrderBy(_ => rng.Next()).ToList();
-            Log(FormattableString.Invariant($"After deleting: file: {fileName}, ID: {id}, test order: {string.Join("+", allButDelete.Select(t => SimpleName(t.test)))}"));
-            foreach (var pair in allButDelete)
-            {
-                bool failWhenDeleted = !testsNotRequiringDocument.Contains(pair);
-                bool failBecauseText = fileIsText && imageOnlyTests.Contains(pair);
-                try
-                {
-                    await KeepTrying(pair.test, fileName, pollingInterval);
-
-                    if (failWhenDeleted)
-                    {
-                        throw new Exception(FormattableString.Invariant($"Lack of exception {pair.description} deleted file! File: {fileName}"));
-                    }
-                    if (failBecauseText)
-                    {
-                        throw new Exception(FormattableString.Invariant($"Lack of exception {pair.description} posted text! File: {fileName}"));
-                    }
-                }
-                catch (SwaggerException ex) when (failBecauseText || failWhenDeleted && ex.Response.Contains("File not in the workflow"))
-                {
-                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
-                }
-                catch (SwaggerException ex) when (failWhenDeleted && string.IsNullOrWhiteSpace(ex.Response))
-                {
-                    throw new Exception(FormattableString.Invariant($"Generic (empty response) exception instead of the expected \"file not in the workflow\" exception"));
-                }
-                catch (SwaggerException ex)
-                {
-                    throw new Exception(FormattableString.Invariant($"Unexpected post-deletion exception caught running {SimpleName(pair.test)} on {fileName}"), ex);
-                }
-                catch (Exception ex) when (ex.Message.Contains("No attributes to patch"))
-                {
-                    Log(FormattableString.Invariant($"Expected exception caught for file {fileName}"));
-                }
-            }
+            return httpClient;
         }
 
-        static async Task<int> PostAsync(DocumentClient client, string fileName)
-        {
-            DocumentIdResult result;
-
-            if (Path.GetExtension(fileName).Equals(".txt", StringComparison.OrdinalIgnoreCase))
-            {
-                var text = File.ReadAllText(fileName);
-                result = await client.PostTextAsync(text ?? " ");
-            }
-            else
-            {
-                using (var stream = File.OpenRead(fileName))
-                {
-                    var file = new FileParameter(stream, fileName);
-                    result = await client.PostDocumentAsync(file);
-                }
-            }
-
-            Log(DateTime.Now.ToLongTimeString() + " Created: " + result.Id);
-
-            return result.Id;
-        }
-
-        static async Task PollForCompletion(DocumentClient client, int id, int pollingInterval = 10000)
-        {
-            while (true)
-            {
-                var result = await client.GetStatusAsync(id);
-
-                if (result.DocumentStatus == DocumentProcessingStatus.Processing)
-                {
-                    await Task.Delay(pollingInterval);
-                }
-                else if (result.DocumentStatus == DocumentProcessingStatus.Done)
-                {
-                    return;
-                }
-                else
-                {
-                    var ex = new InvalidOperationException("Unexpected status: " + result.StatusText);
-                    Log(ex.Message, true);
-                    throw ex;
-                }
-            }
-        }
-
-        public static void Log(string message, bool error = false)
-        {
-            if (error)
-            {
-                Console.Error.WriteLine(message);
-                Trace.TraceError(message);
-            }
-            else
-            {
-                Console.WriteLine(message);
-                Trace.WriteLine(message);
-            }
-        }
-
-        public static void Log(string message, Action func)
+        static void Log(string message)
         {
             Console.WriteLine(message);
             Trace.WriteLine(message);
-            func();
-            Console.WriteLine("Done " + message.Substring(0, 1).ToLower() + message.Substring(1));
-            Trace.WriteLine("Done " + message.Substring(0, 1).ToLower() + message.Substring(1));
-        }
-
-        public static async Task Log(string message, Func<Task> func)
-        {
-            Console.WriteLine(message);
-            Trace.WriteLine(message);
-
-            await func();
-
-            Console.WriteLine("Done " + message.Substring(0, 1).ToLower() + message.Substring(1));
-            Trace.WriteLine("Done " + message.Substring(0, 1).ToLower() + message.Substring(1));
-        }
-
-        public static async Task<T> Log<T>(string message, Func<Task<T>> func)
-        {
-            Console.WriteLine(message);
-            Trace.WriteLine(message);
-
-            var ret = await func();
-
-            Console.WriteLine("Done " + message.Substring(0, 1).ToLower() + message.Substring(1));
-            Trace.WriteLine("Done " + message.Substring(0, 1).ToLower() + message.Substring(1));
-
-            return ret;
-        }
-
-        public static string SimpleName<T>(Func<T> func)
-        {
-            try
-            {
-                return func.Method.Name.Split(new[] { '_', '|' })[2];
-            }
-            catch (NullReferenceException)
-            {
-                return "UnknownMethodName:" + (func?.Method?.Name ?? "");
-            }
-        }
-
-        static async Task KeepTrying(Func<Task> action, string fileName, int pollingInterval)
-        {
-            bool success = false;
-            while (!success)
-            {
-                try
-                {
-                    await action();
-                    success = true;
-                    break;
-                }
-                catch (SwaggerException ex) when (ex.StatusCode == 500 && ex.Message.Contains("Timeout waiting to process request"))
-                {
-                    Log(FormattableString.Invariant($"Handled 500, 'timeout...' exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
-                }
-                catch (SwaggerException ex) when (ex.StatusCode == 500)
-                {
-                    Log(FormattableString.Invariant($"Handled 500 exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
-                }
-                catch (SwaggerException ex) when (ex.StatusCode == 502)
-                {
-                    Log(FormattableString.Invariant($"Handled 502 exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
-                }
-                catch (SwaggerException ex) when (ex.StatusCode == 503)
-                {
-                    Log(FormattableString.Invariant($"Handled 503 exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
-                }
-                catch (OperationCanceledException)
-                {
-                    Log(FormattableString.Invariant($"Handled OperationCanceledException at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
-                }
-
-                await Task.Delay(pollingInterval);
-            }
-        }
-
-        static async Task<T> KeepTrying<T>(Func<Task<T>> func, string fileName, int pollingInterval)
-        {
-            T result = default;
-            bool success = false;
-            while (!success)
-            {
-                try
-                {
-                    result = await func();
-                    success = true;
-                    break;
-                }
-                catch (SwaggerException ex) when (ex.StatusCode == 500 && ex.Message.Contains("Timeout waiting to process request"))
-                {
-                    Log(FormattableString.Invariant($"Handled 500, 'timeout...' exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
-                }
-                catch (SwaggerException ex) when (ex.StatusCode == 500)
-                {
-                    Log(FormattableString.Invariant($"Handled 500 exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
-                }
-                catch (SwaggerException ex) when (ex.StatusCode == 502)
-                {
-                    Log(FormattableString.Invariant($"Handled 502 exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
-                }
-                catch (SwaggerException ex) when (ex.StatusCode == 503)
-                {
-                    Log(FormattableString.Invariant($"Handled 503 exception at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
-                }
-                catch (OperationCanceledException)
-                {
-                    Log(FormattableString.Invariant($"Handled OperationCanceledException at {DateTime.Now} for {fileName}. Retrying in {pollingInterval}ms..."));
-                }
-
-                await Task.Delay(pollingInterval);
-            }
-            return result;
-        }
-    }
-
-    public partial class DocumentAttributePatch : DocumentAttributeCore
-    {
-        public DocumentAttributePatch() { }
-
-        public DocumentAttributePatch(DocumentAttribute attribute)
-        {
-            ConfidenceLevel = attribute.ConfidenceLevel;
-            HasPositionInfo = attribute.HasPositionInfo;
-            ID = attribute.ID;
-            Name = attribute.Name;
-            SpatialPosition = attribute.SpatialPosition;
-            Type = attribute.Type;
-            Value = attribute.Value;
         }
     }
 }
