@@ -316,6 +316,8 @@ namespace Extract.Utilities.Forms
         /// </summary>
         public virtual void SaveState()
         {
+            bool gotMutex = false;
+
             try
             {
                 // Check user.config file for corruption and create backup when this gets destroyed
@@ -323,7 +325,7 @@ namespace Extract.Utilities.Forms
                 UserConfigChecker.EnsureValidUserConfigFile();
 
                 // Synchronize access to persistence data [DNRCAU #???]
-                _layoutMutex.WaitOne();
+                gotMutex = _layoutMutex.WaitOne();
 
                 // Convert the manage UI properties to XML
                 XmlDocument document = new XmlDocument();
@@ -355,7 +357,10 @@ namespace Extract.Utilities.Forms
             }
             finally
             {
-                _layoutMutex.ReleaseMutex();
+                if (gotMutex)
+                {
+                    _layoutMutex.ReleaseMutex();
+                }
             }
         }
 
