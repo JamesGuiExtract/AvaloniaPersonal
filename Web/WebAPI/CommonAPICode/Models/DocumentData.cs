@@ -613,7 +613,12 @@ namespace WebAPI.Models
                         mapOfAttributes.Set(page.ToString(), attributeJSON);
                     }
 
-                    FileApi.FileProcessingDB.CacheAttributeData(FileApi.DocumentSession.Id, mapOfAttributes);
+                    // bOverwriteModifiedData == false because we don't want to overwrite uncommitted changes with data
+                    // from the last stored attribute set. This ensures when this is called via a browser refresh that
+                    // changes aren't lost.
+                    // https://extract.atlassian.net/browse/ISSUE-16827
+                    FileApi.FileProcessingDB.CacheAttributeData(FileApi.DocumentSession.Id, 
+                        mapOfAttributes, bOverwriteModifiedData: false);
                 }
 
                 return documentData;
@@ -721,7 +726,7 @@ namespace WebAPI.Models
                 int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.EditAction);
                 var attrSetName = FileApi.Workflow.OutputAttributeSet;
                 var uncommittedDocumentData = FileApi.FileProcessingDB.GetUncommittedAttributeData(
-                    fileId, actionId, FileApi.DocumentSession.Id, attrSetName);
+                    fileId, actionId, attrSetName);
                 int nCount = uncommittedDocumentData.Size();
 
                 // Each item in uncommittedDocumentData is a variant vector with the following fields:

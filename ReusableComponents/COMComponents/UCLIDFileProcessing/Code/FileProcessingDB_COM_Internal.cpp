@@ -12925,7 +12925,7 @@ bool CFileProcessingDB::GetCachedFileTaskSessionData_QueryCachedData(_Connection
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::CacheAttributeData_Internal(bool bDBLocked, long nFileTaskSessionID,
-													 IStrToStrMap* pmapAttributeData)
+								IStrToStrMap* pmapAttributeData, VARIANT_BOOL bOverwriteModifiedData)
 {
 	try
 	{
@@ -12959,7 +12959,7 @@ bool CFileProcessingDB::CacheAttributeData_Internal(bool bDBLocked, long nFileTa
 
 			string strCursorQuery = gstrGET_FILE_TASK_SESSION_CACHE_DATA;
 			replaceVariable(strCursorQuery, "<FileTaskSessionID>", asString(nFileTaskSessionID));
-			replaceVariable(strCursorQuery, "<FieldList>", "[Page], [AttributeData]");
+			replaceVariable(strCursorQuery, "<FieldList>", "[Page], [AttributeData], [AttributeDataModifiedTime]");
 
 			ipCachedDataRow->Open(strCursorQuery.c_str(),
 				_variant_t((IDispatch*)ipConnection, true), adOpenDynamic,
@@ -12969,7 +12969,9 @@ bool CFileProcessingDB::CacheAttributeData_Internal(bool bDBLocked, long nFileTa
 			{
 				long nPage = getLongField(ipCachedDataRow->Fields, "Page");
 				_bstr_t bstrPage = _bstr_t(asString(nPage).c_str());
-				if (asCppBool(pmapAttributeData->Contains(bstrPage)))
+				if (asCppBool(pmapAttributeData->Contains(bstrPage))
+					&& (asCppBool(bOverwriteModifiedData)
+						|| isNULL(ipCachedDataRow->Fields, "AttributeDataModifiedTime")))
 				{
 					string btrPageData = asString(pmapAttributeData->GetValue(bstrPage));
 					setStringField(ipCachedDataRow->Fields, "AttributeData", btrPageData);
@@ -13032,7 +13034,7 @@ bool CFileProcessingDB::MarkAttributeDataUnmodified_Internal(bool bDBLocked, lon
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::GetUncommittedAttributeData_Internal(bool bDBLocked, long nFileID, long nActionID,
-	long nExceptFileTaskSessionID, BSTR bstrExceptIfMoreRecentAttributeSetName, IIUnknownVector** ppUncommittedPagesOfData)
+	BSTR bstrExceptIfMoreRecentAttributeSetName, IIUnknownVector** ppUncommittedPagesOfData)
 {
 	try
 	{
@@ -13058,8 +13060,6 @@ bool CFileProcessingDB::GetUncommittedAttributeData_Internal(bool bDBLocked, lon
 			replaceVariable(strCursorQuery, "<ActionID>", asString(nActionID));
 			replaceVariable(strCursorQuery, "<ExceptIfMoreRecentAttributeSetName>",
 				asString(bstrExceptIfMoreRecentAttributeSetName));
-			replaceVariable(strCursorQuery, "<ExceptFileTaskSessionID>",
-				asString(nExceptFileTaskSessionID));
 
 			ipCachedDataRow->Open(strCursorQuery.c_str(),
 				_variant_t((IDispatch*)ipConnection, true), adOpenStatic, adLockReadOnly, adCmdText);

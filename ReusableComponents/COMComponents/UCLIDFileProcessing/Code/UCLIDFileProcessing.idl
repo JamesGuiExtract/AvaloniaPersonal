@@ -2132,14 +2132,17 @@ library UCLID_FILEPROCESSINGLib
 		// pmapAttributeData is a map of page numbers (represented as strings) to the JSON representation of the attributes
 		// on each successive page. Retries and locking will be used; if all attributes cannot be cached for whatever
 		// reason, this call will result in an exception.
-		[id(206), helpstring("method CacheAttributeData")] HRESULT CacheAttributeData([in] long nFileTaskSessionID, [in] IStrToStrMap* pmapAttributeData);
+		// NOTE: If bOverwriteModifiedData is VARIANT_TRUE it will overwrite any existing cache rows marked as modified;
+		// otherwise such rows will retain their existing data.
+		[id(206), helpstring("method CacheAttributeData")] HRESULT CacheAttributeData([in] long nFileTaskSessionID,
+			[in] IStrToStrMap* pmapAttributeData, [in] VARIANT_BOOL bOverwriteModifiedData);
 		// -----------------------------------------------------------------------------------------------
 		// Clears the attribute modified status of all cache rows for this session; this allows the cache rows to
 		// be cleaned up when the session is closed/lost.
 		[id(207), helpstring("method MarkAttributeDataUnmodified")] HRESULT MarkAttributeDataUnmodified([in] long nFileTaskSessionID);
 		// -----------------------------------------------------------------------------------------------
-		// Retrieves cached attribute data rows marked as modified, except for rows associated with nExceptFileTaskSessionID
-		// and except if there is a more recent attribute set for file stored under the name bstrExceptIfMoreRecentAttributeSetName.
+		// Retrieves cached attribute data rows marked as modified, except if there is a more recent attribute set for file stored
+		// under the name bstrExceptIfMoreRecentAttributeSetName.
 		// The result is an IUnknownVector of IVariantVectors where each IVariantVector represents a page of uncommitted data. The fields
 		// for each page vector will be:
 		// FullUserName: (user that applied edit)
@@ -2148,7 +2151,7 @@ library UCLID_FILEPROCESSINGLib
 		// AttributeData: JSON representation of the attributes. These are attributes that would completely replace all attributes
 		// on the page, not just the specific attributes that were edited.
 		[id(208), helpstring("method GetUncommittedAttributeData")] HRESULT GetUncommittedAttributeData([in] long nFileID, [in] long nActionID,
-			[in] long nExceptFileTaskSessionID, [in] BSTR bstrExceptIfMoreRecentAttributeSetName, [out, retval] IIUnknownVector** ppUncommittedPagesOfData);
+			[in] BSTR bstrExceptIfMoreRecentAttributeSetName, [out, retval] IIUnknownVector** ppUncommittedPagesOfData);
 		// -----------------------------------------------------------------------------------------------
 		// Deletes cache data rows (whether marked as modified or not), except for rows associated with nExceptFileTaskSessionID
 		[id(209), helpstring("method DiscardOldCacheDataData")] HRESULT DiscardOldCacheData(

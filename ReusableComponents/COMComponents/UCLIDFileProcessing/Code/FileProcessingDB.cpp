@@ -5016,18 +5016,19 @@ STDMETHODIMP CFileProcessingDB::GetCachedPageNumbers(long nFileTaskSessionID, EC
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49495");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::CacheAttributeData(long nFileTaskSessionID, IStrToStrMap* pmapAttributeData)
+STDMETHODIMP CFileProcessingDB::CacheAttributeData(long nFileTaskSessionID, 
+								IStrToStrMap* pmapAttributeData, VARIANT_BOOL bOverwriteModifiedData)
 {
 	try
 	{
 		validateLicense();
 
-		if (!CacheAttributeData_Internal(false, nFileTaskSessionID, pmapAttributeData))
+		if (!CacheAttributeData_Internal(false, nFileTaskSessionID, pmapAttributeData, bOverwriteModifiedData))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrCACHE_LOCK);
 
-			CacheAttributeData_Internal(true, nFileTaskSessionID, pmapAttributeData);
+			CacheAttributeData_Internal(true, nFileTaskSessionID, pmapAttributeData, bOverwriteModifiedData);
 		}
 
 		return S_OK;
@@ -5054,20 +5055,20 @@ STDMETHODIMP CFileProcessingDB::MarkAttributeDataUnmodified(long nFileTaskSessio
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49514");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetUncommittedAttributeData(long nFileID, long nActionID, long nExceptFileTaskSessionID,
+STDMETHODIMP CFileProcessingDB::GetUncommittedAttributeData(long nFileID, long nActionID,
 	BSTR bstrExceptIfMoreRecentAttributeSetName, IIUnknownVector** ppUncommittedPagesOfData)
 {
 	try
 	{
 		validateLicense();
 
-		if (!GetUncommittedAttributeData_Internal(false, nFileID, nActionID, nExceptFileTaskSessionID,
+		if (!GetUncommittedAttributeData_Internal(false, nFileID, nActionID,
 				bstrExceptIfMoreRecentAttributeSetName, ppUncommittedPagesOfData))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrCACHE_LOCK);
 
-			GetUncommittedAttributeData_Internal(true, nFileID, nActionID, nExceptFileTaskSessionID,
+			GetUncommittedAttributeData_Internal(true, nFileID, nActionID,
 				bstrExceptIfMoreRecentAttributeSetName, ppUncommittedPagesOfData);
 		}
 

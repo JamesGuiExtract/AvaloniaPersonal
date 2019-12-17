@@ -1243,6 +1243,98 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
+        /// <summary>
+        /// Tests that on refresh, only updated data is retrieved by GetUncommittedData
+        /// (whether on inital load or a simulated refresh of the browser)
+        /// https://extract.atlassian.net/browse/ISSUE-16827
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void UncommittedDataWhenRefreshed()
+        {
+            string dbName = "AppBackendAPI_Test_UncommittedDataWhenRefreshed";
+
+            try
+            {
+                var (db, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+                var docID = 3;
+                var page = 1;
+
+                LogInToWebApp(controller, user);
+
+                // Test steps
+                // 1) Open a document, update an attribute, close document without committing
+                // 2) Re-open the document; confirm modification from #1 is available via UncommittedData but not DocumentData
+                // 3) Update the same attribute with different modification
+                // 4) Without first closing the document call GetDocumentData again (as a browser refresh would do) and confirm that
+                //    the edit from #3 has not been overwritten in the UncommittedData result.
+
+                controller.OpenDocument(docID)
+                    .AssertGoodResult<DocumentIdResult>();
+
+                var docDataResult = controller.GetDocumentData(docID)
+                    .AssertGoodResult<DocumentDataResult>();
+                var pageAttribute = docDataResult.Attributes
+                    .First(attribute => attribute.HasPositionInfo == true
+                        && attribute.SpatialPosition.Pages.SequenceEqual(new[] { page }));
+                string attributeID = pageAttribute.ID;
+                string originalValue = pageAttribute.Value;
+
+                var uncommittedData = controller.GetUncommittedDocumentData(docID)
+                    .AssertGoodResult<UncommittedDocumentDataResult>();
+                Assert.AreEqual(0, uncommittedData.UncommittedPagesOfAttributes.Count);
+                pageAttribute.Value = "First Modification";
+                controller.EditPageData(docID, page, new[] { pageAttribute }.ToList())
+                    .AssertGoodResult<NoContentResult>();
+
+                controller.CloseDocument(docID, false)
+                    .AssertGoodResult<NoContentResult>();
+
+                // 2) Re-open the document; confirm modification from #1 is available via UncommittedData but not DocumentData
+                controller.OpenDocument(docID)
+                    .AssertGoodResult<DocumentIdResult>();
+                var docDataResult2 = controller.GetDocumentData(docID)
+                    .AssertGoodResult<DocumentDataResult>();
+                var pageAttribute2 = docDataResult2.Attributes
+                    .First(attribute => attribute.ID == pageAttribute.ID
+                        && attribute.SpatialPosition.Pages.SequenceEqual(new[] { page }));
+                Assert.AreEqual(originalValue, pageAttribute2.Value);
+
+                var uncommittedData2 = controller.GetUncommittedDocumentData(docID)
+                    .AssertGoodResult<UncommittedDocumentDataResult>();
+                Assert.AreEqual("First Modification",
+                    uncommittedData2
+                    .UncommittedPagesOfAttributes.Single()
+                    .Attributes.Single()
+                    .Value);
+
+                // 3) Update the same attribute with different modification
+                pageAttribute2.Value = "Second Modification";
+                controller.EditPageData(docID, page, new[] { pageAttribute2 }.ToList())
+                    .AssertGoodResult<NoContentResult>();
+
+                // 4) Without first closing the document call GetDocumentData again (as a browser refresh would do) and confirm that
+                //    the edit from #3 has not been overwritten in the UncommittedData result.
+                controller.GetDocumentData(docID)
+                    .AssertGoodResult<DocumentDataResult>();
+                var uncommittedData3 = controller.GetUncommittedDocumentData(docID)
+                    .AssertGoodResult<UncommittedDocumentDataResult>();
+                Assert.AreEqual("Second Modification",
+                    uncommittedData3
+                    .UncommittedPagesOfAttributes.Single()
+                    .Attributes.Single()
+                    .Value);
+
+                controller.Logout().AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]

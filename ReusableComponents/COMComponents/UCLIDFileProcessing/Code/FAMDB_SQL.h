@@ -2518,7 +2518,7 @@ static const string gstrMARK_TASK_SESSION_ATTRIBUTE_DATA_UNMODIFIED =
 	"	INNER JOIN [FAMSession] ON [FileTaskSession].[FAMSessionID] = [FAMSession].[ID] \r\n"
 	"	INNER JOIN [ActiveFAM] ON [ActiveFAM].[FAMSessionID] = [FAMSession].[ID] \r\n"
 	"	WHERE [FileTaskSessionID] = <FileTaskSessionID> \r\n"
-	"		AND[AttributeDataModifiedTime] IS NOT NULL \r\n";
+	"		AND [AttributeDataModifiedTime] IS NOT NULL \r\n";
 
 static const string gstrDISCARD_OLD_CACHE_DATA = "DELETE [FileTaskSessionCache] \r\n"
 	"	FROM [FileTaskSessionCache] T \r\n"
@@ -2542,7 +2542,6 @@ static const string gstrGET_UNCOMMITTED_ATTRIBUTE_DATA =
 	"		WHERE [FileID] = <FileID> \r\n"
 	"			AND (<ActionID> < 0 OR [FileTaskSession].[ActionID] = <ActionID>) \r\n"
 	"			AND [AttributeDataModifiedTime] IS NOT NULL \r\n"
-	"			AND (<ExceptFileTaskSessionID> < 0 OR [FileTaskSessionID] <> <ExceptFileTaskSessionID>) \r\n"
 	") \r\n"
 	"SELECT [FullUserName], [AttributeDataModifiedTime], [Page], [AttributeData] \r\n"
 	"	FROM [FileTaskSessionCache]\r\n"

@@ -375,9 +375,9 @@ public:
 		SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* bstrAttributeData, BSTR* pbstrException,
 		VARIANT_BOOL* pbFoundCacheData);
 	STDMETHOD(GetCachedPageNumbers)(long nFileTaskSessionID, ECacheDataType eDataType, SAFEARRAY** parrayCachedPages);
-	STDMETHOD(CacheAttributeData)(long nFileTaskSessionID, IStrToStrMap* pmapAttributeData);
+	STDMETHOD(CacheAttributeData)(long nFileTaskSessionID, IStrToStrMap* pmapAttributeData, VARIANT_BOOL bOverwriteModifiedData);
 	STDMETHOD(MarkAttributeDataUnmodified)(long nFileTaskSessionID);
-	STDMETHOD(GetUncommittedAttributeData)(long nFileID, long nActionID, long nExceptFileTaskSessionID,
+	STDMETHOD(GetUncommittedAttributeData)(long nFileID, long nActionID,
 		BSTR bstrExceptIfMoreRecentAttributeSetName, IIUnknownVector** ppUncommittedPagesOfData);
 	STDMETHOD(DiscardOldCacheData)(long nFileID, long nActionID, long nExceptFileTaskSessionID);
 
@@ -1518,9 +1518,10 @@ private:
 	bool GetCachedFileTaskSessionData_QueryCachedData(_ConnectionPtr ipConnection, long nFileTaskSessionID, long nPage,
 		ECacheDataType eDataType, SAFEARRAY** pparrayImageData, BSTR* pbstrUssData, BSTR* pbstrWordZoneData, BSTR* pbstrAttributeData,
 		BSTR* pbstrException);
-	bool CacheAttributeData_Internal(bool bDBLocked, long nFileTaskSessionID, IStrToStrMap* pmapAttributeData);
+	bool CacheAttributeData_Internal(bool bDBLocked, long nFileTaskSessionID, IStrToStrMap* pmapAttributeData,
+		VARIANT_BOOL bOverwriteModifiedData);
 	bool MarkAttributeDataUnmodified_Internal(bool bDBLocked, long nFileTaskSessionID);
-	bool GetUncommittedAttributeData_Internal(bool bDBLocked, long nFileID, long nActionID, long nExceptFileTaskSessionID,
+	bool GetUncommittedAttributeData_Internal(bool bDBLocked, long nFileID, long nActionID,
 		BSTR bstrExceptIfMoreRecentAttributeSetName, IIUnknownVector** ppUncommitedPagesOfData);
 	bool DiscardOldCacheData_Internal(bool bDBLocked, long nFileID, long nActionID, long nExceptFileTaskSessionID);
 
