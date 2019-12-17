@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UCLID_COMUTILSLib;
 
-namespace Extract.AttributeFinder
+namespace Extract.AttributeFinder.Tabula
 {
     /// <summary>
-    /// Interface to inject behavior into <see cref="TabulaUtils.GetTablesFromPage"/>
+    /// Interface to inject behavior into <see cref="TabulaUtility"/>
     /// </summary>
     /// <typeparam name="TResult">The item type of the collection returned by <see cref="ProcessTables"/></typeparam>
     [CLSCompliant(false)]

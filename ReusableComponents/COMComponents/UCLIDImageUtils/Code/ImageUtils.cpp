@@ -359,6 +359,47 @@ STDMETHODIMP CImageUtils::GetSpatialPageInfos(BSTR bstrFileName, IIUnknownVector
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45171");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CImageUtils::GetSpatialPageInfo(BSTR fileName, long pageNumber, ISpatialPageInfo **spatialPageInfo)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI49588", spatialPageInfo != __nullptr);
+
+		string strFileName = asString(fileName);
+		string strUssFileName = strFileName + ".uss";
+		if (isFileOrFolderValid(strUssFileName))
+		{
+			ISpatialStringPtr ipUssData(CLSID_SpatialString);
+			ASSERT_RESOURCE_ALLOCATION("ELI49589", ipUssData != __nullptr);
+
+			ipUssData->LoadPageFromFile(strUssFileName.c_str(), pageNumber);
+			if (ipUssData->SpatialPageInfos->Contains(pageNumber))
+			{
+				ISpatialPageInfoPtr ipSpatialPageInfo = ipUssData->SpatialPageInfos->GetValue(pageNumber);
+				*spatialPageInfo = ipSpatialPageInfo.Detach();
+				return S_OK;
+			}
+		}
+
+		ISpatialPageInfoPtr ipSpatialPageInfo(CLSID_SpatialPageInfo);
+		ASSERT_RESOURCE_ALLOCATION("ELI49590", ipSpatialPageInfo != __nullptr);
+
+		int nWidth = 0;
+		int nHeight = 0;
+		getImagePixelHeightAndWidth(strFileName, nHeight, nWidth, pageNumber);
+
+		ipSpatialPageInfo->Initialize(nWidth, nHeight, kRotNone, 0);
+
+		*spatialPageInfo = ipSpatialPageInfo.Detach();
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49591");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent

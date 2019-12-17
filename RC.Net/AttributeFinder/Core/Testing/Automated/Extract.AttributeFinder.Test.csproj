@@ -160,6 +160,10 @@
       <Project>{52C53912-5790-4F68-AB57-6CBC3EF45A14}</Project>
       <Name>Extract.AttributeFinder.Rules</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Tabula\Code\Extract.AttributeFinder.Tabula.csproj">
+      <Project>{59bc0149-830c-4515-be56-32503fa73ad6}</Project>
+      <Name>Extract.AttributeFinder.Tabula</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Code\Extract.AttributeFinder.csproj">
       <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
       <Name>Extract.AttributeFinder</Name>
@@ -645,6 +649,10 @@
     <EmbeddedResource Include="Resources\Tabula\us-006.hugePage.tif.byPage.byColumn.voa" />
     <EmbeddedResource Include="Resources\Tabula\getTableCellsWithFeatures.rsd" />
     <EmbeddedResource Include="Resources\Tabula\TableScripts.fsx" />
+    <EmbeddedResource Include="Resources\Tabula\MultilineTable.tif" />
+    <EmbeddedResource Include="Resources\Tabula\MultilineTable.tif.uss" />
+    <EmbeddedResource Include="Resources\Tabula\MultilineTable.tif.byPage.byRow.voa" />
+    <EmbeddedResource Include="Resources\Tabula\MultilineTable.tif.byPage.byColumn.voa" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

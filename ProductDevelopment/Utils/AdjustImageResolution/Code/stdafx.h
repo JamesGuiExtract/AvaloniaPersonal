@@ -38,8 +38,9 @@ using namespace UCLID_COMUTILSLib;
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" named_guids 
 using namespace UCLID_COMLMLib;
 
+#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb" named_guids \
+	rename ("LoadImage", "LoadRasterImage")
+using namespace UCLID_RASTERANDOCRMGMTLib;
+
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.tlb" named_guids
 using namespace UCLID_IMAGEUTILSLib;
-
-
-

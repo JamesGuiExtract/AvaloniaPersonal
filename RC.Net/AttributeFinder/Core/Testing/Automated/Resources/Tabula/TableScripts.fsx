@@ -1,8 +1,9 @@
 #I @"C:\Engineering\Binaries\Debug"
 #I @"C:\Program Files (x86)\Extract Systems\CommonComponents"
-#r "Extract.AttributeFinder.dll"
+#r "Extract.AttributeFinder.Tabula.dll"
 #r "Extract.Imaging.dll"
 #r "Tabula.IKVM.exe"
+#r "IKVM.OpenJDK.Core.dll"
 #r "Interop.UCLID_AFCORELib.dll"
 #r "Interop.UCLID_COMUTILSLib.dll"
 #r "Interop.UCLID_RASTERANDOCRMGMTLib.dll"
@@ -89,7 +90,7 @@ module Regex =
  |______|______|______|______|______|
 *)
 module AFDoc =
-  open Extract.AttributeFinder
+  open Extract.AttributeFinder.Tabula
 
   // Active pattern for getting first page, ignoring __EMPTYPAGE__
   let private (|Empty|FirstAvailablePage|) (text: SpatialString) =
@@ -200,8 +201,9 @@ module AFDoc =
 
   let getCellsWithFeaturesForAllPages (doc: AFDocument): AFDocument =
     let sourceDocName = doc.Text.SourceDocName
-    let tables = TabulaUtils.GetTableCellsAsSpatialStrings sourceDocName
-    let cellsWithFeatures = tables |> tableCellsToAttributesWithFeatures sourceDocName
+    use tableFinder = TabulaUtils.CreateTabulaUtility();
+    let tables = tableFinder.GetTablesOnSpecifiedPages sourceDocName
+    let cellsWithFeatures = tables |> Seq.concat |> tableCellsToAttributesWithFeatures sourceDocName
     doc.Attribute.SubAttributes <- cellsWithFeatures
     doc
 
@@ -210,9 +212,10 @@ module AFDoc =
     match text with
     | Empty -> doc.Attribute.SubAttributes.Clear ()
     | FirstAvailablePage pageNumber ->
+      use tableFinder = TabulaUtils.CreateTabulaUtility()
       let sourceDocName = text.SourceDocName
-      let tables = TabulaUtils.GetTableCellsAsSpatialStrings (sourceDocName, [pageNumber])
-      let cellsWithFeatures = tables |> tableCellsToAttributesWithFeatures sourceDocName
+      let tables = tableFinder.GetTablesOnSpecifiedPages (sourceDocName, pageNumbers = [pageNumber])
+      let cellsWithFeatures = tables |> Seq.concat |> tableCellsToAttributesWithFeatures sourceDocName
       doc.Attribute.SubAttributes <- cellsWithFeatures
     doc
 

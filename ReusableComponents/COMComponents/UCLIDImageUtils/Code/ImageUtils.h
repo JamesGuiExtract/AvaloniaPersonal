@@ -48,6 +48,7 @@ public:
 		long nMaxPercent, VARIANT_BOOL *pResult);
 	STDMETHOD(GetImageStats)(BSTR strImage, IRasterZone * pRaster, IImageStats ** ppImageStats);
 	STDMETHOD(GetSpatialPageInfos)(BSTR bstrFileName, IIUnknownVector **pvecSpatialPageInfos);
+	STDMETHOD(GetSpatialPageInfo)(BSTR fileName, long pageNumber, ISpatialPageInfo **spatialPageInfo);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

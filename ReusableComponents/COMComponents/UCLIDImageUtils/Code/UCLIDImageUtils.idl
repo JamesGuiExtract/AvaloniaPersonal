@@ -82,6 +82,10 @@ library UCLID_IMAGEUTILSLib
 		//-----------------------------------------------------------------------------------------
 		[id(12), helpstring("method GetPageCount")] HRESULT GetPageCount(
 			[in] BSTR bstrImageFileName, [out, retval] long* pnPageCount);
+		//-----------------------------------------------------------------------------------------
+		[id(13), helpstring("method GetSpatialPageInfo")] HRESULT GetSpatialPageInfo(
+			[in] BSTR fileName, [in] long pageNumber, [out, retval] ISpatialPageInfo **spatialPageInfo);
+		//-----------------------------------------------------------------------------------------
 	};
 
 	[

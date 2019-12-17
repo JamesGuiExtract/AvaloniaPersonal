@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using technology.tabula;
 
-namespace Extract.AttributeFinder
+namespace Extract.AttributeFinder.Tabula
 {
     /// <summary>
     /// Container for page info and tables

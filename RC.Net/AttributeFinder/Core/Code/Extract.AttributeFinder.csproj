@@ -257,10 +257,6 @@
     <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Tabula.IKVM, Version=1.0.4.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\APIs\Tabula.IKVM\target\Tabula.IKVM.exe</HintPath>
-    </Reference>
     <Reference Include="ZstdNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\APIs\ZstdNet\ZstdNet\bin\x86\Release\ZstdNet.dll</HintPath>
@@ -282,10 +278,6 @@
     <Compile Include="AttributeMethods.cs" />
     <Compile Include="CategoryQueryPair.cs" />
     <Compile Include="FileDerivedResourceCache.cs" />
-    <Compile Include="ITabulaTableProcessor.cs" />
-    <Compile Include="ITabulaTableFinder.cs" />
-    <Compile Include="TabulaTablesForPage.cs" />
-    <Compile Include="TabulaUtils.cs" />
     <Compile Include="LabelAttributes.cs">
       <DependentUpon>LearningMachine.cs</DependentUpon>
     </Compile>

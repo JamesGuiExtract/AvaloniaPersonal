@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using technology.tabula;
 
-namespace Extract.AttributeFinder
+namespace Extract.AttributeFinder.Tabula
 {
     /// <summary>
     /// Interface to inject behavior into various <see cref="TabulaUtils"/> methods

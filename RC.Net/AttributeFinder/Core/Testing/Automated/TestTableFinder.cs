@@ -1,4 +1,5 @@
-﻿using Extract.DataCaptureStats;
+﻿using Extract.AttributeFinder.Tabula;
+using Extract.DataCaptureStats;
 using Extract.ETL;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using UCLID_AFCORELib;
+using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 using OCRParam = Extract.Utilities.Union<(int key, int value), (int key, double value), (string key, int value), (string key, double value), (string key, string value)>;
@@ -49,6 +51,10 @@ namespace Extract.AttributeFinder.Test
             "Resources.Tabula.us-006.pdf.uss",
             "Resources.Tabula.us-006.pdf.tif.uss",
             "Resources.Tabula.us-006.pdf.tif.pdf.uss",
+            "Resources.Tabula.MultilineTable.tif",
+            "Resources.Tabula.MultilineTable.tif.uss",
+            "Resources.Tabula.MultilineTable.tif.byPage.byRow.voa",
+            "Resources.Tabula.MultilineTable.tif.byPage.byColumn.voa",
             "Resources.Tabula.getTableCellsWithFeatures.rsd",
             "Resources.Tabula.TableScripts.fsx",
         };
@@ -75,6 +81,8 @@ namespace Extract.AttributeFinder.Test
         /// Manages the test files used by this test
         /// </summary>
         static TestFileManager<TestTableFinder> _testFiles;
+
+        static readonly ThreadLocal<AFUtility> _afutil = new ThreadLocal<AFUtility>(() => new AFUtilityClass());
 
         #endregion Fields
 
@@ -114,20 +122,21 @@ namespace Extract.AttributeFinder.Test
         [Test]
         public static void TablesAsOneAttributePerPageFromNativelyDigitalPdfByColumn()
         {
-            foreach (var inputFile in _testFilePaths.Where(x => Regex.IsMatch(x, @"\d.pdf$")))
-            {
-                var expectedFile = inputFile + ".byPage.byColumn.voa";
-                var expectedAttributes = new IUnknownVectorClass();
-                expectedAttributes.LoadFrom(expectedFile, false);
-                var tables = TabulaUtils.GetTablesAsOneAttributePerPage(inputFile, byRow: false, pdfFile: inputFile);
+            using (var tabulaUtility = new TabulaUtility<SpatialString>(new TabulaTableFinderV1(), new TablesToSpatialString(byRow: false)))
+                foreach (var inputFile in _testFilePaths.Where(x => Regex.IsMatch(x, @"\d.pdf$")))
+                {
+                    var expectedAttributes = _afutil.Value.GetAttributesFromFile(inputFile + ".byPage.byColumn.voa");
+                    var tables = tabulaUtility
+                        .GetTablesOnSpecifiedPages(inputFile, pdfFile: inputFile)
+                        .GetTablesAsOneAttributePerPage();
 
-                var expectedText = ConcatAttributeText(expectedAttributes);
-                var foundText = ConcatAttributeText(tables);
-                Assert.AreEqual(expectedText, foundText);
+                    var expectedText = ConcatAttributeText(expectedAttributes);
+                    var foundText = ConcatAttributeText(tables);
+                    Assert.AreEqual(expectedText, foundText);
 
-                var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
-                Assert.AreEqual("Expected||1||Found||1||Correct||1||", spatialResults);
-            }
+                    var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
+                    Assert.AreEqual("Expected||1||Found||1||Correct||1||", spatialResults);
+                }
         }
 
         /// <summary>
@@ -136,20 +145,21 @@ namespace Extract.AttributeFinder.Test
         [Test]
         public static void TablesAsOneAttributePerPageFromNativelyDigitalPdfByRow()
         {
-            foreach (var inputFile in _testFilePaths.Where(x => Regex.IsMatch(x, @"\d.pdf$")))
-            {
-                var expectedFile = inputFile + ".byPage.byRow.voa";
-                var expectedAttributes = new IUnknownVectorClass();
-                expectedAttributes.LoadFrom(expectedFile, false);
-                var tables = TabulaUtils.GetTablesAsOneAttributePerPage(inputFile, byRow: true, pdfFile: inputFile);
+            using (var tabulaUtility = TabulaUtils.CreateTabulaUtility(new TablesToSpatialString(byRow: true)))
+                foreach (var inputFile in _testFilePaths.Where(x => Regex.IsMatch(x, @"\d.pdf$")))
+                {
+                    var expectedAttributes = _afutil.Value.GetAttributesFromFile(inputFile + ".byPage.byRow.voa");
+                    var tables = tabulaUtility
+                        .GetTablesOnSpecifiedPages(inputFile, pdfFile: inputFile)
+                        .GetTablesAsOneAttributePerPage();
 
-                var expectedText = ConcatAttributeText(expectedAttributes);
-                var foundText = ConcatAttributeText(tables);
-                Assert.AreEqual(expectedText, foundText);
+                    var expectedText = ConcatAttributeText(expectedAttributes);
+                    var foundText = ConcatAttributeText(tables);
+                    Assert.AreEqual(expectedText, foundText);
 
-                var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
-                Assert.AreEqual("Expected||1||Found||1||Correct||1||", spatialResults);
-            }
+                    var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
+                    Assert.AreEqual("Expected||1||Found||1||Correct||1||", spatialResults);
+                }
         }
 
         /// <summary>
@@ -158,20 +168,48 @@ namespace Extract.AttributeFinder.Test
         [Test]
         public static void TablesAsOneAttributePerPageFromTifImagesByColumn()
         {
-            foreach (var inputFile in _testFilePaths.Where(x => x.EndsWith(".tif", StringComparison.OrdinalIgnoreCase)))
-            {
-                var expectedFile = inputFile + ".byPage.byColumn.voa";
-                var expectedAttributes = new IUnknownVectorClass();
-                expectedAttributes.LoadFrom(expectedFile, false);
-                var tables = TabulaUtils.GetTablesAsOneAttributePerPage(inputFile, byRow: false);
+            using (var tabulaUtility = TabulaUtils.CreateTabulaUtility(new TablesToSpatialString(byRow: false)))
+                foreach (var inputFile in _testFilePaths
+                    .Where(x => x.EndsWith(".tif", StringComparison.OrdinalIgnoreCase))
+                    .Where(x => _testFilePaths.Any(y => y.Equals(x + ".byPage.byColumn.voa", StringComparison.OrdinalIgnoreCase))))
+                {
+                    var expectedAttributes = _afutil.Value.GetAttributesFromFile(inputFile + ".byPage.byColumn.voa");
+                    var tables = tabulaUtility
+                        .GetTablesOnSpecifiedPages(inputFile)
+                        .GetTablesAsOneAttributePerPage();
 
-                var expectedText = ConcatAttributeText(expectedAttributes);
-                var foundText = ConcatAttributeText(tables);
-                Assert.AreEqual(expectedText, foundText);
+                    var expectedText = ConcatAttributeText(expectedAttributes);
+                    var foundText = ConcatAttributeText(tables);
+                    Assert.AreEqual(expectedText, foundText);
 
-                var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
-                Assert.AreEqual("Expected||1||Found||1||Correct||1||", spatialResults);
-            }
+                    var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
+                    Assert.AreEqual("Expected||1||Found||1||Correct||1||", spatialResults);
+                }
+        }
+
+        /// <summary>
+        /// Test getting spatial string version of tables from TIFs, row first ordering of cells
+        /// </summary>
+        [Test]
+        public static void TablesAsOneAttributePerPageFromTifImagesByRow()
+        {
+            using (var tabulaUtility = TabulaUtils.CreateTabulaUtility(new TablesToSpatialString(byRow: true)))
+                foreach (var inputFile in _testFilePaths
+                    .Where(x => x.EndsWith(".tif", StringComparison.OrdinalIgnoreCase))
+                    .Where(x => _testFilePaths.Any(y => y.Equals(x + ".byPage.byRow.voa", StringComparison.OrdinalIgnoreCase))))
+                {
+                    var expectedAttributes = _afutil.Value.GetAttributesFromFile(inputFile + ".byPage.byRow.voa");
+                    var tables = tabulaUtility
+                        .GetTablesOnSpecifiedPages(inputFile)
+                        .GetTablesAsOneAttributePerPage();
+
+                    var expectedText = ConcatAttributeText(expectedAttributes);
+                    var foundText = ConcatAttributeText(tables);
+                    Assert.AreEqual(expectedText, foundText);
+
+                    var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
+                    Assert.AreEqual("Expected||1||Found||1||Correct||1||", spatialResults);
+                }
         }
 
         /// <summary>
@@ -180,21 +218,22 @@ namespace Extract.AttributeFinder.Test
         [Test]
         public static void HugePage()
         {
-            foreach (var inputFile in _testFilePaths_ISSUE_16821
-                .Where(x => x.EndsWith(".hugePage.tif", StringComparison.OrdinalIgnoreCase)))
-            {
-                var expectedFile = inputFile + ".byPage.byColumn.voa";
-                var expectedAttributes = new IUnknownVectorClass();
-                expectedAttributes.LoadFrom(expectedFile, false);
-                var tables = TabulaUtils.GetTablesAsOneAttributePerPage(inputFile, byRow: false);
+            using (var tabulaUtility = TabulaUtils.CreateTabulaUtility(new TablesToSpatialString(byRow: false)))
+                foreach (var inputFile in _testFilePaths_ISSUE_16821
+                    .Where(x => x.EndsWith(".hugePage.tif", StringComparison.OrdinalIgnoreCase)))
+                {
+                    var expectedAttributes = _afutil.Value.GetAttributesFromFile(inputFile + ".byPage.byColumn.voa");
+                    var tables = tabulaUtility
+                        .GetTablesOnSpecifiedPages(inputFile)
+                        .GetTablesAsOneAttributePerPage();
 
-                var expectedText = ConcatAttributeText(expectedAttributes);
-                var foundText = ConcatAttributeText(tables);
-                Assert.AreEqual(expectedText, foundText);
+                    var expectedText = ConcatAttributeText(expectedAttributes);
+                    var foundText = ConcatAttributeText(tables);
+                    Assert.AreEqual(expectedText, foundText);
 
-                var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
-                Assert.AreEqual("Expected||1||Found||1||Correct||1||", spatialResults);
-            }
+                    var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
+                    Assert.AreEqual("Expected||1||Found||1||Correct||1||", spatialResults);
+                }
         }
 
         /// <summary>
@@ -242,22 +281,23 @@ namespace Extract.AttributeFinder.Test
         [Test]
         public static void LowDpi()
         {
-            foreach (var inputFile in _testFilePaths_ISSUE_16821
-                .Where(x => x.EndsWith(".lowDPI.tif", StringComparison.OrdinalIgnoreCase)))
-            {
-                var expectedFile = inputFile + ".byPage.byColumn.voa";
-                var expectedAttributes = new IUnknownVectorClass();
-                expectedAttributes.LoadFrom(expectedFile, false);
-                var tables = TabulaUtils.GetTablesAsOneAttributePerPage(inputFile, byRow: false);
+            using (var tabulaUtility = TabulaUtils.CreateTabulaUtility(new TablesToSpatialString(byRow: false)))
+                foreach (var inputFile in _testFilePaths_ISSUE_16821
+                    .Where(x => x.EndsWith(".lowDPI.tif", StringComparison.OrdinalIgnoreCase)))
+                {
+                    var expectedAttributes = _afutil.Value.GetAttributesFromFile(inputFile + ".byPage.byColumn.voa");
+                    var tables = tabulaUtility
+                        .GetTablesOnSpecifiedPages(inputFile)
+                        .GetTablesAsOneAttributePerPage();
 
-                var expectedText = ConcatAttributeText(expectedAttributes);
-                var foundText = ConcatAttributeText(tables);
-                Assert.AreEqual(expectedText, foundText);
+                    var expectedText = ConcatAttributeText(expectedAttributes);
+                    var foundText = ConcatAttributeText(tables);
+                    Assert.AreEqual(expectedText, foundText);
 
-                // No tables are actually found
-                var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
-                Assert.AreEqual("Expected||0||", spatialResults);
-            }
+                    // No tables are actually found
+                    var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
+                    Assert.AreEqual("Expected||0||", spatialResults);
+                }
         }
 
         /// <summary>
@@ -266,20 +306,21 @@ namespace Extract.AttributeFinder.Test
         [Test]
         public static void TablesAsOneAttributePerPageFromImageBasedPdfByColumn()
         {
-            foreach (var inputFile in _testFilePaths.Where(x => x.EndsWith(".tif.pdf", StringComparison.OrdinalIgnoreCase)))
-            {
-                var expectedFile = inputFile + ".byPage.byColumn.voa";
-                var expectedAttributes = new IUnknownVectorClass();
-                expectedAttributes.LoadFrom(expectedFile, false);
-                var tables = TabulaUtils.GetTablesAsOneAttributePerPage(inputFile, byRow: false);
+            using (var tabulaUtility = TabulaUtils.CreateTabulaUtility(new TablesToSpatialString(byRow: false)))
+                foreach (var inputFile in _testFilePaths.Where(x => x.EndsWith(".tif.pdf", StringComparison.OrdinalIgnoreCase)))
+                {
+                    var expectedAttributes = _afutil.Value.GetAttributesFromFile(inputFile + ".byPage.byColumn.voa");
+                    var tables = tabulaUtility
+                        .GetTablesOnSpecifiedPages(inputFile)
+                        .GetTablesAsOneAttributePerPage();
 
-                var expectedText = ConcatAttributeText(expectedAttributes);
-                var foundText = ConcatAttributeText(tables);
-                Assert.AreEqual(expectedText, foundText);
+                    var expectedText = ConcatAttributeText(expectedAttributes);
+                    var foundText = ConcatAttributeText(tables);
+                    Assert.AreEqual(expectedText, foundText);
 
-                var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
-                Assert.AreEqual("Expected||1||Found||1||Correct||1||", spatialResults);
-            }
+                    var spatialResults = GetComparisonResultsSpatial(expectedAttributes, tables);
+                    Assert.AreEqual("Expected||1||Found||1||Correct||1||", spatialResults);
+                }
         }
 
         /// <summary>
@@ -289,14 +330,18 @@ namespace Extract.AttributeFinder.Test
         public static void TablesFromSinglePage()
         {
             var inputFile = _testFiles.GetFile("Resources.Tabula.us-005.pdf");
-            var expectedFile = inputFile + ".byPage.byColumn.voa";
-            var expectedAttributes = new IUnknownVectorClass();
-            expectedAttributes.LoadFrom(expectedFile, false);
-            var table = TabulaUtils.GetTablesAsSpatialString(inputFile, 1, byRow: false);
+            var expectedAttributes = _afutil.Value.GetAttributesFromFile(inputFile + ".byPage.byColumn.voa");
+            using (var tabulaUtility = TabulaUtils.CreateTabulaUtility(new TablesToSpatialString(byRow: false)))
+            {
+                var table = tabulaUtility
+                    .GetTablesOnSpecifiedPages(inputFile, pageNumbers: new[] { 1 }, pdfFile: inputFile)
+                    .SelectMany(x => x)
+                    .GetTablesAsSpatialString();
 
-            var expectedText = ConcatAttributeText(expectedAttributes);
-            var foundText = table.String;
-            Assert.AreEqual(expectedText, foundText);
+                var expectedText = ConcatAttributeText(expectedAttributes);
+                var foundText = table.String;
+                Assert.AreEqual(expectedText, foundText);
+            }
         }
 
         /// <summary>
@@ -306,7 +351,8 @@ namespace Extract.AttributeFinder.Test
         public static void TablesFromMissingPage()
         {
             var inputFile = _testFiles.GetFile("Resources.Tabula.us-005.pdf");
-            Assert.Throws<ExtractException>(() => TabulaUtils.GetTablesAsSpatialString(inputFile, 100, byRow: false));
+            using (var tabulaUtility = TabulaUtils.CreateTabulaUtility(new TablesToSpatialString(byRow: false)))
+                Assert.Throws<ExtractException>(() => tabulaUtility.GetTablesOnSpecifiedPages(inputFile, pageNumbers: new[] { 100 }));
         }
 
         /// <summary>
@@ -316,9 +362,7 @@ namespace Extract.AttributeFinder.Test
         public static void TablesCellsWithFeatures()
         {
             var inputFile = _testFiles.GetFile("Resources.Tabula.us-005.pdf");
-            var expectedFile = inputFile + ".protofeatures.voa";
-            var expectedAttributes = new IUnknownVectorClass();
-            expectedAttributes.LoadFrom(expectedFile, false);
+            var expectedAttributes = _afutil.Value.GetAttributesFromFile(inputFile + ".protofeatures.voa");
 
             var inputSpatialStringFile = _testFiles.GetFile("Resources.Tabula.us-005.pdf.uss");
             var doc = new AFDocumentClass();
