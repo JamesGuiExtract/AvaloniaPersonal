@@ -514,7 +514,7 @@ namespace WebAPI.Models
                         FileApi.FileProcessingDB.SetStatusForFile(fileId, FileApi.Workflow.PostEditAction,
                             FileApi.Workflow.Id, EActionStatus.kActionPending,
                             vbQueueChangeIfProcessing: true, vbAllowQueuedStatusOverride: false,
-                            out var eActionStatus);
+                            poldStatus: out var eActionStatus);
                     }
                 }
                 finally
@@ -549,7 +549,7 @@ namespace WebAPI.Models
                     FileApi.FileProcessingDB.SetStatusForFile(fileId, FileApi.Workflow.PostWorkflowAction,
                             FileApi.Workflow.Id, EActionStatus.kActionPending,
                             vbQueueChangeIfProcessing: true, vbAllowQueuedStatusOverride: false,
-                            out var eActionStatus);
+                            poldStatus: out var eActionStatus);
                 }
             }
             catch (Exception ex)

@@ -1245,7 +1245,7 @@ namespace Extract.Web.WebAPI.Test
 
         /// <summary>
         /// Tests that on refresh, only updated data is retrieved by GetUncommittedData
-        /// (whether on inital load or a simulated refresh of the browser)
+        /// (whether on initial load or a simulated refresh of the browser)
         /// https://extract.atlassian.net/browse/ISSUE-16827
         /// </summary>
         [Test]
