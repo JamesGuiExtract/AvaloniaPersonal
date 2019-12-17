@@ -1189,9 +1189,11 @@ namespace WebAPI.Models
                 }
 
                 using (var fs = new FileStream(fullPath, FileMode.Create))
+                using (var sw = new StreamWriter(fs, new UTF8Encoding(false)))
                 {
-                    byte[] text = Encoding.ASCII.GetBytes(submittedText);
-                    fs.Write(text, 0, submittedText.Length);
+                    sw.Write(submittedText);
+                    sw.Flush();
+                    sw.Close();
                     fs.Close();
                 }
 

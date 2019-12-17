@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -217,6 +218,36 @@ namespace Extract.Web.WebAPI.Test
 
                 var sourceFilename = fileProcessingDb.GetFileNameFromFileID(submitResult.Id);
                 Assert.IsNotNullOrEmpty(sourceFilename, "Failed to post text");
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test, Category("Automated")]
+        public static void Test_UTF8Text()
+        {
+            string dbName = "DocumentAPI_Test_UTF8Text";
+
+            try
+            {
+                (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
+                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+
+                var testText = "¡Buenos días! ¿Cómo estás? It's 212°!";
+
+                var result = controller.PostText(testText);
+                var submitResult = result.AssertGoodResult<DocumentIdResult>();
+
+                var sourceFilename = fileProcessingDb.GetFileNameFromFileID(submitResult.Id);
+                Assert.IsNotNullOrEmpty(sourceFilename, "Failed to post text");
+
+                result = controller.GetText(submitResult.Id);
+                var textResult = result.AssertGoodResult<PageTextResult>();
+
+                Assert.AreEqual(testText, textResult.Pages.Single().Text);
             }
             finally
             {
