@@ -56,7 +56,7 @@ namespace WebAPI.Filters
                 else if (operation.OperationId == "ApiDocumentTextPost")
                 {
                     operation.Consumes.Clear();
-                    operation.Consumes.Add("text/plain");
+                    operation.Consumes.Add("multipart/form-data; charset=utf-8");
                 }
                 else if (context.ApiDescription.HttpMethod != "GET")
                 {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -586,6 +587,11 @@ namespace WebAPI.Controllers
         /// <returns></returns>
         [HttpGet("DocumentPage/{docID}")]
         [Authorize]
+        // For NSwag auto-client generation; see also: MapType<FileResult> in ConfigureServices
+        [SwaggerResponse(200, typeof(FileResult))]
+        // Specify FileResult base type. If PhysicalFileResult is specified, the swagger
+        // documentation lists the model as the return type with the physical path providing the
+        // file which can be confusing for a consumer needing to stream the file.
         [ProducesResponseType(200, Type = typeof(FileResult))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
