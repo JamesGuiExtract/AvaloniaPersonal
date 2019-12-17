@@ -405,7 +405,7 @@ namespace WebAPI.Models
                     }
 
                     HTTPError.Assert("ELI46297", StatusCodes.Status423Locked, fileRecord != null,
-                        "Document is not in the current queue.", ("FileId", id, true));
+                        "Document is not queued or is locked by another process.", ("FileId", id, true));
                 }
                 else
                 {
@@ -507,8 +507,14 @@ namespace WebAPI.Models
                 {
                     if (setStatusTo == EActionStatus.kActionCompleted && !string.IsNullOrWhiteSpace(FileApi.Workflow.PostEditAction))
                     {
-                        FileApi.FileProcessingDB.SetFileStatusToPending(fileId,
-                            FileApi.Workflow.PostEditAction, true);
+                        // Note: SetFileStatusToPending will immediately change the status even if the file is
+                        // processing, which can result the file being stuck since it won't be removed from
+                        // the LockedFile table when processing completes. SetStatusForFile allows
+                        // vbQueueChangeIfProcessing to be specified.
+                        FileApi.FileProcessingDB.SetStatusForFile(fileId, FileApi.Workflow.PostEditAction,
+                            FileApi.Workflow.Id, EActionStatus.kActionPending,
+                            vbQueueChangeIfProcessing: true, vbAllowQueuedStatusOverride: false,
+                            out var eActionStatus);
                     }
                 }
                 finally
@@ -536,8 +542,14 @@ namespace WebAPI.Models
 
                 if (!string.IsNullOrWhiteSpace(FileApi.Workflow.PostWorkflowAction))
                 {
-                    FileApi.FileProcessingDB.SetFileStatusToPending(fileId,
-                        FileApi.Workflow.PostWorkflowAction, true);
+                    // Note: SetFileStatusToPending will immediately change the status even if the file is
+                    // processing, which can result the file being stuck since it won't be removed from
+                    // the LockedFile table when processing completes. SetStatusForFile allows
+                    // vbQueueChangeIfProcessing to be specified.
+                    FileApi.FileProcessingDB.SetStatusForFile(fileId, FileApi.Workflow.PostWorkflowAction,
+                            FileApi.Workflow.Id, EActionStatus.kActionPending,
+                            vbQueueChangeIfProcessing: true, vbAllowQueuedStatusOverride: false,
+                            out var eActionStatus);
                 }
             }
             catch (Exception ex)
