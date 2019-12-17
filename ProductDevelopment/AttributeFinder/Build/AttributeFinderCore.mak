@@ -418,9 +418,9 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@COPY "$(RCNETDir)\APIs\MSOffice\Office2007\installer\o2007pia.msi" "$(AFCoreInstallFilesRootDir)\OfficeRedist"
 	@COPY /v "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\Utils\ProcessFiles\Code\res\ProcessFiles.ico" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v "$(ReusableComponentsRootDirectory)\APIs\Nuance_20\Bin\CAPI_PInvoke.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@XCOPY "$(RCNETDir)\APIs\IKVM.8.1.5717.0\lib\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
+	@XCOPY "$(RCNETDir)\APIs\IKVM\lib\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
 # Copy to DotNetGAC for Installshield
-	@XCOPY "$(RCNETDir)\APIs\IKVM.8.1.5717.0\lib\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC" /v /s /e /y
+	@XCOPY "$(RCNETDir)\APIs\IKVM\lib\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC" /v /s /e /y
 	@XCOPY "$(RCNETDir)\APIs\WindowsAPICodePack.1.1.0\lib\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
 # Copy WindowsAPICodePack to DotNetGAC for installshield
 	@XCOPY "$(RCNETDir)\APIs\WindowsAPICodePack.1.1.0\lib\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC" /v /s /e /y

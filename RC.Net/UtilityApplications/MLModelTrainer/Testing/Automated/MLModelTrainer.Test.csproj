@@ -75,8 +75,9 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
-    <Reference Include="IKVM.OpenJDK.Core, Version=8.1.5717.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\IKVM.8.1.5717.0\lib\IKVM.OpenJDK.Core.dll</HintPath>
+    <Reference Include="IKVM.OpenJDK.Core, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Core.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
