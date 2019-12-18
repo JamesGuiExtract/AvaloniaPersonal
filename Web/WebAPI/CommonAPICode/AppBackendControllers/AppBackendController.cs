@@ -50,10 +50,6 @@ namespace WebAPI.Controllers
                 {
                     userData.LoginUser(user);
 
-                    // IPAddress is used to identify the caller via the "Machine" column in FAMSession. If no RemoteIpAddress
-                    // exists, this is likely a unit test; assume 127.0.0.1.
-                    string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
-
                     // Token is specific to user and FAMSessionId
                     var token = AuthUtils.GenerateToken(user, context);
 
@@ -188,12 +184,8 @@ namespace WebAPI.Controllers
                 var context = LoginContext(workflow);
                 using (var sessionData = new DocumentData(context))
                 {
-                    // IPAddress is used to identify the caller via the "Machine" column in FAMSession. If no RemoteIpAddress
-                    // exists, this is likely a unit test; assume 127.0.0.1.
-                    string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
-
                     // Starts an active FAM session via FileProcessingDB and ties the active context to the session
-                    sessionData.OpenSession(User, ipAddress, false);
+                    sessionData.OpenSession(User, Request.GetIpAddress(), "WebRedactionVerification", forQueuing: false, endSessionOnDispose: false);
 
                     var user = new User
                     {

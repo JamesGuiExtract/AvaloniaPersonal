@@ -6865,7 +6865,7 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::RecordWebSessionStart_Internal(bool bDBLocked)
+bool CFileProcessingDB::RecordWebSessionStart_Internal(bool bDBLocked, VARIANT_BOOL vbForQueuing)
 {
 	try
 	{
@@ -6886,7 +6886,6 @@ bool CFileProcessingDB::RecordWebSessionStart_Internal(bool bDBLocked)
 				UCLIDException ue("ELI46664", "Application Trace: Timed out waiting for thread to exit.");
 				ue.log();
 			}
-
 
 			string strFAMSessionQuery = "INSERT INTO [" + gstrFAM_SESSION + "] ";
 			strFAMSessionQuery += "([MachineID], [FAMUserID], [UPI], [FPSFileID], [ActionID], "
@@ -6913,14 +6912,24 @@ bool CFileProcessingDB::RecordWebSessionStart_Internal(bool bDBLocked)
 				m_strFPSFileName.empty() ? "<Unsaved FPS File>" : m_strFPSFileName);
 			long nMachineID = getKeyID(ipConnection, gstrMACHINE, "MachineName", m_strMachineName);
 			long nUserID = getKeyID(ipConnection, gstrFAM_USER, "UserName", m_strFAMUserName);
-			// A web application will always be processing, never queuing.
-			string strQueuing = "0";
-			string strProcessing = "1";
+			
+			bool bForQueuing = asCppBool(vbForQueuing);
+
+			string strQueuing = bForQueuing ? "1" : "0";
+			string strProcessing = bForQueuing ? "0" : "1";
 
 			UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
-				getWorkflowDefinition(ipConnection, getActiveWorkflowID(ipConnection));
+				getCachedWorkflowDefinition(ipConnection);
+			ASSERT_RESOURCE_ALLOCATION("ELI43187", ipWorkflowDefinition != __nullptr);
 
-			string strActionName = asString(ipWorkflowDefinition->EditAction);
+			string strActionName = bForQueuing
+				? asString(ipWorkflowDefinition->StartAction)
+				: asString(ipWorkflowDefinition->EditAction);
+			ASSERT_RUNTIME_CONDITION("ELI49568", !strActionName.empty(),
+				(bForQueuing
+				? "Workflow start action not configured"
+				: "Workflow verify/update action not configured"));
+
 			setActiveAction(ipConnection, strActionName);
 
 			strFAMSessionQuery += asString(nMachineID) + ", " + asString(nUserID) + ", '"

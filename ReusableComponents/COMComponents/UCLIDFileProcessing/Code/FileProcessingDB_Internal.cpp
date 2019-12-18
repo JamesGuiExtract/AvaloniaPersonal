@@ -6868,9 +6868,15 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getCachedWorkflowDefinition(
-	_ConnectionPtr ipConnection, long nWorkflowID)
+	_ConnectionPtr ipConnection, long nWorkflowID /*= -1*/)
 {
 	CSingleLock lock(&m_criticalSection, TRUE);
+
+	if (nWorkflowID < 1)
+	{
+		nWorkflowID = getActiveWorkflowID(ipConnection);
+		ASSERT_RUNTIME_CONDITION("ELI49567", nWorkflowID > 0, "No active workflow set!");
+	}
 
 	auto iterWorkflow = m_mapWorkflowDefinitions.find(nWorkflowID);
 	if (iterWorkflow != m_mapWorkflowDefinitions.end())

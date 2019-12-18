@@ -359,7 +359,7 @@ public:
 	STDMETHOD(DefineNewMLModel)(BSTR strModelName, long* pnID);
 	STDMETHOD(DeleteMLModel)(BSTR strModelName);
 	STDMETHOD(GetMLModels)(IStrToStrMap** pmapModelNameToID);
-	STDMETHOD(RecordWebSessionStart)(BSTR bstrType, BSTR bstrLoginId, BSTR bstrIpAddress, BSTR bstrUser);
+	STDMETHOD(RecordWebSessionStart)(BSTR bstrType, VARIANT_BOOL vbForQueuing, BSTR bstrLoginId, BSTR bstrIpAddress, BSTR bstrUser);
 	STDMETHOD(GetActiveUsers)(BSTR bstrAction, IVariantVector** ppvecUserNames);
 	STDMETHOD(AbortFAMSession)(long nFAMSessionID);
 	STDMETHOD(MarkFileDeleted)(long nFileID, long nWorkflowID);
@@ -1276,7 +1276,7 @@ private:
 	
 	// Gets the specified workflow in cases where performance is important and it's not expected
 	// that the workflow will have changed.
-	UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr getCachedWorkflowDefinition(_ConnectionPtr ipConnection, long nID);
+	UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr getCachedWorkflowDefinition(_ConnectionPtr ipConnection, long nID = -1);
 
 	// For every action in a workflow, gets the action id, name and whether main sequence.
 	vector<tuple<long, string, bool>> getWorkflowActions(_ConnectionPtr ipConnection, long nWorkflowID);
@@ -1409,7 +1409,7 @@ private:
 		LONGLONG* pllNewValue);
 	bool RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstrFPSFileName, BSTR bstrActionName,
 		VARIANT_BOOL vbQueuing, VARIANT_BOOL vbProcessing);
-	bool RecordWebSessionStart_Internal(bool bDBLocked);
+	bool RecordWebSessionStart_Internal(bool bDBLocked, VARIANT_BOOL vbForQueuing);
 	bool RecordFAMSessionStop_Internal(bool bDBLocked);
 	bool RecordInputEvent_Internal(bool bDBLocked, BSTR bstrTimeStamp, long nActionID,
 		long nEventCount, long nProcessID);

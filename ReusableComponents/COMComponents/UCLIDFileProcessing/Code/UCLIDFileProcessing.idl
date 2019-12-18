@@ -2049,7 +2049,7 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Opens a session for a web application (Recorded in FAMSession table, same as FAM sessions.
 		[id(193), helpstring("method RecordWebSessionStart")] HRESULT RecordWebSessionStart( 
-			[in] BSTR bstrType, [in] BSTR bstrLoginId, [in] BSTR bstrIpAddress, [in] BSTR bstrUser);
+			[in] BSTR bstrType, [in] VARIANT_BOOL vbForQueuing, [in] BSTR bstrLoginId, [in] BSTR bstrIpAddress, [in] BSTR bstrUser);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Gets the names of all users with active FAM session for the specified action.
 		[id(194), helpstring("method GetActiveUsers")] HRESULT GetActiveUsers(

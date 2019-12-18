@@ -4647,7 +4647,8 @@ STDMETHODIMP CFileProcessingDB::GetMLModels(IStrToStrMap * * pmapModelNameToID)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI45124");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::RecordWebSessionStart(BSTR bstrType, BSTR bstrLoginId, BSTR bstrIpAddress, BSTR bstrUser)
+STDMETHODIMP CFileProcessingDB::RecordWebSessionStart(BSTR bstrType, VARIANT_BOOL vbForQueuing,
+												BSTR bstrLoginId, BSTR bstrIpAddress, BSTR bstrUser)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -4664,7 +4665,7 @@ STDMETHODIMP CFileProcessingDB::RecordWebSessionStart(BSTR bstrType, BSTR bstrLo
 		
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-		RecordWebSessionStart_Internal(true);
+		RecordWebSessionStart_Internal(true, vbForQueuing);
 
 		return S_OK;
 	}

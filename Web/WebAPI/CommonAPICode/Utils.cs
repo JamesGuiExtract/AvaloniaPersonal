@@ -1,10 +1,12 @@
 ﻿using Extract;
 using Microsoft.AspNetCore.Hosting;     // for IHostingEnvironment
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
@@ -411,6 +413,24 @@ namespace WebAPI
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI48352");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the remote IP address for the specified request. If not available, assume assume 127.0.0.1.
+        /// In OpenSession calls, the IP address is used to identify the caller via the "Machine" column in FAMSession.
+        /// </summary>
+        /// <param name="request">The <see cref="HttpRequest"/></param>
+        public static string GetIpAddress(this HttpRequest request)
+        {
+            try
+            {
+                string ipAddress = (request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
+                return ipAddress;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49579");
             }
         }
     }

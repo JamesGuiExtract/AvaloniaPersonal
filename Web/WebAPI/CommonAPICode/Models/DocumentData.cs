@@ -114,8 +114,12 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="claimsPrincipal">The <see cref="ClaimsPrincipal"/> this instance is specific to.</param>
         /// <param name="remoteIpAddress">The IP address of the web application user.s</param>
+        /// <param name="apiName">The name the API should be identified in the established session.</param>
+        /// <param name="forQueuing"><c>true</c> if this session is to queue files; <c>false</c> for
+        /// processing.</param>
         /// <param name="endSessionOnDispose">Whether to call EndSession() when this instance is disposed</param>
-        public void OpenSession(ClaimsPrincipal claimsPrincipal, string remoteIpAddress, bool endSessionOnDispose)
+        public void OpenSession(ClaimsPrincipal claimsPrincipal, string remoteIpAddress,
+            string apiName, bool forQueuing, bool endSessionOnDispose)
         {
             var user = new User()
             {
@@ -123,23 +127,26 @@ namespace WebAPI.Models
                 WorkflowName = claimsPrincipal.GetClaim(Utils._WORKFLOW_NAME)
             };
 
-            OpenSession(user, remoteIpAddress, endSessionOnDispose);
+            OpenSession(user, remoteIpAddress, apiName, forQueuing, endSessionOnDispose);
         }
 
         /// <summary>
         /// Opens a session for the specified user.
         /// </summary>
         /// <param name="user">The <see cref="User"/> this instance is specific to.</param>
-        /// <param name="remoteIpAddress">The IP address of the web application user.s</param>
+        /// <param name="remoteIpAddress">The IP address of the web application user.</param>
+        /// <param name="apiName">The name the API should be identified in the established session.</param>
+        /// <param name="forQueuing"><c>true</c> if this session is to queue files; <c>false</c> for
+        /// processing.</param>
         /// <param name="endSessionOnDispose">Whether to call EndSession() when this instance is disposed</param>
-        public void OpenSession(User user, string remoteIpAddress, bool endSessionOnDispose)
+        public void OpenSession(User user, string remoteIpAddress,
+            string apiName, bool forQueuing, bool endSessionOnDispose)
         {
             try
             {
                 _endSessionOnDispose = endSessionOnDispose;
                 FileApi.FileProcessingDB.RecordWebSessionStart(
-                    "WebRedactionVerification", _apiContext.SessionId,
-                    remoteIpAddress, user.Username);
+                    apiName, forQueuing, _apiContext.SessionId, remoteIpAddress, user.Username);
                 FileApi.FileProcessingDB.RegisterActiveFAM();
 
                 // Once a FAM session has been established, tie the session to this context
@@ -218,6 +225,9 @@ namespace WebAPI.Models
         {
             try
             {
+                ExtractException.Assert("ELI49569", "Workflow verify/update action not configured",
+                    !string.IsNullOrWhiteSpace(FileApi.Workflow.EditAction));
+
                 int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.EditAction);
                 var stats = FileApi.FileProcessingDB.GetStats(actionId, false, true);
                 var users = FileApi.FileProcessingDB.GetActiveUsers(FileApi.Workflow.EditAction);
@@ -266,6 +276,9 @@ namespace WebAPI.Models
         {
             try
             {
+                ExtractException.Assert("ELI49570", "Workflow verify/update action not configured",
+                    !string.IsNullOrWhiteSpace(FileApi.Workflow.EditAction));
+
                 int wfID = FileApi.Workflow.Id;
                 string action = FileApi.Workflow.EditAction;
                 string joinSkipped = skippedFiles
@@ -372,6 +385,8 @@ namespace WebAPI.Models
             try
             {
                 ExtractException.Assert("ELI45235", "No active user", _user != null);
+                ExtractException.Assert("ELI49571", "Workflow verify/update action not configured",
+                    !string.IsNullOrWhiteSpace(FileApi.Workflow.EditAction));
 
                 // Per GGK request, if a document is already open, return the already open ID
                 // without error
@@ -719,6 +734,8 @@ namespace WebAPI.Models
             {
                 AssertRequestFileId("ELI49521", fileId);
                 AssertDocumentSession("ELI49542");
+                ExtractException.Assert("ELI49575", "Workflow verify/update action not configured",
+                    !string.IsNullOrWhiteSpace(FileApi.Workflow.EditAction));
 
                 var result = new UncommittedDocumentDataResult();
                 var mostRecentDateTime = new DateTime(0);
@@ -775,6 +792,8 @@ namespace WebAPI.Models
             {
                 AssertRequestFileId("ELI49556", fileId);
                 AssertDocumentSession("ELI49557");
+                ExtractException.Assert("ELI49576", "Workflow verify/update action not configured",
+                    !string.IsNullOrWhiteSpace(FileApi.Workflow.EditAction));
 
                 int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.EditAction);
                 FileApi.FileProcessingDB.DiscardOldCacheData(fileId, actionId, FileApi.DocumentSession.Id);
@@ -864,6 +883,8 @@ namespace WebAPI.Models
             try
             {
                 ExtractException.Assert("ELI46694", "No open document", FileApi.DocumentSession.IsOpen);
+                ExtractException.Assert("ELI49577", "Workflow verify/update action not configured",
+                    !string.IsNullOrWhiteSpace(FileApi.Workflow.EditAction));
 
                 int fileId = FileApi.DocumentSession.FileId;
                 int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.EditAction);
@@ -883,6 +904,8 @@ namespace WebAPI.Models
             try
             {
                 ExtractException.Assert("ELI46716", "No open document", FileApi.DocumentSession.IsOpen);
+                ExtractException.Assert("ELI49578", "Workflow verify/update action not configured",
+                    !string.IsNullOrWhiteSpace(FileApi.Workflow.EditAction));
 
                 int fileId = FileApi.DocumentSession.FileId;
                 int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.EditAction);

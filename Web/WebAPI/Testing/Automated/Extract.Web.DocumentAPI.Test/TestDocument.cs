@@ -1127,10 +1127,103 @@ namespace Extract.Web.WebAPI.Test
                 a.SpatialPosition.Pages.Count != a.SpatialPosition.Pages.Distinct().Count()));
         }
 
+        /// <summary>
+        /// Tests that informative errors are returned when the appropriate actions for API calls are not
+        /// set and that operations are recorded under the appropriate action in the database given the operation.
+        /// https://extract.atlassian.net/browse/ISSUE-16745
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void Test_ProperWorkflowActionNamesUsed()
+        {
+            string dbName = "DocumentAPI_Test_ProperWorkflowActionNamesUsed";
+
+            // This test will:
+            // 1) Set the workflow start action and clear the verify/edit action
+            // 2) Confirm file can be posted and it does so under the start action
+            // 3) Confirm descriptive error when trying to put data without the verify/edit action set.
+            // 4) Clear the workflow start action and set the verify/edit action
+            // 5) Confirm descriptive error when trying to post a file without a start action set.
+            // 6) Confirm data can be posted and it does so under the verify/edit action.
+
+            try
+            {
+                (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
+                    InitializeAndLogin("Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
+
+                var filename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001);
+
+                using (var stream = new FileStream(filename, FileMode.Open))
+                {
+                    // 1) Set the workflow start action and clear the verify/edit action
+                    var workflowId = fileProcessingDb.GetWorkflowID(ApiTestUtils.CurrentApiContext.WorkflowName);
+                    var workflow = fileProcessingDb.GetWorkflowDefinition(workflowId);
+                    workflow.StartAction = "Compute";
+                    workflow.EditAction = "";
+                    fileProcessingDb.SetWorkflowDefinition(workflow);
+
+                    // 2) Confirm file can be posted and it does so under the start action
+                    var formFile = new FormFile(stream, 0, stream.Length, filename, filename);
+                    var documentIdResult = controller.PostDocument(formFile)
+                        .AssertGoodResult<DocumentIdResult>();
+
+                    var recordSet = fileProcessingDb.GetResultsForQuery(
+                        $@"SELECT [ASCName]
+	                        FROM [QueueEvent]
+	                        INNER JOIN [Action] ON [ActionID] = [Action].[ID]
+	                        WHERE [FileID] = {documentIdResult.Id}");
+                    recordSet.MoveFirst();
+                    Assert.AreEqual("Compute", recordSet.Fields["ASCName"].Value);
+                    recordSet.MoveNext();
+                    Assert.IsTrue(recordSet.EOF);
+
+                    // 3) Confirm descriptive error when trying to put data without the verify/edit action set.
+                    var badResult = controller.PutDocumentData(documentIdResult.Id, new DocumentDataInput());
+                    badResult.AssertResultCode(500);
+                    Assert.That(((ErrorResult)((ObjectResult)badResult).Value).Error.Message,
+                        Contains.Substring("verify/update action"),
+                        "Expected error citing verify/update action configuration");
+
+                    // 4) Clear the workflow start action and set the verify/edit action
+                    workflow.StartAction = "";
+                    workflow.EditAction = "Verify";
+                    fileProcessingDb.SetWorkflowDefinition(workflow);
+
+                    // 5) Confirm descriptive error when trying to post a file without a start action set.
+                    badResult = controller.PostDocument(formFile);
+                    badResult.AssertResultCode(500);
+                    Assert.That(((ErrorResult)((ObjectResult)badResult).Value).Error.Message,
+                        Contains.Substring("start action"),
+                        "Expected error citing start action configuration");
+
+                    // Files must be pending in verify/edit action to allow for data to be posted.
+                    fileProcessingDb.SetFileStatusToPending(documentIdResult.Id, "Verify", false);
+
+                    // 6) Confirm data can be posted and it does so under the verify/edit action.
+                    controller.PutDocumentData(documentIdResult.Id, new DocumentDataInput() { Attributes = new List<DocumentAttribute>() })
+                        .AssertGoodResult<NoContentResult>();
+
+                    recordSet = fileProcessingDb.GetResultsForQuery(
+                        $@"SELECT [ASCName]
+	                        FROM [FileTaskSession]
+	                        INNER JOIN [Action] ON [ActionID] = [Action].[ID]
+	                        WHERE [FileID] = {documentIdResult.Id}");
+                    recordSet.MoveFirst();
+                    Assert.AreEqual("Verify", recordSet.Fields["ASCName"].Value);
+                    recordSet.MoveNext();
+                    Assert.IsTrue(recordSet.EOF);
+                }
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
         #endregion Public Test Functions
 
         static (FileProcessingDB fileProcessingDb, User user, DocumentController DocumentController)
-            InitializeAndLogin(string dbResource, string dbName, string username, string password)
+        InitializeAndLogin(string dbResource, string dbName, string username, string password)
         {
             (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                 _testDbManager.InitializeEnvironment<TestDocument, UsersController>

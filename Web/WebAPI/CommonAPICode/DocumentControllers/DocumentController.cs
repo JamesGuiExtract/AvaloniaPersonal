@@ -45,11 +45,7 @@ namespace WebAPI.Controllers
 
                 using (var data = new DocumentData(User, requireSession: true))
                 {
-                    // IPAddress is used to identify the caller via the "Machine" column in FAMSession. If no RemoteIpAddress
-                    // exists, this is likely a unit test; assume 127.0.0.1.
-                    string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
-
-                    data.OpenSession(User, ipAddress, true);
+                    data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: true, endSessionOnDispose: true);
 
                     try
                     {
@@ -158,11 +154,7 @@ namespace WebAPI.Controllers
 
                 using (var data = new DocumentData(User, requireSession: true))
                 {
-                    // IPAddress is used to identify the caller via the "Machine" column in FAMSession. If no RemoteIpAddress
-                    // exists, this is likely a unit test; assume 127.0.0.1.
-                    string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
-
-                    data.OpenSession(User, ipAddress, true);
+                    data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: true, endSessionOnDispose: true);
 
                     try
                     {
@@ -412,11 +404,7 @@ namespace WebAPI.Controllers
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
                 using (var data = new DocumentData(User, requireSession: true))
                 {
-                    // IPAddress is used to identify the caller via the "Machine" column in FAMSession. If no RemoteIpAddress
-                    // exists, this is likely a unit test; assume 127.0.0.1.
-                    string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
-                    
-                    data.OpenSession(User, ipAddress, true);
+                    data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: false, endSessionOnDispose: true);
                     data.OpenDocument(Id, processSkipped: false, dataUpdateOnly: true);
 
                     try
@@ -475,11 +463,7 @@ namespace WebAPI.Controllers
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
                 using (var data = new DocumentData(User, requireSession: true))
                 {
-                    // IPAddress is used to identify the caller via the "Machine" column in FAMSession. If no RemoteIpAddress
-                    // exists, this is likely a unit test; assume 127.0.0.1.
-                    string ipAddress = (Request.HttpContext.Connection.RemoteIpAddress ?? IPAddress.Parse("127.0.0.1")).ToString();
-
-                    data.OpenSession(User, ipAddress, true);
+                    data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: false, endSessionOnDispose: true); ;
                     data.OpenDocument(Id, processSkipped: false, dataUpdateOnly: true);
 
                     try
