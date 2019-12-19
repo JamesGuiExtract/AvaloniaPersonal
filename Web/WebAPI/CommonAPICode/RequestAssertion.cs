@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using WebAPI.Models;
 
 namespace WebAPI
@@ -57,10 +59,11 @@ namespace WebAPI
         {
             int statusCode = StatusCodes.Status500InternalServerError;
             ErrorResult errorObject = null;
+            ExtractException ee = null;
 
             try
             {
-                var ee = ex as ExtractException;
+                ee = ex as ExtractException;
 
                 var errorDetails = ee?.Data
                     .OfType<DictionaryEntry>()
@@ -105,20 +108,39 @@ namespace WebAPI
                 {
                     statusCode = StatusCodes.Status500InternalServerError;
                     // Add new top-level interal server error exception.
-                    ex = new HTTPError(eliCode, statusCode, "Internal Server Error", ex);
+                    ee = new HTTPError(eliCode, statusCode, "Internal Server Error", ex);
                 }
             }
             catch
             {
                 statusCode = StatusCodes.Status500InternalServerError;
                 // Add new top-level interal server error exception.
-                ex = new HTTPError(eliCode, statusCode, "Internal Server Error", ex);
+                ee = new HTTPError(eliCode, statusCode, "Internal Server Error", ex);
             }
+
+            // Add request infor to logged exception to help troubleshooting.
+            ee = ee ?? ex.AsExtract(eliCode);
+            try
+            {
+                if (controller.Request.Path.HasValue)
+                {
+                    ee.AddDebugData("Path", controller.Request.Path.Value, false);
+                }
+
+                foreach (var header in controller.Request.Headers)
+                {
+                    ee.AddDebugData(header.Key, header.Value.ToString(),
+                        string.Equals(header.Key, "Authorization", StringComparison.OrdinalIgnoreCase));
+                }
+
+                // TODO: Re-reading the body after it has already been done is trickier and not yet implemented.
+            }
+            catch { }
 
             if (true != Utils.CurrentApiContext?.ExceptionLogFilter
                 .Any(range => range.Contains(statusCode)))
             {
-                ex.ExtractLog(eliCode);
+                ee.ExtractLog(eliCode);
             }
 
             return controller.StatusCode(statusCode, errorObject);

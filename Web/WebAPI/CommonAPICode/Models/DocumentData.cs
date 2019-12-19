@@ -156,10 +156,12 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
+                var ee = CreateException(ex, "ELI45225");
+
                 FileApi.AbortSession();
                 _fileApi = null;
 
-                throw ex.AsExtract("ELI45225");
+                throw ee;
             }
         }
 
@@ -188,7 +190,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI45229");
+                throw CreateException(ex, "ELI45229");
             }
         }
 
@@ -212,9 +214,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                ExtractException ee = ex.AsExtract("ELI45272");
-                ee.AddDebugData("Current User", System.Environment.UserDomainName);
-                throw ee;
+                throw CreateException(ex, "ELI45272");
             }
         }
 
@@ -244,7 +244,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI45525");
+                throw CreateException(ex, "ELI49580");
             }
         }
 
@@ -259,7 +259,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw CreateException(ex, "ELI49581");
             }
         }
 
@@ -364,7 +364,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI47048");
+                throw CreateException(ex, "ELI47048");
             }
         }
 
@@ -420,7 +420,7 @@ namespace WebAPI.Models
                     }
 
                     HTTPError.Assert("ELI46297", StatusCodes.Status423Locked, fileRecord != null,
-                        "Document is not queued or is locked by another process.", ("FileId", id, true));
+                        "Document is not queued or is locked by another process.", ("FileID", id, true));
                 }
                 else
                 {
@@ -465,7 +465,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI45236");
+                throw CreateException(ex, "ELI45236", id);
             }
         }
 
@@ -539,7 +539,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI45240");
+                throw CreateException(ex, "ELI45240");
             }
         }
 
@@ -569,7 +569,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI46292");
+                throw CreateException(ex, "ELI46292", fileId);
             }
         }
 
@@ -640,7 +640,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI42124");
+                throw CreateException(ex, "ELI42124", fileId);
             }
         }
 
@@ -662,7 +662,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI44889");
+                throw CreateException(ex, "ELI44889", fileId);
             }
         }
 
@@ -688,7 +688,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI49512");
+                throw CreateException(ex, "ELI49512", fileId, page);
             }
         }
 
@@ -717,7 +717,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI49555");
+                throw CreateException(ex, "ELI49555", fileId);
             }
         }
 
@@ -778,7 +778,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI49529");
+                throw CreateException(ex, "ELI49529", fileId);
             }
         }
 
@@ -800,7 +800,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI49558");
+                throw CreateException(ex, "ELI49558", fileId);
             }
         }
 
@@ -823,7 +823,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI44889");
+                throw CreateException(ex, "ELI44889", fileId);
             }
         }
 
@@ -841,7 +841,7 @@ namespace WebAPI.Models
             }
             catch(Exception ex)
             {
-                throw ex.AsExtract("ELI47181");
+                throw CreateException(ex, "ELI47181");
             }
         }
 
@@ -870,7 +870,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI47201");
+                throw CreateException(ex, "ELI47201");
             }
         }
 
@@ -892,7 +892,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI46695");
+                throw CreateException(ex, "ELI46695");
             }
         }
 
@@ -914,7 +914,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI46717");
+                throw CreateException(ex, "ELI46717");
             }
         }
 
@@ -941,7 +941,7 @@ namespace WebAPI.Models
                 }
                 catch (Exception ex)
                 {
-                    var ee = ex.AsExtract("ELI43651");
+                    var ee = CreateException(ex, "ELI43651", fileId);
                     ee.AddDebugData("MissingResource", ee.Message, false);
                     throw ee;
                 }
@@ -957,7 +957,8 @@ namespace WebAPI.Models
                 }
                 catch (Exception ex)
                 {
-                    var ee = ex.AsExtract("ELI46415");
+                    var ee = CreateException(ex, "ELI46415", fileId);
+
                     if (ee.EliCode == "ELI38763")
                     {
                         throw new HTTPError("ELI46416", StatusCodes.Status404NotFound,
@@ -969,8 +970,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI42106");
-                ee.AddDebugData("FileID", fileId, encrypt: false);
+                var ee = CreateException(ex, "ELI42106", fileId);
                 ee.AddDebugData("AttributeSetName", FileApi.Workflow.OutputAttributeSet, encrypt: false);
                 ee.AddDebugData("Workflow", FileApi.Workflow.Name, encrypt: false);
 
@@ -1035,7 +1035,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI42124");
+                throw CreateException(ex, "ELI42124", fileId, page);
             }
             finally
             {
@@ -1081,7 +1081,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI43242");
+                throw CreateException(ex, "ELI43242");
             }
         }
 
@@ -1142,18 +1142,6 @@ namespace WebAPI.Models
                         out bool bAlreadyExists,                                  // returns whether file already existed
                         out EActionStatus previousActionStatus);                  // returns the previous action status (if file already existed)
 
-                //try
-                //{
-                //    FileApi.FileProcessingDB.SetMetadataFieldValue(fileRecord.FileID, "UploadedFromPath", fullPath);
-                //}
-                //catch { }
-
-                //try
-                //{
-                //    FileApi.FileProcessingDB.SetMetadataFieldValue(fileRecord.FileID, "Uploader", _user.GetUsername());
-                //}
-                //catch { }
-
                 DocumentIdResult result = new DocumentIdResult()
                 {
                     Id = fileRecord.FileID
@@ -1163,7 +1151,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI43331");
+                throw CreateException(ex, "ELI43331");
             }
         }
 
@@ -1187,7 +1175,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI45084");
+                throw CreateException(ex, "ELI45084", fileId);
             }
         }
 
@@ -1229,7 +1217,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI43243");
+                throw CreateException(ex, "ELI43243");
             }
         }
 
@@ -1264,7 +1252,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI43244");
+                throw CreateException(ex, "ELI43244", fileId);
             }
         }
 
@@ -1352,7 +1340,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI45016");
+                throw CreateException(ex, "ELI45016", fileId);
             }
         }
 
@@ -1454,7 +1442,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI45264");
+                throw CreateException(ex, "ELI45264", fileId, pageNum);
             }
         }
 
@@ -1495,8 +1483,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI42119");
-                ee.AddDebugData("FileID", fileId, encrypt: false);
+                var ee = CreateException(ex, "ELI42119", fileId);
                 ee.AddDebugData("OutputFileMetadataField", getFileTag, encrypt: false);
                 throw ee;
             }
@@ -1604,9 +1591,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                var ee = ex.AsExtract("ELI46307");
-                ee.AddDebugData("ID", Id, encrypt: false);
-                throw ee;
+                throw CreateException(ex, "ELI46307", Id);
             }
         }
 
@@ -1629,7 +1614,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI43329");
+                throw CreateException(ex, "ELI43329", id);
             }
         }
 
@@ -1657,7 +1642,7 @@ namespace WebAPI.Models
                 FileApi.FileProcessingDB.IsFileInWorkflow(fileId, FileApi.Workflow.Id),
                 "File not in the workflow",
                 ("Workflow", FileApi.Workflow.Name, true),
-                ("FileId", fileId, true));
+                ("FileID", fileId, true));
         }
 
         /// <summary>
@@ -1677,7 +1662,7 @@ namespace WebAPI.Models
             {
                 var ee = new HTTPError(eliCode, StatusCodes.Status404NotFound,
                     "Page is not valid for specified file");
-                ee.AddDebugData("FileId", fileId, false);
+                ee.AddDebugData("FileID", fileId, false);
                 ee.AddDebugData("Page", page, false);
                 ee.AddDebugData("Filename", fileName, true);
                 throw ee;
@@ -1845,7 +1830,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI48303");
+                throw CreateException(ex, "ELI48303", docID);
             }
         }
 
@@ -2130,6 +2115,52 @@ namespace WebAPI.Models
 
                 throw ex;
             }
+        }
+
+        /// <summary>
+        /// Generates an <see cref="ExtractException"/> that contains a details about the file/session for
+        /// which the error occurrred (if possible).
+        /// </summary>
+        /// <param name="ex">The exception representing the error to this point</param>
+        /// <param name="eliCode">The ELI code to assign</param>
+        /// <param name="fileId">The File ID (if known)</param>
+        /// <param name="page">The page (if known)</param>
+        ExtractException CreateException(Exception ex, string eliCode, int? fileId = null, int? page = null)
+        {
+            ExtractException ee = ex.AsExtract(eliCode);
+
+            try
+            {
+                // Use the _fileApi field not property so as not to trigger api acquisition if we don't currently have one.
+                if (_fileApi != null)
+                {
+                    if ((!fileId.HasValue || fileId.Value <= 0) 
+                        && _fileApi.DocumentSession.IsOpen)
+                    {
+                        fileId = _fileApi.DocumentSession.FileId;
+                    }
+
+                    if (fileId.HasValue && fileId.Value > 0)
+                    {
+                        ee.AddDebugData("FileID", fileId, false);
+
+                        try
+                        {
+                            string fileName = _fileApi.FileProcessingDB.GetFileNameFromFileID(fileId.Value);
+                            ee.AddDebugData("Server filename", fileName, false);
+                        }
+                        catch { }
+                    }
+                }
+
+                if (page.HasValue && page.Value > 0)
+                {
+                    ee.AddDebugData("Page", page.Value, false);
+                }
+            }
+            catch { }
+
+            return ee;
         }
 
         #endregion Private Members
