@@ -5116,15 +5116,18 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
 
             // The below code handles https://extract.atlassian.net/browse/ISSUE-16323
-            var firstAttribute = attributes.ToIEnumerable<IAttribute>().First();
-            if(attributes.Size() == 1 && firstAttribute.Name.Equals("Document"))
+            if(attributes.Size() == 1)
             {
-                attributes = firstAttribute
-                                .SubAttributes
-                                .ToIEnumerable<IAttribute>()
-                                .SingleOrDefault(y => y.Name.Equals("DocumentData"))
-                                ?.SubAttributes
-                                ?? new IUnknownVector();
+                var firstAttribute = attributes.ToIEnumerable<IAttribute>().First();
+                if (firstAttribute.Name.Equals("Document"))
+                {
+                    attributes = firstAttribute
+                        .SubAttributes
+                        .ToIEnumerable<IAttribute>()
+                        .SingleOrDefault(y => y.Name.Equals("DocumentData"))
+                        ?.SubAttributes
+                        ?? new IUnknownVector();
+                }
             }
 
             return attributes;
