@@ -937,36 +937,77 @@ namespace Extract.FileActionManager.Utilities
         /// <param name="dbManager"></param>
         void StartETL(FAMServiceDatabaseManager dbManager)
         {
-            // Get just the unique ETL processes
-            var etlArguments = dbManager.GetFpsFileData(true)
-                .Where(d => d.FileName.StartsWith("ETL", StringComparison.OrdinalIgnoreCase))
-                .GroupBy(g => g.FileName)
-                .Select(g => g.First())
-                .ToList();
-
-            // Get the ETL database and server if configured
-            dbManager.Settings.TryGetValue("DatabaseServer", out _etlDatabaseServer);
-            dbManager.Settings.TryGetValue("DatabaseName", out _etlDatabaseName);
-
-            // check for database settings for ETL
-            if (etlArguments.Any())
+            try
             {
-                if (string.IsNullOrEmpty(_etlDatabaseServer) || string.IsNullOrEmpty(_etlDatabaseName))
-                {
-                    ExtractException etlException = new ExtractException("ELI46269",
-                        "ETL processes are configured to run in the service but no database is configured in Settings.");
-                    etlException.AddDebugData("DatabaseServer", _etlDatabaseServer ?? string.Empty, false);
-                    etlException.AddDebugData("DatabaseName", _etlDatabaseName ?? string.Empty, false);
-                    throw etlException;
-                }
+                // Get just the unique ETL processes
+                var etlArguments = dbManager.GetFpsFileData(true)
+                    .Where(d => d.FileName.StartsWith("ETL", StringComparison.OrdinalIgnoreCase))
+                    .GroupBy(g => g.FileName)
+                    .Select(g => g.First())
+                    .ToList();
 
+                // Get the ETL database and server if configured
+                dbManager.Settings.TryGetValue("DatabaseServer", out _etlDatabaseServer);
+                dbManager.Settings.TryGetValue("DatabaseName", out _etlDatabaseName);
+
+                // This is called here so that it will open the the database - if it fails it will throw an exception
+                // https://extract.atlassian.net/browse/ISSUE-16841
                 _listOfEnabledServices = GetListOfEnabledServicesFromDB();
 
-                // Start the DatabaseServiceManagers
-                List<string> etlProcesses = etlArguments.Select(e => e.FileName).ToList();
-                new Thread(() =>
+                // check for database settings for ETL
+                if (etlArguments.Any())
                 {
-                    try
+                    if (string.IsNullOrEmpty(_etlDatabaseServer) || string.IsNullOrEmpty(_etlDatabaseName))
+                    {
+                        ExtractException etlException = new ExtractException("ELI46269",
+                            "ETL processes are configured to run in the service but no database is configured in Settings.");
+                        etlException.AddDebugData("DatabaseServer", _etlDatabaseServer ?? string.Empty, false);
+                        etlException.AddDebugData("DatabaseName", _etlDatabaseName ?? string.Empty, false);
+                        throw etlException;
+                    }
+
+                    // Start the DatabaseServiceManagers
+                    List<string> etlProcesses = etlArguments.Select(e => e.FileName).ToList();
+                    new Thread(() =>
+                    {
+                        try
+                        {
+                        // if _stopProcessing is set return without starting the DatabaseServiceManagers
+                        if (WaitHandle.WaitAny(new WaitHandle[] { _startThreads, _stopProcessing }) == 1)
+                            {
+                                return;
+                            }
+
+                            foreach (var etl in etlArguments)
+                            {
+                                string etlName = etl.FileName.Replace("ETL:", string.Empty).Trim();
+                                if (etl.FileName == "ETL" || _listOfEnabledServices
+                                    .Select(s => DatabaseService.FromJson(s).Description)
+                                    .Contains(etlName, StringComparer.CurrentCultureIgnoreCase))
+                                {
+                                    _databaseServiceManagers.Add(
+                                        new DatabaseServiceManager(etl.FileName, _etlDatabaseServer, _etlDatabaseName, etlProcesses, etl.NumberOfInstances));
+                                }
+                            }
+                        }
+                        catch (ThreadAbortException)
+                        {
+                        // Don't log or throw ThreadAboartException
+                    }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractLog("ELI46288");
+                        }
+                    }
+                    ).Start();
+                }
+
+                _lastETLStart = DateTime.Now;
+
+                // if the etlDatabaseServer and etlDatabaseName is not configured there is no way to poll for ETL changes
+                if (!string.IsNullOrEmpty(_etlDatabaseServer) && !string.IsNullOrEmpty(_etlDatabaseName))
+                {
+                    new Thread(() =>
                     {
                         // if _stopProcessing is set return without starting the DatabaseServiceManagers
                         if (WaitHandle.WaitAny(new WaitHandle[] { _startThreads, _stopProcessing }) == 1)
@@ -974,105 +1015,77 @@ namespace Extract.FileActionManager.Utilities
                             return;
                         }
 
-                        foreach (var etl in etlArguments)
+                        if (_etlFAMDB is null || _etlFAMDB.DatabaseServer != _etlDatabaseServer || _etlFAMDB.DatabaseName != _etlDatabaseName)
                         {
-                            string etlName = etl.FileName.Replace("ETL:", string.Empty).Trim();
-                            if (etl.FileName == "ETL" || _listOfEnabledServices
-                                .Select(s => DatabaseService.FromJson(s).Description)
-                                .Contains(etlName, StringComparer.CurrentCultureIgnoreCase))
+                            if (_etlFAMDB != null)
                             {
-                                _databaseServiceManagers.Add(
-                                    new DatabaseServiceManager(etl.FileName, _etlDatabaseServer, _etlDatabaseName, etlProcesses, etl.NumberOfInstances));
+                                _etlFAMDB.UnregisterActiveFAM();
+                                _etlFAMDB.RecordFAMSessionStop();
+                                _etlFAMDB.CloseAllDBConnections();
+                                _etlFAMDB = null;
                             }
+                            _etlFAMDB = new FileProcessingDB();
+                            _etlFAMDB.DatabaseName = _etlDatabaseName;
+                            _etlFAMDB.DatabaseServer = _etlDatabaseServer;
                         }
-                    }
-                    catch (ThreadAbortException)
-                    {
-                        // Don't log or throw ThreadAboartException
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.ExtractLog("ELI46288");
-                    }
-                }
-                ).Start();
-            }
 
-            _lastETLStart = DateTime.Now;
-
-            // if the etlDatabaseServer and etlDatabaseName is not configured there is no way to poll for ETL changes
-            if (!string.IsNullOrEmpty(_etlDatabaseServer) && !string.IsNullOrEmpty(_etlDatabaseName))
-            {
-                new Thread(() =>
-                {
-                    // if _stopProcessing is set return without starting the DatabaseServiceManagers
-                    if (WaitHandle.WaitAny(new WaitHandle[] { _startThreads, _stopProcessing }) == 1)
-                    {
-                        return;
-                    }
-
-                    if (_etlFAMDB is null || _etlFAMDB.DatabaseServer != _etlDatabaseServer || _etlFAMDB.DatabaseName != _etlDatabaseName)
-                    {
-                        if (_etlFAMDB != null)
+                        // Changed this from using a timer to a thread because timer
+                        // would fire on different thread and cause lots of connections 
+                        // to be created in _etlFAMDB
+                        // https://extract.atlassian.net/browse/ISSUE-16675
+                        new Thread(() =>
                         {
-                            _etlFAMDB.UnregisterActiveFAM();
-                            _etlFAMDB.RecordFAMSessionStop();
-                            _etlFAMDB.CloseAllDBConnections();
-                            _etlFAMDB = null;
-                        }
-                        _etlFAMDB = new FileProcessingDB();
-                        _etlFAMDB.DatabaseName = _etlDatabaseName;
-                        _etlFAMDB.DatabaseServer = _etlDatabaseServer;
-                    }
-
-                    // Changed this from using a timer to a thread because timer
-                    // would fire on different thread and cause lots of connections 
-                    // to be created in _etlFAMDB
-                    // https://extract.atlassian.net/browse/ISSUE-16675
-                    new Thread(() =>
-                    {
-                        try
-                        {
-                            do
+                            try
                             {
-                                // Check the FAM still active
-                                if (_etlFAMDB.ActiveFAMID == 0 && _etlFAMDB.IsConnected)
+                                do
                                 {
-                                    ExtractException lostActiveFAM = new ExtractException("ELI46691", "Application Trace: ETL Polling ActiveFAM was lost");
-                                    lostActiveFAM.Log();
-                                    _etlFAMDB.RegisterActiveFAM();
-                                    ExtractException restroredActiveFAM = new ExtractException("ELI46692", "Application Trace: ETL Polling ActiveFAM was restored.");
-                                    restroredActiveFAM.Log();
-                                }
+                                    // Check the FAM still active
+                                    if (_etlFAMDB.ActiveFAMID == 0 && _etlFAMDB.IsConnected)
+                                    {
+                                        ExtractException lostActiveFAM = new ExtractException("ELI46691", "Application Trace: ETL Polling ActiveFAM was lost");
+                                        lostActiveFAM.Log();
+                                        _etlFAMDB.RegisterActiveFAM();
+                                        ExtractException restroredActiveFAM = new ExtractException("ELI46692", "Application Trace: ETL Polling ActiveFAM was restored.");
+                                        restroredActiveFAM.Log();
+                                    }
 
-                                string restartSetting = _etlFAMDB.GetDBInfoSetting("ETLRestart", false);
-                                DateTime restartTime;
-                                if (!DateTime.TryParse(restartSetting, out restartTime))
-                                {
-                                    ExtractException restartInvalid = new ExtractException("ELI46424",
-                                        "ETLRestart value in DBInfo should be a date time string");
-                                    restartInvalid.AddDebugData("ETLRestart", restartSetting, false);
-                                    throw restartInvalid;
-                                }
+                                    string restartSetting = _etlFAMDB.GetDBInfoSetting("ETLRestart", false);
+                                    DateTime restartTime;
+                                    if (!DateTime.TryParse(restartSetting, out restartTime))
+                                    {
+                                        ExtractException restartInvalid = new ExtractException("ELI46424",
+                                            "ETLRestart value in DBInfo should be a date time string");
+                                        restartInvalid.AddDebugData("ETLRestart", restartSetting, false);
+                                        throw restartInvalid;
+                                    }
 
-                                if (restartTime > _lastETLStart)
-                                {
-                                    StopAndRestartETL();
-                                    break;
-                                }
+                                    if (restartTime > _lastETLStart)
+                                    {
+                                        StopAndRestartETL();
+                                        break;
+                                    }
 
+                                }
+                                while (!_stopProcessing.WaitOne(30000));
                             }
-                            while (!_stopProcessing.WaitOne(30000));
-                        }
-                        catch (Exception ex)
-                        {
-                            ex.ExtractLog("ELI46302");
-                        }
+                            catch (Exception ex)
+                            {
+                                ex.ExtractLog("ELI46302");
+                            }
+                        }).Start();
+                        _etlFAMDB.RecordFAMSessionStart("ETL Polling", string.Empty, false, false);
+                        _etlFAMDB.RegisterActiveFAM();
                     }).Start();
-
-                    _etlFAMDB.RecordFAMSessionStart("ETL Polling", string.Empty, false, false);
-                    _etlFAMDB.RegisterActiveFAM();
-                }).Start();
+                }
+            }
+            catch(Exception ex)
+            {
+                // Debug info added to help trouble shoot ESFAMService exit
+                // https://extract.atlassian.net/browse/ISSUE-16841
+                var ee = ex.AsExtract("ELI49583");
+                ee.AddDebugData("EtlDatabaseServer", _etlDatabaseServer);
+                ee.AddDebugData("EtlDatabaseName", _etlDatabaseName);
+                throw ee;
             }
         }
 
