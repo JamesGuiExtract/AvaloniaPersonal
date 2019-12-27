@@ -353,7 +353,7 @@ namespace WebAPI.Controllers
 
                 using (var data = new DocumentData(User, requireSession: true))
                 {
-                    var documentId = data.OpenDocument(docID, processSkipped, false, this.User.GetUsername());
+                    var documentId = data.OpenDocument(Constants.TaskClassWebVerification, docID, processSkipped, false, this.User.GetUsername());
 
                     return Ok(documentId);
                 }

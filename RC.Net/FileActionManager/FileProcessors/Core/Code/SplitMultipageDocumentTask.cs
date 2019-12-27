@@ -57,7 +57,7 @@ namespace Extract.FileActionManager.FileProcessors
     /// documents porting uss and voa data to the output documents in the process.
     /// </summary>
     [ComVisible(true)]
-    [Guid("EF1279E8-4EC2-4CBF-9DE5-E107D97916C0")]
+    [Guid(Constants.TaskClassSplitMultipageDocument)]
     [ProgId("Extract.FileActionManager.FileProcessors.SplitMultipageDocumentTask")]
     public class SplitMultipageDocumentTask : ISplitMultipageDocumentTask, IDisposable
     {

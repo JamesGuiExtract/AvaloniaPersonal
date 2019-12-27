@@ -77,7 +77,7 @@ namespace Extract.FileActionManager.FileProcessors
     /// A <see cref="IFileProcessingTask"/> that allows validation of XML file syntax and schema.
     /// </summary>
     [ComVisible(true)]
-    [Guid("B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006")]
+    [Guid(Constants.TaskClassStoreRetrieveAttributes)]
     [ProgId("Extract.FileActionManager.FileProcessors.StoreAttributesInDbTask")]
     public class StoreAttributesInDBTask: IStoreAttributesInDBTask
     {

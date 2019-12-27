@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Transactions;
+using static System.FormattableString;
 
 namespace Extract.ETL
 {
@@ -786,7 +787,10 @@ namespace Extract.ETL
                         if (onlyTasksStoringAttributes)
                         {
                             cmd.CommandText += 
-                                "WHERE TaskClass.GUID in ('B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006', 'FD7867BD-815B-47B5-BAF4-243B8C44AABB')";
+                                Invariant($@"WHERE TaskClass.GUID in (
+                                    '{Constants.TaskClassStoreRetrieveAttributes}', 
+                                    '{Constants.TaskClassDocumentApi}',
+                                    '{Constants.TaskClassWebVerification}')");
                         }
                         var result = cmd.ExecuteScalar();
                         

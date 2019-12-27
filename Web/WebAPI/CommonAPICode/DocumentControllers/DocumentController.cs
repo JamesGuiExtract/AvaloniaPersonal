@@ -405,7 +405,7 @@ namespace WebAPI.Controllers
                 using (var data = new DocumentData(User, requireSession: true))
                 {
                     data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: false, endSessionOnDispose: true);
-                    data.OpenDocument(Id, processSkipped: false, dataUpdateOnly: true);
+                    data.OpenDocument(Constants.TaskClassDocumentApi, Id, processSkipped: false, dataUpdateOnly: true);
 
                     try
                     {
@@ -464,7 +464,7 @@ namespace WebAPI.Controllers
                 using (var data = new DocumentData(User, requireSession: true))
                 {
                     data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: false, endSessionOnDispose: true); ;
-                    data.OpenDocument(Id, processSkipped: false, dataUpdateOnly: true);
+                    data.OpenDocument(Constants.TaskClassDocumentApi, Id, processSkipped: false, dataUpdateOnly: true);
 
                     try
                     {

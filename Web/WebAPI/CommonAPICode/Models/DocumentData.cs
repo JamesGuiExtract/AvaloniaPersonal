@@ -28,8 +28,6 @@ namespace WebAPI.Models
     /// </summary>
     public sealed class DocumentData: IDisposable
     {
-        const string _WEB_VERIFY_TASK_GUID = "FD7867BD-815B-47B5-BAF4-243B8C44AABB";
-
         ApiContext _apiContext;
         AttributeDBMgr _attributeDbMgr;
         FileApi _fileApi;
@@ -372,6 +370,7 @@ namespace WebAPI.Models
         /// <summary>
         /// Checkouts the document.
         /// </summary>
+        /// <param name="taskGuid">The GUID identifying the source of the operation in the database.</param>
         /// <param name="id">The identifier.</param>
         /// <param name="processSkipped">If <paramref name="id"/> is -1, if this is <c>true</c> then the document to open
         /// will be the next one in the skipped queue for the user, if <c>false</c> the next document in the pending queue will be opend</param>
@@ -380,7 +379,7 @@ namespace WebAPI.Models
         /// <param name="userName"> The username of the user who is making the call. Only required for the recursive version </param>
         /// <param name="retries"> the number of times to retry. </param>
         /// <returns></returns>
-        public DocumentIdResult OpenDocument(int id, bool processSkipped = false, bool dataUpdateOnly = false, string userName = "", int retries = 10)
+        public DocumentIdResult OpenDocument(string taskGuid, int id, bool processSkipped = false, bool dataUpdateOnly = false, string userName = "", int retries = 10)
         {
             try
             {
@@ -436,7 +435,7 @@ namespace WebAPI.Models
                                 retryException.AddDebugData("Remaining Retries", retries);
                                 retryException.Log();
 
-                                return OpenDocument(id, processSkipped, false, userName, --retries);
+                                return OpenDocument(taskGuid, id, processSkipped, false, userName, --retries);
                             }
                         }
 
@@ -456,7 +455,7 @@ namespace WebAPI.Models
                 FileApi.DocumentSession =
                 (
                     true,
-                    FileApi.FileProcessingDB.StartFileTaskSession(_WEB_VERIFY_TASK_GUID, documentId.Id, fileRecord.ActionID),
+                    FileApi.FileProcessingDB.StartFileTaskSession(taskGuid, documentId.Id, fileRecord.ActionID),
                     documentId.Id,
                     DateTime.Now
                 );

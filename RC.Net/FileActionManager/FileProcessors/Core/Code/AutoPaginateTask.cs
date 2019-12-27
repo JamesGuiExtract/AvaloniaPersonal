@@ -132,7 +132,7 @@ namespace Extract.FileActionManager.FileProcessors
     /// all of a source document based on configured requirements for automatic output of documents.
     /// </summary>
     [ComVisible(true)]
-    [Guid("8ECBCC95-7371-459F-8A84-A2AFF7769800")]
+    [Guid(Constants.TaskClassAutoPaginate)]
     [ProgId("Extract.FileActionManager.AutoPaginateTask")]
     [CLSCompliant(false)]
     public class AutoPaginateTask : IAutoPaginateTask

@@ -547,7 +547,7 @@ namespace Extract.Web.WebAPI.Test
                     Func<AppBackendController, Task<(int FileID, int SessionID)>> openDoc = async (controller) =>
                     {
                         // Ask for next available document, and get the document (FileTask) session ID associated
-                        // with each document. Use slightly variying delays before each call to ensure the order
+                        // with each document. Use slightly varying delays before each call to ensure the order
                         // for which the calls are happening between the two controllers vary.
                         await Task.Delay(rng.Next(0, 100));
                         var idResult = controller.OpenDocument(-1, processSkipped: false)
@@ -561,7 +561,7 @@ namespace Extract.Web.WebAPI.Test
                     var openDoc2 = openDoc(controller2);
                     Task.WaitAll(openDoc1, openDoc2);
 
-                    //  Prior to the fix for ISSUE-16852, the following check would fail within a few itereations
+                    //  Prior to the fix for ISSUE-16852, the following check would fail within a few iterations
                     Assert.AreNotEqual(openDoc1.Result.FileID, openDoc2.Result.FileID,
                         "Same file grabbed by both controllers");
                     // This check was not failing, but good to confirm they are different nonetheless.

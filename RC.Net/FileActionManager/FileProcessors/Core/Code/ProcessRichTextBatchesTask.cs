@@ -86,9 +86,6 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
 
-        static readonly string _SPLIT_RICH_TEXT_BATCHES_TASK_GUID = "5F37ABA6-7D18-4AB9-9ABE-79CE0F49C903";
-        static readonly string _UPDATE_RICH_TEXT_BATCHES_TASK_GUID = "4FF8821E-D98A-4B45-AD1A-5E7F62621581";
-
         static readonly Encoding _encoding = Encoding.GetEncoding("windows-1252");
 
         #endregion Constants
@@ -436,7 +433,7 @@ namespace Extract.FileActionManager.FileProcessors
                     pFAMTM = new FAMTagManager();
                 }
 
-                string taskGUID = DivideBatchIntoRichTextFiles ? _SPLIT_RICH_TEXT_BATCHES_TASK_GUID : _UPDATE_RICH_TEXT_BATCHES_TASK_GUID;
+                string taskGUID = DivideBatchIntoRichTextFiles ? Constants.TaskClassRtfDivideBatches : Constants.TaskClassRtfUpdateBatches;
                 int fileTaskSessionID = pDB.StartFileTaskSession(taskGUID, pFileRecord.FileID, pFileRecord.ActionID);
                 DateTime sessionStartTime = DateTime.Now;
 

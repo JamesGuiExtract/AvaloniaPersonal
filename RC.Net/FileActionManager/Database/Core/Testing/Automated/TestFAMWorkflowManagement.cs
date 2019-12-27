@@ -519,7 +519,7 @@ namespace Extract.FileActionManager.Database.Test
                 int actionA_NoWorkflow_ID = fileProcessingDb.GetActionID(_ACTION_A);
                 int actionB_NoWorkflow_ID = fileProcessingDb.GetActionID(_ACTION_B);
 
-                fileProcessingDb.StartFileTaskSession("59496DF7-3951-49B7-B063-8C28F4CD843F", fileRecord1.FileID, actionA_NoWorkflow_ID);
+                fileProcessingDb.StartFileTaskSession(Constants.TaskClassDataEntryVerification, fileRecord1.FileID, actionA_NoWorkflow_ID);
 
                 fileProcessingDb.RecordFAMSessionStop();
 
@@ -588,7 +588,7 @@ namespace Extract.FileActionManager.Database.Test
                 var fileRecord2 = fileProcessingDb.AddFile(testfileName2, _ACTION_B, -1, EFilePriority.kPriorityNormal,
                     false, false, EActionStatus.kActionSkipped, false, out alreadyExists, out previousStatus);
 
-                fileProcessingDb.StartFileTaskSession("59496DF7-3951-49B7-B063-8C28F4CD843F", fileRecord2.FileID, actionB_Workflow1_ID);
+                fileProcessingDb.StartFileTaskSession(Constants.TaskClassDataEntryVerification, fileRecord2.FileID, actionB_Workflow1_ID);
 
                 fileProcessingDb.RecordFAMSessionStop();
 

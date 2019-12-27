@@ -136,7 +136,7 @@ namespace Extract.FileActionManager.FileProcessors
     /// Represents a file processing task that allows pagination of documents.
     /// </summary>
     [ComVisible(true)]
-    [Guid("DF414AD2-742A-4ED7-AD20-C1A1C4993175")]
+    [Guid(Constants.TaskClassPaginationVerification)]
     [ProgId("Extract.FileActionManager.PaginationTask")]
     [CLSCompliant(false)]
     public class PaginationTask : IPaginationTask

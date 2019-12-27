@@ -15,7 +15,7 @@ namespace Extract.Redaction.Verification
     /// Represents a file processing task that performs verification of redactions.
     /// </summary>
     [ComVisible(true)]
-    [Guid("AD7F3F3F-20EC-4830-B014-EC118F6D4567")]
+    [Guid(Constants.TaskClassRedactionVerification)]
     [ProgId("Extract.Redaction.Verification.VerificationTask")]
     public class VerificationTask : ICategorizedComponent, IConfigurableObject, ICopyableObject,
         IFileProcessingTask, ILicensedComponent, IPersistStream

@@ -1984,6 +1984,7 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 		vecQueries.push_back(gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES);
 		vecQueries.push_back(gstrINSERT_PAGINATION_TASK_CLASS);
 		vecQueries.push_back(gstrSPLIT_MULTI_PAGE_DOCUMENT_TASK_CLASS);
+		vecQueries.push_back(gstrINSERT_TASKCLASS_DOCUMENT_API);
 		vecQueries.push_back(gstrINSERT_TASKCLASS_WEB_VERIFICATION);
 		vecQueries.push_back(gstrINSERT_AUTO_PAGINATE_TASK_CLASS);
 		vecQueries.push_back(gstrINSERT_RTF_DIVIDE_BATCHES_TASK_CLASS);

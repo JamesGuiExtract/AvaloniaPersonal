@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Threading;
 using System.Transactions;
 using System.Windows.Forms;
+using static System.FormattableString;
 
 namespace Extract.ETL
 {
@@ -80,7 +81,7 @@ namespace Extract.ETL
         ///     @LastProcessedID - Last processed file task session
         /// </summary>
         static readonly string GET_TOUCHED_FILES =
-            @"
+            Invariant($@"
                 DECLARE @FilesTable TABLE (
                 	FileID INT
                 )
@@ -89,20 +90,18 @@ namespace Extract.ETL
                 	SELECT FileTaskSession.ID FileTaskSessionID, FileID, FileTaskSession.DateTimeStamp
                 	FROM FileTaskSession INNER JOIN TaskClass ON FileTaskSession.TaskClassID = TaskClass.ID
                 	WHERE FileTaskSession.ID > @LastProcessedID AND FileTaskSession.ID <= @LastInBatchID
-                        AND ([TaskClass].GUID IN 
-                           ('FD7867BD-815B-47B5-BAF4-243B8C44AABB', 
-                            '59496DF7-3951-49B7-B063-8C28F4CD843F', 
-                            'AD7F3F3F-20EC-4830-B014-EC118F6D4567',
-                            'DF414AD2-742A-4ED7-AD20-C1A1C4993175',
-                            '8ECBCC95-7371-459F-8A84-A2AFF7769800')) 
-                )
-                
+                        AND ([TaskClass].GUID IN (
+                            '{Constants.TaskClassDocumentApi}', 
+                            '{Constants.TaskClassDataEntryVerification}', 
+                            '{Constants.TaskClassPaginationVerification}',
+                            '{Constants.TaskClassAutoPaginate}'
+                           )
                 INSERT INTO @FilesTable
                     SELECT FileID FROM TouchedFiles; 
-            ";
+            ");
 
 
-        readonly string _UpdateQuery = GET_TOUCHED_FILES + @"
+        readonly string _UpdateQuery = GET_TOUCHED_FILES + Invariant($@"
             DELETE FROM ReportingHIMStats
             FROM ReportingHIMStats
             Where SourceFileID in (Select FileID FROM @FilesTable);
@@ -158,11 +157,12 @@ namespace Extract.ETL
                        AND FileActionStatus.ActionStatus = 'C'
                      WHERE FileTaskSession.ID > @LastProcessedID
                            AND FileTaskSession.ID <= @LastInBatchID
-                           AND [TaskClass].GUID IN(
-                           'FD7867BD-815B-47B5-BAF4-243B8C44AABB',
-                           '59496DF7-3951-49B7-B063-8C28F4CD843F',
-                           'AD7F3F3F-20EC-4830-B014-EC118F6D4567'
-                                                  )
+                           AND [TaskClass].GUID IN (
+                           '{Constants.TaskClassDocumentApi}'                           
+                           '{Constants.TaskClassDataEntryVerification}',                           
+                           '{Constants.TaskClassPaginationVerification}',
+                           '{Constants.TaskClassAutoPaginate}'
+                           )
                      AND FileTaskSession.DateTimeStamp IS NOT NULL
                      AND FileTaskSession.ActionID IS NOT NULL
                      AND (FileTaskSession.FileID NOT IN
@@ -211,7 +211,7 @@ namespace Extract.ETL
                         DataToInsert.ActionID, 
                         DataToInsert.FileTaskSessionID, 
                         DataToInsert.ASCName
-                 FROM DataToInsert;";
+                 FROM DataToInsert;");
 
         #endregion
 

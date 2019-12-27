@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using System.Windows.Forms;
+using static System.FormattableString;
 
 namespace Extract.ETL
 {
@@ -100,7 +101,7 @@ namespace Extract.ETL
         /// This string is to be used in a string.Format statement with {0} either (0) if no previous ID's 
         ///     or (<comma separated list of previously active id's>)
         /// </summary>
-        static readonly string _QUERY_FOR_SOURCE_RECORDS = @"
+        static readonly string _QUERY_FOR_SOURCE_RECORDS = Invariant($@"
             SELECT [FileTaskSession].[ID]
                      ,[FileID]
             		 ,[FileTaskSession].[ActionID]
@@ -112,15 +113,15 @@ namespace Extract.ETL
                    INNER JOIN [dbo].[TaskClass] ON [TaskClass].[ID] = [FileTaskSession].[TaskClassID]
                    
                  WHERE ([TaskClass].GUID IN 
-                           ('FD7867BD-815B-47B5-BAF4-243B8C44AABB', 
-                            '59496DF7-3951-49B7-B063-8C28F4CD843F', 
-                            'AD7F3F3F-20EC-4830-B014-EC118F6D4567',
-                            'DF414AD2-742A-4ED7-AD20-C1A1C4993175')) 
+                           ('{Constants.TaskClassWebVerification}', 
+                            '{Constants.TaskClassDataEntryVerification}', 
+                            '{Constants.TaskClassRedactionVerification}',
+                            '{Constants.TaskClassPaginationVerification}')) 
                        AND (([FileTaskSession].[ID] > @LastProcessedFileTaskSessionID 
             			AND [FileTaskSession].[ID] < = @EndOfBatch
             AND [FileTaskSession].[Duration] IS NOT NULL 
             AND [FileTaskSession].OverheadTime IS NOT NULL))
-            ORDER BY ID ASC";
+            ORDER BY ID ASC");
 
         /// <summary>
         /// Query to add or update the ReportingVerificationRates table

@@ -22,7 +22,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
     /// or allowing DEP controls to be populated via OCR "swipes" in the image viewer.</item>
     /// </list>
     /// </summary>
-    [Guid("59496DF7-3951-49b7-B063-8C28F4CD843F")]
+    [Guid(Constants.TaskClassDataEntryVerification)]
     [ProgId("Extract.DataEntry.Utilities.DataEntryApplication")]
     [ComVisible(true)]
     public class ComClass : IFileProcessingTask, ICategorizedComponent, ILicensedComponent,

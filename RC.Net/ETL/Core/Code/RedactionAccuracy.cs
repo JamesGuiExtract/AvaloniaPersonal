@@ -16,6 +16,7 @@ using System.Threading;
 using System.Transactions;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
+using static System.FormattableString;
 
 namespace Extract.ETL
 {
@@ -99,7 +100,7 @@ namespace Extract.ETL
         ///     @LastProcessedID - Last processed file task session
         /// </summary>
         static readonly string GET_TOUCHED_FILES =
-            @"
+            Invariant($@"
                 DECLARE @FilesTable TABLE (
                 	FileID INT
                 )
@@ -108,12 +109,15 @@ namespace Extract.ETL
                 	SELECT FileTaskSession.ID FileTaskSessionID, FileID, FileTaskSession.DateTimeStamp
                 	FROM FileTaskSession INNER JOIN TaskClass ON FileTaskSession.TaskClassID = TaskClass.ID
                 	WHERE FileTaskSession.ID > @LastProcessedID AND FileTaskSession.ID <= @LastInBatchID
-                        AND TaskClass.GUID IN ('B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006', 'FD7867BD-815B-47B5-BAF4-243B8C44AABB')
+                        AND TaskClass.GUID IN (
+                            '{Constants.TaskClassStoreRetrieveAttributes}',
+                            '{Constants.TaskClassWebVerification}',
+                            '{Constants.TaskClassDocumentApi}')
                 )
                 
                 INSERT INTO @FilesTable
                     SELECT FileID FROM TouchedFiles 
-            ";
+            ");
 
         /// <summary>
         /// Query used to get the data used to create the records in ReportingRedactionAccuracy table

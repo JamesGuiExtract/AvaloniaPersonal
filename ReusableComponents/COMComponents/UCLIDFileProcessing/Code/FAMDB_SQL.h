@@ -1949,11 +1949,15 @@ static const string gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES =
 
 static const string gstrINSERT_PAGINATION_TASK_CLASS =
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
-	"	('DF414AD2-742A-4ED7-AD20-C1A1C4993175', 'Core: Paginate files') \r\n";
+	"	('DF414AD2-742A-4ED7-AD20-C1A1C4993175', 'Pagination: Verify') \r\n";
 
 static const string gstrSPLIT_MULTI_PAGE_DOCUMENT_TASK_CLASS =
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
 	"	('EF1279E8-4EC2-4CBF-9DE5-E107D97916C0', 'Core: Split multi-page document') \r\n";
+
+static const string gstrINSERT_TASKCLASS_DOCUMENT_API =
+	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
+	"	('49C8149D-38D9-4EAF-A46B-CF16EBF0882F', 'Core: Document API') \r\n";
 
 static const string gstrINSERT_TASKCLASS_WEB_VERIFICATION =
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"

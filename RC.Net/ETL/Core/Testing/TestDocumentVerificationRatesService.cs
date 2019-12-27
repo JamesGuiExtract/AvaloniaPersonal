@@ -171,10 +171,10 @@ namespace Extract.ETL.Test
         [Test]
         [Category("Automated")]
         [Category("ETL")]
-        [TestCase("DF414AD2-742A-4ED7-AD20-C1A1C4993175", TestName = "Core: Paginate files")]
-        [TestCase("FD7867BD-815B-47B5-BAF4-243B8C44AABB", TestName = "Core: Web verification")]
-        [TestCase("59496DF7-3951-49B7-B063-8C28F4CD843F", TestName = "Data Entry: Verify extracted data")]
-        [TestCase("AD7F3F3F-20EC-4830-B014-EC118F6D4567", TestName = "Redaction: Verify sensitive data")]
+        [TestCase(Constants.TaskClassPaginationVerification, TestName = "Pagination: Verify")]
+        [TestCase(Constants.TaskClassWebVerification, TestName = "Core: Web verification")]
+        [TestCase(Constants.TaskClassDataEntryVerification, TestName = "Data Entry: Verify extracted data")]
+        [TestCase(Constants.TaskClassRedactionVerification, TestName = "Redaction: Verify sensitive data")]
         public static void TestDocumentVerificationRatesServiceProcess(string taskGuid)
         {
             string testDBName = taskGuid + "_Test";
