@@ -94,7 +94,7 @@ IF EXIST "%TEMP%\LabDEInstalled.reg" DEL "%TEMP%\LabDEInstalled.reg"
 @regedit /e "%TEMP%\LabDEInstalled.reg" %LABDE_KEY%
 IF NOT EXIST "%TEMP%\LabDEInstalled.reg" (
 	@ECHO There was a error installing LabDE
-	GOTO END
+	GOTO ERROR
 )
 DEL "%TEMP%\LabDEInstalled.reg"
 
@@ -107,7 +107,7 @@ IF EXIST "%TEMP%\IDShieldInstalled.reg" DEL "%TEMP%\IDShieldInstalled.reg"
 @regedit /e "%TEMP%\IDShieldInstalled.reg" %IDSHIELD_KEY%
 IF NOT EXIST "%TEMP%\IDShieldInstalled.reg" (
 	@ECHO There was a error installing ID Shield
-	GOTO END
+	GOTO ERROR
 )
 DEL "%TEMP%\IDShieldInstalled.reg"
 
@@ -120,7 +120,7 @@ IF EXIST "%TEMP%\FlexIndexInstalled.reg" DEL "%TEMP%\FlexIndexInstalled.reg"
 @regedit /e "%TEMP%\FlexIndexInstalled.reg" %FLEXINDEX_KEY%
 IF NOT EXIST "%TEMP%\FlexIndexInstalled.reg" (
 	@ECHO There was a error installing FLEX Index
-	GOTO END
+	GOTO ERROR
 )
 DEL "%TEMP%\FlexIndexInstalled.reg"
 
@@ -129,6 +129,17 @@ call "%EXTRACT_COMMON%\RegisterAll.bat" /s
 @ECHO.
 @ECHO.
 @ECHO PLEASE REBOOT YOUR COMPUTER.
+GOTO END
+
+:: Handle common error tasks
+:ERROR
+
+:: Check if the .net framework prerequisite was installed
+REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" >NUL
+IF ERRORLEVEL 1 (
+    @ECHO The .NET Framework 4.6 Prerequisite was not installed. Install manually before running the install again.
+)
+
 :END
 @ECHO.
 
