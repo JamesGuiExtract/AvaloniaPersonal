@@ -513,6 +513,85 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
+        /// <summary>
+        /// Tests that different controllers don't end up being assigned the same document
+        /// when requesting the next open document repeatedly at about the same time.
+        /// https://extract.atlassian.net/browse/ISSUE-16852
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void OpenDocument_ConcurrentSessions()
+        {
+            string dbName = "AppBackendAPI_Test_OpenDocument_ConcurrentSessions";
+
+            try
+            {
+                // This test uses two different controller instances (each with its own FAM session)
+                // to repeatedly try to request the next open document within a fraction of a second of
+                // each other (slightly altering the timing each time).
+
+                // (User1 = jane_doe)
+                var (fileProcessingDb, user1, controller1) = InitializeDBAndUser(dbName, _testFiles);
+                LogInToWebApp(controller1, user1);
+
+                User user2 = ApiTestUtils.CreateUser("jon_doe", "123");
+                var controller2 = ApiTestUtils.CreateController<AppBackendController>(user2);
+                LogInToWebApp(controller2, user2);
+
+                var rng = new Random();
+                var totalDocCount = _testFileArray.Length;
+
+                for (int i = 0; i < 100; i++)
+                {
+                    Func<AppBackendController, Task<(int FileID, int SessionID)>> openDoc = async (controller) =>
+                    {
+                        // Ask for next available document, and get the document (FileTask) session ID associated
+                        // with each document. Use slightly variying delays before each call to ensure the order
+                        // for which the calls are happening between the two controllers vary.
+                        await Task.Delay(rng.Next(0, 100));
+                        var idResult = controller.OpenDocument(-1, processSkipped: false)
+                            .AssertGoodResult<DocumentIdResult>();
+                        await Task.Delay(rng.Next(0, 100));
+                        var sessionId = controller.GetActiveDocumentSessionId();
+                        return (FileID: idResult.Id, SessionID: sessionId);
+                    };
+
+                    var openDoc1 = openDoc(controller1);
+                    var openDoc2 = openDoc(controller2);
+                    Task.WaitAll(openDoc1, openDoc2);
+
+                    //  Prior to the fix for ISSUE-16852, the following check would fail within a few itereations
+                    Assert.AreNotEqual(openDoc1.Result.FileID, openDoc2.Result.FileID,
+                        "Same file grabbed by both controllers");
+                    // This check was not failing, but good to confirm they are different nonetheless.
+                    Assert.AreNotEqual(openDoc1.Result.SessionID, openDoc2.Result.SessionID,
+                        "Same session ID being used by both controllers");
+
+                    // Confirm there are now 2 fewer documents indicated as pending than originally.
+                    var queueStatus = controller1.GetQueueStatus()
+                        .AssertGoodResult<QueueStatusResult>();
+                    Assert.AreEqual(totalDocCount - 2, queueStatus.PendingDocuments);
+
+                    // Close the documents without committing to return them to the queue.
+                    controller1.CloseDocument(openDoc1.Result.FileID, commit: false)
+                        .AssertGoodResult<NoContentResult>();
+                    controller2.CloseDocument(openDoc2.Result.FileID, commit: false)
+                        .AssertGoodResult<NoContentResult>();
+                }
+
+                controller1.Logout()
+                    .AssertGoodResult<NoContentResult>();
+                controller2.Logout()
+                    .AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
         [Test]
         [Category("Automated")]
         [Category("WebAPIBackend")]

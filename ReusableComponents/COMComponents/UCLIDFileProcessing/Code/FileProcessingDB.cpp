@@ -4726,10 +4726,10 @@ STDMETHODIMP CFileProcessingDB::ResumeWebSession(long nFAMSessionID, long* pnFil
 		string strGetOpenFileFromFAMSession =
 			"SELECT TOP(1) [FileTaskSession].[ID] AS [FileTaskSessionID], [FileTaskSession].[FileID]"
 			"	FROM [dbo].[FileTaskSession]"
-			"	JOIN [dbo].[FileActionStatus] ON [FileTaskSession].[FileID] = [FileActionStatus].FileID"
-			"		AND [FileTaskSession].[ActionID] = [FileActionStatus].[ActionID]"
+			"	JOIN [dbo].[LockedFile] ON [ActiveFAMID] = " + asString(m_nActiveFAMID) +
+			"		AND [FileTaskSession].[FileID] = [LockedFile].[FileID]"
+			"		AND [FileTaskSession].[ActionID] = [LockedFile].[ActionID]"
 			"	WHERE [FAMSessionID] = " + strFAMSessionID +
-			"		AND [ActionStatus] = 'R'"
 			"	ORDER BY [FileTaskSession].[ID] DESC";
 
 		ipRecords = getThisAsCOMPtr()->GetResultsForQuery(strGetOpenFileFromFAMSession.c_str());
