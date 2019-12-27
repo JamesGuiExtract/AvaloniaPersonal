@@ -37,7 +37,7 @@ namespace
 	// WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
 	const string gstrSCHEMA_VERSION_NAME = "AttributeCollectionSchemaVersion";
 	const string gstrDESCRIPTION = "Attribute database manager";
-	const long glSCHEMA_VERSION = 9;
+	const long glSCHEMA_VERSION = 10;
 	const long dbSchemaVersionWhenAttributeCollectionWasIntroduced = 129;
 
 
@@ -230,9 +230,19 @@ namespace
 		return GetSchema_v8(bAddUserTables);
 	}
 
+	VectorOfString GetSchema_v10(bool bAddUserTables)
+	{
+		VectorOfString queries = GetSchema_v9(bAddUserTables);
+		queries.push_back(gstrCreate_ReportingDataCaptureAccuracy_FKS);
+		queries.push_back(gstrAdd_FKS_REPORTINGHIMSTATS);
+		queries.push_back(gstrAdd_FKS_REPORTINGREDACTIONACCURACY);
+
+		return queries;
+	}
+
 	VectorOfString GetCurrentSchema(bool bAddUserTables = true)
 	{
-		return GetSchema_v9(bAddUserTables);
+		return GetSchema_v10(bAddUserTables);
 	}
 
 
@@ -541,6 +551,34 @@ namespace
 			return nNewSchemaVersion;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46601");
+	}
+	//-------------------------------------------------------------------------------------------------
+	int UpdateToSchemaVersion10(_ConnectionPtr ipConnection, long* pnNumSteps)
+	{
+		try
+		{
+			const int nNewSchemaVersion = 10;
+
+			if (pnNumSteps != __nullptr)
+			{
+				*pnNumSteps += 1;
+				return nNewSchemaVersion;
+			}
+
+			vector<string> queries;
+			queries.push_back(gstrAdd_FKS_REPORTINGREDACTIONACCURACY);
+			queries.push_back(gstrAdd_FKS_REPORTINGHIMSTATS);
+			queries.push_back(gstrCreate_ReportingDataCaptureAccuracy_FKS);
+
+			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
+			long saveCommandTimeout = ipConnection->CommandTimeout;
+			ipConnection->CommandTimeout = 0;
+			executeVectorOfSQL(ipConnection, queries);
+			ipConnection->CommandTimeout = saveCommandTimeout;
+
+			return nNewSchemaVersion;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49587");
 	}
 }
 
@@ -926,6 +964,13 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 				break;
 
 			case 9:
+				if (nFAMDBSchemaVersion == 178)
+				{
+					*pnProdSchemaVersion = UpdateToSchemaVersion10(ipConnection, pnNumSteps);
+				}
+				break;
+
+			case 10:
 				break;
 
 			default:
