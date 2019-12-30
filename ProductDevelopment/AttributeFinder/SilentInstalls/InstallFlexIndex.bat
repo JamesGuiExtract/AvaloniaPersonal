@@ -94,10 +94,12 @@ GOTO END
 :: Handle common error tasks
 :ERROR
 :: Check if the .net framework prerequisite was installed
-REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" >NUL
-IF ERRORLEVEL 1 (
+SET %NET_RELEASE%=
+FOR /f "tokens=3" %%a in ('REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" /v Release ^|findstr /ri "REG_DWORD"') do set NET_RELEASE=%%a
+IF %NET_RELEASE% LSS 393295 (
     @ECHO The .NET Framework 4.6 Prerequisite was not installed. Install manually before running the install again.
 )
+SET %NET_RELEASE%=
 
 :END
 @ECHO.
