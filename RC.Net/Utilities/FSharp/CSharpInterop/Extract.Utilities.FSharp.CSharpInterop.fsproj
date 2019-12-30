@@ -72,9 +72,6 @@
     <Reference Include="FSharp.Core">
       <HintPath>..\..\..\APIs\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
     </Reference>
-    <Reference Include="fsi">
-      <HintPath>..\..\..\APIs\FSharp.Compiler.Tools.10.2.3\tools\fsi.exe</HintPath>
-    </Reference>
     <Reference Include="FSharp.Compiler.Interactive.Settings">
       <HintPath>..\..\..\APIs\FSharp.Compiler.Tools.10.2.3\tools\FSharp.Compiler.Interactive.Settings.dll</HintPath>
     </Reference>

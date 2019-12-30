@@ -136,13 +136,15 @@ namespace Extract.AttributeFinder.Rules
                 pDocument.Attribute.ReportMemoryUsage();
 
                 var expandedScriptPath = Path.GetFullPath(AFUtility.ExpandTagsAndFunctions(ScriptPath, pDocument));
+                var componentDataDir = AFUtility.ExpandTagsAndFunctions("<ComponentDataDir>", pDocument);
 
                 FSharpFunc<AFDocument, AFDocument> fun = null;
                 try
                 {
                     fun = FileDerivedResourceCache.GetCachedObject(
-                        () => FunctionLoader.LoadFunction<AFDocument>(expandedScriptPath, FunctionName),
+                        () => FunctionLoader.LoadFunction<AFDocument>(expandedScriptPath, FunctionName, componentDataDir),
                         expandedScriptPath,
+                        componentDataDir, // include this dir so that there will be a unique entry in the cache for each FKB in use
                         FunctionName);
 
                 }

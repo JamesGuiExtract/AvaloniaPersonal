@@ -305,6 +305,7 @@ namespace Extract.UtilityApplications.NERAnnotation
 
                     return new AttributeFinderPathTags { Document = afdoc };
                 });
+                string componentDataDir = _pathTags.Value.Expand("<ComponentDataDir>");
 
                 // Update working dir to match the setting location
                 Directory.SetCurrentDirectory(_settings.WorkingDir);
@@ -318,7 +319,7 @@ namespace Extract.UtilityApplications.NERAnnotation
                 {
                     var scriptPath = Path.GetFullPath(_pathTags.Value.Expand(_settings.PreprocessingScript));
                     _preprocessingFunction =
-                        FunctionLoader.LoadFunction<AFDocument>(scriptPath, _settings.PreprocessingFunctionName);
+                        FunctionLoader.LoadFunction<AFDocument>(scriptPath, _settings.PreprocessingFunctionName, componentDataDir);
                 }
 
                 // Load filter functions into the register
@@ -326,7 +327,11 @@ namespace Extract.UtilityApplications.NERAnnotation
                 {
                     _entityFilteringFunctions = new Dictionary<string, FSharpFunc<EntitiesAndPage, EntitiesAndPage>>();
                     _entityFilteringScriptPath = Path.GetFullPath(_pathTags.Value.Expand(_settings.EntityFilteringScript));
-                    var entityFilteringFunctions = FunctionLoader.LoadFunctions<EntitiesAndPage>(_entityFilteringScriptPath, EntityFilteringFunctionNames.ToArray());
+                    var entityFilteringFunctions = FunctionLoader.LoadFunctions<EntitiesAndPage>(
+                        _entityFilteringScriptPath,
+                        EntityFilteringFunctionNames.ToArray(),
+                        componentDataDir
+                        );
                     for (int i = 0; i < EntityFilteringFunctionNames.Count; i++)
                     {
                         _entityFilteringFunctions[EntityFilteringFunctionNames[i]] = entityFilteringFunctions[i];
@@ -338,7 +343,7 @@ namespace Extract.UtilityApplications.NERAnnotation
                 {
                     var scriptPath = Path.GetFullPath(_pathTags.Value.Expand(_settings.CharacterReplacingScript));
                     _characterReplacingFunction =
-                        FunctionLoader.LoadFunction<string>(scriptPath, _settings.CharacterReplacingFunctionName);
+                        FunctionLoader.LoadFunction<string>(scriptPath, _settings.CharacterReplacingFunctionName, componentDataDir);
                 }
 
                 if (_settings.Format == NamedEntityRecognizer.OpenNLP)
