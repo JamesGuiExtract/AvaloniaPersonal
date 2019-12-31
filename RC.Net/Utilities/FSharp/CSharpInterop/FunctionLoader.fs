@@ -15,6 +15,13 @@ module Evaluator =
         let fullPath = Path.GetFullPath path
         Extract.ExtractException.Assert("ELI46985", "Path is not a full path", (path = fullPath), "Path", path);
 
+        let includeDirectories =
+          seq {
+            yield Extract.Utilities.FileSystemMethods.CommonComponentsPath
+            yield! includeDirectories
+          }
+          |> Seq.distinct
+
         let fsi =
             let sbOut = StringBuilder()
             let sbErr = StringBuilder()
