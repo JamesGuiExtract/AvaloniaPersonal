@@ -1434,9 +1434,7 @@ namespace WebAPI.Models
                 }
                 else
                 {
-                    byte[] imageData = (byte[])_imageConverter.Value.GetPDFImage(fileName, pageNum, true);
-
-                    return imageData;
+                    return GetImagePage(fileName, pageNum);
                 }
             }
             catch (Exception ex)
@@ -1876,6 +1874,69 @@ namespace WebAPI.Models
             }
         }
 
+        /// <summary>
+        /// Get page an image by conversion to PDF
+        /// </summary>
+        /// <param name="fileName">The path to the image or PDF file</param>
+        /// <param name="pageNumber">The page number to retrieve (1-based)</param>
+        /// <param name="imageData">Will be set to the image data on return if return value is <c>true</c></param>
+        /// <returns><c>true</c> if successful, <c>false</c> if there is an error getting the page</returns>
+        public static bool TryGetPageWithConversionToPdf(string fileName, int pageNumber, out byte[] imageData)
+        {
+            try
+            {
+                imageData = (byte[])_imageConverter.Value.GetPDFImage(fileName, pageNumber, true);
+                return true;
+            }
+            catch { }
+
+            imageData = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Get page from the PDF version of an image if it can be found
+        /// </summary>
+        /// <param name="fileName">The path to the image or PDF file</param>
+        /// <param name="pageNumber">The page number to retrieve (1-based)</param>
+        /// <param name="imageData">Will be set to the image data on return if return value is <c>true</c></param>
+        /// <returns><c>true</c> if successful, <c>false</c> if PDF can't be found or there is an error getting the page</returns>
+        public static bool TryGetPageFromAssociatedPdf(string fileName, int pageNumber, out byte[] imageData)
+        {
+            try
+            {
+                bool foundPdf = false;
+                var pdfFileName = fileName;
+                if (pdfFileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                {
+                    foundPdf = true;
+                }
+                else if (File.Exists(pdfFileName = fileName + ".pdf"))
+                {
+                    foundPdf = true;
+                }
+                else if (File.Exists(pdfFileName = Path.ChangeExtension(fileName, ".pdf")))
+                {
+                    foundPdf = true;
+                }
+                else if (File.Exists(pdfFileName = Path.ChangeExtension(fileName, null))
+                    && pdfFileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                {
+                    foundPdf = true;
+                }
+
+                if (foundPdf)
+                {
+                    imageData = GetPageFromPdf(pdfFileName, pageNumber);
+                    return true;
+                }
+            }
+            catch { }
+
+            imageData = null;
+            return false;
+        }
+
         #region Private Members
 
         FileApi FileApi
@@ -2080,7 +2141,7 @@ namespace WebAPI.Models
                 HTTPError.Assert("ELI48418", StatusCodes.Status404NotFound, page > 0 && page <= pageCount,
                     "Page not found");
 
-                var image = (byte[])_imageConverter.Value.GetPDFImage(fileName, page, true);
+                var image = GetImagePage(fileName, page);
                 string stringizedPageUss = null;
                 string wordZoneJson = null;
                 var pageUSS = GetUssData(fileName, page);
@@ -2162,6 +2223,30 @@ namespace WebAPI.Models
             return ee;
         }
 
+        private static byte[] GetImagePage(string fileName, int pageNumber)
+        {
+            if (TryGetPageFromAssociatedPdf(fileName, pageNumber, out byte[] imageData))
+            {
+                return imageData;
+            }
+            else
+            {
+                return (byte[])_imageConverter.Value.GetPDFImage(fileName, pageNumber, true);
+            }
+        }
+
+        private static byte[] GetPageFromPdf(string pdfFileName, int pageNumber)
+        {
+            using (var entireDoc = org.apache.pdfbox.pdmodel.PDDocument.load(new java.io.File(pdfFileName)))
+            using (var pageDoc = new org.apache.pdfbox.pdmodel.PDDocument())
+            using (var pageStream = new java.io.ByteArrayOutputStream())
+            {
+                pageDoc.addPage(entireDoc.getPage(pageNumber - 1));
+                pageDoc.save(pageStream);
+                return pageStream.toByteArray();
+            }
+        }
+        
         #endregion Private Members
     }
 }

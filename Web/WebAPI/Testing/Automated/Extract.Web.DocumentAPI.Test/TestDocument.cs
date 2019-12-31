@@ -1220,6 +1220,163 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
+        [Test, Category("Automated"), Category("TryGetPage")]
+        public static void Test_GetImagePageFromTIF()
+        {
+            string tifPath = null;
+            try
+            {
+                tifPath = _testFiles.GetFile("Resources.TestImage003.tif");
+                Assert.False(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out var _));
+
+                Assert.True(DocumentData.TryGetPageWithConversionToPdf(tifPath, 1, out byte[] imageDataFromConversion));
+                Assert.That(imageDataFromConversion.Length > 0);
+            }
+            finally
+            {
+                if (tifPath is string)
+                {
+                    _testFiles.RemoveFile("Resources.TestImage003.tif");
+                }
+            }
+        }
+
+        [Test, Category("Automated"), Category("TryGetPage")]
+        public static void Test_GetImagePageFromPDF()
+        {
+            string pdfPath = null;
+            try
+            {
+                pdfPath = _testFiles.GetFile("Resources.TestImage003.pdf");
+                Assert.True(DocumentData.TryGetPageFromAssociatedPdf(pdfPath, 1, out byte[] imageDataFromPDF));
+                Assert.That(imageDataFromPDF.Length > 0);
+            }
+            finally
+            {
+                if (pdfPath is string)
+                {
+                    _testFiles.RemoveFile("Resources.TestImage003.pdf");
+                }
+            }
+        }
+
+        [Test, Category("Automated"), Category("TryGetPage")]
+        public static void Test_GetImagePageFromAssociatedPDF()
+        {
+            string tifPath = null;
+            string pdfPath = null;
+            try
+            {
+                tifPath = _testFiles.GetFile("Resources.TestImage003.tif");
+                Assert.False(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out var _));
+
+                pdfPath = _testFiles.GetFile("Resources.TestImage003.pdf");
+                Assert.True(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out byte[] imageDataFromPDF));
+
+                var pdfPathOld = pdfPath;
+                pdfPath = _testFiles.GetFile("Resources.TestImage003.pdf", tifPath + ".PDF");
+                Assert.False(File.Exists(pdfPathOld));
+                Assert.True(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out imageDataFromPDF));
+
+                tifPath = _testFiles.GetFile("Resources.TestImage003.tif", Path.ChangeExtension(tifPath, ".pdf.tif"));
+                pdfPathOld = pdfPath;
+                pdfPath = _testFiles.GetFile("Resources.TestImage003.pdf", Path.ChangeExtension(tifPath, null));
+                Assert.False(File.Exists(pdfPathOld));
+                Assert.True(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out imageDataFromPDF));
+            }
+            finally
+            {
+                if (tifPath is string)
+                {
+                    _testFiles.RemoveFile("Resources.TestImage003.tif");
+                }
+                if (pdfPath is string)
+                {
+                    _testFiles.RemoveFile("Resources.TestImage003.pdf");
+                }
+            }
+        }
+
+        // I used nuance to convert this TIF to PDF so the data is the same for both methods
+        // The only differences are in the prefix and suffix of the documents
+        [TestCase(1, Description = "Page 1"), Category("Automated"), Category("TryGetPage")]
+        [TestCase(2, Description = "Page 2"), Category("Automated"), Category("TryGetPage")]
+        [TestCase(3, Description = "Page 3"), Category("Automated"), Category("TryGetPage")]
+        [TestCase(4, Description = "Page 4"), Category("Automated"), Category("TryGetPage")]
+        public static void Test_ComparePDFPages(int pageNumber)
+        {
+            // Hack to pull out the image from the PDF by looking for null bytes to indicate beginning
+            // and then searching for 'endstream' text
+            byte[] getMainStream(byte[] pdfData)
+            {
+                int find(int start, byte[] pattern)
+                {
+                    int matchLength = 0;
+                    int matchStart = 0;
+                    for (int i = start; i < pdfData.Length && matchLength < pattern.Length; i++)
+                    {
+                        if (pdfData[i] == pattern[matchLength])
+                        {
+                            if (matchLength == 0)
+                            {
+                                matchStart = i;
+                            }
+                            matchLength++;
+                        }
+                        else
+                        {
+                            matchLength = 0;
+                        }
+                    }
+
+                    return matchLength == pattern.Length
+                        ? matchStart
+                        : -1;
+                }
+
+                int startStream = find(0, new byte[] { 0, 0, 0, 0 });
+                int endStream = find(startStream, ASCIIEncoding.GetEncoding("windows-1252").GetBytes("endstream"));
+
+                // Remove newline chars b/c the two libraries use differerent line endings
+                while (pdfData[--endStream] == '\r' || pdfData[endStream] == '\n') ;
+
+                return pdfData.Skip(startStream).Take(endStream - startStream).ToArray();
+            }
+
+            string tifPath = null;
+            string pdfPath = null;
+            try
+            {
+                pdfPath = _testFiles.GetFile("Resources.TestImage003.pdf");
+                Assert.True(DocumentData.TryGetPageFromAssociatedPdf(pdfPath, pageNumber, out byte[] imageDataFromPDF));
+
+                tifPath = _testFiles.GetFile("Resources.TestImage003.tif");
+                Assert.True(DocumentData.TryGetPageWithConversionToPdf(tifPath, pageNumber, out byte[] imageDataFromConversion));
+
+                // Sanity check--these should be a little different
+                CollectionAssert.AreNotEqual(imageDataFromPDF, imageDataFromConversion);
+
+                byte[] middleNoConversion = getMainStream(imageDataFromPDF);
+                byte[] middleConverted = getMainStream(imageDataFromConversion);
+
+                // Sanity check--this is most of the data, right?
+                Assert.Greater(middleConverted.Length, 0.9 * imageDataFromConversion.Length);
+
+                CollectionAssert.AreEqual(middleConverted, middleNoConversion);
+            }
+            finally
+            {
+                if (tifPath is string)
+                {
+                    _testFiles.RemoveFile("Resources.TestImage003.tif");
+                }
+                if (pdfPath is string)
+                {
+                    _testFiles.RemoveFile("Resources.TestImage003.pdf");
+                }
+            }
+        }
+
         #endregion Public Test Functions
 
         static (FileProcessingDB fileProcessingDb, User user, DocumentController DocumentController)

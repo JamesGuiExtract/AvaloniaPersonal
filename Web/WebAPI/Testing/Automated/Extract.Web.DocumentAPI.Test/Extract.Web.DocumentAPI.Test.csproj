@@ -250,6 +250,8 @@
     <EmbeddedResource Include="Resources\K151.tif.restored.xml" />
     <EmbeddedResource Include="Resources\TestImage002.tif.restored.xml" />
     <EmbeddedResource Include="Resources\TestImage003.tif.restored.xml" />
+    <EmbeddedResource Include="Resources\TestImage003.tif" />
+    <EmbeddedResource Include="Resources\TestImage003.pdf" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
