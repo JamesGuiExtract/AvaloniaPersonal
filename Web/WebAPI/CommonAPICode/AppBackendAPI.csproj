@@ -101,8 +101,16 @@
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>
-    <COMReference Include="UCLID_AFVALUEFINDERSLib.dll">
+	<COMReference Include="UCLID_AFVALUEFINDERSLib.dll">
       <Guid>55a9de56-080b-43e0-ac99-02b815c1df6c</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+    </COMReference>
+	<COMReference Include="UCLID_SSOCRLib.dll">
+      <Guid>c0f50ac4-62b2-4d15-a26f-404fec1d58b2</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <WrapperTool>tlbimp</WrapperTool>
@@ -158,6 +166,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\RC.Net\Core\Code\Extract.csproj">
     </ProjectReference>
+    <ProjectReference Include="..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="app.config">

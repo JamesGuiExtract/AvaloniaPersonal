@@ -14,6 +14,7 @@
 #include <COMUtils.h>
 #include <SpecialIcoMap.h>
 #include <mathUtil.h>
+#include <TemporaryFileName.h>
 
 #include <io.h>
 #include <cmath>
@@ -574,6 +575,95 @@ STDMETHODIMP CScansoftOCR2::WriteOCRSettingsToFile(BSTR bstrFileName, VARIANT_BO
 		return S_OK;	
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16762");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CScansoftOCR2::GetPDFImage(BSTR bstrFileName, int nPage, VARIANT* pImageData)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		// validate the license
+		validateLicense();
+
+		string strInputFileName = asString(bstrFileName);
+		bool bOutputImageOpened(false);
+		unique_ptr<HIMGFILE> uphOutputImage(__nullptr);
+		unique_ptr<TemporaryFileName> pTempOutputFile;
+
+		try
+		{
+			try
+			{
+				HIMGFILE hInputImage;
+				THROW_UE_ON_ERROR("ELI49594", "Unable to open source image file.",
+					kRecOpenImgFile(strInputFileName.c_str(), &hInputImage, IMGF_READ, FF_SIZE));
+
+				// Ensure that the memory stored for the image file is released
+				RecMemoryReleaser<tagIMGFILEHANDLE> inputImageFileMemoryReleaser(hInputImage);
+
+				IMG_INFO imgInfo = { 0 };
+				IMF_FORMAT imgFormat;
+				THROW_UE_ON_ERROR("ELI49595", "Failed to identify image format.",
+					kRecGetImgFilePageInfo(0, hInputImage, nPage - 1, &imgInfo, &imgFormat));
+				int nBitsPerPixel = imgInfo.BitsPerPixel;
+
+				// Keep the same image format if the source image is a PDF. Otherwise,
+				// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
+				// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
+				// FF_PDF_SUPERB.
+				IMF_FORMAT nFormat = (imgFormat >= FF_PDF_MIN && imgFormat <= FF_PDF_MRC_SUPERB)
+					? imgFormat
+					: (nBitsPerPixel == 1) ? FF_PDF_SUPERB : FF_PDF_GOOD;
+
+				// NOTE: RecAPI uses zero-based page number indexes
+				HPAGE hImagePage;
+				loadPageFromImageHandle(strInputFileName, hInputImage, nPage - 1, &hImagePage);
+
+				// Ensure that the memory stored for the image page is released.
+				RecMemoryReleaser<RECPAGESTRUCT> pageMemoryReleaser(hImagePage);
+
+				pTempOutputFile.reset(new TemporaryFileName(true, NULL, ".pdf"));
+				string strTempOutputFileName = pTempOutputFile->getName();
+				// If the destination file name exists before Nuance tries to open it, it will throw an error.
+				deleteFile(strTempOutputFileName);
+
+				uphOutputImage.reset(new HIMGFILE);
+				THROW_UE_ON_ERROR("ELI49596", "Unable to create destination image file.",
+					kRecOpenImgFile(strTempOutputFileName.c_str(), uphOutputImage.get(), IMGF_RDWR, FF_SIZE));
+
+				bOutputImageOpened = true;
+
+				THROW_UE_ON_ERROR("ELI49597", "Cannot save to image page in the specified format.",
+					kRecSaveImg(0, *uphOutputImage, nFormat, hImagePage, II_CURRENT, TRUE));
+
+				kRecCloseImgFile(*uphOutputImage);
+
+				readFileDataToVariant(strTempOutputFileName, pImageData);
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49598");
+		}
+		catch (UCLIDException & ue)
+		{
+			// We need to close the out image file if the output image file was opened but we didn't
+			// make it to the "happy case" close call.
+			if (bOutputImageOpened && nPage != -1)
+			{
+				try
+				{
+					kRecCloseImgFile(*uphOutputImage);
+				}
+				CATCH_AND_LOG_ALL_EXCEPTIONS("ELI49599");
+			}
+
+			ue.addDebugInfo("Source image", strInputFileName);
+			ue.addDebugInfo("Page", asString(nPage + 1));
+			throw ue;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49600");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -3105,6 +3195,51 @@ void CScansoftOCR2::convertToCodePage(unsigned short *usLetterCode)
 	else
 	{
 		*usLetterCode = buff;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CScansoftOCR2::readFileDataToVariant(const string& strFileName, VARIANT* pFileData)
+{
+	void* pArrayData = __nullptr;
+	ifstream ifs(strFileName.c_str(), ios::in | ios::binary);
+	try
+	{
+		try
+		{
+			stringstream data;
+			ifs.seekg(0, ifs.end);
+			long length = (long)ifs.tellg();
+
+			SAFEARRAYBOUND rgsabound[1];
+			rgsabound[0].cElements = length;
+			rgsabound[0].lLbound = 0;
+
+			pFileData->vt = VT_ARRAY | VT_UI1;
+			pFileData->parray = SafeArrayCreate(VT_UI1, 1, rgsabound);
+
+			SafeArrayAccessData(pFileData->parray, &pArrayData);
+			ifs.seekg(0, ifs.beg);
+			ifs.read((char*)pArrayData, length);
+			if (ifs.gcount() != length)
+			{
+				UCLIDException ue("ELI49603", "Image read failed");
+				ue.addDebugInfo("Read bytes", ifs.gcount());
+				ue.addDebugInfo("Expected bytes", length);
+			}
+			SafeArrayUnaccessData(pFileData->parray);
+			ifs.close();
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49604");
+	}
+	catch (UCLIDException & ue)
+	{
+		if (pArrayData != __nullptr)
+		{
+			SafeArrayUnaccessData(pFileData->parray);
+		}
+		ifs.close();
+
+		throw ue;
 	}
 }
 

@@ -112,6 +112,14 @@
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>
+    <COMReference Include="UCLID_SSOCRLib.dll">
+      <Guid>c0f50ac4-62b2-4d15-a26f-404fec1d58b2</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="TokenProvider\" />
@@ -160,6 +168,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\RC.Net\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj" />
+    <ProjectReference Include="..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj" />
       
   </ItemGroup>
   <ItemGroup>

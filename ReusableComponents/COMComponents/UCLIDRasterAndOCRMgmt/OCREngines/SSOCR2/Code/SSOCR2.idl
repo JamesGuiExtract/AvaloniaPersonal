@@ -144,8 +144,12 @@ library UCLID_SSOCR2Lib
 			[in] BSTR bstrFormat, [in] BSTR bstrOutputFileName);
 		//-----------------------------------------------------------------------------------------
 		// PURPOSE: To set the output format that will be used by CreateOutputImage
-    // This must be done prior to the call to SetOCRParameters if output-specific settings are to be used
+		// This must be done prior to the call to SetOCRParameters if output-specific settings are to be used
 		[id(13), helpstring("method SetOutputFormat")] HRESULT SetOutputFormat([in] BSTR bstrFormat);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Gets the specified image page as a PDF.
+		[id(14), helpstring("method GetPDFImage")] HRESULT GetPDFImage(
+			[in] BSTR bstrFileName, [in] int nPage, [out, retval] VARIANT* pImageData);
 	};
 
 	//----------------------------------------------------------------------------------------------

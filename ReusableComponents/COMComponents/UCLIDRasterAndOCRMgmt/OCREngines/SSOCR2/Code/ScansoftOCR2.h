@@ -69,6 +69,7 @@ END_COM_MAP()
 		VARIANT_BOOL vbWriteExtractImplementedSettings);
 	STDMETHOD(CreateOutputImage)(BSTR bstrImageFileName, BSTR bstrFormat, BSTR bstrOutputFileName);
 	STDMETHOD(SetOutputFormat)(BSTR bstrFormat);
+	STDMETHOD(GetPDFImage)(BSTR bstrFileName, int nPage, VARIANT* pImageData);
 
 // IPrivateLicensedComponent
 	STDMETHOD(raw_InitPrivateLicense)(/*[in]*/ BSTR strPrivateLicenseKey);
@@ -488,4 +489,7 @@ private:
 	// P16 #2356
 	bool isBasicLatinCharacter(unsigned short usLetterCode);
 	bool isMICRCharacter(unsigned short usLetterCode);
+
+	// Helper method for GetPDFImage to compile variant result.
+	void readFileDataToVariant(const string& strFileName, VARIANT* pFileData);
 };

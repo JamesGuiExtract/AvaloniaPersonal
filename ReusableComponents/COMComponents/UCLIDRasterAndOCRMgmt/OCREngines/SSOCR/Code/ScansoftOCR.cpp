@@ -378,6 +378,28 @@ STDMETHODIMP CScansoftOCR::raw_CreateOutputImage(BSTR bstrImageFileName, BSTR bs
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI46465");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CScansoftOCR::raw_GetPDFImage(BSTR bstrFileName, int nPage, VARIANT* pImageData)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		// increment # of images processed
+		InterlockedIncrement(&m_ulNumImagesProcessed);
+
+		IScansoftOCR2Ptr ipOcrEngine = getOCREngine();
+		ASSERT_RESOURCE_ALLOCATION("ELI49592", ipOcrEngine != __nullptr);
+
+		_variant_t vtImageData = ipOcrEngine->GetPDFImage(bstrFileName, nPage);
+
+		VariantCopy(pImageData, &vtImageData);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49593");
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent

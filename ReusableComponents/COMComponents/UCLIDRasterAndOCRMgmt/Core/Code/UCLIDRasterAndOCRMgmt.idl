@@ -1492,6 +1492,10 @@ library UCLID_RASTERANDOCRMGMTLib
 		[id(8), helpstring("method WhackOCREngine")] HRESULT WhackOCREngine();
 		[id(9), helpstring("method CreateOutputImage")] HRESULT CreateOutputImage([in] BSTR bstrImageFileName, 
 			[in] BSTR bstrFormat, [in] BSTR bstrOutputFileName, [in] IOCRParameters* pOCRParameters);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Gets the specified image page as a PDF.
+		[id(10), helpstring("method GetPDFImage")] HRESULT GetPDFImage(
+			[in] BSTR bstrFileName, [in] int nPage, [out, retval] VARIANT* pImageData);
 	};
 
 	[

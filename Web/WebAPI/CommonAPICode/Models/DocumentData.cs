@@ -1,4 +1,5 @@
 ﻿using Extract;
+using Extract.Licensing;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
@@ -14,6 +15,7 @@ using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using UCLID_IMAGEUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
+using UCLID_SSOCRLib;
 using static WebAPI.Utils;
 using AttributeDBMgr = AttributeDbMgrComponentsLib.AttributeDBMgr;
 using ComAttribute = UCLID_AFCORELib.Attribute;
@@ -36,11 +38,23 @@ namespace WebAPI.Models
 
         // To be used for FAM DB operations that occur outside the context of a given DocumentData instance.
         static FileProcessingDB _utilityFileProcessingDB;
-        static object _lock = new object();
+        static object _lockUtilityFileProcessingDB = new object();
+        static object _lockSSOCR = new object();
 
         static ThreadLocal<MiscUtils> _miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtils());
         static ThreadLocal<ImageUtils> _imageUtils = new ThreadLocal<ImageUtils>(() => new ImageUtils());
-        static ThreadLocal<ImageConverter> _imageConverter = new ThreadLocal<ImageConverter>(() => new ImageConverter());
+        static ThreadLocal<ScansoftOCRClass> _ssocr = new ThreadLocal<ScansoftOCRClass>(() =>
+            {
+                // https://extract.atlassian.net/browse/ISSUE-16861
+                // To help prevent nuance licensing from being overwhelmed, only initialize one ssocr instance
+                // at a time.
+                lock (_lockSSOCR)
+                {
+                    var ssocr = new ScansoftOCRClass();
+                    ssocr.InitPrivateLicense(GetSpecialOcrValue());
+                    return ssocr;
+                }
+            });
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DocumentData"/> class.
@@ -1885,7 +1899,7 @@ namespace WebAPI.Models
         {
             try
             {
-                imageData = (byte[])_imageConverter.Value.GetPDFImage(fileName, pageNumber, true);
+                imageData = (byte[])_ssocr.Value.GetPDFImage(fileName, pageNumber);
                 return true;
             }
             catch { }
@@ -1977,7 +1991,7 @@ namespace WebAPI.Models
                     _utilityFileProcessingDB.DatabaseServer != context.DatabaseServerName ||
                     _utilityFileProcessingDB.DatabaseName != context.DatabaseName)
                 {
-                    lock (_lock)
+                    lock (_lockUtilityFileProcessingDB)
                     {
                         if (_utilityFileProcessingDB == null ||
                             _utilityFileProcessingDB.DatabaseServer != context.DatabaseServerName ||
@@ -2231,7 +2245,7 @@ namespace WebAPI.Models
             }
             else
             {
-                return (byte[])_imageConverter.Value.GetPDFImage(fileName, pageNumber, true);
+                return (byte[])_ssocr.Value.GetPDFImage(fileName, pageNumber);
             }
         }
 
@@ -2246,7 +2260,17 @@ namespace WebAPI.Models
                 return pageStream.toByteArray();
             }
         }
-        
+
+        /// <summary>
+        /// Gets the private license code for licensing the OCR engine.
+        /// </summary>
+        /// <returns>A <see cref="string"/> containing the license
+        /// key for licensing the OCR engine.</returns>
+        static string GetSpecialOcrValue()
+        {
+            return LicenseUtilities.GetMapLabelValue(new MapLabel());
+        }
+
         #endregion Private Members
     }
 }

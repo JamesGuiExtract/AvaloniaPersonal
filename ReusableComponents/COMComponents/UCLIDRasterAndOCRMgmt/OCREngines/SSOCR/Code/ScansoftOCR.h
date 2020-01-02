@@ -58,6 +58,7 @@ public:
 	STDMETHOD(raw_WhackOCREngine)();
 	STDMETHOD(raw_CreateOutputImage)(BSTR bstrImageFileName, BSTR bstrFormat, BSTR bstrOutputFileName,
 		IOCRParameters* pOCRParameters);
+	STDMETHOD(raw_GetPDFImage)(BSTR bstrFileName, int nPage, VARIANT* pImageData);
 
 // ILicensedComponent
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
