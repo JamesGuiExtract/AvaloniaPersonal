@@ -79,9 +79,9 @@ FLEX Index,0
 -    FLEX Server Full PDF R/W (4 LeadTools threads),7073:$FlexServer
 
 ID Shield,0
--    Client (verification UI) ,$IDShield:$OCROnClient:7045:7047
--    ID Shield Server Standard (2 LeadTools threads),$IDShield:7044:7045:$FlexShieldServerCore
--    ID Shield Server Full PDF R/W (4 LeadTools threads),$IDShield:7044:7045:7073:$FlexShieldServerCore
+-    Client (verification UI) ,$IDShield:$OCROnClient:7045:7047:$FlexIndex
+-    ID Shield Server Standard (2 LeadTools threads),$IDShield:7044:7045:$FlexShieldServerCore:$FlexIndex
+-    ID Shield Server Full PDF R/W (4 LeadTools threads),$IDShield:7044:7045:7073:$FlexShieldServerCore:$FlexIndex
 
 LabDE,0
 -    Client (Verify data),$LabDEClient:7047
