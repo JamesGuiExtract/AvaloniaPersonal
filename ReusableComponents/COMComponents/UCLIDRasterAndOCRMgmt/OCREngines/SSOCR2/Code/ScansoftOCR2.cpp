@@ -191,7 +191,9 @@ CScansoftOCR2::~CScansoftOCR2()
 	try
 	{
 		THROW_UE_ON_ERROR("ELI18325", "Unable to free OCR engine resources. Possible memory leak.",
-			kRecQuit() );
+			RecQuitPlus() );
+
+		recursiveRemoveDirectory(getTemporaryDataFolder(GetCurrentProcessId()));
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI11014")
 }
@@ -1859,8 +1861,14 @@ void CScansoftOCR2::timeoutLoop()
 		// If the wait times out that means the timeout has expired so we can kill the process
 		if( ret == WAIT_TIMEOUT )
 		{
-			HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, GetCurrentProcessId());
+			RecQuitPlus();
+
+			DWORD pid = GetCurrentProcessId();
+			HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
 			TerminateProcess(hProcess, 0);
+
+			// Cleanup temporary data files
+			recursiveRemoveDirectory(getTemporaryDataFolder(pid));
 			break;
 		}
 		// If the kill thread object gets signaled
@@ -2133,9 +2141,15 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 		ue.addDebugInfo("Page Number", nPageNum);
 		ue.log();
 
+		RecQuitPlus();
+
 		// Nuance recommends terminating the process and starting clean if there is a hard timeout
-		HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, GetCurrentProcessId());
+		DWORD pid = GetCurrentProcessId();
+		HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
 		TerminateProcess(hProcess, 0);
+
+		// Cleanup temporary data files
+		recursiveRemoveDirectory(getTemporaryDataFolder(pid));
 	}
 	else if(rc != NO_TXT_WARN)
 	{
@@ -3268,6 +3282,12 @@ CScansoftOCR2::RecMemoryReleaser<tagIMGFILEHANDLE>::~RecMemoryReleaser()
 			loadScansoftRecErrInfo(ue, rc);
 			ue.log();
 		}
+
+		// Delete files in temp dir when cleaning up an image so that they don't accumulate
+		// https://extract.atlassian.net/browse/ISSUE-16868
+		string tempDataDir = getTemporaryDataFolder(GetCurrentProcessId());
+		vector<string> vecSubDirs;
+		getAllSubDirsAndDeleteAllFiles(tempDataDir, vecSubDirs);
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16954");
 }

@@ -2,6 +2,7 @@
 #include "OcrMethods.h"
 #include "ScansoftErr.h"
 
+#include <iomanip>
 #include <UCLIDException.h>
 
 void loadPageFromImageHandle(const string& strImage, HIMGFILE hImage, int iPageIndex, HPAGE* phPage)
@@ -49,4 +50,15 @@ void loadPageFromImageHandle(const string& strImage, HIMGFILE hImage, int iPageI
 			ue.log();
 		}
 	}
+}
+//-------------------------------------------------------------------------------------------------
+string getTemporaryDataFolder(long pid)
+{
+	string tmpDir;
+	getTempDir(tmpDir);
+
+	stringstream ss;
+	ss << tmpDir << "\\Extract Systems\\SSOCR2\\" << setfill('0') << setw(6) << pid;
+
+	return ss.str();
 }

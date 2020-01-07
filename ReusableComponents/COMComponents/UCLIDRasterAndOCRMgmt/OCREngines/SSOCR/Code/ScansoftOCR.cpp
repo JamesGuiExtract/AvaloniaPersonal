@@ -3,6 +3,7 @@
 #include "SSOCR.h"
 #include "ScansoftOCR.h"
 #include "PSUpdateThreadMgr.h"
+#include "OcrMethods.h"
 
 #include <COMUtils.h>
 #include <cpputil.h>
@@ -662,6 +663,10 @@ void CScansoftOCR::killOCREngine()
 		TerminateProcess(hProcess, 0);
 		CloseHandle(hProcess);
 	}
+
+	// Cleanup temporary data files
+	recursiveRemoveDirectory(getTemporaryDataFolder(m_pid));
+
 	m_pid = -1;
 }
 //-------------------------------------------------------------------------------------------------
