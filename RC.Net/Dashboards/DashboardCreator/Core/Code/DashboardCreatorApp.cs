@@ -20,7 +20,7 @@ namespace DashboardCreator
             try
             {
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI45312",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DashboardCreator, "ELI45312",
                     Application.ProductName);
 
                 if (args.Length > 1 || args.Contains("/?") || args.Contains("/h", StringComparer.OrdinalIgnoreCase))

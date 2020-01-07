@@ -244,6 +244,10 @@ const unsigned int gnLEADTOOLS_4_EXTRA_CORES			= gnBASE_OFFSET + 90;
 // Barcode search via Nuance.
 const unsigned int gnBARCODES							= gnBASE_OFFSET + 91;
 
+const unsigned int gnDASHBOARD_VIEWER					= gnBASE_OFFSET + 92;
+
+const unsigned int gnDASHBOARD_CREATOR					= gnBASE_OFFSET + 93;
+
 //-------------------------------------------------------------------------------------------------
 // Constants for items licensed for FLEX Index / ID Shield integration
 //-------------------------------------------------------------------------------------------------

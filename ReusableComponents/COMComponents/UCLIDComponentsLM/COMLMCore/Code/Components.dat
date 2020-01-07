@@ -75,6 +75,8 @@
 7089,Leadtools2ExtraCores
 7090,Leadtools4ExtraCores
 7091,Barcodes
+7092,DashboardViewer
+7093,DashboardCreator
 
 // IDs for FLEX Index / ID Shield integration efforts
 7101,Laserfiche_Integration_Verification

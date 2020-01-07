@@ -107,6 +107,10 @@ FLEX Index / ID Shield Utilities,0
 -    Leadtools 4 extra cores,7090
 -    Barcodes,7091
 
+Dashboards,0
+-    Dashboard Creator and Viewer,7093:7092
+-    Dashboard Viewer,7092
+
 ID Shield Office 1.0,0
 -    ID Shield Office,$IDShieldOffice
 
