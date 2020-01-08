@@ -28,7 +28,7 @@ namespace WebAPI.Models
     /// <summary>
     /// This class is the data model for the DocumentController.
     /// </summary>
-    public sealed class DocumentData: IDisposable
+    public sealed class DocumentData : IDisposable
     {
         ApiContext _apiContext;
         AttributeDBMgr _attributeDbMgr;
@@ -38,6 +38,7 @@ namespace WebAPI.Models
 
         // To be used for FAM DB operations that occur outside the context of a given DocumentData instance.
         static FileProcessingDB _utilityFileProcessingDB;
+        static HashSet<string> _metadataFieldNames;
         static object _lockUtilityFileProcessingDB = new object();
         static object _lockSSOCR = new object();
 
@@ -217,7 +218,7 @@ namespace WebAPI.Models
 
                 var result = JsonConvert.DeserializeObject<WebAppSettingsResult>(json);
 
-                if(!string.IsNullOrEmpty(result.DocumentTypes))
+                if (!string.IsNullOrEmpty(result.DocumentTypes))
                 {
                     result.ParsedDocumentTypes = File.ReadAllLines(result.DocumentTypes);
                 }
@@ -419,7 +420,7 @@ namespace WebAPI.Models
                     AssertRequestFileId("ELI45263", id);
 
                     fileRecord = FileApi.FileProcessingDB.GetFileToProcess(id, FileApi.Workflow.EditAction,
-                        processSkipped ? "S":"P");
+                        processSkipped ? "S" : "P");
 
                     // https://extract.atlassian.net/browse/ISSUE-16748
                     // If the session is being opened only for a put/patch data call, allow the session for completed and failed files.
@@ -440,7 +441,7 @@ namespace WebAPI.Models
                     var fileRecords = FileApi.FileProcessingDB.GetFilesToProcess(FileApi.Workflow.EditAction, 1, processSkipped, _user.GetUsername());
                     if (fileRecords.Size() == 0)
                     {
-                        if (retries > 0 )
+                        if (retries > 0)
                         {
                             var queueStatus = GetQueueStatus(userName);
                             if ((processSkipped ? queueStatus.skippedDocumentsForCurrentUser : queueStatus.PendingDocuments) > 0)
@@ -603,7 +604,7 @@ namespace WebAPI.Models
         /// and <see cref="CommitCachedDocumentData"/>. In order to be cached,
         /// <see paramref="splitMultiPageAttributes"/> must be <c>true</c>.</param>
         /// <returns>DocumentAttributeSet instance, including error info iff there is an error</returns>
-        public DocumentDataResult GetDocumentData(int fileId, 
+        public DocumentDataResult GetDocumentData(int fileId,
             bool includeNonSpatial, bool verboseSpatialData, bool splitMultiPageAttributes,
             bool cacheData)
         {
@@ -645,7 +646,7 @@ namespace WebAPI.Models
                     // from the last stored attribute set. This ensures when this is called via a browser refresh that
                     // changes aren't lost.
                     // https://extract.atlassian.net/browse/ISSUE-16827
-                    FileApi.FileProcessingDB.CacheAttributeData(FileApi.DocumentSession.Id, 
+                    FileApi.FileProcessingDB.CacheAttributeData(FileApi.DocumentSession.Id,
                         mapOfAttributes, bOverwriteModifiedData: false);
                 }
 
@@ -852,7 +853,7 @@ namespace WebAPI.Models
                 string metadataValue = FileApi.FileProcessingDB.GetMetadataFieldValue(this.DocumentSessionFileId, metaDataField);
                 return new MetadataFieldResult { Value = metadataValue };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw CreateException(ex, "ELI47181");
             }
@@ -1090,7 +1091,11 @@ namespace WebAPI.Models
                     fs.Close();
                 }
 
-                return AddFile(fullPath);
+                var result = AddFile(fullPath);
+
+                AddFileMetadata(result.Id, fileName);
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -1106,8 +1111,8 @@ namespace WebAPI.Models
         /// <returns>a filename that can be used safely</returns>
         static string GetSafeFilename(string path, string filename)
         {
-            HTTPError.Assert("ELI46337", !String.IsNullOrWhiteSpace(path) && 
-                            !String.IsNullOrWhiteSpace(filename), 
+            HTTPError.Assert("ELI46337", !String.IsNullOrWhiteSpace(path) &&
+                            !String.IsNullOrWhiteSpace(filename),
                             "Either path or filename is empty");
 
             string filenameOnly = Path.GetFileName(filename);
@@ -1118,7 +1123,7 @@ namespace WebAPI.Models
             // In order to prevent performance issues from having too many files in the same folder, 
             // create a folder hierarchy 2 levels deep with 256 * 4096 = 1M potential buckets where it is
             // very unlikely to have more than 1K items in any one folder.
-            string fullfilename = Path.Combine(path, guid.Substring(0,2), guid.Substring(2,3), newName);
+            string fullfilename = Path.Combine(path, guid.Substring(0, 2), guid.Substring(2, 3), newName);
 
             return fullfilename;
         }
@@ -1129,8 +1134,8 @@ namespace WebAPI.Models
         /// <param name="fullPath">path + filename - path is expected to exist at this point</param>
         /// <param name="caller">caller of this method - DO NOT SET, specified by compiler</param>
         /// <returns>DocumentSubmitresult instance that contains error info iff an error has occurred</returns>
-        public DocumentIdResult AddFile(string fullPath,
-                                            [CallerMemberName] string caller = "")
+        DocumentIdResult AddFile(string fullPath,
+                                [CallerMemberName] string caller = "")
         {
             try
             {
@@ -1169,6 +1174,51 @@ namespace WebAPI.Models
         }
 
         /// <summary>
+        /// // Sets standard metadata fields for a file added into the database.
+        /// </summary>
+        /// <param name="documentId">The ID of the file being added.</param>
+        /// <param name="uploaderReportedFileName">The filename supplied by the API consumer. This may or
+        /// may not be a full path depending on the caller's implementation though it can be expected that if
+        /// it is a full path it will be relative to the machine uploading the document.</param>
+        void AddFileMetadata(int documentId, string uploaderReportedFileName)
+        {
+            // https://extract.atlassian.net/browse/ISSUE-16872
+            // Try to set "OriginalFileName" and "UploaderReportedFileName" metadata fields, but don't treat as an error
+            // when fields don't exist. "OriginalFileName" should be expected to exist for most installations and is used
+            // to return data in GetQueuedFiles. UploaderReportedFileName could be helpful (and thus present) in deployments
+            // where caller is supplying the full path and there is a reason to be able to report on that path.
+            if (!string.IsNullOrWhiteSpace(uploaderReportedFileName))
+            {
+                if (MetadataFieldNames.Contains("UploaderReportedFileName"))
+                {
+                    try
+                    {
+                        FileApi.FileProcessingDB.SetMetadataFieldValue(documentId, "UploaderReportedFileName", uploaderReportedFileName);
+                    }
+                    catch (Exception ex)
+                    {
+                        var ee = new ExtractException("ELI49611", "Failed to set UploaderReportedFileName", ex);
+                        ee.Log();
+                    }
+                }
+
+                if (MetadataFieldNames.Contains("OriginalFileName"))
+                {
+                    try
+                    {
+                        string fileName = Path.GetFileName(uploaderReportedFileName);
+                        FileApi.FileProcessingDB.SetMetadataFieldValue(documentId, "OriginalFileName", fileName);
+                    }
+                    catch (Exception ex)
+                    {
+                        var ee = new ExtractException("ELI49612", "Failed to set OriginalFileName", ex);
+                        ee.Log();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Updates the document data for the specified fileId in the FAM DB.
         /// </summary>
         /// <param name="fileId">The FAM file ID for which data should be updated.</param>
@@ -1203,7 +1253,7 @@ namespace WebAPI.Models
             {
                 HTTPError.AssertRequest("ELI46340", !String.IsNullOrEmpty(submittedText),
                     "Text not provided");
-                var workflow = FileApi.Workflow; 
+                var workflow = FileApi.Workflow;
                 var uploads = workflow.DocumentFolder;
                 HTTPError.Assert("ELI46339", !String.IsNullOrWhiteSpace(uploads),
                     "Target location not configured");
@@ -1479,7 +1529,7 @@ namespace WebAPI.Models
 
                     filename = FileApi.FileProcessingDB.GetMetadataFieldValue(fileId, getFileTag);
                     HTTPError.Assert("ELI46344", StatusCodes.Status404NotFound,
-                        !String.IsNullOrWhiteSpace(filename), 
+                        !String.IsNullOrWhiteSpace(filename),
                         "No result found for the specified file", ("FileId", fileId, true));
                 }
                 catch (Exception ex)
@@ -1997,6 +2047,9 @@ namespace WebAPI.Models
                             _utilityFileProcessingDB.DatabaseServer != context.DatabaseServerName ||
                             _utilityFileProcessingDB.DatabaseName != context.DatabaseName)
                         {
+                            // If the utility DB is being updated, any cached metadata field list needs to be cleared.
+                            Interlocked.Exchange(ref _metadataFieldNames, null);
+
                             _utilityFileProcessingDB = new FileProcessingDB();
                             _utilityFileProcessingDB.DatabaseServer = context.DatabaseServerName;
                             _utilityFileProcessingDB.DatabaseName = context.DatabaseName;
@@ -2007,6 +2060,31 @@ namespace WebAPI.Models
                 }
 
                 return _utilityFileProcessingDB;
+            }
+        }
+
+        /// <summary>
+        /// Provides a set of the metadata fields names that exist in the current database.
+        /// </summary>
+        static HashSet<string> MetadataFieldNames
+        {
+            get
+            {
+                var context = CurrentApiContext;
+
+                // In addition to checking if _metadataFieldNames has been set, also check if the
+                // database name has changed since the last time the utility database was used.
+                if (_metadataFieldNames == null ||
+                    _utilityFileProcessingDB.DatabaseServer != context.DatabaseServerName ||
+                    _utilityFileProcessingDB.DatabaseName != context.DatabaseName)
+                {
+                    var metadataFieldNames = new HashSet<string>(
+                        UtilityFileProcessingDB.GetMetadataFieldNames()
+                            .ToIEnumerable<string>());
+                    Interlocked.Exchange(ref _metadataFieldNames, metadataFieldNames);
+                }
+
+                return _metadataFieldNames;
             }
         }
 

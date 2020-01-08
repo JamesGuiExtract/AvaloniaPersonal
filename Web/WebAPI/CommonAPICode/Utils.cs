@@ -349,6 +349,22 @@ namespace WebAPI
         }
 
         /// <summary>
+        /// Converts variantVector into an enumerable.
+        /// </summary>
+        /// <typeparam name="T">The type of object in the vector.</typeparam>
+        /// <param name="variantVector">The <see cref="IVariantVector"/> to convert.</param>
+        /// <returns>An enumerable of type T.</returns>
+        public static IEnumerable<T> ToIEnumerable<T>(this IVariantVector variantVector)
+        {
+            int size = variantVector.Size;
+
+            for (int i = 0; i < size; i++)
+            {
+                yield return (T)variantVector[i];
+            }
+        }
+
+        /// <summary>
         /// Converts <see paramref="enumerable"/> into an <see cref="IIUnknownVector"/>.
         /// </summary>
         /// <typeparam name="T">The type of object in the enumerable.</typeparam>

@@ -201,6 +201,112 @@ namespace Extract.Web.WebAPI.Test
         }
 
         /// <summary>
+        /// Tests that metadata is set properly when the appropriate metadata fields exist.
+        /// Tests https://extract.atlassian.net/browse/ISSUE-16872
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void Test_PostDocumentMetadata()
+        {
+            string dbName = "DocumentAPI_Test_PostDocumentMetadata";
+
+            try
+            {
+                (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
+                _testDbManager.InitializeEnvironment<TestDocument, UsersController>
+                    ("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+
+                // Add metadata fields to the DB before the DocumentData class gets around to caching which metadata
+                // fields exist.
+                fileProcessingDb.AddMetadataField("OriginalFileName");
+                fileProcessingDb.AddMetadataField("UploaderReportedFileName");
+
+                var result = userController.Login(user);
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+
+                var controller = user.CreateController<DocumentController>();
+
+                var filename = _testFiles.GetFile("Resources.A418.tif");
+                using (var stream = new FileStream(filename, FileMode.Open))
+                {
+                    var formFile = new FormFile(stream, 0, stream.Length, filename, filename);
+
+                    result = controller.PostDocument(formFile);
+                    var submitResult1 = result.AssertGoodResult<DocumentIdResult>();
+
+                    Assert.AreEqual(Path.GetFileName(filename), fileProcessingDb.GetMetadataFieldValue(submitResult1.Id, "OriginalFileName"));
+                    Assert.AreEqual(filename, fileProcessingDb.GetMetadataFieldValue(submitResult1.Id, "UploaderReportedFileName"));
+                }
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        /// <summary>
+        /// Tests corner cases related to documnet metadata fields:
+        /// - Missing metadata field in the in the database
+        /// - Filename only specified (not path)
+        /// - Invalid file paths specified
+        /// Tests https://extract.atlassian.net/browse/ISSUE-16872
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void Test_PostDocumentMetadataCornerCases()
+        {
+            string dbName = "DocumentAPI_Test_PostDocumentMetadataCornerCases";
+
+            try
+            {
+                (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
+                _testDbManager.InitializeEnvironment<TestDocument, UsersController>
+                    ("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+
+                // Add metadata field to the DB before the DocumentData class gets around to caching which metadata
+                // fields exist.
+                fileProcessingDb.AddMetadataField("OriginalFileName");
+                // TEST: Missing UploaderReportedFileName metadata field
+
+                var result = userController.Login(user);
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+
+                var controller = user.CreateController<DocumentController>();
+
+                var filename = _testFiles.GetFile("Resources.A418.tif");
+                using (var stream = new FileStream(filename, FileMode.Open))
+                {
+                    // TEST: Filename only specified (not path)
+                    string fileNameOnly = Path.GetFileName(filename);
+
+                    var formFile = new FormFile(stream, 0, stream.Length, filename, fileNameOnly);
+
+                    result = controller.PostDocument(formFile);
+                    var submitResult = result.AssertGoodResult<DocumentIdResult>();
+
+                    Assert.AreEqual(fileNameOnly, fileProcessingDb.GetMetadataFieldValue(submitResult.Id, "OriginalFileName"));
+                }
+
+                using (var stream = new FileStream(filename, FileMode.Open))
+                {
+                    // TEST: Invalid file paths specified
+                    string badFileName = "Garbage;path!Name/";
+
+                    var formFile = new FormFile(stream, 0, stream.Length, filename, badFileName);
+
+                    result = controller.PostDocument(formFile);
+                    var submitResult = result.AssertGoodResult<DocumentIdResult>();
+
+                    Assert.IsNullOrEmpty(fileProcessingDb.GetMetadataFieldValue(submitResult.Id, "OriginalFileName"));
+                }
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        /// <summary>
         /// Tests both DocumentData.SubmitText and DocumentData.GetSourceFileName
         /// </summary>
         [Test, Category("Automated")]
