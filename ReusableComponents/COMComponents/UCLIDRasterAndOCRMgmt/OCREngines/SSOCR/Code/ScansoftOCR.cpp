@@ -386,17 +386,48 @@ STDMETHODIMP CScansoftOCR::raw_GetPDFImage(BSTR bstrFileName, int nPage, VARIANT
 
 	try
 	{
-		// increment # of images processed
-		InterlockedIncrement(&m_ulNumImagesProcessed);
+		try
+		{
+			try
+			{
+				// increment # of images processed
+				InterlockedIncrement(&m_ulNumImagesProcessed);
+				
+				// https://extract.atlassian.net/browse/ISSUE-16861
+				// checkOCREngine is purposely not called upfront as this was added to retrieve images
+				// for the AppBackend API under a heavy load with as little risk as possible to triggering
+				// nuance license errors. Whether or not it would risk inducing those errors, checkOCREngine
+				// is additional overhead and involves searches for Windows not applicable running as a web
+				// service.
+				// See catch handler below.
 
-		IScansoftOCR2Ptr ipOcrEngine = getOCREngine();
-		ASSERT_RESOURCE_ALLOCATION("ELI49592", ipOcrEngine != __nullptr);
+				IScansoftOCR2Ptr ipOcrEngine = getOCREngine();
+				ASSERT_RESOURCE_ALLOCATION("ELI49592", ipOcrEngine != __nullptr);
 
-		_variant_t vtImageData = ipOcrEngine->GetPDFImage(bstrFileName, nPage);
+				_variant_t vtImageData = ipOcrEngine->GetPDFImage(bstrFileName, nPage);
 
-		VariantCopy(pImageData, &vtImageData);
+				VariantCopy(pImageData, &vtImageData);
 
-		return S_OK;
+				return S_OK;
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49615");
+		}
+		catch (UCLIDException &ue)
+		{
+			try
+			{
+				// In the event of an error, force a recycle of the OCR engine that should trigger
+				// a reset of the nuance license manager if needed.
+				if (m_pid > 0)
+				{
+					ue.addDebugInfo("ProcessKill", "Attempting OCR process recycle");
+					killOCREngine();
+				}
+			}
+			catch (...) { }
+
+			throw ue;
+		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49593");
 }
