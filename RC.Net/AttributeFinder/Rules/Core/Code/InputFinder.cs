@@ -122,9 +122,12 @@ namespace Extract.AttributeFinder.Rules
                 IAttribute attribute = afDocCopy.Attribute;
 
                 // Update source document of subattributes
-                foreach (var a in attribute.EnumerateDepthFirst())
+                if (!String.IsNullOrEmpty(pDocument.Text.SourceDocName))
                 {
-                    a.Value.SourceDocName = pDocument.Text.SourceDocName;
+                    foreach (var a in attribute.EnumerateDepthFirst())
+                    {
+                        a.Value.SourceDocName = pDocument.Text.SourceDocName;
+                    }
                 }
                 IUnknownVector result = new IUnknownVector();
                 result.PushBack(attribute);

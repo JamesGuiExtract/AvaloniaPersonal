@@ -851,7 +851,7 @@ namespace Extract.AttributeFinder.Rules
                         }
                         else
                         {
-                            newAttr.Value.ReplaceAndDowngradeToNonSpatial(eval.QueryResult);
+                            newAttr.Value.CreateNonSpatialString(eval.QueryResult, pDoc.Text.SourceDocName);
                         }
 
                         eval.EvaluateQuery(subAttr.TypeOfAttribute, 
