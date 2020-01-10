@@ -380,32 +380,32 @@ static const std::string gstrCREATE_DESTFILE_WITH_INCLUDES_INDEX =
 
 static const std::string gstrCreate_ReportingDataCaptureAccuracy_FKS =
 " ALTER TABLE[dbo].[ReportingDataCaptureAccuracy]"
-" WITH CHECK ADD CONSTRAINT FK_ReportingDataCaptureAccuracy_FAMUser_Found FOREIGN KEY([FoundFAMUserID])"
+" WITH NOCHECK ADD CONSTRAINT FK_ReportingDataCaptureAccuracy_FAMUser_Found FOREIGN KEY([FoundFAMUserID])"
 " REFERENCES[dbo].[FAMUser]([ID])"
 " ON UPDATE NO ACTION"
 " ON DELETE NO ACTION;"
   
 " ALTER TABLE[dbo].[ReportingDataCaptureAccuracy]"
-" WITH CHECK ADD CONSTRAINT FK_ReportingDataCaptureAccuracy_FAMUser_Expected FOREIGN KEY([ExpectedFAMUserID])"
+" WITH NOCHECK ADD CONSTRAINT FK_ReportingDataCaptureAccuracy_FAMUser_Expected FOREIGN KEY([ExpectedFAMUserID])"
 " REFERENCES[dbo].[FAMUser]([ID])"
 " ON UPDATE NO ACTION"
 " ON DELETE NO ACTION;"
   
 " ALTER TABLE[dbo].[ReportingDataCaptureAccuracy]"
-" WITH CHECK ADD CONSTRAINT FK_ReportingDataCaptureAccuracy_Action_Found FOREIGN KEY([FoundActionID])"
+" WITH NOCHECK ADD CONSTRAINT FK_ReportingDataCaptureAccuracy_Action_Found FOREIGN KEY([FoundActionID])"
 " REFERENCES[dbo].[Action]([ID])"
 " ON UPDATE NO ACTION"
 " ON DELETE NO ACTION;"
   
 " ALTER TABLE[dbo].[ReportingDataCaptureAccuracy]"
-" WITH CHECK ADD CONSTRAINT FK_ReportingDataCaptureAccuracy_Action_Expected FOREIGN KEY([ExpectedActionID])"
+" WITH NOCHECK ADD CONSTRAINT FK_ReportingDataCaptureAccuracy_Action_Expected FOREIGN KEY([ExpectedActionID])"
 " REFERENCES[dbo].[Action]([ID])"
 " ON UPDATE NO ACTION"
 " ON DELETE NO ACTION;";
 
 static const std::string gstrAdd_FKS_REPORTINGHIMSTATS =
 "ALTER TABLE [dbo].[ReportingHIMStats]"
-" WITH CHECK"
+" WITH NOCHECK"
 " ADD CONSTRAINT[FK_ReportingHIMStats_Pagination]"
 " FOREIGN KEY([PaginationID])"
 " REFERENCES[dbo].[Pagination]([ID]) ON"
@@ -413,7 +413,7 @@ static const std::string gstrAdd_FKS_REPORTINGHIMSTATS =
 " ON DELETE NO ACTION"
 
 " ALTER TABLE[dbo].[ReportingHIMStats]"
-" WITH CHECK"
+" WITH NOCHECK"
 " ADD CONSTRAINT[FK_ReportingHIMStats_FAMUser]"
 " FOREIGN KEY([FAMUserID])"
 " REFERENCES[dbo].[FAMUser]([ID])"
@@ -421,7 +421,7 @@ static const std::string gstrAdd_FKS_REPORTINGHIMSTATS =
 " ON DELETE NO ACTION"
 
 " ALTER TABLE[dbo].[ReportingHIMStats]"
-" WITH CHECK"
+" WITH NOCHECK"
 " ADD CONSTRAINT[FK_ReportingHIMStats_FAMFile_SourceFile]"
 " FOREIGN KEY([SourceFileID])"
 " REFERENCES[dbo].[FAMFile]([ID])"
@@ -429,7 +429,7 @@ static const std::string gstrAdd_FKS_REPORTINGHIMSTATS =
 " ON DELETE NO ACTION"
 
 " ALTER TABLE[dbo].[ReportingHIMStats]"
-" WITH CHECK"
+" WITH NOCHECK"
 " ADD CONSTRAINT[FK_ReportingHIMStats_FAMFile_DestFile]"
 " FOREIGN KEY([DestFileID])"
 " REFERENCES[dbo].[FAMFile]([ID])"
@@ -437,7 +437,7 @@ static const std::string gstrAdd_FKS_REPORTINGHIMSTATS =
 " ON DELETE NO ACTION"
 
 " ALTER TABLE[dbo].[ReportingHIMStats]"
-" WITH CHECK"
+" WITH NOCHECK"
 " ADD CONSTRAINT[FK_ReportingHIMStats_FAMFile_OriginalFile]"
 " FOREIGN KEY([OriginalFileID])"
 " REFERENCES[dbo].[FAMFile]([ID])"
@@ -445,7 +445,7 @@ static const std::string gstrAdd_FKS_REPORTINGHIMSTATS =
 " ON DELETE NO ACTION"
 
 " ALTER TABLE[dbo].[ReportingHIMStats]"
-" WITH CHECK"
+" WITH NOCHECK"
 " ADD CONSTRAINT[FK_ReportingHIMStats_FileTaskSession]"
 " FOREIGN KEY([FileTaskSessionID])"
 " REFERENCES[dbo].[FileTaskSession]([ID])"
@@ -453,32 +453,32 @@ static const std::string gstrAdd_FKS_REPORTINGHIMSTATS =
 " ON DELETE NO ACTION"
 
 " ALTER TABLE[dbo].ReportingHIMStats "
-" WITH CHECK ADD CONSTRAINT FK_ReportingHIMStats_ActionID FOREIGN KEY([ActionID])"
+" WITH NOCHECK ADD CONSTRAINT FK_ReportingHIMStats_ActionID FOREIGN KEY([ActionID])"
 " REFERENCES[dbo].[Action]([ID])"
 " ON UPDATE NO ACTION"
 " ON DELETE NO ACTION";
 
 static const std::string gstrAdd_FKS_REPORTINGREDACTIONACCURACY =
 "ALTER TABLE[dbo].[ReportingRedactionAccuracy]"
-" WITH CHECK ADD CONSTRAINT FK_ReportingRedactionAccuracy_FAMUser_Found FOREIGN KEY([FoundFAMUserID])"
+" WITH NOCHECK ADD CONSTRAINT FK_ReportingRedactionAccuracy_FAMUser_Found FOREIGN KEY([FoundFAMUserID])"
 " REFERENCES[dbo].[FAMUser]([ID])"
 " ON UPDATE NO ACTION"
 " ON DELETE NO ACTION"
 
 " ALTER TABLE[dbo].[ReportingRedactionAccuracy]"
-" WITH CHECK ADD CONSTRAINT FK_ReportingRedactionAccuracy_FAMUser_Expected FOREIGN KEY([ExpectedFAMUserID])"
+" WITH NOCHECK ADD CONSTRAINT FK_ReportingRedactionAccuracy_FAMUser_Expected FOREIGN KEY([ExpectedFAMUserID])"
 " REFERENCES[dbo].[FAMUser]([ID])"
 " ON UPDATE NO ACTION"
 " ON DELETE NO ACTION"
 
 " ALTER TABLE[dbo].[ReportingRedactionAccuracy]"
-" WITH CHECK ADD CONSTRAINT FK_ReportingRedactionAccuracy_Action_Found FOREIGN KEY([FoundActionID])"
+" WITH NOCHECK ADD CONSTRAINT FK_ReportingRedactionAccuracy_Action_Found FOREIGN KEY([FoundActionID])"
 " REFERENCES[dbo].[Action]([ID])"
 " ON UPDATE NO ACTION"
 " ON DELETE NO ACTION"
 
 " ALTER TABLE[dbo].[ReportingRedactionAccuracy]"
-" WITH CHECK ADD CONSTRAINT FK_ReportingRedactionAccuracy_Action_Expected FOREIGN KEY([ExpectedActionID])"
+" WITH NOCHECK ADD CONSTRAINT FK_ReportingRedactionAccuracy_Action_Expected FOREIGN KEY([ExpectedActionID])"
 " REFERENCES[dbo].[Action]([ID])"
 " ON UPDATE NO ACTION"
 " ON DELETE NO ACTION";

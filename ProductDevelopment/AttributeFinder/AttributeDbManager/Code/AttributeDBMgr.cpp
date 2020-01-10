@@ -37,7 +37,7 @@ namespace
 	// WARNING -- When the version is changed, the corresponding switch handler needs to be updated, see WARNING!!!
 	const string gstrSCHEMA_VERSION_NAME = "AttributeCollectionSchemaVersion";
 	const string gstrDESCRIPTION = "Attribute database manager";
-	const long glSCHEMA_VERSION = 10;
+	const long glSCHEMA_VERSION = 11;
 	const long dbSchemaVersionWhenAttributeCollectionWasIntroduced = 129;
 
 
@@ -240,9 +240,14 @@ namespace
 		return queries;
 	}
 
+	VectorOfString GetSchema_v11(bool bAddUserTables)
+	{
+		return  GetSchema_v10(bAddUserTables);;
+	}
+
 	VectorOfString GetCurrentSchema(bool bAddUserTables = true)
 	{
-		return GetSchema_v10(bAddUserTables);
+		return GetSchema_v11(bAddUserTables);
 	}
 
 
@@ -566,6 +571,85 @@ namespace
 			}
 
 			vector<string> queries;
+			
+			// since the the items this had added were changed with version 11 this does nothing 
+
+			queries.emplace_back(GetVersionUpdateStatement(nNewSchemaVersion));
+			long saveCommandTimeout = ipConnection->CommandTimeout;
+			ipConnection->CommandTimeout = 0;
+			executeVectorOfSQL(ipConnection, queries);
+			ipConnection->CommandTimeout = saveCommandTimeout;
+
+			return nNewSchemaVersion;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49587");
+	}
+
+	//-------------------------------------------------------------------------------------------------
+	int UpdateToSchemaVersion11(_ConnectionPtr ipConnection, long* pnNumSteps)
+	{
+		try
+		{
+			const int nNewSchemaVersion = 11;
+
+			if (pnNumSteps != __nullptr)
+			{
+				*pnNumSteps += 1;
+				return nNewSchemaVersion;
+			}
+
+			vector<string> queries;
+
+			// If the FK's had been added with a previous upgrade to 10 drop those FK's before adding the updated ones
+			queries.push_back(
+				"IF OBJECT_ID('dbo.[FK_ReportingRedactionAccuracy_FAMUser_Expected]', 'F') IS NOT NULL "
+				"	ALTER TABLE dbo.[ReportingRedactionAccuracy] DROP CONSTRAINT FK_ReportingRedactionAccuracy_FAMUser_Expected ");
+			queries.push_back(
+				"IF OBJECT_ID('dbo.[FK_ReportingRedactionAccuracy_FAMUser_Found]', 'F') IS NOT NULL "
+				"	ALTER TABLE dbo.[ReportingRedactionAccuracy] DROP CONSTRAINT FK_ReportingRedactionAccuracy_FAMUser_Found ");
+			queries.push_back(
+				"IF OBJECT_ID('dbo.[FK_ReportingRedactionAccuracy_Action_Found]', 'F') IS NOT NULL "
+				"	ALTER TABLE dbo.[ReportingRedactionAccuracy] DROP CONSTRAINT FK_ReportingRedactionAccuracy_Action_Found ");
+			queries.push_back(
+				"IF OBJECT_ID('dbo.[FK_ReportingRedactionAccuracy_Action_Expected]', 'F') IS NOT NULL "
+				"	ALTER TABLE dbo.[ReportingRedactionAccuracy] DROP CONSTRAINT FK_ReportingRedactionAccuracy_Action_Expected ");
+
+			queries.push_back(
+				"IF OBJECT_ID('dbo.[FK_ReportingHIMStats_Pagination]', 'F') IS NOT NULL "
+				"	ALTER TABLE dbo.[ReportingHIMStats] DROP CONSTRAINT FK_ReportingHIMStats_Pagination ");
+			queries.push_back(
+				"IF OBJECT_ID('dbo.[FK_ReportingHIMStats_FAMUser]', 'F') IS NOT NULL "
+				"	ALTER TABLE dbo.[ReportingHIMStats] DROP CONSTRAINT FK_ReportingHIMStats_FAMUser ");
+			queries.push_back(
+				"IF OBJECT_ID('dbo.[FK_ReportingHIMStats_FAMFile_SourceFile]', 'F') IS NOT NULL "
+				"	ALTER TABLE dbo.[ReportingHIMStats] DROP CONSTRAINT FK_ReportingHIMStats_FAMFile_SourceFile ");
+			queries.push_back(
+				"IF OBJECT_ID('dbo.[FK_ReportingHIMStats_FAMFile_DestFile]', 'F') IS NOT NULL "
+				"	ALTER TABLE dbo.[ReportingHIMStats] DROP CONSTRAINT FK_ReportingHIMStats_FAMFile_DestFile ");
+			queries.push_back(
+				"IF OBJECT_ID('dbo.[FK_ReportingHIMStats_FAMFile_OriginalFile]', 'F') IS NOT NULL "
+				"	ALTER TABLE dbo.[ReportingHIMStats] DROP CONSTRAINT FK_ReportingHIMStats_FAMFile_OriginalFile ");
+			queries.push_back(
+				"IF OBJECT_ID('dbo.[FK_ReportingHIMStats_FileTaskSession]', 'F') IS NOT NULL "
+				"	ALTER TABLE dbo.[ReportingHIMStats] DROP CONSTRAINT FK_ReportingHIMStats_FileTaskSession ");
+			queries.push_back(
+				"IF OBJECT_ID('dbo.[FK_ReportingHIMStats_ActionID]', 'F') IS NOT NULL "
+				"	ALTER TABLE dbo.[ReportingHIMStats] DROP CONSTRAINT FK_ReportingHIMStats_ActionID ");
+
+			queries.push_back(
+				"IF OBJECT_ID('dbo.[FK_ReportingDataCaptureAccuracy_FAMUser_Found]', 'F') IS NOT NULL "
+				"	ALTER TABLE dbo.[ReportingDataCaptureAccuracy] DROP CONSTRAINT FK_ReportingDataCaptureAccuracy_FAMUser_Found ");
+			queries.push_back(
+				"IF OBJECT_ID('dbo.[FK_ReportingDataCaptureAccuracy_FAMUser_Expected]', 'F') IS NOT NULL "
+				"	ALTER TABLE dbo.[ReportingDataCaptureAccuracy] DROP CONSTRAINT FK_ReportingDataCaptureAccuracy_FAMUser_Expected ");
+			queries.push_back(
+				"IF OBJECT_ID('dbo.[FK_ReportingDataCaptureAccuracy_Action_Found]', 'F') IS NOT NULL "
+				"	ALTER TABLE dbo.[ReportingDataCaptureAccuracy] DROP CONSTRAINT FK_ReportingDataCaptureAccuracy_Action_Found ");
+			queries.push_back(
+				"IF OBJECT_ID('dbo.[FK_ReportingDataCaptureAccuracy_Action_Expected]', 'F') IS NOT NULL "
+				"	ALTER TABLE dbo.[ReportingDataCaptureAccuracy] DROP CONSTRAINT FK_ReportingDataCaptureAccuracy_Action_Expected ");
+
+			// Add the FK's
 			queries.push_back(gstrAdd_FKS_REPORTINGREDACTIONACCURACY);
 			queries.push_back(gstrAdd_FKS_REPORTINGHIMSTATS);
 			queries.push_back(gstrCreate_ReportingDataCaptureAccuracy_FKS);
@@ -578,7 +662,7 @@ namespace
 
 			return nNewSchemaVersion;
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49587");
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49616");
 	}
 }
 
@@ -968,9 +1052,16 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 				{
 					*pnProdSchemaVersion = UpdateToSchemaVersion10(ipConnection, pnNumSteps);
 				}
-				break;
+				// Fall through to next case
 
 			case 10:
+				if (nFAMDBSchemaVersion == 179)
+				{
+					*pnProdSchemaVersion = UpdateToSchemaVersion11(ipConnection, pnNumSteps);
+				}
+				break;
+			
+			case 11:
 				break;
 
 			default:
