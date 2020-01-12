@@ -1444,7 +1444,6 @@ namespace Util
 		inputBuffer.seekg(0, ios_base::beg);
 		dest.reserve((size_t)(end - beg));
 		dest.assign(istreambuf_iterator<char>(inputBuffer), istreambuf_iterator<char>());
-		std::copy(dest.begin(), dest.end(), std::ostream_iterator<char>(std::cout));
 		return base64Encode(dest);
 	}
 	//-------------------------------------------------------------------------------------------------
