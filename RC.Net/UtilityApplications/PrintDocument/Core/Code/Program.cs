@@ -24,7 +24,13 @@ namespace Extract.PrintDocument
 
             try
             {
-                // [license related code]
+                // Load license files from folder
+                LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
+                    "ELI36005", "Print document utility");
+
+                UnlockLeadtools.UnlockLeadToolsSupport();
 
                 // Check the number of command line arguments
                 if (args.Length < 1 || args[0] == "/?")
