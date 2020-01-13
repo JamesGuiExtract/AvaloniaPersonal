@@ -95,7 +95,8 @@ namespace Extract.ETL
                             '{Constants.TaskClassDataEntryVerification}', 
                             '{Constants.TaskClassPaginationVerification}',
                             '{Constants.TaskClassAutoPaginate}'
-                           )
+                           ))
+                )
                 INSERT INTO @FilesTable
                     SELECT FileID FROM TouchedFiles; 
             ");
@@ -158,7 +159,7 @@ namespace Extract.ETL
                      WHERE FileTaskSession.ID > @LastProcessedID
                            AND FileTaskSession.ID <= @LastInBatchID
                            AND [TaskClass].GUID IN (
-                           '{Constants.TaskClassDocumentApi}'                           
+                           '{Constants.TaskClassDocumentApi}',                          
                            '{Constants.TaskClassDataEntryVerification}',                           
                            '{Constants.TaskClassPaginationVerification}',
                            '{Constants.TaskClassAutoPaginate}'
