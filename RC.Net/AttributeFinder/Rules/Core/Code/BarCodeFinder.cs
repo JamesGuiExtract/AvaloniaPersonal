@@ -326,6 +326,8 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
+                LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI49617", _COMPONENT_DESCRIPTION);
+
                 var results = new IUnknownVector();
 
                 // Rather than allow a non-spatial source end up throwing an exception, simply return nothing.

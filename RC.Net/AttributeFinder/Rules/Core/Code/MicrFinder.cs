@@ -505,6 +505,8 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
+                LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI49618", _COMPONENT_DESCRIPTION);
+
                 _currentDocument = pDocument;
 
                 var results = FindMicrs(pDocument);
