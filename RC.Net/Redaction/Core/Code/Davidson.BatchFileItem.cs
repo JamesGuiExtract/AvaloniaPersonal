@@ -8,6 +8,7 @@ namespace Extract.Redaction.Davidson
     /// <summary>
     /// Base class for two types of items appearing in Davidson County RTF batches
     /// </summary>
+    [System.Reflection.Obfuscation(Feature = "renaming", Exclude = true)]
     [ProtoContract]
     [ProtoInclude(500, typeof(BetweenFileData))]
     [ProtoInclude(501, typeof(OutputFileData))]
@@ -46,6 +47,7 @@ namespace Extract.Redaction.Davidson
     /// <summary>
     /// Represents content that occurs at the begining of an RTF batch or between actual file contents, e.g., labels and whitespace
     /// </summary>
+    [System.Reflection.Obfuscation(Feature = "renaming", Exclude = true)]
     [ProtoContract]
     public class BetweenFileData : BatchFileItem
     {
@@ -110,6 +112,7 @@ namespace Extract.Redaction.Davidson
     /// <summary>
     /// Represents RTF batch content that will be output to a file plus extra stuff between this and the next file's data (sub-label and whitespace)
     /// </summary>
+    [System.Reflection.Obfuscation(Feature = "renaming", Exclude = true)]
     [ProtoContract]
     public class OutputFileData : BatchFileItem
     {
