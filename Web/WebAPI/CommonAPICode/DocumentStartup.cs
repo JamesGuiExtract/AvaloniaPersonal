@@ -1,7 +1,6 @@
 ﻿using Extract;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Formatters;              // for HttpNoContentOutputFormatter
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -128,11 +127,6 @@ namespace WebAPI
                     // attributes for every method and partially because there seems to otherwise be no good way to clear the
                     // lists via Produces/Consumes attributes when no content is produced or consumed.
                     config.OperationFilter<ContentTypeSpecifier>();
-
-                    // Mapping FileResult to "file" causes NSwag's automatic client generation to use a return type
-                    // of FileResponse for methods that return PhysicalFileResult. On the client side, FileResponse allows
-                    // for the streaming of the file itself whereas PhysicalFileResult provides only the source paths.
-                    config.MapType<FileResult>(() => new Schema { Type = "file", });
                 });
 
                 services.Configure<ServerOptions>(Configuration);
