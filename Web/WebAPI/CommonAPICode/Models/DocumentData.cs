@@ -293,7 +293,7 @@ namespace WebAPI.Models
                     !string.IsNullOrWhiteSpace(FileApi.Workflow.EditAction));
 
                 int wfID = FileApi.Workflow.Id;
-                string action = FileApi.Workflow.EditAction;
+                int actionID = FileApi.FileProcessingDB.GetActionIDForWorkflow(FileApi.Workflow.EditAction, wfID);
                 string joinSkipped = skippedFiles
                     ? Inv($"JOIN SkippedFile ON SkippedFile.FileID = FAMFile.ID")
                     : "";
@@ -335,14 +335,16 @@ namespace WebAPI.Models
                      FileMetadataFieldValue.Value AS MetadataValue
                     FROM FAMFile
                       JOIN WorkflowFile ON WorkflowFile.FileID = FAMFile.ID
-                      JOIN Action ON Action.WorkflowID = WorkflowFile.WorkflowID
-                      JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID AND FileActionStatus.ActionID = Action.ID
+                      JOIN FileActionStatus
+                        ON FileActionStatus.FileID = FAMFile.ID
+                        AND FileActionStatus.ActionID = {actionID}
                       {joinSkipped}
-                      LEFT JOIN FileActionComment ON FileActionComment.FileID = FAMFile.ID
+                      LEFT JOIN FileActionComment
+                        ON FileActionComment.FileID = FAMFile.ID
+                        AND FileActionComment.ActionID = {actionID}
                       LEFT JOIN FileMetadataFieldValue ON FileMetadataFieldValue.FileID = FAMFile.ID
                       LEFT JOIN MetadataField ON MetadataField.ID = FileMetadataFieldValue.MetaDataFieldID
-                      WHERE ASCName = '{action.Replace("'", "''")}'
-                      AND WorkflowFile.WorkflowID = {wfID}
+                      WHERE WorkflowFile.WorkflowID = {wfID}
 				      AND WorkflowFile.Deleted = 0
                       AND {skippedOrPendingClause}
                     ) AS SourceTable PIVOT(MIN(MetadataValue) FOR MetadataName IN ([OriginalFileName], [SubmittedByUser], [DocumentType])) AS PivotTable
