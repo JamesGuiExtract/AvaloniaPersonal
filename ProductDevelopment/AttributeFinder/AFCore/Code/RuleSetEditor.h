@@ -229,10 +229,6 @@ private:
 	int m_nDefaultW;
 	int m_nDefaultH;
 
-	// Minimum dimensions
-	int m_nMinWidth;
-	int m_nMinHeight;
-
 	// Window position mgr
 	WindowPersistenceMgr m_wMgr;
 

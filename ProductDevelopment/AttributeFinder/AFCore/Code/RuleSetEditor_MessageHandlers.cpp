@@ -724,11 +724,6 @@ BOOL CRuleSetEditor::OnInitDialog()
 			m_nDefaultW = rectDlg.Width();
 			m_nDefaultH = rectDlg.Height();
 		
-			// Save minimum window width/height
-			GetWindowRect(rectDlg);
-			m_nMinWidth = rectDlg.Width();
-			m_nMinHeight = rectDlg.Height();
-
 			// Set as initialized
 			m_bInitialized = true;
 
@@ -2116,8 +2111,18 @@ void CRuleSetEditor::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 {
 	try
 	{
-		lpMMI->ptMinTrackSize.x = m_nMinWidth;
-		lpMMI->ptMinTrackSize.y = m_nMinHeight;
+		// DLU values taken from AFCore.rc
+		CRect rectDlg;
+		rectDlg.left = 0;
+		rectDlg.top = 0;
+		rectDlg.right = 329;
+		rectDlg.bottom = 359;
+
+		// Convert from DLUs to pixels
+		MapDialogRect(rectDlg);
+
+		lpMMI->ptMinTrackSize.x = rectDlg.Width();
+		lpMMI->ptMinTrackSize.y = rectDlg.Height();
 		CDialog::OnGetMinMaxInfo(lpMMI);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI37588");
