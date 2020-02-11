@@ -152,8 +152,8 @@ namespace Extract.ETL
                     [LastFileTaskSessionID] = @LastFileTaskSessionID
                 WHERE [FileID] = @FileID AND [ActionID] = @ActionID AND [TaskClassID] = @TaskClassID AND [DatabaseServiceID] = @DatabaseServiceID
             END ELSE BEGIN
-                /* Insert New records only if the duration and overhead is not 0 */
-                IF (ABS(@Duration) > 0.00001 AND ABS(@Overhead) > 0.00001) 
+                /* Insert New records only if the duration is not 0 */
+                IF (ABS(@Duration) > 0.00001) 
                 BEGIN
                     INSERT INTO [ReportingVerificationRates]
                         ([DatabaseServiceID], [FileID], [ActionID], [TaskClassID], [LastFileTaskSessionID], [Duration], [OverheadTime], [ActivityTime])
