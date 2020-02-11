@@ -39,6 +39,7 @@ namespace Extract.ETL.Test
         static readonly string _TEST_FILE2 = "Resources.TestImage002.tif";
 
         static readonly string _ACTION_A = "ActionA";
+        static readonly string _ACTION_B = "ActionB";
 
         #endregion
 
@@ -177,44 +178,33 @@ namespace Extract.ETL.Test
         [TestCase(Constants.TaskClassRedactionVerification, TestName = "Redaction: Verify sensitive data")]
         public static void TestDocumentVerificationRatesServiceProcess(string taskGuid)
         {
-            string testDBName = taskGuid + "_Test";
+            string testDBName = "TestDocumentVerificationRatesServiceProcess_" + taskGuid + "_Test";
             try
             {
-                var fileProcessingDb = CreateTestDatabase(testDBName);
+                var setupData = SetupDatabase(testDBName);
 
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", _ACTION_A, true, true);
-                fileProcessingDb.RegisterActiveFAM();
+                int actionID1 = setupData.db.GetActionID(_ACTION_A);
 
-                string testfileName1 = _testFileManager.GetFile(_TEST_FILE1);
-                string testfileName2 = _testFileManager.GetFile(_TEST_FILE2);
-                bool alreadyExists = false;
-                EActionStatus previousStatus;
-                var fileRecord1 = fileProcessingDb.AddFile(testfileName1, _ACTION_A, -1, EFilePriority.kPriorityNormal,
-                    false, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
-                var fileRecord2 = fileProcessingDb.AddFile(testfileName2, _ACTION_A, -1, EFilePriority.kPriorityNormal,
-                    false, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
-
-                int actionID1 = fileProcessingDb.GetActionID(_ACTION_A);
-
-                int fileTaskSessionID = fileProcessingDb.StartFileTaskSession(taskGuid, fileRecord1.FileID, actionID1);
-
-                fileProcessingDb.EndFileTaskSession(fileTaskSessionID, 10.0, 1.0, 10.0);
-                fileProcessingDb.UnregisterActiveFAM();
-                fileProcessingDb.RecordFAMSessionStop();
-
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", _ACTION_A, true, true);
-                fileProcessingDb.RegisterActiveFAM();
-
-                fileTaskSessionID = fileProcessingDb.StartFileTaskSession(taskGuid, fileRecord2.FileID, actionID1);
-
+                PerformTestSession(setupData.db, taskGuid, setupData.fileRecord1.FileID, actionID1, 10.0, 1.0, 10.0);
+                
                 DocumentVerificationRates rates = new DocumentVerificationRates();
-                rates.DatabaseServer = fileProcessingDb.DatabaseServer;
-                rates.DatabaseName = fileProcessingDb.DatabaseName;
+                rates.DatabaseServer = setupData.db.DatabaseServer;
+                rates.DatabaseName = setupData.db.DatabaseName;
                 rates.DatabaseServiceID = StoreDatabaseServiceRecord(rates);
 
                 // This should not process any results
                 Assert.Throws<ExtractException>(() => rates.Process(_cancel));
                 CheckResults(rates, taskGuid, new VerificationRatesList());
+
+                rates.Process(_noCancel);
+
+                CheckResults(rates, taskGuid, _PROCESS1_EXPECTED);
+
+                // Test that a StartedFileTaskSession does not affect the results
+
+                setupData.db.RecordFAMSessionStart("Test.fps", _ACTION_A, true, true);
+                setupData.db.RegisterActiveFAM();
+                int fileTaskSessionID = setupData.db.StartFileTaskSession(taskGuid, setupData.fileRecord2.FileID, actionID1);
 
                 rates.Process(_noCancel);
 
@@ -226,7 +216,7 @@ namespace Extract.ETL.Test
                 Assert.AreEqual(status.LastFileTaskSessionIDProcessed, 1, "LastFileTaskSessionIDProcessed is 1.");
                 Assert.That(status.SetOfActiveFileTaskIds.Count == 0, "SetOfActiveFileTaskIds is no longer used.");
 
-                fileProcessingDb.EndFileTaskSession(fileTaskSessionID, 20.0, 2.0, 20.0);
+                setupData.db.EndFileTaskSession(fileTaskSessionID, 20.0, 2.0, 20.0);
                 rates.Process(_noCancel);
 
                 status = rates.Status as DocumentVerificationStatus;
@@ -235,28 +225,21 @@ namespace Extract.ETL.Test
 
                 CheckResults(rates, taskGuid, _PROCESS2_EXPECTED);
 
-                fileProcessingDb.UnregisterActiveFAM();
-                fileProcessingDb.RecordFAMSessionStop();
+                setupData.db.UnregisterActiveFAM();
+                setupData.db.RecordFAMSessionStop();
 
                 rates.Process(_noCancel);
 
                 CheckResults(rates, taskGuid, _PROCESS2_EXPECTED);
 
-                fileProcessingDb.RecordFAMSessionStart("Test.fps", _ACTION_A, true, true);
-                fileProcessingDb.RegisterActiveFAM();
-
-                fileTaskSessionID = fileProcessingDb.StartFileTaskSession(taskGuid, fileRecord2.FileID, actionID1);
-
-                fileProcessingDb.EndFileTaskSession(fileTaskSessionID, 30.0, 3.0, 30.0);
-                fileProcessingDb.UnregisterActiveFAM();
-                fileProcessingDb.RecordFAMSessionStop();
+                PerformTestSession(setupData.db, taskGuid, setupData.fileRecord2.FileID, actionID1, 30.0, 3.0, 30.0);
 
                 rates.Process(_noCancel);
 
                 CheckResults(rates, taskGuid, _PROCESS4_EXPECTED);
 
                 // Test that the status gets reset if the database is cleared with retain settings
-                fileProcessingDb.Clear(true);
+                setupData.db.Clear(true);
 
                 using (var connection = GetConnection(rates))
                 {
@@ -283,6 +266,108 @@ namespace Extract.ETL.Test
             }
         }
 
+        [Test]
+        [Category("Automated")]
+        [Category("ETL")]
+        [TestCase(Constants.TaskClassPaginationVerification, 10.0,  0.0,  0.0, TestName = "Pagination: Verify 10.0,  0.0,  0.0")]
+        [TestCase(Constants.TaskClassPaginationVerification, 10.0,  0.0, 10.0, TestName = "Pagination: Verify 10.0,  0.0, 10.0")]
+        [TestCase(Constants.TaskClassPaginationVerification, 10.0, 10.0,  0.0, TestName = "Pagination: Verify 10.0, 10.0,  0.0")]
+        [TestCase(Constants.TaskClassPaginationVerification, 10.0, 10.0, 10.0, TestName = "Pagination: Verify 10.0, 10.0, 10.0")]
+        [TestCase(Constants.TaskClassPaginationVerification,  0.0, 10.0, 10.0, TestName = "Pagination: Verify  0.0, 10.0, 10.0")]
+        [TestCase(Constants.TaskClassWebVerification, 10.0,  0.0,  0.0, TestName = "Core: Web verification 10.0,  0.0,  0.0")]
+        [TestCase(Constants.TaskClassWebVerification, 10.0,  0.0, 10.0, TestName = "Core: Web verification 10.0,  0.0, 10.0")]
+        [TestCase(Constants.TaskClassWebVerification, 10.0, 10.0,  0.0, TestName = "Core: Web verification 10.0, 10.0,  0.0")]
+        [TestCase(Constants.TaskClassWebVerification, 10.0, 10.0, 10.0, TestName = "Core: Web verification 10.0, 10.0, 10.0")]
+        [TestCase(Constants.TaskClassWebVerification,  0.0, 10.0, 10.0, TestName = "Core: Web verification  0.0, 10.0, 10.0")]
+        [TestCase(Constants.TaskClassDataEntryVerification, 10.0,  0.0,  0.0, TestName = "Data Entry: Verify extracted data 10.0,  0.0,  0.0")]
+        [TestCase(Constants.TaskClassDataEntryVerification, 10.0,  0.0, 10.0, TestName = "Data Entry: Verify extracted data 10.0,  0.0, 10.0")]
+        [TestCase(Constants.TaskClassDataEntryVerification, 10.0, 10.0,  0.0, TestName = "Data Entry: Verify extracted data 10.0, 10.0,  0.0")]
+        [TestCase(Constants.TaskClassDataEntryVerification, 10.0, 10.0, 10.0, TestName = "Data Entry: Verify extracted data 10.0, 10.0, 10.0")]
+        [TestCase(Constants.TaskClassDataEntryVerification,  0.0, 10.0, 10.0, TestName = "Data Entry: Verify extracted data  0.0, 10.0, 10.0")]
+        [TestCase(Constants.TaskClassRedactionVerification, 10.0,  0.0,  0.0, TestName = "Redaction: Verify sensitive data 10.0,  0.0,  0.0")]
+        [TestCase(Constants.TaskClassRedactionVerification, 10.0,  0.0, 10.0, TestName = "Redaction: Verify sensitive data 10.0,  0.0, 10.0")]
+        [TestCase(Constants.TaskClassRedactionVerification, 10.0, 10.0,  0.0, TestName = "Redaction: Verify sensitive data 10.0, 10.0,  0.0")]
+        [TestCase(Constants.TaskClassRedactionVerification, 10.0, 10.0, 10.0, TestName = "Redaction: Verify sensitive data 10.0, 10.0, 10.0")]
+        [TestCase(Constants.TaskClassRedactionVerification,  0.0, 10.0, 10.0, TestName = "Redaction: Verify sensitive data  0.0, 10.0, 10.0")]
+        [CLSCompliant(false)]
+        // Added for https://extract.atlassian.net/browse/ISSUE-16928 
+        public static void TestDocumentVerificationRatesZeroTimes(string taskGuid, double duration,
+            double overheadTime, double activityTime)
+        {
+            string testDBName = "TestDocumentVerificationRatesZeroTimes_" + taskGuid + "_Test";
+            try
+            {
+                var setupData = SetupDatabase(testDBName);
+
+                int actionID1 = setupData.db.GetActionID(_ACTION_A);
+
+                PerformTestSession(setupData.db, taskGuid, setupData.fileRecord1.FileID, actionID1, duration, overheadTime, activityTime);
+
+                DocumentVerificationRates rates = new DocumentVerificationRates();
+                rates.DatabaseServer = setupData.db.DatabaseServer;
+                rates.DatabaseName = setupData.db.DatabaseName;
+                rates.DatabaseServiceID = StoreDatabaseServiceRecord(rates);
+
+                var expected = duration != 0 ? new VerificationRatesList
+                {
+                    (1, 1, 1, "", 1, duration, overheadTime, activityTime)
+                } : new VerificationRatesList();
+
+                rates.Process(_noCancel);
+
+                CheckResults(rates, taskGuid, expected);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDBName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        [Category("ETL")]
+        [TestCase(Constants.TaskClassPaginationVerification, TestName = "Pagination: Verify")]
+        [TestCase(Constants.TaskClassWebVerification, TestName = "Core: Web verification")]
+        [TestCase(Constants.TaskClassDataEntryVerification, TestName = "Data Entry: Verify extracted data")]
+        [TestCase(Constants.TaskClassRedactionVerification, TestName = "Redaction: Verify sensitive data")]
+        // Added for https://extract.atlassian.net/browse/ISSUE-16932
+        public static void TestDocumentVerificationRatesNullActionID(string taskGuid)
+        {
+            string testDBName = "TestDocumentVerificationRatesNullActionID_" + taskGuid + "_Test";
+            try
+            {
+                var setupData = SetupDatabase(testDBName);
+
+                int actionIDA = setupData.db.GetActionID(_ACTION_A);
+                int actionIDB = setupData.db.GetActionID(_ACTION_B);
+
+                PerformTestSession(setupData.db, taskGuid, setupData.fileRecord1.FileID, actionIDA, 10.0, 0.0, 10.0);
+                
+                PerformTestSession(setupData.db, taskGuid, setupData.fileRecord1.FileID, actionIDB, 10.0, 0.0, 10.0);
+
+                setupData.db.DeleteAction(_ACTION_B);
+
+                DocumentVerificationRates rates = new DocumentVerificationRates();
+                rates.DatabaseServer = setupData.db.DatabaseServer;
+                rates.DatabaseName = setupData.db.DatabaseName;
+                rates.DatabaseServiceID = StoreDatabaseServiceRecord(rates);
+
+                var expected = new VerificationRatesList
+                {
+                    (1, 1, 1, "", 1, 10.0, 0.0, 10.0)
+                };
+
+                rates.Process(_noCancel);
+
+                CheckResults(rates, taskGuid, expected);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDBName);
+            }
+        }
+
+
         #endregion
 
         #region Helper methods
@@ -293,6 +378,7 @@ namespace Extract.ETL.Test
 
             // Create 2 actions
             fileProcessingDB.DefineNewAction(_ACTION_A);
+            fileProcessingDB.DefineNewAction(_ACTION_B);
 
             return fileProcessingDB;
         }
@@ -397,6 +483,35 @@ namespace Extract.ETL.Test
                         "Compare the actual data with the expected");
                 }
             }
+        }
+
+        static (IFileProcessingDB db, string fileName1, FileRecord fileRecord1, string fileName2, FileRecord fileRecord2) SetupDatabase(string testDBName)
+        {
+            var fileProcessingDb = CreateTestDatabase(testDBName);
+
+            string testFileName1 = _testFileManager.GetFile(_TEST_FILE1);
+            string testFileName2 = _testFileManager.GetFile(_TEST_FILE2);
+            bool alreadyExists = false;
+            EActionStatus previousStatus;
+            var fileRecord1 = fileProcessingDb.AddFile(testFileName1, _ACTION_A, -1, EFilePriority.kPriorityNormal,
+                false, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
+            var fileRecord2 = fileProcessingDb.AddFile(testFileName2, _ACTION_A, -1, EFilePriority.kPriorityNormal,
+                false, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
+            return (fileProcessingDb, testFileName1, fileRecord1, testFileName2, fileRecord2);
+
+        }
+
+        static void PerformTestSession(IFileProcessingDB db, string taskGuid, int fileID, int actionID, double duration,
+            double overheadTime, double activityTime)
+        {
+            db.RecordFAMSessionStart("Test.fps", _ACTION_A, true, true);
+            db.RegisterActiveFAM();
+
+            int fileTaskSessionID = db.StartFileTaskSession(taskGuid, fileID, actionID);
+
+            db.EndFileTaskSession(fileTaskSessionID, duration, overheadTime, activityTime);
+            db.UnregisterActiveFAM();
+            db.RecordFAMSessionStop();
         }
 
         #endregion
