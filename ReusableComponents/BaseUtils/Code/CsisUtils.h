@@ -4,6 +4,7 @@
 #include "BaseUtils.h"
 
 #include <map>
+#include <set>
 #include <string>
 
 using namespace std;
@@ -37,6 +38,16 @@ template<typename T>
 struct csis_map
 {
 	typedef map<string, T, csis_less> type;
+};
+
+//-------------------------------------------------------------------------------------------------
+// Defines an STL set where the values are strings that will be compared case-insensitively
+// Example use:
+// csis_set::type setTest;
+// setTest["one"] = "Test";
+struct csis_set
+{
+	typedef set<string, csis_less> type;
 };
 
 #endif // CSIS_UTILS_H

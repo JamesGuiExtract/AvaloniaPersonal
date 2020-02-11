@@ -119,6 +119,8 @@ STDMETHODIMP CCopyMoveDeleteFileProcessorPP::Apply(void)
 				ipFP->ThrowIfUnableToDeleteSecurely =
 					asVariantBool(m_btnThrowIfUnableToDeleteSecurely.GetCheck() == BST_CHECKED);
 
+				ipFP->IncludeRelatedFiles = asVariantBool(m_btnRelatedFiles.GetCheck() == BST_CHECKED);
+
 				// Handle Source radio buttons
 				if (m_radioSrcErr.GetCheck() == BST_CHECKED)
 				{
@@ -206,7 +208,7 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, L
 			m_radioCopy = GetDlgItem(IDC_RADIO_COPY);
 			m_radioDelete = GetDlgItem(IDC_RADIO_DELETE);
 
-			// Get the allow readonly checkbox
+			m_btnRelatedFiles = GetDlgItem(IDC_CHECK_RELATED_FILES);
 			m_btnAllowReadonly = GetDlgItem(IDC_CHECK_ALLOW_READONLY);
 
 			// Secure delete options.
@@ -237,6 +239,8 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, L
 
 			m_btnSecureDelete.SetCheck(asBSTChecked(ipFP->SecureDelete));
 			m_btnThrowIfUnableToDeleteSecurely.SetCheck(asBSTChecked(ipFP->ThrowIfUnableToDeleteSecurely));
+
+			m_btnRelatedFiles.SetCheck(asBSTChecked(ipFP->IncludeRelatedFiles));
 
 			BOOL bTmp;
 			OnBnClickedCheckSecureDelete(0, 0, 0, bTmp);

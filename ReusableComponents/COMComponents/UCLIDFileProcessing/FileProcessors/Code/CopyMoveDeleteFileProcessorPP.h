@@ -79,6 +79,7 @@ private:
 	ATLControls::CButton m_radioMove;
 	ATLControls::CButton m_radioCopy;
 	ATLControls::CButton m_radioDelete;
+	ATLControls::CButton m_btnRelatedFiles;
 	ATLControls::CButton m_btnAllowReadonly;
 	ATLControls::CButton m_btnSecureDelete;
 	ATLControls::CButton m_btnThrowIfUnableToDeleteSecurely;

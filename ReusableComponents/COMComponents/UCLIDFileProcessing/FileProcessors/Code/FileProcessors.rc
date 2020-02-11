@@ -162,7 +162,7 @@ BEGIN
     PUSHBUTTON      "...",IDC_BTN_BROWSE_OCR_PARAMETERS_RULESET,291,153,15,14
 END
 
-IDD_COPYMOVEDELETEFILEPROCESSORPP DIALOGEX 0, 0, 283, 296
+IDD_COPYMOVEDELETEFILEPROCESSORPP DIALOGEX 0, 0, 283, 319
 STYLE DS_SETFONT | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Sans Serif", 0, 0, 0x1
@@ -173,32 +173,34 @@ BEGIN
     COMBOBOX        IDC_CMB_SRC_FILE,14,52,220,58,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_SRC_DOC_TAG,239,52,10,14,BS_ICON
     PUSHBUTTON      "...",IDC_BTN_BROWSE_SRC,255,52,15,14
+    CONTROL         "Also perform this operation on all files related to the specified document",IDC_CHECK_RELATED_FILES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,69,257,12
     CONTROL         "Allow read only file to be deleted",IDC_CHECK_ALLOW_READONLY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,69,165,12
-    CONTROL         "Securely delete",IDC_CHECK_SECURE_DELETE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,84,116,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,83,165,12
+    CONTROL         "Securely delete",IDC_CHECK_SECURE_DELETE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,99,116,10
     CONTROL         "Skip the operation with an error if the file cannot be securely overwritten",IDC_CHECK_SECURE_DELETE_THROW,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,99,241,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,114,241,10
     CONTROL         "Record an error and continue",IDC_RADIO_NOSRC_ERR,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,21,127,119,10
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,21,143,119,10
     CONTROL         "Skip the operation without error",IDC_RADIO_NOSRC_NOERR,
-                    "Button",BS_AUTORADIOBUTTON,21,140,119,10
-    COMBOBOX        IDC_CMB_DST_FILE,14,180,220,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DST_DOC_TAG,239,180,10,14,BS_ICON
-    PUSHBUTTON      "...",IDC_BTN_BROWSE_DST,255,180,15,14
+                    "Button",BS_AUTORADIOBUTTON,21,156,119,10
+    COMBOBOX        IDC_CMB_DST_FILE,14,193,220,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DST_DOC_TAG,239,193,10,14,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_DST,255,193,15,14
     CONTROL         "Create destination folder if not present",IDC_CHECK_DIRECTORY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,197,145,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,210,145,12
     CONTROL         "Modify SourceDocName in database to match the above destination filename.",IDC_CHECK_MODIFY_SOURCEDOCNAME,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,214,260,12
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,227,260,12
     CONTROL         "Skip the operation and record an error",IDC_RADIO_DEST_ERR,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,21,242,181,10
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,21,255,181,10
     CONTROL         "Skip the operation without error",IDC_RADIO_DEST_NOERR,
-                    "Button",BS_AUTORADIOBUTTON,21,255,177,10
-    CONTROL         "Overwrite the file and continue",IDC_RADIO_DEST_OVERWRITE,
                     "Button",BS_AUTORADIOBUTTON,21,268,177,10
-    GROUPBOX        "From",IDC_STATIC,7,40,268,124
-    GROUPBOX        "If Source File Does Not Exist",IDC_STATIC,14,117,220,40
-    GROUPBOX        "To",IDC_STATIC,7,168,268,121
-    GROUPBOX        "If Destination File Already Exists",IDC_STATIC,14,230,220,53
+    CONTROL         "Overwrite the file and continue",IDC_RADIO_DEST_OVERWRITE,
+                    "Button",BS_AUTORADIOBUTTON,21,281,177,10
+    GROUPBOX        "From",IDC_STATIC,7,40,268,139
+    GROUPBOX        "If Source File Does Not Exist",IDC_STATIC,14,133,220,40
+    GROUPBOX        "To",IDC_STATIC,7,180,268,121
+    GROUPBOX        "If Destination File Already Exists",IDC_STATIC,14,243,220,53
 END
 
 IDD_LAUNCHAPPFILEPROCESSORPP DIALOGEX 0, 0, 310, 123
@@ -421,7 +423,7 @@ BEGIN
         LEFTMARGIN, 4
         RIGHTMARGIN, 278
         TOPMARGIN, 5
-        BOTTOMMARGIN, 257
+        BOTTOMMARGIN, 310
     END
 
     IDD_LAUNCHAPPFILEPROCESSORPP, DIALOG
@@ -497,6 +499,11 @@ BEGIN
 END
 
 IDD_OCRFILEPROCESSORPP AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_COPYMOVEDELETEFILEPROCESSORPP AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

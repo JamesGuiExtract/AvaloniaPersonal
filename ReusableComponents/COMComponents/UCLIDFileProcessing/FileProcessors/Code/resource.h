@@ -180,14 +180,15 @@
 #define IDC_RADIO_OCR_PARAMS_HERE       322
 #define IDC_BTN_OCR_PARAMETERS_RULESET_DOC_TAG 323
 #define IDC_BTN_BROWSE_OCR_PARAMETERS_RULESET 324
+#define IDC_CHECK_RELATED_FILES         325
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        156
+#define _APS_NEXT_RESOURCE_VALUE        157
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         325
+#define _APS_NEXT_CONTROL_VALUE         326
 #define _APS_NEXT_SYMED_VALUE           145
 #endif
 #endif

@@ -4,6 +4,10 @@
 #include "resource.h"       // main symbols
 
 #include "..\..\..\UCLIDFileProcessing\Code\FPCategories.h"
+
+#include <CsisUtils.h>
+
+#include <map>
 #include <string>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -76,6 +80,8 @@ public:
 	STDMETHOD(put_SecureDelete)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_ThrowIfUnableToDeleteSecurely)(/*[out, retval]*/ VARIANT_BOOL *pRetVal);
 	STDMETHOD(put_ThrowIfUnableToDeleteSecurely)(/*[in]*/ VARIANT_BOOL newVal);
+	STDMETHOD(get_IncludeRelatedFiles)(/*[out, retval]*/ VARIANT_BOOL* pRetVal);
+	STDMETHOD(put_IncludeRelatedFiles)(/*[in]*/ VARIANT_BOOL newVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -124,6 +130,7 @@ private:
 	ECMDDestinationPresentType		m_eDestPresentType;
 	std::string m_strSrc;
 	std::string m_strDst;
+	csis_set::type					m_setTargetExtensions;
 
 	bool	m_bCreateDirectory;
 
@@ -138,6 +145,8 @@ private:
 	bool m_bSecureDelete;
 	bool m_bThrowIfUnableToDeleteSecurely;
 
+	bool m_bIncludeRelatedFiles;
+
 	/////////////
 	// Methods
 	/////////////
@@ -151,6 +160,15 @@ private:
 	// Checks destination folder and creates directory if needed and desired.
 	// If needed and NOT desired, thorws exception
 	void handleDirectory(const std::string& strDestinationFile);
+
+	void processFile(string& strSourceFile, string& strDestFile);
+	
+	// https://extract.atlassian.net/browse/ISSUE-16914
+	// These functions pertain to finding and processing files related to a source document
+	// (when m_bIncludeRelatedFiles is true)
+	void processRelatedFiles(map<string, string>& mapRelatedFiles);
+	map<string, string> getRelatedFiles(const std::string& strTargetFile, const std::string& strDestFile);
+	string getQualifyingRootFileName(const string& strTargetFile);
 
 	void validateLicense();
 };

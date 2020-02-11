@@ -13,11 +13,11 @@
 #include <misc.h>
 #include <ComUtils.h>
 #include <ComponentLicenseIDs.h>
+#include <FileDirectorySearcher.h>
 
 #include <math.h>
 #include <strstream>
 #include <fstream>
-#include <string>
 
 using namespace std;
 
@@ -34,13 +34,20 @@ extern CComModule _Module;
 // Constants
 //--------------------------------------------------------------------------------------------------
 // current version
-const unsigned long gnCurrentVersion = 5;
+const unsigned long gnCurrentVersion = 6;
 // Version 3:
 //		Added m_bAllowReadonly to allow move and delete of readonly files
 // Version 4:
 //		Added m_bModifySourceDocName to allow modification of the SourceDocName in the database
 // Version 5:
 //		Added m_bSecureDelete and m_bThrowIfUnableToDeleteSecurely
+// Version 6:
+//		Added m_bIncludeRelatedFiles
+
+static const string arrTargetFileExtensions[] =
+{
+	".TIF", ".TIFF", ".PDF", ".JPG", ".JPEG", ".BMP", ".RTF"
+};
 
 //--------------------------------------------------------------------------------------------------
 // CCopyMoveDeleteFileProcessor
@@ -55,11 +62,16 @@ CCopyMoveDeleteFileProcessor::CCopyMoveDeleteFileProcessor()
   m_bModifySourceDocName(false),
   m_bSecureDelete(false),
   m_bThrowIfUnableToDeleteSecurely(false),
+  m_bIncludeRelatedFiles(false),
   m_eSrcMissingType(kCMDSourceMissingError),
   m_eDestPresentType(kCMDDestinationPresentError)
 {
 	try
 	{
+		for each(string strExt in arrTargetFileExtensions)
+		{
+			m_setTargetExtensions.emplace(strExt);
+		}
 	}
 	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI12154")
 }
@@ -152,194 +164,64 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_ProcessFile(IFileRecord* pFileRec
 		IFileRecordPtr ipFileRecord(pFileRecord);
 		ASSERT_ARGUMENT("ELI31341", ipFileRecord != __nullptr);
 
-		// Default to successful completion
-		*pResult = kProcessingSuccessful;
-
 		std::string strSourceDocName = asString(ipFileRecord->Name);
 		ASSERT_ARGUMENT("ELI17915", strSourceDocName.empty() == false);
 
+		std::string strSourceFile = CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, m_strSrc, strSourceDocName);
+		simplifyPathName(strSourceFile);
+
 		// Call ExpandTagsAndTFE() to expand tags and functions
-		std::string strExSrc = CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, m_strSrc, strSourceDocName);
+		std::string strDestFile = CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, m_strDst, strSourceDocName);
+		simplifyPathName(strDestFile);
 
-		switch (m_eOperation)
+		// Per https://extract.atlassian.net/browse/ISSUE-16914, Order of operations will be:
+		// 1) Perform file operation on the main file (if error occurs, no related files will be touched and any rename will not occur)
+		// 2) Rename file in DB (if rename fails, file operation will have occurred, but name will not be changed in DB and related files
+		//	  will not be acted upon)
+		// 3) Perform file operations on the related files. Operation will be attempted for related files individually so that an
+		//	  error processing one related file does not prevent attempts processing other. All errors to be reported in aggregate.
+		// However, related files should be determined before the primary operation as the absence of the original file can alter
+		// the calculation of related files.
+		map<string, string> mapRelatedFiles;
+		if (m_bIncludeRelatedFiles)
 		{
-		case kCMDOperationMoveFile:
-			{
-				// Call ExpandTagsAndTFE() to expand tags and functions
-				std::string strExDst = CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, m_strDst, strSourceDocName);
-
-				simplifyPathName(strExDst);
-
-				// Check destination folder
-				handleDirectory( strExDst );
-
-				// Check destination file
-				if (!checkDestinationFile( strExDst ))
-				{
-					break;
-				}
-
-				// Check source file
-				if (isFileOrFolderValid( strExSrc ))
-				{
-					// Move File - overwrite if present
-					if (m_bSecureDelete)
-					{
-						// If m_bSecureDelete is set, delete securely.
-						moveFile( strExSrc, strExDst, true, true );
-					}
-					else
-					{
-						// If m_bSecureDelete is not set, allow the SecureDeleteAllSensitiveFiles
-						// registry entry to dictate whether the file is deleted securely.
-						moveFile( strExSrc, strExDst, true );
-					}
-
-					if (m_bModifySourceDocName)
-					{
-						try
-						{
-							try
-							{
-								pDB->RenameFile(ipFileRecord, strExDst.c_str());
-							}
-							CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31468");
-						}
-						catch (UCLIDException &ue)
-						{
-							UCLIDException uex("ELI31469", "File was moved successfully, "
-								"but unable to change name in FAM database.", ue);
-							uex.addDebugInfo("Name in DB", strSourceDocName);
-							uex.addDebugInfo("Name to change to", strExDst);
-							throw uex;
-						}
-					}
-
-				}
-				// Source file not found, check for error condition
-				else if (m_eSrcMissingType == kCMDSourceMissingError)
-				{
-					// Create and throw exception
-					UCLIDException ue("ELI13181", "Cannot Move missing file!");
-					ue.addDebugInfo("FileToMove", strExSrc);
-					ue.addDebugInfo("Target", strExDst);
-					throw ue;
-				}
-				// Source file not found, just skip this file
-				else if (m_eSrcMissingType == kCMDSourceMissingSkip)
-				{
-					// Do not Move this file
-					break;
-				}
-				else
-				{
-					THROW_LOGIC_ERROR_EXCEPTION("ELI13187");
-				}
-			}
-			break;
-		case kCMDOperationCopyFile:
-			{
-				// Call ExpandTagsAndTFE() to expand tags and functions
-				std::string strExDst = CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, m_strDst, strSourceDocName);  
-
-				simplifyPathName(strExDst);
-
-				// Check destination folder
-				handleDirectory( strExDst );
-
-				// Check destination file
-				if (!checkDestinationFile( strExDst ))
-				{
-					break;
-				}
-
-				// Check source file
-				if (isFileOrFolderValid( strExSrc ))
-				{
-					// Copy File
-					copyFile(strExSrc, strExDst);
-
-					if (m_bModifySourceDocName)
-					{
-						try
-						{
-							try
-							{
-								pDB->RenameFile(ipFileRecord, strExDst.c_str());
-							}
-							CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31504");
-						}
-						catch (UCLIDException &ue)
-						{
-							UCLIDException uex("ELI31470", "File was copied successfully, "
-								"but unable to change name in FAM database.", ue);
-							uex.addDebugInfo("Name in DB", strSourceDocName);
-							uex.addDebugInfo("Name to change to", strExDst);
-							throw uex;
-						}
-					}
-
-				}
-				// Source file not found, check for error condition
-				else if (m_eSrcMissingType == kCMDSourceMissingError)
-				{
-					// Create and throw exception
-					UCLIDException ue("ELI13182", "Cannot copy missing file!");
-					ue.addDebugInfo("FileToCopy", strExSrc);
-					ue.addDebugInfo("Target", strExDst);
-					throw ue;
-				}
-				// Source file not found, just skip this file
-				else if (m_eSrcMissingType == kCMDSourceMissingSkip)
-				{
-					// Do not Copy this file
-					break;
-				}
-				else
-				{
-					THROW_LOGIC_ERROR_EXCEPTION("ELI13188");
-				}
-			}
-			break;
-		case kCMDOperationDeleteFile:
-			{
-				// Check source file
-				if (isFileOrFolderValid( strExSrc ))
-				{
-					if (m_bSecureDelete)
-					{
-						// If m_bSecureDelete is set, delete securely.
-						deleteFile(strExSrc, m_bAllowReadonly, true,
-							m_bThrowIfUnableToDeleteSecurely);
-					}
-					else
-					{
-						// If m_bSecureDelete is not set, allow the SecureDeleteAllSensitiveFiles
-						// registry entry to dictate whether the file is deleted securely.
-						deleteFile(strExSrc, m_bAllowReadonly);
-					}
-				}
-				// Source file not found, check for error condition
-				else if (m_eSrcMissingType == kCMDSourceMissingError)
-				{
-					// Create and throw exception
-					UCLIDException ue("ELI13183", "Cannot Delete missing file!");
-					ue.addDebugInfo("FileToDelete", strExSrc);
-					throw ue;
-				}
-				// Source file not found, just skip this file
-				else if (m_eSrcMissingType == kCMDSourceMissingSkip)
-				{
-					// Do not Delete this file
-					break;
-				}
-				else
-				{
-					THROW_LOGIC_ERROR_EXCEPTION("ELI13189");
-				}
-			}
-			break;
+			// Gets a mapping of the related documents to the corresponding destination filename
+			mapRelatedFiles = getRelatedFiles(strSourceFile, strDestFile);
 		}
+
+		// 1) Perform file operation on the primary file
+		processFile(strSourceFile, strDestFile);
+
+		// 2) Rename file in DB
+		if (m_bModifySourceDocName && 
+			(m_eOperation == kCMDOperationCopyFile || m_eOperation == kCMDOperationMoveFile))
+		{
+			try
+			{
+				try
+				{
+					pDB->RenameFile(ipFileRecord, strDestFile.c_str());
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49649");
+			}
+			catch (UCLIDException & ue)
+			{
+				UCLIDException uex("ELI49650", "File was " +
+					(m_eOperation == kCMDOperationCopyFile) ? "copied successfully, " : "moved successfully, " 
+					"but unable to change name in FAM database.", ue);
+				uex.addDebugInfo("Name in DB", strSourceDocName);
+				uex.addDebugInfo("Name to change to", strDestFile);
+				throw uex;
+			}
+		}
+
+		// 3) Perform file operations on the related files.
+		if (m_bIncludeRelatedFiles)
+		{
+			processRelatedFiles(mapRelatedFiles);
+		}
+
+		*pResult = kProcessingSuccessful;
 
 		return S_OK;
 	}
@@ -477,7 +359,8 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_CopyFrom(IUnknown *pObject)
 		m_bModifySourceDocName = asCppBool(ipCopyThis->ModifySourceDocName);
 		m_bSecureDelete = asCppBool(ipCopyThis->SecureDelete);
 		m_bThrowIfUnableToDeleteSecurely = asCppBool(ipCopyThis->ThrowIfUnableToDeleteSecurely);
-	
+		m_bIncludeRelatedFiles = asCppBool(ipCopyThis->IncludeRelatedFiles);
+
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12812");
@@ -540,6 +423,7 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::Load(IStream *pStream)
 		m_bModifySourceDocName = false;
 		m_bSecureDelete = false;
 		m_bThrowIfUnableToDeleteSecurely = false;
+		m_bIncludeRelatedFiles = false;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -605,6 +489,11 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::Load(IStream *pStream)
 			dataReader >> m_bThrowIfUnableToDeleteSecurely;
 		}
 
+		if (nDataVersion >= 6)
+		{
+			dataReader >> m_bIncludeRelatedFiles;
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	
@@ -642,6 +531,8 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::Save(IStream *pStream, BOOL fClearDir
 
 		dataWriter << m_bSecureDelete;
 		dataWriter << m_bThrowIfUnableToDeleteSecurely;
+
+		dataWriter << m_bIncludeRelatedFiles;
 
 		dataWriter.flushToByteStream();
 
@@ -1136,6 +1027,41 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::put_ThrowIfUnableToDeleteSecurely(VAR
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI32861");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CCopyMoveDeleteFileProcessor::get_IncludeRelatedFiles(VARIANT_BOOL* pRetVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+		try
+	{
+		ASSERT_ARGUMENT("ELI49644", pRetVal != __nullptr);
+
+		// Check license
+		validateLicense();
+
+		*pRetVal = asVariantBool(m_bIncludeRelatedFiles);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49645");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CCopyMoveDeleteFileProcessor::put_IncludeRelatedFiles(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		m_bIncludeRelatedFiles = asCppBool(newVal);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49646");
+}
+
+//-------------------------------------------------------------------------------------------------
 // Private functions
 //-------------------------------------------------------------------------------------------------
 void CCopyMoveDeleteFileProcessor::validateLicense()
@@ -1143,6 +1069,274 @@ void CCopyMoveDeleteFileProcessor::validateLicense()
 	static const unsigned long THIS_COMPONENT_ID = gnFILE_ACTION_MANAGER_OBJECTS;
 
 	VALIDATE_LICENSE(THIS_COMPONENT_ID, "ELI12179", "CopyMoveDelete File Processor");
+}
+//-------------------------------------------------------------------------------------------------
+void CCopyMoveDeleteFileProcessor::processFile(string& strSourceFile, string& strDestFile)
+{
+	switch (m_eOperation)
+	{
+		case kCMDOperationMoveFile:
+		{
+			// Check destination folder
+			handleDirectory(strDestFile);
+
+			// Check destination file
+			if (!checkDestinationFile(strDestFile))
+			{
+				break;
+			}
+
+			// Check source file
+			if (isFileOrFolderValid(strSourceFile))
+			{
+				// Move File - overwrite if present
+				if (m_bSecureDelete)
+				{
+					// If m_bSecureDelete is set, delete securely.
+					moveFile(strSourceFile, strDestFile, true, true);
+				}
+				else
+				{
+					// If m_bSecureDelete is not set, allow the SecureDeleteAllSensitiveFiles
+					// registry entry to dictate whether the file is deleted securely.
+					moveFile(strSourceFile, strDestFile, true);
+				}
+			}
+			// Source file not found, check for error condition
+			else if (m_eSrcMissingType == kCMDSourceMissingError)
+			{
+				// Create and throw exception
+				UCLIDException ue("ELI13181", "Cannot Move missing file!");
+				ue.addDebugInfo("FileToMove", strSourceFile);
+				ue.addDebugInfo("Target", strDestFile);
+				throw ue;
+			}
+			// Source file not found, just skip this file
+			else if (m_eSrcMissingType == kCMDSourceMissingSkip)
+			{
+				// Do not Move this file
+				break;
+			}
+			else
+			{
+				THROW_LOGIC_ERROR_EXCEPTION("ELI13187");
+			}
+		}
+		break;
+		case kCMDOperationCopyFile:
+		{
+			handleDirectory(strDestFile);
+
+			// Check destination file
+			if (!checkDestinationFile(strDestFile))
+			{
+				break;
+			}
+
+			// Check source file
+			if (isFileOrFolderValid(strSourceFile))
+			{
+				// Copy File
+				copyFile(strSourceFile, strDestFile);
+			}
+			// Source file not found, check for error condition
+			else if (m_eSrcMissingType == kCMDSourceMissingError)
+			{
+				// Create and throw exception
+				UCLIDException ue("ELI13182", "Cannot copy missing file!");
+				ue.addDebugInfo("FileToCopy", strSourceFile);
+				ue.addDebugInfo("Target", strDestFile);
+				throw ue;
+			}
+			// Source file not found, just skip this file
+			else if (m_eSrcMissingType == kCMDSourceMissingSkip)
+			{
+				// Do not Copy this file
+				break;
+			}
+			else
+			{
+				THROW_LOGIC_ERROR_EXCEPTION("ELI13188");
+			}
+		}
+		break;
+		case kCMDOperationDeleteFile:
+		{
+			// Check source file
+			if (isFileOrFolderValid(strSourceFile))
+			{
+				if (m_bSecureDelete)
+				{
+					// If m_bSecureDelete is set, delete securely.
+					deleteFile(strSourceFile, m_bAllowReadonly, true,
+						m_bThrowIfUnableToDeleteSecurely);
+				}
+				else
+				{
+					// If m_bSecureDelete is not set, allow the SecureDeleteAllSensitiveFiles
+					// registry entry to dictate whether the file is deleted securely.
+					deleteFile(strSourceFile, m_bAllowReadonly);
+				}
+			}
+			// Source file not found, check for error condition
+			else if (m_eSrcMissingType == kCMDSourceMissingError)
+			{
+				// Create and throw exception
+				UCLIDException ue("ELI13183", "Cannot Delete missing file!");
+				ue.addDebugInfo("FileToDelete", strSourceFile);
+				throw ue;
+			}
+			// Source file not found, just skip this file
+			else if (m_eSrcMissingType == kCMDSourceMissingSkip)
+			{
+				// Do not Delete this file
+				break;
+			}
+			else
+			{
+				THROW_LOGIC_ERROR_EXCEPTION("ELI13189");
+			}
+		}
+		break;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void CCopyMoveDeleteFileProcessor::processRelatedFiles(map<string, string>& mapRelatedFiles)
+{
+	// https://extract.atlassian.net/browse/ISSUE-16914
+	// Perform same operation that succeeded for the primary files on all files deemed related to
+	// the primary file
+	
+	vector<UCLIDException> ueRelatedFileErrors;
+
+	for (map<string, string>::iterator iter = mapRelatedFiles.begin();
+		iter != mapRelatedFiles.end();
+		iter++)
+	{
+		// Attempt each related file separately so that all related files that can be acted
+		// upon are acted upon.
+		try
+		{
+			try
+			{
+				string strRelatedSource = iter->first;
+				string strRelatedDest = iter->second;
+
+				processFile(strRelatedSource, strRelatedDest);
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49653")
+		}
+		catch (UCLIDException & ue)
+		{
+			ueRelatedFileErrors.push_back(ue);
+		}
+	}
+
+	if (ueRelatedFileErrors.size() > 0)
+	{
+		UCLIDException ueAggregate("ELI49654", "One or more related files could not be processed");
+		for each (UCLIDException ue in ueRelatedFileErrors)
+		{
+			ueAggregate.addDebugInfo("Failed Operation", ue);
+		}
+		throw ueAggregate;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+map<string, string> CCopyMoveDeleteFileProcessor::getRelatedFiles(const string& strSourceFile, const string& strDestFile)
+{
+	// https://extract.atlassian.net/browse/ISSUE-16914
+	// Determine which files should be deemed related to strSourceFile (which files should also be
+	// acted upon when m_bIncludeRelatedFiles is true).
+	// Return a mapping of the related documents to the corresponding destination filename
+	
+	map<string, string> mapRelatedFiles;
+
+	string strSearchRoot = getQualifyingRootFileName(strSourceFile);
+	strSearchRoot = strSearchRoot.empty()
+		? strSourceFile
+		: strSearchRoot;
+
+	FileDirectorySearcher findFiles;
+	vector<string> relatedFiles = findFiles.searchFiles(strSearchRoot + ".*", false);
+
+	for each (string strRelatedFile in relatedFiles)
+	{
+		// Source file does not qualify as a related file; skip
+		if (_strcmpi(strRelatedFile.c_str(), strSourceFile.c_str()) == 0)
+		{
+			continue;
+		}
+
+		string strSuffix = strRelatedFile.substr(strSearchRoot.size());
+		if (strSuffix.empty() || strSuffix[0] != '.')
+		{
+			UCLIDException ue("ELI49647", "Unexpected related file");
+			ue.addDebugInfo("Related file", strRelatedFile);
+			throw ue;
+		}
+
+		// For copy/move operations, compute the corresponding destination filename.
+		string strSourceSuffix = strSourceFile.substr(strSearchRoot.size());
+		string strRelatedDestFile = strDestFile;
+		if (!strRelatedDestFile.empty())
+		{
+			size_t nDestSuffixPos = strRelatedDestFile.length() - strSourceSuffix.length();
+			string strDestSuffix = strRelatedDestFile.substr(nDestSuffixPos);
+
+			if (_strcmpi(strSourceSuffix.c_str(), strDestSuffix.c_str()) != 0)
+			{
+				UCLIDException ue("ELI49651", "Unable to map related source file to destination.");
+				ue.addDebugInfo("Related source", strRelatedFile);
+				ue.addDebugInfo("Related dest", strRelatedDestFile);
+				throw ue;
+			}
+
+			strRelatedDestFile = strRelatedDestFile.substr(0, nDestSuffixPos) + strSuffix;
+		}
+
+		mapRelatedFiles[strRelatedFile] = strRelatedDestFile;
+	}
+
+	return mapRelatedFiles;
+}
+//-------------------------------------------------------------------------------------------------
+string CCopyMoveDeleteFileProcessor::getQualifyingRootFileName(const string& strTargetFile)
+{
+	// https://extract.atlassian.net/browse/ISSUE-16914
+	// This function will return a qualified root name to use in finding related files (or "" if no
+	// such root exists). The first qualification for a root to exist is that the specified strTargetFile
+	// has an expected extension (typical extension for a <SourceDocName>) and that the file itself exists).
+	string strExt = getExtensionFromFullPath(strTargetFile);
+
+	if (!strExt.empty() &&
+		m_setTargetExtensions.find(strExt) != m_setTargetExtensions.end() &&
+		fileExistsAndIsReadable(strTargetFile))
+	{
+		string strFilenameRoot = getPathAndFileNameWithoutExtension(strTargetFile);
+
+		// The last qualification for a root file is that the root itself does not exist as a file; 
+		// But this qualification should only be tested on the deepest root that otherwise qualified
+		// so recursion should happen before testing if the root exists.
+		// For example, for "Test.pdf.tif", "Test.pdf" is likely to exist, but that should not prevent
+		// testing whether "Test" qualifies as a root (where "Test" will not exist)
+		// OTOH, if "Test.pdf" does not exist, Test.pdf ends up becoming the root.
+		string strNestedRoot = getQualifyingRootFileName(strFilenameRoot);
+
+		if (!strNestedRoot.empty())
+		{
+			return strNestedRoot;
+		}
+		// strFilenameRoot is qualified if there is no file by that name.
+		// If strFilenameRoot is a directory per directoryExists, by Windows filesystem rules there
+		// cannot also be a file by that name.
+		else if (!isFileOrFolderValid(strFilenameRoot) || directoryExists(strFilenameRoot))
+		{
+			return strFilenameRoot;
+		}
+	}
+
+	return "";
 }
 //-------------------------------------------------------------------------------------------------
 bool CCopyMoveDeleteFileProcessor::checkDestinationFile(const std::string& strDestinationFile)
@@ -1199,4 +1393,3 @@ void CCopyMoveDeleteFileProcessor::handleDirectory(const std::string& strDestina
 		}
 	}
 }
-//-------------------------------------------------------------------------------------------------
