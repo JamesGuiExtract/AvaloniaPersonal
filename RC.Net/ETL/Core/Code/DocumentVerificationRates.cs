@@ -103,24 +103,27 @@ namespace Extract.ETL
         /// </summary>
         static readonly string _QUERY_FOR_SOURCE_RECORDS = Invariant($@"
             SELECT [FileTaskSession].[ID]
-                     ,[FileID]
-            		 ,[FileTaskSession].[ActionID]
-                     ,[TaskClassID]
-                     , COALESCE([Duration], 0.0) [Duration]
-                     , COALESCE([OverheadTime], 0.0) [OverheadTime]
-                     , COALESCE([ActivityTime], 0.0) [ActivityTime] 
-                 FROM [dbo].[FileTaskSession] 
-                   INNER JOIN [dbo].[TaskClass] ON [TaskClass].[ID] = [FileTaskSession].[TaskClassID]
-                   
-                 WHERE ([TaskClass].GUID IN 
-                           ('{Constants.TaskClassWebVerification}', 
-                            '{Constants.TaskClassDataEntryVerification}', 
-                            '{Constants.TaskClassRedactionVerification}',
-                            '{Constants.TaskClassPaginationVerification}')) 
-                       AND (([FileTaskSession].[ID] > @LastProcessedFileTaskSessionID 
-            			AND [FileTaskSession].[ID] < = @EndOfBatch
-            AND [FileTaskSession].[Duration] IS NOT NULL 
-            AND [FileTaskSession].OverheadTime IS NOT NULL))
+	            ,[FileID]
+	            ,[FileTaskSession].[ActionID]
+	            ,[TaskClassID]
+	            ,COALESCE([Duration], 0.0) [Duration]
+	            ,COALESCE([OverheadTime], 0.0) [OverheadTime]
+	            ,COALESCE([ActivityTime], 0.0) [ActivityTime]
+            FROM [dbo].[FileTaskSession]
+            INNER JOIN [dbo].[TaskClass]
+	            ON [TaskClass].[ID] = [FileTaskSession].[TaskClassID]
+            WHERE [TaskClass].GUID IN (
+		            '{Constants.TaskClassWebVerification}'
+		            ,'{Constants.TaskClassDataEntryVerification}'
+		            ,'{Constants.TaskClassRedactionVerification}'
+		            ,'{Constants.TaskClassPaginationVerification}'
+		            )
+	            AND [FileTaskSession].[ID] > @LastProcessedFileTaskSessionID
+	            AND [FileTaskSession].[ID] < = @EndOfBatch
+	            AND [FileTaskSession].[Duration] IS NOT NULL
+	            AND [FileTaskSession].OverheadTime IS NOT NULL
+                /* https://extract.atlassian.net/browse/ISSUE-16932 */
+	            AND ActionID IS NOT NULL
             ORDER BY ID ASC");
 
         /// <summary>
