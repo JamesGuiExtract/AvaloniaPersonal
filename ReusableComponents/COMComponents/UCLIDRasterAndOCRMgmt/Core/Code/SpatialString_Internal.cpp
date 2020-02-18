@@ -4689,7 +4689,20 @@ void CSpatialString::savePagesToArchive(const string& strOutputFile, IIUnknownVe
 		string baseName(pszTemp);
 		string internalPath = baseName + "." + asString(page->OCREngineVersion) + ".uss";
 
-		z.AddFileToPathInZip(bstrtTmpPagePath, internalPath.c_str());
+        int retries = 0;
+        while (!z.AddFileToPathInZip(bstrtTmpPagePath, internalPath.c_str()))
+        {
+            if (retries >= 50)
+            {
+                UCLIDException ue("ELI49657", "Unable to save pages to uss file.");
+                ue.addDebugInfo("OutputFile", strOutputFile);
+                ue.addDebugInfo("NumberOfRetries", retries);
+                throw ue;
+            }
+            retries++;
+            Sleep(100);
+            z.OpenZip(strOutputFile.c_str(), NULL, bAppend);
+        }
 	}
 }
 //-------------------------------------------------------------------------------------------------
