@@ -38,6 +38,9 @@ protected:
 	void stopListening();
 
 protected:
+	// This method is called before the file is checked for readablity  
+	// returns true if the file name matches the pattern being watched for
+	virtual bool fileMatchPattern(const std::string& /*strFileName*/) { return true; }
 	// following methods can be overridden in the derived class
 	// REQUIRE: These handlers MAY NOT throw exceptions 
 	// REQUIRE: These handlers must be written THREAD SAFE

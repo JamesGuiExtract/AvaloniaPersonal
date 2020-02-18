@@ -430,7 +430,8 @@ UINT FolderEventsListener::threadDispatchEvents(LPVOID pParam)
 					FolderEvent event;
 					fl->m_queEvents.getTopAndPop(event);
 
-					if(event.m_nEvent == kFileAdded || event.m_nEvent == kFileModified || event.m_nEvent == kFileRenamed)
+					if((event.m_nEvent == kFileAdded || event.m_nEvent == kFileModified || event.m_nEvent == kFileRenamed) &&
+						fl->fileMatchPattern(event.m_strFileNameNew))
 					{
 						if(!fl->fileReadyForAccess(event.m_strFileNameNew))
 						{

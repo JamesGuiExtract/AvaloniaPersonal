@@ -123,6 +123,7 @@ protected:
 	virtual bool shouldStop();
 
 	// overrides for FolderEventsListener
+	virtual bool fileMatchPattern(const std::string& strFileName);
 	virtual void onFileAdded(const std::string& strFileName);
 	virtual void onFileRemoved(const std::string& strFileName);
 	virtual void onFileRenamed(const std::string& strOldName, const std::string strNewName);

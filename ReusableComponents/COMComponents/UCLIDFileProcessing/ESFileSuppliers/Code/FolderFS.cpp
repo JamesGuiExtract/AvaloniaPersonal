@@ -834,6 +834,16 @@ bool CFolderFS::shouldStop()
 //-------------------------------------------------------------------------------------------------
 // FolderEventsListener overridden functions
 //-------------------------------------------------------------------------------------------------
+bool CFolderFS::fileMatchPattern(const std::string& strFileName)
+{
+	try
+	{
+		string strTmp = getFileNameFromFullPath(strFileName);
+		return doesFileMatchPatterns(m_vecFileExtensions, strTmp);
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI49660");
+}
+//-------------------------------------------------------------------------------------------------
 void CFolderFS::onFileAdded(const std::string& strFileName)
 {
 	try
