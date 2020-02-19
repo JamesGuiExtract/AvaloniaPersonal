@@ -1,0 +1,74 @@
+﻿<UserControl x:Class="DatabaseMigrationWizard.Pages.Import"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:pages="clr-namespace:DatabaseMigrationWizard.Pages"
+             xmlns:pages1="clr-namespace:DatabaseMigrationWizard.Pages.Utility"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <Style x:Key="TextBoxInError" TargetType="{x:Type TextBox}">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="ToolTip"
+              Value="{Binding RelativeSource={x:Static RelativeSource.Self},
+                              Path=(Validation.Errors)[0].ErrorContent}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <pages1:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+    </UserControl.Resources>
+    <Grid Style="{StaticResource ContentRoot}">
+        <ScrollViewer>
+            <StackPanel MinWidth="200">
+                <TextBlock Text="Import Path" Style="{StaticResource Heading2}" Margin="0,0,0,8" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBox 
+                        Grid.Column="0"
+                    x:Name="ImportPath" 
+                    Style="{StaticResource TextBoxInError}"
+                    Margin="0,0,0,8">
+                        <TextBox.Text>
+                            <Binding 
+                            Path="ImportOptions.ImportPath"
+                            Mode="TwoWay"
+                            UpdateSourceTrigger="PropertyChanged"
+                            ValidatesOnNotifyDataErrors="True"
+                            ValidatesOnDataErrors="True"
+                            NotifyOnValidationError="True">
+                                <Binding.ValidationRules>
+                                    <pages:DirectoryRule ValidatesOnTargetUpdated="True"></pages:DirectoryRule>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                    <Button Grid.Column="1" x:Name="FolderButton" Content="Select Folder" Margin="0,0,0,8" Click="FolderButton_Click"/>
+                    <Button Grid.Column="2" x:Name="FolderBrowser" Content="Browse" Margin="0,0,0,8" Click="FolderBrowser_Click"/>
+                </Grid>
+                <CheckBox IsChecked="{Binding ImportOptions.ClearDatabase}" Content="Clear the database?" Margin="0,0,0,8"/>
+                <Button Content="Import" Margin="0,0,0,8" Click="Import_Click"/>
+            </StackPanel>
+        </ScrollViewer>
+        <ScrollViewer Margin="0,150,0,0">
+            <StackPanel>
+                <TextBlock Text="Processing" Style="{StaticResource Heading2}" Margin="0,0,0,8" HorizontalAlignment="Left"/>
+                <ListBox ItemsSource="{Binding Processing}" Margin="0,0,0,32" HorizontalAlignment="Left" DisplayMemberPath=".">
+                </ListBox>
+            </StackPanel>
+        </ScrollViewer>
+        <ScrollViewer Margin="0,150,0,0">
+            <StackPanel>
+                <TextBlock Text="Completed" Style="{StaticResource Heading2}" Margin="0,0,10,8" HorizontalAlignment="Right"/>
+                <ListBox ItemsSource="{Binding Completed}" Margin="0,0,10,8" HorizontalAlignment="Right">
+                </ListBox>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

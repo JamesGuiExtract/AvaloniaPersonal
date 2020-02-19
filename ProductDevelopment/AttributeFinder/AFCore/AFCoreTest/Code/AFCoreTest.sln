@@ -1181,6 +1181,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Tab
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database Migration Wizard", "..\..\..\..\..\RC.Net\Database Migration Wizard\Database Migration Wizard\Database Migration Wizard.csproj", "{481D8253-54B0-41CA-B667-9E2CB0A6968E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -6074,6 +6076,36 @@ Global
 		{59BC0149-830C-4515-BE56-32503FA73AD6}.Template|x64.Build.0 = Release|Any CPU
 		{59BC0149-830C-4515-BE56-32503FA73AD6}.Template|x86.ActiveCfg = Release|Any CPU
 		{59BC0149-830C-4515-BE56-32503FA73AD6}.Template|x86.Build.0 = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Debug|Win32.Build.0 = Debug|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Debug|x64.Build.0 = Debug|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Debug|x86.Build.0 = Debug|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Release|Win32.ActiveCfg = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Release|Win32.Build.0 = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Release|x64.ActiveCfg = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Release|x64.Build.0 = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Release|x86.ActiveCfg = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Release|x86.Build.0 = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Template|Any CPU.ActiveCfg = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Template|Any CPU.Build.0 = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Template|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Template|Mixed Platforms.Build.0 = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Template|Win32.ActiveCfg = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Template|Win32.Build.0 = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Template|x64.ActiveCfg = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Template|x64.Build.0 = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Template|x86.ActiveCfg = Release|Any CPU
+		{481D8253-54B0-41CA-B667-9E2CB0A6968E}.Template|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
