@@ -139,8 +139,15 @@ STDMETHODIMP CCopyMoveDeleteFileProcessorPP::Apply(void)
 				ipFP->CreateFolder = (m_btnCreateFolder.GetCheck() == BST_CHECKED) 
 					? VARIANT_TRUE : VARIANT_FALSE;
 
-				// Set flag for modifing the source doc name
-				ipFP->ModifySourceDocName = asVariantBool(m_btnModifySourceDocName.GetCheck() == BST_CHECKED);
+				if (_strcmpi(asString(bstrSrcFileName).c_str(), "<SourceDocName>") == 0)
+				{
+					// Set flag for modifing the source doc name
+					ipFP->ModifySourceDocName = asVariantBool(m_btnModifySourceDocName.GetCheck() == BST_CHECKED);
+				}
+				else
+				{
+					ipFP->ModifySourceDocName = VARIANT_FALSE;
+				}
 
 				// Handle Destination radio buttons
 				if (m_radioDstErr.GetCheck() == BST_CHECKED)
@@ -311,6 +318,8 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, L
 			{
 				THROW_LOGIC_ERROR_EXCEPTION("ELI19425");
 			}
+
+			updateEnabledState();
 		}
 
 		SetDirty(FALSE);
@@ -456,6 +465,19 @@ LRESULT CCopyMoveDeleteFileProcessorPP::OnBnClickedCheckSecureDelete(WORD wNotif
 		updateEnabledState();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32862");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CCopyMoveDeleteFileProcessorPP::OnCbnSrcFileKillFocus(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		updateEnabledState();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI49669");
 
 	return 0;
 }
@@ -650,6 +672,11 @@ void CCopyMoveDeleteFileProcessorPP::updateEnabledState()
 	BOOL bEnableSecureDelete = asMFCBool(bMoveSelected || bDeleteSelected);
 	BOOL bEnableForSecureDelete = asMFCBool(bDeleteSelected && bSecureDeleteSelected);
 
+	CString zSrcFileName;
+	m_cmbSrc.GetWindowText(zSrcFileName);
+	BOOL bEnableModifySourceDocName = bDisableForDelete &&
+		_strcmpi(((LPCTSTR)zSrcFileName), "<SourceDocName>") == 0;
+
 	// Disable or enable destination controls
 	m_cmbDst.EnableWindow(bDisableForDelete);
 	m_btnDstSelectTag.EnableWindow(bDisableForDelete);
@@ -659,7 +686,7 @@ void CCopyMoveDeleteFileProcessorPP::updateEnabledState()
 	m_radioDstErr.EnableWindow(bDisableForDelete);
 	m_radioDstSkip.EnableWindow(bDisableForDelete);
 	m_radioDstOver.EnableWindow(bDisableForDelete);
-	m_btnModifySourceDocName.EnableWindow(bDisableForDelete);
+	m_btnModifySourceDocName.EnableWindow(bEnableModifySourceDocName);
 
 	// Enable or disable readonly checkbox
 	m_btnAllowReadonly.EnableWindow(bEnableForDelete);

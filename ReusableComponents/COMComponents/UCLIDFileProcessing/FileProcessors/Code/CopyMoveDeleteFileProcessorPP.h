@@ -49,6 +49,7 @@ BEGIN_MSG_MAP(CCopyMoveDeleteFileProcessorPP)
 	COMMAND_HANDLER(IDC_BTN_SELECT_DST_DOC_TAG, BN_CLICKED, OnClickedBtnDstSelectTag)
 	COMMAND_HANDLER(IDC_BTN_BROWSE_DST, BN_CLICKED, OnClickedBtnDstBrowse)
 	COMMAND_HANDLER(IDC_CHECK_SECURE_DELETE, BN_CLICKED, OnBnClickedCheckSecureDelete)
+	COMMAND_HANDLER(IDC_CMB_SRC_FILE, CBN_KILLFOCUS, OnCbnSrcFileKillFocus)
 	// REFLECT_NOTIFICATIONS needed by ImageButtonWithSytle
 	REFLECT_NOTIFICATIONS()
 END_MSG_MAP()
@@ -71,6 +72,7 @@ END_MSG_MAP()
 	LRESULT OnCbnSelEndCancelCmbSrcFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnCbnSelEndCancelCmbDstFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnBnClickedCheckSecureDelete(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnCbnSrcFileKillFocus(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 private:
 	///////////
