@@ -72,6 +72,9 @@
     <Reference Include="Microsoft.AspNetCore.Mvc.Formatters.Json, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Mvc.Formatters.Json.1.1.2\lib\net451\Microsoft.AspNetCore.Mvc.Formatters.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc.Versioning, Version=1.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Mvc.Versioning.1.2.1\lib\net451\Microsoft.AspNetCore.Mvc.Versioning.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNetCore.Mvc.ViewFeatures, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Mvc.ViewFeatures.1.1.2\lib\net451\Microsoft.AspNetCore.Mvc.ViewFeatures.dll</HintPath>
     </Reference>

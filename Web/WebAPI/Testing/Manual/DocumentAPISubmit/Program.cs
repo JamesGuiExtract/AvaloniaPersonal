@@ -123,7 +123,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
                 testBackendApi = !string.IsNullOrWhiteSpace(backendApiUrl)
                     || !string.IsNullOrWhiteSpace(backendApiUrlFile);
 
-                if (testDocumentApi && processText)
+                if (testBackendApi && processText)
                 {
                     processText = false;
                     Log("Text processing is disabled to test backend API");
@@ -194,7 +194,7 @@ namespace Extract.Web.WebAPI.DocumentAPISubmit
             int totalTasksStarted = 0;
             int totalTasksCompleted = 0;
 
-            while (t.Elapsed < _settings.minTimeToRun!)
+            while (t.Elapsed < _settings.minTimeToRun)
             {
                 Log($"------------ {DateTime.Now} Starting new test set ------------");
                 var t2 = new Stopwatch();

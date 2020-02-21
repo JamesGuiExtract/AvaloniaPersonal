@@ -15,7 +15,8 @@ The utility assumes the following of an active FAM workflow:
 	- Sets to complete the actions required for the file to be considered complete in the workflow
 	- Work on image files as well as text files.
 	- Text files will be generated for each source document pre-pended with the source filename from which they came. This may be useful in to "fake" rule results for a test that focuses on the API calls and not rules execution).
-	- Generate and output file (both for posted images and posted text) based on the data found by the rules
+	- Generate an output file (both for posted images and posted text) based on the data found by the rules.
+	- The output file should be the same format as the source document but should be a separate file. A uss file should not be produced (tester will not expect result for image input)
 
 AppBackendAPI:
 - To test the AppBackendAPI, the utility will be looking for queued files (either via the DocumentAPI tests or another process that is setting files to pending in verify)

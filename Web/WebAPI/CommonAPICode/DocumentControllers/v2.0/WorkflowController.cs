@@ -7,20 +7,25 @@ using WebAPI.Models;
 using static WebAPI.Utils;
 
 
-namespace WebAPI.Controllers
+namespace WebAPI.Controllers.v2_0
 {
     /// <summary>
     /// workflow controller
     /// </summary>
     [Authorize]
-    [ApiVersion("3.0")]
-    [Route("api/v3.0/[controller]")]
+    [ApiVersion("2.0")]
+    [Route("api/v2.0/[controller]")]
     // All controller versions will be mapped to "api/[controller]"; 
     // Utils.CurrentApiContext.ApiVersion will determine which to us at this route.
     [Route("api/[controller]")]
     [EnableCors("AllowAll")]
     public class WorkflowController : Controller
     {
+        //[HttpGet]
+        //[Route("api/v2.0/[controller]")]
+        //public IActionResult Get(ApiVersion apiVersion) =>
+        //    Ok(new { Action = nameof(Get), Version = apiVersion.ToString() });
+
         /// <summary>
         /// Gets the overall status of the workflow (# of files in each state)
         /// </summary>

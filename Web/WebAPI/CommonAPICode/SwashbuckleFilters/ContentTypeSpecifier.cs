@@ -1,9 +1,11 @@
 ﻿using Extract;
+using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace WebAPI.Filters
 {
@@ -24,13 +26,13 @@ namespace WebAPI.Filters
         {
             try
             {
-                if (operation.OperationId == "ApiDocumentByIdGet")
+                if (Regex.IsMatch(operation.OperationId, @"(?ix)Api(V\d+\.\d+)?DocumentByIdGet"))
                 {
                     operation.Produces.Clear();
                     operation.Produces.Add("image/tiff");
                     operation.Produces.Add("application/pdf");
                 }
-                else if (operation.OperationId == "ApiDocumentByIdOutputFileGet")
+                else if (Regex.IsMatch(operation.OperationId, @"(?ix)Api(V\d +\.\d +)?DocumentByIdOutputFileGet"))
                 {
                     operation.Produces.Clear();
                     operation.Produces.Add("image/tiff");
@@ -48,15 +50,30 @@ namespace WebAPI.Filters
                     operation.Produces.Add("application/json");
                 }
 
-                if (operation.OperationId == "ApiDocumentPost")
+                if (Regex.IsMatch(operation.OperationId, @"(?ix)Api(V\d+\.\d+)?DocumentPost"))
                 {
                     operation.Consumes.Clear();
                     operation.Consumes.Add("multipart/form-data");
                 }
-                else if (operation.OperationId == "ApiDocumentTextPost")
+                else if (Regex.IsMatch(operation.OperationId, @"(?ix)Api(V\d+\.\d+)?DocumentTextPost"))
                 {
                     operation.Consumes.Clear();
-                    operation.Consumes.Add("multipart/form-data; charset=utf-8");
+
+                    // Starting in version 3.0, DocumentTextPost should report a consumed content type
+                    // of "multipart/form-data; charset=utf-8"
+                    if (!context.ApiDescription.TryGetMethodInfo(out var methodInfo)
+                        || methodInfo.DeclaringType.GetCustomAttributes(true)
+                            .OfType<ApiVersionAttribute>()
+                            .SelectMany(c => c.Versions)
+                            .Any(v => v.MajorVersion >= 3))
+                    {
+                        operation.Consumes.Add("multipart/form-data; charset=utf-8");
+                    }
+                    else
+                    {
+                        // The original API versions reported a consumed content type of "text/plain"
+                        operation.Consumes.Add("text/plain");
+                    }
                 }
                 else if (context.ApiDescription.HttpMethod != "GET")
                 {

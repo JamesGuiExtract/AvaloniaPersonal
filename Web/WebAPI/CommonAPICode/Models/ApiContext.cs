@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 
@@ -19,8 +20,21 @@ namespace WebAPI.Models
         const string _defaultRetryTimeout = "120";
 
         /// <summary>
+        /// The API version initially released to customers (before versioning was instituted).
+        /// This is the version that should be assumed if no version is specified.
+        /// </summary>
+        public const string LEGACY_VERSION = "2.0";
+
+        /// <summary>
+        /// The current API version 
+        /// </summary>
+        public const string CURRENT_VERSION = "3.0";
+
+
+        /// <summary>
         /// This class maintains the essential API context data - Database server name, database name, and workflow name
         /// </summary>
+        /// <param name="apiVersion">The API version to use</param>
         /// <param name="databaseServerName">server name</param>
         /// <param name="databaseName">database name</param>
         /// <param name="workflowName">workflow name</param>
@@ -33,7 +47,8 @@ namespace WebAPI.Models
         /// <param name="exceptionLogFilter">Specifies the HTTP result codes that should not be logged
         /// to the main Extract exception log. Specify <c>null</c> to use the default value or empty
         /// string to log all error codes.</param>
-        public ApiContext(string databaseServerName,
+        public ApiContext(string apiVersion,
+                          string databaseServerName,
                           string databaseName,
                           string workflowName,
                           string numberOfConnectionRetries = "",
@@ -42,6 +57,8 @@ namespace WebAPI.Models
                           string requestWaitTimeout = "",
                           string exceptionLogFilter = null)
         {
+            ApiVersion = ApiVersion.Parse(apiVersion ?? LEGACY_VERSION);
+
             HTTPError.Assert("ELI46375", !String.IsNullOrWhiteSpace(databaseServerName),
                 "Database server name is empty");
             DatabaseServerName = databaseServerName;
@@ -102,6 +119,11 @@ namespace WebAPI.Models
                 }
             }
         }
+
+        /// <summary>
+        /// The API version to use.
+        /// </summary>
+        public ApiVersion ApiVersion { get; }
 
         /// <summary>
         /// The number of times to retry DB connection on failure

@@ -51,7 +51,9 @@ namespace Extract.Web.WebAPI.Test
         /// basic test of login funcitonality - login as admin
         /// </summary>
         [Test, Category("Automated")]
-        public static void Test_Login()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_Login(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_Login";
 
@@ -59,7 +61,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                     _testDbManager.InitializeEnvironment<TestUsers, UsersController>
-                        ("Resources.Demo_LabDE.bak", dbName, "Admin", "a");
+                        (apiVersion, "Resources.Demo_LabDE.bak", dbName, "Admin", "a");
 
                 // Login should not be allowed for Admin account
                 var result = userController.Login(user);

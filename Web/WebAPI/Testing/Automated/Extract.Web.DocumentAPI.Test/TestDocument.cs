@@ -154,14 +154,16 @@ namespace Extract.Web.WebAPI.Test
         /// Tests both DocumentController.PostDocument
         /// </summary>
         [Test, Category("Automated")]
-        public static void Test_PostDocument()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_PostDocument(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_PostDocument";
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 var filename = _testFiles.GetFile("Resources.A418.tif");
                 using (var stream = new FileStream(filename, FileMode.Open))
@@ -205,7 +207,9 @@ namespace Extract.Web.WebAPI.Test
         /// Tests https://extract.atlassian.net/browse/ISSUE-16872
         /// </summary>
         [Test, Category("Automated")]
-        public static void Test_PostDocumentMetadata()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_PostDocumentMetadata(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_PostDocumentMetadata";
 
@@ -213,7 +217,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                 _testDbManager.InitializeEnvironment<TestDocument, UsersController>
-                    ("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    (apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 // Add metadata fields to the DB before the DocumentData class gets around to caching which metadata
                 // fields exist.
@@ -252,7 +256,9 @@ namespace Extract.Web.WebAPI.Test
         /// Tests https://extract.atlassian.net/browse/ISSUE-16872
         /// </summary>
         [Test, Category("Automated")]
-        public static void Test_PostDocumentMetadataCornerCases()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_PostDocumentMetadataCornerCases(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_PostDocumentMetadataCornerCases";
 
@@ -260,7 +266,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                 _testDbManager.InitializeEnvironment<TestDocument, UsersController>
-                    ("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    (apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 // Add metadata field to the DB before the DocumentData class gets around to caching which metadata
                 // fields exist.
@@ -310,14 +316,16 @@ namespace Extract.Web.WebAPI.Test
         /// Tests both DocumentData.SubmitText and DocumentData.GetSourceFileName
         /// </summary>
         [Test, Category("Automated")]
-        public static void Test_PostText()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_PostText(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_PostText";
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 var result = controller.PostText("Document 1, SSN: 111-22-3333, DOB: 10-04-1999");
                 var submitResult = result.AssertGoodResult<DocumentIdResult>();
@@ -333,14 +341,16 @@ namespace Extract.Web.WebAPI.Test
         }
 
         [Test, Category("Automated")]
-        public static void Test_UTF8Text()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_UTF8Text(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_UTF8Text";
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 var testText = "¡Buenos días! ¿Cómo estás? It's 212°!";
 
@@ -363,14 +373,16 @@ namespace Extract.Web.WebAPI.Test
         }
 
         [Test, Category("Automated")]
-        public static void Test_GetStatus()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_GetStatus(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_GetStatus";
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 for (int i = 1; i <= 10; ++i)
                 {
@@ -387,7 +399,9 @@ namespace Extract.Web.WebAPI.Test
         }
 
         [Test, Category("Automated")]
-        public static void Test_GetOutputFile()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_GetOutputFile(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_GetOutputFile";
             var tempFiles = new List<string>();
@@ -395,7 +409,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 var workflowId = fileProcessingDb.GetWorkflowID(ApiTestUtils.CurrentApiContext.WorkflowName);
                 var workflow = fileProcessingDb.GetWorkflowDefinition(workflowId);
@@ -429,14 +443,16 @@ namespace Extract.Web.WebAPI.Test
         }
 
         [Test, Category("Automated")]
-        public static void Test_PostGetDeleteFile()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_PostGetDeleteFile(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_PostGetDeleteFile";
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 var filename = _testFiles.GetFile("Resources.A418.tif");
                 using (var stream = new FileStream(filename, FileMode.Open))
@@ -469,14 +485,16 @@ namespace Extract.Web.WebAPI.Test
         }
 
         [Test, Category("Automated")]
-        public static void Test_GetPageInfoAndText()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_GetPageInfoAndText(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_GetPageInfoAndText";
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 var testFilename = _testFiles.GetFile(_TEST_FILE_C413);
                 var ussFilename = _testFiles.GetFile(_TEST_FILE_C413_USS);
@@ -539,14 +557,16 @@ namespace Extract.Web.WebAPI.Test
         }
 
         [Test, Category("Automated")]
-        public static void Test_GetDocumentWordZones()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_GetDocumentWordZones(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_GetDocumentWordZones";
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 string testFileName = _testFiles.GetFile(_TEST_FILE_C413);
                 string ussFileName = _testFiles.GetFile(_TEST_FILE_C413_USS);
@@ -603,14 +623,16 @@ namespace Extract.Web.WebAPI.Test
         }
 
         [Test, Category("Automated")]
-        public static void Test_GetTextResult()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_GetTextResult(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_GetTextResult";
 
             try
             {   
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 var filename = _testFiles.GetFile("Resources.ResultText.txt");
                 SetupMetadataFieldValue(1, filename, OutputFileMetadataFieldID, dbName);
@@ -629,14 +651,16 @@ namespace Extract.Web.WebAPI.Test
         }
 
         [Test, Category("Automated")]
-        public static void Test_GetDocumentType()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_GetDocumentType(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_GetDocumentType";
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 for (int i = 1; i <= MaxDemo_LabDE_FileId; ++i)
                 {
@@ -670,14 +694,16 @@ namespace Extract.Web.WebAPI.Test
         /// test IDShield documents
         /// </summary>
         [Test, Category("Automated")]
-        public static void TestIDShield_GetDocumentData()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void TestIDShield_GetDocumentData(string apiVersion)
         {
             string dbName = "DocumentAPI_TestIDShield_GetDocumentData";
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
 
                 foreach (var kvpFileInfo in IDShieldFileIdToFileInfo)
                 {
@@ -701,14 +727,16 @@ namespace Extract.Web.WebAPI.Test
         /// Test IDShield documents
         /// </summary>
         [Test, Category("Automated")]
-        public static void Test_PutDocumentData()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_PutDocumentData(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_PutDocumentData";
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
 
                 var testFilename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001);
                 var ussFilename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001_USS);
@@ -833,14 +861,16 @@ namespace Extract.Web.WebAPI.Test
         /// Tests https://extract.atlassian.net/browse/ISSUE-16747
         /// </summary>
         [Test, Category("Automated")]
-        public static void Test_PutMinimalDocumentData()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_PutMinimalDocumentData(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_PutMinimalDocumentData";
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
 
                 var testFilename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001);
                 var ussFilename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001_USS);
@@ -872,15 +902,17 @@ namespace Extract.Web.WebAPI.Test
         /// Tests that document data can be updated via put and patch when documents are in P/S, C and F.
         /// Tests https://extract.atlassian.net/browse/ISSUE-16748
         [Test, Category("Automated")]
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
 
-        public static void Test_PutPatchNonPendingFile()
+        public static void Test_PutPatchNonPendingFile(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_PutPatchNonPendingFile";
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
 
                 var workflowId = fileProcessingDb.GetWorkflowID(ApiTestUtils.CurrentApiContext.WorkflowName);
                 var workflow = fileProcessingDb.GetWorkflowDefinition(workflowId);
@@ -1027,14 +1059,16 @@ namespace Extract.Web.WebAPI.Test
         /// Test IDShield documents
         /// </summary>
         [Test, Category("Automated")]
-        public static void Test_PatchDocumentData()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_PatchDocumentData(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_PatchDocumentData";
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 var testFilename = _testFiles.GetFile(_TEST_FILE_C413);
                 var ussFilename = _testFiles.GetFile(_TEST_FILE_C413_USS);
@@ -1152,14 +1186,16 @@ namespace Extract.Web.WebAPI.Test
         }
 
         [Test, Category("Automated")]
-        public static void TestLabDE_GetDocumentData()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void TestLabDE_GetDocumentData(string apiVersion)
         {
             string dbName = "DocumentAPI_TestLabDE_GetDocumentData";
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 foreach (var kvpFileInfo in LabDEFileIdToFileInfo)
                 {
@@ -1185,14 +1221,16 @@ namespace Extract.Web.WebAPI.Test
         /// test FlexIndex documents
         /// </summary>
         [Test, Category("Automated")]
-        public static void TestFlexIndex_GetDocumentData()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void TestFlexIndex_GetDocumentData(string apiVersion)
         {
             string dbName = "DocumentAPI_TestFlexIndex_GetDocumentData";
 
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_FlexIndex.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_FlexIndex.bak", dbName, "jon_doe", "123");
 
                 foreach (var kvpFileInfo in FlexIndexFileIdToFileInfo)
                 {
@@ -1239,7 +1277,9 @@ namespace Extract.Web.WebAPI.Test
         /// https://extract.atlassian.net/browse/ISSUE-16745
         /// </summary>
         [Test, Category("Automated")]
-        public static void Test_ProperWorkflowActionNamesUsed()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_ProperWorkflowActionNamesUsed(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_ProperWorkflowActionNamesUsed";
 
@@ -1254,7 +1294,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
-                    InitializeAndLogin("Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
+                    InitializeAndLogin(apiVersion, "Resources.Demo_IDShield.bak", dbName, "jon_doe", "123");
 
                 var filename = _testFiles.GetFile(_TEST_FILE_TESTIMAGE001);
 
@@ -1486,11 +1526,11 @@ namespace Extract.Web.WebAPI.Test
         #endregion Public Test Functions
 
         static (FileProcessingDB fileProcessingDb, User user, DocumentController DocumentController)
-        InitializeAndLogin(string dbResource, string dbName, string username, string password)
+        InitializeAndLogin(string apiVersion, string dbResource, string dbName, string username, string password)
         {
             (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                 _testDbManager.InitializeEnvironment<TestDocument, UsersController>
-                    (dbResource, dbName, username, password);
+                    (apiVersion, dbResource, dbName, username, password);
 
             var result = userController.Login(user);
             var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -1522,25 +1562,6 @@ namespace Extract.Web.WebAPI.Test
 
                     conn.Close();
                 }
-            }
-        }
-
-        static DocumentDataResult GetDocumentResultSet(int fileId, string dbName)
-        {
-            try
-            {
-                ApiTestUtils.SetDefaultApiContext(dbName);
-
-                using (var data = new DocumentData(Utils.CurrentApiContext))
-                {
-                    Assert.IsTrue(data != null, "null DocumentData reference");
-                    return data.GetDocumentData(fileId, includeNonSpatial: true,
-                        verboseSpatialData: true, splitMultiPageAttributes: false, cacheData: false);
-                }
-            }
-            finally
-            {
-                FileApiMgr.ReleaseAll();
             }
         }
 

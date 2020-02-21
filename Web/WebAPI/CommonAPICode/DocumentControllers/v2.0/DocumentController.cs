@@ -4,24 +4,24 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using System;
 using System.IO;
+using System.Net;
 using System.Text.RegularExpressions;
 using UCLID_FILEPROCESSINGLib;
 using WebAPI.Models;
 
-namespace WebAPI.Controllers
+namespace WebAPI.Controllers.v2_0
 {
     /// <summary>
     /// A REST API <see cref="Controller"/> to add/retrieve and interact with a FAM workflow.
     /// </summary>
     [Authorize]
-    [ApiVersion("3.0")]
-    [Route("api/v3.0/[controller]")]
+    [ApiVersion("2.0")]
+    [Route("api/v2.0/[controller]")]
     // All controller versions will be mapped to "api/[controller]"; 
     // Utils.CurrentApiContext.ApiVersion will determine which to us at this route.
-    [Route("api/[controller]")] 
+    [Route("api/[controller]")]
     [EnableCors("AllowAll")]
     public class DocumentController : Controller
     {
@@ -35,7 +35,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         // NOTE: If method name changes, ContentTypeSpecifier and FileUploadOperation should be updated to match.
-        public IActionResult PostDocument([FromForm] IFormFile file)
+        public IActionResult PostDocument(IFormFile file)
         {
             try
             {
@@ -77,12 +77,7 @@ namespace WebAPI.Controllers
         /// <param name="Id">The document ID</param>
         /// <returns>The original image file associated with the file id</returns>
         [HttpGet("{Id}")]
-        // For NSwag auto-client generation; see also: MapType<FileResult> in ConfigureServices
-        [SwaggerResponse(200, typeof(FileResult))]
-        // Specify FileResult base type. If PhysicalFileResult is specified, the swagger
-        // documentation lists the model as the return type with the physical path providing the
-        // file which can be confusing for a consumer needing to stream the file.
-        [ProducesResponseType(200, Type = typeof(FileResult))]
+        [ProducesResponseType(200, Type = typeof(PhysicalFileResult))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404, Type = typeof(ErrorResult))]
@@ -148,7 +143,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         // NOTE: If method name changes, ContentTypeSpecifier should be updated to match.
-        public IActionResult PostText([FromForm] string textData)
+        public IActionResult PostText([FromBody]string textData)
         {
             try
             {
@@ -505,14 +500,9 @@ namespace WebAPI.Controllers
         /// Gets the output file for the specified input document (e.g., a redacted copy or a searchable PDF)
         /// </summary>
         /// <param name="Id">The document ID</param>
-        /// <returns>The output document that reflects any redactions/transformations applied by the workflow.</returns>
+        /// <returns>A <see cref="PhysicalFileResult"/>.</returns>
         [HttpGet("{Id}/OutputFile")]
-        // For NSwag auto-client generation; see also: MapType<FileResult> in ConfigureServices
-        [SwaggerResponse(200, typeof(FileResult))]
-        // Specify FileResult base type. If PhysicalFileResult is specified, the swagger
-        // documentation lists the model as the return type with the physical path providing the
-        // file which can be confusing for a consumer needing to stream the file.
-        [ProducesResponseType(200, Type = typeof(FileResult))]
+        [ProducesResponseType(200, Type = typeof(PhysicalFileResult))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404, Type = typeof(ErrorResult))]

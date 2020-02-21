@@ -183,6 +183,7 @@ namespace WebAPI
         /// </summary>
         void InitializeDefaultValues()
         {
+            var apiVersion = Configuration["ApiVersion"];
             var databaseServer = Configuration["DatabaseServer"];
             var databaseName = Configuration["DatabaseName"];
             var workflowName = Configuration["DefaultWorkflow"];
@@ -190,7 +191,7 @@ namespace WebAPI
             var dbConnectionRetries = Configuration["DbNumberOfConnectionRetries"];
             var dbConnectionTimeout = Configuration["DbConnectionRetryTimeout"];
 
-            Utils.SetCurrentApiContext(databaseServer, databaseName, workflowName, dbConnectionRetries, dbConnectionTimeout);
+            Utils.SetCurrentApiContext(apiVersion, databaseServer, databaseName, workflowName, dbConnectionRetries, dbConnectionTimeout);
 
             Utils.ValidateCurrentApiContext();
 

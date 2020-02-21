@@ -1,6 +1,7 @@
 ﻿using Extract;
 using Microsoft.AspNetCore.Hosting;     // for IHostingEnvironment
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -118,6 +119,7 @@ namespace WebAPI
         /// <summary>
         /// set the default API context instance
         /// </summary>
+        /// <param name="apiVersion">The API version to use</param>
         /// <param name="databaseServerName">database server name</param>
         /// <param name="databaseName">database name</param>
         /// <param name="workflowName">workflow name</param>
@@ -130,7 +132,8 @@ namespace WebAPI
         /// <param name="exceptionLogFilter">Specifies the HTTP result codes that should not be logged
         /// to the main Extract exception log. Specify <c>null</c> to use the default value or empty
         /// string to log all error codes.</param>
-        public static void SetCurrentApiContext(string databaseServerName,
+        public static void SetCurrentApiContext(string apiVersion,
+                                                string databaseServerName,
                                                 string databaseName,
                                                 string workflowName,
                                                 string dbNumberOfConnectionRetries = "",
@@ -143,7 +146,8 @@ namespace WebAPI
             {
                 lock (_apiContextLock)
                 {
-                    _currentApiContext = new ApiContext(databaseServerName,
+                    _currentApiContext = new ApiContext(apiVersion,
+                                                        databaseServerName,
                                                         databaseName,
                                                         workflowName,
                                                         dbNumberOfConnectionRetries,
@@ -235,6 +239,7 @@ namespace WebAPI
         {
             try
             {
+                var apiVersion = CurrentApiContext.ApiVersion.ToString();
                 var workflowName = user.Claims.Where(claim => claim.Type == _WORKFLOW_NAME).Select(claim => claim.Value).FirstOrDefault();
                 var databaseServerName = CurrentApiContext.DatabaseServerName;
                 var databaseName = CurrentApiContext.DatabaseName;
@@ -246,7 +251,7 @@ namespace WebAPI
                 HTTPError.Assert("ELI46371", !String.IsNullOrWhiteSpace(workflowName),
                     "Workflow name is not provided");
 
-                var context = new ApiContext(databaseServerName, databaseName, workflowName);
+                var context = new ApiContext(apiVersion, databaseServerName, databaseName, workflowName);
                 context.SessionId = user.GetClaim(JwtRegisteredClaimNames.Jti);
                 context.FAMSessionId = user.Claims
                     .Where(claim => claim.Type.Equals(_FAM_SESSION_ID, StringComparison.OrdinalIgnoreCase))
@@ -324,12 +329,13 @@ namespace WebAPI
             // Get the current API context once to ensure thread safety.
             var context = CurrentApiContext;
 
+            var apiVersion = context.ApiVersion.ToString();
             var databaseServerName = context.DatabaseServerName;
             var databaseName = context.DatabaseName;
 
             var namedWorkflow = !String.IsNullOrWhiteSpace(workflowName) ? workflowName : context.WorkflowName;
 
-            return new ApiContext(databaseServerName, databaseName, namedWorkflow);
+            return new ApiContext(apiVersion, databaseServerName, databaseName, namedWorkflow);
         }
 
         /// <summary>

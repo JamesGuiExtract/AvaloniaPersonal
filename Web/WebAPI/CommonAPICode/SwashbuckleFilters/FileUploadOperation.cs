@@ -3,6 +3,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace WebAPI.Filters
 {
@@ -21,10 +22,10 @@ namespace WebAPI.Filters
         {
             try
             {
-                // “api” + [Controller name] + [Method Name] + [HTTP Verb]
+                // “api” + [optional version] + [Controller name] + [Method Name] + [HTTP Verb]
                 // Or in other words, it is the URL of your controller method, but without “/” + [HTTP Verb]
                 //            if (operation.OperationId.ToLower() == "apidocumentuploadfilepost")
-                if (operation.OperationId.IsEquivalent("ApiDocumentPost"))
+                if (Regex.IsMatch(operation.OperationId, @"(?ix)Api(V\d+\.\d+)?DocumentPost"))
                 {
                     // Clear all parameters EXCEPT for the authorization parameter, if it exists. Not doing this
                     // creates an order dependency - the auth filter needs to be AFTER the file upload filter. If

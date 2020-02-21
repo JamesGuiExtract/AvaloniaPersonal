@@ -57,7 +57,9 @@ namespace Extract.Web.WebAPI.Test
         /// basic test that list of current workflows can be retrieved
         /// </summary>
         [Test, Category("Automated")]
-        public static void Test_GetDefaultWorkflow()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_GetDefaultWorkflow(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_GetDefaultWorkflow";
 
@@ -65,7 +67,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
-                var c = ApiTestUtils.SetDefaultApiContext(dbName);
+                var c = ApiTestUtils.SetDefaultApiContext(apiVersion, dbName);
                 var fileApi = FileApiMgr.GetInterface(c);
 
                 try
@@ -94,7 +96,9 @@ namespace Extract.Web.WebAPI.Test
         /// basic test that list of current workflows can be retrieved
         /// </summary>
         [Test, Category("Automated")]
-        public static void Test_GetWorkflowStatus()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_GetWorkflowStatus(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_GetWorkflowStatus";
 
@@ -104,7 +108,7 @@ namespace Extract.Web.WebAPI.Test
 
                 (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
                     _testDbManager.InitializeEnvironment<TestWorkflow, UsersController>
-                        ("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                        (apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 // Should cause file 1 to be counted as incomplete.
                 fileProcessingDb.SetStatusForFile(1, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out EActionStatus oldStatus);
@@ -144,7 +148,9 @@ namespace Extract.Web.WebAPI.Test
         /// basic test that list of current workflows can be retrieved
         /// </summary>
         [Test, Category("Automated")]
-        public static void Test_GetFileStatuses()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_GetFileStatuses(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_GetFileStatuses";
 
@@ -154,7 +160,7 @@ namespace Extract.Web.WebAPI.Test
 
                 (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
                     _testDbManager.InitializeEnvironment<TestWorkflow, UsersController>
-                        ("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                        (apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 // Should cause file 1 to be counted as incomplete.
                 fileProcessingDb.SetStatusForFile(1, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out EActionStatus oldStatus);
@@ -200,7 +206,9 @@ namespace Extract.Web.WebAPI.Test
         /// basic test that list of current workflows can be retrieved
         /// </summary>
         [Test, Category("Automated")]
-        public static void Test_GetFileDeletion()
+        [TestCase(ApiContext.LEGACY_VERSION)]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_GetFileDeletion(string apiVersion)
         {
             string dbName = "DocumentAPI_Test_GetFileDeletion";
 
@@ -210,7 +218,7 @@ namespace Extract.Web.WebAPI.Test
 
                 (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
                     _testDbManager.InitializeEnvironment<TestWorkflow, UsersController>
-                        ("Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                        (apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 var documentController = user.CreateController<DocumentController>();
 

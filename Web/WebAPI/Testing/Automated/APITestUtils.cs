@@ -55,6 +55,7 @@ namespace Extract.Web.WebAPI.Test
         /// <summary>
         /// Initializes the FileProcessingDB, User, ApiContext and controller for a unit test.
         /// </summary>
+        /// <param name="apiVersion">The API version to use.</param>
         /// <param name="dbResource">The project resource name of the database to use.</param>
         /// <param name="dbName">Name to assign to the restored DB.</param>
         /// <param name="username">The database username to use for this context.</param>
@@ -62,14 +63,14 @@ namespace Extract.Web.WebAPI.Test
         /// <returns></returns>
         public static (FileProcessingDB fileProcessingDb, User user, TController controller)
             InitializeEnvironment<TTestClass, TController>
-                (this FAMTestDBManager<TTestClass> testManager, string dbResource, string dbName, string username, string password)
+                (this FAMTestDBManager<TTestClass> testManager, string apiVersion, string dbResource, string dbName, string username, string password)
                 where TController : ControllerBase, new()
         {
             try
             {
                 UnlockLeadtools.UnlockLeadToolsSupport();
                 FileProcessingDB fileProcessingDb = testManager.InitializeDatabase(dbResource, dbName);
-                ApiTestUtils.SetDefaultApiContext(dbName);
+                ApiTestUtils.SetDefaultApiContext(apiVersion, dbName);
                 fileProcessingDb.ActiveWorkflow = ApiTestUtils.CurrentApiContext.WorkflowName;
                 User user = CreateUser(username, password);
                 TController controller = CreateController<TController>(user);
@@ -85,14 +86,16 @@ namespace Extract.Web.WebAPI.Test
         /// <summary>
         /// Set the default API context info - this also creates a FileApi object.
         /// </summary>
+        /// <param name="apiVersion">The API version to use.</param>
         /// <param name="databaseName">The name of the FileProcessingDB for this context.</param>
         /// <param name="workflowName">The workflow to use in the database.</param>
         /// <param name="databaseServer">The database server name.</param>
-        public static ApiContext SetDefaultApiContext(string databaseName,
+        public static ApiContext SetDefaultApiContext(string apiVersion,
+                                                      string databaseName,
                                                       string workflowName = "CourtOffice",
                                                       string databaseServer = "(local)")
         {
-            var apiContext = new ApiContext(databaseServer, databaseName, workflowName);
+            var apiContext = new ApiContext(apiVersion, databaseServer, databaseName, workflowName);
             Utils.SetCurrentApiContext(apiContext);
             Utils.ValidateCurrentApiContext();
 

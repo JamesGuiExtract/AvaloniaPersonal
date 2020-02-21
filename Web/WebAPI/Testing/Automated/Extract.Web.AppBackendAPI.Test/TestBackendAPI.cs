@@ -805,7 +805,7 @@ namespace Extract.Web.WebAPI.Test
                 FileApiMgr.ReleaseAll();
 
                 // Reset the default context to ensure no crossover of session IDs.
-                ApiTestUtils.SetDefaultApiContext(dbName);
+                ApiTestUtils.SetDefaultApiContext(ApiContext.CURRENT_VERSION, dbName);
                 var controller2 = ApiTestUtils.CreateController<AppBackendController>(user);
 
                 // Simulate a client that still has a token a previous instance of the service that has since been closed.
@@ -2396,7 +2396,7 @@ namespace Extract.Web.WebAPI.Test
         {
             var (fileProcessingDb, user, controller) =
                 _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        ("Resources.Demo_IDShield.bak", dbName, username, password);
+                        (ApiContext.CURRENT_VERSION, "Resources.Demo_IDShield.bak", dbName, username, password);
 
             var actionID = fileProcessingDb.GetActionIDForWorkflow(_VERIFY_ACTION, fileProcessingDb.GetWorkflowID("CourtOffice"));
             AddFilesToDB(testFiles, fileProcessingDb, actionID);
