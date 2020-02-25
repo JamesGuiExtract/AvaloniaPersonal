@@ -5,7 +5,6 @@ open System
 open System.Reflection
 open UCLID_AFCORELib
 open UCLID_COMUTILSLib
-open Extract.AttributeFinder.Rules
 
 module RuleObjectConverter =
 
@@ -54,13 +53,14 @@ module RuleObjectConverter =
 
   let private getConverterForDomainObject (domain: obj) =
     match domain with
-    | :? IRuleSet -> Some (RuleSetConverter () :> IRuleObjectConverter)
-    | :? IObjectWithDescription -> Some (ObjectWithDescriptionConverter () :> IRuleObjectConverter)
+    | :? IRuleSet -> Ok (RuleSetConverter () :> IRuleObjectConverter)
+    | :? IObjectWithDescription -> Ok (ObjectWithDescriptionConverter () :> IRuleObjectConverter)
     | :? ICategorizedComponent as c ->
-      match descriptionToConverter.TryGetValue (c.GetComponentDescription ()) with
-      | true, converter -> Some converter
-      | false, _ -> None
-    | _ -> None
+      let description = c.GetComponentDescription ()
+      match descriptionToConverter.TryGetValue description with
+      | true, converter -> Ok converter
+      | false, _ -> Error description
+    | _ -> Error (domain.GetType().Name)
 
   let private getConverterForDtoObject (dto: obj) =
     match dtoTypeToConverter.TryGetValue (dto.GetType ()) with
@@ -74,8 +74,8 @@ module RuleObjectConverter =
         else
           let converter =
             match getConverterForDomainObject domain with
-            | Some converter -> converter
-            | None -> failwithf "Type, %s, not supported!" (domain.GetType ()).Name
+            | Ok converter -> converter
+            | Error description -> failwithf "Rule object, %s, is not supported!" description
           let typeName =
             let typ = converter.convertsDto
             typ.Name

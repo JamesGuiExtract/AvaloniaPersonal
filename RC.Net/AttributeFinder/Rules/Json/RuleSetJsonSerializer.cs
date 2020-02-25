@@ -107,7 +107,8 @@ namespace Extract.AttributeFinder.Rules.Json
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI49685", "Failed to compare rulesets");
+                new ExtractException("ELI49685", "Failed to convert ruleset to DTO", ex).Log();
+                return false;
             }
         }
 
@@ -123,7 +124,8 @@ namespace Extract.AttributeFinder.Rules.Json
             }
             catch (Exception ex)
             {
-                throw ex.CreateComVisible("ELI49695", "Failed to compare rulesets");
+                new ExtractException("ELI49695", "Failed to convert ruleset to DTO", ex).Log();
+                _unmodifiedRuleSet = _defaultRuleSet;
             }
         }
 

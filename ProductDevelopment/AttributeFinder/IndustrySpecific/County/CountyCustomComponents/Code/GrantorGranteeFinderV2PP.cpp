@@ -189,7 +189,8 @@ void CGrantorGranteeFinderV2PP::loadDocTypeList()
 	m_vecDocTypes.clear();
 
 	// This object is obsolete so don't bother to update to correctly call this method
-	string strComponentDataFolder = m_ipAFUtil->GetComponentDataFolder(__nullptr);
+	IAFDocumentPtr dummy(CLSID_AFDocument);
+	string strComponentDataFolder = m_ipAFUtil->GetComponentDataFolder(dummy);
 
 	string strIndustrySpecificFolder = strComponentDataFolder 
 								+ "\\" + DOC_CLASSIFIERS_FOLDER 
@@ -259,7 +260,8 @@ string CGrantorGranteeFinderV2PP::getRulesFolder()
 {
 	// get component data folder
 	// This object is obsolete so don't bother to update to correctly call this method
-	string strRulesFolder = m_ipAFUtil->GetComponentDataFolder(__nullptr);
+	IAFDocumentPtr dummy(CLSID_AFDocument);
+	string strRulesFolder = m_ipAFUtil->GetComponentDataFolder(dummy);
 
 	return strRulesFolder;
 }
