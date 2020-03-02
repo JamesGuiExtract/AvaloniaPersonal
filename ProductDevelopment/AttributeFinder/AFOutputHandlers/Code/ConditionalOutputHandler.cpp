@@ -141,8 +141,8 @@ STDMETHODIMP CConditionalOutputHandler::raw_SetRule(IUnknown* pRule)
 		IUnknownPtr ipTmp(pRule);
 		ASSERT_RESOURCE_ALLOCATION("ELI10866", ipTmp != __nullptr);
 
-		ipTmp->QueryInterface(IID_IOutputHandler, (void**)&pRule);
-		if(pRule == NULL)
+		IOutputHandlerPtr ipOutputHandler = ipTmp;
+		if(ipOutputHandler == __nullptr)
 		{
 			UCLIDException ue("ELI10867", "Specified Object is not an Output Handler!");
 			throw ue;

@@ -156,8 +156,8 @@ STDMETHODIMP CConditionalAttributeModifier::raw_SetRule(IUnknown* pRule)
 		IUnknownPtr ipTmp(pRule);
 		ASSERT_RESOURCE_ALLOCATION("ELI11949", ipTmp != __nullptr);
 
-		ipTmp->QueryInterface(IID_IAttributeModifyingRule, (void**)&pRule);
-		if(pRule == NULL)
+		IAttributeModifyingRulePtr ipAttributeModifyingRule = ipTmp;
+		if (ipAttributeModifyingRule == __nullptr)
 		{
 			UCLIDException ue("ELI11951", "Specified Object is not an Attribute Modifier.");
 			throw ue;

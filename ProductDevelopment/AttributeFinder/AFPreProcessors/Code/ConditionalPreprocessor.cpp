@@ -143,8 +143,8 @@ STDMETHODIMP CConditionalPreprocessor::raw_SetRule(IUnknown* pRule)
 		IUnknownPtr ipTmp(pRule);
 		ASSERT_RESOURCE_ALLOCATION("ELI10832", ipTmp != __nullptr);
 
-		ipTmp->QueryInterface(IID_IDocumentPreprocessor, (void**)&pRule);
-		if(pRule == NULL)
+		IDocumentPreprocessorPtr ipDocumentPreprocessor = ipTmp;
+		if(ipDocumentPreprocessor == __nullptr)
 		{
 			UCLIDException ue("ELI10833", "Specified Object is not a Document Preprocessor.");
 			throw ue;

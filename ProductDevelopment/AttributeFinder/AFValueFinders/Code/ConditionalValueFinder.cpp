@@ -141,8 +141,8 @@ STDMETHODIMP CConditionalValueFinder::raw_SetRule(IUnknown* pRule)
 		IUnknownPtr ipTmp(pRule);
 		ASSERT_RESOURCE_ALLOCATION("ELI10725", ipTmp != __nullptr);
 
-		ipTmp->QueryInterface(IID_IAttributeFindingRule, (void**)&pRule);
-		if(pRule == NULL)
+		IAttributeFindingRulePtr ipAttributeFindingRule = ipTmp;
+		if(ipAttributeFindingRule == __nullptr)
 		{
 			UCLIDException ue("ELI10726", "Specified Object is not an Attribute Finding Rule.");
 			throw ue;

@@ -318,7 +318,7 @@ STDMETHODIMP CVariantPair::CopyFrom(IUnknown *pObject)
 
 			IUnknownPtr ipCopy = ipCopier->Clone();
 			ASSERT_RESOURCE_ALLOCATION("ELI46029", ipCopy != __nullptr);
-			vtKey = ipCopy.Detach();
+			vtKey = (IUnknown*)ipCopy;
 		}
 		varType = vtValue.vt;
 		if (varType == VT_UNKNOWN || varType == VT_DISPATCH)
@@ -328,7 +328,7 @@ STDMETHODIMP CVariantPair::CopyFrom(IUnknown *pObject)
 
 			IUnknownPtr ipCopy = ipCopier->Clone();
 			ASSERT_RESOURCE_ALLOCATION("ELI46031", ipCopy != __nullptr);
-			vtValue = ipCopy.Detach();
+			vtValue = (IUnknown*)ipCopy;
 		}
 		m_vtKey = vtKey;
 		m_vtValue = vtValue;

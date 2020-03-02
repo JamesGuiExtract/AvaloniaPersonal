@@ -188,9 +188,9 @@ STDMETHODIMP CRunObjectOnQuery::SetObjectAndIID(IID newIID, ICategorizedComponen
 		ICategorizedComponentPtr ipTmp(newObject);
 		ASSERT_RESOURCE_ALLOCATION("ELI10414", ipTmp != __nullptr);
 
-		IUnknown* pUnknown;
-		ipTmp->QueryInterface(newIID, (void**)&pUnknown);
-		if(pUnknown == NULL)
+		IUnknownPtr ipUnknown;
+		ipTmp->QueryInterface(newIID, (void**)&ipUnknown);
+		if(ipUnknown == __nullptr)
 		{
 			UCLIDException ue("ELI10428", "The specified Object does not implement the specified interface.");
 			throw ue;
