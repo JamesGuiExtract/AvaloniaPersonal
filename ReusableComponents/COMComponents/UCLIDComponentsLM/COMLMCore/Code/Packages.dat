@@ -48,7 +48,7 @@
 !IDShield,7005:$FlexIndexAndIDShieldCore:$RedactionCore
 
 // RDT = special components + FlexServer + IDShieldServer + IDShieldClient + RuleSetEditor
-!RuleDevelopmentToolkit,7006:$FlexServer:$IDShield:7026:7027:7044:7045:7046:7077:7081:7086
+!RuleDevelopmentToolkit,7006:$FlexServer:$IDShield:7026:7027:7044:7045:7046:7077:7081
 
 // Laserfiche = IDShieldServer + IDShieldClient + Laserfiche_Integration
 !LaserficheVerification,$IDShield:7044:7045:7101
@@ -90,7 +90,6 @@ LabDE,0
 
 FLEX Index / ID Shield Utilities,0
 -    Create Searchable PDF,7079
--    Data Entry Verification Logging,7086
 -    Disable Rule Execution Counters,7072
 -    File Inspector Search,7084
 -    FTP/SFTP file transfer,7083

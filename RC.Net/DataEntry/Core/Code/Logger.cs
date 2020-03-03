@@ -233,13 +233,6 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (!LicenseUtilities.IsLicensed(LicenseIdName.DataEntryVerificationLogging))
-                {
-                    var ee = new ExtractException("ELI38347",
-                        "A data entry verification logging license is required.");
-                    throw ee;
-                }
-
                 _logToMemory = logToMemory;
                 _logCategories = logCategories;
 
