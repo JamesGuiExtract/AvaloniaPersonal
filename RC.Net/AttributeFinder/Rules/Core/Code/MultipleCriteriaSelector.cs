@@ -543,7 +543,7 @@ namespace Extract.AttributeFinder.Rules
 
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
-                    writer.Write((IPersistStream)Selectors, clearDirty);
+                    writer.Write(ComUtilities.GetIPersistStreamInterface(Selectors), clearDirty);
                     writer.Write(_negatedSelectors);
                     writer.Write(SelectExclusively);
 

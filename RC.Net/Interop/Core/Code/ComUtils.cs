@@ -93,5 +93,31 @@ namespace Extract.Interop
                 throw ex.AsExtract("ELI33492");
             }
         }
+
+        /// <summary>
+        /// Sometimes C++ COM objects won't cast to IPersistStream in .NET. This method attempts to cast
+        /// to IPersistStream and if that fails, clones it and casts the clone.
+        /// </summary>
+        /// <param name="persistableCopyable">An object that is known to implement IPersistStream and ICopyableObject</param>
+        [CLSCompliant(false)]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Copyable")]
+        public static IPersistStream GetIPersistStreamInterface(object persistableCopyable)
+        {
+            try
+            {
+                if (persistableCopyable is IPersistStream persist)
+                {
+                    return persist;
+                }
+                else
+                {
+                    return (IPersistStream)((ICopyableObject)persistableCopyable).Clone();
+                }
+            }
+            catch (ExtractException ex)
+            {
+                throw ex.AsExtract("ELI49696");
+            }
+        }
     }
 }

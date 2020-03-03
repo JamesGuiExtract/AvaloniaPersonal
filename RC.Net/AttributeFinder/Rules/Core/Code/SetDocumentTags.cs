@@ -1273,7 +1273,7 @@ namespace Extract.AttributeFinder.Rules
                         writer.Write(UseSelectedAttributesForStringTagValue);
                         if (UseSelectedAttributesForStringTagValue)
                         {
-                            writer.Write((IPersistStream)StringTagAttributeSelector, clearDirty);
+                            writer.Write(ComUtilities.GetIPersistStreamInterface(StringTagAttributeSelector), clearDirty);
                         }
                     }
 
@@ -1291,7 +1291,7 @@ namespace Extract.AttributeFinder.Rules
                         writer.Write(UseSelectedAttributesForObjectTagValue);
                         if (UseSelectedAttributesForObjectTagValue)
                         {
-                            writer.Write((IPersistStream)ObjectTagAttributeSelector, clearDirty);
+                            writer.Write(ComUtilities.GetIPersistStreamInterface(ObjectTagAttributeSelector), clearDirty);
                         }
                     }
 

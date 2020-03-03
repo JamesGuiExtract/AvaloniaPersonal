@@ -384,7 +384,7 @@ namespace Extract.AttributeFinder.Rules
             {
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
-                    writer.Write((IPersistStream)Condition, clearDirty);
+                    writer.Write(ComUtilities.GetIPersistStreamInterface(Condition), clearDirty);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);

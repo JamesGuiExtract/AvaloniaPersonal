@@ -576,12 +576,12 @@ namespace Extract.AttributeFinder.Rules
             {
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
-                    writer.Write((IPersistStream)AttributeSelector, clearDirty);
+                    writer.Write(ComUtilities.GetIPersistStreamInterface(AttributeSelector), clearDirty);
                     writer.Write(DividingAttributeName);
                     writer.Write(RunOutputHandler);
                     if (RunOutputHandler)
                     {
-                        writer.Write((IPersistStream)OutputHandler, clearDirty);
+                        writer.Write(ComUtilities.GetIPersistStreamInterface(OutputHandler), clearDirty);
                     }
 
                     // Write to the provided IStream.
