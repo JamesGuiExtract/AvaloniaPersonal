@@ -510,6 +510,9 @@ library UCLID_AFCORELib
 		// Used by Extract.AttributeFinder.Rules.ParallelRuleSet
 		[propget, id(29), helpstring("property DefinedAttributeNames")] HRESULT DefinedAttributeNames(
 			[out, retval] IVariantVector* *pVal);
+		//-----------------------------------------------------------------------------------------
+		// Get whether this instance is dirty
+		[propget, id(30), helpstring("property IsDirty")] HRESULT IsDirty([out, retval] VARIANT_BOOL* pVal);
 	};
 
 	[
@@ -551,6 +554,43 @@ library UCLID_AFCORELib
 	interface IRunModeConfigure : IDispatch
 	{
 		[id(1), helpstring("method ConfigureRunMode")] HRESULT ConfigureRunMode([in] IRunMode *pRunMode, long nHandle);
+	}
+
+	[
+		object,
+		uuid(64563786-0697-4678-8864-C1F6E65463CE),
+		dual,
+		helpstring("IRuleSetJsonSerializer Interface"),
+		pointer_default(unique)
+	]
+	interface IRuleSetSerializer : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// Save a ruleset to a JSON file
+		//	pRuleSet: The RuleSet to save
+		//	strFileName: The path to save the file to
+		//	bUpdateUnmodified: If true then the intermediate DTO object will be stored for later comparison
+		[id(1), helpstring("method SaveRuleSet")] HRESULT SaveRuleSet([in] IRuleSet *pRuleSet, BSTR bstrFileName, VARIANT_BOOL bUpdateUnmodified);
+		//-----------------------------------------------------------------------------------------
+		// Load a ruleset from a JSON file
+		//	bstrFileName: The path of the JSON file
+        //	pRuleSet: The deserialized RuleSet or null if the file content is invalid
+        //	returns: true if the file might be a JSON file (has no null bytes in the decrypted content) else false
+		//	NOTE: This will have the side-effect of storing the loaded, intermediate DTO object for later comparison
+		[id(2), helpstring("method TryLoadRuleSet")] HRESULT TryLoadRuleSet([in] BSTR bstrFileName,
+			[out] IRuleSet **pRuleSet, [out, retval] VARIANT_BOOL* pbIsValidTextFile);
+		//-----------------------------------------------------------------------------------------
+		// Converts a RuleSet to a Dto.RuleSet and compares it to the DTO last loaded or saved with this instance
+		//	pRuleSet: The RuleSet to compare
+		//	returns: true if there are no differences between the last loaded/saved ruleset and the input, else false
+		//	NOTE: The SavedInSoftwareVersion of the loaded ruleset is updated to match the current version for
+		//	comparison purposes so this will not count as a modification
+		[id(3), helpstring("method EqualsUnmodified")] HRESULT EqualsUnmodified([in] IRuleSet *pRuleSet,
+			[out, retval] VARIANT_BOOL *pbEquals);
+		//-----------------------------------------------------------------------------------------
+		// Store the DTO version of a RuleSet for later comparison (for IsDirty calculations)
+		//	pRuleSet: The RuleSet to store
+		[id(4), helpstring("method InitializeUnmodified")] HRESULT InitializeUnmodified([in] IRuleSet* pRuleSet);
 	}
 
 	[

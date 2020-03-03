@@ -86,7 +86,8 @@ m_strInsertParentValue(""),
 m_bDeepCopyInput(false),
 m_ipParallelRuleSet(__nullptr),
 m_sProgressCounts(),
-m_ipOCRParameters(__nullptr)
+m_ipOCRParameters(__nullptr),
+m_ipRuleSetSerializer(__nullptr)
 {
 	try
 	{
@@ -206,32 +207,48 @@ STDMETHODIMP CRuleSet::LoadFrom(BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlag
 				get_bstr_t(gstrAF_AUTO_ENCRYPT_KEY_PATH.c_str()));
 		}
 
-		IPersistStreamPtr ipPersistStream = getThisAsCOMPtr();
-		ASSERT_RESOURCE_ALLOCATION("ELI16904", ipPersistStream != __nullptr);
-
-		// Load the ruleset
 		try
 		{
-			readObjectFromFile(ipPersistStream, strFullFileName, m_bstrStreamName, bIsEncrypted);
+			try
+			{
+				// First check for JSON to load from
+				UCLID_AFCORELib::IRuleSetPtr ipRuleSet;
+				if (getRuleSetSerializer()->TryLoadRuleSet(strFullFileName, &ipRuleSet))
+				{
+					ASSERT_RESOURCE_ALLOCATION("ELI49691", ipRuleSet != __nullptr);
+
+					ICopyableObjectPtr ipThis = getThisAsCOMPtr();
+					ipThis->CopyFrom(ipRuleSet);
+				}
+				else
+				{
+					// Load the ruleset from IPersistStream
+					IPersistStreamPtr ipPersistStream = getThisAsCOMPtr();
+					ASSERT_RESOURCE_ALLOCATION("ELI16904", ipPersistStream != __nullptr);
+
+					readObjectFromFile(ipPersistStream, strFullFileName, m_bstrStreamName, bIsEncrypted);
+
+					getRuleSetSerializer()->InitializeUnmodified(getThisAsCOMPtr());
+				}
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49691")
 		}
-		catch (UCLIDException& ue)
+		catch (UCLIDException & ue)
 		{
 			ue.addDebugInfo("File to load", strFileName);
 			throw ue;
 		}
+
 		// https://extract.atlassian.net/browse/ISSUE-15984
 		// Don't consider encrypted if loaded internally and a full RDT license is present.
 		m_bIsEncrypted = bIsEncrypted &&
 			(!isRdtLicensed() || !isInternalToolsLicensed());
 
 		// mark this object as dirty depending upon bSetDirtyFlagToTrue
-		m_bDirty = (bSetDirtyFlagToTrue == VARIANT_TRUE);
+		m_bDirty = asCppBool(bSetDirtyFlagToTrue);
 
 		// update the filename associated with this ruleset
 		m_strFileName = strFileName;
-
-		// Wait for the file to be accessible
-		waitForFileAccess(m_strFileName, giMODE_READ_ONLY);
 	
 		return S_OK;
 	}
@@ -250,26 +267,10 @@ STDMETHODIMP CRuleSet::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty,
 
 		validateLicense();
 
-		if (bClearDirty == VARIANT_TRUE)
+		getRuleSetSerializer()->SaveRuleSet(getThisAsCOMPtr(), strFullFileName, bClearDirty);
+
+		if (bClearDirty)
 		{
-			// [FlexIDSCore:4865]
-			// If the filename has changed, in order to prevent the IdentifiableObject GUIDs in a
-			// copied ruleset from conflicting with the GUIDs in the original ruleset, regenerate the
-			// GUIDs for all rule objects in this ruleset.
-			if (_strcmpi(m_strPreviousFileName.c_str(), asString(strFullFileName).c_str()) != 0)
-			{
-				// Regenerate the GUID for the ruleset itself.
-				getGUID(true);
-
-				// Create a clone off this ruleset, then copy the date from that clone. This causes all
-				// contained rule objects to be re-created which, in turn, creates new GUIDs for them.
-				ICopyableObjectPtr ipCopyThis = getThisAsCOMPtr();
-				ICopyableObjectPtr ipCopy = ipCopyThis->Clone();
-				CopyFrom(ipCopy);
-
-				*pbGUIDsRegenerated = VARIANT_TRUE;
-			}
-
 			// update the filename associated with this ruleset
 			// NOTE: we only want to update the filename when bClearDirty is
 			// true because this method gets called for "temporary saving" 
@@ -279,16 +280,14 @@ STDMETHODIMP CRuleSet::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty,
 			m_strPreviousFileName = m_strFileName;
 		}
 
-		writeObjectToFile(this, strFullFileName, m_bstrStreamName, asCppBool(bClearDirty));
-
 		// mark this object as dirty depending upon bDontChangeDirtyFlag
-		if (bClearDirty == VARIANT_TRUE)
+		if (asCppBool(bClearDirty))
 		{
 			m_bDirty = false;
 		}
 
 		// Wait until the file is readable
-		waitForStgFileAccess(strFullFileName);
+		waitForFileAccess(m_strFileName, giMODE_READ_ONLY);
 	
 		return S_OK;
 	}
@@ -1297,6 +1296,21 @@ STDMETHODIMP CRuleSet::FlushCounters()
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI39191")
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_IsDirty(VARIANT_BOOL *pbIsDirty)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pbIsDirty = asVariantBool(m_bDirty || !getRuleSetSerializer()->EqualsUnmodified(getThisAsCOMPtr()));
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04768");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IRunMode
@@ -1492,61 +1506,7 @@ STDMETHODIMP CRuleSet::IsDirty(void)
 
 	try
 	{
-		validateLicense();
-
-		// check m_bDirty flag first, if it's not dirty then
-		// check all objects owned by this object
-		HRESULT hr = m_bDirty ? S_OK : S_FALSE;
-		if (!m_bDirty)
-		{
-			IPersistStreamPtr ipPersistStream(m_ipAttributeNameToInfoMap);
-			if (ipPersistStream==NULL)
-			{
-				throw UCLIDException("ELI04784", "Object does not support persistence.");
-			}
-
-			hr = ipPersistStream->IsDirty();
-			if (hr == S_OK)
-			{
-				return hr;
-			}
-
-			if (m_ipDocPreprocessor)
-			{
-				// Check Document Preprocessor
-				ipPersistStream = __nullptr;
-				ipPersistStream = m_ipDocPreprocessor;
-				if (ipPersistStream == __nullptr)
-				{
-					throw UCLIDException( "ELI06130", "Object does not support persistence." );
-				}
-
-				hr = ipPersistStream->IsDirty();
-				if (hr == S_OK)
-				{
-					return hr;
-				}
-			}
-
-			if (m_ipOutputHandler)
-			{
-				// Check Output Handler
-				ipPersistStream = __nullptr;
-				ipPersistStream = m_ipOutputHandler;
-				if (ipPersistStream == __nullptr)
-				{
-					throw UCLIDException( "ELI07928", "Object does not support persistence." );
-				}
-
-				hr = ipPersistStream->IsDirty();
-				if (hr == S_OK)
-				{
-					return hr;
-				}
-			}
-		}
-
-		return hr;
+		return getThisAsCOMPtr()->IsDirty ? S_OK : S_FALSE;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04768");
 }
@@ -2916,5 +2876,16 @@ IOCRParametersPtr CRuleSet::getOCRParameters()
 	}
 
 	return m_ipOCRParameters;
+}
+//-------------------------------------------------------------------------------------------------
+UCLID_AFCORELib::IRuleSetSerializerPtr CRuleSet::getRuleSetSerializer()
+{
+	if (m_ipRuleSetSerializer == __nullptr)
+	{
+		m_ipRuleSetSerializer.CreateInstance("Extract.AttributeFinder.Rules.Json.RuleSetJsonSerializer");
+		ASSERT_RESOURCE_ALLOCATION("ELI49686", m_ipRuleSetSerializer != __nullptr);
+	}
+
+	return m_ipRuleSetSerializer;
 }
 //-------------------------------------------------------------------------------------------------

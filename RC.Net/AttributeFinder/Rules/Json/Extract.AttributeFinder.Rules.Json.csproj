@@ -236,6 +236,7 @@
   <ItemGroup>
     <Compile Include="ObjectWithDescriptionJsonConverter.cs" />
     <Compile Include="ObjectWithTypeJsonConverter.cs" />
+    <Compile Include="RuleSetJsonSerializer.cs" />
     <Compile Include="RuleObjectJsonSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

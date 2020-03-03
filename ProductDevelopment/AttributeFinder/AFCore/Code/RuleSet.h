@@ -110,6 +110,7 @@ public:
 	STDMETHOD(get_CustomCounters)(IIUnknownVector **pVal);
 	STDMETHOD(put_CustomCounters)(IIUnknownVector *pNewVal);
 	STDMETHOD(FlushCounters)();
+	STDMETHOD(get_IsDirty)(VARIANT_BOOL *pbIsDirty);
 
 	// IRunMode
 	STDMETHOD(get_RunMode)(ERuleSetRunMode *pRunMode);
@@ -265,6 +266,9 @@ private:
 
 	IOCRParametersPtr m_ipOCRParameters;
 
+	UCLID_AFCORELib::IRuleSetSerializerPtr m_ipRuleSetSerializer;
+	bool m_bUsingRuleSetSerializer;
+
 	/////////////////
 	// Helper functions
 	/////////////////
@@ -386,4 +390,6 @@ private:
 	void validateRunability();
 
 	IOCRParametersPtr getOCRParameters();
+
+	UCLID_AFCORELib::IRuleSetSerializerPtr getRuleSetSerializer();
 };

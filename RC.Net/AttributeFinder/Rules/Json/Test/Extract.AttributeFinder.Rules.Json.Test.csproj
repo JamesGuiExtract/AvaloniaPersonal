@@ -271,6 +271,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LoadFromFile.cs" />
     <Compile Include="DtoToJsonToDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BinaryToBinary.cs" />
