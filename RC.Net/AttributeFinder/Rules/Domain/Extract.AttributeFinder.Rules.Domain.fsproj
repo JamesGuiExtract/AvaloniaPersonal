@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>865f2ea2-32aa-4e5c-8c0b-6bcc343741f2</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Extract.AttributeFinder.Rules.Domain</RootNamespace>
+    <AssemblyName>Extract.AttributeFinder.Rules.Domain</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <UseStandardResourceNames>true</UseStandardResourceNames>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <WarningsAsErrors>3239;$(WarningsAsErrors)</WarningsAsErrors>
+    <Name>Extract.AttributeFinder.Rules.Domain</Name>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <Tailcalls>false</Tailcalls>
+    <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <Tailcalls>true</Tailcalls>
+    <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(FSharpTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets') ">
+    <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
+  </PropertyGroup>
+  <Import Project="$(FSharpTargetsPath)" />
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.fs" />
+    <Content Include="packages.config" />
+    <Compile Include="IMasterRuleObjectConverter.fs" />
+    <Compile Include="IRuleObjectConverter.fs" />
+    <Compile Include="ObjectWithDescription.fs" />
+    <Compile Include="AdvancedReplaceString.fs" />
+    <Compile Include="AttributeRule.fs" />
+    <Compile Include="AttributeFindInfo.fs" />
+    <Compile Include="AutoShrinkRedactionZones.fs" />
+    <Compile Include="BarcodeFinder.fs" />
+    <Compile Include="BlockFinder.fs" />
+    <Compile Include="BoxFinder.fs" />
+    <Compile Include="ChangeCase.fs" />
+    <Compile Include="CharacterConfidenceCondition.fs" />
+    <Compile Include="CharacterConfidenceDS.fs" />
+    <Compile Include="CheckFinder.fs" />
+    <Compile Include="ConditionalAttributeModifier.fs" />
+    <Compile Include="ConditionalOutputHandler.fs" />
+    <Compile Include="ConditionalPreprocessor.fs" />
+    <Compile Include="ConditionalValueFinder.fs" />
+    <Compile Include="CreateAttribute.fs" />
+    <Compile Include="CreateValue.fs" />
+    <Compile Include="DataEntryPreloader.fs" />
+    <Compile Include="DataQueryRuleObject.fs" />
+    <Compile Include="DataScorerBasedAS.fs" />
+    <Compile Include="DateInputValidator.fs" />
+    <Compile Include="DateTimeSplitter.fs" />
+    <Compile Include="DocPreprocessorSequence.fs" />
+    <Compile Include="DocTypeCondition.fs" />
+    <Compile Include="DocumentClassifier.fs" />
+    <Compile Include="DoubleInputValidator.fs" />
+    <Compile Include="DuplicateAndSeparateTrees.fs" />
+    <Compile Include="EliminateDuplicates.fs" />
+    <Compile Include="EnhanceOCR.fs" />
+    <Compile Include="EntityFinder.fs" />
+    <Compile Include="EntityNameDataScorer.fs" />
+    <Compile Include="EntityNameSplitter.fs" />
+    <Compile Include="ExtractLine.fs" />
+    <Compile Include="ExtractOcrTextInImageArea.fs" />
+    <Compile Include="FindFromRSD.fs" />
+    <Compile Include="FindingRuleCondition.fs" />
+    <Compile Include="FloatInputValidator.fs" />
+    <Compile Include="FSharpPreprocessor.fs" />
+    <Compile Include="ImageRegionWithLines.fs" />
+    <Compile Include="InputFinder.fs" />
+    <Compile Include="InsertCharacters.fs" />
+    <Compile Include="IntegerInputValidator.fs" />
+    <Compile Include="LabDEOrderMapper.fs" />
+    <Compile Include="LearningMachineOutputHandler.fs" />
+    <Compile Include="LimitAsLeftPart.fs" />
+    <Compile Include="LimitAsMidPart.fs" />
+    <Compile Include="LimitAsRightPart.fs" />
+    <Compile Include="LocateImageRegion.fs" />
+    <Compile Include="LoopFinder.fs" />
+    <Compile Include="LoopPreprocessor.fs" />
+    <Compile Include="MergeAttributes.fs" />
+    <Compile Include="MergeAttributeTrees.fs" />
+    <Compile Include="MERSHandler.fs" />
+    <Compile Include="MicrFinder.fs" />
+    <Compile Include="ModifyAttributeValueOH.fs" />
+    <Compile Include="ModifySpatialMode.fs" />
+    <Compile Include="MoveAndModifyAttributes.fs" />
+    <Compile Include="MoveCopyAttributes.fs" />
+    <Compile Include="MultipleCriteriaSelector.fs" />
+    <Compile Include="NERFinder.fs" />
+    <Compile Include="NumericSequencer.fs" />
+    <Compile Include="OCRArea.fs" />
+    <Compile Include="OutputHandlerSequence.fs" />
+    <Compile Include="OutputToVOA.fs" />
+    <Compile Include="OutputToXML.fs" />
+    <Compile Include="PadValue.fs" />
+    <Compile Include="PersonNameSplitter.fs" />
+    <Compile Include="QueryBasedAS.fs" />
+    <Compile Include="ReformatPersonNames.fs" />
+    <Compile Include="RegExprInputValidator.fs" />
+    <Compile Include="RegExprRule.fs" />
+    <Compile Include="RemoveCharacters.fs" />
+    <Compile Include="RemoveEntriesFromList.fs" />
+    <Compile Include="RemoveInvalidEntries.fs" />
+    <Compile Include="RemoveSpatialInfo.fs" />
+    <Compile Include="RemoveSubAttributes.fs" />
+    <Compile Include="ReplaceStrings.fs" />
+    <Compile Include="REPMFinder.fs" />
+    <Compile Include="RSDDataScorer.fs" />
+    <Compile Include="RSDFileCondition.fs" />
+    <Compile Include="RSDSplitter.fs" />
+    <Compile Include="RuleSet.fs" />
+    <Compile Include="RunObjectOnAttributes.fs" />
+    <Compile Include="SelectOnlyUniqueValues.fs" />
+    <Compile Include="SelectPageRegion.fs" />
+    <Compile Include="SelectUsingMajority.fs" />
+    <Compile Include="SetDocumentTags.fs" />
+    <Compile Include="ShortInputValidator.fs" />
+    <Compile Include="SpatialContentBasedAS.fs" />
+    <Compile Include="SpatiallySortAttributes.fs" />
+    <Compile Include="SpatialProximityAS.fs" />
+    <Compile Include="SplitRegionIntoContentAreas.fs" />
+    <Compile Include="SSNFinder.fs" />
+    <Compile Include="StringTokenizerModifier.fs" />
+    <Compile Include="StringTokenizerSplitter.fs" />
+    <Compile Include="TemplateFinder.fs" />
+    <Compile Include="TranslateToClosestValueInList.fs" />
+    <Compile Include="TranslateValue.fs" />
+    <Compile Include="TranslateValueToBestMatch.fs" />
+    <Compile Include="ValueAfterClue.fs" />
+    <Compile Include="ValueBeforeClue.fs" />
+    <Compile Include="ValueConditionSelector.fs" />
+    <Compile Include="ValueFromList.fs" />
+    <Compile Include="RuleObjectConverter.fs" />
+    <COMReference Include="UCLID_INPUTFUNNELLib">
+      <Guid>{775ACC91-32AC-11D6-8259-0050DAD4FF55}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFCONDITIONSLib">
+      <Guid>{D3DC98FB-A212-409B-B68C-64D1DC430594}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFCORELib">
+      <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFDATASCORERSLib">
+      <Guid>{F0A8FC59-37EE-4EB5-A9C8-C322F851BC88}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFOUTPUTHANDLERSLib">
+      <Guid>{F8F1F33C-B4CE-4171-8855-7DE5AEC361B8}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFPREPROCESSORSLib">
+      <Guid>{6E739155-A988-45D0-8FF9-D2718B7B4126}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFSELECTORSLib">
+      <Guid>{B2548FD4-6D38-4849-828E-FE0660B45935}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFSPLITTERSLib">
+      <Guid>{9C61A6A5-6789-4648-9777-5405D6C517DF}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFUTILSLib">
+      <Guid>{AC966E48-1A26-40C7-B61E-AC4C09C9D565}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFVALUEFINDERSLib">
+      <Guid>{55A9DE56-080B-43E0-AC99-02B815C1DF6C}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFVALUEMODIFIERSLib">
+      <Guid>{C5230183-3ACC-4C4F-8D91-745FFB3C018E}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COMLMLib">
+      <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COMUTILSLib">
+      <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COUNTYCUSTOMCOMPONENTSLib">
+      <Guid>{3C187D28-0950-4498-A607-B122D7544DBA}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_DATAENTRYCUSTOMCOMPONENTSLib">
+      <Guid>{035D73E6-27B9-49B7-97AA-9D4E5722679E}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_EXCEPTIONMGMTLib">
+      <Guid>{454F2387-F8A9-4F64-9A5E-7B06784E8751}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_GENERALIVLib">
+      <Guid>{203E8934-0C8B-4607-B2F5-84A9167B1107}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_IMAGEUTILSLib">
+      <Guid>{D46831E6-669C-423F-8209-D6A7A80C2ADD}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
+      <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_REDACTIONCUSTOMCOMPONENTSLib">
+      <Guid>{18CF5BEC-2929-43DD-86E0-7D50F152663A}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_REGEXPRIVLib">
+      <Guid>{98469F15-E4D9-4050-94B5-D47F3DAD5F46}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="FSharp.Core">
+      <HintPath>..\..\..\APIs\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="mscorlib" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\APIs\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.ValueTuple">
+      <HintPath>..\..\..\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <ProjectReference Include="..\..\..\..\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Code\LabResultsCustomComponents.csproj">
+      <Name>LabResultsCustomComponents</Name>
+      <Project>{89c9999b-d0eb-4516-a2e2-f6dc87638839}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">
+      <Name>Extract</Name>
+      <Project>{7c37b0fb-81b8-4aa2-bc14-b21028c7ab9f}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Interop\Core\Code\Extract.Interop.csproj">
+      <Name>Extract.Interop</Name>
+      <Project>{4f37507c-6ce8-4c68-a54b-efcce96a99ea}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Name>Extract.Utilities</Name>
+      <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Core\Code\Extract.AttributeFinder.Rules.csproj">
+      <Name>Extract.AttributeFinder.Rules</Name>
+      <Project>{52c53912-5790-4f68-ab57-6cbc3ef45a14}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Dto\Extract.AttributeFinder.Rules.Dto.fsproj">
+      <Name>Extract.AttributeFinder.Rules.Dto</Name>
+      <Project>{a66faa6a-b785-4c7b-9590-c04f45007f7f}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\FSharp\Extract.AttributeFinder.Rules.FSharp.csproj">
+      <Name>Extract.AttributeFinder.Rules.FSharp</Name>
+      <Project>{f1d14ae3-cbc6-4515-8e81-6804d1245994}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
