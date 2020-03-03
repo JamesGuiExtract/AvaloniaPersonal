@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>a66faa6a-b785-4c7b-9590-c04f45007f7f</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Extract.AttributeFinder.Rules.Dto</RootNamespace>
+    <AssemblyName>Extract.AttributeFinder.Rules.Dto</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <UseStandardResourceNames>true</UseStandardResourceNames>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <WarningsAsErrors>3239;$(WarningsAsErrors)</WarningsAsErrors>
+    <Name>Extract.AttributeFinder.Rules.Dto</Name>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <Tailcalls>false</Tailcalls>
+    <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <Tailcalls>true</Tailcalls>
+    <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(FSharpTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets') ">
+    <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
+  </PropertyGroup>
+  <Import Project="$(FSharpTargetsPath)" />
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.fs" />
+    <Content Include="packages.config" />
+    <Compile Include="ObjectWithDescription.fs" />
+    <Compile Include="AdvancedReplaceString.fs" />
+    <Compile Include="AttributeRule.fs" />
+    <Compile Include="AttributeFindInfo.fs" />
+    <Compile Include="AutoShrinkRedactionZones.fs" />
+    <Compile Include="BarcodeFinder.fs" />
+    <Compile Include="BlockFinder.fs" />
+    <Compile Include="BoxFinder.fs" />
+    <Compile Include="ChangeCase.fs" />
+    <Compile Include="CharacterConfidenceCondition.fs" />
+    <Compile Include="CharacterConfidenceDS.fs" />
+    <Compile Include="CheckFinder.fs" />
+    <Compile Include="ConditionalAttributeModifier.fs" />
+    <Compile Include="ConditionalOutputHandler.fs" />
+    <Compile Include="ConditionalPreprocessor.fs" />
+    <Compile Include="ConditionalValueFinder.fs" />
+    <Compile Include="CreateAttribute.fs" />
+    <Compile Include="CreateValue.fs" />
+    <Compile Include="DataEntryPreloader.fs" />
+    <Compile Include="DataQueryRuleObject.fs" />
+    <Compile Include="DataScorerBasedAS.fs" />
+    <Compile Include="DateInputValidator.fs" />
+    <Compile Include="DateTimeSplitter.fs" />
+    <Compile Include="DocPreprocessorSequence.fs" />
+    <Compile Include="DocTypeCondition.fs" />
+    <Compile Include="DocumentClassifier.fs" />
+    <Compile Include="DoubleInputValidator.fs" />
+    <Compile Include="DuplicateAndSeparateTrees.fs" />
+    <Compile Include="EliminateDuplicates.fs" />
+    <Compile Include="EnhanceOCR.fs" />
+    <Compile Include="EntityFinder.fs" />
+    <Compile Include="EntityNameDataScorer.fs" />
+    <Compile Include="EntityNameSplitter.fs" />
+    <Compile Include="ExtractLine.fs" />
+    <Compile Include="ExtractOcrTextInImageArea.fs" />
+    <Compile Include="FindFromRSD.fs" />
+    <Compile Include="FindingRuleCondition.fs" />
+    <Compile Include="FloatInputValidator.fs" />
+    <Compile Include="FSharpPreprocessor.fs" />
+    <Compile Include="ImageRegionWithLines.fs" />
+    <Compile Include="InputFinder.fs" />
+    <Compile Include="InsertCharacters.fs" />
+    <Compile Include="IntegerInputValidator.fs" />
+    <Compile Include="LabDEOrderMapper.fs" />
+    <Compile Include="LearningMachineOutputHandler.fs" />
+    <Compile Include="LimitAsLeftPart.fs" />
+    <Compile Include="LimitAsMidPart.fs" />
+    <Compile Include="LimitAsRightPart.fs" />
+    <Compile Include="LocateImageRegion.fs" />
+    <Compile Include="LoopFinder.fs" />
+    <Compile Include="LoopPreprocessor.fs" />
+    <Compile Include="MergeAttributes.fs" />
+    <Compile Include="MergeAttributeTrees.fs" />
+    <Compile Include="MERSHandler.fs" />
+    <Compile Include="MicrFinder.fs" />
+    <Compile Include="ModifyAttributeValueOH.fs" />
+    <Compile Include="ModifySpatialMode.fs" />
+    <Compile Include="MoveAndModifyAttributes.fs" />
+    <Compile Include="MoveCopyAttributes.fs" />
+    <Compile Include="MultipleCriteriaSelector.fs" />
+    <Compile Include="NERFinder.fs" />
+    <Compile Include="NumericSequencer.fs" />
+    <Compile Include="OCRArea.fs" />
+    <Compile Include="OutputHandlerSequence.fs" />
+    <Compile Include="OutputToVOA.fs" />
+    <Compile Include="OutputToXML.fs" />
+    <Compile Include="PadValue.fs" />
+    <Compile Include="PersonNameSplitter.fs" />
+    <Compile Include="QueryBasedAS.fs" />
+    <Compile Include="ReformatPersonNames.fs" />
+    <Compile Include="RegExprInputValidator.fs" />
+    <Compile Include="RegExprRule.fs" />
+    <Compile Include="RemoveCharacters.fs" />
+    <Compile Include="RemoveEntriesFromList.fs" />
+    <Compile Include="RemoveInvalidEntries.fs" />
+    <Compile Include="RemoveSpatialInfo.fs" />
+    <Compile Include="RemoveSubAttributes.fs" />
+    <Compile Include="ReplaceStrings.fs" />
+    <Compile Include="REPMFinder.fs" />
+    <Compile Include="RSDDataScorer.fs" />
+    <Compile Include="RSDFileCondition.fs" />
+    <Compile Include="RSDSplitter.fs" />
+    <Compile Include="RuleSet.fs" />
+    <Compile Include="RunObjectOnAttributes.fs" />
+    <Compile Include="SelectOnlyUniqueValues.fs" />
+    <Compile Include="SelectPageRegion.fs" />
+    <Compile Include="SelectUsingMajority.fs" />
+    <Compile Include="SetDocumentTags.fs" />
+    <Compile Include="ShortInputValidator.fs" />
+    <Compile Include="SpatialContentBasedAS.fs" />
+    <Compile Include="SpatiallySortAttributes.fs" />
+    <Compile Include="SpatialProximityAS.fs" />
+    <Compile Include="SplitRegionIntoContentAreas.fs" />
+    <Compile Include="SSNFinder.fs" />
+    <Compile Include="StringTokenizerModifier.fs" />
+    <Compile Include="StringTokenizerSplitter.fs" />
+    <Compile Include="TemplateFinder.fs" />
+    <Compile Include="TranslateToClosestValueInList.fs" />
+    <Compile Include="TranslateValue.fs" />
+    <Compile Include="TranslateValueToBestMatch.fs" />
+    <Compile Include="ValueAfterClue.fs" />
+    <Compile Include="ValueBeforeClue.fs" />
+    <Compile Include="ValueConditionSelector.fs" />
+    <Compile Include="ValueFromList.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="FSharp.Core">
+      <HintPath>..\..\..\APIs\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+  </ItemGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
