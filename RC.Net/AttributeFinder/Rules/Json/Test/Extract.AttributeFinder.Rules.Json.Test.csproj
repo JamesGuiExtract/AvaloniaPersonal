@@ -1,0 +1,467 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E6A53D9E-018A-45C3-911A-F017245E1609}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Extract.AttributeFinder.Rules.Json.Test</RootNamespace>
+    <AssemblyName>Extract.AttributeFinder.Rules.Json.Test</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
+    <IsCodedUITest>False</IsCodedUITest>
+    <TestProjectType>UnitTest</TestProjectType>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\..\Binaries\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\..\..\Binaries\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj">
+      <Project>{F3314BBE-B008-488D-A2E0-351C49D914D7}</Project>
+      <Name>Extract.Testing.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
+      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
+      <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
+      <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
+      <Name>Extract.Interop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
+      <Name>Extract.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Core\Code\Extract.AttributeFinder.Rules.csproj">
+      <Project>{52c53912-5790-4f68-ab57-6cbc3ef45a14}</Project>
+      <Name>Extract.AttributeFinder.Rules</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Domain\Extract.AttributeFinder.Rules.Domain.fsproj">
+      <Project>{865f2ea2-32aa-4e5c-8c0b-6bcc343741f2}</Project>
+      <Name>Extract.AttributeFinder.Rules.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Dto\Extract.AttributeFinder.Rules.Dto.fsproj">
+      <Project>{a66faa6a-b785-4c7b-9590-c04f45007f7f}</Project>
+      <Name>Extract.AttributeFinder.Rules.Dto</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Extract.AttributeFinder.Rules.Json.csproj">
+      <Project>{43867fe6-f672-4f96-ae79-0844f1a17c6b}</Project>
+      <Name>Extract.AttributeFinder.Rules.Json</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="nunit.framework, Version=2.5.8.10295, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\APIs\NUnit_2.5\bin\nunit.framework.dll</HintPath>
+    </Reference>
+    <COMReference Include="UCLID_AFCONDITIONSLib">
+      <Guid>{D3DC98FB-A212-409B-B68C-64D1DC430594}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFCORELib">
+      <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFDATASCORERSLib">
+      <Guid>{F0A8FC59-37EE-4EB5-A9C8-C322F851BC88}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFDATASCORERSTESTLib">
+      <Guid>{16609C4A-1074-4410-B493-4FF71223BDF9}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFOUTPUTHANDLERSLib">
+      <Guid>{F8F1F33C-B4CE-4171-8855-7DE5AEC361B8}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFPREPROCESSORSLib">
+      <Guid>{6E739155-A988-45D0-8FF9-D2718B7B4126}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFSELECTORSLib">
+      <Guid>{B2548FD4-6D38-4849-828E-FE0660B45935}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFSPLITTERSLib">
+      <Guid>{9C61A6A5-6789-4648-9777-5405D6C517DF}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFUTILSLib">
+      <Guid>{AC966E48-1A26-40C7-B61E-AC4C09C9D565}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFVALUEFINDERSLib">
+      <Guid>{55A9DE56-080B-43E0-AC99-02B815C1DF6C}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_AFVALUEMODIFIERSLib">
+      <Guid>{C5230183-3ACC-4C4F-8D91-745FFB3C018E}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COMLMLib">
+      <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COMUTILSLib">
+      <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COUNTYCUSTOMCOMPONENTSLib">
+      <Guid>{3C187D28-0950-4498-A607-B122D7544DBA}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_DATAENTRYCUSTOMCOMPONENTSLib">
+      <Guid>{035D73E6-27B9-49B7-97AA-9D4E5722679E}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_GENERALIVLib">
+      <Guid>{203E8934-0C8B-4607-B2F5-84A9167B1107}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_IMAGEUTILSLib">
+      <Guid>{D46831E6-669C-423F-8209-D6A7A80C2ADD}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
+      <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_REDACTIONCUSTOMCOMPONENTSLib">
+      <Guid>{18CF5BEC-2929-43DD-86E0-7D50F152663A}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_REGEXPRIVLib">
+      <Guid>{98469F15-E4D9-4050-94B5-D47F3DAD5F46}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DtoToJsonToDto.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="BinaryToBinary.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>11.0.2</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RuleSets\Indexing-AddressFinders-AddressFinder.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Indexing-DocumentDate-commonOH.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\LabDE-PatientInfo-Name-LabSpecificRules.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\LabDE-PatientInfo-Name-reOCR.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\LabDE-SwipingRules-Date.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\LabDE-TestResults-processMultipleDates.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\ReusableComponents-getDocAndPagesCC.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\ReusableComponents-getDocAndPagesCChelper.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\ReusableComponents-MLFeatureGen-LocationFinder-GetPageBoundaries.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\ReusableComponents-MLFeatureGen-LocationFinder-LocationFinder.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\ReusableComponents-PS-MasterConfidence.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\ReusableComponents-RemoveSubattributeDuplicates.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\ReusableComponents-spansPages.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\RunTest.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Essentia-Solution-Rules-CompressAutoPaginationVOA.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Essentia-Solution-Rules-CreateDocDescVOA.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Essentia-Solution-Rules-DocumentDate-HCdates.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Essentia-Solution-Rules-FilenameFix.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Essentia-Solution-Rules-findDocumentData.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Essentia-Solution-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Essentia-Solution-Rules-Master_NoVOA.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Essentia-Solution-Rules-ML-Deleter-deleter.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Essentia-Solution-Rules-ML-Pagination-createProtofeatures.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Essentia-Solution-Rules-ML-Pagination-getImagePageNumber.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Essentia-Solution-Rules-PaginationMaster.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Essentia-Solution-Rules-PatientInfo-findDOB.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Essentia-Solution-Rules-ShadowFax.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Essentia-Solution-Rules-Singles-PaginateSingles.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Essentia-Solution-Rules-UnsolicitedOrders-PopulateOrderAndCSN.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\_Demo-Demo_HIM-Solution-Rules-findDocumentData.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\_Demo-Demo_HIM-Solution-Rules-PaginationMaster.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\_Demo-Demo_HIM-Solution-Rules-PaginationRules-main.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\American Family-Rules-master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\American Family-TestingFiles-testAllSingleValues.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\CA - Sacramento Demo-Rules-SSNRedaction-DOB.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\CA - Santa Clara-Solution-Rules-docTypeOH.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\MN - District - Tyler-Rules-rules.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Surefire - Judgments-Solution-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Surefire - SNL-Solution-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Surefire-Solution-Rules-Common-selectMajoritySubs.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Surefire-Solution-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\TX - Tarrant-DataEntryConfig-SaveVolumeAndPage.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\ZZ-Situs-Solution-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\ZZ-Situs-Solution-Rules-Rent-data.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Arcondis-Solution-Rules-CreateTrainingDataAndTryToLearn.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Arcondis-Solution-Rules-Ensemble-main.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Arcondis-Solution-Rules-Ensemble-SensitiveRows.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Arcondis-Solution-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\CA - Amador - BMI-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\CA - Humboldt - BMI Imaging-Rules-Utils-CChelper.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\CA - Marin Vital Records - DFM-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\CA - Orange - SouthTech-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Delta Dental-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Demo_IDShield_EDI_sanitize-Rules-People-People.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Demo_MGIC-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Demo_PHI-Rules-MRN-MRNMaster.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\IL - Ogle-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\IN - District Rules - ACS-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\IN - SOS - GCR-Solution-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\IN - SOS-Rules-perPage.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\MGIC-Rules-SensitivePageClassifier-makePageClue.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\MGIC-Utils-OnlyPageClues.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\OH - BWC-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\OH - Cuyahoga Probate Court - Proware-Rules-decrement.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Pfizer-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Pfizer-Rules-ML-currency-cellClassifier-getCandidates.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Pfizer-Rules-ML-main.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\TX - DallasCountyElections-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\WI - Dodge - TriMin-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\WI - Dodge - TriMin-Rules-Utils-PageCC.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\WV - SOS UCC-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\CA - Cedar Sinai-Solution-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\CA - Cedar Sinai-Solution-Rules-TestResults-getTests.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Demo_LabDE-Solution-Rules-DocumentSorter-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Hurley-Solution-Rules-SplitDeletedPages.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\Northwestern Memorial Hospital-Solution-Rules-ShadowFax.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\UW Transplant-Solution-Rules-DocumentSorter-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\UW Transplant-Solution-Rules-PaginationMaster.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\UW Transplant-Solution-Rules-Swiping-CollectionDate.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\WI - Exact Sciences-Solution-Rules-Master.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\WI - Exact Sciences-Solution-Rules-Master_NoUSS.rsd" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RuleObjects\AdvancedReplaceString.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\AutoShrinkRedactionZones.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\BarcodeFinder.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\BlockFinder.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\BoxFinder.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ChangeCase.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\CharacterConfidenceCondition.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\CharacterConfidenceDS.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ConditionalAttributeModifier.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ConditionalOutputHandler.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ConditionalPreprocessor.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ConditionalValueFinder.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\CreateAttribute.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\CreateValue.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\DataEntryPreloader.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\DataQueryRuleObject.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\DataScorerBasedAS.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\DateInputValidator.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\DateTimeSplitter.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\DocPreprocessorSequence.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\DocTypeCondition.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\DocumentClassifier.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\DuplicateAndSeparateTrees.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\EliminateDuplicates.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\EnhanceOCR.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\EntityFinder.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\EntityNameDataScorer.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\EntityNameSplitter.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ExtractLine.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ExtractOcrTextInImageArea.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\FindFromRSD.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\FindingRuleCondition.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\FSharpPreprocessor.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ImageRegionWithLines.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\InputFinder.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\InsertCharacters.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\IntegerInputValidator.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\LabDEOrderMapper.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\LearningMachineOutputHandler.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\LimitAsLeftPart.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\LimitAsMidPart.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\LimitAsRightPart.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\LocateImageRegion.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\LoopFinder.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\LoopPreprocessor.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\MergeAttributes.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\MergeAttributeTrees.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\MERSHandler.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\MicrFinderV1.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\MicrFinderV2.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ModifyAttributeValueOH.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ModifySpatialMode.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\MoveAndModifyAttributes.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\MoveOrCopyAttributes.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\MultipleCriteriaSelector.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\NERFinder.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\NumericSequencer.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\OCRArea.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\OutputHandlerSequence.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\OutputToVOA.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\OutputToXML.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\PadValue.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\PersonNameSplitter.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\QueryBasedAS.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ReformatPersonNames.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\RegExprInputValidator.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\RegExprRule.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\RemoveCharacters.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\RemoveEntriesFromList.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\RemoveInvalidEntries.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\RemoveSpatialInfo.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\RemoveSubAttributes.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ReplaceStrings.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\REPMFinder.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\RSDDataScorer.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\RSDFileCondition.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\RSDSplitter.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\RunObjectOnAttributes.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\SelectOnlyUniqueValues.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\SelectPageRegion.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\SelectUsingMajority.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\SetDocumentTags.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ShortInputValidator.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\SpatialContentBasedAS.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\SpatiallySortAttributes.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\SpatialProximityAS.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\SplitRegionIntoContentAreas.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\SSNFinder.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\StringTokenizerSplitter.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\TemplateFinder.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\TranslateToClosestValueInList.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\TranslateValue.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\TranslateValueToBestMatch.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ValueAfterClue.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ValueBeforeClue.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ValueConditionSelector.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\ValueFromList.hex.txt" />
+  </ItemGroup>
+  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

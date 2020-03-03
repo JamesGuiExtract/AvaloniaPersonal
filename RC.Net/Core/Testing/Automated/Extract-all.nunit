@@ -3,6 +3,7 @@
   <Config name="Debug" binpathtype="Auto" runtimeFramework="any" appbase="C:\Engineering\binaries\debug">
     <assembly path="Extract.AttributeFinder.OutputHandlers.Test.dll" />
     <assembly path="Extract.AttributeFinder.Test.dll" />
+    <assembly path="Extract.AttributeFinder.Rules.Json.Test.dll" />
     <assembly path="Extract.DataCaptureStats.Test.dll" />
     <assembly path="Extract.DataEntry.LabDE.Test.dll" />
     <assembly path="Extract.DataEntry.Test.dll" />
@@ -26,6 +27,7 @@
   <Config name="Release" binpathtype="Auto" runtimeFramework="any">
     <assembly path="Extract.AttributeFinder.OutputHandlers.Test.dll" />
     <assembly path="Extract.AttributeFinder.Test.dll" />
+    <assembly path="Extract.AttributeFinder.Rules.Json.Test.dll" />
     <assembly path="Extract.DataCaptureStats.Test.dll" />
     <assembly path="Extract.DataEntry.LabDE.Test.dll" />
     <assembly path="Extract.DataEntry.Test.dll" />
