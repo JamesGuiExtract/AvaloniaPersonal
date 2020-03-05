@@ -148,7 +148,7 @@ CreateFlexDataEntryInstallDir:
 	@IF NOT EXIST "$(FLEXIndexDemo)\Input" MKDIR "$(FLEXIndexDemo)\Input"
 	@IF NOT EXIST "$(FLEXIndexDemo)\Rules" MKDIR "$(FLEXIndexDemo)\Rules"
 	@ECHO Updating Flex Data Entry rules for FKB update...
-	$(CScriptProgram) "$(PDRootDir)\Utils\Scripts\UpdateFKB.js" -silent "$(FlexDataEntryRulesDir)" "$(FKBVersion)"
+	$(CScriptProgram) "$(PDRootDir)\Utils\Scripts\UpdateFKB.js" -silent "$(FlexDataEntryRulesDir)" "$(LastBuiltFKB)"
 	@ECHO Copying the Demo_FlexIndex related files
 	@XCOPY "$(AFRootDirectory)\Utils\FlexDataEntry\Files\*.*" "$(FLEXIndexDemo)" /v /s /e /y
 	$(VerifyDir) "$(AFRootDirectory)\Utils\FlexDataEntry\Files" "$(FLEXIndexDemo)"

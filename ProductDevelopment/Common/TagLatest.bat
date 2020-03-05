@@ -110,7 +110,7 @@ IF %ERRORLEVEL% NEQ 0 (
 
 cd %BUILD_VSS_ROOT%\Engineering\Rules\Build_FKB
 
-FOR /F "tokens=2 delims==" %%F IN ('findstr FKBVersion FKBVersion.mak') DO SET LAST_FKB_TAG=%%F
+FOR /F "tokens=2 delims==" %%F IN ('findstr LastBuiltFKB FKBVersion.mak') DO SET LAST_FKB_TAG=%%F
 SET LAST_FKB_TAG=%LAST_FKB_TAG: Ver. =/%
 SET LAST_FKB_TAG=%LAST_FKB_TAG:.=/%
 
