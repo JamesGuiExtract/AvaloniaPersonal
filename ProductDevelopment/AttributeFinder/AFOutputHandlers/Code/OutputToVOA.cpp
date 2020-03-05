@@ -109,17 +109,10 @@ STDMETHODIMP COutputToVOA::put_FileName(BSTR newVal)
 				ue.addDebugInfo("File", strFile);
 				throw ue;
 			}
-			else if (!canCreateFile(strFile)) 
-			{
-				UCLIDException ue("ELI08857", "The specified file cannot be written to!");
-				ue.addDebugInfo("File", strFile);
-				throw ue;
-			}
 		}
 
 		// store the filename
 		m_strFileName = strFile;
-		//m_bDirty = true;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08858")
 
