@@ -34,9 +34,26 @@ namespace DatabaseMigrationWizard.Database.Output
         /// <param name="dbConnection">The database to obtain the data from</param>
         public static void WriteTableInBulk(string sql, StreamWriter writer, DbConnection dbConnection)
         {
-            var dataTable = DBMethods.ExecuteDBQuery(dbConnection, sql);
-
-            writer.WriteLine(JsonConvert.SerializeObject(dataTable, Formatting.Indented));
+            try
+            {
+                var dataTable = DBMethods.ExecuteDBQuery(dbConnection, sql);
+                try
+                {
+                    writer.WriteLine(JsonConvert.SerializeObject(dataTable, Formatting.Indented));
+                }
+                catch(Exception e)
+                {
+                    ExtractException extractException = e.AsExtract("ELI49704");
+                    throw extractException;
+                }
+            }
+            catch(Exception e)
+            {
+                ExtractException extractException = e.AsExtract("ELI49703");
+                extractException.AddDebugData("SQL", sql);
+                extractException.AddDebugData("ConnectionString", dbConnection.ConnectionString);
+                throw extractException;
+            }
         }
 
         /// <summary>
@@ -51,15 +68,31 @@ namespace DatabaseMigrationWizard.Database.Output
         /// <param name="rowCountSQL">Select the number of rows in the table, must label the count as "COUNT". See a calling example.</param>
         public void WriteTableInBatches(string orderBySQL, StreamWriter writer, DbConnection dbConnection, string rowCountSQL )
         {
-            int tableRowCount = int.Parse(DBMethods.ExecuteDBQuery(dbConnection, rowCountSQL).Rows[0]["COUNT"].ToString(), CultureInfo.InvariantCulture);
-
-            for (int i = 0; i < tableRowCount; i += batchSize)
+            try
             {
-                string sql = orderBySQL + $@" OFFSET {i.ToString(CultureInfo.InvariantCulture)} ROWS FETCH NEXT {batchSize.ToString(CultureInfo.InvariantCulture)} ROWS ONLY";
+                int tableRowCount = int.Parse(DBMethods.ExecuteDBQuery(dbConnection, rowCountSQL).Rows[0]["COUNT"].ToString(), CultureInfo.InvariantCulture);
 
-                var dataTable = DBMethods.ExecuteDBQuery(dbConnection, sql);
+                for (int i = 0; i < tableRowCount; i += batchSize)
+                {
+                    string sql = orderBySQL + $@" OFFSET {i.ToString(CultureInfo.InvariantCulture)} ROWS FETCH NEXT {batchSize.ToString(CultureInfo.InvariantCulture)} ROWS ONLY";
+                    try
+                    {
+                        var dataTable = DBMethods.ExecuteDBQuery(dbConnection, sql);
 
-                writer.WriteLine(JsonConvert.SerializeObject(dataTable, Formatting.Indented));
+                        writer.WriteLine(JsonConvert.SerializeObject(dataTable, Formatting.Indented));
+                    }
+                    catch(Exception e)
+                    {
+                        ExtractException extractException = e.AsExtract("ELI49706");
+                        extractException.AddDebugData("SQL", sql);
+                        extractException.AddDebugData("ConnectionString", dbConnection.ConnectionString);
+                        throw extractException;
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                throw e.AsExtract("ELI49705");
             }
         }
 
@@ -76,7 +109,7 @@ namespace DatabaseMigrationWizard.Database.Output
 
                 foreach (ISerialize instance in instances)
                 {
-                    new Thread(() => SerializeTableAndWriteToFile(instance, exportOptions, progress)).Start();
+                    SerializeTableAndWriteToFile(instance, exportOptions, progress);
                 }
             }
             catch(Exception e)
@@ -92,11 +125,7 @@ namespace DatabaseMigrationWizard.Database.Output
         private static void SerializeTableAndWriteToFile(ISerialize instance, ExportOptions exportOptions, IProgress<string> progress)
         {
             var TableName = instance.ToString().Substring(instance.ToString().LastIndexOf("Serialize", StringComparison.OrdinalIgnoreCase)).Replace("Serialize", string.Empty);
-
-            App.Current.Dispatcher.Invoke(delegate
-            {
-                progress.Report(TableName);
-            });
+            progress.Report(TableName);
 
             using (var sqlConnection = new SqlConnection($@"Server={exportOptions.ConnectionInformation.DatabaseServer};Database={exportOptions.ConnectionInformation.DatabaseName};Integrated Security=SSPI"))
             using (StreamWriter writer = File.CreateText($@"{exportOptions.ExportPath}\{TableName}.json"))
@@ -105,10 +134,7 @@ namespace DatabaseMigrationWizard.Database.Output
                 instance.SerializeTable(sqlConnection, writer);
             }
 
-            App.Current.Dispatcher.Invoke(delegate
-            {
-                progress.Report(TableName);
-            });
+            progress.Report(TableName);
         }
     }
 }

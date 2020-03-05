@@ -6,7 +6,6 @@ using System.Windows;
 
 [assembly: CLSCompliant(true)]
 [assembly: NeutralResourcesLanguageAttribute("en")]
-[assembly: SuppressMessage("Microsoft.Design", "CA2210:AssembliesShouldHaveValidStrongNames", Justification = "Making the project large address aware violates this rule. I need the memory so...")]
 namespace DatabaseMigrationWizard
 {
     /// <summary>

@@ -286,15 +286,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>CALL CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>CALL CommonDebugPostBuild.bat "$(TargetPath)"
+CALL "$(DevEnvDir)..\..\VC\Auxiliary\Build\vcvars32.bat"
+editbin /largeaddressaware "$(TargetPath)"
+sn -Ra "$(TargetPath)" "$(TargetDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk"</PostBuildEvent>
   </PropertyGroup>
-  <Import Project="..\..\APIs\LargeAddressAware.1.0.4\build\LargeAddressAware.targets" Condition="Exists('..\..\APIs\LargeAddressAware.1.0.4\build\LargeAddressAware.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\APIs\LargeAddressAware.1.0.4\build\LargeAddressAware.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\APIs\LargeAddressAware.1.0.4\build\LargeAddressAware.targets'))" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

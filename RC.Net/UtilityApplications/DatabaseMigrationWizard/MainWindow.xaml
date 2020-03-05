@@ -5,11 +5,9 @@
         Title="Database Migration Wizard" IsTitleVisible="True"
         ContentSource="/Pages/Home.xaml">
     <mui:ModernWindow.MenuLinkGroups>
-        <mui:LinkGroup>
+        <mui:LinkGroup x:Name="MainLinks">
             <mui:LinkGroup.Links>
                 <mui:Link DisplayName="home" Source="/Pages/Home.xaml" />
-                <mui:Link DisplayName="import" Source="/Pages/Import.xaml" />
-                <mui:Link DisplayName="export" Source="/Pages/Export.xaml" />
             </mui:LinkGroup.Links>
         </mui:LinkGroup>
         <mui:LinkGroup DisplayName="settings" GroupKey="settings">

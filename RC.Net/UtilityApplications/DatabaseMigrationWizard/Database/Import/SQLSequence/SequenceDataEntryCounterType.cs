@@ -46,11 +46,11 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
         public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
         {
-            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
-
-            ImportHelper.PopulateTemporaryTable<DataEntryCounterType>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
-
-            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
+            //DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
+            //
+            //ImportHelper.PopulateTemporaryTable<DataEntryCounterType>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
+            //
+            //DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
         }
     }
 }

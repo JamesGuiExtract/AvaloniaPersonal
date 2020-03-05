@@ -65,7 +65,17 @@ namespace DatabaseMigrationWizard.Database.Input
                             insertBuilder.Append($" {deSerializedTable[i].ToString()},");
                             if ((i % batchSize == 0 && i != 0) || i + 1 == deSerializedTable.Count)
                             {
-                                DBMethods.ExecuteDBQuery(dbConnection, insertBuilder.ToString().TrimEnd(','));
+                                try
+                                {
+                                    DBMethods.ExecuteDBQuery(dbConnection, insertBuilder.ToString().TrimEnd(','));
+                                }
+                                catch(Exception e)
+                                {
+                                    ExtractException extractException = e.AsExtract("ELI49707");
+                                    extractException.AddDebugData("SQL", insertBuilder.ToString().TrimEnd(','));
+                                    throw extractException;
+                                }
+
                                 insertBuilder = new StringBuilder(insertTemporaryTableSql);
                             }
                         }
@@ -114,13 +124,13 @@ namespace DatabaseMigrationWizard.Database.Input
         private IEnumerable<ISequence> FilteredInstances()
         {
             string[] files = System.IO.Directory.GetFiles(this.ImportOptions.ImportPath);
-            bool hasLabDeTables = files.Where(m => m.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE")).Any();
+            bool hasLabDeTables = files.Where(file => file.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE")).Any();
             IEnumerable<ISequence> instances = Universal.GetClassesThatImplementInterface<ISequence>();
             if(!hasLabDeTables)
             {
-                instances = instances.Where(m => !m.TableName.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE"));
+                instances = instances.Where(instance => !instance.TableName.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE"));
             }
-            IEnumerable<ISequence> missingFiles = instances.Where(m => !File.Exists(this.ImportOptions.ImportPath + "\\" + m.TableName + ".json"));
+            IEnumerable<ISequence> missingFiles = instances.Where(instance => !File.Exists(this.ImportOptions.ImportPath + "\\" + instance.TableName + ".json"));
             if(missingFiles.Any())
             {
                 ExtractException extractException = new ExtractException("ELI49697", "You are missing required tables to run this import!");
@@ -156,7 +166,7 @@ namespace DatabaseMigrationWizard.Database.Input
         private void ExecutePriority(IEnumerable<ISequence> instances, Priorities priority)
         {
             List<Thread> threads = new List<Thread>();
-            foreach (ISequence instance in instances.Where(m => m.Priority == priority))
+            foreach (ISequence instance in instances.Where(instance => instance.Priority == priority))
             {
                 Thread thread = new Thread(() => 
                 {

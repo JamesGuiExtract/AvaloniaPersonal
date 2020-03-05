@@ -9,9 +9,9 @@
         <ScrollViewer>
             <StackPanel HorizontalAlignment="Left">
                 <TextBlock Text="DatabaseServer" Style="{StaticResource Heading2}" />
-                <TextBox Text="{Binding DatabaseServer}" Margin="0,0,0,8"></TextBox>
+                <TextBox Text="{Binding DatabaseServer}" Margin="0,0,0,8" TextChanged="ConnectionInformationChanged"></TextBox>
                 <TextBlock Text="DatabaseName" Style="{StaticResource Heading2}" />
-                <TextBox Text="{Binding DatabaseName}" Margin="0,0,0,8"></TextBox>
+                <TextBox Text="{Binding DatabaseName}" Margin="0,0,0,8" TextChanged="ConnectionInformationChanged"></TextBox>
                 <StackPanel Orientation="Horizontal">
                     <Button x:Name="DatabaseStatus" Background="Red" IsEnabled="False" Width="20" Height="20" HorizontalAlignment="Left">
                         <Button.Resources>
@@ -22,6 +22,10 @@
                     </Button>
                     <TextBlock Text="DatabaseStatus"/>
                 </StackPanel>
+
+                <TextBlock Text="Admin Password" Style="{StaticResource Heading2}" />
+                <PasswordBox x:Name="PasswordBox" Margin="0,0,0,8"></PasswordBox>
+                <Button x:Name="PasswordButton" Content="Login" Click="PasswordChanged" />
             </StackPanel>
         </ScrollViewer>
     </Grid>

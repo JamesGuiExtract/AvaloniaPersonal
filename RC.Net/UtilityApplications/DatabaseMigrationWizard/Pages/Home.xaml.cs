@@ -1,10 +1,13 @@
 ﻿using DatabaseMigrationWizard.Database;
 using DatabaseMigrationWizard.Pages.Utility;
+using FirstFloor.ModernUI.Presentation;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using UCLID_FILEPROCESSINGLib;
 
 namespace DatabaseMigrationWizard.Pages
 {
@@ -64,6 +67,37 @@ namespace DatabaseMigrationWizard.Pages
                 }
             }
             catch (Exception) { }
+        }
+
+        private void PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            var mainWindow = ((MainWindow)Application.Current.MainWindow);
+            var fileProcessingDb = new FileProcessingDB()
+            {
+                DatabaseServer = connectionInformation.DatabaseServer,
+                DatabaseName = connectionInformation.DatabaseName
+            };
+            try
+            {
+                fileProcessingDb.LoginUser("admin", PasswordBox.Password);
+                mainWindow.MainLinks.Links.Add(new Link() { DisplayName = "import", Source = new Uri("/Pages/Import.xaml", UriKind.Relative) });
+                mainWindow.MainLinks.Links.Add(new Link() { DisplayName = "export", Source = new Uri("/Pages/Export.xaml", UriKind.Relative) });
+                PasswordBox.Password = "";
+            }
+            catch(Exception)
+            {
+                MessageBox.Show("Invalid password, or the connection is invalid (red box up above). Please try again.");
+            }
+        }
+
+        private void ConnectionInformationChanged(object sender, TextChangedEventArgs e)
+        {
+            var mainWindow = ((MainWindow)System.Windows.Application.Current.MainWindow);
+            var linksToRemove = mainWindow.MainLinks.Links.Where(link => link.DisplayName.Equals("import") || link.DisplayName.Equals("export")).ToList();
+            foreach(Link link in linksToRemove)
+            {
+                mainWindow.MainLinks.Links.Remove(link);
+            }
         }
     }
 }

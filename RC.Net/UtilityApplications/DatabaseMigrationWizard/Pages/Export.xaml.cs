@@ -3,6 +3,8 @@ using DatabaseMigrationWizard.Pages.Utility;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace DatabaseMigrationWizard.Pages
@@ -34,7 +36,10 @@ namespace DatabaseMigrationWizard.Pages
         /// <param name="e"></param>
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            ExportHelper.BeginExport(this.ExportOptions, GetProgressTracker());
+            new Task(() =>
+            {
+                ExportHelper.BeginExport(this.ExportOptions, GetProgressTracker());
+            }, TaskCreationOptions.LongRunning).Start();
         }
 
         /// <summary>
@@ -62,17 +67,20 @@ namespace DatabaseMigrationWizard.Pages
         {
             return new Progress<string>(processedItem =>
             {
-                if (Processing.Contains(processedItem))
+                App.Current.Dispatcher.Invoke(delegate
                 {
-                    Processing.Remove(processedItem);
-                    Completed.Add(processedItem);
-                }
-                else
-                {
-                    Processing.Add(processedItem);
-                }
+                    if (Processing.Contains(processedItem))
+                    {
+                        Processing.Remove(processedItem);
+                        Completed.Add(processedItem);
+                    }
+                    else
+                    {
+                        Processing.Add(processedItem);
+                    }
 
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Processing"));
+                    this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Processing"));
+                });
             });
         }
     }
