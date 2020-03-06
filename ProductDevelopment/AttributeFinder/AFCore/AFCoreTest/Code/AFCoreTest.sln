@@ -1182,6 +1182,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Tab
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database Migration Wizard", "..\..\..\..\..\RC.Net\Database Migration Wizard\Database Migration Wizard\Database Migration Wizard.csproj", "{481D8253-54B0-41CA-B667-9E2CB0A6968E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
