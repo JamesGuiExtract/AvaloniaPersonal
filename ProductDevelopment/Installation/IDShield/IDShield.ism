@@ -2012,8 +2012,8 @@
 		<col def="S255">ISReleaseFlags</col>
 		<row><td>_3A92E09E_117B_4D2C_8AAB_99D057B1D7FA_</td><td>Microsoft SQL Server 2008 R2 Native Client 10.50.6560.0 (x64).prq</td><td>2</td><td/><td/></row>
 		<row><td>_44B74AE9_6369_45C7_B748_69EAC099D9AF_</td><td>Microsoft Visual C++ 2015-2019 Redistributable Package (x86).prq</td><td>1</td><td/><td/></row>
-		<row><td>_50017D5A_140B_4131_A217_ED7E83BB0E99_</td><td>Microsoft .NET Framework 4.6 Full.prq</td><td>0</td><td/><td/></row>
 		<row><td>_A66E9521_4946_4A46_B9D7_76465DA7D152_</td><td>Microsoft SQL Server 2008 R2 Native Client 10.50.6560.0 (x86).prq</td><td>3</td><td/><td/></row>
+		<row><td>_B6D04668_6AA3_406D_895C_3EECAE1A963D_</td><td>Microsoft .NET Framework 4.8 Full.prq</td><td/><td/><td/></row>
 	</table>
 
 	<table name="ISSetupType">
