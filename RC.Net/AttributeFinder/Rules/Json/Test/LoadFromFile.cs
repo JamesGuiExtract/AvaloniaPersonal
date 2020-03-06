@@ -246,7 +246,6 @@ namespace Extract.AttributeFinder.Rules.Json.Test
 
             // Save/load json
             ruleset.SaveTo(rsdPath, false);
-            ruleset = new RuleSetClass();
             ruleset.LoadFrom(rsdPath, false);
 
             var dtoFromJson = (Dto.RuleSet)Domain.RuleObjectConverter.ConvertToDto(ruleset);

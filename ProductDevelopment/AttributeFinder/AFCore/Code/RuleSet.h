@@ -392,4 +392,6 @@ private:
 	IOCRParametersPtr getOCRParameters();
 
 	UCLID_AFCORELib::IRuleSetSerializerPtr getRuleSetSerializer();
+
+	void clear();
 };

@@ -1522,34 +1522,14 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 		// Check license
 		validateLicense();
 
-		m_ipDocPreprocessor = __nullptr;
-
-		// Set all counters to default of false
-		m_bUseDocsIndexingCounter = false;
-		m_bUsePaginationCounter = false;
-		m_bUsePagesRedactionCounter = false;
-		m_bUseDocsRedactionCounter = false;
-		m_bUsePagesIndexingCounter = false;
+		clear();
 		bool bHasCustomCounters = false;
-		m_ipCustomCounters = __nullptr;
-		m_apmapCounters.reset(__nullptr);
 
-		// by default rulesets can be used internally or externally
+		// Previously, by default, rulesets could be used internally or externally
 		m_bRuleSetOnlyForInternalUse = false;
-
-		// By default rulesets are not swiping rules
-		m_bSwipingRule = false;
-
-		m_strFKBVersion = "";
 
 		// whether or not this is a version 2 and beyond
 		bool bVersion2AndBeyond = false;
-
-		m_eRuleSetRunMode = kRunPerDocument;
-		m_bInsertAttributesUnderParent = false;
-		m_strInsertParentName = "";
-		m_strInsertParentValue = "";
-		m_bDeepCopyInput = false;
 
 		// read signature from stream and ensure that it is correct
 		CComBSTR bstrSignature;
@@ -1987,6 +1967,8 @@ STDMETHODIMP CRuleSet::raw_CopyFrom(IUnknown * pObject)
 		// Validate license first
 		validateLicense();
 
+		clear();
+
 		// Create the other RuleSet object
 		UCLID_AFCORELib::IRuleSetPtr ipSource = pObject;
 		ASSERT_RESOURCE_ALLOCATION("ELI08224", ipSource != __nullptr);
@@ -2038,6 +2020,7 @@ STDMETHODIMP CRuleSet::raw_CopyFrom(IUnknown * pObject)
 		m_bInsertAttributesUnderParent = asCppBool(ipRunMode->InsertAttributesUnderParent);
 		m_strInsertParentName = asString(ipRunMode->InsertParentName);
 		m_strInsertParentValue = asString(ipRunMode->InsertParentValue);
+		m_bDeepCopyInput = asCppBool(ipRunMode->DeepCopyInput);
 
 		// Copy OCR parameters
 		IHasOCRParametersPtr ipOCRParams(pObject);
@@ -2887,5 +2870,31 @@ UCLID_AFCORELib::IRuleSetSerializerPtr CRuleSet::getRuleSetSerializer()
 	}
 
 	return m_ipRuleSetSerializer;
+}
+//-------------------------------------------------------------------------------------------------
+void CRuleSet::clear()
+{
+	m_ipAttributeNameToInfoMap = __nullptr; 
+	m_bDirty = false;
+	m_bIsEncrypted = false;
+	m_bUseDocsIndexingCounter = false;
+	m_bUsePaginationCounter = false;
+	m_bUsePagesRedactionCounter = false;
+	m_bUseDocsRedactionCounter = false;
+	m_bUsePagesIndexingCounter = false;
+	m_ipCustomCounters = __nullptr;
+	m_apmapCounters.reset(__nullptr);
+	m_bRuleSetOnlyForInternalUse = true;
+	m_bSwipingRule = false;
+	m_strFKBVersion = "";
+	m_bIgnorePreprocessorErrors = false;
+	m_bIgnoreOutputHandlerErrors = false;
+	m_nVersionNumber = gnCurrentVersion;
+	m_eRuleSetRunMode = kRunPerDocument;
+	m_bInsertAttributesUnderParent = false;
+	m_strInsertParentName = "";
+	m_strInsertParentValue = "";
+	m_bDeepCopyInput = false;
+	m_ipOCRParameters = __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
