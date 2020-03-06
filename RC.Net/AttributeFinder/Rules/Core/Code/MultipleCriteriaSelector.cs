@@ -543,7 +543,9 @@ namespace Extract.AttributeFinder.Rules
 
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
+                    #pragma warning disable 618
                     writer.Write(ComUtilities.GetIPersistStreamInterface(Selectors), clearDirty);
+                    #pragma warning restore 618
                     writer.Write(_negatedSelectors);
                     writer.Write(SelectExclusively);
 

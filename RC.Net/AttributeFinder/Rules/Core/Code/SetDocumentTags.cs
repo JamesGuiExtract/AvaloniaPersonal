@@ -1273,7 +1273,9 @@ namespace Extract.AttributeFinder.Rules
                         writer.Write(UseSelectedAttributesForStringTagValue);
                         if (UseSelectedAttributesForStringTagValue)
                         {
+                            #pragma warning disable 618
                             writer.Write(ComUtilities.GetIPersistStreamInterface(StringTagAttributeSelector), clearDirty);
+                            #pragma warning restore 618
                         }
                     }
 
@@ -1291,7 +1293,9 @@ namespace Extract.AttributeFinder.Rules
                         writer.Write(UseSelectedAttributesForObjectTagValue);
                         if (UseSelectedAttributesForObjectTagValue)
                         {
+                            #pragma warning disable 618
                             writer.Write(ComUtilities.GetIPersistStreamInterface(ObjectTagAttributeSelector), clearDirty);
+                            #pragma warning restore 618
                         }
                     }
 

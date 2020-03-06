@@ -101,6 +101,7 @@ namespace Extract.Interop
         /// <param name="persistableCopyable">An object that is known to implement IPersistStream and ICopyableObject</param>
         [CLSCompliant(false)]
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Copyable")]
+        [Obsolete("Suppress if cloning the object is OK!", false)]
         public static IPersistStream GetIPersistStreamInterface(object persistableCopyable)
         {
             try
