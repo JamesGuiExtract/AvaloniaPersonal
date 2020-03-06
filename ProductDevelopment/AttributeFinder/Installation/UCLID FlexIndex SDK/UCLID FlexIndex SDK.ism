@@ -1970,10 +1970,10 @@
 		<col def="I2">Order</col>
 		<col def="I2">ISSetupLocation</col>
 		<col def="S255">ISReleaseFlags</col>
-		<row><td>_00E10194_B7B9_4528_8E36_9A95BF48B27D_</td><td>Microsoft SQL Server 2008 R2 Native Client 10.50.6560.0 (x64).prq</td><td>2</td><td/><td/></row>
 		<row><td>_1479B60F_0C0E_435E_B217_DC74438E4646_</td><td>Microsoft Visual C++ 2015-2019 Redistributable Package (x86).prq</td><td>1</td><td/><td/></row>
+		<row><td>_5FAC6B3F_5E8D_4D09_B6A8_3BC21391D615_</td><td>Microsoft SQL Server 2012 Native Client (x64).prq</td><td/><td/><td/></row>
 		<row><td>_717598A3_4B44_433B_BEE0_09A78F062472_</td><td>Microsoft .NET Framework 4.8 Full.prq</td><td/><td/><td/></row>
-		<row><td>_B5A47F0F_6E82_42B4_B064_9331D1B460A5_</td><td>Microsoft SQL Server 2008 R2 Native Client 10.50.6560.0 (x86).prq</td><td>3</td><td/><td/></row>
+		<row><td>_CD543C84_67D7_4792_A61F_5AE0D9F5DAE1_</td><td>Microsoft SQL Server 2012 Native Client (x86).prq</td><td/><td/><td/></row>
 	</table>
 
 	<table name="ISSetupType">

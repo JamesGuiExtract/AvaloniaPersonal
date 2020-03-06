@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29324.140
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AutoIncrementVssLabel", "..\..\AutoIncrementVssLabel\AutoIncrementVssLabel.vcxproj", "{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CalcTotalMemLeak", "..\..\CalcTotalMemLeak\CalcTotalMemLeak.vcxproj", "{3F49F480-CCD2-4EDE-A749-C1BF40160343}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ChangeCase", "..\..\ChangeCase\ChangeCase.vcxproj", "{96F81DFA-8150-4CA7-85D9-2DB8A981C638}"
@@ -243,20 +241,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}.Debug|Win32.ActiveCfg = Debug|Win32
-		{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}.Debug|Win32.Build.0 = Debug|Win32
-		{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}.Debug|x64.ActiveCfg = Debug|Win32
-		{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}.Debug|x86.ActiveCfg = Debug|Win32
-		{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}.Release|Any CPU.ActiveCfg = Release|Win32
-		{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}.Release|Win32.ActiveCfg = Release|Win32
-		{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}.Release|Win32.Build.0 = Release|Win32
-		{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}.Release|x64.ActiveCfg = Release|Win32
-		{CF7B04CC-3AAE-4E53-B14E-5DED4AD2C678}.Release|x86.ActiveCfg = Release|Win32
 		{3F49F480-CCD2-4EDE-A749-C1BF40160343}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{3F49F480-CCD2-4EDE-A749-C1BF40160343}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{3F49F480-CCD2-4EDE-A749-C1BF40160343}.Debug|Mixed Platforms.Build.0 = Debug|Win32

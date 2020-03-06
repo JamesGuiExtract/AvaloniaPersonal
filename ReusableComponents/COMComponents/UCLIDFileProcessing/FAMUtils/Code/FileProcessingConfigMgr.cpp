@@ -80,7 +80,7 @@ const int FileProcessingConfigMgr::DLG_MIN_HEIGHT = 200;
 static const int DEFAULT_NUM_THREADS = 0;
 
 static const string DEFAULT_DB_CONNECTION_STRING = 
-			"Provider=SQLNCLI;Server=(local);"
+			"Provider=SQLNCLI11;Server=(local);"
 			"Database=FPDB;Integrated Security=SSPI;"
 			"DataTypeCompatibility=80;"
 			"MARS Connection=True;";
