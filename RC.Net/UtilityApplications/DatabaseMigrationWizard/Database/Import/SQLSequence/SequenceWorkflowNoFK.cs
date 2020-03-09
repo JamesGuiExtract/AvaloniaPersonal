@@ -10,30 +10,24 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
     {
         private readonly string CreateTempTableSQL = @"
                                         CREATE TABLE [dbo].[##Workflow](
+										[Guid] uniqueidentifier NOT NULL,
 	                                    [Name] [nvarchar](100) NULL,
 	                                    [WorkflowTypeCode] [nvarchar](1) NULL,
 	                                    [Description] [nvarchar](max) NULL,
-	                                    [StartActionID] [int] NULL,
-	                                    [EndActionID] [int] NULL,
-	                                    [PostWorkflowActionID] [int] NULL,
 	                                    [DocumentFolder] [nvarchar](255) NULL,
-	                                    [OutputAttributeSetID] [bigint] NULL,
-	                                    [OutputFileMetadataFieldID] [int] NULL,
 	                                    [OutputFilePathInitializationFunction] [nvarchar](255) NULL,
 	                                    [LoadBalanceWeight] [int] NOT NULL,
-	                                    [EditActionID] [int] NULL,
-	                                    [PostEditActionID] [int] NULL,
-                                        [StartAction] NVARCHAR(MAX) NULL,
-                                        [EditAction] NVARCHAR(MAX) NULL,
-                                        [EndAction] NVARCHAR(MAX) NULL,
-                                        [PostEditAction] NVARCHAR(MAX) NULL,
-                                        [PostWorkflowAction] NVARCHAR(MAX) NULL,
-                                        [AttributeSetName] NVARCHAR(MAX) NULL,
-                                        [MetadataFieldName] NVARCHAR(MAX) NULL
+										[EditActionGUID] uniqueidentifier NULL,
+										[EndActionGUID] uniqueidentifier NULL,
+										[PostEditActionGUID] uniqueidentifier NULL,
+										[PostWorkflowActionGUID] uniqueidentifier NULL,
+										[StartActionGUID] uniqueidentifier NULL,
+                                        [AttributeSetNameGuid] uniqueidentifier NULL,
+                                        [MetadataFieldNameGuid] uniqueidentifier NULL
                                     )";
 
         private readonly string insertSQL = @"
-                                    INSERT INTO dbo.Workflow (Name, WorkflowTypeCode, Description, DocumentFolder, LoadBalanceWeight)
+                                    INSERT INTO dbo.Workflow (Name, WorkflowTypeCode, Description, DocumentFolder, LoadBalanceWeight, GUID)
 
                                     SELECT
 	                                    Name
@@ -41,33 +35,28 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 	                                    , Description
 	                                    , DocumentFolder
 	                                    , LoadBalanceWeight
+                                        , [Guid]
                                     FROM 
 	                                    ##Workflow
                                     WHERE
-	                                    Name NOT IN (SELECT Name FROM dbo.Workflow)";
+	                                    GUID NOT IN (SELECT GUID FROM dbo.Workflow)";
 
         private readonly string insertTempTableSQL = @"
                                             INSERT INTO ##Workflow (
-                                                                    Name
+																	GUID
+                                                                    , Name
                                                                     , WorkflowTypeCode
                                                                     , Description
-                                                                    , StartActionID
-                                                                    , EndActionID
-                                                                    , PostWorkflowActionID
                                                                     , DocumentFolder
-                                                                    , OutputAttributeSetID
-                                                                    , OutputFileMetadataFieldID
                                                                     , OutputFilePathInitializationFunction
                                                                     , LoadBalanceWeight
-                                                                    , EditActionID
-                                                                    , PostEditActionID
-                                                                    , StartAction
-                                                                    , EditAction
-                                                                    , EndAction
-                                                                    , PostEditAction
-                                                                    , PostWorkflowAction
-                                                                    , AttributeSetName
-                                                                    , MetadataFieldName)
+                                                                    , EditActionGUID
+                                                                    , EndActionGUID
+                                                                    , PostEditActionGUID
+                                                                    , PostWorkflowActionGUID
+                                                                    , StartActionGUID
+                                                                    , AttributeSetNameGuid
+                                                                    , MetadataFieldNameGuid)
                                             VALUES
                                             ";
 
@@ -75,13 +64,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
         public string TableName => "Workflow";
 
-        public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
+        public void ExecuteSequence(ImportOptions importOptions)
         {
-            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
+            importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
-            ImportHelper.PopulateTemporaryTable<Workflow>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
+            ImportHelper.PopulateTemporaryTable<Workflow>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
+            importOptions.ExecuteCommand(this.insertSQL);
         }
     }
 }

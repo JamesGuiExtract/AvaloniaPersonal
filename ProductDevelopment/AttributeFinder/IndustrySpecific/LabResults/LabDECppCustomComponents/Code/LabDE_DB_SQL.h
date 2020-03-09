@@ -21,7 +21,8 @@ static const string gstrCREATE_PATIENT_TABLE =
     " [DOB] DATETIME NULL, "
     " [Gender] NCHAR(1) NULL, "
     " [MergedInto] NVARCHAR(20) NULL, "
-    " [CurrentMRN] NVARCHAR(20) NOT NULL)";
+    " [CurrentMRN] NVARCHAR(20) NOT NULL, "
+    " [Guid] uniqueidentifier NOT NULL DEFAULT newid())";
 
 static const string gstrADD_FK_PATIENT_MERGEDINTO= 
     "ALTER TABLE [dbo].[LabDEPatient]  "
@@ -59,7 +60,8 @@ static const string gstrCREATE_LABDE_PROVIDER_TABLE =
 "[Address][nvarchar](1000) NULL, "
 "[OtherProviderID][nvarchar](64) NULL, "
 "[Inactive][bit] NULL, "
-"[MFNMessage][xml] NULL) "
+"[MFNMessage][xml] NULL, "
+"[Guid] uniqueidentifier NOT NULL DEFAULT newid()) "
 "END ";
 
 static const string gstrCREATE_LABDE_PROVIDER_INDEX_FIRSTLAST =
@@ -114,7 +116,8 @@ static const string gstrCREATE_ENCOUNTER_TABLE =
     " [EncounterProvider] NVARCHAR(256) NOT NULL, "
 	" [DischargeDate] DATETIME NULL, "
 	" [AdmissionDate] DATETIME NULL, "
-    " ADTMessage XML)";
+    " ADTMessage XML,"
+    " [Guid] uniqueidentifier NOT NULL DEFAULT newid())";
 
 static const string gstrADD_FK_ENCOUNTER_PATIENT =
 "ALTER TABLE [dbo].[LabDEEncounter] "
@@ -140,9 +143,9 @@ static const string gstrCREATE_ORDER_STATUS_TABLE =
 
 // Populate the LabDEOrderStatus table.
 static const string gstrPOPULATE_ORDER_STATUSES = 
-    "INSERT INTO [dbo].[LabDEOrderStatus] VALUES ('A', "
+    "INSERT INTO [dbo].[LabDEOrderStatus] (Code, Meaning) VALUES ('A', "
         "'Available: Has not been cancelled; may or may not have been fulfilled'); "
-    "INSERT INTO [dbo].[LabDEOrderStatus] VALUES ('C', 'Canceled');";
+    "INSERT INTO [dbo].[LabDEOrderStatus] (Code, Meaning) VALUES ('C', 'Canceled');";
 
 //--------------------------------------------------------------------------------------------------
 // Order Table
@@ -159,7 +162,8 @@ static const string gstrCREATE_ORDER_TABLE =
     " [ReferenceDateTime] DATETIME, "
     " [ORMMessage] XML, "
     " [EncounterID] NVARCHAR(20) NULL, "
-	" [AccessionNumber] NVARCHAR(50) NULL )";
+	" [AccessionNumber] NVARCHAR(50) NULL, "
+    " [Guid] uniqueidentifier NOT NULL DEFAULT newid())";
 
 static const string gstrADD_FK_ORDER_PATIENT_MRN = 
     "ALTER TABLE [dbo].[LabDEOrder]  "

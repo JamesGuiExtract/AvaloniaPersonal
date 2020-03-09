@@ -14,7 +14,7 @@ namespace DatabaseMigrationWizard.Database.Output
                             FROM 
 	                            [dbo].FAMUser";
 
-        public void SerializeTable(DbConnection dbConnection, StreamWriter writer)
+        public void SerializeTable(DbConnection dbConnection, TextWriter writer)
         {
             ExportHelper.WriteTableInBulk(this.sql, writer, dbConnection);
         }

@@ -24,11 +24,35 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 	                                    [Address] [nvarchar](1000) NULL,
 	                                    [OtherProviderID] [nvarchar](64) NULL,
 	                                    [Inactive] [bit] NULL,
-	                                    [MFNMessage] [xml] NULL
+	                                    [MFNMessage] [xml] NULL,
+                                        [Guid] uniqueidentifier NOT NULL,
                                         )";
 
         private readonly string insertSQL = @"
-                                    INSERT INTO dbo.LabDEProvider(ID, FirstName, MiddleName, LastName, ProviderType, Title, Degree, Departments, Specialties, Phone, Fax, Address, OtherProviderID, Inactive, MFNMessage)
+                                    UPDATE
+										dbo.LabDEProvider
+									SET
+										FirstName = UpdatingLabDEProvider.FirstName
+										, MiddleName = UpdatingLabDEProvider.MiddleName
+										, LastName = UpdatingLabDEProvider.LastName
+										, ProviderType = UpdatingLabDEProvider.ProviderType
+										, Title = UpdatingLabDEProvider.Title
+										, Degree = UpdatingLabDEProvider.Degree
+										, Departments = UpdatingLabDEProvider.Departments
+										, Specialties = UpdatingLabDEProvider.Specialties
+										, Phone = UpdatingLabDEProvider.Phone
+										, Fax = UpdatingLabDEProvider.Fax
+										, Address = UpdatingLabDEProvider.Address
+										, OtherProviderID = UpdatingLabDEProvider.OtherProviderID
+										, Inactive = UpdatingLabDEProvider.Inactive
+										, MFNMessage = UpdatingLabDEProvider.MFNMessage
+										, ID = UpdatingLabDEProvider.ID
+									FROM
+										##LabDEProvider AS UpdatingLabDEProvider
+									WHERE
+										LabDEProvider.Guid = UpdatingLabDEProvider.Guid
+									;
+									INSERT INTO dbo.LabDEProvider(ID, FirstName, MiddleName, LastName, ProviderType, Title, Degree, Departments, Specialties, Phone, Fax, Address, OtherProviderID, Inactive, MFNMessage, Guid)
 
 									SELECT
 										ID
@@ -46,36 +70,15 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										, OtherProviderID
 										, Inactive
 										, MFNMessage
+										, Guid
 									FROM 
 										##LabDEProvider
 									WHERE
-										ID NOT IN (SELECT ID FROM dbo.LabDEProvider)
-									;
-									UPDATE
-										dbo.LabDEProvider
-									SET
-										FirstName = UpdatingLabDEProvider.FirstName
-										, MiddleName = UpdatingLabDEProvider.MiddleName
-										, LastName = UpdatingLabDEProvider.LastName
-										, ProviderType = UpdatingLabDEProvider.ProviderType
-										, Title = UpdatingLabDEProvider.Title
-										, Degree = UpdatingLabDEProvider.Degree
-										, Departments = UpdatingLabDEProvider.Departments
-										, Specialties = UpdatingLabDEProvider.Specialties
-										, Phone = UpdatingLabDEProvider.Phone
-										, Fax = UpdatingLabDEProvider.Fax
-										, Address = UpdatingLabDEProvider.Address
-										, OtherProviderID = UpdatingLabDEProvider.OtherProviderID
-										, Inactive = UpdatingLabDEProvider.Inactive
-										, MFNMessage = UpdatingLabDEProvider.MFNMessage
-
-									FROM
-										##LabDEProvider AS UpdatingLabDEProvider
-									WHERE
-										LabDEProvider.ID = UpdatingLabDEProvider.ID";
+										Guid NOT IN (SELECT Guid FROM dbo.LabDEProvider)
+									";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##LabDEProvider (ID, FirstName, MiddleName, LastName, ProviderType, Title, Degree, Departments, Specialties, Phone, Fax, Address, OtherProviderID, Inactive, MFNMessage)
+                                            INSERT INTO ##LabDEProvider (ID, FirstName, MiddleName, LastName, ProviderType, Title, Degree, Departments, Specialties, Phone, Fax, Address, OtherProviderID, Inactive, MFNMessage, Guid)
                                             VALUES
                                             ";
 
@@ -83,13 +86,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
 		public string TableName => "LabDEProvider";
 
-		public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
+		public void ExecuteSequence(ImportOptions importOptions)
         {
-            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
-			
-            ImportHelper.PopulateTemporaryTable<LabDEProvider>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
-			
-            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
-        }
+			importOptions.ExecuteCommand(this.CreateTempTableSQL);
+
+			ImportHelper.PopulateTemporaryTable<LabDEProvider>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+			importOptions.ExecuteCommand(this.insertSQL);
+		}
     }
 }

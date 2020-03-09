@@ -27,14 +27,15 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="3*"></ColumnDefinition>
-                        <ColumnDefinition Width="1*"></ColumnDefinition>
-                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="120"></ColumnDefinition>
+                        <ColumnDefinition Width="120"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <TextBox 
                         Grid.Column="0"
                     x:Name="ExportPath" 
                     Style="{StaticResource TextBoxInError}"
-                    Margin="0,0,0,8">
+                    Margin="0,0,0,8"
+                    IsEnabled="{Binding MainWindow.UIEnabled}" >
                         <TextBox.Text>
                             <Binding 
                             Path="ExportOptions.ExportPath"
@@ -49,12 +50,12 @@
                             </Binding>
                         </TextBox.Text>
                     </TextBox>
-                    <Button Grid.Column="1" x:Name="FolderButton" Content="Select Folder" Margin="0,0,0,8" Click="FolderButton_Click"/>
-                    <Button Grid.Column="2" x:Name="FolderBrowser" Content="Browse" Margin="0,0,0,8" Click="FolderBrowser_Click"/>
+                    <Button Grid.Column="1" x:Name="FolderButton" Content="Select Folder" Margin="0,0,0,8" Click="FolderButton_Click" IsEnabled="{Binding MainWindow.UIEnabled}" />
+                    <Button Grid.Column="2" x:Name="FolderBrowser" Content="File Explorer" Margin="0,0,0,8" Click="FolderBrowser_Click"/>
                 </Grid>
 
-                <CheckBox IsChecked="{Binding ExportOptions.IncludeLabDETables}" x:Name="IncludeLabDETables" Content="Include LabDE tables?" Margin="0,0,0,8"/>
-                <Button x:Name="ExportButton" Content="Export" Margin="0,0,0,8" Click="ExportButton_Click" IsEnabled="{Binding Path=(Validation.HasError), ElementName=ExportPath, Converter={StaticResource InverseBooleanConverter}}"/>
+                <CheckBox IsChecked="{Binding ExportOptions.IncludeLabDETables}" x:Name="IncludeLabDETables" Content="Include LabDE tables?" Margin="0,0,0,8" IsEnabled="{Binding MainWindow.UIEnabled}" />
+                <Button x:Name="ExportButton" Content="Export" Margin="0,0,0,8" Click="ExportButton_Click" IsEnabled="{Binding MainWindow.UIEnabled}" />
 
             </StackPanel>
         </ScrollViewer>

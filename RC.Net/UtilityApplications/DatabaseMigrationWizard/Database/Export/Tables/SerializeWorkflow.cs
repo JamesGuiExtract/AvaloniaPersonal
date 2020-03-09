@@ -10,27 +10,21 @@ namespace DatabaseMigrationWizard.Database.Output
         private readonly string sql =
 							@"
                             SELECT  
-								Workflow.[ID]
+								Workflow.[Guid] AS WorkflowGuid
 								, Workflow.[Name]
 								, Workflow.[WorkflowTypeCode]
 								, Workflow.[Description]
 								, Workflow.[DocumentFolder]
 								, Workflow.[OutputFilePathInitializationFunction]
 								, Workflow.[LoadBalanceWeight]
-								, Workflow.[EditActionID]
-								, EditAction.ASCName AS EditAction 
-								, Workflow.[EndActionID]
-								, EndAction.ASCName AS EndAction 
-								, Workflow.[PostEditActionID]
-								, PostEditAction.ASCName AS PostEditAction 
-								, Workflow.[PostWorkflowActionID]
-								, PostWorkflowAction.ASCName AS PostWorkflowAction 
-								, Workflow.[StartActionID]
-								, StartAction.ASCName AS StartAction 
-								, Workflow.[OutputAttributeSetID]
-								, AttributeSetName.Description AS AttributeSetName 
-								, Workflow.[OutputFileMetadataFieldID]
-								, MetadataField.Name AS MetadataFieldName 
+								, MetadataField.GUID AS MetadataFieldGuid
+								, EditAction.GUID AS EditActionGuid
+								, EndAction.GUID AS EndActionGuid
+								, PostEditAction.GUID AS PostEditActionGuid 
+								, PostWorkflowAction.GUID AS PostWorkflowActionGuid 
+								, StartAction.GUID AS StartActionGuid
+								, AttributeSetName.GUID AS AttributeSetNameGuid
+
 							FROM 
 								[dbo].[Workflow]
 									LEFT OUTER JOIN dbo.Action AS EditAction
@@ -54,7 +48,7 @@ namespace DatabaseMigrationWizard.Database.Output
 									LEFT OUTER JOIN dbo.MetadataField
 										ON dbo.Workflow.OutputFileMetadataFieldID = MetadataField.ID";
 
-        public void SerializeTable(DbConnection dbConnection, StreamWriter writer)
+        public void SerializeTable(DbConnection dbConnection, TextWriter writer)
         {
 			ExportHelper.WriteTableInBulk(this.sql, writer, dbConnection);
         }

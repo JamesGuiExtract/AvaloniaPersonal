@@ -5,7 +5,7 @@ using System.IO;
 
 namespace DatabaseMigrationWizard.Database.Output
 {
-    public class SerializeSerializeDBInfo : ISerialize
+    public class SerializeDBInfo : ISerialize
     {
         private readonly string sql =
                             @"
@@ -14,7 +14,7 @@ namespace DatabaseMigrationWizard.Database.Output
                             FROM 
 	                            [dbo].[DBInfo]";
 
-        public void SerializeTable(DbConnection dbConnection, StreamWriter writer)
+        public void SerializeTable(DbConnection dbConnection, TextWriter writer)
         {
             ExportHelper.WriteTableInBulk(this.sql, writer, dbConnection);
         }

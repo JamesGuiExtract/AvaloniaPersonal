@@ -10,17 +10,16 @@ namespace DatabaseMigrationWizard.Database.Output
         private readonly string sql =
                             @"
                             SELECT  
-	                            WebAppConfig.ID
-	                            , WebAppConfig.Type
-	                            , WebAppConfig.WorkflowID
+	                            WebAppConfig.Type
 	                            , WebAppConfig.Settings
-	                            , Name
+                                , WebAppConfig.GUID AS WebAppConfigGuid
+	                            , dbo.Workflow.GUID AS WorkflowGuid
                             FROM 
 	                            [dbo].[WebAppConfig]
 		                            LEFT OUTER JOIN dbo.Workflow
-			                            ON dbo.Workflow.ID = dbo.WebAppConfig.ID";
+			                            ON dbo.Workflow.ID = dbo.WebAppConfig.WorkflowID";
 
-        public void SerializeTable(DbConnection dbConnection, StreamWriter writer)
+        public void SerializeTable(DbConnection dbConnection, TextWriter writer)
         {
             ExportHelper.WriteTableInBulk(this.sql, writer, dbConnection);
         }

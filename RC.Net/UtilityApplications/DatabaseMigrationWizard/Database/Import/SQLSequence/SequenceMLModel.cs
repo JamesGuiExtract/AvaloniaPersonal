@@ -11,20 +11,31 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
         private readonly string CreateTempTableSQL = @"
                                         CREATE TABLE [dbo].[##MLModel](
 	                                    [Name] [nvarchar](255) NOT NULL,
+                                        [Guid] uniqueidentifier NOT NULL,
                                         )";
 
         private readonly string insertSQL = @"
-                                    INSERT INTO dbo.MLModel(Name)
+                                    UPDATE
+	                                    dbo.MLModel
+                                    SET
+	                                    Name = UpdatingMLModel.Name
+                                    FROM
+	                                    ##MLModel AS UpdatingMLModel
+                                    WHERE
+	                                    dbo.MLModel.Guid = UpdatingMLModel.Guid
+                                    ;
+                                    INSERT INTO dbo.MLModel(Name, Guid)
 
                                     SELECT
 	                                    Name
+	                                    , Guid
                                     FROM 
 	                                    ##MLModel
                                     WHERE
-	                                    Name NOT IN (SELECT Name FROM dbo.MLModel)";
+	                                    Guid NOT IN (SELECT Guid FROM dbo.MLModel)";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##MLModel (Name)
+                                            INSERT INTO ##MLModel (Name, Guid)
                                             VALUES
                                             ";
 
@@ -32,13 +43,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
         public string TableName => "MLModel";
 
-        public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
+        public void ExecuteSequence(ImportOptions importOptions)
         {
-            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
+            importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
-            ImportHelper.PopulateTemporaryTable<MLModel>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
+            ImportHelper.PopulateTemporaryTable<MLModel>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
+            importOptions.ExecuteCommand(this.insertSQL);
         }
     }
 }

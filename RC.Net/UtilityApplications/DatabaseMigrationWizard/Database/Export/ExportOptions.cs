@@ -20,7 +20,7 @@ namespace DatabaseMigrationWizard.Database.Output
                 return this._ExportPath;
             } set {
                 this._ExportPath = value;
-                this.PropertyChanged.Invoke(this, new PropertyChangedEventArgs("ExportPath"));
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ExportPath"));
             } }
 
         /// <summary>
