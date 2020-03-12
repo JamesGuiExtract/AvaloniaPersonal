@@ -28,6 +28,7 @@ const unsigned long gnCurrentVersion = 5;
 CRemoveSubAttributes::CRemoveSubAttributes() :
 m_ipDataScorer(NULL),
 m_eCondition(kEQ),
+m_eConditionComparisonType(kValueOf),
 m_bConditionalRemove(false),
 m_nScoreToCompare(0),
 m_ipAS(NULL)
