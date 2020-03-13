@@ -269,6 +269,7 @@ STDMETHODIMP CRuleSet::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty,
 
 		getRuleSetSerializer()->SaveRuleSet(getThisAsCOMPtr(), strFullFileName, bClearDirty);
 
+		string strFileName = asString(strFullFileName);
 		if (bClearDirty)
 		{
 			// update the filename associated with this ruleset
@@ -276,7 +277,7 @@ STDMETHODIMP CRuleSet::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty,
 			// true because this method gets called for "temporary saving" 
 			// with the auto-save-on-timer feature.  The auto-save method
 			// calls to this method will have bClearDirty set to false.
-			m_strFileName = asString(strFullFileName);
+			m_strFileName = strFileName;
 			m_strPreviousFileName = m_strFileName;
 		}
 
@@ -287,7 +288,7 @@ STDMETHODIMP CRuleSet::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty,
 		}
 
 		// Wait until the file is readable
-		waitForFileAccess(m_strFileName, giMODE_READ_ONLY);
+		waitForFileAccess(strFileName, giMODE_READ_ONLY);
 	
 		return S_OK;
 	}
