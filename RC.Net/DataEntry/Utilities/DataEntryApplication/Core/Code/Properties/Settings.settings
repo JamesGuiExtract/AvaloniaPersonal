@@ -71,5 +71,8 @@
     <Setting Name="InputEventFilter" Type="System.String" Scope="Application">
       <Value Profile="(Default)">KeyDown,SystemKeyDown,LeftButtonDown,NonClientLeftButtonDown,MiddleButtonDown,NonClientMiddleButtonDown,RightButtonDown,NonClientRightButtonDown</Value>
     </Setting>
+    <Setting Name="DisableSkip" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

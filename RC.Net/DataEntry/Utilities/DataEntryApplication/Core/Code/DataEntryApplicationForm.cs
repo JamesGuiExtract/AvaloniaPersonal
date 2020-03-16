@@ -801,6 +801,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 _skipProcessingMenuItem = CreateDisabledMenuItem("Skip document");
                 items.Add(_skipProcessingMenuItem);
+                if (_applicationConfig.Settings.DisableSkip)
+                {
+                    _skipProcessingMenuItem.Enabled = false;
+                }
             }
 
             // Add the exit menu item
@@ -2161,7 +2165,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     if (_fileProcessingDb != null)
                     {
-                        _skipProcessingMenuItem.Enabled = _imageViewer.IsImageAvailable;
+                        _skipProcessingMenuItem.Enabled = 
+                            !_applicationConfig.Settings.DisableSkip && _imageViewer.IsImageAvailable;
                         _tagFileToolStripButton.Enabled = _imageViewer.IsImageAvailable;
                     }
                 }
@@ -3003,7 +3008,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     _saveAndCommitFileCommand.Enabled = _imageViewer.IsImageAvailable;
                     _saveMenuItem.Enabled = _imageViewer.IsImageAvailable;
-                    _skipProcessingMenuItem.Enabled = _imageViewer.IsImageAvailable;
+                    _skipProcessingMenuItem.Enabled =
+                            !_applicationConfig.Settings.DisableSkip && _imageViewer.IsImageAvailable;
                     _printMenuItem.Enabled = _imageViewer.IsImageAvailable;
                     _pageNavigationToolStripMenuItem.Enabled = _imageViewer.IsImageAvailable;
                     _pageNavigationImageViewerToolStrip.Enabled = _imageViewer.IsImageAvailable;
@@ -3077,8 +3083,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _saveMenuItem.Enabled = false;
                     
                     // Skip should always be enabled when on the pagination tab if a document is available
-                    _skipProcessingMenuItem.Enabled = _paginationPanel.SourceDocuments.Any();
-                    
+                    _skipProcessingMenuItem.Enabled =
+                        !_applicationConfig.Settings.DisableSkip && _paginationPanel.SourceDocuments.Any();
+
                     _pageNavigationToolStripMenuItem.Enabled = false;
                     _pageNavigationImageViewerToolStrip.Enabled = false;
                     _gotoNextInvalidCommand.Enabled = false;
@@ -3999,7 +4006,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // can be triggered before the first one is complete (BeginInvokes allow for
                 // processing another event in the midst of the initial handling).
                 _saveAndCommitFileCommand.Enabled = false;
-                
+
                 // AttemptSave will return Cancel if there was invalid data in the DEP.
                 if (AttemptSave(true) == DialogResult.Cancel)
                 {
