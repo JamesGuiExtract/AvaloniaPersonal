@@ -141,7 +141,7 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// The method a limited subset should be selected from the overall set of files.
         /// </summary>
-        public static readonly SubsetType DefaultSubsetType = SubsetType.Top;
+        public static readonly SubsetType DefaultSubsetType = SubsetType.Bottom;
 
         #endregion Constants
 
@@ -598,7 +598,7 @@ namespace Extract.FileActionManager.Utilities
                 MaxFilesToDisplay = DefaultMaxFilesToDisplay;
                 SubsetType = DefaultSubsetType;
                 FileSelector = new FAMFileSelector();
-                
+
                 InitializeComponent();
 
                 // Turn off the tab stop on the page navigation text box.
@@ -1045,19 +1045,35 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
-        /// Resets all changes to file selection back to the default (no conditions, top 5000 files).
+        /// Resets all changes to file selection back to the default (no conditions, bottom 5000 files).
         /// </summary>
         public void ResetFileSelectionSettings()
         {
             try
             {
                 FileSelector.Reset();
-                FileSelector.LimitToSubset(SubsetType == SubsetType.Random,
-                    SubsetType == SubsetType.Top, false, MaxFilesToDisplay, -1);
+                ApplySubsetFilter();
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35768");
+            }
+        }
+
+        /// <summary>
+        /// Applies the a filter on the number of files displayed using
+        /// <see cref="SubsetType"/> and <see cref="MaxFilesToDisplay"/>.
+        /// </summary>
+        public void ApplySubsetFilter()
+        {
+            try
+            {
+                FileSelector.LimitToSubset(SubsetType == SubsetType.Random,
+                        SubsetType == SubsetType.Top, false, MaxFilesToDisplay, -1);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49716");
             }
         }
 
