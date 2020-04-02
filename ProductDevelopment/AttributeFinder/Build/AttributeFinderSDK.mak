@@ -36,11 +36,12 @@ FlexDataEntryInstallationFilesDir=P:\AttributeFinder\FlexDataEntryInstallation
 DotNetFiles=P:\AttributeFinder\CoreInstallation\Files\DotNetGAC
 
 MergeModuleRootDir=$(INSTALLSHIELD_PROJECTS_DIR)\MergeModules
+
+ExtractSoftwareInstallRootDir=$(AFRootDirectory)\ExtractInstaller
+ExtractSoftwareInstallMediaDir=$(ExtractSoftwareInstallRootDir)\Media\CD-ROM\DiskImages\DISK1
+
 FlexIndexSDKInstallRootDir=$(PDRootDir)\AttributeFinder\Installation\UCLID FlexIndex SDK
 FlexIndexSDKInstallMediaDir=$(FlexIndexSDKInstallRootDir)\Media\CD-ROM\DiskImages\DISK1
-
-VOAClientInstallRootDir=$(PDRootDir)\AttributeFinder\Installation\UCLID VOAClient
-VOAClientInstallMediaDir=$(VOAClientInstallRootDir)\Media\CD-ROM\DiskImages\DISK1
 
 IDShieldInstallRootDir=$(PDRootDir)\Installation\IDShield
 IDShieldInstallMediaDir=$(IDShieldInstallRootDir)\Media\CD-ROM\DiskImages\DISK1
@@ -109,40 +110,20 @@ CopyComponentVersionFile:
 	@ECHO Copying Component Version file...
     @COPY /v /y /a "$(PDRootDir)\Common\LatestComponentVersions.mak" /a +"$(EngineeringRootDirectory)\Rules\Build_FKB\FKBVersion.mak" "$(FLEXIndexInstallFiles)\ComponentsVersions.txt"
 
-BuildFlexIndexSDKInstall: BuildAttributeFinderCore CopyFilesToInstallFolder
-    @ECHO Building UCLID FlexIndex SDK installation...
-	$(SetProductVerScript) "$(FlexIndexSDKInstallRootDir)\UCLID FlexIndex SDK.ism" "$(FlexIndexVersion)"
-    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(FlexIndexSDKInstallRootDir)\UCLID FlexIndex SDK.ism"
+BuildExtractSoftware: CreateLabDEInstallFilesAndDemo CopyFilesToInstallFolder
+    @ECHO Building Extract Platform Install
+	$(SetProductVerScript) "$(ExtractSoftwareInstallRootDir)\ExtractInstaller.ism" "$(FlexIndexVersion)"
+    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(ExtractSoftwareInstallRootDir)\ExtractInstaller.ism"
 
-CreateAttributeFinderInstallCD: BuildFlexIndexSDKInstall
-	@ECHO Copying to FlexIndex install folders
-    @IF NOT EXIST "$(FLEXIndexInstallFiles)" MKDIR "$(FLEXIndexInstallFiles)"
-    @XCOPY "$(FlexIndexSDKInstallMediaDir)\*.*" "$(FLEXIndexInstallFiles)" /v /s /e /y
-    $(VerifyDir) "$(FlexIndexSDKInstallMediaDir)" "$(FLEXIndexInstallFiles)"
-	@COPY "$(AFInstallFilesRootDir)\InstallHelp\*.*" "$(FLEXIndexInstallFiles)"
-	@COPY "$(FlexIndexSDKInstallRootDir)\Support Files\license.txt" "$(FLEXIndexSetupFiles)\Readme.txt"
-    @DeleteFiles "$(FLEXIndexInstallFiles)\*.scc"
-	$(FLEXIndexLinkShared)
-	
-CreateFLEXIndexDSInstall:
-	@ECHO Copying DemoShield Files
-	@IF NOT EXIST "$(FLEXIndexInstallDir)" MKDIR "$(FLEXIndexInstallDir)"
-	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(FLEXIndexInstallDir)" /v /s /e /y
-	@COPY "$(AFRootDirectory)\Installation\FlexInstall\Launch.ini" "$(FLEXIndexInstallDir)"
-	@COPY "$(AFRootDirectory)\Installation\FlexInstall\FlexInstall.dbd" "$(FLEXIndexInstallDir)"
-	@COPY "$(AFRootDirectory)\Installation\FlexInstall\autorun.inf" "$(FLEXIndexSetupFiles)"
-	@COPY "$(AFRootDirectory)\Installation\FlexInstall\FlexIndex.ico" "$(FLEXIndexInstallDir)"
+CreateExtractSoftwareInstallCD:
+	@ECHO Copying to Extract Platform files Tools install folders
+    @IF NOT EXIST "$(ExtractSoftwareInstallFiles)" MKDIR "$(ExtractSoftwareInstallFiles)"
+    @XCOPY "$(ExtractSoftwareInstallMediaDir)\*.*" "$(ExtractSoftwareInstallFiles)" /v /s /e /y
+    $(VerifyDir) "$(ExtractSoftwareInstallMediaDir)" "$(ExtractSoftwareInstallFiles)"
+	@COPY "$(AFInstallFilesRootDir)\InstallHelp\*.*" "$(ExtractSoftwareInstallFiles)"
+	@COPY "$(ExtractSoftwareInstallRootDir)\Support Files\license.txt" "$(ExtractSoftware)\Readme.txt"
+    @DeleteFiles "$(ExtractSoftwareInstallFiles)\*.scc"
 
-CopyFLEXIndexSilentInstall:
-	@ECHO Copying IDShield SilentInstall files...
-	@IF NOT EXIST "$(FLEXIndexSilentInstallDir)" MKDIR "$(FLEXIndexSilentInstallDir)"
-	@COPY "$(AFRootDirectory)\SilentInstalls\*Uninst.*" "$(FLEXIndexSilentInstallDir)"
-	@COPY "$(AFRootDirectory)\SilentInstalls\InstallFlexIndex.bat" "$(FLEXIndexSilentInstallDir)"
-	@COPY "$(AFRootDirectory)\SilentInstalls\UninstallExtract.bat" "$(FLEXIndexSilentInstallDir)"
-	@COPY "$(AFRootDirectory)\SilentInstalls\FlexIndex.iss" "$(FLEXIndexSilentInstallDir)"
-	@COPY "$(AFRootDirectory)\SilentInstalls\FlexIndex64.iss" "$(FLEXIndexSilentInstallDir)"
-	
-   
 CreateFlexDataEntryInstallDir:
 	@ECHO Creating Demo_FlexIndex
 	@IF NOT EXIST "$(FLEXIndexDemo)\Input" MKDIR "$(FLEXIndexDemo)\Input"
@@ -163,61 +144,20 @@ CreateFlexDataEntryInstallDir:
 	@DeleteFiles "$(FLEXIndexDemo)\*.dat"
 	@DeleteFiles "$(FLEXIndexDemo)\*.scc"
 		
-BuildIDShieldInstall: 
-    @ECHO Building Extract Systems IDShield installation...
-	$(SetProductVerScript) "$(IDShieldInstallRootDir)\IDShield.ism" "$(FlexIndexVersion)"
-    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(IDShieldInstallRootDir)\IDShield.ism"
-
-CreateIDShieldInstallCD: BuildIDShieldInstall
-	@ECHO Copying IDShield Install files ...
-    @IF NOT EXIST "$(IDShieldInstallFiles)" MKDIR "$(IDShieldInstallFiles)"
-    @XCOPY "$(IDShieldInstallMediaDir)\*.*" "$(IDShieldInstallFiles)" /v /s /e /y
-    $(VerifyDir) "$(IDShieldInstallMediaDir)" "$(IDShieldInstallFiles)"
-    @DeleteFiles "$(IDShieldInstallFiles)\vssver.scc"
-	@IF NOT EXIST "$(IDShieldInstallDir)" MKDIR "$(IDShieldInstallDir)"
-	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(IDShieldInstallDir)" /v /s /e /y
-	@COPY "$(PDRootDir)\Installation\IDShieldInstall\Launch.ini" "$(IDShieldInstallDir)"
-	@COPY "$(PDRootDir)\Installation\IDShieldInstall\IDShieldInstall.dbd" "$(IDShieldInstallDir)"
-	@COPY "$(PDRootDir)\Installation\IDShieldInstall\IDShield.ico" "$(IDShieldInstallDir)"
-	@COPY "$(PDRootDir)\Installation\IDShieldInstall\autorun.inf" "$(IDShieldSetupFiles)"
-	@COPY "$(IDShieldInstallFilesRootDir)\InstallHelp\*.*" "$(IDShieldInstallFiles)"
-	@COPY "$(IDShieldInstallRootDir)\Support Files\license.txt" "$(IDShieldSetupFiles)\Readme.txt"
-	$(IDShieldLinkShared)
-    
-CopyIDShieldSilentInstall:
-	@ECHO Copying IDShield SilentInstall files...
-	@IF NOT EXIST "$(IDShieldSilentInstallDir)" MKDIR "$(IDShieldSilentInstallDir)"
-	@COPY "$(AFRootDirectory)\SilentInstalls\*Uninst.*" "$(IDShieldSilentInstallDir)"
-	@COPY "$(AFRootDirectory)\SilentInstalls\InstallIDShield.bat" "$(IDShieldSilentInstallDir)"
-	@COPY "$(AFRootDirectory)\SilentInstalls\UninstallExtract.bat" "$(IDShieldSilentInstallDir)"
-	@COPY "$(AFRootDirectory)\SilentInstalls\IDShield.iss" "$(IDShieldSilentInstallDir)"
-	@COPY "$(AFRootDirectory)\SilentInstalls\IDShield64.iss" "$(IDShieldSilentInstallDir)"
-	
 CreateRedactionDemoInstall:
 	@ECHO Creating Redaction Demo Install Directory ...
 	@CD "$(RedactionDemoBuildDir)"
 	@nmake /F $(RedactionDemoBuildDir)\RedactionDemo.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" DoEverything
-	
-CreateOtherDemos:
-	@ECHO Creating other demos...
-	@IF NOT EXIST "$(OtherSetupFiles)\Other Demos\Demo_RedactionGame" MKDIR "$(OtherSetupFiles)\Other Demos\Demo_RedactionGame"
-	@XCOPY  "$(AFRootDirectory)\Utils\Demo_RedactionGame\*.*" "$(OtherSetupFiles)\Other Demos\Demo_RedactionGame" /v /s /e /y
 
-CreateLabDEInstall:
+CreateLabDEInstallFilesAndDemo:
 	@Echo Building LabDE...
 	@CD "$(LabDEBuildDir)"
     @nmake /F LabDE.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(LabDEVersion)" DoEverything
 	
 CopySilentInstallsDir:
 	@ECHO Copying SilentInstalls folder
-	@IF NOT EXIST "$(OtherSetupFiles)\SilentInstalls" MKDIR "$(OtherSetupFiles)\SilentInstalls"
-	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.*" "$(OtherSetupFiles)\SilentInstalls"
-	
-CreateSharepointInstall:
-#@Echo Creating Sharepoint Installs...
-#@CD $(PDRootDir)\AFIntegrations\Sharepoint\Build
-#@nmake /F FlexIDSSP.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" BuildAfterAF
-#@CD \Engineering\ProductDevelopment\AttributeFinder\Build
+	@IF NOT EXIST "$(ExtractSoftwareInstallFiles)\SilentInstalls" MKDIR "$(ExtractSoftwareInstallFiles)\SilentInstalls"
+	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.*" "$(ExtractSoftwareInstallFiles)\SilentInstalls"
 	
 UpdateLicenseFiles:
 	@IF "$(Branch)"=="master" (
@@ -246,9 +186,9 @@ CopyFilesToInternalUse:
 	@COPY  "$(BinariesFolder)\*.dll" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	@COPY  "$(BinariesFolder)\*.xml" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	
-CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateIDShieldInstallCD CopyIDShieldSilentInstall CreateFLEXIndexDSInstall CopyFLEXIndexSilentInstall CreateLabDEInstall CopySilentInstallsDir CopyFilesToInternalUse
+CreateInstalls: BuildExtractSoftware  CopySilentInstallsDir CopyFilesToInternalUse
 
-DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall CreateOtherDemos
+DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall
 
 DoBuilds: DisplayTimeStamp SetupBuildEnv CleanBranch BuildAttributeFinderCore
 

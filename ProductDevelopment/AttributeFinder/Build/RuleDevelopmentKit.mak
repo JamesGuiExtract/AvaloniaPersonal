@@ -38,8 +38,6 @@ IDSInstallProjectDirectory=$(PDRootDir)\Installation\IDShieldCustomerRDT
 IDSRDTInstallMediaDir=$(IDSInstallProjectDirectory)\Media\CD-ROM\DiskImages\Disk1
 
 RDTReleaseBleedingEdgeDir=S:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\RDT
-IDSRDTReleaseBleedingEdgeDir=$(OtherSetupFiles)\RDT_IDShieldCustomer
-FLEXCustomerRDTReleaseBleedingEdgeDir=$(OtherSetupFiles)\RDT_FLEXIndexCustomer
 
 RCDotNetDir=$(EngineeringRootDirectory)\RC.Net
 
@@ -132,28 +130,6 @@ CreateRDTInstallCD: BuildRDTInstall
     $(VerifyDir) "$(RDTInstallMediaDir)" "$(RDTReleaseBleedingEdgeDir)"
     @DeleteFiles "$(RDTReleaseBleedingEdgeDir)\vssver.scc"
 
-BuildIDSRDTInstall: CreateRDTInstallCD
-    @ECHO Building the ID Shield RDT installation...
-	$(SetProductVerScript) "$(IDSInstallProjectDirectory)\IDShieldCustomerRDT.ism" "$(FlexIndexVersion)"
-    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(IDSInstallProjectDirectory)\IDShieldCustomerRDT.ism"
-
-CreateIDSRDTInstallCD: BuildIDSRDTInstall
-    @IF NOT EXIST "$(IDSRDTReleaseBleedingEdgeDir)" MKDIR "$(IDSRDTReleaseBleedingEdgeDir)"
-    @XCOPY "$(IDSRDTInstallMediaDir)\*.*" "$(IDSRDTReleaseBleedingEdgeDir)" /v /s /e /y
-    $(VerifyDir) "$(IDSRDTInstallMediaDir)" "$(IDSRDTReleaseBleedingEdgeDir)"
-    @DeleteFiles "$(IDSRDTReleaseBleedingEdgeDir)\vssver.scc"
-
-BuildFLEXCustomerRDTInstall: CreateRDTInstallCD
-	@ECHO Building the Customer FLEX Index RDT
-	$(SetProductVerScript) "$(FLEXCustomerRDTInstallProjectRoot)\FlexIndexCustomerRDT.ism" "$(FlexIndexVersion)"
-    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(FLEXCustomerRDTInstallProjectRoot)\FlexIndexCustomerRDT.ism"
-
-CreateFLEXCustomerRDTInstallCD: BuildFLEXCustomerRDTInstall
-    @IF NOT EXIST "$(FLEXCustomerRDTReleaseBleedingEdgeDir)" MKDIR "$(FLEXCustomerRDTReleaseBleedingEdgeDir)"
-    @XCOPY "$(FLEXCustomerRDTMediaDir)\*.*" "$(FLEXCustomerRDTReleaseBleedingEdgeDir)" /v /s /e /y
-    $(VerifyDir) "$(FLEXCustomerRDTMediaDir)" "$(FLEXCustomerRDTReleaseBleedingEdgeDir)"
-    @DeleteFiles "$(FLEXCustomerRDTReleaseBleedingEdgeDir)\vssver.scc"
-	
 CopyTestFiles:
 	@ECHO Copying Automated Test Files
 	@DeleteFiles "$(TestingFilesDirectory)\*.*" /S /Q 
@@ -195,7 +171,7 @@ CopyTestFiles:
 
 DoEverythingNoGet: DoEverything
 
-DoEverything: DisplayTimeStamp CreateIDSRDTInstallCD CreateFLEXCustomerRDTInstallCD
+DoEverything: DisplayTimeStamp CreateRDTInstallCD
     @ECHO.
     @DATE /T
     @TIME /T

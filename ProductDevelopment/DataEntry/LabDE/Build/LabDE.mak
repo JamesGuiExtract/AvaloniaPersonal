@@ -99,35 +99,10 @@ CopyFilesForLabDEInstall: CopyFilesToInstallFolder
 	@DeleteFiles  "$(DataEntryCoreInstallFilesDir)\MergeModules\*.*"
 	@COPY /v "$(DataEntryInstallMediaDir)\*.msm" "$(DataEntryCoreInstallFilesDir)\MergeModules"
 
-BuildLabDEInstall: CopyFilesForLabDEInstall
-    @ECHO Building Extract Systems LabDE Install...
-	$(SetProductVerScript) "$(LabDEInstallRootDir)\LabDE\LabDE.ism" "$(FlexIndexVersion)"
-    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(LabDEInstallRootDir)\LabDE\LabDE.ism"
-	
 BuildDemoLabDE_DEP:
 	@ECHO Building DemoLabDE_DEP...
 	@CD $(Demo_LabDE_DEP)
 	@devenv Demo_LabDE.sln /BUILD $(BuildConfig) 
-
-CreateLabDEInstallCD: BuildLabDEInstall
-	@ECHO Copying DataEntry Install files ...
-    @IF NOT EXIST "$(LabDEInstallFiles)" MKDIR "$(LabDEInstallFiles)"
-    @XCOPY "$(LabDEInstallMediaDir)\*.*" "$(LabDEInstallFiles)" /v /s /e /y
-    $(VerifyDir) "$(LabDEInstallMediaDir)" "$(LabDEInstallFiles)"
-	@COPY /v "$(LabDEInstallBuildFiles)\InstallHelp\*.*" "$(LabDEInstallFiles)"
-	@COPY /v "$(LabDEInstallRootDir)\LabDE\Support Files\license.txt" "$(LabDESetupFiles)\Readme.txt"
-    @DeleteFiles "$(LabDEInstallFiles)\vssver.scc"
-	$(LabDELinkShared)
-	$(LabDECorePointLink)
-
-CreateDemoShieldInstall: CreateLabDEInstallCD 
-	@ECHO Copying DemoShield Files
-	@IF NOT EXIST "$(LabDEInstallDir)" MKDIR "$(LabDEInstallDir)"
-	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(LabDEInstallDir)" /v /s /e /y
-	@COPY "$(LabDEInstallRootDir)\LabDEInstall\Launch.ini" "$(LabDEInstallDir)"
-	@COPY "$(LabDEInstallRootDir)\LabDEInstall\LabDEInstall.dbd" "$(LabDEInstallDir)"
-	@COPY "$(LabDEInstallRootDir)\LabDEInstall\LabDE.ico" "$(LabDEInstallDir)"
-	@COPY "$(LabDEInstallRootDir)\LabDEInstall\autorun.inf" "$(LabDESetupFiles)"
 
 CreateDemo_LabDE: BuildDemoLabDE_DEP
 	@ECHO Copying Demo_LabDE files...
@@ -151,20 +126,11 @@ CreateDemo_LabDE: BuildDemoLabDE_DEP
     @DeleteFiles "$(LabDEDemo)\Solution\Rules\*.dat"
     @DeleteFiles "$(LabDEDemo)\Solution\Rules\*.rsd"
     @DeleteFiles "$(LabDEDemo)\Solution\Rules\*.dcc"
-		@DeleteFiles "$(LabDEDemo)\Solution\Rules\*.spm"
+	@DeleteFiles "$(LabDEDemo)\Solution\Rules\*.spm"
     @DeleteFiles "$(LabDEDemo)\Solution\Rules\*.nlp"
     @DeleteFiles "$(LabDEDemo)\Solution\Rules\vssver.scc"
 	
-CopySilentInstall:
-	@ECHO Copying LabDE SilentInstall
-	@IF NOT EXIST "$(LabDESilentInstallDir)" MKDIR "$(LabDESilentInstallDir)"
-	@COPY "$(AFRootDirectory)\SilentInstalls\*Uninst.*" "$(LabDESilentInstallDir)"
-	@COPY "$(AFRootDirectory)\SilentInstalls\InstallLabDE.bat" "$(LabDESilentInstallDir)"
-	@COPY "$(AFRootDirectory)\SilentInstalls\UninstallExtract.bat" "$(LabDESilentInstallDir)"
-	@COPY "$(AFRootDirectory)\SilentInstalls\LabDE.iss" "$(LabDESilentInstallDir)"
-	@COPY "$(AFRootDirectory)\SilentInstalls\LabDE64.iss" "$(LabDESilentInstallDir)"
-
-DoEverything: DisplayTimeStamp SetupBuildEnv CreateDemoShieldInstall CreateDemo_LabDE CopySilentInstall
+DoEverything: DisplayTimeStamp SetupBuildEnv CopyFilesForLabDEInstall CreateDemo_LabDE
     @ECHO.
     @DATE /T
     @TIME /T

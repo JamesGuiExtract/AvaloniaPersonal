@@ -56,7 +56,7 @@ IF NOT "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 
 SET LabDE_GUID={0E412937-E4FA-4737-A321-00AED69497C7}
 SET IdShield_GUID={158160CD-7B55-462F-8477-7E18B2937D40}
-SET FlexIndex_GUID={A7DFE34D-A07E-4D57-A624-B758E42A69D4}
+SET FlexIndex_GUID={A7DFE34D-A07E-4D57-A624-B758E42A69D4} // this is also the same as the ExtractInstaller
 SET LM_GUID={EB8DE231-8B66-4DE6-A56D-39452D8CF35F}
 SET IDShieldSPClient_GUID={6BF486D7-B930-4B82-A0A0-D8450F5C7BAB}
 SET RDT_GUID={735E1622-3990-445F-9E5D-B0D7FDE292A3}
@@ -94,7 +94,7 @@ start /wait "" "%LabDE%" -l0x0409  /removeonly /s /w /f1"%~dp0labdeuninst.iss"
 
 :UninstFlexIndex
 
-:: UnInstall FlexIndex
+:: UnInstall FlexIndex or ExtractInstaller (works for both)
 IF NOT EXIST "%FlexIndex%.ini" GOTO UninstIDShield
 
 start /wait "" "%FlexIndex%"  -l0x0409  /removeonly /s /w /f1"%~dp0flexindexuninst.iss"

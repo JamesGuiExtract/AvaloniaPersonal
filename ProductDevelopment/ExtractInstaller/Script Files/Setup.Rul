@@ -13,13 +13,13 @@
 // Include header files /////////////////////////////////////////////////////
 #include "ifx.h"
 
-#include "..\..\..\..\Common\InstallScripts\Common.rul"
+#include "..\..\Common\InstallScripts\Common.rul"
 
-#include "..\..\..\..\Common\InstallScripts\OnFirstUIAfter.rul"
+#include "..\..\Common\InstallScripts\OnFirstUIAfter.rul"
 
-#include "..\..\..\..\Common\InstallScripts\OnMaintUIBefore.rul"
+#include "..\..\Common\InstallScripts\OnMaintUIBefore.rul"
 
-#include "..\..\..\..\Common\InstallScripts\OnMaintUIAfter.rul"
+#include "..\..\Common\InstallScripts\OnMaintUIAfter.rul"
 
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                           

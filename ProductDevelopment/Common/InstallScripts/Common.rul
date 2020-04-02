@@ -78,24 +78,20 @@
 	prototype InstallDotNET();
     prototype CheckOtherExtractProducts();
     prototype RenameUEXFile();
-    prototype InstallInliteKeyDrivers();
     prototype UninstallInliteKeyDrivers();
     prototype InstallCrystalReports();
     prototype CloseApps();
     prototype UninstallCrystalReports12();
     prototype BOOL CheckProductKeyInstalled(STRING, STRING, BYREF STRING, BOOL);
     prototype InstallSQLCE();
-    prototype DetectDotNET_40();
     prototype DetectDotNET_4_6();	
     prototype UninstallSQLCE();
     prototype InstallDotNetService(STRING);
     prototype UninstallDotNetService(STRING);    
 	prototype BOOL AreOtherExtractProductsInstalled();
 	prototype InstallOfficeRedist();
-	prototype RegisterLoginNPShellExtension(STRING);
 	prototype UnregisterLoginNPShellExtension(STRING);   
 	prototype InstallFKB();
-	prototype UninstallFKB();
 	prototype InstallNuanceLicense(); 
 	prototype SetNuanceServicePermissions();     
 	prototype SetDCOMPermissions();
@@ -208,19 +204,6 @@ function InstallDotNET()
 STRING szProgram;
 int nResult, svServiceState;
 begin
-	// Change the root for the registry
-	//RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
-	//if ( RegDBKeyExist ( REG_PATH_DOT_NET_35_INSTALL ) < 0) then
-	//	szProgram = SUPPORTDIR ^ "\\dotnetfx35.exe";
-	//	LaunchAppAndWait(szProgram, "", LAAW_OPTION_WAIT); 
-	//	SdShowMsg("Setup is Installing .NET Framework 3.5", FALSE);
-	//	if ( RegDBKeyExist ( REG_PATH_DOT_NET_35_UNINSTALL ) < 0  ) then
-	//		MessageBox(".NET Framework was not successfully Installed, installation will be aborted", SEVERE);
-	//		gbInstalled = FALSE;
-	//		abort;
-	//	endif;
-	//endif;
-    //DetectDotNET_40();
 	DetectDotNET_4_6();
 end;
 
@@ -386,34 +369,6 @@ end;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// Function: InstallInliteKeyDrivers
-//
-//  Purpose: This function installs the drivers for the Inlite Key
-///////////////////////////////////////////////////////////////////////////////
-function InstallInliteKeyDrivers()
-	string szProgram;
-begin    
-	SdShowMsg("Setup is Installing Inlite drivers.", TRUE);
-	szProgram = SUPPORTDIR ^ "\\CbSetup.exe";
-    
-	if (SYSINFO.nOSMajor >= 6)  then
-		LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
-	endif;
-		
-	LaunchAppAndWait(szProgram, "/Q /CRYPTOKEN", LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
-	
-	szProgram = SUPPORTDIR ^ INLITE_INSTALLER_EXE;
-	LaunchAppAndWait(szProgram, "/S ", LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);    
-	
-	// Remove the Nuance Start Menu item  
-	DeleteDir( StartMenuFolder ^ "Programs\\ClearImage 7 PDK", ALLCONTENTS); 
-	DeleteDir( StartMenuFolder ^ "Programs\\ClearImage 7 PDK", ALLCONTENTS);  
-	
-	SdShowMsg("Setup is Installing Inlite drivers.", FALSE);
-end;
-
-///////////////////////////////////////////////////////////////////////////////
-//
 // Function: UninstallInliteKeyDrivers
 //
 //  Purpose: This function uninstalls the drivers for the Inlite Key
@@ -571,34 +526,6 @@ begin
 		//	abort;
 		//endif;
 	endif;
-end;
-
-            
-///////////////////////////////////////////////////////////////////////////////
-//
-//  FUNCTION:   DetectDotNET_40
-//
-//  EVENT:      Aborts with message if .NET 4.0 is not installed
-//
-///////////////////////////////////////////////////////////////////////////////
-function DetectDotNET_40()
-STRING szProgram, svValue;
-int nResult, svServiceState;       
-NUMBER nvType, nvSize;
-begin
-	// Change the root for the registry
-	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
- 
- 	svValue = "";   
-	RegDBGetKeyValueEx (REG_PATH_DOT_NET_40_INSTALL, "Install", nvType, svValue, nvSize);
-	
-	if ( svValue != "1") then
-		gbInstalled  = FALSE;
-		if (MODE != SILENTMODE) then
-			MessageBox("Microsoft .NET 4.0 must be installed before running this install.", MB_OK);
-		endif;
-		abort;
-	endif; 
 end;
 
 
@@ -907,35 +834,6 @@ end;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// Function: RegisterLoginNPShellExtension
-//
-//  Purpose: This function rgisters a LoginNP shell extension
-///////////////////////////////////////////////////////////////////////////////
-function RegisterLoginNPShellExtension(strExtension)
-	string szProgram;
-	string szArguments;
-begin    
-  	SdShowMsg("Setup is registering shell extension.", TRUE);
-   
-   	szProgram = SUPPORTDIR ^ "\\RegisterExtensionDotNet40_x86.exe";
-   	szArguments = "-i \""  + PROGRAMFILES ^ EXTRACT_DIR ^ strExtension + "\"";
-	LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS); 
-
-  	SdShowMsg("Setup is registering shell extension.", FALSE);
-
-	// Register for 64 bit also
-	if ( SYSINFO.bIsWow64 ) then
-	  	SdShowMsg("Setup is registering 64 bit shell extension.", TRUE);
-   		szProgram = SUPPORTDIR ^ "\\RegisterExtensionDotNet40_x64.exe";
-		LaunchAppAndWait(szProgram, szArguments, LAAW_OPTION_WAIT |  LAAW_OPTION_SHOW_HOURGLASS); 
-		SdShowMsg("Setup is registering 64 bit shell extension.", TRUE);
-	endif;
-	
-  	SdShowMsg("Setup is registering shell extension.", FALSE);
-end;        
-
-///////////////////////////////////////////////////////////////////////////////
-//
 // Function: UnregisterLoginNPShellExtension
 //
 //  Purpose: This function unregisters a LoginNP shell extension
@@ -980,18 +878,6 @@ begin
 	
 	SdShowMsg("Setup is Installing Extract Systems FKB", FALSE);
 end;
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// Function: UninstallFKB
-//
-//  Purpose: This function prompts to ask if you want to uninstall the FKB
-//			 
-///////////////////////////////////////////////////////////////////////////////
-function UninstallFKB()
-begin
-end;
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //

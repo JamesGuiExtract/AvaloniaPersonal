@@ -65,40 +65,14 @@ AFBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge
 BleedingEdgeVersionDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)
 BleedingEdgeVersionUNCDir=$(NAS_BUILD_BASE)\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)
 
-#FLEXIndex install related paths
-FLEXIndexSetupFiles=$(BleedingEdgeVersionDir)\FLEXIndex\SetupFiles
-FLEXIndexSetupFilesMKLink=$(BleedingEdgeVersionUNCDir)\FLEXIndex\SetupFiles
-FLEXIndexInstallFiles=$(FLEXIndexSetupFiles)\FlexIndex
-FLEXIndexDemo=$(FLEXIndexSetupFiles)\Demo_FlexIndex
-FLEXIndexExtractLMDir=$(FLEXIndexSetupFiles)\Extract Systems LM
-FLEXIndexInstallDir=$(FLEXIndexSetupFiles)\FlexIndexInstall
-FLEXIndexSilentInstallDir=$(FLEXIndexSetupFiles)\SilentInstalls
-FLEXIndexLinkShared=$(LinkShared) "& '$(MakeCommonLinks)' '$(FLEXIndexSetupFilesMKLink)\' '$(SharedInstallsPath)\'"
-
-#IDShield install related paths
-IDShieldSetupFiles=$(BleedingEdgeVersionDir)\IDShield\SetupFiles
-IDShieldSetupFilesMKLink=$(BleedingEdgeVersionUNCDir)\IDShield\SetupFiles
-IDShieldInstallFiles=$(IDShieldSetupFiles)\IDShield
-IDShieldDemo=$(IDShieldSetupFiles)\Demo_IDShield
-IDShieldExtractLMDir=$(IDShieldSetupFiles)\Extract Systems LM
-IDShieldInstallDir=$(IDShieldSetupFiles)\IDShieldInstall
-IDShieldSilentInstallDir=$(IDShieldSetupFiles)\SilentInstalls
-IDShieldLinkShared=$(LinkShared) "& '$(MakeCommonLinks)' '$(IDShieldSetupFilesMKLink)\' '$(SharedInstallsPath)\'"
-
-#LabDE install related paths
-LabDESetupFiles=$(BleedingEdgeVersionDir)\LabDE\SetupFiles
-LabDESetupFilesMKLink=$(BleedingEdgeVersionUNCDir)\LabDE\SetupFiles
-LabDEInstallFiles=$(LabDESetupFiles)\LabDE
-LabDEDemo=$(LabDESetupFiles)\Demo_LabDE
-LabDEExtractLMDir=$(LabDESetupFiles)\Extract Systems LM
-LabDEInstallDir=$(LabDESetupFiles)\LabDEInstall
-LabDESilentInstallDir=$(LabDESetupFiles)\SilentInstalls
-LabDELinkShared=$(LinkShared) "& '$(MakeCommonLinks)' '$(LabDESetupFilesMKLink)\' '$(SharedInstallsPath)\'"
-LabDECorePointLink=$(LinkShared) "& '$(MakeSymLink)' 'thoth' '$(LabDESetupFilesMKLink)\' '$(SharedInstallsPath)\' 'Corepoint Integration Engine'"
-
-#Other
-OtherSetupFiles=$(BleedingEdgeVersionDir)\Other
-IntegrationsSetupFiles=$(OtherSetupFiles)\Integrations
+#Extract Platform installer install paths
+ExtractSoftware=$(BleedingEdgeVersionDir)
+ExtractSoftwareMKLink=$(BleedingEdgeVersionUNCDir)
+ExtractSoftwareInstallFiles=$(FLEXIndexSetupFiles)\Install
+FLEXIndexDemo=$(ExtractSoftware)\Demo_FlexIndex
+IDShieldDemo=$(ExtractSoftware)\Demo_IDShield
+LabDEDemo=$(ExtractSoftware)\Demo_LabDE
+FLEXIndexSilentInstallDir=$(ExtractSoftware)\SilentInstalls
 
 #Git tags converted from label
 GitTagFlexIndexVersion=$(FlexIndexVersion:v.=)
