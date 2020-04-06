@@ -1,12 +1,18 @@
 ﻿using DatabaseMigrationWizard.Database.Input;
 using DatabaseMigrationWizard.Pages.Utility;
 using Extract;
+using FirstFloor.ModernUI.Windows;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Automation.Peers;
+using System.Windows.Automation.Provider;
 using System.Windows.Controls;
 using System.Windows.Forms;
 
@@ -25,16 +31,21 @@ namespace DatabaseMigrationWizard.Pages
 
         public MainWindow MainWindow { get; set; }
 
+        private ImportHelper ImportHelper { get; set; }
+
         public Import()
         {
             this.MainWindow = ((MainWindow)System.Windows.Application.Current.MainWindow);
             this.ImportOptions.ConnectionInformation = this.MainWindow.ConnectionInformation;
             InitializeComponent();
             this.DataContext = this;
+            this.MainWindow.Closing += Import_Closing;
+            this.MainWindow.Import = this;
         }
 
         private async void Import_Click(object sender, RoutedEventArgs e)
         {
+            this.ImportHelper = new ImportHelper(this.ImportOptions, GetProgressTracker());
             try
             {
                 Processing.Clear();
@@ -53,17 +64,40 @@ namespace DatabaseMigrationWizard.Pages
                 }
                 await Task.Run(() =>
                 {
-                    new ImportHelper(this.ImportOptions, GetProgressTracker()).Import();
+                    var startTime = DateTime.Now;
+                    try
+                    {
+                        this.ImportHelper.Import();
+                        App.Current.Dispatcher.Invoke(delegate
+                        {
+                            this.CheckForWarningsOrErrors(startTime);
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex.AsExtract("ELI49751");
+                    }
                 });
             }
             catch (Exception ex)
             {
+                this.RollbackTransaction();
                 ex.AsExtract("ELI49725").Display();
             }
-            finally
-            {
-                this.MainWindow.UIEnabled = true;
-            }
+        }
+
+        public void CommitTransaction()
+        {
+            this.ImportHelper.CommitTransaction();
+            this.MainWindow.UIEnabled = true;
+            this.ImportHelper.Dispose();
+        }
+
+        public void RollbackTransaction()
+        {
+            this.ImportHelper.RollbackTransaction();
+            this.MainWindow.UIEnabled = true;
+            this.ImportHelper.Dispose();
         }
 
         /// <summary>
@@ -104,6 +138,62 @@ namespace DatabaseMigrationWizard.Pages
                     }
                 });
             });
+        }
+
+        private void CheckForWarningsOrErrors(DateTime startTime)
+        {
+            PopulateReportingInformation(startTime);
+
+            if (this.MainWindow.Reporting.Where(m => m.Classification.Equals("Warning") || m.Classification.Equals("Error")).Any())
+            {
+                // Switch to the reporting tab.
+                ButtonAutomationPeer peer = new ButtonAutomationPeer(HiddenReportButton);
+                IInvokeProvider invokeProv = peer.GetPattern(PatternInterface.Invoke) as IInvokeProvider;
+                invokeProv.Invoke();
+                if(this.MainWindow.ReportWindow != null)
+                {
+                    this.MainWindow.ReportWindow.CommitPrompt.Visibility = Visibility.Visible;
+                }
+            }
+            else
+            {
+                this.CommitTransaction();
+            }
+        }
+
+        private void Import_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if(this.MainWindow.UIEnabled)
+            {
+                this.ImportHelper.Dispose();
+            }
+        }
+
+        private void PopulateReportingInformation(DateTime startTime)
+        {
+            var command = this.ImportOptions.SqlConnection.CreateCommand();
+            command.CommandText = $"SELECT * FROM dbo.[ReportingDatabaseMigrationWizard] WHERE DateTime > CONVERT(datetime, '{startTime.ToString(CultureInfo.InvariantCulture)}', 101)";
+            command.Transaction = this.ImportOptions.Transaction;
+            var reports = new List<Report>();
+            using (var reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    reports.Add(new Report()
+                    {
+                        Classification = reader.GetString(reader.GetOrdinal("Classification")),
+                        Message = reader.GetString(reader.GetOrdinal("Message")),
+                        DateTime = reader.GetDateTime(reader.GetOrdinal("DateTime")),
+                        TableName = reader.GetString(reader.GetOrdinal("TableName"))
+                    });
+                }
+            }
+
+            this.MainWindow.Reporting.Clear();
+            foreach (Report report in reports)
+            {
+                this.MainWindow.Reporting.Add(report);
+            }
         }
     }
 }

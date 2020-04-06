@@ -46,6 +46,33 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
+        private readonly string ReportingSQL = @"
+                                    INSERT INTO
+	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+                                    SELECT
+	                                    'Warning'
+	                                    , 'FieldSearch'
+	                                    , CONCAT('The FieldSearch ', dbo.FieldSearch.FieldName, ' is present in the destination database, but NOT in the importing source.')
+                                    FROM
+	                                    dbo.FieldSearch
+		                                    LEFT OUTER JOIN ##FieldSearch
+			                                    ON dbo.FieldSearch.Guid = ##FieldSearch.GUID
+                                    WHERE
+	                                    ##FieldSearch.GUID IS NULL
+                                    ;
+                                    INSERT INTO
+	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+                                    SELECT
+	                                    'Info'
+	                                    , 'FieldSearch'
+	                                    , CONCAT('The FieldSearch ', ##FieldSearch.FieldName, ' will be added to the database')
+                                    FROM
+	                                    ##FieldSearch
+		                                    LEFT OUTER JOIN dbo.FieldSearch
+			                                    ON dbo.FieldSearch.Guid = ##FieldSearch.GUID
+                                    WHERE
+	                                    dbo.FieldSearch.Guid IS NULL";
+
         public Priorities Priority => Priorities.Low;
 
         public string TableName => "FieldSearch";
@@ -55,6 +82,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
             ImportHelper.PopulateTemporaryTable<FieldSearch>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+            importOptions.ExecuteCommand(this.ReportingSQL);
 
             importOptions.ExecuteCommand(this.insertSQL);
         }

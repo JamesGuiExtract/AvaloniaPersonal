@@ -34,13 +34,13 @@ namespace DatabaseMigrationWizard.Database.Input
 
         public SqlTransaction Transaction { get; set; }
 
-        public DbConnection DBConnection { get; set; }
+        public SqlConnection SqlConnection { get; set; }
 
         public void ExecuteCommand(string command)
         {
             try
             {
-                using (DbCommand dbCommand = DBConnection.CreateCommand())
+                using (DbCommand dbCommand = SqlConnection.CreateCommand())
                 {
                     dbCommand.Transaction = this.Transaction;
                     dbCommand.CommandText = command;

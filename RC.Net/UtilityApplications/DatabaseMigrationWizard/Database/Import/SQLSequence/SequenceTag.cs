@@ -42,6 +42,33 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
+        private readonly string ReportingSQL = @"
+                                    INSERT INTO
+	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+                                    SELECT
+	                                    'Warning'
+	                                    , 'Tag'
+	                                    , CONCAT('The Tag ', dbo.Tag.TagName, ' is present in the destination database, but NOT in the importing source.')
+                                    FROM
+	                                    dbo.Tag
+		                                    LEFT OUTER JOIN ##Tag
+			                                    ON dbo.Tag.Guid = ##Tag.GUID
+                                    WHERE
+	                                    ##Tag.GUID IS NULL
+                                    ;
+                                    INSERT INTO
+	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+                                    SELECT
+	                                    'Info'
+	                                    , 'Tag'
+	                                    , CONCAT('The Tag ', ##Tag.TagName, ' will be added to the database')
+                                    FROM
+	                                    ##Tag
+		                                    LEFT OUTER JOIN dbo.Tag
+			                                    ON dbo.Tag.Guid = ##Tag.GUID
+                                    WHERE
+	                                    dbo.Tag.Guid IS NULL";
+
         public Priorities Priority => Priorities.High;
 
         public string TableName => "Tag";
@@ -51,6 +78,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
             ImportHelper.PopulateTemporaryTable<Tag>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+            importOptions.ExecuteCommand(this.ReportingSQL);
 
             importOptions.ExecuteCommand(this.insertSQL);
         }

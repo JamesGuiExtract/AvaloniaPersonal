@@ -2596,3 +2596,16 @@ static const string gstrADD_GUID_COLUMNS =
   " IF(Exists(SELECT * FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'LabDEPatient')) BEGIN IF COL_LENGTH('dbo.LabDEPatient', 'GUID') IS NULL BEGIN ALTER TABLE dbo.LabDEPatient ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END END \r\n"
   " IF(Exists(SELECT * FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'LabDEProvider')) BEGIN IF COL_LENGTH('dbo.LabDEProvider', 'GUID') IS NULL BEGIN ALTER TABLE dbo.LabDEProvider  ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END END \r\n"
   " IF(Exists(SELECT * FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'DataEntryCounterDefinition')) BEGIN IF COL_LENGTH('dbo.DataEntryCounterDefinition', 'GUID') IS NULL BEGIN ALTER TABLE dbo.DataEntryCounterDefinition  ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END END \r\n";
+
+static const string gstrCREATE_DATABASE_MIGRATION_WIZARD_REPORTING = 
+	" IF(NOT EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND  TABLE_NAME = 'ReportingDatabaseMigrationWizard')) "
+	" BEGIN "
+	" CREATE TABLE [dbo].[ReportingDatabaseMigrationWizard] "
+	" ( "
+	" [ID] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID() PRIMARY KEY "
+	" , [Classification] NVARCHAR(128) NOT NULL DEFAULT 'Information' "
+	" , [TableName] NVARCHAR(128) NOT NULL "
+	" , [Message] NVARCHAR(512) NOT NULL "
+	" , [DateTime] DATETIME NOT NULL DEFAULT GETDATE() "
+	" )"
+	" END ";

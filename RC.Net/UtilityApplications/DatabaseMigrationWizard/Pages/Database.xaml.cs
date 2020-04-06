@@ -66,15 +66,7 @@ namespace DatabaseMigrationWizard.Pages
                     App.Current.Dispatcher.Invoke(delegate
                     {
                         this.ConnectionInformation.DatabaseName = this.DatabaseNameTextBox.Text;
-                    });
-
-                    App.Current.Dispatcher.Invoke(delegate
-                    {
-                        this.DatabaseServerStatus.Background = Universal.IsDBServerValid(this.ConnectionInformation) ?  Brushes.Green : Brushes.Red;
-                    });
-
-                    App.Current.Dispatcher.Invoke(delegate
-                    {
+                        this.DatabaseServerStatus.Background = Universal.IsDBServerValid(this.ConnectionInformation) ? Brushes.Green : Brushes.Red;
                         this.DatabaseNameStatus.Background = Universal.IsDBDatabaseValid(this.ConnectionInformation) ? Brushes.Green : Brushes.Red;
                     });
 
@@ -100,6 +92,7 @@ namespace DatabaseMigrationWizard.Pages
                 {
                     mainWindow.MainLinks.Links.Add(new Link() { DisplayName = "import", Source = new Uri("/Pages/Import.xaml", UriKind.Relative) });
                     mainWindow.MainLinks.Links.Add(new Link() { DisplayName = "export", Source = new Uri("/Pages/Export.xaml", UriKind.Relative) });
+                    mainWindow.MainLinks.Links.Add(new Link() { DisplayName = "report", Source = new Uri("/Pages/ReportWindow.xaml", UriKind.Relative) });
                 }
 
                 this.PasswordStatus.Background = Brushes.Green;
@@ -126,7 +119,7 @@ namespace DatabaseMigrationWizard.Pages
         private void UpdateConnectionInformation(bool updateDatabaseNames)
         {
             var mainWindow = ((MainWindow)System.Windows.Application.Current.MainWindow);
-            var linksToRemove = mainWindow.MainLinks.Links.Where(link => link.DisplayName.Equals("import") || link.DisplayName.Equals("export")).ToList();
+            var linksToRemove = mainWindow.MainLinks.Links.Where(link => link.DisplayName.Equals("import") || link.DisplayName.Equals("export") || link.DisplayName.Equals("report")).ToList();
             this.PasswordStatus.Background = Brushes.Red;
             foreach (Link link in linksToRemove)
             {

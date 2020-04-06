@@ -43,6 +43,33 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
+		private readonly string ReportingSQL = @"
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+									SELECT
+										'Warning'
+										, 'FAMUser'
+										, CONCAT('The FAMUser ', dbo.FAMUser.UserName, ' is present in the destination database, but NOT in the importing source.')
+									FROM
+										dbo.FAMUser
+											LEFT OUTER JOIN ##FAMUser
+												ON dbo.FAMUser.Guid = ##FAMUser.GUID
+									WHERE
+										##FAMUser.GUID IS NULL
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+									SELECT
+										'Info'
+										, 'FAMUser'
+										, CONCAT('The FAMUser ', ##FAMUser.UserName, ' will be added to the database')
+									FROM
+										##FAMUser
+											LEFT OUTER JOIN dbo.FAMUser
+												ON dbo.FAMUser.Guid = ##FAMUser.GUID
+									WHERE
+										dbo.FAMUser.Guid IS NULL";
+
 		public Priorities Priority => Priorities.High;
 
 		public string TableName => "FAMUser";
@@ -52,6 +79,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
             ImportHelper.PopulateTemporaryTable<FAMUser>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+			importOptions.ExecuteCommand(this.ReportingSQL);
 
             importOptions.ExecuteCommand(this.insertSQL);
         }

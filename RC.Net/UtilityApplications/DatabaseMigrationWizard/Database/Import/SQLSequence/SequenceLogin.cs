@@ -44,6 +44,37 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
+        private readonly string ReportingSQL = @"
+                                    INSERT INTO
+	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+                                    SELECT
+	                                    'Warning'
+	                                    , 'Login'
+	                                    , CONCAT('The Login ', dbo.Login.UserName, ' is present in the destination database, but NOT in the importing source.')
+                                    FROM
+	                                    dbo.Login
+		                                    LEFT OUTER JOIN ##Login
+			                                    ON dbo.Login.Guid = ##Login.GUID
+                                    WHERE
+	                                    ##Login.GUID IS NULL
+                                        AND
+                                        Login.UserName <> 'Admin'
+                                    ;
+                                    INSERT INTO
+	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+                                    SELECT
+	                                    'Info'
+	                                    , 'Login'
+	                                    , CONCAT('The Login ', ##Login.UserName, ' will be added to the database')
+                                    FROM
+	                                    ##Login
+		                                    LEFT OUTER JOIN dbo.Login
+			                                    ON dbo.Login.Guid = ##Login.GUID
+                                    WHERE
+	                                    dbo.Login.Guid IS NULL
+                                        AND
+                                        ##Login.UserName <> 'Admin'";
+
         public Priorities Priority => Priorities.Low;
 
         public string TableName => "Login";
@@ -53,6 +84,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
             ImportHelper.PopulateTemporaryTable<Login>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+            importOptions.ExecuteCommand(this.ReportingSQL);
 
             importOptions.ExecuteCommand(this.insertSQL);
         }

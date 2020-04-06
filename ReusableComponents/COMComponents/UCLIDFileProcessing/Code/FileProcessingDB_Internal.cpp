@@ -1933,6 +1933,7 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 	vecQueries.push_back(gstrCREATE_WORKFLOWCHANGEFILE);
 	vecQueries.push_back(gstrCREATE_MLDATA);
 	vecQueries.push_back(gstrCREATE_REPORTING_VERIFICATION_RATES);
+	vecQueries.push_back(gstrCREATE_DATABASE_MIGRATION_WIZARD_REPORTING);
 
 	return vecQueries;
 }

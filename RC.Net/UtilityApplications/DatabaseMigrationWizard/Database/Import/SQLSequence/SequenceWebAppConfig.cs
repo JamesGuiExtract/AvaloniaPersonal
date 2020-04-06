@@ -49,6 +49,33 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
+		private readonly string ReportingSQL = @"
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+									SELECT
+										'Warning'
+										, 'WebAppConfig'
+										, CONCAT('The WebAppConfig ', dbo.WebAppConfig.Type, ' is present in the destination database, but NOT in the importing source.')
+									FROM
+										dbo.WebAppConfig
+											LEFT OUTER JOIN ##WebAppConfig
+												ON dbo.WebAppConfig.Guid = ##WebAppConfig.WebAppConfigGuid
+									WHERE
+										##WebAppConfig.WebAppConfigGuid IS NULL
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+									SELECT
+										'Info'
+										, 'WebAppConfig'
+										, CONCAT('The WebAppConfig ', ##WebAppConfig.Type, ' will be added to the database')
+									FROM
+										##WebAppConfig
+											LEFT OUTER JOIN dbo.WebAppConfig
+												ON dbo.WebAppConfig.Guid = ##WebAppConfig.WebAppConfigGuid
+									WHERE
+										dbo.WebAppConfig.Guid IS NULL";
+
 		public Priorities Priority => Priorities.Low;
 
 		public string TableName => "WebAppConfig";
@@ -58,6 +85,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 			importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
 			ImportHelper.PopulateTemporaryTable<WebAppConfig>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+			importOptions.ExecuteCommand(this.ReportingSQL);
 
 			importOptions.ExecuteCommand(this.insertSQL);
 		}

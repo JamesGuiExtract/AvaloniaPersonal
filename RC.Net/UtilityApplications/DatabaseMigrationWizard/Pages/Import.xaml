@@ -21,6 +21,7 @@
         <pages1:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
     </UserControl.Resources>
     <Grid Style="{StaticResource ContentRoot}">
+        
         <ScrollViewer>
             <StackPanel MinWidth="200">
                 <TextBlock Text="Import Path" Style="{StaticResource Heading2}" Margin="0,0,0,8" />
@@ -71,5 +72,6 @@
                 </ListBox>
             </StackPanel>
         </ScrollViewer>
+        <Button x:Name="HiddenReportButton" Command="mui:LinkCommands.NavigateLink" CommandParameter="/Pages/ReportWindow.xaml" Visibility="Hidden"/>
     </Grid>
 </UserControl>

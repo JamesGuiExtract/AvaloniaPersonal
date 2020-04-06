@@ -45,6 +45,33 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
+        private readonly string ReportingSQL = @"
+                                            INSERT INTO
+	                                            dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+                                            SELECT
+	                                            'Warning'
+	                                            , 'DatabaseService'
+	                                            , CONCAT('The DatabaseService ', dbo.DatabaseService.Description, ' is present in the destination database, but NOT in the importing source.')
+                                            FROM
+	                                            dbo.DatabaseService
+		                                            LEFT OUTER JOIN ##DatabaseService
+			                                            ON dbo.DatabaseService.Guid = ##DatabaseService.GUID
+                                            WHERE
+	                                            ##DatabaseService.GUID IS NULL
+                                            ;
+                                            INSERT INTO
+	                                            dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+                                            SELECT
+	                                            'Info'
+	                                            , 'DatabaseService'
+	                                            , CONCAT('The DatabaseService ', ##DatabaseService.Description, ' will be added to the database')
+                                            FROM
+	                                            ##DatabaseService
+		                                            LEFT OUTER JOIN dbo.DatabaseService
+			                                            ON dbo.DatabaseService.Guid = ##DatabaseService.GUID
+                                            WHERE
+	                                            dbo.DatabaseService.Guid IS NULL";
+
         public Priorities Priority => Priorities.Medium;
 
         public string TableName => "DatabaseService";
@@ -54,6 +81,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
             ImportHelper.PopulateTemporaryTable<DatabaseService>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+            importOptions.ExecuteCommand(this.ReportingSQL);
 
             importOptions.ExecuteCommand(this.insertSQL);
         }

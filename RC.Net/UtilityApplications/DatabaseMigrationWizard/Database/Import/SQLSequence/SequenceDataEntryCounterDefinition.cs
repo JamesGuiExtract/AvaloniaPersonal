@@ -48,6 +48,33 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
+        private readonly string ReportingSQL = @"
+										INSERT INTO
+											dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+										SELECT
+											'Warning'
+											, 'DataEntryCounterDefinition'
+											, CONCAT('The DataEntryCounterDefinition ', dbo.DataEntryCounterDefinition.Name, ' is present in the destination database, but NOT in the importing source.')
+										FROM
+											dbo.DataEntryCounterDefinition
+												LEFT OUTER JOIN ##DataEntryCounterDefinition
+													ON dbo.DataEntryCounterDefinition.Guid = ##DataEntryCounterDefinition.GUID
+										WHERE
+											##DataEntryCounterDefinition.GUID IS NULL
+										;
+										INSERT INTO
+											dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+										SELECT
+											'Info'
+											, 'DataEntryCounterDefinition'
+											, CONCAT('The DataEntryCounterDefinition ', ##DataEntryCounterDefinition.Name, ' will be added to the database')
+										FROM
+											##DataEntryCounterDefinition
+												LEFT OUTER JOIN dbo.DataEntryCounterDefinition
+													ON dbo.DataEntryCounterDefinition.Guid = ##DataEntryCounterDefinition.GUID
+										WHERE
+											dbo.DataEntryCounterDefinition.Guid IS NULL";
+
         public Priorities Priority => Priorities.Low;
 
         public string TableName => "DataEntryCounterDefinition";
@@ -58,7 +85,9 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
             ImportHelper.PopulateTemporaryTable<DataEntryCounterDefinition>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            importOptions.ExecuteCommand(this.insertSQL);
+			importOptions.ExecuteCommand(this.ReportingSQL);
+
+			importOptions.ExecuteCommand(this.insertSQL);
         }
     }
 }

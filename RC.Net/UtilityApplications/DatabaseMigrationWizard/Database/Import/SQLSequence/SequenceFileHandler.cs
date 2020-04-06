@@ -66,6 +66,33 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
+		private readonly string ReportingSQL = @"
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+									SELECT
+										'Warning'
+										, 'FileHandler'
+										, CONCAT('The FileHandler ', dbo.FileHandler.AppName, ' is present in the destination database, but NOT in the importing source.')
+									FROM
+										dbo.FileHandler
+											LEFT OUTER JOIN ##FileHandler
+												ON dbo.FileHandler.Guid = ##FileHandler.GUID
+									WHERE
+										##FileHandler.GUID IS NULL
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+									SELECT
+										'Info'
+										, 'FileHandler'
+										, CONCAT('The FileHandler ', ##FileHandler.AppName, ' will be added to the database')
+									FROM
+										##FileHandler
+											LEFT OUTER JOIN dbo.FileHandler
+												ON dbo.FileHandler.Guid = ##FileHandler.GUID
+									WHERE
+										dbo.FileHandler.Guid IS NULL";
+
 		public Priorities Priority => Priorities.Low;
 
 		public string TableName => "FileHandler";
@@ -75,6 +102,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 			importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
 			ImportHelper.PopulateTemporaryTable<FileHandler>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+			importOptions.ExecuteCommand(this.ReportingSQL);
 
 			importOptions.ExecuteCommand(this.insertSQL);
 		}

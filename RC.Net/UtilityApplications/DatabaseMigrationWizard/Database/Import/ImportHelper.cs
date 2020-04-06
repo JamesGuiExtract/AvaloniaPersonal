@@ -4,6 +4,7 @@ using Extract.Database;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
@@ -12,20 +13,24 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Windows;
 using UCLID_FILEPROCESSINGLib;
 
 namespace DatabaseMigrationWizard.Database.Input
 {
-    public class ImportHelper
+    public class ImportHelper : IDisposable
     {
         private ImportOptions ImportOptions { get; set; }
 
-        private IProgress<string> Progress;
+        private readonly IProgress<string> Progress;
 
         public ImportHelper(ImportOptions importOptions, IProgress<string> progress)
         {
             this.ImportOptions = importOptions;
             this.Progress = progress;
+            this.ImportOptions.SqlConnection = new SqlConnection($@"Server={ImportOptions.ConnectionInformation.DatabaseServer};Database={ImportOptions.ConnectionInformation.DatabaseName};Integrated Security=SSPI");
+            this.ImportOptions.SqlConnection.Open();
+            this.ImportOptions.Transaction = this.ImportOptions.SqlConnection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
         }
 
         /// <summary>
@@ -100,36 +105,24 @@ namespace DatabaseMigrationWizard.Database.Input
             try
             {
                 IEnumerable<ISequence> instances = FilteredInstances();
-
-                var sqlConnection = new SqlConnection($@"Server={ImportOptions.ConnectionInformation.DatabaseServer};Database={ImportOptions.ConnectionInformation.DatabaseName};Integrated Security=SSPI");
-                this.ImportOptions.DBConnection = sqlConnection;
-                sqlConnection.Open();
-                using (this.ImportOptions.Transaction = sqlConnection.BeginTransaction(System.Data.IsolationLevel.Serializable))
-                {
-                    ClearDatabase();
-
-                    try
-                    {
-                        ExecutePriority(instances);
-                        this.ImportOptions.Transaction.Commit();
-                    }
-                    catch (Exception ex)
-                    {
-                        this.ImportOptions.Transaction.Rollback();
-                        throw ex.AsExtract("ELI49717");
-                    }
-                    finally
-                    {
-                        this.ImportOptions.Transaction.Dispose();
-                    }
-
-                    sqlConnection.Close();
-                }
+                ClearDatabase();
+                ExecutePriority(instances);
             }
             catch(Exception e)
             {
+                this.ImportOptions.Transaction.Rollback();
                 throw e.AsExtract("ELI49681");
             }
+        }   
+        
+        public void CommitTransaction()
+        {
+            this.ImportOptions.Transaction.Commit();
+        }
+
+        public void RollbackTransaction()
+        {
+            this.ImportOptions.Transaction.Rollback();
         }
 
         /// <summary>
@@ -227,6 +220,25 @@ namespace DatabaseMigrationWizard.Database.Input
             }
 
             return (list, stillJsonObjectsToDeserialize);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.ImportOptions.Transaction.Dispose();
+                this.ImportOptions.Transaction = null;
+                this.ImportOptions.SqlConnection.Close();
+                this.ImportOptions.SqlConnection.Dispose();
+                this.ImportOptions.SqlConnection = null;
+            }
         }
     }
 }

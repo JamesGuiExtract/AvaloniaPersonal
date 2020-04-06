@@ -57,6 +57,7 @@ namespace DatabaseMigrationWizard.Test
 
             ImportHelper importHelper = new ImportHelper(ImportOptions, new Progress<string>((garbage) => { }));
             importHelper.Import();
+            importHelper.CommitTransaction();
 
             SqlConnection = new SqlConnection($@"Server={ImportOptions.ConnectionInformation.DatabaseServer};Database={ImportOptions.ConnectionInformation.DatabaseName};Integrated Security=SSPI");
             SqlConnection.Open();

@@ -8,11 +8,12 @@ namespace DatabaseMigrationWizard.Database.Input
     public enum Priorities : Int32
     {
         None = 0,
-        Low = 2,
-        MediumLow = 4,
-        Medium = 8,
-        MediumHigh = 16,
-        High = 32
+        Reporting = 2,
+        Low = 4,
+        MediumLow = 8,
+        Medium = 16,
+        MediumHigh = 32,
+        High = 64
     };
 
     public interface ISequence

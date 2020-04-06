@@ -40,6 +40,33 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
+        private readonly string ReportingSQL = @"
+                                    INSERT INTO
+	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+                                    SELECT
+	                                    'Warning'
+	                                    , 'AttributeSetName'
+	                                    , CONCAT('The Attribute Set Name ', dbo.AttributeSetName.Description, ' is present in the destination database, but NOT in the importing source.')
+                                    FROM
+	                                    dbo.AttributeSetName
+		                                    LEFT OUTER JOIN ##AttributeSetName
+			                                    ON dbo.AttributeSetName.Guid = ##AttributeSetName.GUID
+                                    WHERE
+	                                    ##AttributeSetName.GUID IS NULL
+                                    ;
+                                    INSERT INTO
+	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+                                    SELECT
+	                                    'Info'
+	                                    , 'AttributeSetName'
+	                                    , CONCAT('The Attribute Set Name ', ##AttributeSetName.Description, ' will be added to the database')
+                                    FROM
+	                                    ##AttributeSetName
+		                                    LEFT OUTER JOIN dbo.AttributeSetName
+			                                    ON dbo.AttributeSetName.Guid = ##AttributeSetName.GUID
+                                    WHERE
+	                                    dbo.AttributeSetName.Guid IS NULL";
+
         public Priorities Priority => Priorities.High;
 
         public string TableName => "AttributeSetName";
@@ -49,6 +76,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
             ImportHelper.PopulateTemporaryTable<AttributeSetName>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+            importOptions.ExecuteCommand(this.ReportingSQL);
 
             importOptions.ExecuteCommand(this.insertSQL);
         }

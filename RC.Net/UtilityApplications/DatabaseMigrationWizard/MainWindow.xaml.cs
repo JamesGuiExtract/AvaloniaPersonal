@@ -1,8 +1,11 @@
 ﻿using DatabaseMigrationWizard.Database;
+using DatabaseMigrationWizard.Pages;
+using DatabaseMigrationWizard.Pages.Utility;
 using Extract;
 using Extract.Licensing;
 using FirstFloor.ModernUI.Windows.Controls;
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 
@@ -18,6 +21,12 @@ namespace DatabaseMigrationWizard
         private bool _UIEnabled = true;
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public ObservableCollection<Report> Reporting { get; } = new ObservableCollection<Report>();
+
+        public Import Import { get; set; }
+
+        public ReportWindow ReportWindow { get; set; }
 
         public bool UIEnabled
         {

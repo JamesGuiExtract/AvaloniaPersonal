@@ -65,12 +65,16 @@ namespace DatabaseMigrationWizard.Test
             DatabaseMigrationWizardTestHelper = new DatabaseMigrationWizardTestHelper();
             DatabaseMigrationWizardTestHelper.LoadInitialValues();
             DatabaseMigrationWizardTestHelper.WriteEverythingToDirectory(ImportOptions.ImportPath);
-            new ImportHelper(ImportOptions, new Progress<string>((garbage) => { })).Import();
+            var importHelper1 = new ImportHelper(ImportOptions, new Progress<string>((garbage) => { }));
+            importHelper1.Import();
+            importHelper1.CommitTransaction();
             dataBase.ExecuteCommandQuery(DropTempTables);
 
             RenameRecords();
             DatabaseMigrationWizardTestHelper.WriteEverythingToDirectory(ImportOptions.ImportPath);
-            new ImportHelper(ImportOptions, new Progress<string>((garbage) => { })).Import();
+            var importHelper2 = new ImportHelper(ImportOptions, new Progress<string>((garbage) => { }));
+            importHelper2.Import();
+            importHelper2.CommitTransaction();
 
             SqlConnection = new SqlConnection($@"Server={ImportOptions.ConnectionInformation.DatabaseServer};Database={ImportOptions.ConnectionInformation.DatabaseName};Integrated Security=SSPI");
             SqlConnection.Open();

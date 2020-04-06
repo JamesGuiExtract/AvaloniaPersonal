@@ -40,6 +40,33 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
+        private readonly string ReportingSQL = @"
+                                    INSERT INTO
+	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+                                    SELECT
+	                                    'Warning'
+	                                    , 'MetadataField'
+	                                    , CONCAT('The MetadataField ', dbo.MetadataField.Name, ' is present in the destination database, but NOT in the importing source.')
+                                    FROM
+	                                    dbo.MetadataField
+		                                    LEFT OUTER JOIN ##MetadataField
+			                                    ON dbo.MetadataField.Guid = ##MetadataField.GUID
+                                    WHERE
+	                                    ##MetadataField.GUID IS NULL
+                                    ;
+                                    INSERT INTO
+	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+                                    SELECT
+	                                    'Info'
+	                                    , 'MetadataField'
+	                                    , CONCAT('The MetadataField ', ##MetadataField.Name, ' will be added to the database')
+                                    FROM
+	                                    ##MetadataField
+		                                    LEFT OUTER JOIN dbo.MetadataField
+			                                    ON dbo.MetadataField.Guid = ##MetadataField.GUID
+                                    WHERE
+	                                    dbo.MetadataField.Guid IS NULL";
+
         public Priorities Priority => Priorities.High;
 
         public string TableName => "MetadataField";
@@ -49,6 +76,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
             ImportHelper.PopulateTemporaryTable<MetadataField>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+            importOptions.ExecuteCommand(this.ReportingSQL);
 
             importOptions.ExecuteCommand(this.insertSQL);
         }

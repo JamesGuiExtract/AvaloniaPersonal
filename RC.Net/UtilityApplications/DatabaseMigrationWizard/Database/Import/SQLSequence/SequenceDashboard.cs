@@ -58,6 +58,33 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
+		private readonly string ReportingSQL = @"
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+									SELECT
+										'Warning'
+										, 'Dashboard'
+										, CONCAT('The dashboard ', dbo.Dashboard.DashboardName, ' is present in the destination database, but NOT in the importing source.')
+									FROM
+										dbo.Dashboard
+											LEFT OUTER JOIN ##Dashboard
+												ON dbo.Dashboard.Guid = ##Dashboard.DashboardGuid
+									WHERE
+										##Dashboard.DashboardGuid IS NULL
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+									SELECT
+										'Info'
+										, 'Dashboard'
+										, CONCAT('The dashboard ', ##Dashboard.DashboardName, ' will be added to the database')
+									FROM
+										##Dashboard
+											LEFT OUTER JOIN dbo.Dashboard
+												ON dbo.Dashboard.Guid = ##Dashboard.DashboardGuid
+									WHERE
+										dbo.Dashboard.Guid IS NULL";
+
 		public Priorities Priority => Priorities.Low;
 
 		public string TableName => "Dashboard";
@@ -67,6 +94,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 			importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
 			ImportHelper.PopulateTemporaryTable<Dashboard>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+			importOptions.ExecuteCommand(this.ReportingSQL);
 
 			importOptions.ExecuteCommand(this.insertSQL);
 		}

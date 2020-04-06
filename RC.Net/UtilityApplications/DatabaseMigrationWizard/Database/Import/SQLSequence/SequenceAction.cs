@@ -24,7 +24,7 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										ASCName = UpdatingAction.ASCName
 										, Description = UpdatingAction.Description
 										, MainSequence = UpdatingAction.MainSequence
-
+										, WorkflowID = dbo.Workflow.ID
 									FROM
 										##Action AS UpdatingAction
 												LEFT OUTER JOIN dbo.Workflow
@@ -55,6 +55,33 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
+		private readonly string ReportingSQL = @"
+											INSERT INTO
+												dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+											SELECT
+												'Warning'
+												, 'Action'
+												, CONCAT('The action ', dbo.action.ASCName, ' is present in the destination database, but NOT in the importing source.')
+											FROM
+												dbo.Action
+													LEFT OUTER JOIN ##Action
+														ON dbo.Action.Guid = ##Action.ActionGUID
+											WHERE
+												##Action.ActionGUID IS NULL
+											;
+											INSERT INTO
+												dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+											SELECT
+												'Info'
+												, 'Action'
+												, CONCAT('The action ', ##Action.ASCName, ' will be added to the database')
+											FROM
+												##Action
+													LEFT OUTER JOIN dbo.Action
+														ON dbo.Action.Guid = ##Action.ActionGUID
+											WHERE
+												dbo.Action.Guid IS NULL";
+
 		public Priorities Priority => Priorities.MediumHigh;
 
 		public string TableName => "Action";
@@ -64,6 +91,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 			importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
             ImportHelper.PopulateTemporaryTable<Action>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+			importOptions.ExecuteCommand(this.ReportingSQL);
 
 			importOptions.ExecuteCommand(this.insertSQL);
 		}

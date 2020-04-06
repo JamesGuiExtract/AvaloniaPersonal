@@ -60,6 +60,33 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
+        private readonly string ReportingSQL = @"
+                                            INSERT INTO
+	                                            dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+                                            SELECT
+	                                            'Warning'
+												, 'Workflow'
+	                                            , CONCAT('The workflow ', dbo.Workflow.Name, ' is present in the destination database, but NOT in the importing source.')
+                                            FROM
+	                                            dbo.Workflow
+		                                            LEFT OUTER JOIN ##Workflow
+			                                            ON dbo.Workflow.Guid = ##Workflow.Guid
+                                            WHERE
+	                                            ##Workflow.Guid IS NULL
+                                            ;
+                                            INSERT INTO
+	                                            dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+                                            SELECT
+	                                            'Info'
+												, 'Workflow'
+	                                            , CONCAT('The workflow ', ##Workflow.Name, ' will be added to the database')
+                                            FROM
+	                                            ##Workflow
+		                                            LEFT OUTER JOIN dbo.Workflow
+			                                            ON dbo.Workflow.Guid = ##Workflow.Guid
+                                            WHERE
+	                                            dbo.Workflow.Guid IS NULL";
+
         public Priorities Priority => Priorities.High;
 
         public string TableName => "Workflow";
@@ -69,6 +96,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
             ImportHelper.PopulateTemporaryTable<Workflow>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+            importOptions.ExecuteCommand(this.ReportingSQL);
 
             importOptions.ExecuteCommand(this.insertSQL);
         }

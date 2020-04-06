@@ -65,6 +65,20 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
+		private readonly string ReportingSQL = @"
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+									SELECT
+										'Info'
+										, 'LabDEOrder'
+										, CONCAT('The LabDEOrder table will have ', COUNT(*), ' rows added to the database')
+									FROM
+										##LabDEOrder
+											LEFT OUTER JOIN dbo.LabDEOrder
+												ON dbo.LabDEOrder.Guid = ##LabDEOrder.Guid
+									WHERE
+										dbo.LabDEOrder.Guid IS NULL";
+
 		public Priorities Priority => Priorities.Low;
 
 		public string TableName => "LabDEOrder";
@@ -74,6 +88,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 			importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
 			ImportHelper.PopulateTemporaryTable<LabDEOrder>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+			importOptions.ExecuteCommand(this.ReportingSQL);
 
 			importOptions.ExecuteCommand(this.insertSQL);
 		}
