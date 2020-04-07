@@ -1,4 +1,5 @@
-﻿using Extract.Imaging;
+﻿using Extract.DataEntry;
+using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -1521,6 +1522,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         HandlePaginationSeparator_DocumentDataPanelRequest;
                     separator.DocumentDataPanelClosed -=
                         HandlePaginationSeparator_DocumentDataPanelClosed;
+                    separator.DocumentDataPanelAutoClosed -=
+                        HandlePaginationSeparator_DocumentDataPanelAutoClosed;
                     separator.DocumentCollapsedChanged -=
                         HandlePaginationSeparator_DocumentCollapsedChanged;
                     separator.DocumentSelectedToCommitChanged -=
@@ -1935,11 +1938,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (DocumentInDataEdit.PaginationSeparator != null)
-                {
-                    _flowLayoutPanel.ScrollControlIntoViewManual(DocumentInDataEdit.PaginationSeparator,
-                        flushWithTop: true);
-                }
+                _flowLayoutPanel.Controls
+                    .OfType<PaginationControl>()
+                    .Except(DocumentInDataEdit.PageControls.Concat(new PaginationControl[] { DocumentInDataEdit.PaginationSeparator }))
+                    .ToList()
+                    .ForEach(control => control.Visible = false);
+
+                PerformLayout();
+
+                //if (DocumentInDataEdit.PaginationSeparator != null)
+                //{
+                //    _flowLayoutPanel.ScrollControlIntoViewManual(DocumentInDataEdit.PaginationSeparator,
+                //        flushWithTop: true);
+                //}
             }
             catch (Exception ex)
             {
@@ -2013,7 +2024,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "Space";
                 _toggleDocumentSeparatorMenuItem.ShowShortcutKeys = true;
                 _toggleDocumentSeparatorCommand = new ApplicationCommand(Shortcuts,
-                    new Keys[] { Keys.Space }, HandleAddDocumentSeparator,
+                    new Keys[] { Keys.Insert }, HandleAddDocumentSeparator,
                     JoinToolStripItems(
                         _toggleDocumentSeparatorMenuItem, _paginationUtility.ToggleDocumentSeparatorMenuItem),
                     false, true, false);
@@ -2068,6 +2079,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (DocumentDataPanel?.PanelControl != null &&
                     DocumentDataPanel.PanelControl.ContainsFocus)
                 {
+                    if (keyData == Keys.Escape)
+                    {
+                        if (AttributeStatusInfo.IsEditInProgress)
+                        {
+                            AttributeStatusInfo.EndEdit();
+                        }
+
+                        return base.ProcessCmdKey(ref msg, keyData);
+                    }
+                    
                     IgnoreShortcutKey = true;
                 }
 
@@ -2824,6 +2845,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // If a data panel was provided to be opened...
                 if (e.DocumentDataPanel != null)
                 {
+                    var updateLock = new PageLayoutControlUpdateLock(this);
+                    this.SafeBeginInvoke("ELI49743", () =>
+                    {
+                        updateLock.Dispose();
+                    });
+
                     DocumentDataPanel = e.DocumentDataPanel;
                     DocumentInDataEdit = e.OutputDocument;
 
@@ -2869,6 +2896,48 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 DocumentDataPanel = null;
                 DocumentInDataEdit = null;
+
+                using (new PageLayoutControlUpdateLock(this))
+                {
+                    foreach (var separator in _flowLayoutPanel.Controls.OfType<PaginationSeparator>())
+                    {
+                        separator.Visible = true;
+                        if (!separator.Collapsed)
+                        {
+                            foreach (var pageControl in separator.Document.PageControls)
+                            {
+                                pageControl.Visible = true;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI40229");
+            }
+        }
+
+        void HandlePaginationSeparator_DocumentDataPanelAutoClosed(object sender, EventArgs e)
+        {
+            try
+            {
+                DocumentDataPanel = null;
+                DocumentInDataEdit = null;
+
+                _flowLayoutPanel.Controls
+                    .OfType<PaginationSeparator>()
+                    .ToList()
+                    .ForEach(s => s.Visible = true);
+
+                if (sender is PaginationSeparator separator)
+                {
+                    separator.Collapsed = true;
+                    SelectDocument(separator.Document);
+                    var nextDocument = SelectNextDocument(true);
+                    nextDocument.Collapsed = false;
+                    _flowLayoutPanel.Focus();
+                }
             }
             catch (Exception ex)
             {
@@ -2913,6 +2982,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var separator = (PaginationSeparator)sender;
                 if (separator.Collapsed)
                 {
+                    SelectDocument(separator.Document);
+                    //ProcessControlSelection(separator.Document.PageControls.First());
                     _flowLayoutPanel.ScrollControlIntoViewManual(separator, flushWithTop: false);
                 }
             }
@@ -3045,6 +3116,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     HandlePaginationSeparator_DocumentDataPanelRequest;
                 asPaginationSeparator.DocumentDataPanelClosed +=
                     HandlePaginationSeparator_DocumentDataPanelClosed;
+                asPaginationSeparator.DocumentDataPanelAutoClosed +=
+                    HandlePaginationSeparator_DocumentDataPanelAutoClosed;
                 asPaginationSeparator.DocumentCollapsedChanged +=
                     HandlePaginationSeparator_DocumentCollapsedChanged;
                 asPaginationSeparator.DocumentSelectedToCommitChanged +=
@@ -3378,7 +3451,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 // Make sure the selected control is scrolled into view.
                 if (scrollToControl &&
-                    control.Visible &&
+//                    control.Visible &&
                     Rectangle.Intersect(ClientRectangle, control.Bounds) != control.Bounds)
                 {
                     _flowLayoutPanel.ScrollControlIntoViewManual(control, flushWithTop: false);
@@ -3522,12 +3595,24 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ? currentControl.NextControl
                 : currentControl.PreviousControl;
 
-            result = currentControl as NavigablePaginationControl;
-            while ((currentControl != null) && result == null)
+            var activeDocument = GetActiveDocument(forward, null);
+
+            result = (currentControl?.Visible == true)
+                ? currentControl as NavigablePaginationControl
+                : null;
+            while (currentControl != null && !currentControl.Visible && result == null)
             {
                 currentControl = forward
                     ? currentControl.NextControl
                     : currentControl.PreviousControl;
+
+                if (activeDocument != null
+                    && currentControl is PageThumbnailControl pageControl
+                    && pageControl.Document != activeDocument)
+                {
+                    return null;
+                }
+
                 if (currentControl != null && currentControl.Visible)
                 {
                     result = currentControl as NavigablePaginationControl;
@@ -3553,11 +3638,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return GetNextNavigableControl(down);
             }
 
+            var activeDocument = GetActiveDocument(down);
+
             // Iterate from currentControl until the next page control is encountered that is
             // vertically aligned with the current control.
             NavigablePaginationControl result = null;
             for (NavigablePaginationControl nextControl = GetNextNavigableControl(down, currentControl);
-                 nextControl != null;
+                 nextControl != null 
+                    && (activeDocument == null || (nextControl as PageThumbnailControl)?.Document == activeDocument);
                  nextControl = GetNextNavigableControl(down, nextControl))
             {
                 result = nextControl;
@@ -3566,37 +3654,23 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // row.
                 if (down && result.Top > currentControl.Top && result.Left >= currentControl.Left)
                 {
-                    break;
+                    return result;
                 }
                 else if (!down && result.Top < currentControl.Top && result.Left <= currentControl.Left)
                 {
-                    break;
+                    return result;
                 }
             }
 
-            if (result == null)
-            {
-                return null;
-            }
-
-            return result;
+            return null;
         }
 
-        /// <summary>
-        /// Selects the document containing <see paramref="selectionTarget"/> unless all pages of
-        /// that document are already selected, in which case the next document before/after that
-        /// document is selected.
-        /// </summary>
-        /// <param name="forward"><see langword="true"/> to select the next document if the target
-        /// document is already entirely selected; <see langword="false"/> to select the previous.</param>
-        /// <param name="selectionTarget">The <see cref="PageThumbnailControl"/> the document
-        /// selection is to be based off of.</param>
-        void SelectNextDocument(bool forward, PageThumbnailControl selectionTarget = null)
+        OutputDocument GetActiveDocument(bool forward, PageThumbnailControl selectionTarget = null)
         {
             // If there are no page controls, there is nothing to do.
             if (!_flowLayoutPanel.Controls.OfType<PageThumbnailControl>().Any())
             {
-                return;
+                return null;
             }
 
             // If not specified, use the active control as the selectionTarget.
@@ -3621,15 +3695,29 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             // If there are no page controls, there are no documents to select.
-            if (selectionTarget == null)
-            {
-                return;
-            }
+            return (selectionTarget == null)
+                ? null
+                : selectionTarget.Document;
+        }
+
+        /// <summary>
+        /// Selects the document containing <see paramref="selectionTarget"/> unless all pages of
+        /// that document are already selected, in which case the next document before/after that
+        /// document is selected.
+        /// </summary>
+        /// <param name="forward"><see langword="true"/> to select the next document if the target
+        /// document is already entirely selected; <see langword="false"/> to select the previous.</param>
+        /// <param name="selectionTarget">The <see cref="PageThumbnailControl"/> the document
+        /// selection is to be based off of.</param>
+        OutputDocument SelectNextDocument(bool forward, PageThumbnailControl selectionTarget = null)
+        {
+            OutputDocument nextDocument = null;
+            var activeDocument = GetActiveDocument(forward, selectionTarget);
 
             // If this document is fully selected, iterate the page controls forward/backward until
             // we get to the next document.
-            IEnumerable<PageThumbnailControl> pageControls = selectionTarget.Document.PageControls;
-            if (pageControls.All(page => page.Selected))
+            IEnumerable<PageThumbnailControl> pageControls = activeDocument.PageControls;
+            if (forward || pageControls.All(page => page.Selected))
             {
                 PaginationControl control = forward
                     ? pageControls.Last()
@@ -3644,23 +3732,32 @@ namespace Extract.UtilityApplications.PaginationUtility
                     var pageControl = control as PageThumbnailControl;
                     if (pageControl != null)
                     {
-                        selectionTarget = pageControl;
+                        nextDocument = pageControl.Document;
                         break;
                     }
                 }
                 while (control != null);
 
-                pageControls = selectionTarget.Document.PageControls;
+                pageControls = nextDocument?.PageControls;
+            }
+
+            if (nextDocument == null)
+            {
+                nextDocument = activeDocument;
             }
 
             // Select the selectionTarget and the pageControls that make up the document it is in.
             // Do not allow handling of modifier keys since modifier keys have a different meaning
             // for document navigation.
             ProcessControlSelection(
-                activeControl: selectionTarget,
+                activeControl: nextDocument.PageControls.First(),
                 additionalControls: pageControls,
                 select: true,
                 modifierKeys: Keys.None);
+
+            _flowLayoutPanel.ScrollControlIntoViewManual(nextDocument.PaginationSeparator, flushWithTop: false);
+
+            return nextDocument;
         }
 
         /// <summary>
@@ -3822,6 +3919,122 @@ namespace Extract.UtilityApplications.PaginationUtility
             OnStateChanged();
         }
 
+        void HandleMockupForward()
+        {
+            var currentControl = GetActiveControl(true);
+            if (currentControl is PageThumbnailControl pageThumbnailControl)
+            {
+                var separator = pageThumbnailControl.Document.PaginationSeparator;
+                if (separator.Collapsed)
+                {
+                    separator.Collapsed = false;
+                    return;
+                }
+                else 
+                {
+                    var nextControl = GetNextControl(currentControl, true);
+                    if (!(nextControl is PageThumbnailControl)
+                        && !separator.IsDataPanelOpen)
+                    {
+                        using (new PageLayoutControlUpdateLock(this))
+                        {
+                            separator.OpenDataPanel();
+                            separator.Collapsed = false;
+                            return;
+                        }
+                    }
+                }
+            }
+
+            HandleSelectNextPage();
+            _flowLayoutPanel.Focus();
+        }
+
+        void HandleMockupBackward()
+        {
+            var currentControl = GetActiveControl(true);
+            var previousControl = currentControl;
+            PageThumbnailControl previousPageThumbnailControl = null;
+            while (previousControl != null && previousPageThumbnailControl == null)
+            {
+                previousControl = previousControl.PreviousControl;
+                previousPageThumbnailControl = previousControl as PageThumbnailControl;
+            }
+
+            if (previousPageThumbnailControl != null)
+            {
+                var previousDocument = previousPageThumbnailControl.Document;
+                if (previousPageThumbnailControl?.Document != null
+                    && (currentControl as PageThumbnailControl)?.Document != previousDocument)
+                {
+                    SelectDocument(previousDocument);
+                    //previousDocument.Collapsed = false;
+                    //ProcessControlSelection(previousPageThumbnailControl, null, true, Control.ModifierKeys & ~Keys.Shift, true);
+                    //_flowLayoutPanel.Focus();
+                    return;
+                }
+            }
+
+            if (previousPageThumbnailControl == null)
+            {
+                _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
+            }
+            else
+            {
+                ProcessControlSelection(previousPageThumbnailControl, null, true, Control.ModifierKeys & ~Keys.Shift, true);
+            }
+            _flowLayoutPanel.Focus();
+        }
+
+        void HandleMockupCheckDocument()
+        {
+            var activeSeparator = GetActiveDocument(true)?.PaginationSeparator;
+            if (activeSeparator != null)
+            {
+                activeSeparator.DocumentSelectedToCommit =
+                    !activeSeparator.DocumentSelectedToCommit;
+            }
+
+            //HandleSelectNextPage();
+            //_flowLayoutPanel.Focus();
+        }
+
+        void HandleOpenDataPanel()
+        {
+            try
+            {
+                var activeSeparator = GetActiveDocument(true)?.PaginationSeparator;
+                if (activeSeparator != null && DocumentInDataEdit != activeSeparator.Document)
+                {
+                    activeSeparator.OpenDataPanel();
+                    activeSeparator.Collapsed = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI0");
+            }
+        }
+
+        void HandleCloseDataPanel()
+        {
+            try
+            {
+                if (DocumentInDataEdit != null)
+                {
+                    DocumentInDataEdit.PaginationSeparator.CloseDataPanel(saveData: true, validateData: false);
+                }
+                else
+                {
+                    ClearSelection();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI0");
+            }
+        }
+
         /// <summary>
         /// Initializes the page navigation and operations associated with keystrokes.
         /// </summary>
@@ -3836,14 +4049,22 @@ namespace Extract.UtilityApplications.PaginationUtility
             _toggleDocumentSeparatorCommand.Enabled = false;
             _outputDocumentCommand.Enabled = false;
 
-            Shortcuts[Keys.Escape] = ClearSelection;
+            //Shortcuts[Keys.Escape] = ClearSelection;
 
-            Shortcuts[Keys.Tab] = HandleSelectNextPage;
+            //Shortcuts[Keys.Oemtilde] = HandleMockupForward;
+            Shortcuts[Keys.Space] = HandleMockupCheckDocument;
+            Shortcuts[Keys.Tab] = HandleMockupForward;
+            Shortcuts[Keys.Tab | Keys.Shift] = HandleMockupBackward;
+
             Shortcuts[Keys.Tab | Keys.Control] = HandleSelectNextDocument;
             // [DotNetRCAndUtils:984]
             // Don't allow the shift key to expand selection when used in conjunction with tab.
-            Shortcuts[Keys.Tab | Keys.Shift] = HandleSelectPreviousPageNoShift;
+            //Shortcuts[Keys.Tab | Keys.Shift] = HandleSelectPreviousPageNoShift;
             Shortcuts[Keys.Tab | Keys.Control | Keys.Shift] = HandleSelectPreviousDocument;
+
+            Shortcuts[Keys.Enter] = HandleOpenDataPanel;
+            Shortcuts[Keys.F2] = HandleOpenDataPanel;
+            Shortcuts[Keys.Escape] = HandleCloseDataPanel;
 
             Shortcuts[Keys.Left] = HandleSelectPreviousPage;
             Shortcuts[Keys.Left | Keys.Control] = HandleSelectPreviousPage;
@@ -4276,15 +4497,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                NavigablePaginationControl navigableControl = GetNextNavigableControl(true);
-
-                if (navigableControl == null)
+                var currentControl = GetActiveControl(true);
+                if (currentControl is PageThumbnailControl pageControl && pageControl.Document.Collapsed)
                 {
-                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Maximum;
+                    pageControl.Document.Collapsed = false;
                 }
                 else
                 {
-                    ProcessControlSelection(navigableControl);
+                    NavigablePaginationControl navigableControl = GetNextNavigableControl(true);
+
+                    if (navigableControl == null)
+                    {
+                        //_flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Maximum;
+                    }
+                    else
+                    {
+                        ProcessControlSelection(navigableControl);
+                    }
                 }
             }
             catch (Exception ex)
@@ -4304,7 +4533,12 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (navigableControl == null)
                 {
-                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
+                    var activeDocument = GetActiveDocument(false);
+                    if (activeDocument?.Collapsed == false)
+                    {
+                        activeDocument.Collapsed = true;
+                    }
+                    //_flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
                 }
                 else
                 {
@@ -4418,7 +4652,16 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (navigableControl == null)
                 {
-                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Maximum;
+                    var outputDocument = SelectNextDocument(true);
+                    if (outputDocument == null)
+                    {
+                        _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Maximum;
+                    }
+                    else
+                    {
+                        //ProcessControlSelection(outputDocument.PageControls.First());
+                        PrimarySelection = outputDocument.PageControls.First();
+                    }
                 }
                 else
                 {
@@ -4438,11 +4681,21 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                var activeControl = GetActiveControl(true) as PageThumbnailControl;
                 NavigablePaginationControl navigableControl = GetNextRowNavigableControl(false);
 
                 if (navigableControl == null)
                 {
-                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
+                    var outputDocument = SelectNextDocument(false);
+                    if (outputDocument == null)
+                    {
+                        _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
+                    }
+                    else
+                    {
+                        //ProcessControlSelection(outputDocument.PageControls.First());
+                        PrimarySelection = outputDocument.PageControls.First();
+                    }
                 }
                 else
                 {

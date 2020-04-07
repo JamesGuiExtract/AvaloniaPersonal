@@ -1561,7 +1561,7 @@ namespace Extract.DataEntry
             try
             {
                 // If in design mode, just return false
-                if (_inDesignMode)
+                if (_inDesignMode /*|| TopLevelControl == null*/)
                 {
                     return false;
                 }
@@ -3035,24 +3035,7 @@ namespace Extract.DataEntry
             {
                 base.OnParentChanged(e);
 
-                if (Parent == null)
-                {
-                    // Don't allow PreFilterMessage to be called when the DEP is not loaded.
-                    Application.RemoveMessageFilter(this);
-
-                    AttributeStatusInfo.AttributeInitialized -= HandleAttributeInitialized;
-                    AttributeStatusInfo.ViewedStateChanged -= HandleViewedStateChanged;
-                    AttributeStatusInfo.ValidationStateChanged -= HandleValidationStateChanged;
-                }
-                else
-                {
-                    // So that PreFilterMessage is called
-                    Application.AddMessageFilter(this);
-
-                    AttributeStatusInfo.AttributeInitialized += HandleAttributeInitialized;
-                    AttributeStatusInfo.ViewedStateChanged += HandleViewedStateChanged;
-                    AttributeStatusInfo.ValidationStateChanged += HandleValidationStateChanged;
-                }
+                ProcessAncestorChange();
             }
             catch (Exception ex)
             {
@@ -3061,6 +3044,67 @@ namespace Extract.DataEntry
                 throw ee;
             }
         }
+
+        private void UpdateAnscestors()
+        {
+            var ancestors = new List<Control>();
+            for (var ancestor = Parent; ancestor != null; ancestor = ancestor.Parent)
+            {
+                ancestors.Add(ancestor);
+            }
+
+            var oldAncestors = _ancestors.Except(ancestors);
+            foreach (var oldAncestor in oldAncestors)
+            {
+                oldAncestor.ParentChanged -= Ancestor_ParentChanged;
+            }
+
+            var newAncestors = ancestors.Except(_ancestors);
+            foreach (var newAncestor in newAncestors)
+            {
+                newAncestor.ParentChanged += Ancestor_ParentChanged;
+            }
+
+            _ancestors = ancestors;
+        }
+
+        void Ancestor_ParentChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessAncestorChange();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI0");
+            }
+        }
+
+        private void ProcessAncestorChange()
+        {
+            UpdateAnscestors();
+
+            if (TopLevelControl == null)
+            {
+                // Don't allow PreFilterMessage to be called when the DEP is not loaded.
+                Application.RemoveMessageFilter(this);
+
+                AttributeStatusInfo.AttributeInitialized -= HandleAttributeInitialized;
+                AttributeStatusInfo.ViewedStateChanged -= HandleViewedStateChanged;
+                AttributeStatusInfo.ValidationStateChanged -= HandleValidationStateChanged;
+            }
+            else
+            {
+                // So that PreFilterMessage is called
+                Application.AddMessageFilter(this);
+
+                AttributeStatusInfo.AttributeInitialized += HandleAttributeInitialized;
+                AttributeStatusInfo.ViewedStateChanged += HandleViewedStateChanged;
+                AttributeStatusInfo.ValidationStateChanged += HandleValidationStateChanged;
+            }
+        }
+
+        List<Control> _ancestors = new List<Control>();
 
         /// <summary>
         /// Override <see cref="Control.OnEnter"/> to keep track of when focus had belonged to 
@@ -5859,7 +5903,21 @@ namespace Extract.DataEntry
                 Stack<IAttribute> nextTabStopGenealogy = GetNextTabStopGenealogy(
                     forward, activeAttribute, activeGenealogy, out tabByGroup);
 
-                if (nextTabStopGenealogy != null)
+                if (nextTabStopGenealogy == null)
+                {
+                    if (_isDocumentLoaded)
+                    {
+                        if (GetNextUnviewedAttribute() == null)
+                        //{
+                        //    this.SafeBeginInvoke("ELI49745", () => GoToNextUnviewed());
+                        //}
+                        //else
+                        {
+                            LastControl?.Invoke(this, new EventArgs());
+                        }
+                    }
+                }
+                else
                 {
                     // Indicate a manual focus event so that HandleControlGotFocus allows the
                     // new attribute selection rather than overriding it.
@@ -5896,6 +5954,8 @@ namespace Extract.DataEntry
             }
             while (repeat);
         }
+
+        public event EventHandler<EventArgs> LastControl;
 
         /// <summary>
         /// Finds the next attribute genealogy after <see paramref="activeAttribute"/> and
