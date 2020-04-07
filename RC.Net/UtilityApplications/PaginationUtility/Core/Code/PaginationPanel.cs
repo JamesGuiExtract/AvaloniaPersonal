@@ -1,5 +1,6 @@
 ﻿using ADODB;
 using Extract.AttributeFinder;
+using Extract.DataEntry;
 using Extract.DataEntry.LabDE;
 using Extract.Imaging;
 using Extract.Imaging.Forms;
@@ -417,7 +418,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             get;
             set;
         }
-
+        
         #endregion Configuration Properties
 
         #region Runtime Properties
@@ -587,6 +588,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 _documentDataPanel.DataPanelChanged += HandleDataPanel_DataPanelChanged;
                             }
                         }
+
+                        _primaryPageLayoutControl.AllowDataEdit = (_documentDataPanel != null);
                     }
                 }
                 catch (Exception ex)
@@ -2122,6 +2125,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// A <see cref="ToolStripItem"/> Context menu option that opens the data panel for editing.
+        /// </summary>
+        public ToolStripItem EditDocumentDataMenuItem 
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// A <see cref="ToolStripItem"/> intended to toggle a document separator ahead of the
         /// currently selected page or <see langword="null"/> if no such item is available.
         /// </summary>
@@ -2427,12 +2441,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.Click"/> event of the <see cref="_applyToolStripButton"/>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_submitToolStripButton"/>
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleApplyToolStripButton_Click(object sender, EventArgs e)
+        void HandleSubmitToolStripButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -2753,7 +2767,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                ProcessFocusChange(forceUpdate: false);
+                // The panel does not necessarily yet have an a focused ActiveDataControl when this event
+                // occurs. This can lead to controls in inconsistent states as neither the page controls
+                // nor the panel are being treated as focused. Specifically, tab navigation was not working
+                // after double-click opening the first document in a batch using a DEP with no tab stops
+                this.SafeBeginInvoke("ELI49863", () => ProcessFocusChange(forceUpdate: false));
             }
             catch (Exception ex)
             {
@@ -3462,7 +3480,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _revertToSourceToolStripButton.Enabled = RevertToSourceEnabled;
 
                     _saveToolStripButton.Enabled = PendingDocuments.Any();
-                    _applyToolStripButton.Enabled = CommitEnabled;
+                    _submitToolStripButton.Enabled = CommitEnabled;
                     _collapseAllToolStripButton.Image =
                         AllDocumentsCollapsed
                             ? Properties.Resources.Expand

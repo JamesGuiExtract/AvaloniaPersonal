@@ -231,11 +231,18 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             ForceNextLayout = false;
 
+            bool foundFirstVisible = false;
+
             // Layout all PaginationControls (ignore any other kind of control).
             foreach (PaginationControl control in parent.Controls.OfType<PaginationControl>())
             {
                 var separator = control as PaginationSeparator;
-                var previousControl = control.PreviousControl as PaginationControl;
+
+                // Don't allow a hidden control to qualify as the previousControl
+                PaginationControl previousControl = foundFirstVisible
+                    ? control.PreviousControl as PaginationControl
+                    : null;
+
                 var previousSeparator = previousControl as PaginationSeparator;
 
                 // Only apply layout to visible controls.
@@ -243,6 +250,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     continue;
                 }
+
+                foundFirstVisible = true;
 
                 ExtractException.Assert("ELI35655",
                     "The PaginationLayoutEngine does not respect margins.",

@@ -685,6 +685,21 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Ensures a field is selected by selecting the first field if necessary.
+        /// </summary>
+        public void EnsureFieldSelection()
+        {
+            try
+            {
+                ActiveDataEntryPanel?.EnsureFieldSelection();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49744");
+            }
+        }
+
+        /// <summary>
         /// Performs an undo operation.
         /// </summary>
         public void Undo()

@@ -62,7 +62,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._topToolStrip = new System.Windows.Forms.ToolStrip();
             this._collapseAllToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this._applyToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this._submitToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._saveToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._revertToSourceToolStripButton = new System.Windows.Forms.ToolStripButton();
             this._revertToOriginalToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -114,7 +114,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._topToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this._topToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._collapseAllToolStripButton,
-            this._applyToolStripButton,
+            this._submitToolStripButton,
             this._saveToolStripButton,
             this._revertToSourceToolStripButton,
             this._revertToOriginalToolStripButton});
@@ -133,14 +133,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._collapseAllToolStripButton.Size = new System.Drawing.Size(23, 22);
             this._collapseAllToolStripButton.Click += new System.EventHandler(this.HandleCollapseAllToolStripButton_Click);
             // 
-            // _applyToolStripButton
+            // _submitToolStripButton
             // 
-            this._applyToolStripButton.Image = global::Extract.UtilityApplications.PaginationUtility.Properties.Resources.Accept;
-            this._applyToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._applyToolStripButton.Name = "_applyToolStripButton";
-            this._applyToolStripButton.Size = new System.Drawing.Size(58, 22);
-            this._applyToolStripButton.Text = "Apply";
-            this._applyToolStripButton.Click += new System.EventHandler(this.HandleApplyToolStripButton_Click);
+            this._submitToolStripButton.Image = global::Extract.UtilityApplications.PaginationUtility.Properties.Resources.Accept;
+            this._submitToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._submitToolStripButton.Name = "_submitToolStripButton";
+            this._submitToolStripButton.Size = new System.Drawing.Size(58, 22);
+            this._submitToolStripButton.Text = "Submit";
+            this._submitToolStripButton.Click += new System.EventHandler(this.HandleSubmitToolStripButton_Click);
             // 
             // _saveToolStripButton
             // 
@@ -197,7 +197,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         private System.Windows.Forms.ToolStripContainer _toolStripContainer;
         private System.Windows.Forms.ToolStrip _topToolStrip;
-        private System.Windows.Forms.ToolStripButton _applyToolStripButton;
+        private System.Windows.Forms.ToolStripButton _submitToolStripButton;
         private System.Windows.Forms.ToolStripButton _revertToSourceToolStripButton;
         private System.Windows.Forms.ToolStripButton _revertToOriginalToolStripButton;
         private System.Windows.Forms.TableLayoutPanel _tableLayoutPanel;

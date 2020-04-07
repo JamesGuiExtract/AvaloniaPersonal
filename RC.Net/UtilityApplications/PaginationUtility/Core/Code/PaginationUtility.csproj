@@ -336,7 +336,6 @@
     <None Include="Resources\Accept.png" />
     <Content Include="Resources\Edit11.png" />
     <None Include="Resources\Error.png" />
-    <None Include="Resources\EditGray.png" />
     <Content Include="Resources\PaginationUtility.ico" />
   </ItemGroup>
   <ItemGroup>

@@ -215,6 +215,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         void ShowMessage(string message);
 
         /// <summary>
+        /// Ensures a field is selected by selecting the first field if necessary.
+        /// </summary>
+        void EnsureFieldSelection();
+
+        /// <summary>
         /// Performs an undo operation.
         /// </summary>
         void Undo();

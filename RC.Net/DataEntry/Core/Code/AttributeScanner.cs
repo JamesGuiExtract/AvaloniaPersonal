@@ -3,6 +3,7 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 
@@ -31,7 +32,7 @@ namespace Extract.DataEntry
         /// control more that two generations of attributes.</bullet>
         /// </list>
         /// </summary>
-        /// <typeparam name="T">The data type of value accessed by <see cref="AccessorMethod"/></typeparam>
+        /// <typeparam name="T">The data type of value accessed by <see cref="ScanDelegate"/></typeparam>
         class AttributeScanner<T>
         {
             #region Fields
@@ -50,9 +51,8 @@ namespace Extract.DataEntry
             public Stack<IAttribute> _startingPoint;
 
             /// <summary>
-            /// An attribute genealogy specifying the attribute that caused a scan to abort based
-            /// on the <see cref="AttributeStatusInfo.AccessorMethod"/> returning
-            /// <see langword="false"/>.
+            /// An attribute genealogy specifying the attribute that caused a scan to end based
+            /// on the <see cref="ScanDelegate"/> returning <c>true</c>.
             /// </summary>
             public Stack<IAttribute> _resultAttributeGenealogy;
 
@@ -94,24 +94,23 @@ namespace Extract.DataEntry
             public string _resultDisplayOrder;
 
             /// <summary>
-            /// <see langword="true"/> if all attributes were scanned without any triggered the
-            /// scan to be aborted (with a return value of <see langword="false"/> from the 
-            /// <see cref="AttributeStatusInfo.AccessorMethod"/>), <see langword="false"/> if the
-            /// scan was aborted.
+            /// <c>true</c> if an scan ended with <see cref="ScanDelegate"/> returning <c>true</c>
+            /// for an attribute in the hierarchy; <c>false</c> if <see cref="ScanDelegate"/> returned
+            /// <c>false</c> for all attributes.
             /// </summary>
-            public bool _result = true;
+            public bool _result = false;
 
             /// <summary>
             /// A method used to get or set an <see cref="AttributeStatusInfo"/> field for each 
             /// attribute.
             /// </summary>
-            public AccessorMethod<T> _accessorMethod;
+            public ScanDelegate<T> _scanDelegate;
 
             /// <summary>
             /// Either specifies the value an <see cref="AttributeStatusInfo"/> field should be set
-            /// to or specifies the value a field is required to be.
+            /// to or a value used to identify target attributes in a scan.
             /// </summary>
-            public T _value;
+            public T _argument;
 
             #endregion Fields
 
@@ -125,24 +124,24 @@ namespace Extract.DataEntry
             /// </summary>
             /// <param name="attributes">An <see cref="IUnknownVector"/> of 
             /// <see cref="IAttribute"/>s to scan.</param>
-            /// <param name="accessorMethod">A method used to get or set an 
-            /// <see cref="AttributeStatusInfo"/> field for each attribute.</param>
-            /// <param name="value">Either specifies the value an <see cref="AttributeStatusInfo"/>
-            /// field should be set to or specifies the value a field is  required to be.</param>
+            /// <param name="scanDelegate">A operation or check to perform on each attribute in the
+            /// hierarchy. A <c>true</c> return value will stop the scan and apply the attribute
+            /// for which true was returned as <see paramref="resultAttributeGenealogy"/>.</param>
+            /// <param name="argument">Specifies either a value to be applied to a field for each
+            /// attribute or a value used to identify target attributes in a scan.</param>
             /// <param name="resultAttributeGenealogy">An attribute genealogy specifying the 
-            /// attribute that caused a scan to abort based on the 
-            /// <see cref="AttributeStatusInfo.AccessorMethod"/> returning <see langword="false"/>.
-            /// </param>
+            /// attribute that caused a scan to comple based on the <see paramref="scanDelegate"/>
+            /// returning <c>true</c>.</param>
             /// <param name="forward"><see langword="true"/> if scanning forward through the 
             /// attribute hierarchy, <see langword="false"/> if scanning backward.</param>
-            AttributeScanner(IUnknownVector attributes, AccessorMethod<T> accessorMethod,
-                T value, bool forward, Stack<IAttribute> resultAttributeGenealogy)
+            AttributeScanner(IUnknownVector attributes, ScanDelegate<T> scanDelegate,
+                T argument, bool forward, Stack<IAttribute> resultAttributeGenealogy)
             {
                 try
                 {
                     _attributes = attributes;
-                    _accessorMethod = accessorMethod;
-                    _value = value;
+                    _scanDelegate = scanDelegate;
+                    _argument = argument;
                     _forward = forward;
                     _resultAttributeGenealogy = resultAttributeGenealogy;
                 }
@@ -167,10 +166,11 @@ namespace Extract.DataEntry
             /// The scan will start with the first attribute after the target attribute (the target 
             /// being the attribute at the bottom of the stack) and will end with the target attribute 
             /// (assuming the scan isn't aborted somewhere in between).</param>
-            /// <param name="accessorMethod">A method used to get or set an 
-            /// <see cref="AttributeStatusInfo"/> field for each attribute.</param>
-            /// <param name="value">Either specifies the value an <see cref="AttributeStatusInfo"/>
-            /// field should be set to or specifies the value a field is  required to be.</param>
+            /// <param name="scanDelegate">A operation or check to perform on each attribute in the
+            /// hierarchy. A <c>true</c> return value will stop the scan and apply the attribute
+            /// for which true was returned as <see paramref="resultAttributeGenealogy"/>.</param>
+            /// <param name="argument">Specifies either a value to be applied to a field for each
+            /// attribute or a value used to identify target attributes in a scan.</param>
             /// <param name="forward"><see langword="true"/> if scanning forward through the 
             /// attribute hierarchy, <see langword="false"/> if scanning backward.</param>
             /// <param name="loop"><see langword="true"/> to resume scanning from the beginning of
@@ -178,11 +178,12 @@ namespace Extract.DataEntry
             /// successfully, <see langword="false"/> to end the scan once the end of the 
             /// <see cref="IAttribute"/> vector is reached.</param>
             /// <param name="resultAttributeGenealogy">A genealogy of <see cref="IAttribute"/>s 
-            /// specifying the attribute that caused a scan to abort based on the 
-            /// <see cref="AttributeStatusInfo.AccessorMethod"/> returning <see langword="false"/>
-            /// </param>
+            /// specifying the attribute that caused a scan to abort based on the
+            /// <see paramref="scanDelegate"/> returning <c>true</c>.</param>
+            /// <returns><c>true</c> if an attribute was found such that the scan ended with the
+            /// <see paramref="scanDelegate"/> returning <c>true</c> for an attribute.</returns>
             public static bool Scan(IUnknownVector attributes,
-                Stack<IAttribute> startingPoint, AccessorMethod<T> accessorMethod, T value,
+                Stack<IAttribute> startingPoint, ScanDelegate<T> scanDelegate, T argument,
                 bool forward, bool loop, Stack<IAttribute> resultAttributeGenealogy)
             {
                 try
@@ -192,15 +193,15 @@ namespace Extract.DataEntry
                         LicenseIdName.DataEntryCoreComponents, "ELI26132", _OBJECT_NAME);
 
                     // Create a node in charge of scanning the root-level attributes.
-                    AttributeScanner<T> rootScanNode = new AttributeScanner<T>(attributes, accessorMethod,
-                        value, forward, resultAttributeGenealogy);
+                    AttributeScanner<T> rootScanNode = new AttributeScanner<T>(attributes, scanDelegate,
+                        argument, forward, resultAttributeGenealogy);
 
                     // Initialize the scan node for the first pass of the scan (from the starting
                     // point to the end of the attribute vector.
                     rootScanNode = rootScanNode.GetScanNode(attributes, startingPoint, true);
                     rootScanNode.Scan(null);
 
-                    if (loop && rootScanNode._result)
+                    if (loop && !rootScanNode._result)
                     {
                         // If looping is requested and the first pass of the scan completed (was not
                         // aborted), initialize the scan node for the second pass of the scan (from
@@ -241,8 +242,8 @@ namespace Extract.DataEntry
                 Stack<IAttribute> startingPoint, bool firstPass)
             {
                 // Create and initialize the child AttributeScanner instance.
-                AttributeScanner<T> childStatusinfo = new AttributeScanner<T>(attributes, _accessorMethod,
-                    _value, _forward, _resultAttributeGenealogy);
+                AttributeScanner<T> childStatusinfo = new AttributeScanner<T>(attributes, _scanDelegate,
+                    _argument, _forward, _resultAttributeGenealogy);
                 childStatusinfo._attributes = attributes;
                 childStatusinfo._firstPass = firstPass;
 
@@ -364,41 +365,40 @@ namespace Extract.DataEntry
                         currentCutoffDisplayOrder = cutoffDisplayOrder;
                     }
 
-                    // Call the accessor method unless the attribute should be skipped per the
-                    // order cutoff.
+                    // Call the _scanDelegate unless the attribute should be skipped per the order cutoff.
                     if (!this.SkipAttribute(i, statusInfo.DisplayOrder, currentCutoffDisplayOrder) &&
-                        !_accessorMethod(attribute, statusInfo, _value))
+                        _scanDelegate(attribute, statusInfo, _argument))
                     {
-                        // If accessMethod returned false, check to see if this an existing result
+                        // If _scanDelegate returned true, check to see if this an existing result
                         // from a sub-attribute should be used in place of this result.
-                        if (childScanNode == null || childScanNode._result ||
+                        if (childScanNode == null || !childScanNode._result ||
                             IsBefore(statusInfo.DisplayOrder, childScanNode._resultDisplayOrder))
                         {
                             // Apply this result.
-                            _result = false;
+                            _result = true;
                             _resultDisplayOrder = statusInfo.DisplayOrder;
 
                             // Clear any current result genealogy.
-                            if (_resultAttributeGenealogy.Count > 0)
+                            if (_resultAttributeGenealogy?.Count > 0)
                             {
                                 _resultAttributeGenealogy.Clear();
                             }
                         }
                     }
 
-                    // If the current accessor method was skipped or succeeded, but a sub attribute
-                    // failed the accessor method, use the child's result.
-                    if (_result && childScanNode != null && !childScanNode._result)
+                    // If the current scanDelegate was skipped or succeeded, but a sub attribute
+                    // failed the scanDelegate, use the child's result.
+                    if (!_result && childScanNode != null && childScanNode._result)
                     {
-                        _result = false;
+                        _result = true;
                         _resultDisplayOrder = childScanNode._resultDisplayOrder;
                     }
 
-                    // In the case of a negative result, apply the current attribute to the result's
+                    // In the case of a positive result, apply the current attribute to the result's
                     // geneology and stop scanning.
-                    if (!_result)
+                    if (_result)
                     {
-                        _resultAttributeGenealogy.Push(attribute);
+                        _resultAttributeGenealogy?.Push(attribute);
                         break;
                     }
                 }
@@ -407,7 +407,7 @@ namespace Extract.DataEntry
             }
 
             /// <summary>
-            /// Determines whether the <see cref="AccessorMethod"/> for the <see cref="IAttribute"/>
+            /// Determines whether the <see cref="ScanDelegate"/> for the <see cref="IAttribute"/>
             /// at the specified attribute should be skipped based on the cutoff value.
             /// </summary>
             /// <param name="index">The index of the <see cref="IAttribute"/> to check.</param>
@@ -415,7 +415,7 @@ namespace Extract.DataEntry
             /// <param name="cutoffDisplayOrder">The cutoff display order to compare against.
             /// </param>
             /// <returns><see langword="true"/> if the <see cref="IAttribute"/> should be skipped,
-            /// <see langword="false"/> if the accessory method should be called.</returns>
+            /// <see langword="false"/> if the scanDelegate should be called.</returns>
             bool SkipAttribute(int index, string displayOrder, string cutoffDisplayOrder)
             {
                 // If this is the attribute specified by the starting point, skip it.
@@ -441,7 +441,7 @@ namespace Extract.DataEntry
                     }
                 }
 
-                // Don't skip; call the accessor method.
+                // Don't skip; call the scanDelegate method.
                 return false;
             }
 
@@ -477,63 +477,67 @@ namespace Extract.DataEntry
         #region Delegates
 
         /// <summary>
-        /// Used as a parameter for an attribute scan to define what should be done for each 
-        /// attribute in the tree.
+        /// Used as a parameter for an attribute scan to define the operation or check to be done
+        /// for each attribute in the tree.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
         /// <param name="statusInfo">The <see cref="AttributeStatusInfo"/> instance associated with 
         /// the <see cref="IAttribute"/> in question.</param>
-        /// <param name="value">A value to either be set or confirmed depending upon the purpose of
-        /// each specific AccessorMethod implementation.</param>
-        /// <returns><see langword="true"/> to continue traversing the attribute tree, 
-        /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
-        /// without traversing any more attributes.</returns>
+        /// <param name="argument">A value to either be applied or used to check the current attribute
+        /// state depending upon the ScanDelegate implementation.</param>
+        /// <returns><c>true</c> to indicate a scan of the attribute tree should be considered
+        /// complete based on an attribute being found that matches criteria; <c>false</c> if
+        /// the attribute does meet criteria to stop the scan; scan will proceed.</returns>
         /// <typeparam name="T">The data type of value accessed.</typeparam>
-        delegate bool AccessorMethod<T>(IAttribute attribute, AttributeStatusInfo statusInfo,
-            T value);
+        delegate bool ScanDelegate<T>(IAttribute attribute, AttributeStatusInfo statusInfo,
+            T argument);
 
         #endregion Delegates
 
-        #region AssessorMethods
+        #region ScanDelegates
 
         /// <summary>
-        /// An <see cref="AccessorMethod"/> implementation used to confirm all attributes
-        /// have been viewed (or not viewed)
+        /// An <see cref="ScanDelegate"/> implementation used to confirm whether attributes
+        /// either have been viewed or are not viewable.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
         /// <param name="statusInfo">The <see cref="AttributeStatusInfo"/> instance containing
         /// the status information for the attribute in question.</param>
-        /// <param name="value"><see langword="true"/> to confirm all attributes have been viewed
-        /// or <see langword="false"/> to confirm all attributes have not been viewed.</param>
+        /// <param name="tabStopOnly"><c>true</c> to confirm only that all tab-stop
+        /// attributes have been viewed; <c>false</c> to confirm all visible
+        /// attributes have been viewed.</param>
         /// <returns><see langword="true"/> to continue traversing the attribute tree, 
         /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
         /// without traversing any more attributes.</returns>
-        static bool ConfirmDataViewed(IAttribute attribute, AttributeStatusInfo statusInfo,
-            bool value)
+        private static bool IsUnviewed(IAttribute attribute, AttributeStatusInfo statusInfo,
+            bool tabStopOnly)
         {
-            return (!statusInfo._isViewable || statusInfo._hasBeenViewed == value);
+            return (statusInfo._hasBeenViewed == false
+                    && statusInfo._isViewable
+                    && ((statusInfo.OwningControl as Control)?.Enabled != false)
+                    && (!tabStopOnly || IsTabStop(attribute, statusInfo, true)));
         }
 
         /// <summary>
-        /// An <see cref="AccessorMethod"/> implementation to test that an attribute's
-        /// data validity is not included in <see paramref="targetValidity"/>.
+        /// An <see cref="ScanDelegate"/> implementation to test that an attribute's
+        /// data validity is included in <see paramref="targetValidity"/>.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
         /// <param name="statusInfo">The <see cref="AttributeStatusInfo"/> instance containing
         /// the status information for the attribute in question.</param>
         /// <param name="targetValidity">The <see cref="DataValidity"/> values that should
         /// trigger the scan to stop on a particular attribute.</param>
-        /// <returns><see langword="true"/> to continue traversing the attribute tree, 
-        /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
-        /// without traversing any more attributes.</returns>
-        static bool DataValidityDoesNotMatch(IAttribute attribute,
+        /// <returns><c>true</c> if the attribute statis matches <see paramref="targetValidity"/>;
+        /// otherwise, <c>false</c>.</returns>
+        static bool DataValidityMatches(IAttribute attribute,
             AttributeStatusInfo statusInfo, DataValidity targetValidity)
         {
-            return (!statusInfo._isViewable || (targetValidity & statusInfo._dataValidity) == 0);
+            // Consider the target attribute status to match targetValidity only for viewable attributes
+            return (statusInfo._isViewable && (targetValidity & statusInfo._dataValidity) != 0);
         }
 
         /// <summary>
-        /// An <see cref="AccessorMethod"/> implementation used to confirm all attributes
+        /// An <see cref="ScanDelegate"/> implementation used to confirm all attributes
         /// have been propagated into <see cref="IDataEntryControl"/>s.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
@@ -544,14 +548,15 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> to continue traversing the attribute tree, 
         /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
         /// without traversing any more attributes.</returns>
-        static bool ConfirmHasBeenPropagated(IAttribute attribute,
+        static bool HasBeenPropagated(IAttribute attribute,
             AttributeStatusInfo statusInfo, bool value)
         {
-            return (statusInfo._owningControl == null || statusInfo._hasBeenPropagated == value);
+            // Consider only mapped controls when checking for propagation.
+            return (statusInfo._owningControl != null && statusInfo._hasBeenPropagated == value);
         }
 
         /// <summary>
-        /// An <see cref="AccessorMethod"/> implementation used to check whether attributes are
+        /// An <see cref="ScanDelegate"/> implementation used to check whether attributes are
         /// tabstops or not.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
@@ -562,7 +567,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> to continue traversing the attribute tree, 
         /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
         /// without traversing any more attributes.</returns>
-        static bool ConfirmIsTabStop(IAttribute attribute, AttributeStatusInfo statusInfo,
+        static bool IsTabStop(IAttribute attribute, AttributeStatusInfo statusInfo,
             bool value)
         {
             // Default the attribute as not being a tab stop.
@@ -606,7 +611,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// An <see cref="AccessorMethod"/> implementation used to check whether the specified
+        /// An <see cref="ScanDelegate"/> implementation used to check whether the specified
         /// <see cref="IAttribute"/> represents a tab stop or group.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
@@ -617,17 +622,17 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> to continue traversing the attribute tree, 
         /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
         /// without traversing any more attributes.</returns>
-        static bool ConfirmIsTabStopOrGroup(IAttribute attribute, AttributeStatusInfo statusInfo,
+        static bool IsTabStopOrGroup(IAttribute attribute, AttributeStatusInfo statusInfo,
             bool value)
         {
             // Default the attribute as not being a tab stop or group.
             bool isTabStopOrGroup = false;
 
-            if (ConfirmIsTabStop(attribute, statusInfo, true))
+            if (IsTabStop(attribute, statusInfo, true))
             {
                 isTabStopOrGroup = true;
             }
-            else if (ConfirmIsTabGroup(attribute, statusInfo, true))
+            else if (IsTabGroup(attribute, statusInfo, true))
             {
                 isTabStopOrGroup = true;
             }
@@ -636,7 +641,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// An <see cref="AccessorMethod"/> implementation used to check whether the specified
+        /// An <see cref="ScanDelegate"/> implementation used to check whether the specified
         /// <see cref="IAttribute"/> represents a tab group.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
@@ -648,7 +653,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> to continue traversing the attribute tree, 
         /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
         /// without traversing any more attributes.</returns>
-        static bool ConfirmIsTabGroup(IAttribute attribute, AttributeStatusInfo statusInfo,
+        static bool IsTabGroup(IAttribute attribute, AttributeStatusInfo statusInfo,
             bool value)
         {
             bool isTabGroup;
@@ -657,7 +662,7 @@ namespace Extract.DataEntry
             // of this method should be considered a tab group if it is a tab stop.
             if (statusInfo._tabGroup == null)
             {
-                isTabGroup = ConfirmIsTabStop(attribute, statusInfo, true);
+                isTabGroup = IsTabStop(attribute, statusInfo, true);
             }
             else
             {
@@ -668,7 +673,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// An <see cref="AccessorMethod"/> implementation used to mark all attributes
+        /// An <see cref="ScanDelegate"/> implementation used to mark all attributes
         /// as propagated or not propagated.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
@@ -683,9 +688,9 @@ namespace Extract.DataEntry
             bool value)
         {
             statusInfo._hasBeenPropagated = value;
-            return true;
+            return false; // Don't stop scan
         }
 
-        #endregion AssessorMethods
+        #endregion ScanDelegates
     }
 }

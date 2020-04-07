@@ -81,6 +81,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         ToolStripItem PrintMenuItem { get; }
 
         /// <summary>
+        /// A <see cref="ToolStripItem"/> that opens the data panel for editing.
+        /// </summary>
+        ToolStripItem EditDocumentDataMenuItem { get; }
+
+        /// <summary>
         /// A <see cref="ToolStripItem"/> intended to toggle a document separator ahead of the
         /// currently selected page or <see langword="null"/> if no such item is available.
         /// </summary>

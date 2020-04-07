@@ -67,11 +67,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _clickEventHandledInternally;
 
         /// <summary>
-        /// Indicates whether the visibility of the data editing panel is currently being toggled.
-        /// </summary>
-        bool _changingDataPanelVisiblity;
-
-        /// <summary>
         /// Indicates whether the selection check box should be visible.
         /// </summary>
         bool _showSelectionCheckBox;
@@ -96,11 +91,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// The current color of the separator bar.
         /// </summary>
         Color _currentColor;
-
-        /// <summary>
-        /// The edit button icon (to be displayed for editable documents and hidden for read-only documents)
-        /// </summary>
-        Image _editButtonImage;
 
         /// <summary>
         /// The view button icon
@@ -147,8 +137,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _tableLayoutPanel.ColumnStyles[2].Width = 0;
                 }
 
-                _editButtonImage = _editDocumentDataButton.Image;
-
                 System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PaginationSeparator));
                 _viewButtonImage = ((System.Drawing.Image)(resources.GetObject("_viewDocumentDataButton.Image")));
 
@@ -158,11 +146,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _warningIconImage = warningBitmap.ResizeHighQuality(16, 16);
                 }
-
-                // Having auto-size set in the designer allows the button to be initialized to a size that
-                // fits the edit icon/text. But once initialized, disable so that the button doesn't resize
-                // when text is changed to "View"
-                _editDocumentDataButton.AutoSize = false;
 
                 _toolTip.SetToolTip(_newDocumentGlyph, "This is a new document that will be created");
                 _toolTip.SetToolTip(_editedPaginationGlyph, "Manual pagination has been applied");
@@ -224,6 +207,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Raised when a <see cref="IPaginationDocumentDataPanel"/> is closed.
         /// </summary>
         public event EventHandler<EventArgs> DocumentDataPanelClosed;
+
+        /// <summary>
+        /// Raised when the user has navigated out of the <see cref="IPaginationDocumentDataPanel"/>
+        /// via tab navigation (as opposed to explicitly closing the panel).
+        /// NOTE: <see cref="DocumentDataPanelClosed"/> will still be raised as the data panel closes.
+        /// </summary>
+        public event EventHandler<EventArgs> DocumentDataPanelNavigatedOut;
 
         /// <summary>
         /// Raised when the view of the associated <see cref="OutputDocument"/> pages have either
@@ -352,6 +342,21 @@ namespace Extract.UtilityApplications.PaginationUtility
             set
             {
                 _invalidatePending = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance's data panel is open.
+        /// </summary>
+        /// <value><see langword="true"/> if this instance's data panel is open; otherwise,
+        /// <see langword="false"/>.
+        /// </value>
+        public bool IsDataPanelOpen
+        {
+            get
+            {
+                return _documentDataPanelControl != null &&
+                    _tableLayoutPanel.Controls.Contains(_documentDataPanelControl);
             }
         }
 
@@ -499,8 +504,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             try
             {
-                _changingDataPanelVisiblity = true;
-
                 if (Document != null && !IsDataPanelOpen)
                 {
                     var args = new DocumentDataPanelRequestEventArgs(Document);
@@ -519,39 +522,25 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         args.DocumentDataPanel.LoadData(args.OutputDocument.DocumentData, forEditing: !Document.OutputProcessed);
 
-                        _editDocumentDataButton.Checked = true;
-
                         args.DocumentDataPanel.DataPanelChanged += DocumentDataPanel_DataPanelChanged;
+                        var activeDataPanel = ((DataEntryPanelContainer)args.DocumentDataPanel).ActiveDataEntryPanel;
+                        activeDataPanel.NavigatedOut += HandleDEP_NavigatedOut;
 
                         DocumentDataHasBeenViewed = true;
 
                         // Ensure this control gets sized based upon the added _documentDataPanelControl.
                         PerformLayout();
-                    }
-                    else
-                    {
-                        // The data panel was not able to be opened.
-                        _editDocumentDataButton.Checked = false;
+
+                        DocumentDataPanel.EnsureFieldSelection();
                     }
                 }
             }
             catch (Exception ex)
             {
-                try
-                {
-                    _editDocumentDataButton.Checked = IsDataPanelOpen;
-                }
-                catch (Exception ex2)
-                {
-                    ex2.ExtractLog("ELI40268");
-                }
-
                 throw ex.AsExtract("ELI40237");
             }
             finally
             {
-                _changingDataPanelVisiblity = false;
-
                 if (locked)
                 {
                     try
@@ -581,8 +570,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _changingDataPanelVisiblity = true;
-
                 if (IsDataPanelOpen)
                 {
                     var documentDataPanel = (IPaginationDocumentDataPanel)_documentDataPanelControl;
@@ -590,13 +577,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         if (saveData && !documentDataPanel.SaveData(_outputDocument.DocumentData, validateData))
                         {
-                            _editDocumentDataButton.Checked = true;
                             return false;
                         }
 
                         documentDataPanel.ClearData();
                     }
 
+                    var activeDataPanel = ((DataEntryPanelContainer)documentDataPanel).ActiveDataEntryPanel;
+                    activeDataPanel.NavigatedOut -= HandleDEP_NavigatedOut;
                     documentDataPanel.DataPanelChanged -= DocumentDataPanel_DataPanelChanged;
 
                     // Report the DEP to be closed before it is removed so that events that trigger
@@ -609,26 +597,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     Height = _tableLayoutPanel.Height;
                 }
 
-                _editDocumentDataButton.Checked = false;
-
                 return true;
             }
             catch (Exception ex)
             {
-                try
-                {
-                    _editDocumentDataButton.Checked = IsDataPanelOpen;
-                }
-                catch (Exception ex2)
-                {
-                    ex2.ExtractLog("ELI40269");
-                }
-
                 throw ex.AsExtract("ELI40267");
-            }
-            finally
-            {
-                _changingDataPanelVisiblity = false;
             }
         }
 
@@ -775,8 +748,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     .Except(new Control[] {
                         _topDividingLinePanel,
                         _bottomDividingLinePanel,
-                        _documentDataPanelControl,
-                        _editDocumentDataButton }))
+                        _documentDataPanelControl}))
                 {
                     control.BackColor = newColor;
                 }
@@ -810,6 +782,28 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        protected override void OnDoubleClick(EventArgs e)
+        {
+            try
+            {
+                base.OnDoubleClick(e);
+
+                if (!IsDataPanelOpen)
+                {
+                    OpenDataPanel();
+                    Collapsed = false;
+                }
+                else
+                {
+                    Collapsed = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49872");
+            }
+        }
+
         /// <summary>
         /// Processes a command key.
         /// </summary>
@@ -822,8 +816,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 if (ActiveControl == _collapseDocumentButton ||
-                    ActiveControl == _selectedCheckBox ||
-                    ActiveControl == _editDocumentDataButton)
+                    ActiveControl == _selectedCheckBox)
                 {
                     // Prevent confusion that space key is intended to activate this buttons by
                     // preventing keys from activating these buttons. Instead, send the key event
@@ -853,12 +846,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     components.Dispose();
                     components = null;
-                }
-
-                if (_editButtonImage != null)
-                {
-                    _editButtonImage.Dispose();
-                    _editButtonImage = null;
                 }
 
                 if (_viewButtonImage != null)
@@ -913,17 +900,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.Click"/> event of the <see cref="_editDocumentDataButton"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleEditDocumentDataButton_Click(object sender, EventArgs e)
-        {
-            _clickEventHandledInternally = true;
-        }
-
-        /// <summary>
         /// Handles the <see cref="Control.Click"/> event of the <see cref="_selectedCheckBox"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -958,38 +934,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40207");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="CheckBox.CheckedChanged"/> event of the
-        /// <see cref="_editDocumentDataButton"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleEditDocumentDataButton_CheckedChanged(object sender, EventArgs e)
-        {
-            if (_changingDataPanelVisiblity)
-            {
-                return;
-            }
-
-            try
-            {
-                if (_editDocumentDataButton.Checked)
-                {
-                    OpenDataPanel();
-                    Document.Collapsed = false;
-                }
-                else
-                {
-                    CloseDataPanel(true, false);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI40185");
             }
         }
 
@@ -1034,6 +978,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // https://extract.atlassian.net/browse/ISSUE-15139
                 // Ensure this control gets sized based upon the added _documentDataPanelControl.
                 PerformLayout();
+
+                var activeDataPanel = ((DataEntryPanelContainer)_documentDataPanelControl).ActiveDataEntryPanel;
+                activeDataPanel.NavigatedOut += HandleDEP_NavigatedOut;
             }
             catch (Exception ex)
             {
@@ -1080,24 +1027,29 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Handles case when tab navigation reaches the last control in the DEP. At this point, DEP
+        /// data should be saved and navigation focus should be returned to the PageLayouControl.
+        /// </summary>
+        void HandleDEP_NavigatedOut(object sender, EventArgs e)
+        {
+            try
+            {
+                var documentDataPanel = (IPaginationDocumentDataPanel)_documentDataPanelControl;
+                if (documentDataPanel.SaveData(_outputDocument.DocumentData, validateData: true))
+                {
+                    DocumentDataPanelNavigatedOut?.Invoke(this, new EventArgs());
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49857");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
-
-        /// <summary>
-        /// Gets a value indicating whether this instance's data panel is open.
-        /// </summary>
-        /// <value><see langword="true"/> if this instance's data panel is open; otherwise,
-        /// <see langword="false"/>.
-        /// </value>
-        bool IsDataPanelOpen
-        {
-            get
-            {
-                return _documentDataPanelControl != null &&
-                    _tableLayoutPanel.Controls.Contains(_documentDataPanelControl);
-            }
-        }
 
         /// <summary>
         /// Updates UI indications to reflect the current state of the associated document.
@@ -1143,11 +1095,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _collapseDocumentButton.Image = Document.Collapsed
                     ? Properties.Resources.Expand
                     : Properties.Resources.Collapse;
-                _editDocumentDataButton.Visible =
-                    Document.DocumentData != null
-                    && Document.DocumentData.AllowDataEdit;
-                _editDocumentDataButton.Image = Document.OutputProcessed ? _viewButtonImage : _editButtonImage;
-                _editDocumentDataButton.Text = Document.OutputProcessed ? "View" : "Edit";
                 _summaryLabel.Visible = true;
                 _summaryLabel.Text = Document.Summary
                     + (Document.OutputProcessed ? " (PROCESSED)" : "");
@@ -1182,7 +1129,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _hasAppliedStatus = false;
                     _collapseDocumentButton.Visible = false;
                     _selectedCheckBox.Visible = false;
-                    _editDocumentDataButton.Visible = false;
                     _summaryLabel.Text = "";
                     _pagesLabel.Text = "";
                     _newDocumentGlyph.Visible = false;

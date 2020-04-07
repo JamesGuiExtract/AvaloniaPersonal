@@ -711,6 +711,27 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// <c>true</c> if an edit operation is currently being tracked (Attributes have been modified, 
+        /// but <see cref="EndEdit"/> has not been called or completed.
+        /// </summary>
+        public static bool IsEditInProgress
+        {
+            get
+            {
+                try
+                {
+                    InitializeStatics();
+
+                    return _attributesBeingModified.Count > 0;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI49855");
+                }
+            }
+        }
+
+        /// <summary>
         /// Indicates whether an <see cref="EndEdit"/> call is currently being processed.
         /// </summary>
         /// <returns><see langword="false"/> if an EndEdit call is currently being processed; otherwise,
@@ -2241,7 +2262,7 @@ namespace Extract.DataEntry
             {
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
-                if (statusInfo._isViewable && !statusInfo._hasBeenViewed)
+                if (IsUnviewed(attribute, statusInfo, tabStopOnly: false))
                 {
                     // This attribute has not been viewed.
                     return false;
@@ -2249,8 +2270,12 @@ namespace Extract.DataEntry
                 else if (recursive)
                 {
                     // Check to see that all subattributes have been viewed as well.
-                    return AttributeScanner<bool>.Scan(attribute.SubAttributes, null,
-                        ConfirmDataViewed, true, true, true, null);
+                    return !AttributeScanner<bool>.Scan(attribute.SubAttributes, null,
+                        IsUnviewed,
+                        argument: false, // tabStopsOnly
+                        forward: true,
+                        loop: true,
+                        resultAttributeGenealogy: null);
                 }
 
                 return true;
@@ -2278,6 +2303,9 @@ namespace Extract.DataEntry
         /// the <see cref="IAttribute"/>s (back to the starting point) if the end was reached 
         /// successfully, <see langword="false"/> to end the scan once the end of the 
         /// <see cref="IAttribute"/> vector is reached.</param>
+        /// <param name="tabStopsOnly"><c>true</c> to confirm only that all tab-stop
+        /// attributes have been viewed; <c>false</c> to confirm all visible
+        /// attributes have been viewed.</param>
         /// <returns>A stack of <see cref="IAttribute"/>s
         /// where the first attribute in the stack represents the root-level attribute
         /// the unviewed attribute is descended from, and each successive attribute represents
@@ -2285,14 +2313,14 @@ namespace Extract.DataEntry
         /// attribute.</returns>
         [ComVisible(false)]
         public static Stack<IAttribute> FindNextUnviewedAttribute(IUnknownVector attributes,
-            Stack<IAttribute> startingPoint, bool forward, bool loop)
+            Stack<IAttribute> startingPoint, bool forward, bool loop, bool tabStopsOnly)
         {
             try
             {
                 Stack<IAttribute> unviewedAttributes = new Stack<IAttribute>();
 
-                if (!AttributeScanner<bool>.Scan(attributes, startingPoint, ConfirmDataViewed, true,
-                    forward, loop, unviewedAttributes))
+                if (AttributeScanner<bool>.Scan(attributes, startingPoint, IsUnviewed,
+                    tabStopsOnly, forward, loop, unviewedAttributes))
                 {
                     return unviewedAttributes;
                 }
@@ -2374,17 +2402,13 @@ namespace Extract.DataEntry
         {
             try
             {
-                Stack<IAttribute> invalidAttributes = new Stack<IAttribute>();
+                Stack<IAttribute> targetAttributes = new Stack<IAttribute>();
 
-                // Keep scanning as long as an attribute's data DataValidityDoesNotMatch
-                // the targetValidity.
-                bool scanResult =
-                    AttributeScanner<DataValidity>.Scan(attributes, startingPoint,
-                        DataValidityDoesNotMatch, targetValidity, forward, loop, invalidAttributes);
-
-                if (!scanResult)
+                // Scan for attributes where DataValidityMatches targetValidity
+                if (AttributeScanner<DataValidity>.Scan(attributes, startingPoint,
+                    DataValidityMatches, targetValidity, forward, loop, targetAttributes))
                 {
-                    return invalidAttributes;
+                    return targetAttributes;
                 }
                 else
                 {
@@ -2498,8 +2522,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Checks to see whether the associated <see cref="IAttribute"/> has been fully propagated
-        /// into <see cref="IDataEntryControl"/>s.
+        /// Gets <see cref="IAttribute"/>s that have not been fully propagated into <see cref="IDataEntryControl"/>s.
         /// </summary>
         /// <param name="attributes">The <see cref="IAttribute"/> to be checked for whether it has
         /// been propagated.</param>
@@ -2513,16 +2536,18 @@ namespace Extract.DataEntry
         /// represents a sub-attribute to the previous until the final attribute is the first 
         /// unpropagated attribute.
         /// </param>
-        /// <returns><see langword="true"/> if the <see cref="IAttribute"/> and all subattributes
-        /// have been flagged as propagated; <see langword="false"/> otherwise.</returns>
+        /// <returns><c>true</c> if unpropagated <see cref="IAttribute"/>s were found; otherwise, <c>false</c>.
         [ComVisible(false)]
-        public static bool HasBeenPropagated(IUnknownVector attributes,
+        public static bool GetUnPropagatedAttributes(IUnknownVector attributes,
             Stack<IAttribute> startingPoint, Stack<IAttribute> unPropagatedAttributes)
         {
             try
             {
-                return AttributeScanner<bool>.Scan(attributes, startingPoint, ConfirmHasBeenPropagated,
-                    true, true, true, unPropagatedAttributes);
+                return AttributeScanner<bool>.Scan(attributes, startingPoint, HasBeenPropagated,
+                    argument: false, // search for unpropagated
+                    forward: true, 
+                    loop: true,
+                    unPropagatedAttributes);
             }
             catch (Exception ex)
             {
@@ -2664,7 +2689,7 @@ namespace Extract.DataEntry
         /// <see cref="IAttribute"/>.</returns>
         [ComVisible(false)]
         public static Stack<IAttribute> GetNextTabStopAttribute(IUnknownVector attributes,
-            Stack<IAttribute> startingPoint, bool forward)
+            Stack<IAttribute> startingPoint, bool forward, bool loop)
         {
             try
             {
@@ -2674,8 +2699,11 @@ namespace Extract.DataEntry
 
                 Stack<IAttribute> nextTabStopAttributeGenealogy = new Stack<IAttribute>();
 
-                if (!AttributeScanner<bool>.Scan(
-                        attributes, startingPoint, ConfirmIsTabStop, false, forward, true,
+                if (AttributeScanner<bool>.Scan(
+                        attributes, startingPoint, IsTabStop,
+                        argument: true,
+                        forward, 
+                        loop,
                         nextTabStopAttributeGenealogy))
                 {
                     return nextTabStopAttributeGenealogy;
@@ -2708,7 +2736,7 @@ namespace Extract.DataEntry
         /// tab stop attribute in a control that does not support tab stops.</returns>
         [ComVisible(false)]
         public static Stack<IAttribute> GetNextTabGroupAttribute(IUnknownVector attributes,
-            Stack<IAttribute> startingPoint, bool forward)
+            Stack<IAttribute> startingPoint, bool forward, bool loop)
         {
             try
             {
@@ -2718,8 +2746,11 @@ namespace Extract.DataEntry
 
                 Stack<IAttribute> nextTabGroupAttributeGenealogy = new Stack<IAttribute>();
 
-                if (!AttributeScanner<bool>.Scan(
-                        attributes, startingPoint, ConfirmIsTabGroup, false, forward, true,
+                if (AttributeScanner<bool>.Scan(
+                        attributes, startingPoint, IsTabGroup,
+                        argument: true, 
+                        forward,
+                        loop,
                         nextTabGroupAttributeGenealogy))
                 {
                     return nextTabGroupAttributeGenealogy;
@@ -2753,7 +2784,7 @@ namespace Extract.DataEntry
         /// same manner as <see cref="GetNextTabGroupAttribute"/>.</returns>
         [ComVisible(false)]
         public static Stack<IAttribute> GetNextTabStopOrGroupAttribute(IUnknownVector attributes,
-            Stack<IAttribute> startingPoint, bool forward)
+            Stack<IAttribute> startingPoint, bool forward, bool loop)
         {
             try
             {
@@ -2774,8 +2805,11 @@ namespace Extract.DataEntry
                 Stack<IAttribute> nextTabStopOrGroupAttributeGenealogy = new Stack<IAttribute>();
 
                 // Find the next tab stop or group attribute
-                if (!AttributeScanner<bool>.Scan(
-                        attributes, startingPoint, ConfirmIsTabStopOrGroup, false, forward, true,
+                if (AttributeScanner<bool>.Scan(
+                        attributes, startingPoint, IsTabStopOrGroup, 
+                        argument: true, 
+                        forward, 
+                        loop, 
                         nextTabStopOrGroupAttributeGenealogy))
                 {
                     // Find the attribute and control indicated by the result.
@@ -2805,7 +2839,7 @@ namespace Extract.DataEntry
 
                         // Otherwise, search instead for the next tab group.
                         return GetNextTabGroupAttribute(attributes,
-                            nextTabStopOrGroupAttributeGenealogy, forward);
+                            nextTabStopOrGroupAttributeGenealogy, forward, loop);
                     }
                 }
                 else
@@ -3179,7 +3213,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                return ConfirmIsTabStop(attribute, GetStatusInfo(attribute), true);
+                return IsTabStop(attribute, GetStatusInfo(attribute), true);
             }
             catch (Exception ex)
             {

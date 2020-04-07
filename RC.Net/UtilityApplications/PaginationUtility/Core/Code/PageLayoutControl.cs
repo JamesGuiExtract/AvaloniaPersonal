@@ -1,4 +1,5 @@
-﻿using Extract.Imaging;
+﻿using Extract.DataEntry;
+using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -318,11 +319,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         ApplicationCommand _pasteCommand;
 
         /// <summary>
+        /// Context menu option that opens the data panel for editing.
+        /// </summary>
+        readonly ToolStripMenuItem _editDocumentDataMenuItem = new ToolStripMenuItem("Edit document data");
+
+        /// <summary>
         /// Context menu option that allows the a document separator prior to the selected page to
         /// be toggled on or off.
         /// </summary>
         readonly ToolStripMenuItem _toggleDocumentSeparatorMenuItem =
-            new ToolStripMenuItem("Toggle document separator");
+            new ToolStripMenuItem("Start new document on this page");
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the insert
@@ -652,8 +658,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             SelectedControls.OfType<PageThumbnailControl>())
                                 .Count() == document.PageControls.Count());
 
-                    return selectedDocuments.Where(document =>
-                        document.PageControls.Last().NextControl is PaginationSeparator);
+                    return selectedDocuments;
                 }
                 catch (Exception ex)
                 {
@@ -928,6 +933,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// <c>true</c>If an option to edit document data should be made available; <c>false</c>
+        /// if no data panel configuration has been defined to allow editing.
+        /// </summary>
+        public bool AllowDataEdit
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -1521,6 +1536,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         HandlePaginationSeparator_DocumentDataPanelRequest;
                     separator.DocumentDataPanelClosed -=
                         HandlePaginationSeparator_DocumentDataPanelClosed;
+                    separator.DocumentDataPanelNavigatedOut -=
+                        HandlePaginationSeparator_DocumentDataPanelNavigatedOut;
                     separator.DocumentCollapsedChanged -=
                         HandlePaginationSeparator_DocumentCollapsedChanged;
                     separator.DocumentSelectedToCommitChanged -=
@@ -1643,6 +1660,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                         nextPageControl.Page.OriginalDocumentName);
 
                     MovePagesToDocument(newDocument, nextPageControl);
+
+                    // After a document separator is inserted, select the page control previous to
+                    // the inserted document. This keeps the context in the previous document which
+                    // is important in the case of tab navigation to ensure the next tab will signify
+                    // completed review of the previous document so as to collapse and select it for
+                    // submitting.
+                    if (nextPageControl.Selected)
+                    {
+                        SelectControl(previousPageControl, true, true, true);
+                    }
                 }
 
                 OnSelectionChanged();
@@ -1929,7 +1956,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Snaps the active data panel so that it is flush with the top of the view by adjusting
-        /// scroll position.
+        /// scroll position and hides the controls for all other documents.
         /// </summary>
         public void SnapDataPanelToTop()
         {
@@ -1937,6 +1964,13 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (DocumentInDataEdit.PaginationSeparator != null)
                 {
+                    // Hide all other documents except for the DEP and page controls for the document displayed. 
+                    _flowLayoutPanel.Controls
+                        .OfType<PaginationControl>()
+                        .Except(DocumentInDataEdit.PageControls.Concat(new PaginationControl[] { DocumentInDataEdit.PaginationSeparator }))
+                        .ToList()
+                        .ForEach(control => control.Visible = false);
+                
                     _flowLayoutPanel.ScrollControlIntoViewManual(DocumentInDataEdit.PaginationSeparator,
                         flushWithTop: true);
                 }
@@ -2010,10 +2044,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     false, true, false);
                 _printMenuItem.Click += HandlePrintMenuItem_Click;
 
-                _toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "Space";
+                _editDocumentDataMenuItem.ShortcutKeyDisplayString = "Enter or double-click";
+                _editDocumentDataMenuItem.ShowShortcutKeys = true;
+                _editDocumentDataMenuItem.Click += HandleEditDocumentDataSeparator_Click;
+
+                _toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "Insert";
                 _toggleDocumentSeparatorMenuItem.ShowShortcutKeys = true;
                 _toggleDocumentSeparatorCommand = new ApplicationCommand(Shortcuts,
-                    new Keys[] { Keys.Space }, HandleAddDocumentSeparator,
+                    new Keys[] { Keys.Insert }, HandleAddDocumentSeparator,
                     JoinToolStripItems(
                         _toggleDocumentSeparatorMenuItem, _paginationUtility.ToggleDocumentSeparatorMenuItem),
                     false, true, false);
@@ -2033,6 +2071,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ContextMenuStrip.Items.Add(_unDeleteMenuItem);
                 ContextMenuStrip.Items.Add(new ToolStripSeparator());
                 ContextMenuStrip.Items.Add(_printMenuItem);
+                ContextMenuStrip.Items.Add(new ToolStripSeparator());
+                ContextMenuStrip.Items.Add(_editDocumentDataMenuItem);
                 ContextMenuStrip.Items.Add(new ToolStripSeparator());
                 ContextMenuStrip.Items.Add(_toggleDocumentSeparatorMenuItem);
                 ContextMenuStrip.Opening += HandleContextMenuStrip_Opening;
@@ -2068,6 +2108,23 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (DocumentDataPanel?.PanelControl != null &&
                     DocumentDataPanel.PanelControl.ContainsFocus)
                 {
+                    // Esc will close the data panel, but first any open edit operation needs to be ended
+                    // (will occur when a table cell is in edit)
+                    if (keyData == Keys.Escape)
+                    {
+                        if (AttributeStatusInfo.IsEditInProgress)
+                        {
+                            AttributeStatusInfo.EndEdit();
+                        }
+
+                        return base.ProcessCmdKey(ref msg, keyData);
+                    }
+                    else if (keyData == Keys.PageUp || keyData == Keys.PageDown)
+                    {
+                        // Allow page up/down to change pages while DEP is open/active
+                        return base.ProcessCmdKey(ref msg, keyData);
+                    }
+                    
                     IgnoreShortcutKey = true;
                 }
 
@@ -2216,41 +2273,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.VisibleChanged"/> event of
-        /// <see cref="PageThumbnailControl"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleThumbnailControl_VisibleChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                var pageControl = (PageThumbnailControl)sender;
-                if (!pageControl.Visible && pageControl == _commandTargetControl)
-                {
-                    // If the selected page was collapsed, select the next visible page instead.
-                    this.SafeBeginInvoke("ELI40223", () =>
-                    {
-                        for (PaginationControl c = pageControl.NextControl; c != null; c = c.NextControl)
-                        {
-                            PageThumbnailControl nextPageControl = c as PageThumbnailControl;
-                            if (nextPageControl != null && nextPageControl.Visible)
-                            {
-                                ProcessControlSelection(nextPageControl);
-                                break;
-                            }
-                        }
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI40222");
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="Control.MouseMove"/> event of a <see cref="PaginationControl"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -2303,7 +2325,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // Don't start a drag and drop operation unless the user has dragged out of
                         // the origin control to help prevent accidental drag/drops.
                         Point mouseLocation = PointToClient(Control.MousePosition);
-                        var pageThumbnailControl = GetThumbnailControlAtPoint(mouseLocation);
+                        var pageThumbnailControl = GetControlAtPoint<PageThumbnailControl>(mouseLocation);
                         var originThumbnailControl = sender as PageThumbnailControl;
 
                         if (pageThumbnailControl != null
@@ -2420,7 +2442,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 Point dragLocation = PointToClient(new Point(e.X, e.Y));
-                var pageThumbnailControl = GetThumbnailControlAtPoint(dragLocation);
+                var pageThumbnailControl = GetControlAtPoint<PageThumbnailControl>(dragLocation);
 
                 if (pageThumbnailControl != null
                     && pageThumbnailControl.Visible
@@ -2608,10 +2630,20 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Whenever the context menu opens, use the current mouse position as the target of
                 // any context menu command rather than the active control.
                 Point mouseLocation = PointToClient(MousePosition);
-                _commandTargetControl = GetThumbnailControlAtPoint(mouseLocation);
+                PaginationSeparator separator = null;
+                _commandTargetControl = GetControlAtPoint<PageThumbnailControl>(mouseLocation);
+                if (_commandTargetControl == null)
+                {
+                    separator = GetControlAtPoint<PaginationSeparator>(mouseLocation);
+                    _commandTargetControl = separator;
+                }
                 if (_commandTargetControl != null && !_commandTargetControl.Selected)
                 {
                     ProcessControlSelection(_commandTargetControl);
+                    if (separator != null)
+                    {
+                        _commandTargetControl = separator;
+                    }
                 }
                 else if (_commandTargetControl == null)
                 {
@@ -2711,6 +2743,28 @@ namespace Extract.UtilityApplications.PaginationUtility
         void HandlePrintMenuItem_Click(object sender, EventArgs e)
         {
             HandlePrintSelectedItems();
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Click"/> event of the <see cref="_editDocumentDataMenuItem"/>.
+        /// </summary>
+        void HandleEditDocumentDataSeparator_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (DocumentInDataEdit == null)
+                {
+                    HandleOpenDataPanel();
+                }
+                else
+                {
+                    DocumentInDataEdit.PaginationSeparator.CloseDataPanel(saveData: true, validateData: false);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49867");
+            }
         }
 
         /// <summary>
@@ -2824,6 +2878,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // If a data panel was provided to be opened...
                 if (e.DocumentDataPanel != null)
                 {
+                    // Update display all at once rather than as controls are being arranged.
+                    var updateLock = new PageLayoutControlUpdateLock(this);
+                    this.SafeBeginInvoke("ELI49743", () =>
+                    {
+                        updateLock.Dispose();
+                    });
+
                     DocumentDataPanel = e.DocumentDataPanel;
                     DocumentInDataEdit = e.OutputDocument;
 
@@ -2869,10 +2930,49 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 DocumentDataPanel = null;
                 DocumentInDataEdit = null;
+
+                // Redisplay controls from other documents that were hidden while a DEP was in edit.
+                using (new PageLayoutControlUpdateLock(this))
+                {
+                    foreach (var separator in _flowLayoutPanel.Controls.OfType<PaginationSeparator>())
+                    {
+                        separator.Visible = true;
+                        if (!separator.Collapsed)
+                        {
+                            foreach (var pageControl in separator.Document.PageControls)
+                            {
+                                pageControl.Visible = true;
+                            }
+                        }
+                    }
+                }
+
+                // The separator will have been flush with the top while the panel was open; to prevent
+                // disorienting shifts, ensure this separator remains right where it is when the rest
+                // of the documents/pages are re-displayed.
+                _flowLayoutPanel.ScrollControlIntoViewManual(sender as Control, flushWithTop: true);
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40229");
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that the user navigated out of the DEP using tab key navigation (as
+        /// opposed to explicitly closing the panel). 
+        /// NOTE: <see cref="DocumentDataPanelClosed"/> will still be raised as the data panel closes.
+        /// </summary>
+        void HandlePaginationSeparator_DocumentDataPanelNavigatedOut(object sender, EventArgs e)
+        {
+            try
+            {
+                SelectControl(DocumentInDataEdit.PageControls.First(), true, true, true);
+                _flowLayoutPanel.Focus();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49858");
             }
         }
 
@@ -2909,12 +3009,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 UpdateCommandStates();
 
                 // https://extract.atlassian.net/browse/ISSUE-14326
-                // Ensure that collapsing a document doesn't cause it to scroll out of view.
+                // Ensure that collapsing/expanding a document doesn't cause it to scroll out of view.
+                // TODO: Bug- After tabbing thru a couple docs, shift tabbing to top, then hitting tab,
+                // below call fails to position the newly expanded top document in view.
                 var separator = (PaginationSeparator)sender;
-                if (separator.Collapsed)
-                {
-                    _flowLayoutPanel.ScrollControlIntoViewManual(separator, flushWithTop: false);
-                }
+                _flowLayoutPanel.ScrollControlIntoViewManual(separator, flushWithTop: false);
             }
             catch (Exception ex)
             {
@@ -2950,16 +3049,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// the last.</param>
         /// <returns>The active <see cref="PaginationControl"/> if there is one; otherwise,
         /// <see langword="null"/></returns>
-        PaginationControl GetActiveControl(bool first = true)
+        PaginationControl GetActiveControl(bool? first = true)
         {
             if (PrimarySelection != null && PrimarySelection.Selected)
             {
                 return _primarySelection;
             }
 
-            var pageControl = first
-                ? SelectedControls.OfType<NavigablePaginationControl>().FirstOrDefault()
-                : SelectedControls.OfType<NavigablePaginationControl>().LastOrDefault();
+            var pageControl = first.HasValue
+                ? first.Value
+                    ? SelectedControls.OfType<NavigablePaginationControl>().FirstOrDefault()
+                    : SelectedControls.OfType<NavigablePaginationControl>().LastOrDefault()
+                : null;
 
             return pageControl;
         }
@@ -3037,7 +3138,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (isPageControl)
             {
                 control.DoubleClick += HandleThumbnailControl_DoubleClick;
-                control.VisibleChanged += new EventHandler(HandleThumbnailControl_VisibleChanged);
             }
             else if (asPaginationSeparator != null)
             {
@@ -3045,6 +3145,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     HandlePaginationSeparator_DocumentDataPanelRequest;
                 asPaginationSeparator.DocumentDataPanelClosed +=
                     HandlePaginationSeparator_DocumentDataPanelClosed;
+                asPaginationSeparator.DocumentDataPanelNavigatedOut +=
+                    HandlePaginationSeparator_DocumentDataPanelNavigatedOut;
                 asPaginationSeparator.DocumentCollapsedChanged +=
                     HandlePaginationSeparator_DocumentCollapsedChanged;
                 asPaginationSeparator.DocumentSelectedToCommitChanged +=
@@ -3517,17 +3619,33 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             NavigablePaginationControl result = null;
 
+            var activeDocument = GetActiveDocument(forward, null);
+
             // Iterate from currentControl until the next page control is encountered.
             currentControl = forward
                 ? currentControl.NextControl
                 : currentControl.PreviousControl;
 
-            result = currentControl as NavigablePaginationControl;
-            while ((currentControl != null) && result == null)
+            // When a DEP is open, all other documents will be hidden. Don't allow navigation
+            // to advance to a page that is hidden.
+            result = (currentControl?.Visible == true)
+                ? currentControl as NavigablePaginationControl
+                : null;
+            while (currentControl != null && !currentControl.Visible && result == null)
             {
                 currentControl = forward
                     ? currentControl.NextControl
                     : currentControl.PreviousControl;
+
+                // A DEP is open, and the next control belongs to a different document (which will currently
+                // be hidden). Do not allow navigation out to the hidden documents.
+                if (activeDocument?.PaginationSeparator.IsDataPanelOpen == true
+                    && currentControl is PageThumbnailControl pageControl
+                    && pageControl.Document != activeDocument)
+                {
+                    return null;
+                }
+
                 if (currentControl != null && currentControl.Visible)
                 {
                     result = currentControl as NavigablePaginationControl;
@@ -3553,11 +3671,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return GetNextNavigableControl(down);
             }
 
+            var activeDocument = GetActiveDocument(down);
+
             // Iterate from currentControl until the next page control is encountered that is
             // vertically aligned with the current control.
             NavigablePaginationControl result = null;
             for (NavigablePaginationControl nextControl = GetNextNavigableControl(down, currentControl);
-                 nextControl != null;
+                 nextControl != null 
+                    && (activeDocument == null || (nextControl as PageThumbnailControl)?.Document == activeDocument);
                  nextControl = GetNextNavigableControl(down, nextControl))
             {
                 result = nextControl;
@@ -3566,20 +3687,99 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // row.
                 if (down && result.Top > currentControl.Top && result.Left >= currentControl.Left)
                 {
-                    break;
+                    return result;
                 }
                 else if (!down && result.Top < currentControl.Top && result.Left <= currentControl.Left)
                 {
-                    break;
+                    return result;
                 }
             }
 
-            if (result == null)
+            return null;
+        }
+
+        OutputDocument GetActiveDocument(bool? forward, PageThumbnailControl selectionTarget = null)
+        {
+            // If there are no page controls, there is nothing to do.
+            if (!_flowLayoutPanel.Controls.OfType<PageThumbnailControl>().Any())
             {
                 return null;
             }
 
-            return result;
+            // If not specified, use the active control as the selectionTarget.
+            if (selectionTarget == null)
+            {
+                var activeControl = GetActiveControl(forward);
+                if (activeControl is PaginationSeparator separator)
+                {
+                    return separator.Document;
+                }
+                else
+                {
+                    selectionTarget = activeControl as PageThumbnailControl;
+                }
+            }
+
+            // If there is no active control or the active control is not a PageThumbnailControl
+            // control, use the next navigable control.
+            if (selectionTarget == null && forward.HasValue)
+            {
+                var nextControl = GetNextNavigableControl(forward.Value);
+
+                // Ignore the load next document button.
+                if (nextControl == _loadNextDocumentButtonControl)
+                {
+                    nextControl = GetNextNavigableControl(forward.Value, nextControl);
+                }
+
+                selectionTarget = nextControl as PageThumbnailControl;
+            }
+
+            // If there are no page controls, there are no documents to select.
+            return (selectionTarget == null)
+                ? null
+                : selectionTarget.Document;
+        }
+
+        /// <summary>
+        /// Advance focus up/down from the currently selected control.
+        /// </summary>
+        /// <param name="forward"><c>true</c> to navigate forward (down) in the panel;
+        /// <c>false</c> to navigate up.</param>
+        void SelectNextRowPage(bool forward)
+        {
+            NavigablePaginationControl navigableControl = GetNextRowNavigableControl(forward);
+
+            if (navigableControl == null)
+            {
+                var activeDocument = GetActiveDocument(forward);
+                if (activeDocument?.PaginationSeparator.IsDataPanelOpen == true)
+                {
+                    // Return focus to the DEP if the up arrow is pressed from the top row of thumbnails
+                    if (!forward && DocumentDataPanel.Editable)
+                    {
+                        DocumentDataPanel.ActiveDataControl?.Focus();
+                    }
+                }
+                else
+                {
+                    var outputDocument = SelectNextDocument(forward);
+                    if (outputDocument == null)
+                    {
+                        _flowLayoutPanel.VerticalScroll.Value = forward
+                            ? _flowLayoutPanel.VerticalScroll.Maximum
+                            : _flowLayoutPanel.VerticalScroll.Minimum;
+                    }
+                    else
+                    {
+                        PrimarySelection = outputDocument.PageControls.First();
+                    }
+                }
+            }
+            else
+            {
+                ProcessControlSelection(navigableControl);
+            }
         }
 
         /// <summary>
@@ -3591,76 +3791,53 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// document is already entirely selected; <see langword="false"/> to select the previous.</param>
         /// <param name="selectionTarget">The <see cref="PageThumbnailControl"/> the document
         /// selection is to be based off of.</param>
-        void SelectNextDocument(bool forward, PageThumbnailControl selectionTarget = null)
+        OutputDocument SelectNextDocument(bool forward, PageThumbnailControl selectionTarget = null)
         {
-            // If there are no page controls, there is nothing to do.
-            if (!_flowLayoutPanel.Controls.OfType<PageThumbnailControl>().Any())
-            {
-                return;
-            }
-
-            // If not specified, use the active control as the selectionTarget.
-            if (selectionTarget == null)
-            {
-                selectionTarget = GetActiveControl(forward) as PageThumbnailControl;
-            }
-
-            // If there is no active control or the active control is not a PageThumbnailControl
-            // control, use the next navigable control.
-            if (selectionTarget == null)
-            {
-                var nextControl = GetNextNavigableControl(forward);
-
-                // Ignore the load next document button.
-                if (nextControl == _loadNextDocumentButtonControl)
-                {
-                    nextControl = GetNextNavigableControl(forward, nextControl);
-                }
-
-                selectionTarget = nextControl as PageThumbnailControl;
-            }
-
-            // If there are no page controls, there are no documents to select.
-            if (selectionTarget == null)
-            {
-                return;
-            }
+            OutputDocument nextDocument = null;
+            var activeDocument = GetActiveDocument(forward, selectionTarget);
 
             // If this document is fully selected, iterate the page controls forward/backward until
             // we get to the next document.
-            IEnumerable<PageThumbnailControl> pageControls = selectionTarget.Document.PageControls;
-            if (pageControls.All(page => page.Selected))
+            IEnumerable<PageThumbnailControl> pageControls = activeDocument.PageControls;
+            PaginationControl control = forward
+                ? pageControls.Last()
+                : pageControls.First();
+
+            do
             {
-                PaginationControl control = forward
-                    ? pageControls.Last()
-                    : pageControls.First();
+                control = forward
+                    ? control.NextControl
+                    : control.PreviousControl;
 
-                do
+                var pageControl = control as PageThumbnailControl;
+                if (pageControl != null)
                 {
-                    control = forward
-                        ? control.NextControl
-                        : control.PreviousControl;
-
-                    var pageControl = control as PageThumbnailControl;
-                    if (pageControl != null)
-                    {
-                        selectionTarget = pageControl;
-                        break;
-                    }
+                    nextDocument = pageControl.Document;
+                    break;
                 }
-                while (control != null);
+            }
+            while (control != null);
 
-                pageControls = selectionTarget.Document.PageControls;
+            pageControls = nextDocument?.PageControls;
+
+            if (nextDocument == null)
+            {
+                return null;
+                //nextDocument = activeDocument;
             }
 
             // Select the selectionTarget and the pageControls that make up the document it is in.
             // Do not allow handling of modifier keys since modifier keys have a different meaning
             // for document navigation.
             ProcessControlSelection(
-                activeControl: selectionTarget,
+                activeControl: nextDocument.PageControls.First(),
                 additionalControls: pageControls,
                 select: true,
                 modifierKeys: Keys.None);
+
+            _flowLayoutPanel.ScrollControlIntoViewManual(nextDocument.PaginationSeparator, flushWithTop: false);
+
+            return nextDocument;
         }
 
         /// <summary>
@@ -3748,30 +3925,48 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 _toggleDocumentSeparatorCommand.Enabled = false;
                 _pasteCommand.Enabled = false;
-                _toggleDocumentSeparatorMenuItem.Text = "Start new document on this page";
             }
             else
             {
                 // Separators cannot be added next to other separators, cannot be the first control
                 // and should only be able to be toggle when there is a single selection.
-                bool controlIsSeparator = _commandTargetControl is PaginationSeparator;
+                var separator = _commandTargetControl as PaginationSeparator;
                 OutputDocument singlySelectedDocument =
                     (FullySelectedDocuments.Count() == 1 && PartiallySelectedDocuments.Count() == 1)
                     ? FullySelectedDocuments.Single()
                     : (SelectedPageControls.Count() == 1)
                         ? SelectedPageControls.Single().Document
                         : null;
+
+                _editDocumentDataMenuItem.Enabled = AllowDataEdit
+                    && (separator != null)
+                    && singlySelectedDocument != null;
+
+                if (_editDocumentDataMenuItem.Enabled)
+                {
+                    if (DocumentInDataEdit == separator.Document)
+                    {
+                        _editDocumentDataMenuItem.Text = "Close data panel";
+                        _editDocumentDataMenuItem.ShortcutKeyDisplayString = "Esc or double-click";
+                    }
+                    else
+                    {
+                        _editDocumentDataMenuItem.Text = "Edit document data";
+                        _editDocumentDataMenuItem.ShortcutKeyDisplayString = "Enter or double-click";
+                    }
+                }
+
                 _toggleDocumentSeparatorCommand.Enabled =
-                    (enablePageModificationCommands
+                    enablePageModificationCommands
                     && contextMenuControlIndex > 1
                     && singlySelectedDocument != null
-                    && !singlySelectedDocument.Collapsed);
+                    && !singlySelectedDocument.Collapsed;
                 var asPageThumbnailControl = _commandTargetControl as PageThumbnailControl;
 
                 // If a separator is selected, or the first page of a document 
                 // (whether that page is marked as deleted or not)
                 if (_toggleDocumentSeparatorCommand.Enabled &&
-                    (controlIsSeparator ||
+                    ((separator != null) ||
                         (asPageThumbnailControl != null 
                         && asPageThumbnailControl == asPageThumbnailControl.Document?.PageControls.FirstOrDefault())))
                 {
@@ -3786,7 +3981,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
 
                     // If the previous page belongs to an alread output document, don't allow this document to be merged.
-                    if (previousPage == null || previousPage.Document.OutputProcessed)
+                    if (previousPage == null || previousPage.Document.OutputProcessed
+                    // Do not allow merge when DEP is open and previous document is not visible.
+                        || DocumentInDataEdit != null)
                     {
                         _toggleDocumentSeparatorCommand.Enabled = false;
                     }
@@ -3794,7 +3991,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 else
                 {
                     _toggleDocumentSeparatorMenuItem.Text = "Start new document on this page";
-                    _toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "Space";
+                    _toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "Insert";
                 }
 
                 // Inserted copied items requires there to be copied items and a single selection.
@@ -3836,14 +4033,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             _toggleDocumentSeparatorCommand.Enabled = false;
             _outputDocumentCommand.Enabled = false;
 
-            Shortcuts[Keys.Escape] = ClearSelection;
-
-            Shortcuts[Keys.Tab] = HandleSelectNextPage;
+            Shortcuts[Keys.Space] = HandleToggleSelectDocumentForCommit;
+            Shortcuts[Keys.Tab] = HandleTabNavigateForward;
+            Shortcuts[Keys.Tab | Keys.Shift] = HandleTabNavigateBackward;
             Shortcuts[Keys.Tab | Keys.Control] = HandleSelectNextDocument;
-            // [DotNetRCAndUtils:984]
-            // Don't allow the shift key to expand selection when used in conjunction with tab.
-            Shortcuts[Keys.Tab | Keys.Shift] = HandleSelectPreviousPageNoShift;
-            Shortcuts[Keys.Tab | Keys.Control | Keys.Shift] = HandleSelectPreviousDocument;
+
+            Shortcuts[Keys.Enter] = HandleOpenDataPanel;
+            Shortcuts[Keys.F2] = HandleOpenDataPanel;
+            Shortcuts[Keys.Escape] = HandleEscape;
 
             Shortcuts[Keys.Left] = HandleSelectPreviousPage;
             Shortcuts[Keys.Left | Keys.Control] = HandleSelectPreviousPage;
@@ -3934,19 +4131,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets the <see cref="PageThumbnailControl"/> that exists at the specified
+        /// Gets the <see cref="Control"/> of the specified type that exists at the specified
         /// <see paramref="location"/>.
         /// </summary>
-        /// <param name="location">The location to check for a <see cref="PageThumbnailControl"/>.
+        /// <param name="location">The location to check for a <see cref="Control"/>.
         /// </param>
-        /// <returns>The <see cref="PageThumbnailControl"/> that exists at the specified
+        /// <returns>The <see cref="Control"/> of the specified type that exists at
         /// <see paramref="location"/> or <see langword="null"/> if no control exists at the
         /// specified location.</returns>
-        PageThumbnailControl GetThumbnailControlAtPoint(Point location)
+        T GetControlAtPoint<T>(Point location) where T : Control
         {
             return _flowLayoutPanel
                 .Controls
-                .OfType<PageThumbnailControl>()
+                .OfType<T>()
                 .Where(c => c.Visible && c.Bounds.Contains(location))
                 .FirstOrDefault();
         }
@@ -4276,15 +4473,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                NavigablePaginationControl navigableControl = GetNextNavigableControl(true);
-
-                if (navigableControl == null)
+                var currentControl = GetActiveControl(true);
+                if (currentControl is PageThumbnailControl pageControl && pageControl.Document.Collapsed)
                 {
-                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Maximum;
+                    pageControl.Document.Collapsed = false;
                 }
                 else
                 {
-                    ProcessControlSelection(navigableControl);
+                    NavigablePaginationControl navigableControl = GetNextNavigableControl(true);
+
+                    if (navigableControl != null)
+                    {
+                        ProcessControlSelection(navigableControl);
+                    }
                 }
             }
             catch (Exception ex)
@@ -4304,7 +4505,15 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (navigableControl == null)
                 {
-                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
+                    var activeDocument = GetActiveDocument(false);
+                    if (activeDocument?.Collapsed == false
+                        && !activeDocument.PaginationSeparator.IsDataPanelOpen)
+                    {
+                        activeDocument.Collapsed = true;
+
+                        _flowLayoutPanel.ScrollControlIntoViewManual(
+                            activeDocument.PaginationSeparator, flushWithTop: false);
+                    }
                 }
                 else
                 {
@@ -4414,16 +4623,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                NavigablePaginationControl navigableControl = GetNextRowNavigableControl(true);
-
-                if (navigableControl == null)
-                {
-                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Maximum;
-                }
-                else
-                {
-                    ProcessControlSelection(navigableControl);
-                }
+                SelectNextRowPage(forward: true);
             }
             catch (Exception ex)
             {
@@ -4438,16 +4638,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                NavigablePaginationControl navigableControl = GetNextRowNavigableControl(false);
-
-                if (navigableControl == null)
-                {
-                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
-                }
-                else
-                {
-                    ProcessControlSelection(navigableControl);
-                }
+                SelectNextRowPage(forward: false);
             }
             catch (Exception ex)
             {
@@ -4482,6 +4673,213 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35463");
+            }
+        }
+
+        /// <summary>
+        /// Implementation of tab navigation that advanced users thru both document pages and data controls.
+        /// https://extract.atlassian.net/browse/ISSUE-16990
+        /// </summary>
+        void HandleTabNavigateForward()
+        {
+            try
+            {
+                var activeControl = GetActiveControl(true);
+                var pageThumbnailIsActive = activeControl is PageThumbnailControl;
+                var activeDocument = GetActiveDocument(true);
+                var activeSeparator = activeDocument?.PaginationSeparator;
+
+                // Expand collapsed document
+                if (pageThumbnailIsActive && activeSeparator.Collapsed)
+                {
+                    activeSeparator.Collapsed = false;
+                }
+                // Open DEP for expanded document
+                else if (pageThumbnailIsActive && AllowDataEdit && !activeSeparator.IsDataPanelOpen)
+                {
+                    activeSeparator.OpenDataPanel();
+                    activeSeparator.Collapsed = false;
+                }
+                // Move to next document after tabbing to last page with DEP open
+                else if (DocumentInDataEdit != null && !(activeControl.NextControl is PageThumbnailControl))
+                {
+                    if (activeSeparator != null)
+                    {
+                        CloseAndSelectDocumentForCommit(activeDocument);
+                    }
+
+                    var nextDocument = SelectNextDocument(true);
+                    if (nextDocument == null)
+                    {
+                        // TODO: Prompt whether to commit batch. Until then, clear control selection when
+                        // there are no more documents to prevent tab loop at end.
+                        ClearSelection();
+                    }
+                    else
+                    {
+                        nextDocument.Collapsed = false;
+                        _flowLayoutPanel.ScrollControlIntoViewManual(activeSeparator, flushWithTop: true);
+                        _flowLayoutPanel.Focus();
+                    }
+                }
+                else
+                {
+                    HandleSelectNextPage();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49869");
+            }
+        }
+
+        /// <summary>
+        /// HandleTabNavigateForward helper
+        /// </summary>
+        void CloseAndSelectDocumentForCommit(OutputDocument document)
+        {
+            var separator = document.PaginationSeparator;
+
+            separator.DocumentSelectedToCommit = true;
+            separator.CloseDataPanel(saveData: true, validateData: false);
+
+            _flowLayoutPanel.Controls
+                .OfType<PaginationSeparator>()
+                .ToList()
+                .ForEach(s => s.Visible = true);
+
+            separator.Collapsed = true;
+            SelectDocument(document);
+        }
+
+        /// <summary>
+        /// Implementation of tab navigation that advanced users thru both document pages and data controls.
+        /// https://extract.atlassian.net/browse/ISSUE-16990
+        /// </summary>
+        void HandleTabNavigateBackward()
+        {
+            try
+            {
+                var currentDocument = GetActiveDocument(true);
+                var previousPageThumbnailControl = GetPreviousPageControl();
+                var previousControlDocument = previousPageThumbnailControl?.Document;
+
+                // Select the previous document
+                if (previousControlDocument != null && previousControlDocument != currentDocument && DocumentInDataEdit == null)
+                {
+                    SelectDocument(previousControlDocument);
+                }
+                // Return focus to the DEP from the page controls
+                else if (previousControlDocument != currentDocument && DocumentInDataEdit != null)
+                {
+                    DocumentDataPanel.EnsureFieldSelection();
+                    DocumentDataPanel.ActiveDataControl?.Focus();
+                }
+                // No previous documents; ensure the panel is scrolled all the way up so the first document is showing.
+                else if (previousPageThumbnailControl == null)
+                {
+                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
+                }
+                // Select previous page control
+                else
+                {
+                    ProcessControlSelection(previousPageThumbnailControl, null, true, Control.ModifierKeys & ~Keys.Shift, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49870");
+            }
+        }
+
+        /// <summary>
+        /// HandleTabNavigateBackward helper
+        /// </summary>
+        /// <returns></returns>
+        PageThumbnailControl GetPreviousPageControl()
+        {
+            PaginationControl previousControl = GetActiveControl(true);
+            PageThumbnailControl previousPageThumbnailControl = null;
+            while(previousControl != null && previousPageThumbnailControl == null)
+            {
+                previousControl = previousControl.PreviousControl;
+                previousPageThumbnailControl = previousControl as PageThumbnailControl;
+            }
+
+            return previousPageThumbnailControl;
+        }
+
+        void HandleToggleSelectDocumentForCommit()
+        {
+            try
+            {
+                var activeDocument = GetActiveDocument(true);
+                if (activeDocument != null)
+                {
+                    var separator = activeDocument.PaginationSeparator;
+
+                    if (activeDocument.DataError && !separator.DocumentSelectedToCommit)
+                    {
+                        using (var messageBox = new CustomizableMessageBox())
+                        {
+                            messageBox.Caption = "Data Error";
+                            messageBox.Text = "This document has data errors that must be resolved before it can be submitted.\r\n\r\n"
+                            + "Select for submission anyway?";
+                            messageBox.AddStandardButtons(MessageBoxButtons.YesNo);
+                            if (messageBox.Show(this) != "Yes")
+                            {
+                                return;
+                            }
+                        }
+                    }
+
+                    separator.DocumentSelectedToCommit =
+                        !separator.DocumentSelectedToCommit;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49866");
+            }
+        }
+
+        void HandleOpenDataPanel()
+        {
+            try
+            {
+                var activeSeparator = GetActiveDocument(true)?.PaginationSeparator;
+                if (activeSeparator != null && DocumentInDataEdit != activeSeparator.Document)
+                {
+                    activeSeparator.OpenDataPanel();
+                    activeSeparator.Collapsed = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49868");
+            }
+        }
+
+        void HandleEscape()
+        {
+            try
+            {
+                if (DocumentInDataEdit != null)
+                {
+                    DocumentInDataEdit.PaginationSeparator.CloseDataPanel(saveData: true, validateData: false);
+                }
+                else
+                {
+                    var activeDocument = GetActiveDocument(true);
+                    if (activeDocument?.Collapsed == false)
+                    {
+                        activeDocument.Collapsed = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49871");
             }
         }
 

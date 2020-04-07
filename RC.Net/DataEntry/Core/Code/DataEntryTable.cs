@@ -4181,6 +4181,9 @@ namespace Extract.DataEntry
                     // Mark this attribute as viewable even though it will not be used to store any
                     // useful data so that focus will be directed to it.
                     AttributeStatusInfo.MarkAsViewable(tabOrderPlaceholderAttribute, true);
+                    // But since it will never contain useful data, don't ever consider it to have unviewed data.
+                    // (Important when checking a DEP for unviewed fields).
+                    AttributeStatusInfo.MarkAsViewed(tabOrderPlaceholderAttribute, true);
 
                     // If this table supports tabbing by row, assign the row attribute a group
                     // consisting of all column attributes.

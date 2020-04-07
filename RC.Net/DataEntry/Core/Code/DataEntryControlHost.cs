@@ -1874,7 +1874,7 @@ namespace Extract.DataEntry
                     // This enables the entire attribute tree to be navigated forward and backward 
                     // for all types of AttributeStatusInfo scans).
                     Stack<IAttribute> unpropagatedAttributeGenealogy = new Stack<IAttribute>();
-                    while (!AttributeStatusInfo.HasBeenPropagated(_attributes, null,
+                    while (AttributeStatusInfo.GetUnPropagatedAttributes(_attributes, null,
                         unpropagatedAttributeGenealogy))
                     {
                         PropagateAttributes(unpropagatedAttributeGenealogy, false, false);
@@ -2147,7 +2147,7 @@ namespace Extract.DataEntry
                 using (new TemporaryWaitCursor())
                 {
                     // Attempt to find and propagate the next unviewed attribute
-                    if (GetNextUnviewedAttribute() == null)
+                    if (GetNextUnviewedAttribute(tabStopsOnly: false) == null)
                     {
                         MessageBox.Show(this, "There are no unviewed items.",
                             _dataEntryApp.ApplicationTitle, MessageBoxButtons.OK,
@@ -2971,6 +2971,13 @@ namespace Extract.DataEntry
         /// </summary>
         public event EventHandler<DataEntryControlEventArgs> ControlUnregistered;
 
+        /// <summary>
+        /// Raised when tab navigation reaches the last control; if handled, the application hosting the
+        /// DEP should implement the UI response to the navigation. If not handled, focus will loop back
+        /// to the top of the DEP.
+        /// </summary>
+        public event EventHandler<EventArgs> NavigatedOut;
+
         #endregion Events
 
         #region Overrides
@@ -3035,24 +3042,7 @@ namespace Extract.DataEntry
             {
                 base.OnParentChanged(e);
 
-                if (Parent == null)
-                {
-                    // Don't allow PreFilterMessage to be called when the DEP is not loaded.
-                    Application.RemoveMessageFilter(this);
-
-                    AttributeStatusInfo.AttributeInitialized -= HandleAttributeInitialized;
-                    AttributeStatusInfo.ViewedStateChanged -= HandleViewedStateChanged;
-                    AttributeStatusInfo.ValidationStateChanged -= HandleValidationStateChanged;
-                }
-                else
-                {
-                    // So that PreFilterMessage is called
-                    Application.AddMessageFilter(this);
-
-                    AttributeStatusInfo.AttributeInitialized += HandleAttributeInitialized;
-                    AttributeStatusInfo.ViewedStateChanged += HandleViewedStateChanged;
-                    AttributeStatusInfo.ValidationStateChanged += HandleValidationStateChanged;
-                }
+                ProcessAncestorChange();
             }
             catch (Exception ex)
             {
@@ -5317,7 +5307,7 @@ namespace Extract.DataEntry
             // If saving should be or can be prevented by unviewed data, check for unviewed data.
             if (UnviewedDataSaveMode != UnviewedDataSaveMode.Allow)
             {
-                if (GetNextUnviewedAttribute() != null)
+                if (GetNextUnviewedAttribute(tabStopsOnly: false) != null)
                 {
                     // If GetNextUnviewedAttribute found something, the selection has been changed.
                     changedSelection = true;
@@ -5840,6 +5830,8 @@ namespace Extract.DataEntry
             // depend on an auto-update.
             AttributeStatusInfo.EndEdit();
 
+            // Tab navigation should loop if there is no handler to process tabbing out of DEP.
+            bool tabLoop = NavigatedOut == null;
             IAttribute originalActiveAttribute = GetActiveAttribute(!forward);
             IAttribute activeAttribute = originalActiveAttribute;
             Stack<IAttribute> activeGenealogy = ActiveAttributeGenealogy(!forward,
@@ -5857,9 +5849,21 @@ namespace Extract.DataEntry
                 // selected individually or as a group (row).
                 bool tabByGroup;
                 Stack<IAttribute> nextTabStopGenealogy = GetNextTabStopGenealogy(
-                    forward, activeAttribute, activeGenealogy, out tabByGroup);
+                    activeAttribute, activeGenealogy, forward, tabLoop, out tabByGroup);
 
-                if (nextTabStopGenealogy != null)
+                if (nextTabStopGenealogy == null)
+                {
+                    // If no further tab stops were found and the hosting application has registered for
+                    // the NavigatedOut event, raise the event to allow it to assume control of tab navigation
+                    if (NavigatedOut != null
+                        && _isDocumentLoaded
+                        && forward
+                        && GetNextUnviewedAttribute(tabStopsOnly: true) == null)
+                    {
+                        NavigatedOut?.Invoke(this, new EventArgs());
+                    }
+                }
+                else
                 {
                     // Indicate a manual focus event so that HandleControlGotFocus allows the
                     // new attribute selection rather than overriding it.
@@ -5902,19 +5906,19 @@ namespace Extract.DataEntry
         /// <see paramref="activeGenealogy"/> in the tab order (<see paramref="forward"/> or
         /// backward) and whether it should be selected individually or as a group (row).
         /// </summary>
-        /// <param name="forward"><see langword="true"/> if the next tab stop should be found,
-        /// <see langword="false"/> if the previous should be found.</param>
         /// <param name="startingPoint">The attribute that best represents the starting point of the
         /// search in the specified search direction.</param>
         /// <param name="activeGenealogy">The attribute genealogy that best represents the starting
         /// point of the search in the specified search direction.</param>
+        /// <param name="forward"><see langword="true"/> if the next tab stop should be found,
+        /// <see langword="false"/> if the previous should be found.</param>
         /// <param name="tabByGroup"><see langword="true"/> if the resulting genealogy should be
         /// selected as a group, otherwise, <see langword="false"/>.</param>
         /// <returns>A Stack of <see cref="IAttribute"/>s describing the next tab stop in the
         /// specified direction.
         /// </returns>
-        Stack<IAttribute> GetNextTabStopGenealogy(bool forward, IAttribute startingPoint,
-            Stack<IAttribute> activeGenealogy, out bool tabByGroup)
+        Stack<IAttribute> GetNextTabStopGenealogy(IAttribute startingPoint,
+            Stack<IAttribute> activeGenealogy, bool forward, bool loop, out bool tabByGroup)
         {
             Stack<IAttribute> nextTabStopGenealogy = null;
             tabByGroup = _dataEntryApp.AllowTabbingByGroup;
@@ -5931,7 +5935,7 @@ namespace Extract.DataEntry
                 {
                     nextTabStopGenealogy =
                         AttributeStatusInfo.GetNextTabGroupAttribute(_attributes,
-                            activeGenealogy, forward);
+                            activeGenealogy, forward, loop);
                 }
                 // If no attribute group is currently selected, use
                 // GetNextTabStopOrGroupAttribute to find either the next tab
@@ -5961,7 +5965,7 @@ namespace Extract.DataEntry
                     {
                         nextTabStopGenealogy =
                             AttributeStatusInfo.GetNextTabStopOrGroupAttribute(_attributes,
-                                activeGenealogy, forward);
+                                activeGenealogy, forward, loop);
 
                         // [DataEntry:754]
                         // If the next tab stop attribute represents an attribute group and that
@@ -5998,7 +6002,7 @@ namespace Extract.DataEntry
             {
                 nextTabStopGenealogy =
                     AttributeStatusInfo.GetNextTabStopAttribute(_attributes,
-                        activeGenealogy, forward);
+                        activeGenealogy, forward, loop);
             }
 
             return nextTabStopGenealogy;
@@ -6616,14 +6620,17 @@ namespace Extract.DataEntry
         /// Attempts to find the next <see cref="IAttribute"/> (in display order) whose data
         /// has not been viewed.
         /// </summary>
+        /// <param name="tabStopsOnly"><c>true</c> to confirm only that all tab-stop
+        /// attributes have been viewed; <c>false</c> to confirm all visible
+        /// attributes have been viewed.</param>
         /// <returns>The first <see cref="IAttribute"/> that has not been viewed, or 
         /// <see langword="null"/> if no unviewed <see cref="IAttribute"/>s were found.</returns>
-        IAttribute GetNextUnviewedAttribute()
+        IAttribute GetNextUnviewedAttribute(bool tabStopsOnly)
         {
             // Look for any attributes whose data failed validation.
             Stack<IAttribute> unviewedAttributeGenealogy =
                 AttributeStatusInfo.FindNextUnviewedAttribute(_attributes,
-                ActiveAttributeGenealogy(true, null), true, true);
+                ActiveAttributeGenealogy(true, null), true, true, tabStopsOnly);
 
             if (unviewedAttributeGenealogy != null)
             {
@@ -8317,6 +8324,81 @@ namespace Extract.DataEntry
                         _propertyDumpTarget = null;
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that an ancestor control has been added or removed to the
+        /// current chain of ancestor controls. Event registration is updated to prevent
+        /// handling of attribute changes when the DEP is not loaded into a verification UI.
+        /// </summary>
+        void ProcessAncestorChange()
+        {
+            UpdateAnscestors();
+
+            if (TopLevelControl == null)
+            {
+                // Don't allow PreFilterMessage to be called when the DEP is not loaded.
+                Application.RemoveMessageFilter(this);
+
+                AttributeStatusInfo.AttributeInitialized -= HandleAttributeInitialized;
+                AttributeStatusInfo.ViewedStateChanged -= HandleViewedStateChanged;
+                AttributeStatusInfo.ValidationStateChanged -= HandleValidationStateChanged;
+            }
+            else
+            {
+                // So that PreFilterMessage is called
+                Application.AddMessageFilter(this);
+
+                AttributeStatusInfo.AttributeInitialized += HandleAttributeInitialized;
+                AttributeStatusInfo.ViewedStateChanged += HandleViewedStateChanged;
+                AttributeStatusInfo.ValidationStateChanged += HandleValidationStateChanged;
+            }
+        }
+
+        List<Control> _ancestors = new List<Control>();
+
+        /// <summary>
+        /// Updates the WinForm controls known to be ancestors to this DEP and updates
+        /// <see cref="Control.ParentChanged"/> event registrations to be notified when the 
+        /// ancestor chain is updated again.
+        /// </summary>
+        void UpdateAnscestors()
+        {
+            var ancestors = new List<Control>();
+            for (var ancestor = Parent; ancestor != null; ancestor = ancestor.Parent)
+            {
+                ancestors.Add(ancestor);
+            }
+
+            var oldAncestors = _ancestors.Except(ancestors);
+            foreach (var oldAncestor in oldAncestors)
+            {
+                oldAncestor.ParentChanged -= HandleAncestor_ParentChanged;
+            }
+
+            var newAncestors = ancestors.Except(_ancestors);
+            foreach (var newAncestor in newAncestors)
+            {
+                newAncestor.ParentChanged += HandleAncestor_ParentChanged;
+            }
+
+            _ancestors = ancestors;
+        }
+
+        /// <summary>
+        /// Handles the case that the parent to one of this panel's ancestors has changed.
+        /// This may occur when the panel is added or removed from the verification application form.
+        /// </summary>
+        void HandleAncestor_ParentChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                ProcessAncestorChange();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49856");
             }
         }
 

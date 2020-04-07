@@ -27,7 +27,6 @@
             this._selectedCheckBox = new System.Windows.Forms.CheckBox();
             this._editedPaginationGlyph = new Extract.UtilityApplications.PaginationUtility.EditedPaginationGlyph();
             this._editedDataPictureBox = new System.Windows.Forms.PictureBox();
-            this._editDocumentDataButton = new System.Windows.Forms.CheckBox();
             this._dataValidityPictureBox = new System.Windows.Forms.PictureBox();
             this._bottomDividingLinePanel = new System.Windows.Forms.Panel();
             this._toolTip = new System.Windows.Forms.ToolTip(this.components);
@@ -44,11 +43,10 @@
             this._tableLayoutPanel.AutoSize = true;
             this._tableLayoutPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this._tableLayoutPanel.BackColor = System.Drawing.Color.White;
-            this._tableLayoutPanel.ColumnCount = 12;
+            this._tableLayoutPanel.ColumnCount = 11;
             this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 2F));
             this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 18F));
             this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 19F));
-            this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 21F));
@@ -58,16 +56,15 @@
             this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 21F));
             this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 0F));
             this._tableLayoutPanel.Controls.Add(this._topDividingLinePanel, 0, 0);
-            this._tableLayoutPanel.Controls.Add(this._reprocessDocumentPictureBox, 6, 1);
+            this._tableLayoutPanel.Controls.Add(this._reprocessDocumentPictureBox, 5, 1);
             this._tableLayoutPanel.Controls.Add(this._collapseDocumentButton, 1, 1);
-            this._tableLayoutPanel.Controls.Add(this._summaryLabel, 4, 1);
-            this._tableLayoutPanel.Controls.Add(this._pagesLabel, 5, 1);
-            this._tableLayoutPanel.Controls.Add(this._newDocumentGlyph, 7, 1);
+            this._tableLayoutPanel.Controls.Add(this._summaryLabel, 3, 1);
+            this._tableLayoutPanel.Controls.Add(this._pagesLabel, 4, 1);
+            this._tableLayoutPanel.Controls.Add(this._newDocumentGlyph, 6, 1);
             this._tableLayoutPanel.Controls.Add(this._selectedCheckBox, 2, 1);
-            this._tableLayoutPanel.Controls.Add(this._editedPaginationGlyph, 8, 1);
-            this._tableLayoutPanel.Controls.Add(this._editedDataPictureBox, 9, 1);
-            this._tableLayoutPanel.Controls.Add(this._editDocumentDataButton, 3, 1);
-            this._tableLayoutPanel.Controls.Add(this._dataValidityPictureBox, 10, 1);
+            this._tableLayoutPanel.Controls.Add(this._editedPaginationGlyph, 7, 1);
+            this._tableLayoutPanel.Controls.Add(this._editedDataPictureBox, 8, 1);
+            this._tableLayoutPanel.Controls.Add(this._dataValidityPictureBox, 9, 1);
             this._tableLayoutPanel.Controls.Add(this._bottomDividingLinePanel, 0, 2);
             this._tableLayoutPanel.Location = new System.Drawing.Point(0, 0);
             this._tableLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
@@ -129,9 +126,9 @@
             this._summaryLabel.AutoEllipsis = true;
             this._summaryLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._summaryLabel.ForeColor = System.Drawing.Color.Black;
-            this._summaryLabel.Location = new System.Drawing.Point(98, 6);
+            this._summaryLabel.Location = new System.Drawing.Point(42, 6);
             this._summaryLabel.Name = "_summaryLabel";
-            this._summaryLabel.Size = new System.Drawing.Size(31, 13);
+            this._summaryLabel.Size = new System.Drawing.Size(87, 13);
             this._summaryLabel.TabIndex = 0;
             this._summaryLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this._summaryLabel.Visible = false;
@@ -202,41 +199,13 @@
             this._editedDataPictureBox.TabStop = false;
             this._editedDataPictureBox.Visible = false;
             // 
-            // _editDocumentDataButton
-            // 
-            this._editDocumentDataButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this._editDocumentDataButton.Appearance = System.Windows.Forms.Appearance.Button;
-            this._editDocumentDataButton.AutoSize = true;
-            this._editDocumentDataButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this._editDocumentDataButton.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this._editDocumentDataButton.FlatAppearance.BorderSize = 0;
-            this._editDocumentDataButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this._editDocumentDataButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this._editDocumentDataButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._editDocumentDataButton.ForeColor = System.Drawing.Color.Black;
-            this._editDocumentDataButton.Image = ((System.Drawing.Image)(resources.GetObject("_editDocumentDataButton.Image")));
-            this._editDocumentDataButton.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this._editDocumentDataButton.Location = new System.Drawing.Point(40, 1);
-            this._editDocumentDataButton.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
-            this._editDocumentDataButton.Name = "_editDocumentDataButton";
-            this._editDocumentDataButton.Size = new System.Drawing.Size(55, 23);
-            this._editDocumentDataButton.TabIndex = 12;
-            this._editDocumentDataButton.TabStop = false;
-            this._editDocumentDataButton.Text = "Edit";
-            this._editDocumentDataButton.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this._editDocumentDataButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this._editDocumentDataButton.UseVisualStyleBackColor = true;
-            this._editDocumentDataButton.Visible = false;
-            this._editDocumentDataButton.CheckedChanged += new System.EventHandler(this.HandleEditDocumentDataButton_CheckedChanged);
-            this._editDocumentDataButton.Click += new System.EventHandler(this.HandleEditDocumentDataButton_Click);
-            // 
-            // _dataErrorPictureBox
+            // _dataValidityPictureBox
             // 
             this._dataValidityPictureBox.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this._dataValidityPictureBox.Image = ((System.Drawing.Image)(resources.GetObject("_dataErrorPictureBox.Image")));
+            this._dataValidityPictureBox.Image = ((System.Drawing.Image)(resources.GetObject("_dataValidityPictureBox.Image")));
             this._dataValidityPictureBox.Location = new System.Drawing.Point(224, 4);
             this._dataValidityPictureBox.Margin = new System.Windows.Forms.Padding(0);
-            this._dataValidityPictureBox.Name = "_dataErrorPictureBox";
+            this._dataValidityPictureBox.Name = "_dataValidityPictureBox";
             this._dataValidityPictureBox.Size = new System.Drawing.Size(17, 17);
             this._dataValidityPictureBox.TabIndex = 21;
             this._dataValidityPictureBox.TabStop = false;
@@ -279,7 +248,6 @@
         private System.Windows.Forms.TableLayoutPanel _tableLayoutPanel;
         private System.Windows.Forms.Button _collapseDocumentButton;
         private System.Windows.Forms.Label _summaryLabel;
-        private System.Windows.Forms.CheckBox _editDocumentDataButton;
         private System.Windows.Forms.Label _pagesLabel;
         private System.Windows.Forms.PictureBox _editedDataPictureBox;
         private NewDocumentGlyph _newDocumentGlyph;
