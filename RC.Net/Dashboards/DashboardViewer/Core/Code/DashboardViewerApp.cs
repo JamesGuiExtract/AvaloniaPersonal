@@ -3,6 +3,7 @@ using DevExpress.Skins;
 using DevExpress.UserSkins;
 using Extract;
 using Extract.Licensing;
+//using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.Linq;
@@ -22,9 +23,8 @@ namespace Extract.DashboardViewer
 
             try
             {
+                // Load the License files but do not validate the license that will be done on dashboard load
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
-                LicenseUtilities.ValidateLicense(LicenseIdName.DashboardViewer, "ELI45312",
-                    Application.ProductName);
 
                 if (args.Length > 9 || args.Contains("/?") || args.Contains("/h", StringComparer.OrdinalIgnoreCase))
                 {

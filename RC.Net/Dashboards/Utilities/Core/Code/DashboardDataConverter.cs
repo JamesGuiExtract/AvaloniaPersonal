@@ -21,7 +21,7 @@ namespace Extract.Dashboard.Utilities
         /// </summary>
         /// <param name="dashboardName">Name of dashboard</param>
         /// <param name="original">Original XDocument</param>
-        /// <param name="serverName">Server name the dashbaord is in</param>
+        /// <param name="serverName">Server name the dashboard is in</param>
         /// <param name="databaseName">Database dashboard is in</param>
         /// <param name="extractDataSourceDir">Directory to store the Extracted data files</param>
         /// <returns>Modified XDocument that uses the Extracted datasource or <c>null</c> if the the dashboard uses parameters</returns>
@@ -33,6 +33,7 @@ namespace Extract.Dashboard.Utilities
                 using (var dashboard = new DevExpress.DashboardCommon.Dashboard())
                 {
                     dashboard.LoadFromXDocument(original);
+                    ExtractCustomData originalCustomData = new ExtractCustomData(original);
 
                     // Get all the SQL Data sources
                     var sqlDataSources = dashboard.DataSources
@@ -48,7 +49,8 @@ namespace Extract.Dashboard.Utilities
                         }
                     }
                     AddExtractDataSources(dashboardName, dashboard, extractDataSourceDir);
-                    return dashboard.SaveToXDocument();
+                    var updatedXDoc = dashboard.SaveToXDocument();
+                    return originalCustomData.AddExtractCustomDataToDashboardXml(updatedXDoc);
                 }
             }
             catch (Exception ex)
@@ -99,7 +101,7 @@ namespace Extract.Dashboard.Utilities
         }
 
         /// <summary>
-        /// Method to update all extracted data sources on a dashbaord
+        /// Method to update all extracted data sources on a dashboard
         /// </summary>
         /// <param name="dashboard">Dashboard to that has the data sources that need updated</param>
         /// <param name="cancelToken"><see cref="CancellationToken"/> that can be used to cancel the process</param>

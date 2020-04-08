@@ -1,0 +1,602 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Dashboard CurrencyCulture="en-US">
+  <Title Text="Redaction Project Summary" Alignment="Left">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</Title>
+  <DataSources>
+    <SqlDataSource Name="SQL Data Source 1" ComponentName="dashboardSqlDataSource1" DataProcessingMode="Client">
+      <Connection Name="localhost_Pioneer_Snohomish_Connection" ProviderKey="MSSqlServer">
+        <Parameters>
+          <Parameter Name="server" Value="pssvr"></Parameter>
+          <Parameter Name="database" Value="Pioneer_Snohomish"></Parameter>
+          <Parameter Name="useIntegratedSecurity" Value="True"></Parameter>
+          <Parameter Name="read only" Value="1"></Parameter>
+          <Parameter Name="generateConnectionHelper" Value="false"></Parameter>
+          <Parameter Name="userid" Value=""></Parameter>
+          <Parameter Name="password" Value=""></Parameter>
+        </Parameters>
+      </Connection>
+      <Query Type="SelectQuery" Name="FAMFile" Distinct="true">
+        <Parameter Name="DatabaseService" Type="DevExpress.DataAccess.Expression">(System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)([Parameters.DatabaseService])</Parameter>
+        <Tables>
+          <Table Name="FAMFile" X="30" Y="30" Width="125" Height="172"></Table>
+          <Table Name="ReportingRedactionAccuracy" X="185" Y="30" Width="125" Height="438"></Table>
+          <Table Name="DashboardAttributeFields" Alias="DocumentTypeField" X="360" Y="330" Width="125" Height="115"></Table>
+          <Table Name="DatabaseService" X="360" Y="30" Width="125" Height="324"></Table>
+          <Table Name="FAMUser" X="360" Y="170" Width="125" Height="115"></Table>
+          <Relation Type="LeftOuter" Parent="ReportingRedactionAccuracy" Nested="DocumentTypeField">
+            <KeyColumn Parent="ExpectedAttributeSetForFileID" Nested="AttributeSetForFileID"></KeyColumn>
+          </Relation>
+          <Relation Type="LeftOuter" Parent="FAMFile" Nested="ReportingRedactionAccuracy">
+            <KeyColumn Parent="ID" Nested="FileID"></KeyColumn>
+          </Relation>
+          <Relation Type="Inner" Parent="ReportingRedactionAccuracy" Nested="DatabaseService">
+            <KeyColumn Parent="DatabaseServiceID" Nested="ID"></KeyColumn>
+          </Relation>
+          <Relation Type="Inner" Parent="ReportingRedactionAccuracy" Nested="FAMUser">
+            <KeyColumn Parent="FoundFAMUserID" Nested="ID"></KeyColumn>
+          </Relation>
+        </Tables>
+        <Columns>
+          <Column Table="FAMFile" Name="FileName"></Column>
+          <Column Table="FAMFile" Name="Pages"></Column>
+          <Expression Alias="Correct">IsNull([ReportingRedactionAccuracy.Correct],0)</Expression>
+          <Expression Alias="Missed">IsNull([ReportingRedactionAccuracy.Missed],0)</Expression>
+          <Expression Alias="Expected">IsNull([ReportingRedactionAccuracy.Expected],0)</Expression>
+          <Expression Alias="DocumentType">iif(ISNULLOREMPTY([DocumentTypeField.Value]) Or [DocumentTypeField.Value]= 'Unknown','UNKNOWN', [DocumentTypeField.Value])</Expression>
+          <Expression Alias="FieldName">iif(ISNULLOREMPTY([ReportingRedactionAccuracy.Attribute]),'Unknown',[ReportingRedactionAccuracy.Attribute])</Expression>
+          <Expression Alias="VerifiedDate">ISNULL([ReportingRedactionAccuracy.ExpectedDateTimeStamp],NOW())</Expression>
+          <Expression Alias="Page">IsNull([ReportingRedactionAccuracy.Page],0)</Expression>
+          <Expression Alias="FalsePositives">IsNull([ReportingRedactionAccuracy.FalsePositives],0)</Expression>
+          <Expression Alias="OverRedacted">IsNull([ReportingRedactionAccuracy.OverRedacted],0)</Expression>
+          <Expression Alias="UnderRedacted">IsNull([ReportingRedactionAccuracy.UnderRedacted],0)</Expression>
+          <Expression Alias="Found">IsNull([ReportingRedactionAccuracy.Found],0)</Expression>
+          <Column Table="DatabaseService" Name="Description"></Column>
+          <Column Table="DatabaseService" Name="ID"></Column>
+          <Column Table="ReportingRedactionAccuracy" Name="DatabaseServiceID"></Column>
+          <Column Table="FAMUser" Name="FullUserName"></Column>
+        </Columns>
+        <Filter>[DatabaseService.Description] = ?DatabaseService</Filter>
+        <GroupFilter></GroupFilter>
+      </Query>
+      <Query Type="SelectQuery" Name="DatabaseService">
+        <Tables>
+          <Table Name="DatabaseService" X="30" Y="30" Width="125" Height="153"></Table>
+        </Tables>
+        <Columns>
+          <Column Table="DatabaseService" Name="Description"></Column>
+          <Column Table="DatabaseService" Name="ID"></Column>
+        </Columns>
+        <Filter>Contains([DatabaseService.Settings], 'RedactionAccuracy')</Filter>
+        <GroupFilter></GroupFilter>
+      </Query>
+      <ResultSchema>
+        <DataSet Name="SQL Data Source 1">
+          <View Name="FAMFile">
+            <Field Name="FileName" Type="String"></Field>
+            <Field Name="Pages" Type="Int32"></Field>
+            <Field Name="Correct" Type="Int64"></Field>
+            <Field Name="Missed" Type="Int64"></Field>
+            <Field Name="Expected" Type="Int64"></Field>
+            <Field Name="DocumentType" Type="String"></Field>
+            <Field Name="FieldName" Type="String"></Field>
+            <Field Name="VerifiedDate" Type="DateTime"></Field>
+            <Field Name="Page" Type="Int32"></Field>
+            <Field Name="FalsePositives" Type="Int64"></Field>
+            <Field Name="OverRedacted" Type="Int64"></Field>
+            <Field Name="UnderRedacted" Type="Int64"></Field>
+            <Field Name="Found" Type="Int64"></Field>
+            <Field Name="Description" Type="String"></Field>
+            <Field Name="ID" Type="Int32"></Field>
+            <Field Name="DatabaseServiceID" Type="Int32"></Field>
+            <Field Name="FullUserName" Type="String"></Field>
+          </View>
+          <View Name="DatabaseService">
+            <Field Name="Description" Type="String"></Field>
+            <Field Name="ID" Type="Int32"></Field>
+          </View>
+        </DataSet>
+      </ResultSchema>
+      <ConnectionOptions CloseConnection="true" DbCommandTimeout="0"></ConnectionOptions>
+      <CalculatedFields>
+        <CalculatedField Name="Capture Rate" Expression="ToDouble(Sum([Correct])) / ToDouble(Sum([Expected]))" DataType="Auto" DataMember="FAMFile"></CalculatedField>
+        <CalculatedField Name="Sensitive File %" Expression="ToDouble([Sensitive File Count]) / ToDouble(CountDistinct([FileName]))" DataType="Auto" DataMember="FAMFile"></CalculatedField>
+        <CalculatedField Name="PagesByFile" Expression="Aggr(Max([Pages]), [FileName])" DataType="Auto" DataMember="FAMFile"></CalculatedField>
+        <CalculatedField Name="SelectedDatabaseService" Expression="[Parameters.DatabaseService]" DataType="Auto" DataMember="FAMFile"></CalculatedField>
+        <CalculatedField Name="Sensitive File Count" Expression="Sum(Iif([Total Expected] &gt; 0, 1, 0))" DataType="Auto" DataMember="FAMFile"></CalculatedField>
+        <CalculatedField Name="Total Expected" Expression="Aggr(Sum([Expected]), [FileName])" DataType="Auto" DataMember="FAMFile"></CalculatedField>
+        <CalculatedField Name="Sensitive File String" Expression="Concat([Sensitive File Count], ' (', 100 * Round([Sensitive File %], 3), '%)')" DataType="Auto" DataMember="FAMFile"></CalculatedField>
+        <CalculatedField Name="Expected by Page" Expression="Aggr(Sum([Expected]), Concat([FileName], [Page]))" DataType="Auto" DataMember="FAMFile"></CalculatedField>
+        <CalculatedField Name="Sensitive Page Count" Expression="Sum(Iif([Expected by Page] &gt; 0, 1, 0))" DataType="Auto" DataMember="FAMFile"></CalculatedField>
+        <CalculatedField Name="Sensitive Page %" Expression="ToDouble([Sensitive Page Count]) / ToDouble(Sum([PagesByFile]))" DataType="Auto" DataMember="FAMFile"></CalculatedField>
+        <CalculatedField Name="Sensitive Page String" Expression="Concat([Sensitive Page Count], ' (', 100 * Round([Sensitive Page %], 3), '%)')" DataType="Auto" DataMember="FAMFile"></CalculatedField>
+        <CalculatedField Name="PagesInSensitiveDocs" Expression="Sum(Iif([Total Expected] &gt; 0, [PagesByFile], 0))" DataType="Auto" DataMember="FAMFile"></CalculatedField>
+        <CalculatedField Name="PagesInSensitiveDocs %" Expression="ToDouble([PagesInSensitiveDocs]) / ToDouble(Sum([PagesByFile]))" DataType="Auto" DataMember="FAMFile"></CalculatedField>
+        <CalculatedField Name="PagesInSensitiveDocsString" Expression="Concat([PagesInSensitiveDocs], ' (', 100 * Round([PagesInSensitiveDocs %], 3), '%)')" DataType="Auto" DataMember="FAMFile"></CalculatedField>
+      </CalculatedFields>
+    </SqlDataSource>
+  </DataSources>
+  <Parameters>
+    <Parameter Name="DatabaseService" Value="Redaction Accuracy">
+      <DynamicListLookUpSettings DataSourceName="dashboardSqlDataSource1" DataMember="DatabaseService" ValueMember="Description" DisplayMember="Description"></DynamicListLookUpSettings>
+    </Parameter>
+  </Parameters>
+  <Items>
+    <Grid ComponentName="gridDashboardItem2" Name="By Document Type" DataSource="dashboardSqlDataSource1" DataMember="FAMFile">
+      <InteractivityOptions MasterFilterMode="Multiple"></InteractivityOptions>
+      <DataItems>
+        <Dimension DataMember="DocumentType" DefaultId="DataItem0"></Dimension>
+        <Measure DataMember="FileName" Name="Docs" SummaryType="CountDistinct" DefaultId="DataItem1"></Measure>
+        <Measure DataMember="FileName" Name="%Doc" SummaryType="CountDistinct" DefaultId="DataItem3">
+          <NumericFormat FormatType="Percent" Precision="1"></NumericFormat>
+          <Calculation>
+            <PercentOfTotal></PercentOfTotal>
+          </Calculation>
+          <WindowDefinition>
+            <GridWindowDefinition></GridWindowDefinition>
+          </WindowDefinition>
+        </Measure>
+        <Measure DataMember="Capture Rate" Name="Capture" DefaultId="DataItem2">
+          <NumericFormat FormatType="Percent"></NumericFormat>
+        </Measure>
+        <Measure DataMember="Expected" Name="Exp" DefaultId="DataItem4"></Measure>
+        <Measure DataMember="Expected" Name="%Exp" DefaultId="DataItem5">
+          <Calculation>
+            <PercentOfTotal></PercentOfTotal>
+          </Calculation>
+          <WindowDefinition>
+            <GridWindowDefinition></GridWindowDefinition>
+          </WindowDefinition>
+        </Measure>
+        <Measure DataMember="Missed" Name="Miss" DefaultId="DataItem6"></Measure>
+        <Measure DataMember="Missed" Name="%Miss" DefaultId="DataItem7">
+          <Calculation>
+            <PercentOfTotal></PercentOfTotal>
+          </Calculation>
+          <WindowDefinition>
+            <GridWindowDefinition></GridWindowDefinition>
+          </WindowDefinition>
+        </Measure>
+      </DataItems>
+      <FormatRules>
+        <GridItemFormatRule Name="FormatRule 1" DataItem="DataItem2">
+          <FormatConditionRangeGradient ValueType="Percent">
+            <RangeSet>
+              <Ranges>
+                <RangeInfo>
+                  <Value Type="System.Double" Value="0"></Value>
+                  <AppearanceSettings AppearanceType="GradientRed"></AppearanceSettings>
+                </RangeInfo>
+                <RangeInfo>
+                  <Value Type="System.Double" Value="55"></Value>
+                </RangeInfo>
+                <RangeInfo>
+                  <Value Type="System.Double" Value="60"></Value>
+                </RangeInfo>
+                <RangeInfo>
+                  <Value Type="System.Double" Value="65"></Value>
+                </RangeInfo>
+                <RangeInfo>
+                  <Value Type="System.Double" Value="70"></Value>
+                </RangeInfo>
+                <RangeInfo>
+                  <Value Type="System.Double" Value="75"></Value>
+                  <AppearanceSettings AppearanceType="GradientYellow"></AppearanceSettings>
+                </RangeInfo>
+                <RangeInfo>
+                  <Value Type="System.Double" Value="80"></Value>
+                </RangeInfo>
+                <RangeInfo>
+                  <Value Type="System.Double" Value="85"></Value>
+                </RangeInfo>
+                <RangeInfo>
+                  <Value Type="System.Double" Value="90"></Value>
+                </RangeInfo>
+                <RangeInfo>
+                  <Value Type="System.Double" Value="95"></Value>
+                  <AppearanceSettings AppearanceType="GradientGreen"></AppearanceSettings>
+                </RangeInfo>
+              </Ranges>
+            </RangeSet>
+          </FormatConditionRangeGradient>
+        </GridItemFormatRule>
+      </FormatRules>
+      <GridColumns>
+        <GridDimensionColumn Name="Document Type" Weight="203.03983771738245">
+          <Dimension DefaultId="DataItem0"></Dimension>
+        </GridDimensionColumn>
+        <GridMeasureColumn Weight="57.380823702738518">
+          <Measure DefaultId="DataItem1"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn Weight="64.737339562063966">
+          <Measure DefaultId="DataItem3"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn Weight="55.909520530873422">
+          <Measure DefaultId="DataItem4"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn Weight="77.979068108849773">
+          <Measure DefaultId="DataItem5"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn Weight="61.794733218333782">
+          <Measure DefaultId="DataItem6"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn Weight="77.979068108849773">
+          <Measure DefaultId="DataItem7"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn Weight="79.450371280714862">
+          <Measure DefaultId="DataItem2"></Measure>
+        </GridMeasureColumn>
+      </GridColumns>
+      <GridOptions EnableBandedRows="true" ColumnWidthMode="Manual"></GridOptions>
+    </Grid>
+    <RangeFilter ComponentName="rangeFilterDashboardItem2" Name="By Date" ShowCaption="true" DataSource="dashboardSqlDataSource1" DataMember="FAMFile">
+      <DataItems>
+        <Dimension DataMember="VerifiedDate" DateTimeGroupInterval="DayMonthYear" DefaultId="DataItem0"></Dimension>
+        <Measure DataMember="FileName" SummaryType="CountDistinct" DefaultId="DataItem1"></Measure>
+      </DataItems>
+      <Argument DefaultId="DataItem0"></Argument>
+      <Series>
+        <Simple>
+          <Value DefaultId="DataItem1"></Value>
+        </Simple>
+      </Series>
+    </RangeFilter>
+    <Grid ComponentName="gridDashboardItem1" Name="File List" DataSource="dashboardSqlDataSource1" DataMember="FAMFile">
+      <InteractivityOptions MasterFilterMode="Multiple"></InteractivityOptions>
+      <DataItems>
+        <Dimension DataMember="FileName" Name="Document" SortOrder="Descending" SortByMeasure="DataItem3" DefaultId="DataItem0"></Dimension>
+        <Measure DataMember="Correct" Name="Correct" DefaultId="DataItem2"></Measure>
+        <Measure DataMember="Missed" Name="Missed" DefaultId="DataItem3"></Measure>
+        <Measure DataMember="Expected" Name="Expected" DefaultId="DataItem4"></Measure>
+        <Measure DataMember="FalsePositives" Name="False" DefaultId="DataItem5"></Measure>
+        <Measure DataMember="UnderRedacted" Name="Under" DefaultId="DataItem6"></Measure>
+        <Measure DataMember="OverRedacted" Name="Over" DefaultId="DataItem7"></Measure>
+        <Measure DataMember="PagesByFile" Name="Pages" DefaultId="DataItem1"></Measure>
+        <Dimension DataMember="DatabaseServiceID" DefaultId="DataItem8"></Dimension>
+      </DataItems>
+      <HiddenDimensions>
+        <Dimension DefaultId="DataItem8"></Dimension>
+      </HiddenDimensions>
+      <FormatRules>
+        <GridItemFormatRule Name="FormatRule 1" DataItem="DataItem3" DataItemApplyTo="DataItem3">
+          <FormatConditionValue Condition="GreaterOrEqual">
+            <AppearanceSettings AppearanceType="Red"></AppearanceSettings>
+            <Value1 Type="System.Int32" Value="1"></Value1>
+          </FormatConditionValue>
+        </GridItemFormatRule>
+        <GridItemFormatRule Name="FormatRule 2" DataItem="DataItem6" DataItemApplyTo="DataItem6">
+          <FormatConditionValue Condition="GreaterOrEqual">
+            <AppearanceSettings AppearanceType="Orange"></AppearanceSettings>
+            <Value1 Type="System.Int32" Value="1"></Value1>
+          </FormatConditionValue>
+        </GridItemFormatRule>
+      </FormatRules>
+      <GridColumns>
+        <GridDimensionColumn Name="Document" Weight="321.24645892351276">
+          <Dimension DefaultId="DataItem0"></Dimension>
+        </GridDimensionColumn>
+        <GridMeasureColumn Weight="43.342776203966004">
+          <Measure DefaultId="DataItem1"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn Weight="30.594900849858355">
+          <Measure DefaultId="DataItem2"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn Weight="41.643059490084987">
+          <Measure DefaultId="DataItem3"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn Weight="50.141643059490086">
+          <Measure DefaultId="DataItem4"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn Weight="37.393767705382437">
+          <Measure DefaultId="DataItem5"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn Weight="39.943342776203963">
+          <Measure DefaultId="DataItem6"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn Weight="35.694050991501413">
+          <Measure DefaultId="DataItem7"></Measure>
+        </GridMeasureColumn>
+      </GridColumns>
+      <GridOptions ColumnWidthMode="Manual"></GridOptions>
+    </Grid>
+    <Card ComponentName="cardDashboardItem1" Name="Cards 1" ShowCaption="false" ParentContainer="dashboardItemGroup1" DataSource="dashboardSqlDataSource1" DataMember="FAMFile" ContentArrangementMode="FixedRowCount">
+      <DataItems>
+        <Measure DataMember="FileName" Name="Doc Count" SummaryType="CountDistinct" DefaultId="DataItem0">
+          <NumericFormat FormatType="Number" Precision="0" Unit="Ones" IncludeGroupSeparator="true"></NumericFormat>
+        </Measure>
+      </DataItems>
+      <Card>
+        <ActualValue DefaultId="DataItem0"></ActualValue>
+        <AbsoluteVariationNumericFormat></AbsoluteVariationNumericFormat>
+        <PercentVariationNumericFormat></PercentVariationNumericFormat>
+        <PercentOfTargetNumericFormat></PercentOfTargetNumericFormat>
+        <LayoutTemplate MinWidth="100" MaxWidth="150" Type="Lightweight">
+          <MainValue Visible="true" ValueType="ActualValue" DimensionIndex="0"></MainValue>
+          <SubValue Visible="true" ValueType="Title" DimensionIndex="0"></SubValue>
+          <BottomValue Visible="true" ValueType="Subtitle" DimensionIndex="0"></BottomValue>
+          <DeltaIndicator Visible="false"></DeltaIndicator>
+          <Sparkline Visible="false"></Sparkline>
+        </LayoutTemplate>
+      </Card>
+    </Card>
+    <Card ComponentName="cardDashboardItem2" Name="Cards 1" ShowCaption="false" ParentContainer="dashboardItemGroup1" DataSource="dashboardSqlDataSource1" DataMember="FAMFile">
+      <DataItems>
+        <Measure DataMember="PagesByFile" Name="Total Pages" DefaultId="DataItem0">
+          <NumericFormat FormatType="Number" Precision="0" Unit="Ones" IncludeGroupSeparator="true"></NumericFormat>
+        </Measure>
+      </DataItems>
+      <Card>
+        <ActualValue DefaultId="DataItem0"></ActualValue>
+        <AbsoluteVariationNumericFormat></AbsoluteVariationNumericFormat>
+        <PercentVariationNumericFormat></PercentVariationNumericFormat>
+        <PercentOfTargetNumericFormat></PercentOfTargetNumericFormat>
+        <LayoutTemplate MinWidth="100" MaxWidth="150" Type="Lightweight">
+          <MainValue Visible="true" ValueType="ActualValue" DimensionIndex="0"></MainValue>
+          <SubValue Visible="true" ValueType="Title" DimensionIndex="0"></SubValue>
+          <BottomValue Visible="true" ValueType="Subtitle" DimensionIndex="0"></BottomValue>
+          <DeltaIndicator Visible="false"></DeltaIndicator>
+          <Sparkline Visible="false"></Sparkline>
+        </LayoutTemplate>
+      </Card>
+    </Card>
+    <Grid ComponentName="gridDashboardItem4" Name="By Field" DataSource="dashboardSqlDataSource1" DataMember="FAMFile" FilterString="[DataItem0] &lt;&gt; 'Unknown'">
+      <InteractivityOptions MasterFilterMode="Multiple"></InteractivityOptions>
+      <DataItems>
+        <Dimension DataMember="FieldName" DefaultId="DataItem0"></Dimension>
+        <Measure DataMember="Capture Rate" DefaultId="DataItem2">
+          <NumericFormat FormatType="Percent" Precision="3"></NumericFormat>
+        </Measure>
+        <Measure DataMember="FieldName" SummaryType="Count" DefaultId="DataItem3"></Measure>
+        <Measure DataMember="Expected" DefaultId="DataItem1"></Measure>
+      </DataItems>
+      <HiddenMeasures>
+        <Measure DefaultId="DataItem3"></Measure>
+      </HiddenMeasures>
+      <GridColumns>
+        <GridDimensionColumn Name="Field Name" Weight="77.945301542777">
+          <Dimension DefaultId="DataItem0"></Dimension>
+        </GridDimensionColumn>
+        <GridMeasureColumn Name="Count" Weight="56.80224403927069">
+          <Measure DefaultId="DataItem1"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn Weight="90.252454417952308">
+          <Measure DefaultId="DataItem2"></Measure>
+        </GridMeasureColumn>
+      </GridColumns>
+      <GridOptions></GridOptions>
+    </Grid>
+    <Gauge ComponentName="gaugeDashboardItem1" Name="Capture Rate" ShowCaption="false" DataSource="dashboardSqlDataSource1" DataMember="FAMFile" ViewType="CircularHalf">
+      <DataItems>
+        <Measure DataMember="Capture Rate" Name="Capture Rate %" Expression="[Capture Rate] * 100" DefaultId="DataItem0">
+          <NumericFormat FormatType="Number" Precision="3"></NumericFormat>
+          <WindowDefinition>
+            <GaugeWindowDefinition></GaugeWindowDefinition>
+          </WindowDefinition>
+        </Measure>
+      </DataItems>
+      <GaugeElement Minimum="0" Maximum="100">
+        <ActualValue DefaultId="DataItem0"></ActualValue>
+        <AbsoluteVariationNumericFormat></AbsoluteVariationNumericFormat>
+        <PercentVariationNumericFormat></PercentVariationNumericFormat>
+        <PercentOfTargetNumericFormat></PercentOfTargetNumericFormat>
+      </GaugeElement>
+    </Gauge>
+    <Grid ComponentName="gridDashboardItem3" Name="Totals" DataSource="dashboardSqlDataSource1" DataMember="FAMFile">
+      <DataItems>
+        <Measure DataMember="Correct" Name="Correct" DefaultId="DataItem2">
+          <NumericFormat FormatType="Number" Precision="0" Unit="Ones" IncludeGroupSeparator="true"></NumericFormat>
+        </Measure>
+        <Measure DataMember="Expected" Name="Expected" DefaultId="DataItem3">
+          <NumericFormat FormatType="Number" Precision="0" Unit="Ones" IncludeGroupSeparator="true"></NumericFormat>
+        </Measure>
+        <Measure DataMember="FalsePositives" Name="False" DefaultId="DataItem4">
+          <NumericFormat FormatType="Number" Precision="0" Unit="Ones" IncludeGroupSeparator="true"></NumericFormat>
+        </Measure>
+        <Measure DataMember="UnderRedacted" Name="Under" DefaultId="DataItem5">
+          <NumericFormat FormatType="Number" Precision="0" Unit="Ones" IncludeGroupSeparator="true"></NumericFormat>
+        </Measure>
+        <Measure DataMember="OverRedacted" Name="Over" DefaultId="DataItem6">
+          <NumericFormat FormatType="Number" Precision="0" Unit="Ones" IncludeGroupSeparator="true"></NumericFormat>
+        </Measure>
+        <Measure DataMember="PagesByFile" Name="Pages" DefaultId="DataItem1">
+          <NumericFormat FormatType="Number" Precision="0" Unit="Ones" IncludeGroupSeparator="true"></NumericFormat>
+        </Measure>
+        <Measure DataMember="Missed" Name="Missed" DefaultId="DataItem0">
+          <NumericFormat FormatType="Number" Precision="0" Unit="Ones" IncludeGroupSeparator="true"></NumericFormat>
+        </Measure>
+      </DataItems>
+      <GridColumns>
+        <GridMeasureColumn>
+          <Measure DefaultId="DataItem1"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn>
+          <Measure DefaultId="DataItem2"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn>
+          <Measure DefaultId="DataItem0"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn>
+          <Measure DefaultId="DataItem3"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn>
+          <Measure DefaultId="DataItem4"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn>
+          <Measure DefaultId="DataItem5"></Measure>
+        </GridMeasureColumn>
+        <GridMeasureColumn>
+          <Measure DefaultId="DataItem6"></Measure>
+        </GridMeasureColumn>
+      </GridColumns>
+      <GridOptions></GridOptions>
+    </Grid>
+    <TextBox ComponentName="textBoxDashboardItem1" Name="Text Box 1" ShowCaption="false" DataSource="dashboardSqlDataSource1" DataMember="FAMFile">
+      <DataItems>
+        <Measure DataMember="Sensitive File String" SummaryType="Count" DefaultId="DataItem0"></Measure>
+        <Measure DataMember="Total Expected" DefaultId="DataItem1"></Measure>
+      </DataItems>
+      <Text>{\rtf1\deff0{\fonttbl{\f0 Calibri;}{\f1 Times New Roman;}}{\colortbl ;\red0\green0\blue255 ;}{\*\defchp \f1\fs24}{\stylesheet {\ql\f1\fs24 Normal;}{\*\cs1\f1\fs24 Default Paragraph Font;}{\*\cs2\sbasedon1\f1\fs24 Line Number;}{\*\cs3\ul\f1\fs24\cf1 Hyperlink;}{\*\ts4\tsrowd\f1\fs24\ql\tscellpaddfl3\tscellpaddl108\tscellpaddfb3\tscellpaddfr3\tscellpaddr108\tscellpaddft3\tsvertalt\cltxlrtb Normal Table;}{\*\ts5\tsrowd\sbasedon4\f1\fs24\ql\trbrdrt\brdrs\brdrw10\trbrdrl\brdrs\brdrw10\trbrdrb\brdrs\brdrw10\trbrdrr\brdrs\brdrw10\trbrdrh\brdrs\brdrw10\trbrdrv\brdrs\brdrw10\tscellpaddfl3\tscellpaddl108\tscellpaddfr3\tscellpaddr108\tsvertalt\cltxlrtb Table Simple 1;}}{\*\listoverridetable}\nouicompat\splytwnine\htmautsp\alntblind\expshrtn\spltpgpar\nogrowautofit\sectd\pard\plain\qc{\lang1033\langfe1033\b\fs22\cf0 Sensitive Docs}\b\fs22\par\pard\plain\qc{\field{\*\fldinst{\fs22\cf0 DOCVARIABLE DataItem0}}{\fldrslt{\fs22\cf0 Sensitive File String}}}\fs22\par{\*\themedata 
+504b03041400020008000000210201159325ae000000270100000b0000005f72656c732f2e72656c738d8f310ec2300c45af1279a76e1910424dbbb07460415c204a9d34a24da224457036068ec415c8d82206164b5ffe7efffbfd7cd5ed7d1ad98d4234
+ce72a88a121859e97a63358739a9cd1edaa63ed3285276c4c1f8c8f2898d1c8694fc0131ca8126110be7c9e68d72611229cba0d10b79159a705b963b0c4b06ac99aceb3984aeaf805d1e9efe613ba58ca4a393f34436fd88f87264b2089a12879499848b
+791236b70c454e00864d8dab779b0f504b0304140002000800000021027f624aeb730000007b0000001c0000007468656d652f7468656d652f7468656d654d616e616765722e786d6c0d8cc10d83300c005789fc2f4e7954554460820e61810991888392
+b465b73e3a5257a89fa7d3ddeff31da633ede6c5a5c62c1eae9d05c332e7254af0f06cebe50ed338906b1b277e9050e062b491eac8c3d6dae110ebac966a970f16756b2e899a6209b8147aeb2bedd85b7bc34451c0e0f807504b03041400020008000000
+21020a5d705ea60000000c010000270000007468656d652f7468656d652f5f72656c732f7468656d654d616e616765722e786d6c2e72656c738dcf3d0ec2300c05e0ab44dea95b068450d32e2c5d11178852278d687e94a408cec6c091b8021113951818
+9fecf7597e3d9e6d7fb333bb524cc63b0e4d55032327fd689ce6b064b5d943dfb5279a452e1b693221b1527189c39473382026399115a9f2815c99281fadc825468d41c88bd084dbbade61fc36606db261e41087b10176be07fac7f64a1949472f174b2e
+ff3881b974a980226aca1c3eb1a90a030cbb16573f756f504b0304140002000800000021026d52debf9f050000fd1b0000160000007468656d652f7468656d652f7468656d65312e786d6ced594f6fdb3614ff2a84eead2c5b729da06e113b76bb356983
+c4ebd0232dd3126b4a14483aa96f437b1c30605837ec3260b71d866d015a608765d887c9d661eb807c8551b42c5136d5244d566c587cb045eaf7deeffde17b22e5939f7eb979fb4944c03e621cd3b86d39d76b1640b14f47380edad6548cafb5acdbb76e
+c27511a20801098ef93a6c5ba110c9ba6d735f4e437e9d262896f7c6944550c8210bec118307524944ec7aadd6b42388630bc430426debc1788c7d0406a94a2b57de23f22b163c9df009dbf315a32ea1b0a38993fef019ef1206f621695b9267440f06e8
+89b000815cc81b6daba63e16b06fddb47329222a8435c1befa2c043389d1a4ae045930cc259dbebb7663b360a8cf195681bd5eafdb730a8d0a017d5f7aebac80dd7ecbe9e45a35d4fc72557bb7e6d5dc25018da1b122b0d6e974bcb5b240a3107057045a
+b5a6bb512f0bb88580b7ea4367a3db6d9605bc42a0b922d0bfb1d6749704142a24389eacc0d3cc1629ca31634aee1af12d896fe56ba180d9da4a9b2b8845d5ba8be063cafa12a0b20c058e819825680c7d89ebc268c830540c701d41ed5636e7f3d5b994
+0e709fe144b4adf713280ba4c09c1c7d7772f4029c1c1d1e3f7d79fcf4c7e367cf8e9ffe6092bc0be340977cfdcda77f7df511f8f3c5d7af9f7f5e21c07581dfbefff8d79f3fab400a1df9ea8bc3df5f1ebefaf2933fbe7d6ec26f3038d4f1031c210eee
+a303b04ba3d43f03051ab2738a0c42884b2230945013b227c212f2fe0c1223b083ca317cc8645b3022ef4c1f97ecdd0bd9546013f25e189590db94920e65669fee293acda7691c54f0b3a90edc8570df48df5dca726f9ac8958d8d4abb212a99ba4364e2
+61806224407a8f4e1032c93dc2b814df6dec33cae95880471874203607668087c22c751747324133a38d32eba5086d3f041d4a8c049b68bf0c95150289512922a568de81530123b3d530223a740b8ad068e8de8cf9a5c07321931e2042416f8438370a3d
+60b392c9f7a06c51e615b04d665119ca049e18a15b90521dba4927dd104689d96e1c873af83d3e912b16821d2acc76d072cda4639910185767fe2146e29cc5fe010e42f36249ef4c99b146102dd7e88c8c218a170f80522b8f70fca6be4eb06cec577d7d
+a9af6fc8879db19e96bb7925f03fdac337e134de41699d5cb5f0ab167ed5c2df50e1ff44e32e7ab5adefd6959ea872eb3ec684ec8919415b5c75792e5d1cf5e5a41a28a1fca89084f272c15702060caa6bc0a8f8108b702f8489e4711445c033dd010709
+e5f28862552a57275e2cbd56735e7e4c957028b6e9683edf289d5f73456a14709daa91aa382b5de3c645e99c39f28c7c8e57c1e7bd99cfd6622acb08c0f47d84d3ac6766721f12344aa33f572d3041bbc81799be45ae2e3d6f3c84239425ce317be634ce
+1ac9d6e981d4f8d61a17e53b4be67442b78ad0bb8cd4d54e4b9dbd5ab9242e8fc08134d3ab7b16f0a344eae4693b832488db962f32874e2df665b72b56ac53ab76bb4492302e36210fe762ea56feee272eecae7b6eaaee02869bbad419c91b2de7dd93db
+cb0944e3b14c7cc54c31cceed1a9406c2f1c1d802199b25d282d77e74b6a84b97c78d41703268bd3cd565bb9e8b3c5bffc2e292b0a48921066eda9a5e77a8e57d7b9116aa4d9675718ff96be342ed117efffec4bba7ce526b83152a735b9356010a4ebb4
+6d5126422adb4d1262bfcfe466429149c3803c06aafe44d277e2a9b1687fd1afec859279770b42b18b03c0b06c71226408ed88ccd353b4398b76989547a629eb2db9c13c99ff0ed13e2283b4729b69082c10e60d248b85022e27ce36d5d830e8ff9b3744
+6ed586e8941d4341e59e6783e2eaed5e7b0aac5dd48a733e6deb156ed7bdb33f6d13799e01e9976ce498f9a4d8fe0ea87ac416fb4db924afb5b252cc2787d2ea96ee5faaeb5d6eaf8ab4b4aa56c1a5ee53b5f837aae27f0ae1dbc7df3384df3b57f4edd5
+62b6b593901a2dfdb7b698b9f537504b030414000200080000002102e9278183ee00000010020000130000005b436f6e74656e745f54797065735d2e786d6cad914d4ec3301085af62795bc54e5920849274012cf959708191334e2ce21fd993aa9c8d05
+47e20a4cd382102a48486c2cd9efcdfb66c66f2fafcd66e727b1c55c5c0cad5cab5a0a0c26f62e0cad9cc9561772d3358fcf098b606b28ad1c89d2a5d6c58ce8a1a89830b06263f6407ccd834e609e60407d56d7e7dac44018a8a27d86ec9a6bb4304f24
+6e76fc7cc0669c8a145707e39ed54a486972068875bd0dfd374a752428ae5c3c6574a9acd820853e8958a41f091f85f7bc89ec7a140f90e90e3cdb34f198f8f55cabdfc34eb41bad7506fb6866cf256a8959fd097a0b81e7cdff833e867d76a097ffedde
+01504b010214001400020008000000210201159325ae000000270100000b00000000000000000000000000000000005f72656c732f2e72656c73504b01021400140002000800000021027f624aeb730000007b0000001c00000000000000000000000000
+d70000007468656d652f7468656d652f7468656d654d616e616765722e786d6c504b01021400140002000800000021020a5d705ea60000000c0100002700000000000000000000000000840100007468656d652f7468656d652f5f72656c732f7468656d
+654d616e616765722e786d6c2e72656c73504b01021400140002000800000021026d52debf9f050000fd1b000016000000000000000000000000006f0200007468656d652f7468656d652f7468656d65312e786d6c504b01021400140002000800000021
+02e9278183ee000000100200001300000000000000000000000000420800005b436f6e74656e745f54797065735d2e786d6c504b050600000000050005005d010000610900000000}{\*\colorschememapping 3c3f786d6c2076657273696f6e3d22312e
+302220656e636f64696e673d227574662d38223f3e3c613a636c724d617020786d6c6e733a613d22687474703a2f2f736368656d61732e6f70656e786d6c666f726d6174732e6f72672f64726177696e676d6c2f323030362f6d61696e22206267313d22
+6c743122207478313d22646b3122206267323d226c743222207478323d22646b322220616363656e74313d22616363656e74312220616363656e74323d22616363656e74322220616363656e74333d22616363656e74332220616363656e74343d226163
+63656e74342220616363656e74353d22616363656e74352220616363656e74363d22616363656e74362220686c696e6b3d22686c696e6b2220666f6c486c696e6b3d22666f6c486c696e6b22202f3e}}</Text>
+      <Values>
+        <Value DefaultId="DataItem0"></Value>
+        <Value DefaultId="DataItem1"></Value>
+      </Values>
+    </TextBox>
+    <TextBox ComponentName="textBoxDashboardItem2" Name="Text Box 2" ShowCaption="false" DataSource="dashboardSqlDataSource1" DataMember="FAMFile">
+      <DataItems>
+        <Measure DataMember="Sensitive Page String" SummaryType="Count" DefaultId="DataItem0"></Measure>
+      </DataItems>
+      <Text>{\rtf1\deff0{\fonttbl{\f0 Calibri;}{\f1 Times New Roman;}}{\colortbl ;\red0\green0\blue255 ;}{\*\defchp \f1\fs24}{\stylesheet {\ql\f1\fs24 Normal;}{\*\cs1\f1\fs24 Default Paragraph Font;}{\*\cs2\sbasedon1\f1\fs24 Line Number;}{\*\cs3\ul\f1\fs24\cf1 Hyperlink;}{\*\ts4\tsrowd\f1\fs24\ql\tscellpaddfl3\tscellpaddl108\tscellpaddfb3\tscellpaddfr3\tscellpaddr108\tscellpaddft3\tsvertalt\cltxlrtb Normal Table;}{\*\ts5\tsrowd\sbasedon4\f1\fs24\ql\trbrdrt\brdrs\brdrw10\trbrdrl\brdrs\brdrw10\trbrdrb\brdrs\brdrw10\trbrdrr\brdrs\brdrw10\trbrdrh\brdrs\brdrw10\trbrdrv\brdrs\brdrw10\tscellpaddfl3\tscellpaddl108\tscellpaddfr3\tscellpaddr108\tsvertalt\cltxlrtb Table Simple 1;}}{\*\listoverridetable}\nouicompat\splytwnine\htmautsp\alntblind\expshrtn\spltpgpar\nogrowautofit\sectd\pard\plain\qc{\lang1033\langfe1033\b\fs22\cf0 Total Sensitive Pages}\b\fs22\par\pard\plain\qc{\field{\*\fldinst{\fs22\cf0 DOCVARIABLE DataItem0}}{\fldrslt{\fs22\cf0 Sensitive Page String}}}\fs22\par{\*\themedata 
+504b03041400020008000000210201159325ae000000270100000b0000005f72656c732f2e72656c738d8f310ec2300c45af1279a76e1910424dbbb07460415c204a9d34a24da224457036068ec415c8d82206164b5ffe7efffbfd7cd5ed7d1ad98d4234
+ce72a88a121859e97a63358739a9cd1edaa63ed3285276c4c1f8c8f2898d1c8694fc0131ca8126110be7c9e68d72611229cba0d10b79159a705b963b0c4b06ac99aceb3984aeaf805d1e9efe613ba58ca4a393f34436fd88f87264b2089a12879499848b
+791236b70c454e00864d8dab779b0f504b0304140002000800000021027f624aeb730000007b0000001c0000007468656d652f7468656d652f7468656d654d616e616765722e786d6c0d8cc10d83300c005789fc2f4e7954554460820e61810991888392
+b465b73e3a5257a89fa7d3ddeff31da633ede6c5a5c62c1eae9d05c332e7254af0f06cebe50ed338906b1b277e9050e062b491eac8c3d6dae110ebac966a970f16756b2e899a6209b8147aeb2bedd85b7bc34451c0e0f807504b03041400020008000000
+21020a5d705ea60000000c010000270000007468656d652f7468656d652f5f72656c732f7468656d654d616e616765722e786d6c2e72656c738dcf3d0ec2300c05e0ab44dea95b068450d32e2c5d11178852278d687e94a408cec6c091b8021113951818
+9fecf7597e3d9e6d7fb333bb524cc63b0e4d55032327fd689ce6b064b5d943dfb5279a452e1b693221b1527189c39473382026399115a9f2815c99281fadc825468d41c88bd084dbbade61fc36606db261e41087b10176be07fac7f64a1949472f174b2e
+ff3881b974a980226aca1c3eb1a90a030cbb16573f756f504b0304140002000800000021026d52debf9f050000fd1b0000160000007468656d652f7468656d652f7468656d65312e786d6ced594f6fdb3614ff2a84eead2c5b729da06e113b76bb356983
+c4ebd0232dd3126b4a14483aa96f437b1c30605837ec3260b71d866d015a608765d887c9d661eb807c8551b42c5136d5244d566c587cb045eaf7deeffde17b22e5939f7eb979fb4944c03e621cd3b86d39d76b1640b14f47380edad6548cafb5acdbb76e
+c27511a20801098ef93a6c5ba110c9ba6d735f4e437e9d262896f7c6944550c8210bec118307524944ec7aadd6b42388630bc430426debc1788c7d0406a94a2b57de23f22b163c9df009dbf315a32ea1b0a38993fef019ef1206f621695b9267440f06e8
+89b000815cc81b6daba63e16b06fddb47329222a8435c1befa2c043389d1a4ae045930cc259dbebb7663b360a8cf195681bd5eafdb730a8d0a017d5f7aebac80dd7ecbe9e45a35d4fc72557bb7e6d5dc25018da1b122b0d6e974bcb5b240a3107057045a
+b5a6bb512f0bb88580b7ea4367a3db6d9605bc42a0b922d0bfb1d6749704142a24389eacc0d3cc1629ca31634aee1af12d896fe56ba180d9da4a9b2b8845d5ba8be063cafa12a0b20c058e819825680c7d89ebc268c830540c701d41ed5636e7f3d5b994
+0e709fe144b4adf713280ba4c09c1c7d7772f4029c1c1d1e3f7d79fcf4c7e367cf8e9ffe6092bc0be340977cfdcda77f7df511f8f3c5d7af9f7f5e21c07581dfbefff8d79f3fab400a1df9ea8bc3df5f1ebefaf2933fbe7d6ec26f3038d4f1031c210eee
+a303b04ba3d43f03051ab2738a0c42884b2230945013b227c212f2fe0c1223b083ca317cc8645b3022ef4c1f97ecdd0bd9546013f25e189590db94920e65669fee293acda7691c54f0b3a90edc8570df48df5dca726f9ac8958d8d4abb212a99ba4364e2
+61806224407a8f4e1032c93dc2b814df6dec33cae95880471874203607668087c22c751747324133a38d32eba5086d3f041d4a8c049b68bf0c95150289512922a568de81530123b3d530223a740b8ad068e8de8cf9a5c07321931e2042416f8438370a3d
+60b392c9f7a06c51e615b04d665119ca049e18a15b90521dba4927dd104689d96e1c873af83d3e912b16821d2acc76d072cda4639910185767fe2146e29cc5fe010e42f36249ef4c99b146102dd7e88c8c218a170f80522b8f70fca6be4eb06cec577d7d
+a9af6fc8879db19e96bb7925f03fdac337e134de41699d5cb5f0ab167ed5c2df50e1ff44e32e7ab5adefd6959ea872eb3ec684ec8919415b5c75792e5d1cf5e5a41a28a1fca89084f272c15702060caa6bc0a8f8108b702f8489e4711445c033dd010709
+e5f28862552a57275e2cbd56735e7e4c957028b6e9683edf289d5f73456a14709daa91aa382b5de3c645e99c39f28c7c8e57c1e7bd99cfd6622acb08c0f47d84d3ac6766721f12344aa33f572d3041bbc81799be45ae2e3d6f3c84239425ce317be634ce
+1ac9d6e981d4f8d61a17e53b4be67442b78ad0bb8cd4d54e4b9dbd5ab9242e8fc08134d3ab7b16f0a344eae4693b832488db962f32874e2df665b72b56ac53ab76bb4492302e36210fe762ea56feee272eecae7b6eaaee02869bbad419c91b2de7dd93db
+cb0944e3b14c7cc54c31cceed1a9406c2f1c1d802199b25d282d77e74b6a84b97c78d41703268bd3cd565bb9e8b3c5bffc2e292b0a48921066eda9a5e77a8e57d7b9116aa4d9675718ff96be342ed117efffec4bba7ce526b83152a735b9356010a4ebb4
+6d5126422adb4d1262bfcfe466429149c3803c06aafe44d277e2a9b1687fd1afec859279770b42b18b03c0b06c71226408ed88ccd353b4398b76989547a629eb2db9c13c99ff0ed13e2283b4729b69082c10e60d248b85022e27ce36d5d830e8ff9b3744
+6ed586e8941d4341e59e6783e2eaed5e7b0aac5dd48a733e6deb156ed7bdb33f6d13799e01e9976ce498f9a4d8fe0ea87ac416fb4db924afb5b252cc2787d2ea96ee5faaeb5d6eaf8ab4b4aa56c1a5ee53b5f837aae27f0ae1dbc7df3384df3b57f4edd5
+62b6b593901a2dfdb7b698b9f537504b030414000200080000002102e9278183ee00000010020000130000005b436f6e74656e745f54797065735d2e786d6cad914d4ec3301085af62795bc54e5920849274012cf959708191334e2ce21fd993aa9c8d05
+47e20a4cd382102a48486c2cd9efcdfb66c66f2fafcd66e727b1c55c5c0cad5cab5a0a0c26f62e0cad9cc9561772d3358fcf098b606b28ad1c89d2a5d6c58ce8a1a89830b06263f6407ccd834e609e60407d56d7e7dac44018a8a27d86ec9a6bb4304f24
+6e76fc7cc0669c8a145707e39ed54a486972068875bd0dfd374a752428ae5c3c6574a9acd820853e8958a41f091f85f7bc89ec7a140f90e90e3cdb34f198f8f55cabdfc34eb41bad7506fb6866cf256a8959fd097a0b81e7cdff833e867d76a097ffedde
+01504b010214001400020008000000210201159325ae000000270100000b00000000000000000000000000000000005f72656c732f2e72656c73504b01021400140002000800000021027f624aeb730000007b0000001c00000000000000000000000000
+d70000007468656d652f7468656d652f7468656d654d616e616765722e786d6c504b01021400140002000800000021020a5d705ea60000000c0100002700000000000000000000000000840100007468656d652f7468656d652f5f72656c732f7468656d
+654d616e616765722e786d6c2e72656c73504b01021400140002000800000021026d52debf9f050000fd1b000016000000000000000000000000006f0200007468656d652f7468656d652f7468656d65312e786d6c504b01021400140002000800000021
+02e9278183ee000000100200001300000000000000000000000000420800005b436f6e74656e745f54797065735d2e786d6c504b050600000000050005005d010000610900000000}{\*\colorschememapping 3c3f786d6c2076657273696f6e3d22312e
+302220656e636f64696e673d227574662d38223f3e3c613a636c724d617020786d6c6e733a613d22687474703a2f2f736368656d61732e6f70656e786d6c666f726d6174732e6f72672f64726177696e676d6c2f323030362f6d61696e22206267313d22
+6c743122207478313d22646b3122206267323d226c743222207478323d22646b322220616363656e74313d22616363656e74312220616363656e74323d22616363656e74322220616363656e74333d22616363656e74332220616363656e74343d226163
+63656e74342220616363656e74353d22616363656e74352220616363656e74363d22616363656e74362220686c696e6b3d22686c696e6b2220666f6c486c696e6b3d22666f6c486c696e6b22202f3e}}</Text>
+      <Values>
+        <Value DefaultId="DataItem0"></Value>
+      </Values>
+    </TextBox>
+    <TextBox ComponentName="textBoxDashboardItem3" Name="Text Box 3" ShowCaption="false" DataSource="dashboardSqlDataSource1" DataMember="FAMFile">
+      <DataItems>
+        <Measure DataMember="PagesInSensitiveDocsString" SummaryType="Count" DefaultId="DataItem0"></Measure>
+      </DataItems>
+      <Text>{\rtf1\deff0{\fonttbl{\f0 Calibri;}{\f1 Times New Roman;}}{\colortbl ;\red0\green0\blue255 ;}{\*\defchp \f1\fs24}{\stylesheet {\ql\f1\fs24 Normal;}{\*\cs1\f1\fs24 Default Paragraph Font;}{\*\cs2\sbasedon1\f1\fs24 Line Number;}{\*\cs3\ul\f1\fs24\cf1 Hyperlink;}{\*\ts4\tsrowd\f1\fs24\ql\tscellpaddfl3\tscellpaddl108\tscellpaddfb3\tscellpaddfr3\tscellpaddr108\tscellpaddft3\tsvertalt\cltxlrtb Normal Table;}{\*\ts5\tsrowd\sbasedon4\f1\fs24\ql\trbrdrt\brdrs\brdrw10\trbrdrl\brdrs\brdrw10\trbrdrb\brdrs\brdrw10\trbrdrr\brdrs\brdrw10\trbrdrh\brdrs\brdrw10\trbrdrv\brdrs\brdrw10\tscellpaddfl3\tscellpaddl108\tscellpaddfr3\tscellpaddr108\tsvertalt\cltxlrtb Table Simple 1;}}{\*\listoverridetable}\nouicompat\splytwnine\htmautsp\alntblind\expshrtn\spltpgpar\nogrowautofit\sectd\pard\plain\qc{\lang1033\langfe1033\b\fs22\cf0 Pages in Sensitive Docs}\b\fs22\par\pard\plain\qc{\field{\*\fldinst{\fs22\cf0 DOCVARIABLE DataItem0}}{\fldrslt{\fs22\cf0 PagesInSensitiveDocsString}}}\fs22\par{\*\themedata 
+504b03041400020008000000210201159325ae000000270100000b0000005f72656c732f2e72656c738d8f310ec2300c45af1279a76e1910424dbbb07460415c204a9d34a24da224457036068ec415c8d82206164b5ffe7efffbfd7cd5ed7d1ad98d4234
+ce72a88a121859e97a63358739a9cd1edaa63ed3285276c4c1f8c8f2898d1c8694fc0131ca8126110be7c9e68d72611229cba0d10b79159a705b963b0c4b06ac99aceb3984aeaf805d1e9efe613ba58ca4a393f34436fd88f87264b2089a12879499848b
+791236b70c454e00864d8dab779b0f504b0304140002000800000021027f624aeb730000007b0000001c0000007468656d652f7468656d652f7468656d654d616e616765722e786d6c0d8cc10d83300c005789fc2f4e7954554460820e61810991888392
+b465b73e3a5257a89fa7d3ddeff31da633ede6c5a5c62c1eae9d05c332e7254af0f06cebe50ed338906b1b277e9050e062b491eac8c3d6dae110ebac966a970f16756b2e899a6209b8147aeb2bedd85b7bc34451c0e0f807504b03041400020008000000
+21020a5d705ea60000000c010000270000007468656d652f7468656d652f5f72656c732f7468656d654d616e616765722e786d6c2e72656c738dcf3d0ec2300c05e0ab44dea95b068450d32e2c5d11178852278d687e94a408cec6c091b8021113951818
+9fecf7597e3d9e6d7fb333bb524cc63b0e4d55032327fd689ce6b064b5d943dfb5279a452e1b693221b1527189c39473382026399115a9f2815c99281fadc825468d41c88bd084dbbade61fc36606db261e41087b10176be07fac7f64a1949472f174b2e
+ff3881b974a980226aca1c3eb1a90a030cbb16573f756f504b0304140002000800000021026d52debf9f050000fd1b0000160000007468656d652f7468656d652f7468656d65312e786d6ced594f6fdb3614ff2a84eead2c5b729da06e113b76bb356983
+c4ebd0232dd3126b4a14483aa96f437b1c30605837ec3260b71d866d015a608765d887c9d661eb807c8551b42c5136d5244d566c587cb045eaf7deeffde17b22e5939f7eb979fb4944c03e621cd3b86d39d76b1640b14f47380edad6548cafb5acdbb76e
+c27511a20801098ef93a6c5ba110c9ba6d735f4e437e9d262896f7c6944550c8210bec118307524944ec7aadd6b42388630bc430426debc1788c7d0406a94a2b57de23f22b163c9df009dbf315a32ea1b0a38993fef019ef1206f621695b9267440f06e8
+89b000815cc81b6daba63e16b06fddb47329222a8435c1befa2c043389d1a4ae045930cc259dbebb7663b360a8cf195681bd5eafdb730a8d0a017d5f7aebac80dd7ecbe9e45a35d4fc72557bb7e6d5dc25018da1b122b0d6e974bcb5b240a3107057045a
+b5a6bb512f0bb88580b7ea4367a3db6d9605bc42a0b922d0bfb1d6749704142a24389eacc0d3cc1629ca31634aee1af12d896fe56ba180d9da4a9b2b8845d5ba8be063cafa12a0b20c058e819825680c7d89ebc268c830540c701d41ed5636e7f3d5b994
+0e709fe144b4adf713280ba4c09c1c7d7772f4029c1c1d1e3f7d79fcf4c7e367cf8e9ffe6092bc0be340977cfdcda77f7df511f8f3c5d7af9f7f5e21c07581dfbefff8d79f3fab400a1df9ea8bc3df5f1ebefaf2933fbe7d6ec26f3038d4f1031c210eee
+a303b04ba3d43f03051ab2738a0c42884b2230945013b227c212f2fe0c1223b083ca317cc8645b3022ef4c1f97ecdd0bd9546013f25e189590db94920e65669fee293acda7691c54f0b3a90edc8570df48df5dca726f9ac8958d8d4abb212a99ba4364e2
+61806224407a8f4e1032c93dc2b814df6dec33cae95880471874203607668087c22c751747324133a38d32eba5086d3f041d4a8c049b68bf0c95150289512922a568de81530123b3d530223a740b8ad068e8de8cf9a5c07321931e2042416f8438370a3d
+60b392c9f7a06c51e615b04d665119ca049e18a15b90521dba4927dd104689d96e1c873af83d3e912b16821d2acc76d072cda4639910185767fe2146e29cc5fe010e42f36249ef4c99b146102dd7e88c8c218a170f80522b8f70fca6be4eb06cec577d7d
+a9af6fc8879db19e96bb7925f03fdac337e134de41699d5cb5f0ab167ed5c2df50e1ff44e32e7ab5adefd6959ea872eb3ec684ec8919415b5c75792e5d1cf5e5a41a28a1fca89084f272c15702060caa6bc0a8f8108b702f8489e4711445c033dd010709
+e5f28862552a57275e2cbd56735e7e4c957028b6e9683edf289d5f73456a14709daa91aa382b5de3c645e99c39f28c7c8e57c1e7bd99cfd6622acb08c0f47d84d3ac6766721f12344aa33f572d3041bbc81799be45ae2e3d6f3c84239425ce317be634ce
+1ac9d6e981d4f8d61a17e53b4be67442b78ad0bb8cd4d54e4b9dbd5ab9242e8fc08134d3ab7b16f0a344eae4693b832488db962f32874e2df665b72b56ac53ab76bb4492302e36210fe762ea56feee272eecae7b6eaaee02869bbad419c91b2de7dd93db
+cb0944e3b14c7cc54c31cceed1a9406c2f1c1d802199b25d282d77e74b6a84b97c78d41703268bd3cd565bb9e8b3c5bffc2e292b0a48921066eda9a5e77a8e57d7b9116aa4d9675718ff96be342ed117efffec4bba7ce526b83152a735b9356010a4ebb4
+6d5126422adb4d1262bfcfe466429149c3803c06aafe44d277e2a9b1687fd1afec859279770b42b18b03c0b06c71226408ed88ccd353b4398b76989547a629eb2db9c13c99ff0ed13e2283b4729b69082c10e60d248b85022e27ce36d5d830e8ff9b3744
+6ed586e8941d4341e59e6783e2eaed5e7b0aac5dd48a733e6deb156ed7bdb33f6d13799e01e9976ce498f9a4d8fe0ea87ac416fb4db924afb5b252cc2787d2ea96ee5faaeb5d6eaf8ab4b4aa56c1a5ee53b5f837aae27f0ae1dbc7df3384df3b57f4edd5
+62b6b593901a2dfdb7b698b9f537504b030414000200080000002102e9278183ee00000010020000130000005b436f6e74656e745f54797065735d2e786d6cad914d4ec3301085af62795bc54e5920849274012cf959708191334e2ce21fd993aa9c8d05
+47e20a4cd382102a48486c2cd9efcdfb66c66f2fafcd66e727b1c55c5c0cad5cab5a0a0c26f62e0cad9cc9561772d3358fcf098b606b28ad1c89d2a5d6c58ce8a1a89830b06263f6407ccd834e609e60407d56d7e7dac44018a8a27d86ec9a6bb4304f24
+6e76fc7cc0669c8a145707e39ed54a486972068875bd0dfd374a752428ae5c3c6574a9acd820853e8958a41f091f85f7bc89ec7a140f90e90e3cdb34f198f8f55cabdfc34eb41bad7506fb6866cf256a8959fd097a0b81e7cdff833e867d76a097ffedde
+01504b010214001400020008000000210201159325ae000000270100000b00000000000000000000000000000000005f72656c732f2e72656c73504b01021400140002000800000021027f624aeb730000007b0000001c00000000000000000000000000
+d70000007468656d652f7468656d652f7468656d654d616e616765722e786d6c504b01021400140002000800000021020a5d705ea60000000c0100002700000000000000000000000000840100007468656d652f7468656d652f5f72656c732f7468656d
+654d616e616765722e786d6c2e72656c73504b01021400140002000800000021026d52debf9f050000fd1b000016000000000000000000000000006f0200007468656d652f7468656d652f7468656d65312e786d6c504b01021400140002000800000021
+02e9278183ee000000100200001300000000000000000000000000420800005b436f6e74656e745f54797065735d2e786d6c504b050600000000050005005d010000610900000000}{\*\colorschememapping 3c3f786d6c2076657273696f6e3d22312e
+302220656e636f64696e673d227574662d38223f3e3c613a636c724d617020786d6c6e733a613d22687474703a2f2f736368656d61732e6f70656e786d6c666f726d6174732e6f72672f64726177696e676d6c2f323030362f6d61696e22206267313d22
+6c743122207478313d22646b3122206267323d226c743222207478323d22646b322220616363656e74313d22616363656e74312220616363656e74323d22616363656e74322220616363656e74333d22616363656e74332220616363656e74343d226163
+63656e74342220616363656e74353d22616363656e74352220616363656e74363d22616363656e74362220686c696e6b3d22686c696e6b2220666f6c486c696e6b3d22666f6c486c696e6b22202f3e}}</Text>
+      <Values>
+        <Value DefaultId="DataItem0"></Value>
+      </Values>
+    </TextBox>
+  </Items>
+  <Groups>
+    <Group ComponentName="dashboardItemGroup1" Name="Group 1" ShowCaption="false">
+      <InteractivityOptions IgnoreMasterFilters="false"></InteractivityOptions>
+    </Group>
+  </Groups>
+  <ColorScheme>
+    <Entry DataSource="dashboardSqlDataSource1" DataMember="ReportingDataCaptureAccuracy" Color="-16777216">
+      <MeasureKey>
+        <Definition DataMember="FileName" SummaryType="CountDistinct"></Definition>
+      </MeasureKey>
+    </Entry>
+  </ColorScheme>
+  <LayoutTree>
+    <LayoutGroup Weight="100">
+      <LayoutGroup Orientation="Vertical" Weight="58.526821457165731">
+        <LayoutGroup DashboardItem="dashboardItemGroup1" Weight="10.387984981226532">
+          <LayoutItem DashboardItem="cardDashboardItem1" Weight="51.02599179206566"></LayoutItem>
+          <LayoutItem DashboardItem="cardDashboardItem2" Weight="48.97400820793434"></LayoutItem>
+        </LayoutGroup>
+        <LayoutGroup Weight="7.2590738423028789">
+          <LayoutItem DashboardItem="textBoxDashboardItem1" Weight="36.114911080711352"></LayoutItem>
+          <LayoutItem DashboardItem="textBoxDashboardItem3" Weight="29.411764705882351"></LayoutItem>
+          <LayoutItem DashboardItem="textBoxDashboardItem2" Weight="34.473324213406293"></LayoutItem>
+        </LayoutGroup>
+        <LayoutItem DashboardItem="gridDashboardItem3" Weight="10.763454317897372"></LayoutItem>
+        <LayoutItem DashboardItem="gridDashboardItem4" Weight="21.526908635794744"></LayoutItem>
+        <LayoutItem DashboardItem="gridDashboardItem1" Weight="50.06257822277847"></LayoutItem>
+      </LayoutGroup>
+      <LayoutGroup Orientation="Vertical" Weight="41.473178542834269">
+        <LayoutItem DashboardItem="gaugeDashboardItem1" Weight="26.408010012515646"></LayoutItem>
+        <LayoutItem DashboardItem="rangeFilterDashboardItem2" Weight="18.397997496871088"></LayoutItem>
+        <LayoutItem DashboardItem="gridDashboardItem2" Weight="55.193992490613269"></LayoutItem>
+      </LayoutGroup>
+    </LayoutGroup>
+  </LayoutTree>
+  <UserData>
+    <ExtractCustomData>
+      <Version>2</Version>
+      <ExtractConfiguredGrids>
+        <Component Name="gridDashboardItem1">
+          <RowQuery>SELECT @_FileID = ID FROM FAMFile WHERE FileName = @FileName</RowQuery>
+          <DataMemberUsedForFileName>FileNameTest</DataMemberUsedForFileName>
+          <DashboardLinks>File Details</DashboardLinks>
+        </Component>
+      </ExtractConfiguredGrids>
+      <CoreLicensed>-1246657755</CoreLicensed>
+    </ExtractCustomData>
+  </UserData>
+</Dashboard>

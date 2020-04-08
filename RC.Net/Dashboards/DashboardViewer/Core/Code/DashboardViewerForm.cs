@@ -6,6 +6,7 @@ using DevExpress.XtraEditors;
 using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Views.Grid;
 using Extract.Dashboard.Utilities;
+using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
@@ -18,6 +19,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace Extract.DashboardViewer
 {
@@ -693,7 +695,7 @@ namespace Extract.DashboardViewer
                 _filteredItems.Clear();
 
                 UpdateMainTitle();
-                _dashboardShared.GridConfigurationsFromXml(CurrentDashboard?.UserData);
+                
                 _toolStripTextBoxlastRefresh.Text = (_usingCachedData) ?
                         _extractedDataFileModifiedTime.ToString(CultureInfo.CurrentCulture)
                         : DateTime.Now.ToString(CultureInfo.CurrentCulture);
@@ -709,7 +711,7 @@ namespace Extract.DashboardViewer
             try
             {
                 base.OnLoad(e);
-
+                
                 if (_inDatabase)
                 {
                     if (!string.IsNullOrEmpty(_dashboardName))
@@ -820,6 +822,17 @@ namespace Extract.DashboardViewer
         {
             DisposeOfDashboardsAndDereferenceTempFiles();
 
+            _dashboardShared.CustomData.AssignDataFromDashboardDefinition(xdoc);
+
+            LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+            bool isLicensed = LicenseUtilities.IsLicensed(LicenseIdName.DashboardViewer);
+            
+            if (!isLicensed && !_dashboardShared.CustomData.CoreLicensed)
+            {
+                ExtractException ee = new ExtractException("ELI49740", "Dashboards are not licensed.");
+                throw ee;
+            }
+
             var dashboard = new DevExpress.DashboardCommon.Dashboard();
             dashboard.LoadFromXDocument(xdoc);
 
@@ -901,7 +914,7 @@ namespace Extract.DashboardViewer
                     return;
                 }
 
-                _dashboardsInDBListBoxControl.DataSource = _dashboardShared.GetDashboardListFromDatabase();
+                _dashboardsInDBListBoxControl.DataSource = _dashboardShared.DashboardListFromDatabase();
             }
             catch (Exception ex)
             {

@@ -837,7 +837,7 @@ namespace Extract.Utilities
         [DllImport("BaseUtils.dll", EntryPoint = "?isInternalToolsLicensed@@YA_NXZ",
             CharSet = CharSet.Ansi, BestFitMapping = false, ThrowOnUnmappableChar = true,
             CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.Bool)]
+        [return: MarshalAs(UnmanagedType.I1)]
         internal static extern bool isInternalToolsLicensed();
 
         /// <summary>

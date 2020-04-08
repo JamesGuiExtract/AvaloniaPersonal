@@ -21,8 +21,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
-using System.Xml.XPath;
 
 namespace Extract.Dashboard.Utilities
 {
@@ -30,12 +28,13 @@ namespace Extract.Dashboard.Utilities
     /// Class used to share code between DashboardCreator and DashboardViewer
     /// </summary>
     /// <typeparam name="T">Type that Implements <see cref="IExtractDashboardCommon"/></typeparam>
-    public class DashboardShared<T> : IDisposable where T : IExtractDashboardCommon
+    public class DashboardShared<T> : IDisposable
+        where T : IExtractDashboardCommon
     {
         #region Constants
 
-        string _BEGIN_GROUP = "BeginGroup";
-        string _EXPORT_TO = "Export To";
+        private string _BEGIN_GROUP = "BeginGroup";
+        private string _EXPORT_TO = "Export To";
 
         #endregion
 
@@ -44,7 +43,7 @@ namespace Extract.Dashboard.Utilities
         /// <summary>
         /// Represents an entry from the FAM DB's FileHandler table
         /// </summary>
-        struct FileHandlerItem
+        private struct FileHandlerItem
         {
             /// <summary>
             /// Gets or sets the name the application should be presented to the user as.
@@ -52,11 +51,7 @@ namespace Extract.Dashboard.Utilities
             /// <value>
             /// The name the application should be presented to the user as.
             /// </value>
-            public string Name
-            {
-                get;
-                set;
-            }
+            public string Name { get; set; }
 
             /// <summary>
             /// Gets or sets the full to the executable to run.
@@ -64,64 +59,44 @@ namespace Extract.Dashboard.Utilities
             /// <value>
             /// The full to the executable to run.
             /// </value>
-            public string ApplicationPath
-            {
-                get;
-                set;
-            }
+            public string ApplicationPath { get; set; }
 
             /// <summary>
-            /// Gets or sets the command-line arguments to use for the application. The
-            /// SourceDocName path tag and path functions are supported.
+            /// Gets or sets the command-line arguments to use for the application. The SourceDocName path tag and path
+            /// functions are supported.
             /// </summary>
             /// <value>
             /// The command-line arguments to use for the application.
             /// </value>
-            public string Arguments
-            {
-                get;
-                set;
-            }
+            public string Arguments { get; set; }
 
             /// <summary>
-            /// Gets or sets a value indicating whether the application item should be available for
-            /// multiple files at once.
+            /// Gets or sets a value indicating whether the application item should be available for multiple files at
+            /// once.
             /// </summary>
-            /// <value><see langword="true"/> if the application item should be available for
-            /// multiple files at once; <see langword="false"/> if the application item should be
-            /// allowed for only one file at a time.
+            /// <value>
+            /// <see langword="true"/> if the application item should be available for multiple files at once; <see
+            /// langword="false"/> if the application item should be allowed for only one file at a time.
             /// </value>
-            public bool AllowMultipleFiles
-            {
-                get;
-                set;
-            }
+            public bool AllowMultipleFiles { get; set; }
 
             /// <summary>
-            /// Gets or sets a value indicating whether the application supports the /ef
-            /// command-line parameter.
+            /// Gets or sets a value indicating whether the application supports the /ef command-line parameter.
             /// </summary>
-            /// <value><see langword="true"/> if the application supports the /ef command-line
-            /// parameter; otherwise, <see langword="false"/>.
+            /// <value>
+            /// <see langword="true"/> if the application supports the /ef command-line parameter; otherwise, <see
+            /// langword="false"/>.
             /// </value>
-            public bool SupportsErrorHandling
-            {
-                get;
-                set;
-            }
+            public bool SupportsErrorHandling { get; set; }
 
             /// <summary>
-            /// Gets or sets a value indicating whether the launched application should block until
-            /// complete.
+            /// Gets or sets a value indicating whether the launched application should block until complete.
             /// </summary>
-            /// <value><see langword="true"/> if application should block until
-            /// complete; <see langword="false"/> if the application run in the background without
-            /// blocking.</value>
-            public bool Blocking
-            {
-                get;
-                set;
-            }
+            /// <value>
+            /// <see langword="true"/> if application should block until complete; <see langword="false"/> if the
+            /// application run in the background without blocking.
+            /// </value>
+            public bool Blocking { get; set; }
 
             /// <summary>
             /// Gets or sets the workflow.
@@ -129,11 +104,7 @@ namespace Extract.Dashboard.Utilities
             /// <value>
             /// The workflow.
             /// </value>
-            public string Workflow
-            {
-                get;
-                set;
-            }
+            public string Workflow { get; set; }
         }
 
         #endregion Structs
@@ -143,48 +114,56 @@ namespace Extract.Dashboard.Utilities
         /// <summary>
         /// The form that implements IExtractDashboardCommon
         /// </summary>
-        T _dashboardForm;
+        private T _dashboardForm;
 
         /// <summary>
-        /// Field to indicate if the Export menu item needs to be put in 
+        /// Field to indicate if the Export menu item needs to be put in
         /// </summary>
-        bool _withExportMenu;
+        private bool _withExportMenu;
 
         /// <summary>
         /// List of menu items to add to the context menu
         /// </summary>
-        Collection<BarItem> _menuItems;
+        private Collection<BarItem> _menuItems;
 
         /// <summary>
         /// Menu that the configured dashboard open items will be placed on
         /// </summary>
-        BarSubItem _dashboardOpenSubMenu;
+        private BarSubItem _dashboardOpenSubMenu;
 
         /// <summary>
         /// Flag indicating that existing <see cref="_menuItems"/> need to be removed and replaced with updated menu 
         /// items
         /// </summary>
-        bool _menuNeedsUpdating;
+        private bool _menuNeedsUpdating;
 
         /// <summary>
-        /// Allows background non-blocking file handler operations to be cancelled before processing
-        /// any additional files.
+        /// Allows background non-blocking file handler operations to be cancelled before processing any additional
+        /// files.
         /// </summary>
-        CancellationTokenSource _fileHandlerCanceler = new CancellationTokenSource();
+        private CancellationTokenSource _fileHandlerCanceler = new CancellationTokenSource();
 
         /// <summary>
         /// Tracks how many file handler operations are currently executing.
         /// </summary>
-        CountdownEvent _fileHandlerCountdownEvent = new CountdownEvent(0);
+        private CountdownEvent _fileHandlerCountdownEvent = new CountdownEvent(0);
 
         #endregion
 
         #region Public Properties
 
         /// <summary>
+        /// Contains the custom data for the dashboard
+        /// </summary>
+        public ExtractCustomData CustomData { get; } = new ExtractCustomData();
+
+        /// <summary>
         /// The key used is the control name
         /// </summary>
-        public Dictionary<string, GridDetailConfiguration> CustomGridValues { get; } = new Dictionary<string, GridDetailConfiguration>();
+        public Dictionary<string, GridDetailConfiguration> CustomGridValues
+        {
+            get { return CustomData.CustomGridValues; }
+        }
 
         /// <summary>
         /// Property for the list of context menu items. Uses <see cref="_menuItems"/> to store the list
@@ -207,11 +186,13 @@ namespace Extract.Dashboard.Utilities
         #region Constructors
 
         /// <summary>
-        /// Constructs <see cref="DashboardShared{T}"/> with the given form with out adding export menu context.
-        /// Should be used by designer control
+        /// Constructs <see cref="DashboardShared{T}"/> with the given form with out adding export menu context. Should
+        /// be used by designer control
         /// </summary>
-        /// <param name="dashboardForm">Form that implements the <see cref="IExtractDashboardCommon"/> interface that 
-        /// either contains a dashboard viewer or dashboard designer</param>
+        /// <param name="dashboardForm">
+        /// Form that implements the <see cref="IExtractDashboardCommon"/> interface that  either contains a dashboard
+        /// viewer or dashboard designer
+        /// </param>
         public DashboardShared(T dashboardForm)
         {
             _dashboardForm = dashboardForm;
@@ -219,11 +200,13 @@ namespace Extract.Dashboard.Utilities
             _dashboardOpenSubMenu = CreateOpenDashboardSubMenu();
         }
 
-        /// <summary> 
+        /// <summary>
         /// Constructs <see cref="DashboardShared{T}"/> with the given form that adds export menu based on parameter
         /// </summary>
-        /// <param name="dashboardForm">Form that implements the <see cref="IExtractDashboardCommon"/> interface that 
-        /// either contains a dashboard viewer or dashboard designer</param>
+        /// <param name="dashboardForm">
+        /// Form that implements the <see cref="IExtractDashboardCommon"/> interface that  either contains a dashboard
+        /// viewer or dashboard designer
+        /// </param>
         /// <param name="withExportMenu">Flag indicating whether or not an export menu should be added to the context menu</param>
         public DashboardShared(T dashboardForm, bool withExportMenu)
         {
@@ -274,7 +257,6 @@ namespace Extract.Dashboard.Utilities
                 }
                 sqlParameters.ServerName = _dashboardForm.ServerName;
                 sqlParameters.DatabaseName = _dashboardForm.DatabaseName;
-
             }
             catch (Exception ex)
             {
@@ -355,7 +337,8 @@ namespace Extract.Dashboard.Utilities
                     _dashboardForm.DrilldownLevelIncreased.TryGetValue(e.DashboardItemName, out drillDownLevelIncreased);
 
                     if (!gridItem.InteractivityOptions.IsDrillDownEnabled ||
-                        drillDownLevelIncreased && (gridItem.GetDimensions().Count - 1 == drillLevel))
+                        drillDownLevelIncreased &&
+                        (gridItem.GetDimensions().Count - 1 == drillLevel))
                     {
                         DisplayDashboardDetailForm(gridItem, e);
                     }
@@ -372,81 +355,40 @@ namespace Extract.Dashboard.Utilities
         #endregion
 
         /// <summary>
-        /// Extracts the GridDetailConfiguration for the configured controls from the xml
-        /// </summary>
-        /// <param name="xml">UserData portion of XML</param>
-        /// <returns>Dictionary with ConfigurationDetailConfigurations for configured components from the XML</returns>
-        public void GridConfigurationsFromXml(XNode xml)
-        {
-            try
-            {
-                CustomGridValues.Clear();
-
-                if (xml is null)
-                {
-                    return;
-                }
-
-                var extractGrids = xml.XPathSelectElements("//ExtractConfiguredGrids/Component");
-
-                foreach (var e in extractGrids)
-                {
-                    var dashboardItem = _dashboardForm.CurrentDashboard.Items.Contains(i => i.ComponentName == e.Attribute("Name").Value);
-                    if (dashboardItem)
-                    {
-                        var gridDetailConfig = new GridDetailConfiguration
-                        {
-                            RowQuery = e.Element("RowQuery").Value,
-                            DataMemberUsedForFileName = e.Element("DataMemberUsedForFileName")?.Value ?? "FileName"
-                        };
-                        var links = e.Element("DashboardLinks")?.Value.Split(',')?
-                                .Where(s => !string.IsNullOrWhiteSpace(s));
-                        if (links != null && links.Count() > 0)
-                        {
-                            gridDetailConfig.DashboardLinks.AddRange(links);
-                        }
-
-                        CustomGridValues[e.Attribute("Name").Value] = gridDetailConfig;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI46968");
-            }
-        }
-
-        /// <summary>
         /// Displays a dialog if there are active custom non blocking file handlers running
         /// </summary>
-        /// <returns>True if the there are no file handlers running or they have been stopped. 
-        /// false if user decides not to close</returns>
+        /// <returns>
+        /// True if the there are no file handlers running or they have been stopped.  false if user decides not to
+        /// close
+        /// </returns>
         public bool RequestDashboardClose()
         {
             if (!_fileHandlerCountdownEvent.Wait(0))
-            {
-                if (DialogResult.OK == MessageBox.Show(
-                    "One or more operations are still running.\r\n\r\n" +
-                    "Stop the operation(s) before the next file is processed " +
-                    "and close the application?",
-                    "Stop operation?", MessageBoxButtons.OKCancel,
-                    MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2, 0))
+                if (DialogResult.OK ==
+                    MessageBox.Show("One or more operations are still running.\r\n\r\n" +
+                        "Stop the operation(s) before the next file is processed " +
+                        "and close the application?",
+                                    "Stop operation?",
+                                    MessageBoxButtons.OKCancel,
+                                    MessageBoxIcon.Warning,
+                                    MessageBoxDefaultButton.Button2,
+                                    0))
                 {
                     _fileHandlerCanceler.Cancel();
                     try
                     {
                         // While waiting for the background process(es) to stop, display a modal
                         // message box.
-                        ShowMessageBoxWhileBlocking("Waiting for operation(s) to stop...", "Dashboard",
-                            () => _fileHandlerCountdownEvent.Wait());
+                        ShowMessageBoxWhileBlocking("Waiting for operation(s) to stop...",
+                                                    "Dashboard",
+                                                    () => _fileHandlerCountdownEvent.Wait());
                     }
-                    catch { }
+                    catch
+                    {
+                    }
                 }
                 else
-                {
                     return false;
-                }
-            }
             return true;
         }
 
@@ -454,7 +396,7 @@ namespace Extract.Dashboard.Utilities
         /// Returns a list of dashboard names from the current database
         /// </summary>
         /// <returns>IList of dashboard names</returns>
-        public IList<string> GetDashboardListFromDatabase()
+        public IList<string> DashboardListFromDatabase()
         {
             try
             {
@@ -477,7 +419,7 @@ namespace Extract.Dashboard.Utilities
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI47220"); ;
+                throw ex.AsExtract("ELI47220");
             }
         }
 
@@ -488,9 +430,10 @@ namespace Extract.Dashboard.Utilities
         #region Menu Creation
 
         /// <summary>
-        /// Creates the <see cref="_menuItems"/> to be displayed in the context menu of a grid if FileName is in the grid
+        /// Creates the <see cref="_menuItems"/> to be displayed in the context menu of a grid if FileName is in the
+        /// grid
         /// </summary>
-        void CreateContextFileMenuActionsList()
+        private void CreateContextFileMenuActionsList()
         {
             // Add the common File Menu actions
             Collection<BarItem> items = new Collection<BarItem>();
@@ -545,7 +488,6 @@ namespace Extract.Dashboard.Utilities
 
             if (_withExportMenu)
             {
-
                 newItem = new BarButtonItem();
                 newItem.Caption = "Export To Excel";
                 newItem.Name = "exportToExcel";
@@ -561,14 +503,14 @@ namespace Extract.Dashboard.Utilities
             AddItemsFromDB(items);
 
             _menuItems = items;
-
         }
 
         /// <summary>
-        /// Creates the menu item that will contain the dashboards that are configured to be opened from the context menu
+        /// Creates the menu item that will contain the dashboards that are configured to be opened from the context
+        /// menu
         /// </summary>
         /// <returns></returns>
-        BarSubItem CreateOpenDashboardSubMenu()
+        private BarSubItem CreateOpenDashboardSubMenu()
         {
             var dashboardSubItems = new BarSubItem();
             dashboardSubItems.Tag = new Dictionary<string, object>
@@ -586,7 +528,7 @@ namespace Extract.Dashboard.Utilities
         /// Adds the configured dashboard menu items to the dashboardSubItems menu used to open dashboard menu links
         /// </summary>
         /// <param name="dashboardLinks"></param>
-        void AddConfiguredDashboardOpenMenus(HashSet<string> dashboardLinks)
+        private void AddConfiguredDashboardOpenMenus(HashSet<string> dashboardLinks)
         {
             try
             {
@@ -627,12 +569,12 @@ namespace Extract.Dashboard.Utilities
         }
 
         /// <summary>
-        /// Returns a list of the dashboards in the <paramref name="dashboardLinks"/> that are not
-        /// currently saved in the database.
+        /// Returns a list of the dashboards in the <paramref name="dashboardLinks"/> that are not currently saved in
+        /// the database.
         /// </summary>
         /// <param name="dashboardLinks">Set of dashboards</param>
         /// <returns>A list of dashboards that are not in the database that were in the <paramref name="dashboardLinks"/></returns>
-        IList<string> GetMissingDashboardsInDatabase(HashSet<string> dashboardLinks)
+        private IList<string> GetMissingDashboardsInDatabase(HashSet<string> dashboardLinks)
         {
             try
             {
@@ -651,14 +593,13 @@ namespace Extract.Dashboard.Utilities
             {
                 throw ex.AsExtract("ELI47190");
             }
-
         }
 
         /// <summary>
         /// Adds menuItems from the current configured Database FileHandler table to the items parameter"/>
         /// </summary>
         /// <param name="items">List of menu items to add the new menus</param>
-        void AddItemsFromDB(Collection<BarItem> items)
+        private void AddItemsFromDB(Collection<BarItem> items)
         {
             try
             {
@@ -732,7 +673,7 @@ namespace Extract.Dashboard.Utilities
 
         #region Handlers for Custom menu items
 
-        void HandleOpenDashboardMenuClick(object sender, ItemClickEventArgs e)
+        private void HandleOpenDashboardMenuClick(object sender, ItemClickEventArgs e)
         {
             try
             {
@@ -744,7 +685,7 @@ namespace Extract.Dashboard.Utilities
             }
         }
 
-        void HandleCustomFileHanderClick(object sender, ItemClickEventArgs e)
+        private void HandleCustomFileHanderClick(object sender, ItemClickEventArgs e)
         {
             try
             {
@@ -825,7 +766,7 @@ namespace Extract.Dashboard.Utilities
             }
         }
 
-        void HandleExportToExcelItemClick(object sender, ItemClickEventArgs e)
+        private void HandleExportToExcelItemClick(object sender, ItemClickEventArgs e)
         {
             try
             {
@@ -848,13 +789,12 @@ namespace Extract.Dashboard.Utilities
             }
             catch (Exception ex)
             {
-
                 ex.ExtractDisplay("ELI46209");
             }
         }
 
 
-        void HandleCopyFileAndDataItemClick(object sender, ItemClickEventArgs e)
+        private void HandleCopyFileAndDataItemClick(object sender, ItemClickEventArgs e)
         {
             try
             {
@@ -868,7 +808,6 @@ namespace Extract.Dashboard.Utilities
                 Clipboard.Clear();
                 if (_dashboardForm.CurrentFilteredFiles.Count() > 0)
                 {
-
                     StringCollection fileCollection = new StringCollection();
                     fileCollection.AddRange(_dashboardForm.CurrentFilteredFiles
                         .SelectMany(fileName => new[] { fileName }
@@ -883,12 +822,11 @@ namespace Extract.Dashboard.Utilities
             }
             catch (Exception ex)
             {
-
                 ex.ExtractDisplay("ELI46203");
             }
         }
 
-        void HandleOpenFileLocationItemClick(object sender, ItemClickEventArgs e)
+        private void HandleOpenFileLocationItemClick(object sender, ItemClickEventArgs e)
         {
             try
             {
@@ -918,9 +856,9 @@ namespace Extract.Dashboard.Utilities
                         }
                         else
                         {
-                            UtilityMethods.ShowMessageBox(
-                                "Neither the file nor its containing directory could be found.",
-                                "File not found.", true);
+                            UtilityMethods.ShowMessageBox("Neither the file nor its containing directory could be found.",
+                                                          "File not found.",
+                                                          true);
                             return;
                         }
                     }
@@ -932,18 +870,15 @@ namespace Extract.Dashboard.Utilities
                         process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
                         process.Start();
                     }
-
-
                 }
             }
             catch (Exception ex)
             {
-
                 ex.ExtractDisplay("ELI46653");
             }
         }
 
-        void HandleCopyFilenameItemClick(object sender, ItemClickEventArgs e)
+        private void HandleCopyFilenameItemClick(object sender, ItemClickEventArgs e)
         {
             try
             {
@@ -962,12 +897,11 @@ namespace Extract.Dashboard.Utilities
             }
             catch (Exception ex)
             {
-
                 ex.ExtractDisplay("ELI46654");
             }
         }
 
-        void HandleCopyFileItemClick(object sender, ItemClickEventArgs e)
+        private void HandleCopyFileItemClick(object sender, ItemClickEventArgs e)
         {
             try
             {
@@ -996,7 +930,7 @@ namespace Extract.Dashboard.Utilities
 
         #region Private Helper functions
 
-        void MakeMenusVisible(IEnumerable<BarItemLink> extractMenuLinks)
+        private void MakeMenusVisible(IEnumerable<BarItemLink> extractMenuLinks)
         {
             int numberOfFiles = _dashboardForm.CurrentFilteredFiles.Count;
             if (numberOfFiles > 0)
@@ -1014,13 +948,14 @@ namespace Extract.Dashboard.Utilities
             {
                 // Find the link for dashboardOpenSubMenu
                 var menuLink = extractMenuLinks
-                    .Where(l => l.Item == _dashboardOpenSubMenu as BarItem).Single();
+                    .Where(l => l.Item == _dashboardOpenSubMenu as BarItem)
+                    .Single();
                 menuLink.Visible = true;
                 SetMenuVisiblity(1, menuLink);
             }
         }
 
-        static void SetMenuVisiblity(int numberOfItems, BarItemLink item)
+        private static void SetMenuVisiblity(int numberOfItems, BarItemLink item)
         {
             var subMenu = item.Item as BarSubItem;
             if (subMenu != null)
@@ -1028,7 +963,8 @@ namespace Extract.Dashboard.Utilities
                 foreach (BarItemLink subItem in subMenu.ItemLinks)
                 {
                     subItem.Item.Manager = subMenu.Manager;
-                    subItem.Item.Enabled = subItem.Item.Tag != null && (SupportsMultipleItems(subItem) || numberOfItems == 1);
+                    subItem.Item.Enabled = subItem.Item.Tag != null &&
+                        (SupportsMultipleItems(subItem) || numberOfItems == 1);
                     subItem.Visible = true;
 
                     if (subItem.Item is BarSubItem)
@@ -1042,7 +978,7 @@ namespace Extract.Dashboard.Utilities
             item.Visible = true;
         }
 
-        void SetupExportMenus(PopupMenu menu, string dashboardItemName)
+        private void SetupExportMenus(PopupMenu menu, string dashboardItemName)
         {
             var exportMenus = menu.ItemLinks.Where(link => link.Caption.Contains(_EXPORT_TO));
             foreach (var link in exportMenus)
@@ -1056,7 +992,7 @@ namespace Extract.Dashboard.Utilities
             }
         }
 
-        IEnumerable<BarItemLink> PreprareExtractMenu(PopupMenu menu, GridDashboardItem grid)
+        private IEnumerable<BarItemLink> PreprareExtractMenu(PopupMenu menu, GridDashboardItem grid)
         {
             // get the extract menu item links
             var extractMenuLinks = menu.ItemLinks.Where(link => IsExtractMenuItem(link));
@@ -1106,12 +1042,12 @@ namespace Extract.Dashboard.Utilities
         }
 
         /// <summary>
-        /// Display the DashboardDetailForm 
+        /// Display the DashboardDetailForm
         /// </summary>
         /// <param name="gridItem">Grid item that needs to display the detail</param>
         /// <param name="e">Event args</param>
         /// <param name="configuration">The configuration to pass to the DashboardDetailForm</param>
-        void DisplayDashboardDetailForm(GridDashboardItem gridItem, DashboardItemMouseActionEventArgs e)
+        private void DisplayDashboardDetailForm(GridDashboardItem gridItem, DashboardItemMouseActionEventArgs e)
         {
             try
             {
@@ -1160,12 +1096,12 @@ namespace Extract.Dashboard.Utilities
         }
 
         /// <summary>
-        /// Test if <see cref="BarItemLink"/> argument is an Extract menu items by checking for Item.Tag being a 
-        /// <see cref="Dictionary{String, Object}"/> type
+        /// Test if <see cref="BarItemLink"/> argument is an Extract menu items by checking for Item.Tag being a  <see
+        /// cref="Dictionary{String, Object}"/> type
         /// </summary>
         /// <param name="link">The <see cref="BarItemLink"/> to check</param>
         /// <returns>If it is a Extract menu item return true else return false</returns>
-        static bool IsExtractMenuItem(BarItemLink link)
+        private static bool IsExtractMenuItem(BarItemLink link)
         {
             Dictionary<string, object> itemMenuData = link.Item.Tag as Dictionary<string, object>;
             if (itemMenuData is null)
@@ -1180,7 +1116,7 @@ namespace Extract.Dashboard.Utilities
         /// </summary>
         /// <param name="link">The <see cref="BarItemLink"/> to check</param>
         /// <returns>returns true if it is not Extract menu object or it supports multiple items otherwise returns false</returns>
-        static bool SupportsMultipleItems(BarItemLink link)
+        private static bool SupportsMultipleItems(BarItemLink link)
         {
             Dictionary<string, object> itemMenuData = link.Item.Tag as Dictionary<string, object>;
             if (itemMenuData is null)
@@ -1200,7 +1136,7 @@ namespace Extract.Dashboard.Utilities
         /// Removes the menuItemLinks in the menu parameter that are in the _menuItems list
         /// </summary>
         /// <param name="menu">Menu to remove the menu item links</param>
-        void RemoveCustomContextMenus(PopupMenu menu)
+        private void RemoveCustomContextMenus(PopupMenu menu)
         {
             try
             {
@@ -1228,7 +1164,7 @@ namespace Extract.Dashboard.Utilities
         /// Returns a connection to the configured database
         /// </summary>
         /// <returns>SqlConnection that connects to the Server and Database from the form</returns>
-        SqlConnection NewSqlDBConnection()
+        private SqlConnection NewSqlDBConnection()
         {
             // Build the connection string from the settings
             SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
@@ -1242,12 +1178,12 @@ namespace Extract.Dashboard.Utilities
 
 
         /// <summary>
-        /// Shows a modal, non-closeable message box with the specified <see param="messageText"/>
-        /// while the specified <see param="action"/> runs on a background thread.
+        /// Shows a modal, non-closeable message box with the specified <see param="messageText"/> while the specified
+        /// <see param="action"/> runs on a background thread.
         /// </summary>
         /// <param name="messageText">The message to be displayed.</param>
         /// <param name="action">The action to run on a background thread.</param>
-        void ShowMessageBoxWhileBlocking(string messageText, string caption, Action action)
+        private void ShowMessageBoxWhileBlocking(string messageText, string caption, Action action)
         {
             var messageBox = new CustomizableMessageBox();
             messageBox.UseDefaultOkButton = false;
@@ -1285,16 +1221,20 @@ namespace Extract.Dashboard.Utilities
 
 
         /// <summary>
-        /// Launches the specified <see paramref="fileNames"/> in the application defined by
-        /// <see paramref="fileHanderItem"/>.
+        /// Launches the specified <see paramref="fileNames"/> in the application defined by <see
+        /// paramref="fileHanderItem"/>.
         /// </summary>
-        /// <param name="fileHanderItem">The <see cref="FileHandlerItem"/> defining the application to
-        /// be run.</param>
+        /// <param name="fileHanderItem">
+        /// The <see cref="FileHandlerItem"/> defining the application to be run.
+        /// </param>
         /// <param name="fileNames">The files to be run in <see paramref="appLaunchItem"/></param>
-        /// <param name="cancelToken">A <see cref="CancellationToken"/> the that should be checked
-        /// before each file to see if the operation has been canceled.</param>
-        void RunApplication(FileHandlerItem fileHanderItem, IEnumerable<string> fileNames,
-            CancellationToken cancelToken)
+        /// <param name="cancelToken">
+        /// A <see cref="CancellationToken"/> the that should be checked before each file to see if the operation has
+        /// been canceled.
+        /// </param>
+        private void RunApplication(FileHandlerItem fileHanderItem,
+                                    IEnumerable<string> fileNames,
+                                    CancellationToken cancelToken)
         {
             try
             {
@@ -1385,12 +1325,12 @@ namespace Extract.Dashboard.Utilities
         }
 
         /// <summary>
-        /// Gets the currently selected files using the configured <see cref="GridDetailConfiguration.DataMemberUsedForFileName"/>
-        /// as the column containing the filenames
+        /// Gets the currently selected files using the configured <see
+        /// cref="GridDetailConfiguration.DataMemberUsedForFileName"/> as the column containing the filenames
         /// </summary>
         /// <param name="gridName">The ComponentName of the grid to get the selected files</param>
         /// <returns><see cref="IEnumerable{String}"/> that containsthe selected files</returns>
-        IEnumerable<string> GetSelectedFiles(string gridName)
+        private IEnumerable<string> GetSelectedFiles(string gridName)
         {
             string dataMember = "FileName";
 
@@ -1400,16 +1340,17 @@ namespace Extract.Dashboard.Utilities
                 dataMember = configuration.DataMemberUsedForFileName;
             }
             return GetSelectedRowsDimensions(gridName)
-                .Where(row => row.ContainsKey(dataMember))
-                .Select(row => row[dataMember].ToString());
+                   .Where(row => row.ContainsKey(dataMember))
+                   .Select(row => row[dataMember].ToString());
         }
 
         /// <summary>
         /// Get Selected rows as IEnumerable of dictionaries that has all the dimensions and values for those dimensions
+        ///
         /// </summary>
         /// <param name="gridName">The ComponentName of the grid to get the selected files</param>
         /// <returns></returns>
-        IEnumerable<Dictionary<string, object>> GetSelectedRowsDimensions(string gridName)
+        private IEnumerable<Dictionary<string, object>> GetSelectedRowsDimensions(string gridName)
         {
             var axisPointTuples = _dashboardForm.GetCurrentFilterValues(gridName);
 
@@ -1441,7 +1382,6 @@ namespace Extract.Dashboard.Utilities
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
         #endregion
     }
 }
