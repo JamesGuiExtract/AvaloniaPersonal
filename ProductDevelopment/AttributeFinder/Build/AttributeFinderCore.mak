@@ -242,6 +242,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.DataEntry.LabDE.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.DataEntry.LabDE.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Utilities.ContextTags.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Utilities.ContextTags.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\ResolutionNormalizer.exe" /mapout:"$(BinariesFolder)\Map\mapResolutionNormalizer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\ResolutionNormalizer2.exe" /mapout:"$(BinariesFolder)\Map\mapResolutionNormalizer2.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\LearningMachineEditor.exe" /mapout:"$(BinariesFolder)\Map\mapLearningMachineEditor.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	editbin.exe /largeaddressaware "$(BinariesFolder)\Obfuscated\LearningMachineEditor.exe"
 	sn -Ra "$(BinariesFolder)\Obfuscated\LearningMachineEditor.exe" "$(StrongNameKeyDir)\ExtractInternalKey.snk"
@@ -343,6 +344,7 @@ CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
 	@COPY /v  "$(BinariesFolder)\Obfuscated\PrintDocument.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\SpecialImageFormatConverter.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\ResolutionNormalizer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /v  "$(BinariesFolder)\Obfuscated\ResolutionNormalizer2.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\DashboardViewer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V  "$(BinariesFolder)\Obfuscated\DashboardCreator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\NERAnnotator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
