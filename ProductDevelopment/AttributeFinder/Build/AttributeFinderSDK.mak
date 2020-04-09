@@ -37,7 +37,7 @@ DotNetFiles=P:\AttributeFinder\CoreInstallation\Files\DotNetGAC
 
 MergeModuleRootDir=$(INSTALLSHIELD_PROJECTS_DIR)\MergeModules
 
-ExtractSoftwareInstallRootDir=$(AFRootDirectory)\ExtractInstaller
+ExtractSoftwareInstallRootDir=$(PDRootDir)\ExtractInstaller
 ExtractSoftwareInstallMediaDir=$(ExtractSoftwareInstallRootDir)\Media\CD-ROM\DiskImages\DISK1
 
 FlexIndexSDKInstallRootDir=$(PDRootDir)\AttributeFinder\Installation\UCLID FlexIndex SDK
