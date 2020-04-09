@@ -45,7 +45,9 @@ namespace Extract.AttributeFinder.Rules.Json
             try
             {
                 var (json, dto) = RuleObjectJsonSerializer.Serialize<RuleSet, Dto.RuleSet>(pRuleSet);
-                File.WriteAllText(bstrFileName, json);
+                var fullPath = Path.GetFullPath(bstrFileName);
+                Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+                File.WriteAllText(fullPath, json);
 
                 if (bUpdateUnmodified)
                 {
