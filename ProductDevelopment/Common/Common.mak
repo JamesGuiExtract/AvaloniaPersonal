@@ -68,7 +68,7 @@ BleedingEdgeVersionUNCDir=$(NAS_BUILD_BASE)\FlexIndex\Internal\BleedingEdge\$(Fl
 #Extract Platform installer install paths
 ExtractSoftware=$(BleedingEdgeVersionDir)
 ExtractSoftwareMKLink=$(BleedingEdgeVersionUNCDir)
-ExtractSoftwareInstallFiles=$(FLEXIndexSetupFiles)\Install
+ExtractSoftwareInstallFiles=$(ExtractSoftware)\Install
 FLEXIndexDemo=$(ExtractSoftware)\Demo_FlexIndex
 IDShieldDemo=$(ExtractSoftware)\Demo_IDShield
 LabDEDemo=$(ExtractSoftware)\Demo_LabDE
