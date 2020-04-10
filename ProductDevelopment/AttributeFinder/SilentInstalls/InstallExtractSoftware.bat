@@ -59,11 +59,11 @@ CALL SET SOFTWARE_INSTALL_ROOT=%SOFTWARE_INSTALL_ROOT:SilentInstalls=Install%
 
 
 IF "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
-	set SOFTWARE_INSTALL_ISS="%~dp0ExtractSoftwareInstall64.iss"
+	set SOFTWARE_INSTALL_ISS="%~dp0ExtractSoftware.iss"
 	set EXTRACT_COMMON=C:\Program Files (x86^)\Extract Systems\CommonComponents
 	set SOFTWARE_INSTALL_KEY="HKEY_LOCAL_MACHINE\SOFTWARE\wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\{A7DFE34D-A07E-4D57-A624-B758E42A69D4}"
 ) ELSE (
-	set SOFTWARE_INSTALL_ISS="%~dp0ExtractSoftwareInstall.iss"
+	set SOFTWARE_INSTALL_ISS="%~dp0ExtractSoftware.iss"
 	set EXTRACT_COMMON=C:\Program Files\Extract Systems\CommonComponents
 	set SOFTWARE_INSTALL_KEY="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{A7DFE34D-A07E-4D57-A624-B758E42A69D4}"
 )
@@ -91,7 +91,7 @@ GOTO END
 :: Handle common error tasks
 :ERROR
 :: Check if the .net framework prerequisite was installed
-SET %NET_RELEASE%=
+SET NET_RELEASE=
 FOR /f "tokens=3" %%a in ('REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" /v Release ^|findstr /ri "REG_DWORD"') do set NET_RELEASE=%%a
 IF %NET_RELEASE% LSS 528040 (
     @ECHO The .NET Framework 4.8 Prerequisite was not installed. Install manually before running the install again.
