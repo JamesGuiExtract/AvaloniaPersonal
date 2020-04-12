@@ -156,8 +156,8 @@ CreateLabDEInstallFilesAndDemo:
 	
 CopySilentInstallsDir:
 	@ECHO Copying SilentInstalls folder
-	@IF NOT EXIST "$(ExtractSoftware)\SilentInstalls" MKDIR "$(ExtractSoftware)\SilentInstalls"
-	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.*" "$(ExtractSoftware)\SilentInstalls"
+	@IF NOT EXIST "$(ExtractSoftwareInstallFiles)\SilentInstalls" MKDIR "$(ExtractSoftwareInstallFiles)\SilentInstalls"
+	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.*" "$(ExtractSoftwareInstallFiles)\SilentInstalls"
 	
 UpdateLicenseFiles:
 	@IF "$(Branch)"=="master" (
@@ -186,7 +186,7 @@ CopyFilesToInternalUse:
 	@COPY  "$(BinariesFolder)\*.dll" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	@COPY  "$(BinariesFolder)\*.xml" "$(InternalUseBuildFilesArchive)\OriginalFiles"
 	
-CreateInstalls: BuildExtractSoftware CreateExtractSoftwareInstallCD CopySilentInstallsDir CopyFilesToInternalUse
+CreateInstalls: BuildExtractSoftware  CopySilentInstallsDir CopyFilesToInternalUse
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall
 
