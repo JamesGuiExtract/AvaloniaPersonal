@@ -96,7 +96,7 @@ FOR /f "tokens=3" %%a in ('REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET 
 IF %NET_RELEASE% LSS 528040 (
     @ECHO The .NET Framework 4.8 Prerequisite was not installed. Install manually before running the install again.
 )
-SET %NET_RELEASE%=
+SET NET_RELEASE=
 
 :END
 @ECHO.
