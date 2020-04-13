@@ -7,7 +7,7 @@ namespace DatabaseMigrationWizard.Database.Output
 {
     public class SerializeLabDEProvider : ISerialize
     {
-        public void SerializeTable(DbConnection dbConnection, TextWriter writer)
+        public void SerializeTable(DbConnection dbConnection, StreamWriter writer)
         {
             new ExportHelper().WriteTableInBatches(GetBatchSQL(), writer, dbConnection, "SELECT COUNT(*) AS COUNT FROM [dbo].[LabDEProvider]");
         }
@@ -31,7 +31,6 @@ namespace DatabaseMigrationWizard.Database.Output
                         , [OtherProviderID]
                         , [Inactive]
                         , [MFNMessage]
-                        , [Guid]
                     FROM 
 	                    [dbo].[LabDEProvider]
                     ORDER BY
@@ -48,8 +47,7 @@ namespace DatabaseMigrationWizard.Database.Output
                         , [Fax]
                         , [Address]
                         , [OtherProviderID]
-                        , [Inactive]
-                        , [Guid]";
+                        , [Inactive]";
         }
     }
 }

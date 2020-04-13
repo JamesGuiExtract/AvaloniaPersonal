@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using static System.FormattableString;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace DatabaseMigrationWizard.Database.Input.DataTransformObject
 {
@@ -11,43 +8,22 @@ namespace DatabaseMigrationWizard.Database.Input.DataTransformObject
         public string ASCName { get; set; }
 
         public string Description { get; set; }
+        
+        public int? WorkflowID { get; set; }
 
         public bool? MainSequence { get; set; }
 
-        public Guid ActionGuid { get; set; }
-
-        public Guid? WorkflowGuid { get; set; }
-
-        public override bool Equals(object obj)
-        {
-            return obj is Action action &&
-                   ASCName == action.ASCName &&
-                   Description == action.Description &&
-                   MainSequence == action.MainSequence &&
-                   ActionGuid.Equals(action.ActionGuid) &&
-                   EqualityComparer<Guid?>.Default.Equals(WorkflowGuid, action.WorkflowGuid);
-        }
-
-        public override int GetHashCode()
-        {
-            var hashCode = 197701942;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ASCName);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Description);
-            hashCode = hashCode * -1521134295 + MainSequence.GetHashCode();
-            hashCode = hashCode * -1521134295 + ActionGuid.GetHashCode();
-            hashCode = hashCode * -1521134295 + WorkflowGuid.GetHashCode();
-            return hashCode;
-        }
+        public string Name { get; set; }
 
         public override string ToString()
         {
-            return Invariant($@"(
+            return $@"(
                 '{ASCName}'
                 , {(Description == null ? "NULL" : "'" + Description + "'")}
+                , {(WorkflowID == null ? "NULL" : WorkflowID.ToString())}
                 , {(MainSequence == null ? "NULL" : (MainSequence == true ? "1" : "0" ))}
-                , '{ActionGuid}'
-                , {(WorkflowGuid == null ? "NULL" : "'" + WorkflowGuid + "'")}
-                )");
+                , {(Name == null ? "NULL" : "'" + Name + "'")}
+                )";
         }
     }
 }

@@ -10,10 +10,13 @@ using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DatabaseMigrationWizard.Database.Output
 {
-    public class ExportHelper
+    class ExportHelper
     {
         /// <summary>
         /// The number of records to buffer before writing. The smaller this number, the slower the speed of
@@ -29,7 +32,7 @@ namespace DatabaseMigrationWizard.Database.Output
         /// <param name="sql">The sql to get the data from the table</param>
         /// <param name="writer">The streamwriter to write the file to</param>
         /// <param name="dbConnection">The database to obtain the data from</param>
-        public static void WriteTableInBulk(string sql, TextWriter writer, DbConnection dbConnection)
+        public static void WriteTableInBulk(string sql, StreamWriter writer, DbConnection dbConnection)
         {
             try
             {
@@ -59,19 +62,19 @@ namespace DatabaseMigrationWizard.Database.Output
         /// Note: This takes advantage of optimistic order for tables. If you are adding data to tables as this
         /// is running, it is possible you will be missing data after this finishes.
         /// </summary>
-        /// <param name="orderBySql">A sql statement with an order by</param>
+        /// <param name="orderBySQL">A sql statement with an order by</param>
         /// <param name="writer">The streamwriter to write the file to</param>
         /// <param name="dbConnection">The database to obtain the data from</param>
-        /// <param name="rowCountSql">Select the number of rows in the table, must label the count as "COUNT". See a calling example.</param>
-        public void WriteTableInBatches(string orderBySql, TextWriter writer, DbConnection dbConnection, string rowCountSql )
+        /// <param name="rowCountSQL">Select the number of rows in the table, must label the count as "COUNT". See a calling example.</param>
+        public void WriteTableInBatches(string orderBySQL, StreamWriter writer, DbConnection dbConnection, string rowCountSQL )
         {
             try
             {
-                int tableRowCount = int.Parse(DBMethods.ExecuteDBQuery(dbConnection, rowCountSql).Rows[0]["COUNT"].ToString(), CultureInfo.InvariantCulture);
+                int tableRowCount = int.Parse(DBMethods.ExecuteDBQuery(dbConnection, rowCountSQL).Rows[0]["COUNT"].ToString(), CultureInfo.InvariantCulture);
 
                 for (int i = 0; i < tableRowCount; i += batchSize)
                 {
-                    string sql = orderBySql + $@" OFFSET {i.ToString(CultureInfo.InvariantCulture)} ROWS FETCH NEXT {batchSize.ToString(CultureInfo.InvariantCulture)} ROWS ONLY";
+                    string sql = orderBySQL + $@" OFFSET {i.ToString(CultureInfo.InvariantCulture)} ROWS FETCH NEXT {batchSize.ToString(CultureInfo.InvariantCulture)} ROWS ONLY";
                     try
                     {
                         var dataTable = DBMethods.ExecuteDBQuery(dbConnection, sql);
@@ -93,7 +96,7 @@ namespace DatabaseMigrationWizard.Database.Output
             }
         }
 
-        public static void Export(ExportOptions exportOptions, IProgress<string> progress)
+        public static void BeginExport(ExportOptions exportOptions, IProgress<string> progress)
         {
             try
             {

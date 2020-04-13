@@ -24,7 +24,7 @@ namespace DatabaseMigrationWizard.Database.Input
 
         string TableName { get; }
 
-        void ExecuteSequence(ImportOptions importOptions);
+        void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions);
     }
 
 }

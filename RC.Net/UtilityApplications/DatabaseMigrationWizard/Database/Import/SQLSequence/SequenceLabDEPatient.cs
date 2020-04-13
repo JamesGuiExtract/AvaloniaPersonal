@@ -19,29 +19,11 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										[Gender] [nchar](1) NULL,
 										[MergedInto] [nvarchar](20) NULL,
 										[CurrentMRN] [nvarchar](20) NOT NULL,
-                                        [Guid] uniqueidentifier NOT NULL,
 										)";
 
         private readonly string insertSQL = @"
                                     ALTER TABLE dbo.LabDEPatient NOCHECK CONSTRAINT ALL;
-									UPDATE
-										dbo.LabDEPatient
-									SET
-										FirstName = UpdatingLabDEPatient.FirstName
-										, MiddleName = UpdatingLabDEPatient.MiddleName
-										, LastName = UpdatingLabDEPatient.LastName
-										, Suffix = UpdatingLabDEPatient.Suffix
-										, DOB = UpdatingLabDEPatient.DOB
-										, Gender = UpdatingLabDEPatient.Gender
-										, MergedInto = UpdatingLabDEPatient.MergedInto
-										, CurrentMRN = UpdatingLabDEPatient.CurrentMRN
-										, MRN = UpdatingLabDEPatient.MRN
-									FROM
-										##LabDEPatient AS UpdatingLabDEPatient
-									WHERE
-										LabDEPatient.Guid = UpdatingLabDEPatient.Guid
-									;
-									INSERT INTO dbo.LabDEPatient(MRN, FirstName, MiddleName, LastName, Suffix, DOB, Gender, MergedInto, CurrentMRN, Guid)
+									INSERT INTO dbo.LabDEPatient(MRN, FirstName, MiddleName, LastName, Suffix, DOB, Gender, MergedInto, CurrentMRN)
 
 									SELECT
 										MRN
@@ -53,17 +35,32 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										, Gender
 										, MergedInto
 										, CurrentMRN
-										, Guid
 									FROM 
 										##LabDEPatient
 									WHERE
-										Guid NOT IN (SELECT Guid FROM dbo.LabDEPatient)
+										MRN NOT IN (SELECT MRN FROM dbo.LabDEPatient)
 									;
+									UPDATE
+										dbo.LabDEPatient
+									SET
+										FirstName = UpdatingLabDEPatient.FirstName
+										, MiddleName = UpdatingLabDEPatient.MiddleName
+										, LastName = UpdatingLabDEPatient.LastName
+										, Suffix = UpdatingLabDEPatient.Suffix
+										, DOB = UpdatingLabDEPatient.DOB
+										, Gender = UpdatingLabDEPatient.Gender
+										, MergedInto = UpdatingLabDEPatient.MergedInto
+										, CurrentMRN = UpdatingLabDEPatient.CurrentMRN
 
+									FROM
+										##LabDEPatient AS UpdatingLabDEPatient
+									WHERE
+										LabDEPatient.MRN = UpdatingLabDEPatient.MRN
+									;
 									ALTER TABLE dbo.LabDEPatient WITH CHECK CHECK CONSTRAINT ALL;";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##LabDEPatient (MRN, FirstName, MiddleName, LastName, Suffix, DOB, Gender, MergedInto, CurrentMRN, Guid)
+                                            INSERT INTO ##LabDEPatient (MRN, FirstName, MiddleName, LastName, Suffix, DOB, Gender, MergedInto, CurrentMRN)
                                             VALUES
                                             ";
 
@@ -71,13 +68,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
 		public string TableName => "LabDEPatient";
 
-		public void ExecuteSequence(ImportOptions importOptions)
+		public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
         {
-			importOptions.ExecuteCommand(this.CreateTempTableSQL);
-
-			ImportHelper.PopulateTemporaryTable<LabDEPatient>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
-
-			importOptions.ExecuteCommand(this.insertSQL);
-		}
+            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
+			
+            ImportHelper.PopulateTemporaryTable<LabDEPatient>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
+			
+            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
+        }
     }
 }

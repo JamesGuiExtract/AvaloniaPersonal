@@ -7,7 +7,7 @@ namespace DatabaseMigrationWizard.Database.Output
 {
     public class SerializeLabDEOrder : ISerialize
     {
-        public void SerializeTable(DbConnection dbConnection, TextWriter writer)
+        public void SerializeTable(DbConnection dbConnection, StreamWriter writer)
         {
             new ExportHelper().WriteTableInBatches(GetBatchSQL(), writer, dbConnection, "SELECT COUNT(*) AS COUNT FROM dbo.LabDEOrder");
         }
@@ -26,7 +26,6 @@ namespace DatabaseMigrationWizard.Database.Output
                     , [ORMMessage]
                     , [EncounterID]
                     , [AccessionNumber]
-                    , [Guid]
                 FROM 
 	                [dbo].[LabDEOrder]
                 ORDER BY
@@ -37,8 +36,7 @@ namespace DatabaseMigrationWizard.Database.Output
                      , [OrderStatus]
                      , [ReferenceDateTime]
                      , [EncounterID]
-                     , [AccessionNumber]
-                     , [Guid]";
+                     , [AccessionNumber]";
         }
     }
 }

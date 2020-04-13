@@ -12,34 +12,48 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                         CREATE TABLE [dbo].[##FAMUser](
 	                                    [UserName] [nvarchar](50) NULL,
 	                                    [FullUserName] [nvarchar](128) NULL,
-                                        [Guid] uniqueidentifier NOT NULL,
                                         )";
 
         private readonly string insertSQL = @"
-                                    UPDATE
-	                                    dbo.FAMUser
-                                    SET
-	                                    FullUserName = UpdatingFAMUser.FullUserName
-	                                    , UserName = UpdatingFAMUser.UserName
-                                    FROM
-	                                    ##FAMUser AS UpdatingFAMUser
-                                    WHERE
-	                                    UpdatingFAMUser.Guid = dbo.FAMUser.Guid
-                                    ;
-                                    INSERT INTO dbo.FAMUser(UserName, FullUserName, Guid)
+                                    INSERT INTO dbo.FAMUser(UserName, FullUserName)
 
                                     SELECT
 	                                    UserName
 	                                    , FullUserName
-	                                    , Guid
                                     FROM 
 	                                    ##FAMUser AS UpdatingFAMUser
                                     WHERE
-	                                    UpdatingFAMUser.Guid NOT IN (SELECT Guid FROM dbo.FAMUser)
+	                                    NOT EXISTS
+	                                    (
+	                                    SELECT
+		                                    *
+	                                    FROM
+		                                    dbo.FAMUser
+	                                    WHERE
+		                                    (
+			                                    dbo.FAMUser.FullUserName = UpdatingFAMUser.FullUserName
+			                                    OR
+			                                    (
+				                                    dbo.FAMUser.FullUserName IS NULL
+				                                    AND
+				                                    UpdatingFAMUser.FullUserName IS NULL
+			                                    )
+		                                    )
+		                                    AND
+		                                    (
+			                                    dbo.FAMUser.UserName = UpdatingFAMUser.UserName
+			                                    OR
+			                                    (
+				                                    dbo.FAMUser.UserName IS NULL
+				                                    AND
+				                                    UpdatingFAMUser.UserName IS NULL
+			                                    )
+		                                    )
+	                                    )
                                     ";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##FAMUser (UserName, FullUserName, Guid)
+                                            INSERT INTO ##FAMUser (UserName, FullUserName)
                                             VALUES
                                             ";
 
@@ -47,13 +61,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
 		public string TableName => "FAMUser";
 
-		public void ExecuteSequence(ImportOptions importOptions)
+		public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
         {
-            importOptions.ExecuteCommand(this.CreateTempTableSQL);
+            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
 
-            ImportHelper.PopulateTemporaryTable<FAMUser>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+            ImportHelper.PopulateTemporaryTable<FAMUser>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
 
-            importOptions.ExecuteCommand(this.insertSQL);
+            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
         }
     }
 }

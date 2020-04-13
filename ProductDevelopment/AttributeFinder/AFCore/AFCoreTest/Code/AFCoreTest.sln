@@ -1261,8 +1261,6 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Extract.AttributeFinder.Rul
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseMigrationWizard.Test", "..\..\..\..\..\RC.Net\UtilityApplications\DatabaseMigrationWizard\Testing\Automated\DatabaseMigrationWizard.Test.csproj", "{0000EB5C-0000-0000-0000-000000000000}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -6306,36 +6304,6 @@ Global
 		{865F2EA2-32AA-4E5C-8C0B-6BCC343741F2}.Template|x64.Build.0 = Release|Any CPU
 		{865F2EA2-32AA-4E5C-8C0B-6BCC343741F2}.Template|x86.ActiveCfg = Release|Any CPU
 		{865F2EA2-32AA-4E5C-8C0B-6BCC343741F2}.Template|x86.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|Win32.Build.0 = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|x64.Build.0 = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Debug|x86.Build.0 = Debug|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|Win32.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|Win32.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|x64.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|x64.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|x86.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Release|x86.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|Any CPU.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|Any CPU.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|Mixed Platforms.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|Win32.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|Win32.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|x64.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|x64.Build.0 = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|x86.ActiveCfg = Release|Any CPU
-		{0000EB5C-0000-0000-0000-000000000000}.Template|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

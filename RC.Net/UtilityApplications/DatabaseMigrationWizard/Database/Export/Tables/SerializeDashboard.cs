@@ -14,14 +14,14 @@ namespace DatabaseMigrationWizard.Database.Output
 	                            , Dashboard.LastImportedDate
 	                            , Dashboard.UseExtractedData
 	                            , Dashboard.ExtractedDataDefinition
-                                , Dashboard.GUID AS DashboardGuid
-	                            , FAMUser.GUID AS FAMUserGuid
+	                            , FAMUser.FullUserName
+	                            , FAMUser.UserName
                             FROM 
 	                            [dbo].[Dashboard]
 		                            LEFT OUTER JOIN dbo.FAMUser
 			                            ON dbo.FAMUser.ID = dbo.Dashboard.FAMUserID";
 
-        public void SerializeTable(DbConnection dbConnection, TextWriter writer)
+        public void SerializeTable(DbConnection dbConnection, StreamWriter writer)
         {
             ExportHelper.WriteTableInBulk(this.sql, writer, dbConnection);
         }

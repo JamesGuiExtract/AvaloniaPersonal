@@ -13,34 +13,21 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                         CREATE TABLE [dbo].[##Login](
 	                                    [UserName] [nvarchar](50) NOT NULL,
 	                                    [Password] [nvarchar](128) NOT NULL,
-                                        [Guid] uniqueidentifier NOT NULL,
 	                                    )";
 
         private readonly string insertSQL = @"
-                                    UPDATE
-	                                    dbo.Login
-                                    SET
-	                                    UserName = UpdatingLogin.UserName
-                                    FROM
-	                                    ##Login AS UpdatingLogin
-                                    WHERE
-	                                    dbo.Login.Guid = UpdatingLogin.Guid
-                                    ;
-                                    INSERT INTO dbo.Login(UserName, Password, Guid)
+                                    INSERT INTO dbo.Login(UserName, Password)
 
                                     SELECT
 	                                    UserName
 	                                    , Password
-	                                    , Guid
                                     FROM 
-	                                    ##Login AS UpdatingLogin
+	                                    ##Login
                                     WHERE
-	                                    UpdatingLogin.Guid NOT IN (SELECT Guid FROM dbo.Login)
-                                        AND
-                                        UserName <> 'admin'";
+	                                    UserName NOT IN (SELECT UserName FROM dbo.Login)";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##Login (UserName, Password, Guid)
+                                            INSERT INTO ##Login (UserName, Password)
                                             VALUES
                                             ";
 
@@ -48,13 +35,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
         public string TableName => "Login";
 
-        public void ExecuteSequence(ImportOptions importOptions)
+        public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
         {
-            importOptions.ExecuteCommand(this.CreateTempTableSQL);
+            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
 
-            ImportHelper.PopulateTemporaryTable<Login>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+            ImportHelper.PopulateTemporaryTable<Login>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
 
-            importOptions.ExecuteCommand(this.insertSQL);
+            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
         }
     }
 }

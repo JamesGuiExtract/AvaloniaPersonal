@@ -5,18 +5,18 @@ using System.IO;
 
 namespace DatabaseMigrationWizard.Database.Output
 {
-    public class SerializeFileHandler : ISerialize
+    public class SerializeDataEntryCounterType : ISerialize
     {
         private readonly string sql =
                             @"
-                            SELECT
+                            SELECT  
 	                            *
                             FROM 
-	                            [dbo].FileHandler";
+	                            [dbo].[DataEntryCounterType]";
 
         public void SerializeTable(DbConnection dbConnection, StreamWriter writer)
         {
-            ExportHelper.WriteTableInBulk(this.sql, writer, dbConnection);
+            //ExportHelper.WriteTableInBulk(this.sql, writer, dbConnection);
         }
     }
 }

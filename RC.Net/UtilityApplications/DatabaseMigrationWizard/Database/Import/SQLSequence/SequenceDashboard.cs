@@ -15,28 +15,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										[LastImportedDate] [datetime] NOT NULL,
 										[UseExtractedData] [bit] NULL,
 										[ExtractedDataDefinition] [xml] NULL,
-                                        [DashboardGuid] uniqueidentifier NOT NULL,
-                                        [FAMUserGuid] uniqueidentifier NOT NULL,
+										[UserName] NVARCHAR(MAX) NULL,
+										[FullUserName] NVARCHAR(MAX) NULL
 										)";
 
         private readonly string insertSQL = @"
-                                    UPDATE
-										dbo.Dashboard
-									SET
-										DashboardName = UpdatingDashboard.DashboardName
-										, Definition = UpdatingDashboard.Definition
-										, ExtractedDataDefinition = UpdatingDashboard.ExtractedDataDefinition
-										, FAMUserID = dbo.FAMUser.ID
-										, LastImportedDate = UpdatingDashboard.LastImportedDate
-										, UseExtractedData = UpdatingDashboard.UseExtractedData
-									FROM
-										##Dashboard AS UpdatingDashboard
-													LEFT OUTER JOIN dbo.FAMUser
-														ON dbo.FAMUser.Guid = UpdatingDashboard.FAMUserGuid
-									WHERE
-										dbo.Dashboard.Guid = UpdatingDashboard.DashboardGuid
-									;
-									INSERT INTO dbo.Dashboard(DashboardName, Definition, FAMUserID, LastImportedDate, UseExtractedData, ExtractedDataDefinition, Guid)
+                                    INSERT INTO dbo.Dashboard(DashboardName, Definition, FAMUserID, LastImportedDate, UseExtractedData, ExtractedDataDefinition)
 
 									SELECT
 										UpdatingDashboard.DashboardName
@@ -45,16 +29,49 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										, UpdatingDashboard.LastImportedDate
 										, UpdatingDashboard.UseExtractedData
 										, UpdatingDashboard.ExtractedDataDefinition
-										, UpdatingDashboard.DashboardGuid
 									FROM 
 										##Dashboard AS UpdatingDashboard
 												LEFT OUTER JOIN dbo.FAMUser
-													ON dbo.FAMUser.Guid = UpdatingDashboard.FAMUserGuid
+													ON dbo.FAMUser.UserName = UpdatingDashboard.UserName
+													AND (
+															dbo.FAMUser.FullUserName = UpdatingDashboard.FullUserName
+															OR
+															(
+																UpdatingDashboard.FullUserName IS NULL
+																AND
+																dbo.FAMUser.FullUserName IS NULL
+															)
+														)
 									WHERE
-										UpdatingDashboard.DashboardGuid NOT IN (SELECT Guid FROM dbo.Dashboard)";
+										UpdatingDashboard.DashboardName NOT IN (SELECT DashboardName FROM dbo.Dashboard)
+									;
+
+									UPDATE
+										dbo.Dashboard
+									SET
+										Definition = UpdatingDashboard.Definition
+										, ExtractedDataDefinition = UpdatingDashboard.ExtractedDataDefinition
+										, FAMUserID = dbo.FAMUser.ID
+										, LastImportedDate = UpdatingDashboard.LastImportedDate
+										, UseExtractedData = UpdatingDashboard.UseExtractedData
+									FROM
+										##Dashboard AS UpdatingDashboard
+																LEFT OUTER JOIN dbo.FAMUser
+																	ON dbo.FAMUser.UserName = UpdatingDashboard.UserName
+																	AND (
+																			dbo.FAMUser.FullUserName = UpdatingDashboard.FullUserName
+																			OR
+																			(
+																				UpdatingDashboard.FullUserName IS NULL
+																				AND
+																				dbo.FAMUser.FullUserName IS NULL
+																			)
+																		)
+									WHERE
+										dbo.Dashboard.DashboardName = UpdatingDashboard.DashboardName";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##Dashboard (DashboardName, Definition, LastImportedDate, UseExtractedData, ExtractedDataDefinition, DashboardGuid, FAMUserGuid)
+                                            INSERT INTO ##Dashboard (DashboardName, Definition, LastImportedDate, UseExtractedData, ExtractedDataDefinition, UserName, FullUserName)
                                             VALUES
                                             ";
 
@@ -62,13 +79,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
 		public string TableName => "Dashboard";
 
-		public void ExecuteSequence(ImportOptions importOptions)
+		public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
         {
-			importOptions.ExecuteCommand(this.CreateTempTableSQL);
+            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
 
-			ImportHelper.PopulateTemporaryTable<Dashboard>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+            ImportHelper.PopulateTemporaryTable<Dashboard>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
 
-			importOptions.ExecuteCommand(this.insertSQL);
-		}
+            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
+        }
     }
 }

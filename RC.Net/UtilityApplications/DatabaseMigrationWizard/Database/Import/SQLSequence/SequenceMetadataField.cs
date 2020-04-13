@@ -11,32 +11,21 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
         private readonly string CreateTempTableSQL = @"
                                         CREATE TABLE [dbo].[##MetadataField](
 	                                    [Name] [nvarchar](50) NOT NULL,
-                                        [Guid] uniqueidentifier NOT NULL,
                                         )";
 
         private readonly string insertSQL = @"
-                                    UPDATE
-	                                    dbo.MetadataField
-                                    SET
-	                                    Name = UpdatingMetadataField.Name
-                                    FROM
-	                                    ##MetadataField AS UpdatingMetadataField
-                                    WHERE
-	                                    UpdatingMetadataField.Guid = dbo.MetadataField.Guid
-                                    ;
-                                    INSERT INTO dbo.MetadataField (Name, Guid)
+                                    INSERT INTO dbo.MetadataField (Name)
 
                                     SELECT
 	                                    Name
-	                                    , Guid
                                     FROM 
 	                                    ##MetadataField
                                     WHERE
-	                                    Guid NOT IN (SELECT Guid FROM dbo.MetadataField)
+	                                    Name NOT IN (SELECT Name FROM dbo.MetadataField)
                                     ";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##MetadataField (Name, Guid)
+                                            INSERT INTO ##MetadataField (Name)
                                             VALUES
                                             ";
 
@@ -44,13 +33,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
         public string TableName => "MetadataField";
 
-        public void ExecuteSequence(ImportOptions importOptions)
+        public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
         {
-            importOptions.ExecuteCommand(this.CreateTempTableSQL);
+            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
 
-            ImportHelper.PopulateTemporaryTable<MetadataField>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+            ImportHelper.PopulateTemporaryTable<MetadataField>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
 
-            importOptions.ExecuteCommand(this.insertSQL);
+            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
         }
     }
 }

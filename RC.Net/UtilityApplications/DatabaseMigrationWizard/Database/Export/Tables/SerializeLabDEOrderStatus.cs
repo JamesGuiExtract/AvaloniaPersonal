@@ -5,14 +5,14 @@ using System.IO;
 
 namespace DatabaseMigrationWizard.Database.Output
 {
-    public class SerializeFileHandler : ISerialize
+    public class SerializeLabDEOrderStatus : ISerialize
     {
         private readonly string sql =
                             @"
                             SELECT
 	                            *
                             FROM 
-	                            [dbo].FileHandler";
+	                            [dbo].[LabDEOrderStatus]";
 
         public void SerializeTable(DbConnection dbConnection, StreamWriter writer)
         {

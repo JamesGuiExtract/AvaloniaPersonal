@@ -20,29 +20,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										[SupportsErrorHandling] [bit] NOT NULL,
 										[Blocking] [bit] NOT NULL,
 										[WorkflowName] [nvarchar](100) NULL,
-                                        [Guid] uniqueidentifier NOT NULL,
 										)";
 
         private readonly string insertSQL = @"
-                                    UPDATE
-										dbo.FileHandler
-									SET
-										Enabled = UpdatingFileHandler.Enabled
-										, IconPath = UpdatingFileHandler.IconPath
-										, ApplicationPath = UpdatingFileHandler.ApplicationPath
-										, Arguments = UpdatingFileHandler.Arguments
-										, AdminOnly = UpdatingFileHandler.AdminOnly
-										, AllowMultipleFiles = UpdatingFileHandler.AllowMultipleFiles
-										, SupportsErrorHandling = UpdatingFileHandler.SupportsErrorHandling
-										, Blocking = UpdatingFileHandler.Blocking
-										, WorkflowName = UpdatingFileHandler.WorkflowName
-										, AppName = UpdatingFileHandler.AppName
-									FROM
-										##FileHandler AS UpdatingFileHandler
-									WHERE
-										dbo.FileHandler.Guid = UpdatingFileHandler.Guid
-									;
-									INSERT INTO dbo.FileHandler(Enabled, AppName, IconPath, ApplicationPath, Arguments, AdminOnly, AllowMultipleFiles, SupportsErrorHandling, Blocking, WorkflowName, Guid)
+                                    INSERT INTO dbo.FileHandler(Enabled, AppName, IconPath, ApplicationPath, Arguments, AdminOnly, AllowMultipleFiles, SupportsErrorHandling, Blocking, WorkflowName)
 									SELECT
 										Enabled
 										, AppName
@@ -54,15 +35,31 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										, SupportsErrorHandling
 										, Blocking
 										, WorkflowName
-										, Guid
 									FROM 
 										##FileHandler AS UpdatingFileHandler
 									WHERE
-										UpdatingFileHandler.Guid NOT IN (SELECT Guid From dbo.FileHandler)
+										UpdatingFileHandler.AppName NOT IN (SELECT Appname From dbo.FileHandler)
+									;
+									UPDATE
+										dbo.FileHandler
+									SET
+										Enabled = UpdatingFileHandler.Enabled
+										, IconPath = UpdatingFileHandler.IconPath
+										, ApplicationPath = UpdatingFileHandler.ApplicationPath
+										, Arguments = UpdatingFileHandler.Arguments
+										, AdminOnly = UpdatingFileHandler.AdminOnly
+										, AllowMultipleFiles = UpdatingFileHandler.AllowMultipleFiles
+										, SupportsErrorHandling = UpdatingFileHandler.SupportsErrorHandling
+										, Blocking = UpdatingFileHandler.Blocking
+										, WorkflowName = UpdatingFileHandler.WorkflowName
+									FROM
+										##FileHandler AS UpdatingFileHandler
+									WHERE
+										dbo.FileHandler.AppName = UpdatingFileHandler.AppName
                                     ";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##FileHandler (Enabled, AppName, IconPath, ApplicationPath, Arguments, AdminOnly, AllowMultipleFiles, SupportsErrorHandling, Blocking, WorkflowName, Guid)
+                                            INSERT INTO ##FileHandler (Enabled, AppName, IconPath, ApplicationPath, Arguments, AdminOnly, AllowMultipleFiles, SupportsErrorHandling, Blocking, WorkflowName)
                                             VALUES
                                             ";
 
@@ -70,13 +67,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
 		public string TableName => "FileHandler";
 
-		public void ExecuteSequence(ImportOptions importOptions)
+		public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
         {
-			importOptions.ExecuteCommand(this.CreateTempTableSQL);
+            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
 
-			ImportHelper.PopulateTemporaryTable<FileHandler>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+            ImportHelper.PopulateTemporaryTable<FileHandler>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
 
-			importOptions.ExecuteCommand(this.insertSQL);
-		}
+            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
+        }
     }
 }

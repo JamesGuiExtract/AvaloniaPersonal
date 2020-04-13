@@ -17,7 +17,6 @@ static const string gstrCREATE_ACTION_TABLE = "CREATE TABLE [dbo].[Action] "
 	"[Description] [nvarchar](255) NULL, "
 	"[WorkflowID] [INT] NULL, "
 	"[MainSequence] [BIT] NULL, "
-	"[Guid] uniqueidentifier NOT NULL DEFAULT newid(),"
 	"CONSTRAINT [IX_Action] UNIQUE NONCLUSTERED ([ASCName], [WorkflowID]))";
 
 static const string gstrCREATE_LOCK_TABLE = 
@@ -113,7 +112,6 @@ static const string gstrCREATE_LOGIN_TABLE = "CREATE TABLE [dbo].[Login]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL, "
 	"[UserName] [nvarchar](50) NOT NULL, "
 	"[Password] [nvarchar](128) NOT NULL DEFAULT(''), "
-	"[Guid] uniqueidentifier NOT NULL DEFAULT newid(),"
 	"CONSTRAINT [PK_LoginID] PRIMARY KEY CLUSTERED ( [ID] ASC ))";
 
 static const string gstrCREATE_MACHINE_TABLE = "CREATE TABLE [dbo].[Machine]("
@@ -126,7 +124,6 @@ static const string gstrCREATE_FAM_USER_TABLE = "CREATE TABLE [dbo].[FAMUser]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL, "
 	"[UserName] [nvarchar](50) NULL, "
 	"[FullUserName] [nvarchar](128) NULL,"
-	"[Guid] uniqueidentifier NOT NULL DEFAULT newid(),"
 	"CONSTRAINT [PK_FAMUser] PRIMARY KEY CLUSTERED ([ID] ASC), "
 	"CONSTRAINT [IX_UserName] UNIQUE NONCLUSTERED ([UserName] ASC))";
 
@@ -153,7 +150,6 @@ static const string gstrCREATE_FAM_TAG_TABLE = "CREATE TABLE [dbo].[Tag] ("
 	"[ID] [int] IDENTITY(1,1) NOT NULL, "
 	"[TagName] [nvarchar](100) NOT NULL, "
 	"[TagDescription] [nvarchar](255) NULL, "
-	"[Guid] uniqueidentifier NOT NULL DEFAULT newid(),"
 	"CONSTRAINT [PK_FAMTag] PRIMARY KEY CLUSTERED ([ID] ASC), "
 	"CONSTRAINT [IX_TagName] UNIQUE NONCLUSTERED ([TagName] ASC))";
 
@@ -177,8 +173,7 @@ static const string gstrCREATE_LOCKED_FILE_TABLE =
 static const string gstrCREATE_USER_CREATED_COUNTER_TABLE =
 	"CREATE TABLE [dbo].[UserCreatedCounter] ("
 	"[CounterName] [nvarchar](50) NOT NULL CONSTRAINT [PK_UserCreatedCounter] PRIMARY KEY CLUSTERED,"
-	"[Value] [bigint] NOT NULL CONSTRAINT [DF_UserCreatedCounter_Value] DEFAULT((0)), "
-	"[Guid] uniqueidentifier NOT NULL DEFAULT newid())";
+	"[Value] [bigint] NOT NULL CONSTRAINT [DF_UserCreatedCounter_Value] DEFAULT((0)))";
 
 static const string gstrCREATE_FPS_FILE_TABLE =
 	"CREATE TABLE [dbo].[FPSFile] ("
@@ -288,8 +283,7 @@ static const string gstrCREATE_FIELD_SEARCH_TABLE =
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FieldSearch] PRIMARY KEY CLUSTERED,"
 	"[Enabled] [bit] NOT NULL DEFAULT 1,"
 	"[FieldName] [nvarchar](64) NOT NULL CONSTRAINT [IX_FieldSearch_FieldName] UNIQUE,"
-	"[AttributeQuery] [nvarchar](256) NOT NULL, "
-	"[Guid] uniqueidentifier NOT NULL DEFAULT newid())";
+	"[AttributeQuery] [nvarchar](256) NOT NULL)";
 
 static const string gstrCREATE_FILE_HANDLER_TABLE =
 	"CREATE TABLE [dbo].[FileHandler]("
@@ -303,8 +297,7 @@ static const string gstrCREATE_FILE_HANDLER_TABLE =
 	"[AllowMultipleFiles] [bit] NOT NULL DEFAULT 0,"
 	"[SupportsErrorHandling] [bit] NOT NULL DEFAULT 0,"
 	"[Blocking] [bit] NOT NULL DEFAULT 1,"
-	"[WorkflowName] NVARCHAR(100) NULL, "
-	"[Guid] uniqueidentifier NOT NULL DEFAULT newid())";
+	"[WorkflowName] NVARCHAR(100) NULL)";
 
 static const string gstrCREATE_FEATURE_TABLE =
 	"CREATE TABLE [dbo].[Feature]("
@@ -341,7 +334,6 @@ static const string gstrCREATE_METADATA_FIELD_TABLE =
 	"CREATE TABLE [dbo].[MetadataField] ("
 	"[ID] INT NOT NULL IDENTITY(1,1) CONSTRAINT [PK_MetadataField] PRIMARY KEY CLUSTERED, "
 	"[Name] NVARCHAR(50) NOT NULL,"
-	"[Guid] uniqueidentifier NOT NULL DEFAULT newid(), "
 	"CONSTRAINT [IX_MetadataFieldName] UNIQUE NONCLUSTERED ([Name] ASC))";
 
 static const string gstrCREATE_FILE_METADATA_FIELD_VALUE_TABLE =
@@ -438,7 +430,6 @@ static const string gstrCREATE_WORKFLOW =
 	"	[LoadBalanceWeight] INT NOT NULL CONSTRAINT [DF_Workflow_LoadBalanceWeight] DEFAULT(1), "
 	"	[EditActionID] INT, "
 	"	[PostEditActionID] INT, "
-	"   [Guid] uniqueidentifier NOT NULL DEFAULT newid(),"
 	"	CONSTRAINT [IX_WorkflowName] UNIQUE NONCLUSTERED ([Name]))";
 
 static const string gstrCREATE_WORKFLOWFILE =
@@ -472,7 +463,6 @@ static const string gstrCREATE_MLMODEL =
 "CREATE TABLE [dbo].[MLModel]( "
 	"	[ID]   INT IDENTITY(1, 1) NOT NULL, "
 	"	[Name] NVARCHAR(255) NOT NULL, "
-	"   [Guid] uniqueidentifier NOT NULL DEFAULT newid(),"
 	"   CONSTRAINT [IX_MLModelName] UNIQUE NONCLUSTERED ([Name] ASC), "
 	"   CONSTRAINT [PK_MLModel] PRIMARY KEY CLUSTERED ([ID] ASC));";
 
@@ -494,7 +484,6 @@ static const string gstrCREATE_WEB_APP_CONFIG =
 	"	[Type] NVARCHAR(100) NOT NULL, "
 	"	[WorkflowID] INT NOT NULL, "
 	"	[Settings] NTEXT, "
-	"   [Guid] uniqueidentifier NOT NULL DEFAULT newid(),"
 	"	CONSTRAINT[IX_WEB_APP_TYPE] UNIQUE NONCLUSTERED ([Type], [WorkflowID]))";
 
 static const string gstrCREATE_DASHBOARD_TABLE =
@@ -504,8 +493,7 @@ static const string gstrCREATE_DASHBOARD_TABLE =
 	"   [FAMUserID] INT NOT NULL, \r\n"
 	"   [LastImportedDate] DATETIME NOT NULL, \r\n "
 	"   [UseExtractedData] BIT DEFAULT 0, \r\n"
-	"   [ExtractedDataDefinition] [xml] NULL,"
-	"   [Guid] uniqueidentifier NOT NULL DEFAULT newid()"
+	"   [ExtractedDataDefinition] [xml] NULL"
 	")";
 
 static const string gstrADD_DASHBOARD_FAMUSER_FK =
@@ -2220,8 +2208,7 @@ static const string gstrCREATE_DATABASE_SERVICE_TABLE =
 	"	[Exception] NVARCHAR(MAX) NULL, "
 	"   [ActiveServiceMachineID] INT NULL, "
 	"   [NextScheduledRunTime] DateTime NULL, "
-	"	[ActiveFAMID] INT NULL, "
-	"   [Guid] uniqueidentifier NOT NULL DEFAULT newid()"
+	"	[ActiveFAMID] INT NULL"
 	")";
 
 static const string gstrCREATE_DATABASE_SERVICE_UPDATE_TRIGGER =
@@ -2574,25 +2561,3 @@ static const string gstrGET_UNCOMMITTED_ATTRIBUTE_DATA =
 	"		AND [AttributeSetName].[Description] = '<ExceptIfMoreRecentAttributeSetName>' \r\n"
 	"		AND [FileTaskSession].[DateTimeStamp] > [AttributeDataModifiedTime] \r\n"
 	"	)) \r\n";
-
-static const string gstrADD_GUID_COLUMNS =
-  " IF COL_LENGTH('dbo.Action', 'GUID') IS NULL BEGIN ALTER TABLE dbo.Action ADD [Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF COL_LENGTH('dbo.AttributeSetName', 'GUID') IS NULL BEGIN ALTER TABLE dbo.AttributeSetName ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF COL_LENGTH('dbo.Dashboard', 'GUID') IS NULL BEGIN ALTER TABLE dbo.Dashboard ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF COL_LENGTH('dbo.DatabaseService', 'GUID') IS NULL BEGIN ALTER TABLE dbo.DatabaseService ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF COL_LENGTH('dbo.FAMUser', 'GUID') IS NULL BEGIN ALTER TABLE dbo.FAMUser ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF COL_LENGTH('dbo.FileHandler', 'GUID') IS NULL BEGIN ALTER TABLE dbo.FileHandler  ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF COL_LENGTH('dbo.Workflow', 'GUID') IS NULL BEGIN ALTER TABLE dbo.Workflow ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF COL_LENGTH('dbo.Login', 'GUID') IS NULL BEGIN ALTER TABLE dbo.Login ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF COL_LENGTH('dbo.MetadataField', 'GUID') IS NULL BEGIN ALTER TABLE dbo.MetadataField ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF COL_LENGTH('dbo.MLModel', 'GUID') IS NULL BEGIN ALTER TABLE dbo.MLModel ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF COL_LENGTH('dbo.Tag', 'GUID') IS NULL BEGIN ALTER TABLE dbo.Tag ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF COL_LENGTH('dbo.WebAppConfig', 'GUID') IS NULL BEGIN ALTER TABLE dbo.WebAppConfig ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF COL_LENGTH('dbo.AttributeName', 'GUID') IS NULL BEGIN ALTER TABLE dbo.AttributeName  ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF COL_LENGTH('dbo.FieldSearch', 'GUID') IS NULL BEGIN ALTER TABLE dbo.FieldSearch  ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF COL_LENGTH('dbo.UserCreatedCounter', 'GUID') IS NULL BEGIN ALTER TABLE dbo.UserCreatedCounter ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END \r\n"
-  " IF(Exists(SELECT * FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'LabDEEncounter')) BEGIN IF COL_LENGTH('dbo.LabDEEncounter', 'GUID') IS NULL BEGIN ALTER TABLE dbo.LabDEEncounter ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END END \r\n"
-  " IF(Exists(SELECT * FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'LabDEOrder')) BEGIN IF COL_LENGTH('dbo.LabDEOrder', 'GUID') IS NULL BEGIN ALTER TABLE dbo.LabDEOrder ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END END \r\n"
-  " IF(Exists(SELECT * FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'LabDEPatient')) BEGIN IF COL_LENGTH('dbo.LabDEPatient', 'GUID') IS NULL BEGIN ALTER TABLE dbo.LabDEPatient ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END END \r\n"
-  " IF(Exists(SELECT * FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'LabDEProvider')) BEGIN IF COL_LENGTH('dbo.LabDEProvider', 'GUID') IS NULL BEGIN ALTER TABLE dbo.LabDEProvider  ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END END \r\n"
-  " IF(Exists(SELECT * FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'DataEntryCounterDefinition')) BEGIN IF COL_LENGTH('dbo.DataEntryCounterDefinition', 'GUID') IS NULL BEGIN ALTER TABLE dbo.DataEntryCounterDefinition  ADD[Guid] uniqueidentifier NOT NULL DEFAULT newid() END END \r\n";

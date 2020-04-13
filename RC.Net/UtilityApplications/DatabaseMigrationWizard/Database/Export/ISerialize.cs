@@ -10,6 +10,6 @@ namespace DatabaseMigrationWizard.Database.Output
         /// </summary>
         /// <param name="dbConnection">The connection to the database</param>
         /// <param name="writer">The writer to use to write the file</param>
-        void SerializeTable(DbConnection dbConnection, TextWriter writer);
+        void SerializeTable(DbConnection dbConnection, StreamWriter writer);
     }
 }

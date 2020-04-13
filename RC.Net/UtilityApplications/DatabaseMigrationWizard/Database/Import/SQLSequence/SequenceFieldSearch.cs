@@ -13,36 +13,33 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 	                                    [Enabled] [bit] NOT NULL,
 	                                    [FieldName] [nvarchar](64) NOT NULL,
 	                                    [AttributeQuery] [nvarchar](256) NOT NULL,
-                                        [Guid] uniqueidentifier NOT NULL,
                                         )";
 
         private readonly string insertSQL = @"
-                                    UPDATE
-	                                    dbo.FieldSearch
-                                    SET
-	                                    Enabled = UpdatingFieldSearch.Enabled
-	                                    , AttributeQuery = UpdatingFieldSearch.AttributeQuery
-	                                    , FieldName = UpdatingFieldSearch.FieldName
-                                    FROM
-	                                    ##FieldSearch AS UpdatingFieldSearch
-                                    WHERE
-	                                    UpdatingFieldSearch.Guid = dbo.FieldSearch.Guid
-                                    ;
-                                    INSERT INTO dbo.FieldSearch(Enabled, FieldName, AttributeQuery, Guid)
+                                    INSERT INTO dbo.FieldSearch(Enabled, FieldName, AttributeQuery)
 
                                     SELECT
 	                                    Enabled
 	                                    , FieldName
 	                                    , AttributeQuery
-	                                    , Guid
                                     FROM 
 	                                    ##FieldSearch
 
                                     WHERE
-	                                    Guid NOT IN (SELECT Guid FROM dbo.FieldSearch)";
+	                                    FieldName NOT IN (SELECT FieldName FROM dbo.FieldSearch)
+                                    ;
+                                    UPDATE
+	                                    dbo.FieldSearch
+                                    SET
+	                                    Enabled = UpdatingFieldSearch.Enabled
+	                                    , AttributeQuery = UpdatingFieldSearch.AttributeQuery
+                                    FROM
+	                                    ##FieldSearch AS UpdatingFieldSearch
+                                    WHERE
+	                                    UpdatingFieldSearch.FieldName = dbo.FieldSearch.FieldName";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##FieldSearch (Enabled, FieldName, AttributeQuery, Guid)
+                                            INSERT INTO ##FieldSearch (Enabled, FieldName, AttributeQuery)
                                             VALUES
                                             ";
 
@@ -50,13 +47,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
         public string TableName => "FieldSearch";
 
-        public void ExecuteSequence(ImportOptions importOptions)
+        public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
         {
-            importOptions.ExecuteCommand(this.CreateTempTableSQL);
+            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
 
-            ImportHelper.PopulateTemporaryTable<FieldSearch>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+            ImportHelper.PopulateTemporaryTable<FieldSearch>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
 
-            importOptions.ExecuteCommand(this.insertSQL);
+            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
         }
     }
 }

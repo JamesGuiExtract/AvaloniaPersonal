@@ -13,35 +13,38 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										[Description] [nvarchar](256) NOT NULL,
 										[Settings] [nvarchar](max) NOT NULL,
 										[Enabled] [bit] NOT NULL,
-                                        [Guid] uniqueidentifier NOT NULL,
                                         )";
 
         private readonly string insertSQL = @"
-                                            UPDATE
-	                                            dbo.DatabaseService
-                                            SET
-	                                            Description = UpdatingDatabaseService.Description
-	                                            , Enabled = UpdatingDatabaseService.Enabled
-	                                            , Settings = UpdatingDatabaseService.Settings
-                                            FROM
-	                                            ##DatabaseService AS UpdatingDatabaseService
-                                            WHERE
-	                                            UpdatingDatabaseService.Guid = dbo.DatabaseService.Guid
-                                            ;
-                                            INSERT INTO dbo.DatabaseService(Description, Settings, Enabled, Guid)
+                                    INSERT INTO dbo.DatabaseService(Description, Settings, Enabled)
 
-                                            SELECT
-	                                            UpdatingDatabaseService.Description
-	                                            , UpdatingDatabaseService.Settings
-	                                            , UpdatingDatabaseService.Enabled
-	                                            , UpdatingDatabaseService.Guid
-                                            FROM 
-	                                            ##DatabaseService AS UpdatingDatabaseService
-                                            WHERE
-	                                            UpdatingDatabaseService.Guid NOT IN (SELECT Guid FROM dbo.DatabaseService)";
+                                    SELECT
+	                                    UpdatingDatabaseService.Description
+	                                    , UpdatingDatabaseService.Settings
+	                                    , UpdatingDatabaseService.Enabled
+                                    FROM 
+	                                    ##DatabaseService AS UpdatingDatabaseService
+                                    WHERE
+	                                    UpdatingDatabaseService.Description NOT IN (SELECT Description FROM dbo.DatabaseService)
+                                    ;
+
+                                    UPDATE
+	                                    dbo.DatabaseService
+                                    SET
+	                                    Enabled = UpdatingDatabaseService.Enabled
+	                                    , Settings = UpdatingDatabaseService.Settings
+                                    FROM
+	                                    ##DatabaseService AS UpdatingDatabaseService
+                                    WHERE
+	                                    UpdatingDatabaseService.Description = dbo.DatabaseService.Description
+	                                    AND
+	                                    --Required because Description is not enforced to be unique. This is to prevent weird errors.
+	                                    (SELECT COUNT(*) FROM dbo.DatabaseService WHERE Description = UpdatingDatabaseService.Description) = 1
+
+									";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##DatabaseService (Description, Settings, Enabled, Guid)
+                                            INSERT INTO ##DatabaseService (Description, Settings, Enabled)
                                             VALUES
                                             ";
 
@@ -49,13 +52,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
         public string TableName => "DatabaseService";
 
-        public void ExecuteSequence(ImportOptions importOptions)
+        public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
         {
-            importOptions.ExecuteCommand(this.CreateTempTableSQL);
-
-            ImportHelper.PopulateTemporaryTable<DatabaseService>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
-
-            importOptions.ExecuteCommand(this.insertSQL);
+            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
+            
+            ImportHelper.PopulateTemporaryTable<DatabaseService>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
+            
+            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
         }
     }
 }

@@ -13,11 +13,10 @@ namespace DatabaseMigrationWizard.Database.Output
 	                            Description
 		                        , Settings
 		                        , Enabled
-                                , Guid
                             FROM 
 	                            [dbo].[DatabaseService]";
 
-        public void SerializeTable(DbConnection dbConnection, TextWriter writer)
+        public void SerializeTable(DbConnection dbConnection, StreamWriter writer)
         {
             ExportHelper.WriteTableInBulk(this.sql, writer, dbConnection);
         }

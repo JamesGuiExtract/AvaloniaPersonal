@@ -27,15 +27,14 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="3*"></ColumnDefinition>
-                        <ColumnDefinition Width="120"></ColumnDefinition>
-                        <ColumnDefinition Width="120"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <TextBox 
                         Grid.Column="0"
                     x:Name="ImportPath" 
                     Style="{StaticResource TextBoxInError}"
-                    Margin="0,0,0,8"
-                    IsEnabled="{Binding MainWindow.UIEnabled}">
+                    Margin="0,0,0,8">
                         <TextBox.Text>
                             <Binding 
                             Path="ImportOptions.ImportPath"
@@ -50,11 +49,11 @@
                             </Binding>
                         </TextBox.Text>
                     </TextBox>
-                    <Button Grid.Column="1" x:Name="FolderButton" Content="Select Folder" Margin="0,0,0,8" Click="FolderButton_Click" IsEnabled="{Binding MainWindow.UIEnabled}"/>
-                    <Button Grid.Column="2" x:Name="FolderBrowser" Content="File Explorer" Margin="0,0,0,8" Click="FolderBrowser_Click"/>
+                    <Button Grid.Column="1" x:Name="FolderButton" Content="Select Folder" Margin="0,0,0,8" Click="FolderButton_Click"/>
+                    <Button Grid.Column="2" x:Name="FolderBrowser" Content="Browse" Margin="0,0,0,8" Click="FolderBrowser_Click"/>
                 </Grid>
-                <CheckBox IsChecked="{Binding ImportOptions.ClearDatabase}" Content="Clear the database?" Margin="0,0,0,8" IsEnabled="{Binding MainWindow.UIEnabled}"/>
-                <Button x:Name="ImportButton" Content="Import" Margin="0,0,0,8" Click="Import_Click" IsEnabled="{Binding MainWindow.UIEnabled}"/>
+                <CheckBox IsChecked="{Binding ImportOptions.ClearDatabase}" Content="Clear the database?" Margin="0,0,0,8"/>
+                <Button Content="Import" Margin="0,0,0,8" Click="Import_Click"/>
             </StackPanel>
         </ScrollViewer>
         <ScrollViewer Margin="0,150,0,0">

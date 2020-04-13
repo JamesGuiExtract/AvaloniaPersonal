@@ -3,9 +3,7 @@ using Extract;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data.SqlClient;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -37,7 +35,27 @@ namespace DatabaseMigrationWizard.Pages.Utility
             }
             catch(Exception e)
             {
-                throw e.AsExtract("ELI49684");
+                throw new ExtractException("ELI49684", "Could not get interfaces for some reason? This should never be seen...", e);
+            }
+        }
+
+        /// <summary>
+        /// Waits for all threads to finish processing.
+        /// </summary>
+        /// <param name="threads">An IEnumerable containing several threads.</param>
+        public static void WaitAll(this IEnumerable<Thread> threads)
+        {
+            try
+            {
+                if (threads != null)
+                {
+                    foreach (Thread thread in threads)
+                    { thread.Join(); }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new ExtractException("ELI49677", "One of the threads failed to complete", e);
             }
         }
 
@@ -61,68 +79,10 @@ namespace DatabaseMigrationWizard.Pages.Utility
             }
         }
 
-        // Checks to see if the database server is valid
-        public static bool IsDBServerValid(ConnectionInformation connectionInformation)
+        public static bool IsDBConfigurationValid(ConnectionInformation connectionInformation)
         {
             try
             {
-                if(connectionInformation.DatabaseServer == null)
-                {
-                    return false;
-                }
-                using (var sqlConnection = new SqlConnection($@"Server={connectionInformation.DatabaseServer};Integrated Security=SSPI; Connection Timeout=5"))
-                {
-                    sqlConnection.Open();
-
-                    return true;
-                }
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Tries to read the database names, returns an empty list if it fails
-        /// or if the user does not have permissions to the table.
-        /// </summary>
-        /// <param name="connectionInformation"></param>
-        /// <returns></returns>
-        public static Collection<string> GetDatabaseNames(ConnectionInformation connectionInformation)
-        {
-            Collection<string> databaseNames = new Collection<string>();
-            try
-            {
-                using (var sqlConnection = new SqlConnection($@"Server={connectionInformation.DatabaseServer};Integrated Security=SSPI; Connection Timeout=5"))
-                {
-                    sqlConnection.Open();
-                    var command = sqlConnection.CreateCommand();
-                    command.CommandText = "SELECT name FROM master.sys.databases";
-                    using (SqlDataReader rdr = command.ExecuteReader())
-                    {
-                        while (rdr.Read())
-                        {
-                            var myString = rdr.GetString(0);
-                            databaseNames.Add(myString);
-                        }
-                    }
-                }
-            }
-            catch (Exception) { }
-
-            return databaseNames;
-        }
-
-        // Checks to see if the database name is valid. It also assumes the server is correct.
-        public static bool IsDBDatabaseValid(ConnectionInformation connectionInformation)
-        {
-            try
-            {
-                if (String.IsNullOrEmpty(connectionInformation.DatabaseName))
-                {
-                    return false;
-                }
                 using (var sqlConnection = new SqlConnection($@"Server={connectionInformation.DatabaseServer};Database={connectionInformation.DatabaseName};Integrated Security=SSPI; Connection Timeout=5"))
                 {
                     sqlConnection.Open();

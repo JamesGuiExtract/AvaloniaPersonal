@@ -12,40 +12,49 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                         CREATE TABLE [dbo].[##WebAppConfig](
 										[Type] [nvarchar](100) NOT NULL,
 										[Settings] [ntext] NULL,
-                                        [WebAppConfigGuid] uniqueidentifier NOT NULL,
-                                        [WorkflowGuid] uniqueidentifier NOT NULL,
+										[Name] nvarchar(max) NULL
 										)";
 
         private readonly string insertSQL = @"
-                                    UPDATE
-										dbo.WebAppConfig
-									SET
-										Settings = UpdatingWebAppConfig.Settings
-										, Type = UpdatingWebAppConfig.Type
-										, WorkflowID = Workflow.ID
-									FROM
-										##WebAppConfig AS UpdatingWebAppConfig
-											LEFT OUTER JOIN dbo.Workflow
-												ON dbo.Workflow.Guid = UpdatingWebAppConfig.WorkflowGuid
-									WHERE
-										UpdatingWebAppConfig.WebAppConfigGuid = dbo.WebAppConfig.Guid
-									;
-									INSERT INTO dbo.WebAppConfig(Type,WorkflowID,Settings, Guid)
+                                    INSERT INTO dbo.WebAppConfig(Type,WorkflowID,Settings)
 									SELECT
 										UpdatingWebAppConfig.Type
 										, dbo.Workflow.ID
 										, UpdatingWebAppConfig.Settings
-										, WebAppConfigGuid
 									FROM 
 										##WebAppConfig AS UpdatingWebAppConfig
 											LEFT OUTER JOIN dbo.Workflow
-												ON dbo.Workflow.Guid = UpdatingWebAppConfig.WorkflowGuid
+												ON dbo.Workflow.Name = UpdatingWebAppConfig.Name
 									WHERE
-										UpdatingWebAppConfig.WebAppConfigGuid NOT IN (SELECT Guid FROM dbo.WebAppConfig)
+										NOT EXISTS
+											(
+												SELECT
+													WorkflowID
+													, Type
+												FROM
+													dbo.WebAppConfig
+												WHERE
+													dbo.WebAppConfig.Type = UpdatingWebAppConfig.Type
+													AND
+													dbo.WebAppConfig.WorkflowID = dbo.Workflow.ID 
+											)
+									;
+									UPDATE
+										dbo.WebAppConfig
+									SET
+										Settings = UpdatingWebAppConfig.Settings
+									FROM
+										##WebAppConfig AS UpdatingWebAppConfig
+											LEFT OUTER JOIN dbo.Workflow
+												ON dbo.Workflow.Name = UpdatingWebAppConfig.Name
+									WHERE
+										dbo.WebAppConfig.Type = UpdatingWebAppConfig.Type
+										AND
+										dbo.WebAppConfig.WorkflowID = dbo.Workflow.ID
                                     ";
 
 		private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##WebAppConfig (Type, Settings, WorkflowGuid, WebAppConfigGuid)
+                                            INSERT INTO ##WebAppConfig (Type, Settings, Name)
                                             VALUES
                                             ";
 
@@ -53,13 +62,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
 		public string TableName => "WebAppConfig";
 
-		public void ExecuteSequence(ImportOptions importOptions)
+		public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
         {
-			importOptions.ExecuteCommand(this.CreateTempTableSQL);
+            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
 
-			ImportHelper.PopulateTemporaryTable<WebAppConfig>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+            ImportHelper.PopulateTemporaryTable<WebAppConfig>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
 
-			importOptions.ExecuteCommand(this.insertSQL);
-		}
+            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
+        }
     }
 }
