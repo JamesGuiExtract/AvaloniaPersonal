@@ -81,7 +81,7 @@ Dlg_SdLicense:
 Dlg_SdAskDestPath:    	
     nResult = SdAskDestPath(szTitle, szMsg, INSTALLDIR, 0);
     if (nResult = BACK) goto Dlg_SdLicense;
-*/
+
 Dlg_SetupType:
     szTitle = "";
     szMsg   = "";
@@ -111,15 +111,18 @@ Dlg_SdFeatureTree:
         nResult = SdFeatureTree(szTitle, szMsg, INSTALLDIR, "", 2);
         if (nResult = BACK) goto Dlg_SetupType;  
     endif;
-
+*/
 
 Dlg_SdStartCopy:	
     if (nResult = BACK) then
+		goto Dlg_SdLicense
+		/*
         if (!bCustom) then
             goto Dlg_SetupType;    
     	else
             goto Dlg_SdFeatureTree;
-    	endif;                         
+    	endif;  
+    	*/                       
     endif;
 
     // setup default status

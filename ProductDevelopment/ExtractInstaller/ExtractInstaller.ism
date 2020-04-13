@@ -335,7 +335,6 @@
 		<row><td>LabDEReports</td><td>{54169BEE-5EA8-44BD-A6E1-2AC7380B9DDA}</td><td>STANDARD_REPORTS</td><td>8</td><td/><td>labde_high_effort_files_by_u</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RedactionCC.dll</td><td>{609DD8EB-6620-4A9E-AE69-452AE7A103C8}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>RedactionCC.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RedactionTester.dll</td><td>{FE6FB54D-7A24-49CD-90FF-A8642E8A116A}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>redactiontester.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Redist</td><td>{EE4C3899-3218-4C52-A42A-33FD36B7160F}</td><td>TARGET_REDIST</td><td>0</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>SDKComponents</td><td>{520CC137-57D4-420C-AF6E-B3F95C8BD13B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
@@ -1179,7 +1178,6 @@
 		<row><td>Documentation</td><td>FlexIndexHelp</td></row>
 		<row><td>Documentation</td><td>IDShieldHelp</td></row>
 		<row><td>Documentation</td><td>LabDEHelp</td></row>
-		<row><td>Redist</td><td>Redist</td></row>
 		<row><td>SDKMain</td><td>AllOtherFiles</td></row>
 		<row><td>SDKMain</td><td>ExemptionCodes</td></row>
 		<row><td>SDKMain</td><td>Extract.LabResultsCustomComponents</td></row>
@@ -1389,7 +1387,6 @@
 		<row><td>LabDEReports</td><td/><td/><td>_D2822A61_C91B_40B5_9F32_E99BF4A6A776_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>RedactionCC.dll</td><td/><td/><td>_03DC90EE_03CF_4902_9272_0C41A69D5B61_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>RedactionTester.dll</td><td/><td/><td>_E3C82770_0C8B_4480_812B_48AA19DB7EBA_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Redist</td><td/><td/><td>_87C1C298_20D3_413C_9D4F_5496D89762B6_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>SDKComponents</td><td/><td/><td>_194782D1_93CC_4676_B268_CA86FF42B50D_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
@@ -1455,7 +1452,6 @@
 		<row><td>IDShieldReports</td><td>&lt;PATH_TO_REPORTS_IDSHIELD_FILES&gt;</td><td>4</td><td/><td>Thumbs.db</td><td>10</td></row>
 		<row><td>LabDEFolder</td><td>&lt;PATH_TO_LABDEFOLDER_FILES&gt;</td><td>4</td><td/><td>AlternateTestNameManager.plugin</td><td>10</td></row>
 		<row><td>LabDEReports</td><td>&lt;PATH_TO_REPORTS_FILES_LABDE&gt;</td><td>4</td><td/><td>LabDE high effort files by user.xml, Thumbs.db</td><td>10</td></row>
-		<row><td>Redist</td><td>&lt;PATH_TO_REDIST_FILES&gt;</td><td>4</td><td/><td/><td>2</td></row>
 	</table>
 
 	<table name="ISFeatureExtended">
@@ -2080,7 +2076,6 @@
 		<col def="L255">Display_Name</col>
 		<col def="i2">Display</col>
 		<col def="S255">Comments</col>
-		<row><td>Custom</td><td>##IDPROP_SETUPTYPE_CUSTOM_DESC##</td><td>##IDPROP_SETUPTYPE_CUSTOM##</td><td>3</td><td/></row>
 		<row><td>Minimal</td><td>##IDPROP_SETUPTYPE_COMPACT_DESC##</td><td>##IDPROP_SETUPTYPE_COMPACT##</td><td>1</td><td/></row>
 		<row><td>Typical</td><td>##IDPROP_SETUPTYPE_TYPICAL_DESC##</td><td>##IDPROP_SETUPTYPE_TYPICAL##</td><td>2</td><td/></row>
 	</table>
@@ -2088,8 +2083,6 @@
 	<table name="ISSetupTypeFeatures">
 		<col key="yes" def="s38">ISSetupType_</col>
 		<col key="yes" def="s38">Feature_</col>
-		<row><td>Custom</td><td>Documentation</td></row>
-		<row><td>Custom</td><td>SDKMain</td></row>
 		<row><td>Minimal</td><td>SDKMain</td></row>
 		<row><td>Typical</td><td>Documentation</td></row>
 		<row><td>Typical</td><td>SDKMain</td></row>
