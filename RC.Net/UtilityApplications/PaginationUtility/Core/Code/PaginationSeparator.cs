@@ -226,11 +226,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<EventArgs> DocumentDataPanelClosed;
 
         /// <summary>
-        /// Raised when a <see cref="IPaginationDocumentDataPanel"/> is closed.
-        /// </summary>
-        public event EventHandler<EventArgs> DocumentDataPanelAutoClosed;
-
-        /// <summary>
         /// Raised when the view of the associated <see cref="OutputDocument"/> pages have either
         /// been collapsed or re-displayed.
         /// </summary>
@@ -527,14 +522,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _editDocumentDataButton.Checked = true;
 
                         args.DocumentDataPanel.DataPanelChanged += DocumentDataPanel_DataPanelChanged;
-                        ((DataEntryPanelContainer)args.DocumentDataPanel).ActiveDataEntryPanel.LastControl += PaginationSeparator_LastControl;
 
                         DocumentDataHasBeenViewed = true;
 
                         // Ensure this control gets sized based upon the added _documentDataPanelControl.
                         PerformLayout();
-
-                        DocumentDataPanel.EnsureFieldSelection();
                     }
                     else
                     {
@@ -575,50 +567,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
-        protected override void OnVisibleChanged(EventArgs e)
-        {
-            base.OnVisibleChanged(e);
-        }
-
-        private void PaginationSeparator_LastControl(object sender, EventArgs e)
-        {
-            try
-            {
-                if (CloseDataPanel(true, true))
-                {
-                    ((DataEntryDocumentDataPanel)sender).LastControl -= PaginationSeparator_LastControl;
-                    DocumentSelectedToCommit = true;
-                    DocumentDataPanelAutoClosed?.Invoke(this, new EventArgs());
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI0");
-            }
-        }
-
-        protected override void OnDoubleClick(EventArgs e)
-        {
-            try
-            {
-                base.OnDoubleClick(e);
-
-                if (!IsDataPanelOpen)
-                {
-                    OpenDataPanel();
-                    Collapsed = false;
-                }
-                else
-                {
-                    Collapsed = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI0");
-            }
-        }
-
         /// <summary>
         /// Closes the <see cref="DocumentDataPanel"/> (if visible), applying any changed data in
         /// the process.
@@ -649,7 +597,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         documentDataPanel.ClearData();
                     }
 
-                    ((DataEntryPanelContainer)documentDataPanel).ActiveDataEntryPanel.LastControl -= PaginationSeparator_LastControl;
                     documentDataPanel.DataPanelChanged -= DocumentDataPanel_DataPanelChanged;
 
                     // Report the DEP to be closed before it is removed so that events that trigger
@@ -1087,8 +1034,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // https://extract.atlassian.net/browse/ISSUE-15139
                 // Ensure this control gets sized based upon the added _documentDataPanelControl.
                 PerformLayout();
-
-                ((DataEntryPanelContainer)_documentDataPanelControl).ActiveDataEntryPanel.LastControl += PaginationSeparator_LastControl;
             }
             catch (Exception ex)
             {
@@ -1145,7 +1090,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <value><see langword="true"/> if this instance's data panel is open; otherwise,
         /// <see langword="false"/>.
         /// </value>
-        public bool IsDataPanelOpen
+        bool IsDataPanelOpen
         {
             get
             {
@@ -1198,11 +1143,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _collapseDocumentButton.Image = Document.Collapsed
                     ? Properties.Resources.Expand
                     : Properties.Resources.Collapse;
-                _editDocumentDataButton.Visible = false;
-                    //Document.DocumentData != null
-                    //&& Document.DocumentData.AllowDataEdit;
-                //_editDocumentDataButton.Image = Document.OutputProcessed ? _viewButtonImage : _editButtonImage;
-                //_editDocumentDataButton.Text = Document.OutputProcessed ? "View" : "Edit";
+                _editDocumentDataButton.Visible =
+                    Document.DocumentData != null
+                    && Document.DocumentData.AllowDataEdit;
+                _editDocumentDataButton.Image = Document.OutputProcessed ? _viewButtonImage : _editButtonImage;
+                _editDocumentDataButton.Text = Document.OutputProcessed ? "View" : "Edit";
                 _summaryLabel.Visible = true;
                 _summaryLabel.Text = Document.Summary
                     + (Document.OutputProcessed ? " (PROCESSED)" : "");

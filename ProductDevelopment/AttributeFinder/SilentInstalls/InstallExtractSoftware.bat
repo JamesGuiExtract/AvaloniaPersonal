@@ -52,31 +52,31 @@ call "%~dp0UninstallExtract.bat"
 :: Assumes release build location has a Other\SilentInstalls folder with the product installs
 ::		in a folder parallel to Other and the product folder has the SetupFiles folder which is
 ::		the same as the internal build root folder
-SET PLATFORM_INSTALL_ROOT=%~dp0
+SET SOFTWARE_INSTALL_ROOT=%~dp0
 
 :: If replace the SilentInstalls with the product folder 
-CALL SET PLATFORM_INSTALL_ROOT=%PLATFORM_INSTALL_ROOT:SilentInstalls=Install%
+CALL SET SOFTWARE_INSTALL_ROOT=%SOFTWARE_INSTALL_ROOT:SilentInstalls=Install%
 
 
 IF "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
-	set PLATFORM_INSTALL_ISS="%~dp0ExtrractPlatformInstall64.iss"
+	set SOFTWARE_INSTALL_ISS="%~dp0ExtractSoftware.iss"
 	set EXTRACT_COMMON=C:\Program Files (x86^)\Extract Systems\CommonComponents
-	set PLATFORM_INSTALL_KEY="HKEY_LOCAL_MACHINE\SOFTWARE\wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\{A7DFE34D-A07E-4D57-A624-B758E42A69D4}"
+	set SOFTWARE_INSTALL_KEY="HKEY_LOCAL_MACHINE\SOFTWARE\wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\{A7DFE34D-A07E-4D57-A624-B758E42A69D4}"
 ) ELSE (
-	set PLATFORM_INSTALL_ISS="%~dp0ExtrractPlatformInstall.iss"
+	set SOFTWARE_INSTALL_ISS="%~dp0ExtractSoftware.iss"
 	set EXTRACT_COMMON=C:\Program Files\Extract Systems\CommonComponents
-	set PLATFORM_INSTALL_KEY="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{A7DFE34D-A07E-4D57-A624-B758E42A69D4}"
+	set SOFTWARE_INSTALL_KEY="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{A7DFE34D-A07E-4D57-A624-B758E42A69D4}"
 )
 
 @ECHO.
-@ECHO Installing Extract Platform...
-start /wait "" "%PLATFORM_INSTALL_ROOT%Setup" /s /f1%PLATFORM_INSTALL_ISS% /f2nul
+@ECHO Installing Extract Software...
+start /wait "" "%SOFTWARE_INSTALL_ROOT%Setup" /s /f1%SOFTWARE_INSTALL_ISS% /f2nul
 
 :: Check registry for the uninstall for FlexIndex as verification that it installed
 IF EXIST "%TEMP%\ExtractSoftwareInstalled.reg" DEL "%TEMP%\ExtractSoftwareInstalled.reg"
-@regedit /e "%TEMP%\ExtractSoftwareInstalled.reg" %PLATFORM_INSTALL_KEY%
+@regedit /e "%TEMP%\ExtractSoftwareInstalled.reg" %SOFTWARE_INSTALL_KEY%
 IF NOT EXIST "%TEMP%\ExtractSoftwareInstalled.reg" (
-	@ECHO There was a error installing Extract Platform Index
+	@ECHO There was a error installing Extract Software
 	GOTO ERROR
 )
 DEL "%TEMP%\ExtractSoftwareInstalled.reg"
@@ -91,7 +91,7 @@ GOTO END
 :: Handle common error tasks
 :ERROR
 :: Check if the .net framework prerequisite was installed
-SET %NET_RELEASE%=
+SET NET_RELEASE=
 FOR /f "tokens=3" %%a in ('REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" /v Release ^|findstr /ri "REG_DWORD"') do set NET_RELEASE=%%a
 IF %NET_RELEASE% LSS 528040 (
     @ECHO The .NET Framework 4.8 Prerequisite was not installed. Install manually before running the install again.

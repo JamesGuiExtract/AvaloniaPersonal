@@ -684,18 +684,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             // Not supported
         }
 
-        public void EnsureFieldSelection()
-        {
-            try
-            {
-                ActiveDataEntryPanel?.EnsureFieldSelection();
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI49744");
-            }
-        }
-
         /// <summary>
         /// Performs an undo operation.
         /// </summary>

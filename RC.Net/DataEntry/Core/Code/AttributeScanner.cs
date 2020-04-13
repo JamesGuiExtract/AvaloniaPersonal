@@ -3,7 +3,6 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 
@@ -512,10 +511,7 @@ namespace Extract.DataEntry
         static bool ConfirmDataViewed(IAttribute attribute, AttributeStatusInfo statusInfo,
             bool value)
         {
-            return (statusInfo._hasBeenViewed == value
-                || !statusInfo.PersistAttribute
-                || ((statusInfo.OwningControl as Control)?.Enabled == false)
-                || !ConfirmIsTabStop(attribute, statusInfo, value));
+            return (!statusInfo._isViewable || statusInfo._hasBeenViewed == value);
         }
 
         /// <summary>

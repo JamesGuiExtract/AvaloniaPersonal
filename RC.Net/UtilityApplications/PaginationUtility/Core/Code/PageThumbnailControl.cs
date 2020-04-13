@@ -623,11 +623,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #region Private Members
 
-        protected override void OnVisibleChanged(EventArgs e)
-        {
-            base.OnVisibleChanged(e);
-        }
-
         /// <summary>
         /// Creates or disposes of <see cref="_contentsPanel"/> depending on current visibility of
         /// this control.

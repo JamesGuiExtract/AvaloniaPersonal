@@ -2668,7 +2668,7 @@ namespace Extract.DataEntry
                 Stack<IAttribute> nextTabStopAttributeGenealogy = new Stack<IAttribute>();
 
                 if (!AttributeScanner<bool>.Scan(
-                        attributes, startingPoint, ConfirmIsTabStop, false, forward, false,
+                        attributes, startingPoint, ConfirmIsTabStop, false, forward, true,
                         nextTabStopAttributeGenealogy))
                 {
                     return nextTabStopAttributeGenealogy;
@@ -2712,7 +2712,7 @@ namespace Extract.DataEntry
                 Stack<IAttribute> nextTabGroupAttributeGenealogy = new Stack<IAttribute>();
 
                 if (!AttributeScanner<bool>.Scan(
-                        attributes, startingPoint, ConfirmIsTabGroup, false, forward, false,
+                        attributes, startingPoint, ConfirmIsTabGroup, false, forward, true,
                         nextTabGroupAttributeGenealogy))
                 {
                     return nextTabGroupAttributeGenealogy;
@@ -2768,7 +2768,7 @@ namespace Extract.DataEntry
 
                 // Find the next tab stop or group attribute
                 if (!AttributeScanner<bool>.Scan(
-                        attributes, startingPoint, ConfirmIsTabStopOrGroup, false, forward, false,
+                        attributes, startingPoint, ConfirmIsTabStopOrGroup, false, forward, true,
                         nextTabStopOrGroupAttributeGenealogy))
                 {
                     // Find the attribute and control indicated by the result.
@@ -3586,23 +3586,6 @@ namespace Extract.DataEntry
                 _attributesToValidate.Clear();
 
                 throw ExtractException.AsExtractException("ELI26118", ex);
-            }
-        }
-
-        public static bool IsEditInProgress
-        {
-            get
-            {
-                try
-                {
-                    InitializeStatics();
-
-                    return _attributesBeingModified.Count > 0;
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI0");
-                }
             }
         }
 
