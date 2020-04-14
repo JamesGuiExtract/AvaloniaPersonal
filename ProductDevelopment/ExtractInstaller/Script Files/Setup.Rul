@@ -115,7 +115,7 @@ Dlg_SdFeatureTree:
 
 Dlg_SdStartCopy:	
     if (nResult = BACK) then
-		goto Dlg_SdLicense
+		goto Dlg_SdLicense;
 		/*
         if (!bCustom) then
             goto Dlg_SetupType;    
