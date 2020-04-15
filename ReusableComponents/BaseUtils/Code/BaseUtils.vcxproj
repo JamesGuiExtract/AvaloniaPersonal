@@ -198,6 +198,7 @@
     <ClCompile Include="DefaultHandlers.cpp" />
     <ClCompile Include="EncryptedFileManager.cpp" />
     <ClCompile Include="EncryptionEngine.cpp" />
+    <ClCompile Include="EnvironmentInfo.cpp" />
     <ClCompile Include="ErrorInfo.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -394,6 +395,7 @@
     <ClInclude Include="DateUtil.h" />
     <ClInclude Include="DefinedTypes.h" />
     <ClInclude Include="DocTagUtils.h" />
+    <ClInclude Include="EnvironmentInfo.h" />
     <ClInclude Include="ExtractFileLock.h" />
     <ClInclude Include="Logging.h" />
     <ClInclude Include="MapInitializationTemplate.h" />

@@ -15,11 +15,12 @@
 
 #include "stdafx.h"
 #include "UCLIDCOMPackages.h"
+#include "Resource.h"
 
 #include <StringTokenizer.h>
 #include <CppUtil.h>
-#include <UCLIDException.h>
 #include <CommentedTextFileReader.h>
+#include <UCLIDException.h>
 
 using namespace std;
 
@@ -246,15 +247,15 @@ std::vector<std::string> COMPackages::getPackages()
 	return vecPackageNames;
 }
 //-------------------------------------------------------------------------------------------------
-void COMPackages::init()
+void COMPackages::init(bool bUseEmbeddedResources/* = false*/)
 {
 	try
 	{
 		// Read the components file
-		int	iCount = readComponentsFile();
+		int	iCount = readComponentsFile(bUseEmbeddedResources);
 
 		// Read the packages file
-		iCount = readPackagesFile();
+		iCount = readPackagesFile(bUseEmbeddedResources);
 	}
 	catch (UCLIDException ue)
 	{
@@ -266,29 +267,20 @@ void COMPackages::init()
 //-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
-int COMPackages::readComponentsFile()
+int COMPackages::readComponentsFile(bool bUseEmbeddedResource)
 {
 	int iCount = 0;
 
-	// Get path to bin folder and DAT file
-	string	strPath = getModuleDirectory( "COMLMCore.DLL" ) +
-		"\\Components.dat";
-	if (!isFileOrFolderValid( strPath ))
-	{
-		// Create and throw exception
-		UCLIDException ue("ELI11974", "Unable to open Components file" );
-		ue.addDebugInfo( "Path", strPath );
-		throw ue;
-	}
+	vector<string> vecFileLines = bUseEmbeddedResource
+		? getFileLines(IDR_COMPONENTS_FILE)
+		: getFileLines("Components.dat");
 
-	// Open Components.dat file
-	ifstream ifs( strPath.c_str() );
-	string strLine;
-	CommentedTextFileReader fileReader( ifs, "//", true );
-	do
+	CommentedTextFileReader fileReader(vecFileLines);
+
+	while (!fileReader.reachedEndOfStream())
 	{
 		// Retrieve the next non-comment line
-		strLine = fileReader.getLineText();
+		string strLine = fileReader.getLineText();
 
 		// Skip any empty lines
 		if (strLine.empty()) 
@@ -323,34 +315,165 @@ int COMPackages::readComponentsFile()
 			++iCount;
 		}		// end else exactly two tokens
 	}
-	while(ifs);
+	//while(ifs);
 
 	return iCount;
 }
 //-------------------------------------------------------------------------------------------------
-int COMPackages::readPackagesFile()
+//int COMPackages::readPackagesFile2()
+//{
+//	int iCount = 0;
+//	CommentedTextFileReader* pFileReader;
+//
+//	HMODULE handle = ::GetModuleHandle("COMLMCore.dll");
+//	HRSRC rc = ::FindResource(handle, MAKEINTRESOURCE(IDR_PACKAGES_TEXT_FILE), RT_RCDATA);
+//	HGLOBAL rcData = ::LoadResource(handle, rc);
+//	string strPackagesFileText = string(static_cast<const char*>(::LockResource(rcData)));
+//	
+//	vector<string> vecLines;
+//	// Tokenize the lines using the newline character
+//	StringTokenizer st('\n');
+//	st.parse(strPackagesFileText, vecLines);
+//
+//	CommentedTextFileReader fileReader(vecLines);
+//	string strLine;
+//	do
+//	{
+//		// Retrieve the next non-comment line
+//		strLine = fileReader.getLineText();
+//
+//		// Skip any empty lines
+//		if (strLine.empty())
+//		{
+//			continue;
+//		}
+//
+//		// Parse the line using comma delimiter
+//		vector<string> vecTokens;
+//		StringTokenizer	st(',');
+//		st.parse(strLine.c_str(), vecTokens);
+//
+//		// Error if not exactly two tokens
+//		if (vecTokens.size() != 2)
+//		{
+//			// Create and throw exception
+//			UCLIDException ue("ELI11977", "Unable to parse string - token count != 2");
+//			ue.addDebugInfo("Token Count", vecTokens.size());
+//			ue.addDebugInfo("Input Line", strLine);
+//			throw ue;
+//		}
+//		else
+//		{
+//			// Ensure that package name is not already present
+//			bool			bDuplicate = false;
+//			unsigned long	ulMaxID = 0;
+//			std::map<unsigned long, std::string>::iterator iter;
+//			for (iter = m_mapPackageIDsToNames.begin();
+//				iter != m_mapPackageIDsToNames.end(); iter++)
+//			{
+//				// Compare names
+//				if (_strcmpi((vecTokens[0]).c_str(),
+//					(iter->second).c_str()) == 0)
+//				{
+//					bDuplicate = true;
+//				}
+//
+//				// Check the package IDs because we need to 
+//				// create a new one
+//				ulMaxID = max(ulMaxID, iter->first);
+//			}
+//
+//			// Continue processing the line only if 
+//			// this is a new package
+//			if (!bDuplicate)
+//			{
+//				// Add package to package map
+//				m_mapPackageIDsToNames[ulMaxID + 1] = vecTokens[0];
+//
+//				// Add collected component IDs to package map
+//				m_mapPackageIDsToComponents[ulMaxID + 1] = vecTokens[1];
+//
+//				// Increment package count
+//				++iCount;
+//
+//			}	// end if package not already included
+//		}		// end else exactly two tokens
+//
+//	} while (!fileReader.reachedEndOfStream());
+//
+//	return iCount;
+//}
+//-------------------------------------------------------------------------------------------------
+vector<string> COMPackages::getFileLines(unsigned long ulResourceID)
 {
-	int iCount = 0;
+	HMODULE handle = ::GetModuleHandle("COMLMCore.dll");
+	HRSRC rc = ::FindResource(handle, MAKEINTRESOURCE(ulResourceID), RT_RCDATA);
+	HGLOBAL rcData = ::LoadResource(handle, rc);
+	string strPackagesFileText = string(static_cast<const char*>(::LockResource(rcData)));
 
+	vector<string> vecLines;
+	// Tokenize the lines using the newline character
+	StringTokenizer st('\n');
+	st.parse(strPackagesFileText, vecLines);
+	
+	return vecLines;
+}
+//-------------------------------------------------------------------------------------------------
+vector<string> COMPackages::getFileLines(string strFileName)
+{
 	// Get path to bin folder and DAT file
-	string	strPath = getModuleDirectory( "COMLMCore.DLL" ) + 
-		"\\Packages.dat";
-	if (!isFileOrFolderValid( strPath ))
+	string	strPath = getModuleDirectory("COMLMCore.DLL") + "\\" + strFileName;
+	if (!isFileOrFolderValid(strPath))
 	{
 		// Create and throw exception
-		UCLIDException ue("ELI11976", "Unable to open Packages file" );
-		ue.addDebugInfo( "Path", strPath );
+		UCLIDException ue("ELI11976", "Unable to open Packages file");
+		ue.addDebugInfo("Path", strPath);
 		throw ue;
 	}
 
 	// Open Packages.dat file
-	ifstream ifs( strPath.c_str() );
-	string strLine;
-	CommentedTextFileReader fileReader( ifs, "//", true );
-	do
+	ifstream ifs(strPath.c_str());
+
+	vector<string> vecLines;
+	while (ifs)
+	{
+		string strLine;
+		getline(ifs, strLine);
+		vecLines.push_back(strLine);
+	}
+
+	return vecLines;
+}
+//-------------------------------------------------------------------------------------------------
+int COMPackages::readPackagesFile(bool bUseEmbeddedResource/* = false*/)
+{
+	int iCount = 0;
+
+	vector<string> vecFileLines = bUseEmbeddedResource
+		? getFileLines(IDR_PACKAGES_FILE)
+		: getFileLines("Packages.dat");
+
+	CommentedTextFileReader fileReader(vecFileLines);
+
+	//// Get path to bin folder and DAT file
+	//string	strPath = getModuleDirectory( "COMLMCore.DLL" ) + 
+	//	"\\Packages.dat";
+	//if (!isFileOrFolderValid( strPath ))
+	//{
+	//	// Create and throw exception
+	//	UCLIDException ue("ELI11976", "Unable to open Packages file" );
+	//	ue.addDebugInfo( "Path", strPath );
+	//	throw ue;
+	//}
+	//
+	//// Open Packages.dat file
+	//ifstream ifs(strPath.c_str());
+	//CommentedTextFileReader fileReader(ifs, "//", true);
+	//string strLine;
+	while (!fileReader.reachedEndOfStream())
 	{
 		// Retrieve the next non-comment line
-		strLine = fileReader.getLineText();
+		string strLine = fileReader.getLineText();
 
 		// Skip any empty lines
 		if (strLine.empty()) 
@@ -409,7 +532,7 @@ int COMPackages::readPackagesFile()
 			}	// end if package not already included
 		}		// end else exactly two tokens
 	}
-	while(ifs);
+	//while(!fileReader.reachedEndOfStream());
 
 	return iCount;
 }

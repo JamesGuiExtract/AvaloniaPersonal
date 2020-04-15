@@ -66,6 +66,7 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\UserLicense.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -76,10 +77,10 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About UserLicense"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
-    LTEXT           "Copyright (C) 2019\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,40,25,119,23
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,21,20
     DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
     EDITTEXT        IDC_EDIT_VERSION,40,7,129,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    LTEXT           "Copyright (C) 2019\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,40,25,119,23
 END
 
 IDD_USERLICENSE_DIALOG DIALOGEX 0, 0, 376, 300
@@ -205,6 +206,18 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,129,26,50,16
 END
 
+IDD_CURRENT_LICENSE DIALOGEX 0, 0, 343, 182
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Extract license info"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,21,20
+    DEFPUSHBUTTON   "OK",IDOK,284,6,50,14,WS_GROUP
+    EDITTEXT        IDC_EDIT_VERSION,40,7,129,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    LTEXT           "Active License",IDC_STATIC,40,22,48,8
+    EDITTEXT        IDC_EDIT_LICENSE,40,33,294,141,ES_MULTILINE | ES_AUTOHSCROLL | WS_VSCROLL
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -242,6 +255,43 @@ BEGIN
     BEGIN
         VALUE "Translation", 0x409, 1200
     END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+    END
+
+    IDD_CURRENT_LICENSE, DIALOG
+    BEGIN
+        RIGHTMARGIN, 334
+        BOTTOMMARGIN, 174
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_ABOUTBOX AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_CURRENT_LICENSE AFX_DIALOG_LAYOUT
+BEGIN
+    0
 END
 
 

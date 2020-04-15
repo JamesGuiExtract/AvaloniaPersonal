@@ -157,6 +157,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CurrentLicenseDlg.cpp" />
     <ClCompile Include="LicenseRequest.cpp" />
     <ClCompile Include="LicenseWizard.cpp" />
     <ClCompile Include="LicenseWizardPage.cpp" />
@@ -186,6 +187,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CurrentLicenseDlg.h" />
     <ClInclude Include="LicenseRequest.h" />
     <ClInclude Include="LicenseWizard.h" />
     <ClInclude Include="LicenseWizardPage.h" />

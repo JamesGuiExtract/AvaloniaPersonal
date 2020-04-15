@@ -68,6 +68,7 @@
     <Compile Include="IErrorEmailTask.cs" />
     <Compile Include="IFileBrowser.cs" />
     <Compile Include="IMemoryManager.cs" />
+    <Compile Include="ILicenseInfo.cs" />
     <Compile Include="ISecureObjectCreator.cs" />
     <Compile Include="ISecureCounter.cs" />
     <Compile Include="ISecureFileDeleter.cs" />

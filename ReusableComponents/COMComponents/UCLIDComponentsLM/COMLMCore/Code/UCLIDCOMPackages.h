@@ -19,6 +19,8 @@
 #include <vector>
 #include <map>
 
+using namespace std;
+
 class COMPackages
 {
 public:
@@ -71,7 +73,7 @@ public:
 	//				same directory as the executable.
 	// PROMISE: Nothing
 	// ARGS:	None
-	void init();
+	void init(bool bUseEmbeddedResources = false);
 
 private:
 
@@ -80,16 +82,29 @@ private:
 	// REQUIRE: Components.dat file must be present in the same directory
 	//				as the executable.
 	// PROMISE: Returns the number of components read.
-	// ARGS:	None
-	int readComponentsFile();
+	// ARGS:	bUseEmbeddedResource- true to use the embedded components.dat
+	//			and packages.dat, false to use the files that exist parallel
+	//			to the running process.
+	int readComponentsFile(bool bUseEmbeddedResource);
 
 	//=======================================================================
 	// PURPOSE: Read the Packages.dat file and populate the data vector.
 	// REQUIRE: Packages.dat file must be present in the same directory
 	//				as the executable.
 	// PROMISE: Returns the number of packages read.
-	// ARGS:	None
-	int readPackagesFile();
+	// ARGS:	bUseEmbeddedResource- true to use the embedded components.dat
+	//			and packages.dat, false to use the files that exist parallel
+	//			to the running process.
+	int readPackagesFile(bool bUseEmbeddedResource);
+
+	//=======================================================================
+	// PURPOSE: Returns the lines from the specified filename
+	vector<string> getFileLines(string strFileName);
+
+	//=======================================================================
+	// PURPOSE: Returns the lines from the specified embedded resource file
+	vector<string> getFileLines(unsigned long ulResourceID);
+
 
 ///////////////
 // DATA MEMBERS

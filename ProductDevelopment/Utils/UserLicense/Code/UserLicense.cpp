@@ -56,6 +56,14 @@ BOOL CUserLicenseApp::InitInstance()
 		static UCLIDExceptionDlg exceptionDlg;
 		UCLIDException::setExceptionHandler( &exceptionDlg );
 
+		// So that the CurrentLicense dialog can show active licensing.
+		// Catch/log to avoid any risk being able to open the utility.
+		try
+		{
+			LicenseManagement::loadLicenseFilesFromFolder(LICENSE_MGMT_PASSWORD);
+		}
+		CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI49757")
+
 		bool bInit = false;
 
 		// If appropriate command line argument has been provided,

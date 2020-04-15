@@ -6,6 +6,7 @@
 
 #include <UCLIDException.h>
 #include <cpputil.h>
+#include <EnvironmentInfo.h>
 
 #include <string>
 
@@ -54,20 +55,12 @@ BOOL CFAMDBAdminAboutDlg::OnInitDialog()
 		string strCaption = "About FAMDBAdmin";
 		SetWindowText(strCaption.c_str());
 
-		// Get module path and filename
-		char zFileName[MAX_PATH];
-		int ret = ::GetModuleFileName(NULL, zFileName, MAX_PATH);
-		if (ret == 0)
-		{
-			throw UCLIDException("ELI15153", "Unable to retrieve module file name!");
-		}
-
-		// Retrieve the Version string
-		string strVersion = "FAMDBAdmin Version ";
-		strVersion += ::getFileVersion(string( zFileName ));
-
-		// Provide the Version string
+		EnvironmentInfo envInfo;
+		string strVersion = "Version " + envInfo.GetExtractVersion();
 		SetDlgItemText(IDC_EDIT_VERSION, strVersion.c_str());
+
+		string strLicenses = asString(envInfo.GetLicensedPackages(), false, "\r\n");
+		SetDlgItemText(IDC_EDIT_LICENSES, strLicenses.c_str());
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18621");
 

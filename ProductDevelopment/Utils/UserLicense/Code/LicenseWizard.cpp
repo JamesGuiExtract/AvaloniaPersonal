@@ -8,8 +8,10 @@
 #include "Step2.h"
 #include "Step3Automatic.h"
 #include "Step3Manual.h"
+#include "CurrentLicenseDlg.h"
 
 #include <cpputil.h>
+#include <LicenseMgmt.h>
 #include <UCLIDException.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -106,6 +108,7 @@ CLicenseWizard::~CLicenseWizard()
 BEGIN_MESSAGE_MAP(CLicenseWizard, CPropertySheet)
 	ON_WM_SYSCOMMAND()
 	ON_BN_CLICKED(IDC_BTN_OPEN_LICENSE_FOLDER, OnOpenLicenseFolder)
+	ON_BN_CLICKED(IDC_BTN_CURRENT_LICENSE, OnShowCurrentLicense)
 END_MESSAGE_MAP()	
 
 //--------------------------------------------------------------------------------------------------
@@ -163,6 +166,15 @@ BOOL CLicenseWizard::OnInitDialog()
 			BS_PUSHBUTTON|WS_CHILD|WS_VISIBLE|WS_TABSTOP, rectButton, this,
 			IDC_BTN_OPEN_LICENSE_FOLDER);
 		m_BtnOpenLicenseFolder.SetFont(GetFont());
+
+		rectButton.left = rectButton.right + 5;
+		// Make the button wide enough for "Current License"
+		rectButton.right = rectButton.left + 100;
+
+		m_BtnShowCurrentLicense.Create("Current License",
+			BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE | WS_TABSTOP, rectButton, this,
+			IDC_BTN_CURRENT_LICENSE);
+		m_BtnShowCurrentLicense.SetFont(GetFont());
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI23351")
 
@@ -236,3 +248,14 @@ void CLicenseWizard::OnOpenLicenseFolder()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32572");
 }
 //--------------------------------------------------------------------------------------------------
+void CLicenseWizard::OnShowCurrentLicense()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		CCurrentLicenseDlg dlgCurrentLicense(this);
+		dlgCurrentLicense.DoModal();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI49754");
+}

@@ -196,9 +196,9 @@
 #define IDC_EDIT_CONN_STR               1008
 #define IDC_BUTTON_CONN_STR             1009
 #define IDC_EDIT_ADDITIONAL_CONN_STR_ATTR 1010
-#define IDC_BUTTON_DEFAULT				1011
+#define IDC_BUTTON_DEFAULT              1011
 #define IDC_BUTTON_USE_CURRENT_CONTEXT  1012
-#define IDC_BUTTON_SELECT_CONTEXT		1015
+#define IDC_BUTTON_SELECT_CONTEXT       1015
 #define IDC_STATIC_WORKFLOW_WARNING     1016
 // End Database Page ID's
 
@@ -270,6 +270,7 @@
 #define IDC_WORKFLOW_COMBO              2068
 #define IDC_STATIC_WORKFLOW             2069
 #define IDC_STATIC_CONTEXT              2070
+#define IDC_EDIT_LICENSES               2071
 #define IDC_BTN_RUN                     32768
 #define IDC_BTN_STOP                    32769
 #define IDC_BTN_AUTO_SCROLL             32770
@@ -316,9 +317,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        2071
+#define _APS_NEXT_RESOURCE_VALUE        2072
 #define _APS_NEXT_COMMAND_VALUE         32817
-#define _APS_NEXT_CONTROL_VALUE         2071
+#define _APS_NEXT_CONTROL_VALUE         2072
 #define _APS_NEXT_SYMED_VALUE           2071
 #endif
 #endif

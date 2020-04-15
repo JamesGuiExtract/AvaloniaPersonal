@@ -3,6 +3,9 @@
 // Used by COMLMCORE.RC
 //
 
+#define IDR_COMPONENTS_FILE		100
+#define IDR_PACKAGES_FILE		101
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

@@ -140,6 +140,7 @@
 #define IDC_WORKFLOW_COMBO              2122
 #define IDC_CONTEXT_EDIT                2123
 #define IDC_STATIC_WORKFLOW             2124
+#define IDC_EDIT_LICENSES               2125
 #define ID_DATABASE_SELECT              32772
 #define ID_DATABASE_CLEAR               32773
 #define ID_DATABASE_RESETLOCK           32774
@@ -187,7 +188,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        148
 #define _APS_NEXT_COMMAND_VALUE         32816
-#define _APS_NEXT_CONTROL_VALUE         2125
-#define _APS_NEXT_SYMED_VALUE           2122
+#define _APS_NEXT_CONTROL_VALUE         2126
+#define _APS_NEXT_SYMED_VALUE           2126
 #endif
 #endif

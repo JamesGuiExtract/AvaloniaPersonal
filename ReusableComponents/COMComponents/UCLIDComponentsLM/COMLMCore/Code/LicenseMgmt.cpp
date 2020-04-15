@@ -294,6 +294,28 @@ bool LicenseManagement::isLicensed(unsigned long ulComponentID)
 	return internalIsLicensed(ulComponentID);
 }
 //-------------------------------------------------------------------------------------------------
+vector<pair<unsigned long, CTime>> LicenseManagement::getLicensedComponents()
+{
+	// prevent simultaneous access to this object from multiple threads
+	CSingleLock guard(&m_lock, TRUE);
+
+	// Check for bad license state
+	validateState();
+
+	return internalGetLicensedComponents();
+}
+//-------------------------------------------------------------------------------------------------
+vector<pair<string, CTime>> LicenseManagement::getLicensedPackageNames()
+{
+	// prevent simultaneous access to this object from multiple threads
+	CSingleLock guard(&m_lock, TRUE);
+
+	// Check for bad license state
+	validateState();
+
+	return internalGetLicensedPackageNames();
+}
+//-------------------------------------------------------------------------------------------------
 bool LicenseManagement::isTemporaryLicense(unsigned long ulComponentID)
 {
 	// prevent simultaneous access to this object from multiple threads
@@ -884,6 +906,52 @@ bool LicenseManagement::internalIsLicensed(unsigned long ulComponentID)
 	///////////////////
 
 	return m_LicenseData.isLicensed(ulComponentID);
+}
+//-------------------------------------------------------------------------------------------------
+vector<pair<unsigned long, CTime>> LicenseManagement::internalGetLicensedComponents()
+{
+	//////////////////////////
+	// Check User License flag
+	//////////////////////////
+	if (!m_bOEMPasswordOK)
+	{
+		// OEM password has not been provided, 
+		// therefore check for User License constraints
+		if (m_bUserLicenseFailure)
+		{
+			return vector<pair<unsigned long, CTime>>();
+		}
+		// else No User License Failure was noted
+		// so go ahead and check the components
+	}
+	// else OEM Password has been provided
+	// so there is no need to check the User License information
+	// so go ahead and check the components
+
+	return m_LicenseData.getLicensedComponents();
+}
+//-------------------------------------------------------------------------------------------------
+vector<pair<string, CTime>> LicenseManagement::internalGetLicensedPackageNames()
+{
+	/////////////////////////
+	// Check User License flag
+	//////////////////////////
+	if (!m_bOEMPasswordOK)
+	{
+		// OEM password has not been provided, 
+		// therefore check for User License constraints
+		if (m_bUserLicenseFailure)
+		{
+			return vector<pair<string, CTime>>();
+		}
+		// else No User License Failure was noted
+		// so go ahead and check the package names
+	}
+	// else OEM Password has been provided
+	// so there is no need to check the User License information
+	// so go ahead and check the package names
+
+	return m_LicenseData.getLicensedPackageNames();
 }
 //-------------------------------------------------------------------------------------------------
 void LicenseManagement::startOrCloseTrpBasedOnLicenseData()

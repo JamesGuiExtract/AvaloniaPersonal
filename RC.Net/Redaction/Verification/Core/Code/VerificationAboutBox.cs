@@ -1,8 +1,10 @@
+using Extract.Interfaces;
 using System;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
+using UCLID_COMLMLib;
 
 namespace Extract.Redaction.Verification
 {
@@ -30,9 +32,10 @@ namespace Extract.Redaction.Verification
             labelCopyright.Text = AssemblyCopyright;
             labelCompanyName.Text = AssemblyCompany;
 
-            // [FlexIDSCore:5013]
-            // A temporary hack to get the verification UI to match ID Shield's version number.
-            labelVersion.Text = labelVersion.Text.Replace("Version 3", "Version 9");
+            ILicenseInfo licenseInfo = new UCLIDComponentLMClass() as ILicenseInfo;
+            licensesTextBox.Text = string.Join(Environment.NewLine, licenseInfo.GetLicensedPackageNamesWithExpiration());
+            // Otherwise all license text ends up being selected.
+            licensesTextBox.Select(0, 0);
         }
 
         #endregion Constructors

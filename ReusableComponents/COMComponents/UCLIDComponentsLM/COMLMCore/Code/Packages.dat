@@ -72,23 +72,22 @@
 !LabDEServer,7050:$LabDECore:$FlexServer
 !LabDEClient,7050:$LabDECore:$FlexIndex:$OCROnClient
 
-
 FLEX Index,0
 -    Client (swiping) ,$FlexIndex:$OCROnClient:7047
--    FLEX Server Standard (2 LeadTools threads),$FlexServer
--    FLEX Server Full PDF R/W (4 LeadTools threads),7073:$FlexServer
+-    Server Standard (2 LeadTools threads),$FlexServer
+-    Server Full PDF R/W (4 LeadTools threads),7073:$FlexServer
 
 ID Shield,0
 -    Client (verification UI) ,$IDShield:$OCROnClient:7045:7047:$FlexIndex
--    ID Shield Server Standard (2 LeadTools threads),$IDShield:7044:7045:$FlexShieldServerCore:$FlexIndex
--    ID Shield Server Full PDF R/W (4 LeadTools threads),$IDShield:7044:7045:7073:$FlexShieldServerCore:$FlexIndex
+-    Server Standard (2 LeadTools threads),$IDShield:7044:7045:$FlexShieldServerCore:$FlexIndex
+-    Server Full PDF R/W (4 LeadTools threads),$IDShield:7044:7045:7073:$FlexShieldServerCore:$FlexIndex
 
 LabDE,0
 -    Client (Verify data),$LabDEClient:7047
 -    LabDE Server Standard (2 LeadTools threads),$LabDEServer
 -    LabDEServer Full PDF R/W (4 LeadTools threads),7073:$LabDEServer
 
-FLEX Index / ID Shield Utilities,0
+Utilities,0
 -    Create Searchable PDF,7079
 -    Disable Rule Execution Counters,7072
 -    File Inspector Search,7084
@@ -112,14 +111,6 @@ Dashboards,0
 
 ID Shield Office 1.0,0
 -    ID Shield Office,$IDShieldOffice
-
-ID Shield for Laserfiche,0
--    Verification Only,$LaserficheVerification
--    Desktop Redaction (includes verification),$LaserficheDesktop
--    Server Redaction (includes desktop redaction),$LaserficheServer
-
-NetDMS Integration,0
--    NetDMS Components,7110
 
 Other<RWOnly>,0
 -    FLEX Index Rule Writing (Simple Rules passwords!) <DevOnly>,$RuleWritingCore:7027:7046:$OCROnClient

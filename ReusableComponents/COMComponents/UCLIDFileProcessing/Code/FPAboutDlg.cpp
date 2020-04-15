@@ -9,6 +9,7 @@
 #include <TemporaryResourceOverride.h>
 #include <RegistryPersistenceMgr.h>
 #include <RegConstants.h>
+#include <EnvironmentInfo.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -67,8 +68,12 @@ BOOL CFPAboutDlg::OnInitDialog(void)
 		ma_pSettingsCfgMgr = unique_ptr<IConfigurationSettingsPersistenceMgr>(
 			new RegistryPersistenceMgr( HKEY_CURRENT_USER, gstrREG_ROOT_KEY ) );
 
-		// Set the Version string
-		SetDlgItemText( IDC_EDIT_VERSION, getFileProcessingManagerVersion().c_str() );
+		EnvironmentInfo envInfo;
+		string strVersion = "Version " + envInfo.GetExtractVersion();
+		SetDlgItemText( IDC_EDIT_VERSION, strVersion.c_str() );
+
+		string strLicenses = asString(envInfo.GetLicensedPackages(), false, "\r\n");
+		SetDlgItemText(IDC_EDIT_LICENSES, strLicenses.c_str());
 
 		// FKB version no longer shown... at least until the versioning system is reworked.
 		//SetDlgItemText( IDC_EDIT_FKB_VERSION, getFKBUpdateVersion().c_str() );

@@ -189,12 +189,16 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TimeRollbackPreventer.cpp" />
+    <ClCompile Include="UCLIDCOMPackages.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="COMLMCore.def" />
     <None Include="res\COMLMCore.rc2" />
     <None Include="Components.dat" />
-    <None Include="Packages.dat" />
+    <None Include="Packages.dat">
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DeploymentContent>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="COMLMCore.rc">
@@ -213,6 +217,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="TimeRollbackPreventer.h" />
+    <ClInclude Include="UCLIDCOMPackages.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\BaseUtils\Code\BaseUtils.vcxproj">

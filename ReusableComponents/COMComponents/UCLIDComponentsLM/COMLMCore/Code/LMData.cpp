@@ -15,6 +15,7 @@
 
 #include "stdafx.h"
 #include "LMData.h"
+#include "UCLIDCOMPackages.h"
 
 #include <cpputil.h>
 #include <ByteStream.h>
@@ -731,6 +732,103 @@ bool LMData::isLicensed(unsigned long ulComponentID)
 
 	// Provide result to caller
 	return bResult;
+}
+//-------------------------------------------------------------------------------------------------
+vector<pair<unsigned long, CTime>> LMData::getLicensedComponents()
+{
+	vector<pair<unsigned long, CTime>> licensedComponents;
+
+	if (m_bUseComputerName && m_strActualComputerName.compare(m_strUserComputerName) != 0)
+	{
+		return licensedComponents;
+	}
+
+	if (m_bUseSerialNumber && m_ulActualSerialNumber != m_ulUserSerialNumber)
+	{
+		return licensedComponents;
+	}
+
+	if (m_bUseMACAddress && m_strActualMACAddress.compare(m_strUserMACAddress) != 0)
+	{
+		return licensedComponents;
+	}
+
+	for (map<unsigned long, ComponentData>::iterator iter = m_mapCompIDToData.begin();
+		iter != m_mapCompIDToData.end();
+		iter++)
+	{
+		// Get component data
+		ComponentData	CD(iter->second);
+
+		// Check if this component has been disabled
+		if (!CD.m_bDisabled && (CD.m_bIsLicensed || !CD.isExpired()))
+		{
+			licensedComponents.push_back(pair<unsigned long, CTime>(
+				iter->first, 
+				(iter->second.isPermanent() ? CTime(0) : iter->second.m_ExpirationDate)));
+		}
+	}
+	
+	return licensedComponents;
+}
+//-------------------------------------------------------------------------------------------------
+vector<pair<string, CTime>> LMData::getLicensedPackageNames()
+{
+	vector<pair<unsigned long, CTime>> vecLicensedComponents = getLicensedComponents();
+	sort(vecLicensedComponents.begin(), vecLicensedComponents.end());
+	vector<pair<string, CTime>> vecLicensedPackages;
+
+	COMPackages packages;
+	packages.init(true);
+	vector<string> vecPackages = packages.getPackages();
+	string strNamePrefix;
+	for each(string strPackage in vecPackages)
+	{
+		if (strPackage.empty() || strPackage[0] != '-')
+		{
+			strNamePrefix = trim(strPackage, " ", " ");
+			continue;
+		}
+
+		strPackage = trim(strPackage, "- ", "");
+
+		string strFullPackageName = strNamePrefix.empty()
+			? trim(strPackage, "", " ")
+			: strNamePrefix + " - " + trim(strPackage, "", " ");
+
+		vector<unsigned long> vecRequiredComponents = packages.getPackageComponents(strPackage);
+		sort(vecRequiredComponents.begin(), vecRequiredComponents.end());
+
+		CTime expirationDate = { 0 };
+		auto iterRequiredComponent = vecLicensedComponents.begin();
+		for each (unsigned long ulComponent in vecRequiredComponents)
+		{
+			while (iterRequiredComponent != vecLicensedComponents.end())
+			{
+				if (iterRequiredComponent->first == ulComponent)
+				{
+					if (iterRequiredComponent->second > 0 &&
+						(expirationDate <= 0 || iterRequiredComponent->second < expirationDate))
+					{
+						expirationDate = iterRequiredComponent->second;
+					}
+
+					break;
+				}
+				else
+				{
+					iterRequiredComponent++;
+				}
+			}
+		}
+
+		if (iterRequiredComponent != vecLicensedComponents.end())
+		{
+			vecLicensedPackages.push_back(pair<string, CTime>(strFullPackageName, expirationDate));
+		}
+	}
+
+	return vecLicensedPackages;
 }
 //-------------------------------------------------------------------------------------------------
 bool LMData::isTemporaryLicense(unsigned long ulComponentID)

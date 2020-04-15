@@ -104,6 +104,25 @@ public:
     static bool isLicensed(unsigned long ulComponentID);
 
     //=======================================================================
+    // PURPOSE: Gets all licensed component codes along with the expiration
+    //			time for any components that are temporarily licensed.
+    // RETURNS: A vector of pairs where the first element in each pair is the
+    //			component code and the second is the time any temporarily
+    //			licensed codes expired or 0 for permanently licensed codes.
+    static vector<pair<unsigned long, CTime>> getLicensedComponents();
+
+    //=======================================================================
+    // PURPOSE: Gets all licensed package names using the packages.dat
+    //			committed at the time of compile. The list of packages is
+    //			determined based on all of the components comprising a
+    //			particular package being licensed as opposed to the packages
+    //			specifically selected when the license code was generated.	
+    // RETURNS: A vector of pairs where the first element in each pair is the
+    //			package name and the second is the time any temporarily
+    //			licensed packages expire or 0 for permanently licensed packages.
+    static vector<pair<string, CTime>> getLicensedPackageNames();
+
+    //=======================================================================
     // PURPOSE: Checks to see if the specified licensed component is
     //			temporarily licensed.
     // REQUIRE: ulComponentID is a licensed component and License information
@@ -292,6 +311,22 @@ private:
     //		 to use the same logic to check the licensed state of a
     //		 component.
     static bool internalIsLicensed(unsigned long ulLicenseID);
+
+    // Gets all licensed component codes along with the expiration time for
+    // any components that are temporarily licensed.
+    // Returns a vector of pairs where the first element in each pair is the
+    // component code and the second is the time any temporarily licensed
+    // codes expired or 0 for permanently licensed codes.
+    static vector<pair<unsigned long, CTime>> internalGetLicensedComponents();
+
+    // Gets all licensed package names using the packages.dat committed at the
+    // time of compile. The list of packages is determined based on all of the
+    // components comprising a particular package being licensed as opposed to
+    // the packages specifically selected when the license code was generated.	
+    // Returns a vector of pairs where the first element in each pair is the
+    // package name and the second is the time any temporarily licensed
+    // packages expire or 0 for permanently licensed packages.
+    static vector<pair<string, CTime>> internalGetLicensedPackageNames();
 
 	// Will either start or stop the TRP service based on whether the current license
 	// data contains an expiring component

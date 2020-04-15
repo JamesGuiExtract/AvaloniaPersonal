@@ -1,4 +1,5 @@
 using Extract.DataEntry.Utilities.DataEntryApplication.Properties;
+using Extract.Interfaces;
 using Extract.Licensing;
 using Extract.Utilities;
 using System;
@@ -7,6 +8,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using UCLID_COMLMLib;
 
 namespace Extract.DataEntry.Utilities.DataEntryApplication
 {
@@ -70,25 +72,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _labelCompanyName.Text = AssemblyCompany;
                 _linkLabelWebsite.Text = AssemblyCompanyUrl;
 
-                if (LicenseUtilities.IsTemporaryLicense(LicenseIdName.DataEntryCoreComponents))
-                {
-                    // Get the expiration date
-                    DateTime date =
-                        LicenseUtilities.GetExpirationDate(LicenseIdName.DataEntryCoreComponents);
-
-                    // Build the expiration date text for the label
-                    StringBuilder sb = new StringBuilder("License expires on ");
-                    sb.Append(date.ToLongDateString());
-                    sb.Append(" (");
-                    sb.Append(((TimeSpan)(date - DateTime.Now)).Days.ToString(CultureInfo.CurrentCulture));
-                    sb.Append(" days remaining).");
-                    _labelLicenseInformation.Text = sb.ToString();
-                }
-                else
-                {
-                    // Product is permanently licensed
-                    _labelLicenseInformation.Text = "Permanently licensed";
-                }
+                ILicenseInfo licenseInfo = new UCLIDComponentLMClass() as ILicenseInfo;
+                _licenseTextBox.Text = string.Join(Environment.NewLine, licenseInfo.GetLicensedPackageNamesWithExpiration());
+                // Otherwise all license text ends up being selected.
+                _licenseTextBox.Select(0, 0);
             }
             catch (Exception ex)
             {
