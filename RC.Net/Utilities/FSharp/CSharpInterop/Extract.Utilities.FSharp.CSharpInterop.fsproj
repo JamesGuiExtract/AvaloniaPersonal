@@ -69,8 +69,9 @@
     <Reference Include="FSharp.Compiler.Private">
       <HintPath>..\..\..\APIs\FSharp.Compiler.Tools.10.2.3\tools\FSharp.Compiler.Private.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Core">
+    <Reference Include="FSharp.Core, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\..\..\APIs\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="FSharp.Compiler.Interactive.Settings">
       <HintPath>..\..\..\APIs\FSharp.Compiler.Tools.10.2.3\tools\FSharp.Compiler.Interactive.Settings.dll</HintPath>
