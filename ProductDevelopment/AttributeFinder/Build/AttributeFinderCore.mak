@@ -83,6 +83,7 @@ SetVersions:
 	@CD "$(EngineeringRootDirectory)"
     @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
+	@SendFilesAsArgumentToApplication AssemblyInfo.fs 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cpp 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
 	@CD "$(RCNETDir)"
 	$(UpdateFileVersion)  "$(DataEntryBranding)\FlexIndex.resx" "$(FlexIndexVersion)"

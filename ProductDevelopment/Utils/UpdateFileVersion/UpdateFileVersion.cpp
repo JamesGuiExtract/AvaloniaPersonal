@@ -265,14 +265,8 @@ bool UpdateVersionInfoInTmpFile(const string& sSrcFileName, const string& sTmpFi
 			bool bInXmlVersionNode = false;
 			if (inFile.good())
 			{
-				while (!inFile.eof())
+				while (getline(inFile, sInBuf))
 				{
-					// If the return count is 0 then need to break out of the loop
-					if (getline(inFile,sInBuf))
-					{
-						break;
-					}
-
 					// Make sure it is not a comment line
 					if (sInBuf.find("//") == 0)
 					{
@@ -303,6 +297,16 @@ bool UpdateVersionInfoInTmpFile(const string& sSrcFileName, const string& sTmpFi
 					else if ((sInBuf.find(_T("[assembly: AssemblyFileVersion("))) != string::npos)
 					{
 						sOutBuf = _T("[assembly: AssemblyFileVersion(\"") + sVersion + "\")]";
+					}
+					// for .net AssemblyInfo.fs file
+					else if ((sInBuf.find(_T("[<assembly: AssemblyVersion("))) != string::npos)
+					{
+						sOutBuf = _T("[<assembly: AssemblyVersion(\"") + sVersion + "\")>]";
+					}
+					// for .net AssemblyInfo.fs file
+					else if ((sInBuf.find(_T("[<assembly: AssemblyFileVersion("))) != string::npos)
+					{
+						sOutBuf = _T("[<assembly: AssemblyFileVersion(\"") + sVersion + "\")>]";
 					}
 					// for .net .resx resource file
 					else if (bInXmlVersionNode &&
