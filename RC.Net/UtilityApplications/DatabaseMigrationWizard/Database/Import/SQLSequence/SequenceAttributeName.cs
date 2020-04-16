@@ -11,21 +11,32 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
         private readonly string CreateTempTableSQL = @"
                                         CREATE TABLE [dbo].[##AttributeName](
 	                                    [Name] [nvarchar](255) NULL,
+                                        [Guid] uniqueidentifier NOT NULL,
                                         )";
 
         private readonly string insertSQL = @"
-                                    INSERT INTO dbo.AttributeName(Name)
+                                    Update 
+	                                    dbo.AttributeName
+                                    SET
+	                                    Name = UpdatingAttributeName.Name
+                                    FROM
+	                                    ##AttributeName AS UpdatingAttributeName
+                                    WHERE
+	                                    UpdatingAttributeName.Guid = dbo.AttributeName.Guid
+                                    ;
+                                    INSERT INTO dbo.AttributeName(Name, Guid)
 
                                     SELECT
 	                                    Name
+	                                    , Guid
                                     FROM 
 	                                    ##AttributeName
 
                                     WHERE
-	                                    Name NOT IN (SELECT Name FROM dbo.AttributeName)";
+	                                    Guid NOT IN (SELECT Guid FROM dbo.AttributeName)";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##AttributeName (Name)
+                                            INSERT INTO ##AttributeName (Name, Guid)
                                             VALUES
                                             ";
 
@@ -33,13 +44,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
         public string TableName => "AttributeName";
 
-        public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
+        public void ExecuteSequence(ImportOptions importOptions)
         {
-            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
+            importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
-            ImportHelper.PopulateTemporaryTable<AttributeName>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
+            ImportHelper.PopulateTemporaryTable<AttributeName>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
+            importOptions.ExecuteCommand(this.insertSQL);
         }
     }
 }

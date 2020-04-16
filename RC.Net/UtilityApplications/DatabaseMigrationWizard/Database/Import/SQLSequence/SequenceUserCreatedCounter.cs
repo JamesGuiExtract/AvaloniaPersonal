@@ -12,31 +12,33 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                         CREATE TABLE [dbo].[##UserCreatedCounter](
 	                                    [CounterName] [nvarchar](50) NOT NULL,
 	                                    [Value] [bigint] NOT NULL,
+                                        [Guid] uniqueidentifier NOT NULL,
                                         )";
 
         private readonly string insertSQL = @"
-                                    INSERT INTO dbo.UserCreatedCounter(CounterName, Value)
-
-                                    SELECT
-	                                    CounterName
-	                                    , Value
-                                    FROM 
-	                                    ##UserCreatedCounter
-                                    WHERE
-	                                    CounterName NOT IN (SELECT CounterName FROM dbo.UserCreatedCounter)
-                                    ;
-
                                     UPDATE 
 	                                    dbo.UserCreatedCounter
                                     SET
 	                                    Value = UpdatingCounter.Value
+	                                    , CounterName = UpdatingCounter.CounterName
                                     FROM
 	                                    ##UserCreatedCounter AS UpdatingCounter
                                     WHERE
-	                                    UpdatingCounter.CounterName = dbo.UserCreatedCounter.CounterName";
+	                                    UpdatingCounter.Guid = dbo.UserCreatedCounter.Guid
+                                    ;
+                                    INSERT INTO dbo.UserCreatedCounter(CounterName, Value, Guid)
+
+                                    SELECT
+	                                    CounterName
+	                                    , Value
+	                                    , Guid
+                                    FROM 
+	                                    ##UserCreatedCounter
+                                    WHERE
+	                                    Guid NOT IN (SELECT Guid FROM dbo.UserCreatedCounter)";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##UserCreatedCounter (Countername, Value)
+                                            INSERT INTO ##UserCreatedCounter (Countername, Value, Guid)
                                             VALUES
                                             ";
 
@@ -44,13 +46,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
         public string TableName => "UserCreatedCounter";
 
-        public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
+        public void ExecuteSequence(ImportOptions importOptions)
         {
-            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
+            importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
-            ImportHelper.PopulateTemporaryTable<UserCreatedCounter>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
+            ImportHelper.PopulateTemporaryTable<UserCreatedCounter>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
+            importOptions.ExecuteCommand(this.insertSQL);
         }
     }
 }

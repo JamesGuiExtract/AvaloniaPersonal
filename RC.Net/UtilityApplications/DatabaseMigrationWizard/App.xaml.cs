@@ -1,4 +1,5 @@
 ﻿using DatabaseMigrationWizard.Database;
+using Extract;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Resources;
@@ -20,15 +21,22 @@ namespace DatabaseMigrationWizard
         /// <param name="e">The database server, then the database name</param>
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            ConnectionInformation connectionInformation = new ConnectionInformation() { DatabaseServer = "(local)", DatabaseName = "ImportTester" }; // Extract_ANONOMYZE
-            if (e.Args.Length == 2)
+            try
             {
-                connectionInformation.DatabaseServer = e.Args[0].ToString();
-                connectionInformation.DatabaseName = e.Args[1].ToString();
+                ConnectionInformation connectionInformation = new ConnectionInformation();
+                if (e.Args.Length == 2)
+                {
+                    connectionInformation.DatabaseServer = e.Args[0].ToString();
+                    connectionInformation.DatabaseName = e.Args[1].ToString();
+                }
+
+                MainWindow wnd = new MainWindow(connectionInformation);
+                wnd.Show();
             }
-            
-            MainWindow wnd = new MainWindow(connectionInformation);
-            wnd.Show();
+            catch(Exception ex)
+            {
+                ex.AsExtract("ELI49727").Display();
+            }
         }
     }
 }

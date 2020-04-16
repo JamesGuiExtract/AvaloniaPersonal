@@ -74,7 +74,8 @@ static const string gstrCREATE_DATAENTRY_COUNTER_DEFINITION =
 	" [Name] NVARCHAR(50) NOT NULL, "
 	" [AttributeQuery] NVARCHAR(255) NOT NULL, "
 	" [RecordOnLoad] BIT NOT NULL, "
-	" [RecordOnSave] BIT NOT NULL)";
+	" [RecordOnSave] BIT NOT NULL, "
+	" [Guid] uniqueidentifier NOT NULL DEFAULT newid())";
 
 //--------------------------------------------------------------------------------------------------
 // DataEntryCounterType
@@ -92,9 +93,9 @@ static const string gstrCREATE_DATAENTRY_COUNTER_TYPE =
 
 // Populate the DataEntryCounterType table.
 static const string gstrPOPULATE_DATAENTRY_COUNTER_TYPES = 
-	"INSERT INTO [dbo].[DataEntryCounterType] VALUES "
+	"INSERT INTO [dbo].[DataEntryCounterType] (Type, Description) VALUES "
 	"('L', 'OnLoad'); "
-	"INSERT INTO [dbo].[DataEntryCounterType] VALUES "
+	"INSERT INTO [dbo].[DataEntryCounterType] (Type, Description) VALUES "
 	"('S', 'OnSave')";
 
 //--------------------------------------------------------------------------------------------------

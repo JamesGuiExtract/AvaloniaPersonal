@@ -14,34 +14,37 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 	                                    [AttributeQuery] [nvarchar](255) NOT NULL,
 	                                    [RecordOnLoad] [bit] NOT NULL,
 	                                    [RecordOnSave] [bit] NOT NULL,
+                                        [Guid] uniqueidentifier NOT NULL,
                                        )";
 
         private readonly string insertSQL = @"
-                                    INSERT INTO dbo.DataEntryCounterDefinition(Name, AttributeQuery, RecordOnLoad, RecordOnSave)
+                                    UPDATE
+	                                    dbo.DataEntryCounterDefinition
+                                    SET
+	                                    Name = UpdatingDataEntryCounterDefinition.Name
+	                                    , AttributeQuery = UpdatingDataEntryCounterDefinition.AttributeQuery
+	                                    , RecordOnLoad = UpdatingDataEntryCounterDefinition.RecordOnLoad
+	                                    , RecordOnSave = UpdatingDataEntryCounterDefinition.RecordOnSave
+                                    FROM
+	                                    ##DataEntryCounterDefinition AS UpdatingDataEntryCounterDefinition
+                                    WHERE
+                                        DataEntryCounterDefinition.Guid = UpdatingDataEntryCounterDefinition.Guid
+                                    ;
+                                    INSERT INTO dbo.DataEntryCounterDefinition(Name, AttributeQuery, RecordOnLoad, RecordOnSave, Guid)
 
                                     SELECT
 	                                    Name
 	                                    , AttributeQuery
 	                                    , RecordOnLoad
 	                                    , RecordOnSave
+	                                    , Guid
                                     FROM 
 	                                    ##DataEntryCounterDefinition
                                     WHERE
-	                                    Name NOT IN (SELECT Name FROM dbo.DataEntryCounterDefinition)
-                                    ;
-                                    UPDATE
-	                                    dbo.DataEntryCounterDefinition
-                                    SET
-	                                    AttributeQuery = UpdatingDataEntryCounterDefinition.AttributeQuery
-	                                    , RecordOnLoad = UpdatingDataEntryCounterDefinition.RecordOnLoad
-	                                    , RecordOnSave = UpdatingDataEntryCounterDefinition.RecordOnSave
-                                    FROM
-	                                    ##DataEntryCounterDefinition AS UpdatingDataEntryCounterDefinition
-                                    WHERE
-                                        DataEntryCounterDefinition.Name = UpdatingDataEntryCounterDefinition.Name";
+	                                    Guid NOT IN (SELECT Guid FROM dbo.DataEntryCounterDefinition)";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##DataEntryCounterDefinition (Name, AttributeQuery, RecordOnLoad, RecordOnSave)
+                                            INSERT INTO ##DataEntryCounterDefinition (Name, AttributeQuery, RecordOnLoad, RecordOnSave, Guid)
                                             VALUES
                                             ";
 
@@ -49,13 +52,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
         public string TableName => "DataEntryCounterDefinition";
 
-        public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
+        public void ExecuteSequence(ImportOptions importOptions)
         {
-            //DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
-            //
-            //ImportHelper.PopulateTemporaryTable<DataEntryCounterDefinition>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
-            //
-            //DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
+            importOptions.ExecuteCommand(this.CreateTempTableSQL);
+
+            ImportHelper.PopulateTemporaryTable<DataEntryCounterDefinition>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+            importOptions.ExecuteCommand(this.insertSQL);
         }
     }
 }

@@ -19,10 +19,29 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										[ORMMessage] [xml] NULL,
 										[EncounterID] [nvarchar](20) NULL,
 										[AccessionNumber] [nvarchar](50) NULL,
+                                        [Guid] uniqueidentifier NOT NULL,
 										)";
 
         private readonly string insertSQL = @"
-                                    INSERT INTO dbo.LabDEOrder(OrderNumber, OrderCode, PatientMRN, ReceivedDateTime, OrderStatus, ReferenceDateTime, ORMMessage, EncounterID, AccessionNumber)
+                                    UPDATE
+										dbo.LabDEOrder
+									SET
+										OrderCode = UpdatingLabDEOrder.OrderCode
+										, PatientMRN = UpdatingLabDEOrder.PatientMRN
+										, ReceivedDateTime = UpdatingLabDEOrder.ReceivedDateTime
+										, OrderStatus = UpdatingLabDEOrder.OrderStatus
+										, ReferenceDateTime = UpdatingLabDEOrder.ReferenceDateTime
+										, ORMMessage = UpdatingLabDEOrder.ORMMessage
+										, EncounterID = UpdatingLabDEOrder.EncounterID
+										, AccessionNumber = UpdatingLabDEOrder.AccessionNumber
+										, OrderNumber = UpdatingLabDEOrder.OrderNumber
+
+									FROM
+										##LabDEOrder AS UpdatingLabDEOrder
+									WHERE
+										LabDEOrder.Guid = UpdatingLabDEOrder.Guid
+									;
+									INSERT INTO dbo.LabDEOrder(OrderNumber, OrderCode, PatientMRN, ReceivedDateTime, OrderStatus, ReferenceDateTime, ORMMessage, EncounterID, AccessionNumber, Guid)
 
 									SELECT
 										OrderNumber
@@ -34,31 +53,15 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										, ORMMessage
 										, EncounterID
 										, AccessionNumber
+										, Guid
 									FROM 
 										##LabDEOrder
 									WHERE
-										OrderNumber NOT IN (SELECT OrderNumber FROM dbo.LabDEOrder)
-									;
-									UPDATE
-										dbo.LabDEOrder
-									SET
-										OrderCode = UpdatingLabDEOrder.OrderCode
-										, PatientMRN = UpdatingLabDEOrder.PatientMRN
-										, ReceivedDateTime = UpdatingLabDEOrder.ReceivedDateTime
-										, OrderStatus = UpdatingLabDEOrder.OrderStatus
-										, ReferenceDateTime = UpdatingLabDEOrder.ReferenceDateTime
-										, ORMMessage = UpdatingLabDEOrder.ORMMessage
-										, EncounterID = UpdatingLabDEOrder.EncounterID
-										, AccessionNumber = UpdatingLabDEOrder.AccessionNumber
-
-									FROM
-										##LabDEOrder AS UpdatingLabDEOrder
-									WHERE
-										LabDEOrder.OrderNumber = UpdatingLabDEOrder.OrderNumber
+										Guid NOT IN (SELECT Guid FROM dbo.LabDEOrder)
 									;";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##LabDEOrder(OrderNumber, OrderCode, PatientMRN, ReceivedDateTime, OrderStatus, ReferenceDateTime, ORMMessage, EncounterID, AccessionNumber)
+                                            INSERT INTO ##LabDEOrder(OrderNumber, OrderCode, PatientMRN, ReceivedDateTime, OrderStatus, ReferenceDateTime, ORMMessage, EncounterID, AccessionNumber, Guid)
                                             VALUES
                                             ";
 
@@ -66,16 +69,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
 		public string TableName => "LabDEOrder";
 
-		public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
+		public void ExecuteSequence(ImportOptions importOptions)
         {
-            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
-			
-            ImportHelper.PopulateTemporaryTable<LabDEOrder>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
-			
-			DbCommand dbCommand = dbConnection.CreateCommand();
-			dbCommand.CommandTimeout = 0;
-			dbCommand.CommandText = this.insertSQL;
-            dbCommand.ExecuteNonQuery();
-        }
+			importOptions.ExecuteCommand(this.CreateTempTableSQL);
+
+			ImportHelper.PopulateTemporaryTable<LabDEOrder>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+			importOptions.ExecuteCommand(this.insertSQL);
+		}
     }
 }

@@ -7,7 +7,7 @@ namespace DatabaseMigrationWizard.Database.Output
 {
     public class SerializeLabDEEncounter : ISerialize
     {
-        public void SerializeTable(DbConnection dbConnection, StreamWriter writer)
+        public void SerializeTable(DbConnection dbConnection, TextWriter writer)
         {
             new ExportHelper().WriteTableInBatches(GetBatchSQL(), writer, dbConnection, "SELECT COUNT(*) AS COUNT FROM [dbo].[LabDEEncounter]");
         }
@@ -25,8 +25,9 @@ namespace DatabaseMigrationWizard.Database.Output
                         , [DischargeDate]
                         , [AdmissionDate]
                         , [ADTMessage]
+                        , [Guid]
                     FROM 
-	                    [Extract_ANONOMYZE].[dbo].[LabDEEncounter]
+	                    [dbo].[LabDEEncounter]
                     ORDER BY
 	                    [CSN]
                         , [PatientMRN]
@@ -35,7 +36,8 @@ namespace DatabaseMigrationWizard.Database.Output
                         , [EncounterType]
                         , [EncounterProvider]
                         , [DischargeDate]
-                        , [AdmissionDate]";
+                        , [AdmissionDate]
+                        , [Guid]";
         }
     }
 }

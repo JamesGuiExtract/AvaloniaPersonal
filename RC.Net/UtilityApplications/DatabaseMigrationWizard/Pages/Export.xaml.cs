@@ -1,9 +1,10 @@
 ﻿using DatabaseMigrationWizard.Database.Output;
 using DatabaseMigrationWizard.Pages.Utility;
+using Extract;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Threading;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -12,7 +13,7 @@ namespace DatabaseMigrationWizard.Pages
     /// <summary>
     /// Interaction logic for Export.xaml
     /// </summary>
-    public partial class Export : System.Windows.Controls.UserControl, INotifyPropertyChanged
+    public partial class Export : System.Windows.Controls.UserControl
     {
         public ExportOptions ExportOptions { get; set; } = new ExportOptions();
 
@@ -20,11 +21,12 @@ namespace DatabaseMigrationWizard.Pages
 
         public ObservableCollection<string> Completed { get; } = new ObservableCollection<string>();
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public MainWindow MainWindow { get; set; }
 
         public Export()
         {
-            this.ExportOptions.ConnectionInformation = ((MainWindow)System.Windows.Application.Current.MainWindow).ConnectionInformation;
+            this.MainWindow = ((MainWindow)System.Windows.Application.Current.MainWindow);
+            this.ExportOptions.ConnectionInformation = this.MainWindow.ConnectionInformation;
             InitializeComponent();
             this.DataContext = this;
         }
@@ -34,12 +36,39 @@ namespace DatabaseMigrationWizard.Pages
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        private async void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            new Task(() =>
+            try
             {
-                ExportHelper.BeginExport(this.ExportOptions, GetProgressTracker());
-            }, TaskCreationOptions.LongRunning).Start();
+                if(Directory.GetFiles(this.ExportOptions.ExportPath).Length > 0)
+                {
+                    MessageBoxResult result = System.Windows.MessageBox.Show($"Files were detected in the output directory. Do you want to overwrite these?", "Database Migration Wizard", MessageBoxButton.YesNo);
+                    switch (result)
+                    {
+                        case MessageBoxResult.No:
+                            return;
+                        case MessageBoxResult.Yes:
+                            Array.ForEach(Directory.GetFiles(this.ExportOptions.ExportPath), delegate (string path) { File.Delete(path); });
+                            break;
+                    }
+                }
+
+                Processing.Clear();
+                Completed.Clear();
+                this.MainWindow.UIEnabled = false;
+                await Task.Run(() =>
+                {
+                    ExportHelper.Export(this.ExportOptions, GetProgressTracker());
+                });
+            }
+            catch(Exception ex)
+            {
+                ex.AsExtract("ELI49735").Display();
+            }
+            finally
+            {
+                this.MainWindow.UIEnabled = true;
+            }
         }
 
         /// <summary>
@@ -49,8 +78,15 @@ namespace DatabaseMigrationWizard.Pages
         /// <param name="e"></param>
         private void FolderButton_Click(object sender, RoutedEventArgs e)
         {
-            string selectedFolder = Universal.SelectFolder();
-            this.ExportOptions.ExportPath = String.IsNullOrEmpty(selectedFolder) ? this.ExportOptions.ExportPath : selectedFolder;
+            try
+            {
+                string selectedFolder = Universal.SelectFolder();
+                this.ExportOptions.ExportPath = String.IsNullOrEmpty(selectedFolder) ? this.ExportOptions.ExportPath : selectedFolder;
+            }
+            catch(Exception ex)
+            {
+                ex.AsExtract("ELI49734").Display();
+            }
         }
 
         /// <summary>
@@ -60,7 +96,14 @@ namespace DatabaseMigrationWizard.Pages
         /// <param name="e"></param>
         private void FolderBrowser_Click(object sender, RoutedEventArgs e)
         {
-            Universal.BrowseToFolder(this.ExportOptions.ExportPath);
+            try
+            {
+                Universal.BrowseToFolder(this.ExportOptions.ExportPath);
+            }
+            catch(Exception ex)
+            {
+                ex.AsExtract("ELI49733").Display();
+            }
         }
 
         private IProgress<string> GetProgressTracker()
@@ -78,8 +121,6 @@ namespace DatabaseMigrationWizard.Pages
                     {
                         Processing.Add(processedItem);
                     }
-
-                    this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Processing"));
                 });
             });
         }

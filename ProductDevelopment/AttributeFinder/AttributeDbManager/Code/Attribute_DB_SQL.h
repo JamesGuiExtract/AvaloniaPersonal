@@ -18,7 +18,8 @@ static const string gstrRASTER_ZONE = "RasterZone";
 static const std::string gstrCREATE_ATTRIBUTE_SET_NAME_TABLE_v1 = 
 	"CREATE TABLE [dbo].[AttributeSetName] "
 	"([ID] [bigint] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_AttributeSetName] PRIMARY KEY CLUSTERED, "
-	"[Description] [nvarchar](255) NULL CONSTRAINT [Attribute_Set_Name_Description_Unique] UNIQUE(Description))";
+	"[Description] [nvarchar](255) NULL CONSTRAINT [Attribute_Set_Name_Description_Unique] UNIQUE(Description),"
+	"[Guid] uniqueidentifier NOT NULL DEFAULT newid())";
 
 static const std::string gstrCREATE_ATTRIBUTE_SET_FOR_FILE_TABLE_v1 = 
 	"CREATE TABLE [dbo].[AttributeSetForFile] "
@@ -29,7 +30,8 @@ static const std::string gstrCREATE_ATTRIBUTE_SET_FOR_FILE_TABLE_v1 =
 static const std::string gstrCREATE_ATTRIBUTE_NAME_TABLE_v1 = 
 	"CREATE TABLE [dbo].[AttributeName] "
 	"([ID] [bigint] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_AttributeName] PRIMARY KEY CLUSTERED, "
-	"[Name] [nvarchar](255) NULL CONSTRAINT [Attribute_Name_Name_Unique] UNIQUE(Name))";
+	"[Name] [nvarchar](255) NULL CONSTRAINT [Attribute_Name_Name_Unique] UNIQUE(Name),"
+	"[Guid] uniqueidentifier NOT NULL DEFAULT newid())";
 
 static const std::string gstrCREATE_ATTRIBUTE_TYPE_TABLE_v1 = 
 	"CREATE TABLE [dbo].[AttributeType] "
@@ -50,6 +52,7 @@ static const std::string gstrCREATE_ATTRIBUTE_TABLE_v1 =
 	"[Value] [nvarchar](max) NOT NULL, "
 	"[ParentAttributeID] [bigint],	"					//FK, Atribute.ID, null allowed
 	"[GUID] [uniqueidentifier] NOT NULL)";
+
 	
 static const std::string gstrCREATE_RASTER_ZONE_TABLE_v1 = 
 	"CREATE TABLE [dbo].[RasterZone] "

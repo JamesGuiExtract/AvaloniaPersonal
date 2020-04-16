@@ -36,7 +36,7 @@ namespace DatabaseMigrationWizard.Database.Input
         /// <param name="insertTemporaryTableSql">The insert command for a given table</param>
         /// <param name="dbConnection">A connection to the database</param>
         [SuppressMessage("Microsoft.Design", "CA1004:IdentifiersShouldBeCasedCorrectly", Justification = "The generic type is required for NewtonsoftJSON, and therefore it required.")]
-        public static void PopulateTemporaryTable<T>(string tablePath, string insertTemporaryTableSql, DbConnection dbConnection)
+        public static void PopulateTemporaryTable<T>(string tablePath, string insertTemporaryTableSql, ImportOptions importOptions)
         {
             try
             {
@@ -57,8 +57,8 @@ namespace DatabaseMigrationWizard.Database.Input
                     {
                         // Read a batch of json items
                         var result = ImportHelper.LoadFromJSON<T>(ref jsonReader, ref serializer);
-                        List<T> deSerializedTable = result.Item1;
-                        keepReadingFile = result.Item2;
+                        List<T> deSerializedTable = result.deSerializedTable;
+                        keepReadingFile = result.keepReadingFile;
 
                         for (int i = 0; i < deSerializedTable.Count; i++)
                         {
@@ -67,7 +67,7 @@ namespace DatabaseMigrationWizard.Database.Input
                             {
                                 try
                                 {
-                                    DBMethods.ExecuteDBQuery(dbConnection, insertBuilder.ToString().TrimEnd(','));
+                                    importOptions.ExecuteCommand(insertBuilder.ToString().TrimEnd(','));
                                 }
                                 catch(Exception e)
                                 {
@@ -95,24 +95,40 @@ namespace DatabaseMigrationWizard.Database.Input
         /// <summary>
         /// Begins the import from the filesystem to the database.
         /// </summary>
-        public void BeginImport()
+        public void Import()
         {
             try
             {
                 IEnumerable<ISequence> instances = FilteredInstances();
-                new Thread(() =>
+
+                var sqlConnection = new SqlConnection($@"Server={ImportOptions.ConnectionInformation.DatabaseServer};Database={ImportOptions.ConnectionInformation.DatabaseName};Integrated Security=SSPI");
+                this.ImportOptions.DBConnection = sqlConnection;
+                sqlConnection.Open();
+                using (this.ImportOptions.Transaction = sqlConnection.BeginTransaction(System.Data.IsolationLevel.Serializable))
                 {
                     ClearDatabase();
-                    ExecutePriority(instances, Priorities.High);
-                    ExecutePriority(instances, Priorities.MediumHigh);
-                    ExecutePriority(instances, Priorities.Medium);
-                    ExecutePriority(instances, Priorities.MediumLow);
-                    ExecutePriority(instances, Priorities.Low);
-                }).Start();
+
+                    try
+                    {
+                        ExecutePriority(instances);
+                        this.ImportOptions.Transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        this.ImportOptions.Transaction.Rollback();
+                        throw ex.AsExtract("ELI49717");
+                    }
+                    finally
+                    {
+                        this.ImportOptions.Transaction.Dispose();
+                    }
+
+                    sqlConnection.Close();
+                }
             }
             catch(Exception e)
             {
-                ExtractException.Display("ELI49681", e);
+                throw e.AsExtract("ELI49681");
             }
         }
 
@@ -124,7 +140,7 @@ namespace DatabaseMigrationWizard.Database.Input
         private IEnumerable<ISequence> FilteredInstances()
         {
             string[] files = System.IO.Directory.GetFiles(this.ImportOptions.ImportPath);
-            bool hasLabDeTables = files.Where(file => file.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE")).Any();
+            bool hasLabDeTables = files.Where(file => Path.GetFileName(file).ToUpper(CultureInfo.InvariantCulture).Contains("LABDE")).Any();
             IEnumerable<ISequence> instances = Universal.GetClassesThatImplementInterface<ISequence>();
             if(!hasLabDeTables)
             {
@@ -163,37 +179,24 @@ namespace DatabaseMigrationWizard.Database.Input
         /// </summary>
         /// <param name="instances">All of the instances that implement SequenceInterface</param>
         /// <param name="priority">The priority level to execute.</param>
-        private void ExecutePriority(IEnumerable<ISequence> instances, Priorities priority)
+        private void ExecutePriority(IEnumerable<ISequence> instances)
         {
-            List<Thread> threads = new List<Thread>();
-            foreach (ISequence instance in instances.Where(instance => instance.Priority == priority))
+            instances = instances.OrderByDescending(m => m.Priority);
+            foreach (ISequence instance in instances)
             {
-                Thread thread = new Thread(() => 
+                string instanceName = instance.ToString().Substring(instance.ToString().LastIndexOf("Sequence", StringComparison.OrdinalIgnoreCase)).Replace("Sequence", string.Empty);
+                App.Current?.Dispatcher.Invoke(delegate
                 {
-                    using (var sqlConnection = new SqlConnection($@"Server={ImportOptions.ConnectionInformation.DatabaseServer};Database={ImportOptions.ConnectionInformation.DatabaseName};Integrated Security=SSPI"))
-                    {
-                        sqlConnection.Open();
-                        string instanceName = instance.ToString().Substring(instance.ToString().LastIndexOf("Sequence", StringComparison.OrdinalIgnoreCase)).Replace("Sequence", string.Empty);
-                        App.Current.Dispatcher.Invoke(delegate
-                        {
-                            this.Progress.Report(instanceName);
-                        });
-
-                        instance.ExecuteSequence(sqlConnection, this.ImportOptions);
-
-                        App.Current.Dispatcher.Invoke(delegate
-                        {
-                            this.Progress.Report(instanceName);
-                        });
-
-                        sqlConnection.Close();
-                    }
+                    this.Progress.Report(instanceName);
                 });
 
-                threads.Add(thread);
-                thread.Start();
+                instance.ExecuteSequence(this.ImportOptions);
+
+                App.Current?.Dispatcher.Invoke(delegate
+                {
+                    this.Progress.Report(instanceName);
+                });
             }
-            threads.WaitAll();
         }
 
         /// <summary>
@@ -203,7 +206,7 @@ namespace DatabaseMigrationWizard.Database.Input
         /// <param name="reader">The reference to the json reader.</param>
         /// <param name="serializer">The reference to the serializer</param>
         /// <returns>Returns a list of deserialized obejcts, and returns true if there are still records to process</returns>
-        private static (List<T>, bool) LoadFromJSON<T>(ref JsonTextReader reader, ref JsonSerializer serializer)
+        private static (List<T> deSerializedTable, bool keepReadingFile) LoadFromJSON<T>(ref JsonTextReader reader, ref JsonSerializer serializer)
         {
             int bufferSize = 20000;
             int index = 0;

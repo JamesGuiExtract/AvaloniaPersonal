@@ -19,10 +19,28 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										[DischargeDate] [datetime] NULL,
 										[AdmissionDate] [datetime] NULL,
 										[ADTMessage] [xml] NULL,
+                                        [Guid] uniqueidentifier NOT NULL,
 										)";
 
         private readonly string insertSQL = @"
-                                    INSERT INTO dbo.LabDEEncounter(CSN, PatientMRN, EncounterDateTime, Department, EncounterType, EncounterProvider, DischargeDate, AdmissionDate, ADTMessage)
+                                    UPDATE
+										dbo.LabDEEncounter
+									SET
+										PatientMRN = UpdatingLabDEEncounter.PatientMRN
+										, EncounterDateTime = UpdatingLabDEEncounter.EncounterDateTime
+										, Department = UpdatingLabDEEncounter.Department
+										, EncounterType = UpdatingLabDEEncounter.EncounterType
+										, EncounterProvider = UpdatingLabDEEncounter.EncounterProvider
+										, DischargeDate = UpdatingLabDEEncounter.DischargeDate
+										, AdmissionDate = UpdatingLabDEEncounter.AdmissionDate
+										, ADTMessage = UpdatingLabDEEncounter.ADTMessage
+										, CSN = UpdatingLabDEEncounter.CSN
+									FROM
+										##LabDEEncounter AS UpdatingLabDEEncounter
+									WHERE
+										LabDEEncounter.Guid = UpdatingLabDEEncounter.Guid
+									;
+									INSERT INTO dbo.LabDEEncounter(CSN, PatientMRN, EncounterDateTime, Department, EncounterType, EncounterProvider, DischargeDate, AdmissionDate, ADTMessage, Guid)
 
 									SELECT
 										CSN
@@ -34,31 +52,14 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										, DischargeDate
 										, AdmissionDate
 										, ADTMessage
+										, Guid
 									FROM 
 										##LabDEEncounter
 									WHERE
-										CSN NOT IN (SELECT CSN FROM dbo.LabDEEncounter)
-									;
-									UPDATE
-										dbo.LabDEEncounter
-									SET
-										PatientMRN = UpdatingLabDEEncounter.PatientMRN
-										, EncounterDateTime = UpdatingLabDEEncounter.EncounterDateTime
-										, Department = UpdatingLabDEEncounter.Department
-										, EncounterType = UpdatingLabDEEncounter.EncounterType
-										, EncounterProvider = UpdatingLabDEEncounter.EncounterProvider
-										, DischargeDate = UpdatingLabDEEncounter.DischargeDate
-										, AdmissionDate = UpdatingLabDEEncounter.AdmissionDate
-										, ADTMessage = UpdatingLabDEEncounter.ADTMessage
-
-									FROM
-										##LabDEEncounter AS UpdatingLabDEEncounter
-									WHERE
-										LabDEEncounter.CSN = UpdatingLabDEEncounter.CSN
-									;";
+										Guid NOT IN (SELECT Guid FROM dbo.LabDEEncounter)";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##LabDEEncounter(CSN, PatientMRN, EncounterDateTime, Department, EncounterType, EncounterProvider, DischargeDate, AdmissionDate, ADTMessage)
+                                            INSERT INTO ##LabDEEncounter(CSN, PatientMRN, EncounterDateTime, Department, EncounterType, EncounterProvider, DischargeDate, AdmissionDate, ADTMessage, Guid)
                                             VALUES
                                             ";
 
@@ -66,16 +67,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
 		public string TableName => "LabDEEncounter";
 
-		public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
+		public void ExecuteSequence(ImportOptions importOptions)
         {
-            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
-			
-            ImportHelper.PopulateTemporaryTable<LabDEEncounter>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
-			
-			DbCommand dbCommand = dbConnection.CreateCommand();
-			dbCommand.CommandTimeout = 0;
-			dbCommand.CommandText = this.insertSQL;
-            dbCommand.ExecuteNonQuery();
-        }
+			importOptions.ExecuteCommand(this.CreateTempTableSQL);
+
+			ImportHelper.PopulateTemporaryTable<LabDEEncounter>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
+
+			importOptions.ExecuteCommand(this.insertSQL);
+		}
     }
 }

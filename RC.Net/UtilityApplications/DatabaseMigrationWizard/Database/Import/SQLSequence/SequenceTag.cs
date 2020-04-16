@@ -12,31 +12,33 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                         CREATE TABLE [dbo].[##Tag](
 	                                    [TagName] [nvarchar](100) NOT NULL,
 	                                    [TagDescription] [nvarchar](255) NULL,
+                                        [Guid] uniqueidentifier NOT NULL,
                                         )";
 
         private readonly string insertSQL = @"
-                                    INSERT INTO dbo.Tag(TagName, TagDescription)
-
-                                    SELECT
-	                                    TagName
-	                                    , TagDescription
-                                    FROM 
-	                                    ##Tag
-                                    WHERE
-	                                    TagName NOT IN (SELECT TagName FROM dbo.Tag)
-                                    ;
-
                                     UPDATE 
 	                                    dbo.Tag
                                     SET
 	                                    TagDescription = UpdatingTag.TagDescription
+	                                    , TagName = UpdatingTag.TagName
                                     FROM
 	                                    ##Tag AS UpdatingTag
                                     WHERE
-	                                    UpdatingTag.TagName = dbo.Tag.TagName";
+	                                    UpdatingTag.Guid = dbo.Tag.Guid
+                                    ;
+                                    INSERT INTO dbo.Tag(TagName, TagDescription, Guid)
+
+                                    SELECT
+	                                    TagName
+	                                    , TagDescription
+	                                    , Guid
+                                    FROM 
+	                                    ##Tag
+                                    WHERE
+	                                    Guid NOT IN (SELECT Guid FROM dbo.Tag)";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##Tag (TagName, TagDescription)
+                                            INSERT INTO ##Tag (TagName, TagDescription, Guid)
                                             VALUES
                                             ";
 
@@ -44,13 +46,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
         public string TableName => "Tag";
 
-        public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
+        public void ExecuteSequence(ImportOptions importOptions)
         {
-            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
+            importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
-            ImportHelper.PopulateTemporaryTable<Tag>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
+            ImportHelper.PopulateTemporaryTable<Tag>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
+            importOptions.ExecuteCommand(this.insertSQL);
         }
     }
 }

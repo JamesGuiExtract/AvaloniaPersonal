@@ -3,11 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mui="http://firstfloorsoftware.com/ModernUI"
         Title="Database Migration Wizard" IsTitleVisible="True"
-        ContentSource="/Pages/Home.xaml">
+        ContentSource="/Pages/Database.xaml" Height="750">
     <mui:ModernWindow.MenuLinkGroups>
         <mui:LinkGroup x:Name="MainLinks">
             <mui:LinkGroup.Links>
-                <mui:Link DisplayName="home" Source="/Pages/Home.xaml" />
+                <mui:Link DisplayName="Database" Source="/Pages/Database.xaml" />
             </mui:LinkGroup.Links>
         </mui:LinkGroup>
         <mui:LinkGroup DisplayName="settings" GroupKey="settings">

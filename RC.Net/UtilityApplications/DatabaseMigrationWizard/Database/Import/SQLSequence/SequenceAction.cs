@@ -12,72 +12,46 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                         CREATE TABLE [dbo].[##Action](
 	                                    [ASCName] [nvarchar](50) NOT NULL,
 	                                    [Description] [nvarchar](255) NULL,
-	                                    [WorkflowID] [int] NULL,
 	                                    [MainSequence] [bit] NULL,
-										[Name] [nvarchar](100) NULL,
+										[ActionGUID] uniqueidentifier NOT NULL,
+										[WorkflowGUID] uniqueidentifier null
                                         )";
 
         private readonly string insertSQL = @"
-                                    INSERT INTO dbo.Action (ASCName, Description, MainSequence, WorkflowID)
+									UPDATE 
+										dbo.Action 
+									SET
+										ASCName = UpdatingAction.ASCName
+										, Description = UpdatingAction.Description
+										, MainSequence = UpdatingAction.MainSequence
+
+									FROM
+										##Action AS UpdatingAction
+												LEFT OUTER JOIN dbo.Workflow
+													ON dbo.Workflow.GUID = UpdatingAction.WorkflowGUID
+
+									WHERE
+										UpdatingAction.ActionGUID = dbo.Action.GUID
+									;
+                                    INSERT INTO dbo.Action (ASCName, Description, MainSequence, WorkflowID, GUID)
 
 									SELECT
 										UpdatingAction.ASCName
 										, UpdatingAction.Description
 										, UpdatingAction.MainSequence
 										, Workflow.ID
+										, ActionGUID
 
 									FROM 
 										##Action AS UpdatingAction
 											LEFT OUTER JOIN dbo.Workflow
-													ON dbo.Workflow.Name = UpdatingAction.Name
+													ON dbo.Workflow.GUID = UpdatingAction.WorkflowGUID
 									WHERE
-										NOT EXISTS
-											(
-												SELECT
-													ASCName
-													, WorkflowID
-												FROM
-													dbo.Action
-												WHERE
-													UpdatingAction.ASCName = dbo.Action.ASCName
-													AND
-													(
-														Workflow.ID = dbo.Action.WorkflowID
-														OR
-														(
-															dbo.Action.WorkflowID IS NULL
-															AND
-															Workflow.ID IS NULL
-														)
-													)
-									)
-									;
-									UPDATE 
-										dbo.Action 
-									SET
-										Description = UpdatingAction.Description
-										, MainSequence = UpdatingAction.MainSequence
-
-									FROM
-										##Action AS UpdatingAction
-												LEFT OUTER JOIN dbo.Workflow
-													ON dbo.Workflow.Name = UpdatingAction.Name
-
-									WHERE
-										UpdatingAction.ASCName = dbo.Action.ASCName
-										AND
-										(
-											dbo.Workflow.ID = dbo.Action.WorkflowID
-											OR
-											(
-												dbo.Workflow.ID IS NULL
-												AND
-												dbo.Action.WorkflowID IS NULL
-											)
-									)";
+										UpdatingAction.ActionGUID NOT IN (SELECT GUID FROM dbo.Action)
+									;";
 
         private readonly string insertTempTableSQL = @"
-                                            INSERT INTO ##Action (ASCName, Description, WorkflowID, MainSequence, Name)
+                                            INSERT INTO ##Action (ASCName, Description, MainSequence, ActionGUID, WorkflowGUID)
                                             VALUES
                                             ";
 
@@ -85,13 +59,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
 		public string TableName => "Action";
 
-		public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
+		public void ExecuteSequence(ImportOptions importOptions)
         {
-            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
+			importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
-            ImportHelper.PopulateTemporaryTable<Action>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
+            ImportHelper.PopulateTemporaryTable<Action>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
-        }
+			importOptions.ExecuteCommand(this.insertSQL);
+		}
     }
 }

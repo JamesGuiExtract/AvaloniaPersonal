@@ -8,35 +8,30 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 	[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "This is instantiated using generics")]
 	class SequenceWorkflowWithFK : ISequence
     {
-        private readonly string CreateTempTableSQL = @"
+		private readonly string CreateTempTableSQL = @"
                                         CREATE TABLE [dbo].[##Workflow1](
+										[Guid] uniqueidentifier NOT NULL,
 	                                    [Name] [nvarchar](100) NULL,
 	                                    [WorkflowTypeCode] [nvarchar](1) NULL,
 	                                    [Description] [nvarchar](max) NULL,
-	                                    [StartActionID] [int] NULL,
-	                                    [EndActionID] [int] NULL,
-	                                    [PostWorkflowActionID] [int] NULL,
 	                                    [DocumentFolder] [nvarchar](255) NULL,
-	                                    [OutputAttributeSetID] [bigint] NULL,
-	                                    [OutputFileMetadataFieldID] [int] NULL,
 	                                    [OutputFilePathInitializationFunction] [nvarchar](255) NULL,
 	                                    [LoadBalanceWeight] [int] NOT NULL,
-	                                    [EditActionID] [int] NULL,
-	                                    [PostEditActionID] [int] NULL,
-                                        [StartAction] NVARCHAR(MAX) NULL,
-                                        [EditAction] NVARCHAR(MAX) NULL,
-                                        [EndAction] NVARCHAR(MAX) NULL,
-                                        [PostEditAction] NVARCHAR(MAX) NULL,
-                                        [PostWorkflowAction] NVARCHAR(MAX) NULL,
-                                        [AttributeSetName] NVARCHAR(MAX) NULL,
-                                        [MetadataFieldName] NVARCHAR(MAX) NULL
+										[EditActionGUID] uniqueidentifier NULL,
+										[EndActionGUID] uniqueidentifier NULL,
+										[PostEditActionGUID] uniqueidentifier NULL,
+										[PostWorkflowActionGUID] uniqueidentifier NULL,
+										[StartActionGUID] uniqueidentifier NULL,
+                                        [AttributeSetNameGuid] uniqueidentifier NULL,
+                                        [MetadataFieldNameGuid] uniqueidentifier NULL
                                     )";
 
-        private readonly string insertSQL = @"
+		private readonly string insertSQL = @"
                                     UPDATE
 										dbo.Workflow 
 									SET
-										WorkflowTypeCode = UpdatingWorkflow.WorkflowTypeCode
+										Name = UpdatingWorkflow.Name
+										, WorkflowTypeCode = UpdatingWorkflow.WorkflowTypeCode
 										, Description = UpdatingWorkflow.Description
 										, StartActionID = StartAction.ID
 										, EndActionID = EndAction.ID
@@ -53,64 +48,58 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										##Workflow1 AS UpdatingWorkflow
 
 												LEFT OUTER JOIN Action AS StartAction
-													ON UpdatingWorkflow.StartAction = StartAction.ASCName
+													ON UpdatingWorkflow.StartActionGUID = StartAction.GUID
 
 												LEFT OUTER JOIN Action AS EndAction
-													ON UpdatingWorkflow.EndAction = EndAction.ASCName
+													ON UpdatingWorkflow.EndActionGUID = EndAction.GUID
 
 												LEFT OUTER JOIN Action AS PostWorkflowAction
-													ON UpdatingWorkflow.PostWorkflowAction = PostWorkflowAction.ASCName
+													ON UpdatingWorkflow.PostWorkflowActionGUID = PostWorkflowAction.GUID
 
 												LEFT OUTER JOIN Action AS EditAction
-													ON UpdatingWorkflow.EditAction = EditAction.ASCName
+													ON UpdatingWorkflow.EditActionGUID = EditAction.GUID
 
 												LEFT OUTER JOIN Action AS PostEditAction
-													ON UpdatingWorkflow.PostEditAction = PostEditAction.ASCName
+													ON UpdatingWorkflow.PostEditActionGUID = PostEditAction.GUID
 
 												LEFT OUTER JOIN AttributeSetName
-													ON AttributeSetName.Description = UpdatingWorkflow.AttributeSetName
+													ON AttributeSetName.Guid = UpdatingWorkflow.AttributeSetNameGuid
 
 												LEFT OUTER JOIN dbo.MetadataField
-													ON dbo.MetadataField.Name = UpdatingWorkflow.MetadataFieldName 
+													ON dbo.MetadataField.Guid = UpdatingWorkflow.MetadataFieldNameGuid
 									WHERE
-										dbo.Workflow.Name = UpdatingWorkflow.Name";
+										dbo.Workflow.GUID = UpdatingWorkflow.GUID";
 
 		private readonly string insertTempTableSQL = @"
                                             INSERT INTO ##Workflow1 (
-                                                                    Name
+																	GUID
+                                                                    , Name
                                                                     , WorkflowTypeCode
                                                                     , Description
-                                                                    , StartActionID
-                                                                    , EndActionID
-                                                                    , PostWorkflowActionID
                                                                     , DocumentFolder
-                                                                    , OutputAttributeSetID
-                                                                    , OutputFileMetadataFieldID
                                                                     , OutputFilePathInitializationFunction
                                                                     , LoadBalanceWeight
-                                                                    , EditActionID
-                                                                    , PostEditActionID
-                                                                    , StartAction
-                                                                    , EditAction
-                                                                    , EndAction
-                                                                    , PostEditAction
-                                                                    , PostWorkflowAction
-                                                                    , AttributeSetName
-                                                                    , MetadataFieldName)
+                                                                    , EditActionGUID
+                                                                    , EndActionGUID
+                                                                    , PostEditActionGUID
+                                                                    , PostWorkflowActionGUID
+                                                                    , StartActionGUID
+                                                                    , AttributeSetNameGuid
+                                                                    , MetadataFieldNameGuid)
                                             VALUES
                                             ";
 
-		public Priorities Priority => Priorities.Low;
+		public Priorities Priority => Priorities.MediumLow;
 
 		public string TableName => "Workflow";
 
-		public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
+		public void ExecuteSequence(ImportOptions importOptions)
         {
-            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
+			importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
-            ImportHelper.PopulateTemporaryTable<Workflow>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
+			ImportHelper.PopulateTemporaryTable<Workflow>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
-        }
+			importOptions.ExecuteCommand(this.insertSQL);
+		}
     }
 }

@@ -11,34 +11,23 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
         private readonly string CreateTempTableSQL = @"
                                         CREATE TABLE [dbo].[##DBInfo](
 	                                    [Name] [nvarchar](50) NOT NULL,
-	                                    [Value] [nvarchar](max) NULL,
+	                                    [Value] [nvarchar](max) NULL
                                         )";
 
         private readonly string insertSQL = @"
-                                    INSERT INTO dbo.DBInfo(Name, Value)
-
-                                    SELECT
-	                                    UpdatingDBInfo.Name
-	                                    , UpdatingDBInfo.Value
-                                    FROM 
-	                                    ##DBInfo AS UpdatingDBInfo
-                                    WHERE
-	                                    UpdatingDBInfo.Name NOT IN (SELECT Name FROM dbo.DBInfo)
-	                                    AND
-	                                    UpdatingDBInfo.Name NOT LIKE '%Version%'
-                                    ;
-                                    UPDATE
-	                                    dbo.DBInfo
-                                    SET
-	                                    Value = UpdatingDBInfo.Value
-                                    FROM
-	                                    ##DBInfo AS UpdatingDBInfo
-                                    WHERE
-	                                    LOWER(dbo.DBInfo.Name) NOT LIKE '%version%'
-	                                    AND
-	                                    dbo.DBInfo.Name <> 'DatabaseID'
-                                        AND
-                                        dbo.DBInfo.Name = UpdatingDBInfo.Name";
+                                           UPDATE
+			                                    dbo.DBInfo
+		                                    SET
+			                                    Value = UpdatingDBInfo.Value
+		                                    FROM
+			                                    ##DBInfo AS UpdatingDBInfo
+		                                    WHERE
+			                                    LOWER(dbo.DBInfo.Name) NOT LIKE '%version%'
+			                                    AND
+			                                    dbo.DBInfo.Name <> 'DatabaseID'
+			                                    AND
+			                                    dbo.DBInfo.Name = UpdatingDBInfo.Name
+                                    ";
 
         private readonly string insertTempTableSQL = @"
                                             INSERT INTO ##DBInfo (Name, Value)
@@ -49,13 +38,13 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
         public string TableName => "DBInfo";
 
-        public void ExecuteSequence(DbConnection dbConnection, ImportOptions importOptions)
+        public void ExecuteSequence(ImportOptions importOptions)
         {
-            DBMethods.ExecuteDBQuery(dbConnection, this.CreateTempTableSQL);
+            importOptions.ExecuteCommand(this.CreateTempTableSQL);
 
-            ImportHelper.PopulateTemporaryTable<DBInfo>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, dbConnection);
+            ImportHelper.PopulateTemporaryTable<DBInfo>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            DBMethods.ExecuteDBQuery(dbConnection, this.insertSQL);
+            importOptions.ExecuteCommand(this.insertSQL);
         }
     }
 }
