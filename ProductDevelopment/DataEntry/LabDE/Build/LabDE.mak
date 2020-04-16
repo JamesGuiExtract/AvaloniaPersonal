@@ -75,19 +75,19 @@ CopyFilesToInstallFolder:
 	@DeleteFiles "$(LabDEInstallBuildFiles)\Reports\*.*" /S
 	@DeleteFiles "$(LabDEInstallBuildFiles)\NonSelfRegFiles\*.*" /S
 	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\Leadtools_20\Dotnet\*.*" "$(DataEntryCoreInstallFilesDir)\DotNet" /v /s /e /y
-	@COPY /v "$(BinariesFolder)\Obfuscated\*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
-	@COPY /v "$(BinariesFolder)\DataEntryCC.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
-	@COPY /v "$(BinariesFolder)\Obfuscated\DataEntryApplication.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
-	@COPY /v "$(BinariesFolder)\Interop.*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
-	@COPY /v "$(BinariesFolder)\Obfuscated\SqlCompactImporter.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
-	@COPY /v "$(BinariesFolder)\Obfuscated\SqlCompactExporter.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
-	@COPY /v "$(BinariesFolder)\Obfuscated\SQLCDBEditor.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
-	@COPY /v "$(BinariesFolder)\LabDECppCC.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
+	@COPY /V /Y "$(BinariesFolder)\Obfuscated\*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
+	@COPY /V /Y "$(BinariesFolder)\DataEntryCC.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
+	@COPY /V /Y "$(BinariesFolder)\Obfuscated\DataEntryApplication.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
+	@COPY /V /Y "$(BinariesFolder)\Interop.*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
+	@COPY /V /Y "$(BinariesFolder)\Obfuscated\SqlCompactImporter.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
+	@COPY /V /Y "$(BinariesFolder)\Obfuscated\SqlCompactExporter.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
+	@COPY /V /Y "$(BinariesFolder)\Obfuscated\SQLCDBEditor.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
+	@COPY /V /Y "$(BinariesFolder)\LabDECppCC.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY "$(RCNETDir)\APIs\ScintillaNET v2.4\Dist\*.*" "$(DataEntryCoreInstallFilesDir)\DotNet" 
-	@COPY /v "$(LabDEDir)\Misc\DisabledThemes.sdb" "$(DataEntryCoreInstallFilesDir)\Misc" 
-	@COPY /v "$(LabDEDir)\Misc\DisabledThemes.sdb" "$(DataEntryCoreInstallFilesDir)\Misc" 
-	@COPY /v "$(BinariesFolder)\DataEntryApplication.LabDE.resources" "$(LabDEInstallBuildFiles)\NonSelfRegFiles"
-	@COPY /v  "$(BinariesFolder)\Obfuscated\AlternateTestNameManager.plugin" "$(LabDEInstallBuildFiles)\LabDEFolder"
+	@COPY /V /Y "$(LabDEDir)\Misc\DisabledThemes.sdb" "$(DataEntryCoreInstallFilesDir)\Misc" 
+	@COPY /V /Y "$(LabDEDir)\Misc\DisabledThemes.sdb" "$(DataEntryCoreInstallFilesDir)\Misc" 
+	@COPY /V /Y "$(BinariesFolder)\DataEntryApplication.LabDE.resources" "$(LabDEInstallBuildFiles)\NonSelfRegFiles"
+	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\AlternateTestNameManager.plugin" "$(LabDEInstallBuildFiles)\LabDEFolder"
 	@XCOPY "$(LabDEDir)\Reports\*.*" "$(LabDEInstallBuildFiles)\Reports" /v /s /e /y
 # Make .nl files to register the COM .NET files
 	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.LabResultsCustomComponents.dll" /b >"$(LabDEInstallBuildFiles)\NonSelfRegFiles\LabDE.nl"
@@ -97,7 +97,7 @@ CopyFilesForLabDEInstall: CopyFilesToInstallFolder
 	@ECHO Copying files for the LabDE Install
 	@IF NOT EXIST "$(DataEntryCoreInstallFilesDir)\MergeModules" @MKDIR "$(DataEntryCoreInstallFilesDir)\MergeModules" 
 	@DeleteFiles  "$(DataEntryCoreInstallFilesDir)\MergeModules\*.*"
-	@COPY /v "$(DataEntryInstallMediaDir)\*.msm" "$(DataEntryCoreInstallFilesDir)\MergeModules"
+	@COPY /V /Y "$(DataEntryInstallMediaDir)\*.msm" "$(DataEntryCoreInstallFilesDir)\MergeModules"
 
 BuildDemoLabDE_DEP:
 	@ECHO Building DemoLabDE_DEP...
@@ -116,7 +116,7 @@ CreateDemo_LabDE: BuildDemoLabDE_DEP
 	@XCOPY "$(AFInstallRootDir)\Demo_LabDE\Sanitized\*.*" "$(LabDEDemo)\Input\" /v /s /e /y
 	@XCOPY "$(RulesDir)\LabDE\Demo_LabDE\Solution\*.*" "$(LabDEDemo)\Solution\" /v /s /e /y	
 	@COPY /y "$(Demo_LabDE_DEP)\Bin\$(BuildConfig)\Extract.DataEntry.DEP.Demo_LabDE.dll" "$(LabDEDemo)\Solution\Bin\"
-	@COPY /v  "$(BinariesFolder)\Obfuscated\AlternateTestNameManager.plugin" "$(LabDEDemo)\Solution\Database Files"
+	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\AlternateTestNameManager.plugin" "$(LabDEDemo)\Solution\Database Files"
 	@ECHO Encrypting LabDE Demo Rules...
 	@SendFilesAsArgumentToApplication "$(LabDEDemo)\Solution\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
 	@SendFilesAsArgumentToApplication "$(LabDEDemo)\Solution\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"

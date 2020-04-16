@@ -99,10 +99,10 @@ CopyFilesToInstallFolder:
     @ECHO Copying the AttributeFinder files to installation directory...
 	@IF NOT EXIST "$(AFInstallFilesRootDir)\Redist" @MKDIR "$(AFInstallFilesRootDir)\Redist"
 	@DeleteFiles "$(AFInstallFilesRootDir)\Redist"\*.*" /S /Q
-    @COPY /v "$(MergeModuleRootDir)\ExtractCommonMM.msm" "$(AFInstallFilesRootDir)\Redist"
-    @COPY /v "$(MergeModuleRootDir)\UCLIDFlexIndex.msm" "$(AFInstallFilesRootDir)\Redist"
-    @COPY /v "$(MergeModuleRootDir)\DataEntry.msm" "$(AFInstallFilesRootDir)\Redist"
-	@COPY /v "$(MergeModuleRootDir)\ExtractFlexCommonMM.msm" "$(AFInstallFilesRootDir)\Redist"
+    @COPY /V /Y "$(MergeModuleRootDir)\ExtractCommonMM.msm" "$(AFInstallFilesRootDir)\Redist"
+    @COPY /V /Y "$(MergeModuleRootDir)\UCLIDFlexIndex.msm" "$(AFInstallFilesRootDir)\Redist"
+    @COPY /V /Y "$(MergeModuleRootDir)\DataEntry.msm" "$(AFInstallFilesRootDir)\Redist"
+	@COPY /V /Y "$(MergeModuleRootDir)\ExtractFlexCommonMM.msm" "$(AFInstallFilesRootDir)\Redist"
     @DeleteFiles "$(AFInstallFilesRootDir)\vssver.scc"
     @DeleteFiles "$(AFInstallFilesRootDir)\mssccprj.scc"
 
@@ -120,8 +120,8 @@ CreateExtractSoftwareInstallCD:
     @IF NOT EXIST "$(ExtractSoftwareInstallFiles)" MKDIR "$(ExtractSoftwareInstallFiles)"
     @XCOPY "$(ExtractSoftwareInstallMediaDir)\*.*" "$(ExtractSoftwareInstallFiles)" /v /s /e /y
     $(VerifyDir) "$(ExtractSoftwareInstallMediaDir)" "$(ExtractSoftwareInstallFiles)"
-	@COPY "$(AFInstallFilesRootDir)\InstallHelp\*.*" "$(ExtractSoftwareInstallFiles)"
-	@COPY "$(ExtractSoftwareInstallRootDir)\Support Files\license.txt" "$(ExtractSoftware)\Readme.txt"
+	@COPY /V /Y "$(AFInstallFilesRootDir)\InstallHelp\*.*" "$(ExtractSoftwareInstallFiles)"
+	@COPY /V /Y "$(ExtractSoftwareInstallRootDir)\Support Files\license.txt" "$(ExtractSoftware)\Readme.txt"
     @DeleteFiles "$(ExtractSoftwareInstallFiles)\*.scc"
 
 CreateFlexDataEntryInstallDir:
@@ -163,16 +163,16 @@ UpdateLicenseFiles:
 	@IF "$(Branch)"=="master" (
 		@Echo Updating Licensing Files...
 		@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDComponentsLM\COMLMCore\Code\*.dat" "$(BinariesFolder)"
-		@Copy "$(BinariesFolder)\Components.dat" "$(DeveloperLicensing)"
-		@Copy "$(BinariesFolder)\Packages.dat" "$(DeveloperLicensing)"
+		@COPY /V /Y "$(BinariesFolder)\Components.dat" "$(DeveloperLicensing)"
+		@COPY /V /Y "$(BinariesFolder)\Packages.dat" "$(DeveloperLicensing)"
 		$(Replace) "$(BinariesFolder)\Packages.dat" ".*<DevOnly>.*\r?\n" "" /e
 		$(Replace) "$(BinariesFolder)\Components.dat" ".*<DevOnly>.*\r?\n" "" /e
-		@Copy "$(BinariesFolder)\Components.dat" "$(RuleWriterLicensing)"
-		@Copy "$(BinariesFolder)\Packages.dat" "$(RuleWriterLicensing)"
+		@COPY /V /Y "$(BinariesFolder)\Components.dat" "$(RuleWriterLicensing)"
+		@COPY /V /Y "$(BinariesFolder)\Packages.dat" "$(RuleWriterLicensing)"
 		$(Replace) "$(BinariesFolder)\Packages.dat" ".*<RWOnly>.*\r?\n" "" /e
 		$(Replace) "$(BinariesFolder)\Components.dat" ".*<RWOnly>.*\r?\n" "" /e
-		@Copy "$(BinariesFolder)\Components.dat" "$(SupportLicensing)"
-		@Copy "$(BinariesFolder)\Packages.dat" "$(SupportLicensing)"
+		@COPY /V /Y "$(BinariesFolder)\Components.dat" "$(SupportLicensing)"
+		@COPY /V /Y "$(BinariesFolder)\Packages.dat" "$(SupportLicensing)"
 	)
 
 CopyFilesToInternalUse:
