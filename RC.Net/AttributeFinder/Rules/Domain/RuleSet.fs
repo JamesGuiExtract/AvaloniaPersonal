@@ -97,7 +97,7 @@ module RuleSet =
   open Extract.AttributeFinder.Rules.Dto
 
   let version = 
-    let assembly = Assembly.GetExecutingAssembly ()
+    let assembly = typeof<IRuleObjectConverter>.Assembly
     if not (assembly = null)
     then assembly.GetName().Version.ToString()
     else "Unknown";

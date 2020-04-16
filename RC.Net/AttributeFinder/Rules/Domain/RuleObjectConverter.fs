@@ -10,7 +10,7 @@ module RuleObjectConverter =
 
   // Collect every IRuleObjectConverter in this assembly
   let private converters =
-    let assembly = Assembly.GetExecutingAssembly ()
+    let assembly = typeof<IRuleObjectConverter>.Assembly
     assembly.GetTypes ()
     |> Seq.filter (fun typ ->
       not typ.IsInterface &&
