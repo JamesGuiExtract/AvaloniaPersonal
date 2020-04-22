@@ -889,6 +889,12 @@ STDMETHODIMP CSpatialString::CreateFromSpatialStrings(IIUnknownVector *pStrings,
 		// https://extract.atlassian.net/browse/ISSUE-15691
 		reset(true, true);
 
+		// If no strings, then nothing to do (string needs to remain in non-spatial mode)
+		if (ipStrings->Size() == 0)
+		{
+			return S_OK;
+		}
+
 		// Need to verify that each SpatialString in the vector
 		// has mode kSpatialMode and calculate the final size of the string
 		long lSize = ipStrings->Size();
