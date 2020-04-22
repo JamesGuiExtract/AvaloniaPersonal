@@ -53,22 +53,36 @@ module SelectPageRegion =
     let verticalEnd = ref 0
     domain.GetVerticalRestriction(verticalStart, verticalEnd)
 
-    { Dto.SelectPageRegion.IncludeRegionDefined = domain.IncludeRegionDefined
-      PageSelectionType = domain.PageSelectionType |> PageSelectionType.toDto
-      SpecificPages = domain.SpecificPages
-      RegExpPageSelectionType = domain.RegExpPageSelectionType |> RegExpPageSelectionType.toDto
-      Pattern = domain.Pattern
-      IsRegExp = domain.IsRegExp
-      IsCaseSensitive = domain.IsCaseSensitive
-      HorizontalStart = !horizontalStart
-      HorizontalEnd = !horizontalEnd
-      VerticalStart = !verticalStart
-      VerticalEnd = !verticalEnd
-      SelectPageRegionReturnType = domain.SelectPageRegionReturnType |> SelectPageRegionReturnType.toDto
-      IncludeIntersectingText = domain.IncludeIntersectingText
-      TextIntersectionType = domain.TextIntersectionType |> SpatialEntity.toDto
-      SelectedRegionRotation = domain.SelectedRegionRotation
-      TextToAssignToRegion = domain.TextToAssignToRegion }
+    let dto =
+      { Dto.SelectPageRegion.IncludeRegionDefined = domain.IncludeRegionDefined
+        PageSelectionType = domain.PageSelectionType |> PageSelectionType.toDto
+        SpecificPages = domain.SpecificPages
+        RegExpPageSelectionType = domain.RegExpPageSelectionType |> RegExpPageSelectionType.toDto
+        Pattern = domain.Pattern
+        IsRegExp = domain.IsRegExp
+        IsCaseSensitive = domain.IsCaseSensitive
+        HorizontalStart = !horizontalStart
+        HorizontalEnd = !horizontalEnd
+        VerticalStart = !verticalStart
+        VerticalEnd = !verticalEnd
+        SelectPageRegionReturnType = domain.SelectPageRegionReturnType |> SelectPageRegionReturnType.toDto
+        IncludeIntersectingText = false
+        TextIntersectionType = SpatialEntity.NoEntity
+        SelectedRegionRotation = -1
+        TextToAssignToRegion = "" }
+
+    match dto.SelectPageRegionReturnType with
+    | SelectPageRegionReturnType.ReturnText ->
+      { dto with
+          IncludeIntersectingText = domain.IncludeIntersectingText
+          TextIntersectionType = domain.TextIntersectionType |> SpatialEntity.toDto }
+    | SelectPageRegionReturnType.ReturnReOcr ->
+      { dto with
+          SelectedRegionRotation = domain.SelectedRegionRotation }
+    | SelectPageRegionReturnType.ReturnImageRegion ->
+      { dto with
+          TextToAssignToRegion = domain.TextToAssignToRegion }
+    | other -> failwithf "Not a valid SelectPageRegionReturnType! %A" other
 
   let fromDto (dto: Dto.SelectPageRegion) =
     let domain =
@@ -78,11 +92,7 @@ module SelectPageRegion =
           RegExpPageSelectionType=(dto.RegExpPageSelectionType |> RegExpPageSelectionType.fromDto),
           IsRegExp=dto.IsRegExp,
           IsCaseSensitive=dto.IsCaseSensitive,
-          SelectPageRegionReturnType=(dto.SelectPageRegionReturnType |> SelectPageRegionReturnType.fromDto),
-          IncludeIntersectingText=dto.IncludeIntersectingText,
-          TextIntersectionType=(dto.TextIntersectionType |> SpatialEntity.fromDto),
-          SelectedRegionRotation=dto.SelectedRegionRotation,
-          TextToAssignToRegion=dto.TextToAssignToRegion )
+          SelectPageRegionReturnType=(dto.SelectPageRegionReturnType |> SelectPageRegionReturnType.fromDto) )
 
     domain.SetHorizontalRestriction(dto.HorizontalStart, dto.HorizontalEnd)
     domain.SetVerticalRestriction(dto.VerticalStart, dto.VerticalEnd)
@@ -92,6 +102,16 @@ module SelectPageRegion =
 
     if dto.SpecificPages |> String.length > 0
     then domain.SpecificPages <- dto.SpecificPages
+
+    match dto.SelectPageRegionReturnType with
+    | SelectPageRegionReturnType.ReturnText ->
+      domain.IncludeIntersectingText <- dto.IncludeIntersectingText
+      domain.TextIntersectionType <- dto.TextIntersectionType |> SpatialEntity.fromDto
+    | SelectPageRegionReturnType.ReturnReOcr ->
+      domain.SelectedRegionRotation <- dto.SelectedRegionRotation
+    | SelectPageRegionReturnType.ReturnImageRegion ->
+      domain.TextToAssignToRegion <- dto.TextToAssignToRegion
+    | other -> failwithf "Not a valid SelectPageRegionReturnType! %A" other
 
     domain
 
