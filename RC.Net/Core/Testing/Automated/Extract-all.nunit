@@ -24,7 +24,7 @@
     <assembly path="Extract.UtilityApplications.MLModelTrainer.Test.dll" />
     <assembly path="Extract.ETL.Test.dll" />
   </Config>
-  <Config name="Release" binpathtype="Auto" runtimeFramework="any">
+  <Config name="Release" binpathtype="Auto" runtimeFramework="any" appbase="C:\Engineering\binaries\release">
     <assembly path="Extract.AttributeFinder.OutputHandlers.Test.dll" />
     <assembly path="Extract.AttributeFinder.Test.dll" />
     <assembly path="Extract.AttributeFinder.Rules.Json.Test.dll" />

@@ -601,6 +601,7 @@
     <EmbeddedResource Include="Resources\CallTestOCRParamsPropagation.rsd" />
     <EmbeddedResource Include="Resources\CallTestOCRParamsPropagationByPage.rsd" />
     <EmbeddedResource Include="Resources\CallTestOCRParamsPropagationByDocument.rsd" />
+    <EmbeddedResource Include="Resources\RotateAndDespeckle.rsd" />
     <EmbeddedResource Include="Resources\Example05.tif" />
     <EmbeddedResource Include="Resources\Example05.tif.uss" />
     <EmbeddedResource Include="Resources\Example05_WithRotatedPage.tif" />

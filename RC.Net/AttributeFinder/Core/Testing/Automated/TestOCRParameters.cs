@@ -26,11 +26,14 @@ namespace Extract.AttributeFinder.Test
 
         const string _A418_TIF_FILE = "Resources.A418.tif";
         const string _GRAY_AREAS_TIF_FILE = "Resources.GrayAreas.tif";
+        const string _EXAMPLE_05_TIF_FILE = "Resources.Example05.tif";
+
         const string _DEFAULT_PARAMS_FILE = "Resources.defaultOCRParams.rsd";
         const string _TEST_PROPAGATION_RULESET = "Resources.TestOCRParamsPropagation.rsd";
         const string _CALL_TEST_PROPAGATION_RULESET = "Resources.CallTestOCRParamsPropagation.rsd";
         const string _CALL_TEST_PROPAGATION_BY_PAGE_RULESET = "Resources.CallTestOCRParamsPropagationByPage.rsd";
         const string _CALL_TEST_PROPAGATION_BY_DOC_RULESET = "Resources.CallTestOCRParamsPropagationByDocument.rsd";
+        const string _ROTATE_AND_DESPECKLE_RULESET = "Resources.RotateAndDespeckle.rsd";
 
         static readonly string _OCR_SINGLE_DOCUMENT_APPLICATION =
             Path.Combine(FileSystemMethods.CommonComponentsPath, "OCRSingleDocument.exe");
@@ -441,6 +444,28 @@ namespace Extract.AttributeFinder.Test
                 _testFiles = new TestFileManager<TestOCRParameters>();
             }
         }
+
+        /// <summary>
+        /// Test that force despeckle works with a rotated zone
+        /// https://extract.atlassian.net/browse/ISSUE-16940
+        /// </summary>
+        [Test, Category("OCRParameters")]
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Despeckle")]
+        public static void ForceDespeckleWithRotatedZone()
+        {
+            string imagePath = _testFiles.GetFile(_EXAMPLE_05_TIF_FILE);
+            string rulesPath = _testFiles.GetFile(_ROTATE_AND_DESPECKLE_RULESET);
+
+            var afEngine = new AttributeFinderEngineClass();
+            var doc = new AFDocumentClass();
+            var result = afEngine.FindAttributes(doc, imagePath, -1, rulesPath, null, false, null, null);
+
+            Assert.AreEqual(1, result.Size());
+            var text = ((IAttribute)result.At(0)).Value.String;
+            var firstLine = text.Split(new[] { '\r', '\n' }, System.StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+            Assert.AreEqual("TERESA ROSE MARTINEZ", firstLine);
+        }
+
         #endregion Public Test Functions
     }
 }
