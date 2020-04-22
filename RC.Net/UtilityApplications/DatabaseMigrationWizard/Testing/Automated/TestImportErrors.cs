@@ -35,7 +35,7 @@ namespace DatabaseMigrationWizard.Test
         /// After triggering an error, make sure that all changes are rolled back.
         /// I'm testing this by making sure the action table remains empty.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void EnsureRollbackIfError()
         {
             var database = FamTestDbManager.GetNewDatabase("EnsureRollback");

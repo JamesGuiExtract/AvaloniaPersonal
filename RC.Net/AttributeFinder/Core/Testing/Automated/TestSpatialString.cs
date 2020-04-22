@@ -114,7 +114,8 @@ namespace Extract.AttributeFinder.Test
 
         /// <summary>
         /// Test that loading pages from file works the same as loading whole file and then getting pages
-        /// TODO: Make this pass. How should this work, given that there is a page 2 file in the archive...
+        /// Page 2 is in an archive, and get pages filters out that page, therefore we need to also filter out
+        /// archived pages in LoadPagesFromFile because it does not filter out archived pages.
         /// </summary>
         [Test, Category("SpatialString")]        
         public static void LoadPagesFromFile()
@@ -123,11 +124,16 @@ namespace Extract.AttributeFinder.Test
             var ss = new SpatialStringClass();
 
             ss.LoadFrom(ussPath, false);
-            var pagesFromMem = ss.GetPages(false, "").ToIEnumerable<IComparableObject>().ToList();
-            var pagesFromFile = ss.LoadPagesFromFile(ussPath).ToIEnumerable<IComparableObject>().ToList();
-
+            var pagesFromMem = ss.GetPages(false, "")
+                .ToIEnumerable<IComparableObject>()
+                .ToList();
+            var pagesFromFile = ss.LoadPagesFromFile(ussPath)
+                .ToIEnumerable<ISpatialString>()
+                .Where(page => page.HasSpatialInfo())
+                .Cast<IComparableObject>()
+                .ToList();
             Assert.AreEqual(2, pagesFromMem.Count);
-            Assert.AreEqual(2, pagesFromFile.Count, "This currently fails. Should it be considered a problem?");
+            Assert.AreEqual(2, pagesFromFile.Count);
             for (int i = 0; i < 2; i++)
             {
                 Assert.That(pagesFromMem[i].IsEqualTo(pagesFromFile[i]));

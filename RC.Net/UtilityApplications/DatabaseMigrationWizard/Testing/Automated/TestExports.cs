@@ -104,7 +104,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting an action.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void Action()
         {
             var writer = BuildAndWriteTable(new SerializeAction());
@@ -121,7 +121,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting an AttributeName.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void AttributeName()
         {
             var writer = BuildAndWriteTable(new SerializeAttributeName());
@@ -135,7 +135,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting an AttributeSetName.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void AttributeSetName()
         {
             var writer = BuildAndWriteTable(new SerializeAttributeSetName());
@@ -149,7 +149,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the dashboard.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void Dashboard()
         {
             var writer = BuildAndWriteTable(new SerializeDashboard());
@@ -169,7 +169,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the DatabaseService.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void DatabaseService()
         {
             var writer = BuildAndWriteTable(new SerializeDatabaseService());
@@ -185,7 +185,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the DataEntryCounterDefinition.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void DataEntryCounterDefinition()
         {
             var writer = BuildAndWriteTable(new SerializeDataEntryCounterDefinition());
@@ -203,7 +203,7 @@ namespace DatabaseMigrationWizard.Test
         /// Tests exporting the DBInfo. This one is a bit weird because its already populated.
         /// So my theory to test it is to look for the database id, and ensure its not null.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void DBInfo()
         {
             var writer = BuildAndWriteTable(new SerializeDBInfo());
@@ -217,7 +217,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the FAMUser.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void FAMUser()
         {
             var writer = BuildAndWriteTable(new SerializeFAMUser());
@@ -232,7 +232,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the FieldSearch.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void FieldSearch()
         {
             var writer = BuildAndWriteTable(new SerializeFieldSearch());
@@ -248,7 +248,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the FileHandler.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void FileHandler()
         {
             var writer = BuildAndWriteTable(new SerializeFileHandler());
@@ -271,7 +271,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the LabDEEncounter.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void LabDEEncounter()
         {
             var writer = BuildAndWriteTable(new SerializeLabDEEncounter());
@@ -293,7 +293,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the LabDEOrder.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void LabDEOrder()
         {
             var writer = BuildAndWriteTable(new SerializeLabDEOrder());
@@ -315,7 +315,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the LabDEPatient.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void LabDEPatient()
         {
             var writer = BuildAndWriteTable(new SerializeLabDEPatient());
@@ -337,7 +337,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the LabDEProvider.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void LabDEProvider()
         {
             var writer = BuildAndWriteTable(new SerializeLabDEProvider());
@@ -364,7 +364,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the Login.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", Justification = "Its like this in the database")]
         public static void Login()
         {
@@ -379,7 +379,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the MetadataField.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void MetadataField()
         {
             var writer = BuildAndWriteTable(new SerializeMetadataField());
@@ -392,7 +392,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the MLModel.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void MLModel()
         {
             var writer = BuildAndWriteTable(new SerializeMLModel());
@@ -405,7 +405,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the Tag.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void Tag()
         {
             var writer = BuildAndWriteTable(new SerializeTag());
@@ -419,7 +419,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the UserCreatedCounter.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void UserCreatedCounter()
         {
             var writer = BuildAndWriteTable(new SerializeUserCreatedCounter());
@@ -433,7 +433,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the WebappConfig.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void WebAppConfig()
         {
             var writer = BuildAndWriteTable(new SerializeWebAppConfig());
@@ -448,7 +448,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests exporting the Workflow.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void Workflow()
         {
             var writer = BuildAndWriteTable(new SerializeWorkflow());
@@ -473,7 +473,7 @@ namespace DatabaseMigrationWizard.Test
         /// Tests running everything
         /// The output does not really matter because that is tested individually in this class.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void ExportEverything()
         {
             var exportOptions = new ExportOptions() { ConnectionInformation = new Database.ConnectionInformation() };

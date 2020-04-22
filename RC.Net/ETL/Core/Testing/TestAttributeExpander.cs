@@ -55,7 +55,7 @@ namespace Extract.ETL.Test
 	              ,[AttributeType].[Type]
                   ,[Value]
                   ,[ParentAttributeID]
-                  ,[GUID]
+                  ,[Attribute].[GUID]
                   ,[Top]
                   ,[Left]
                   ,[Bottom]

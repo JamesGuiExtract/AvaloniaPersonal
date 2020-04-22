@@ -95,7 +95,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure Action imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void Action()
         {
             var actionFromDB = JsonConvert.DeserializeObject<List<Database.Input.DataTransformObject.Action>>(BuildAndWriteTable(new SerializeAction()).ToString());
@@ -109,7 +109,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure AttributeName imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void AttributeName()
         {
             var attributeNameFromDB = JsonConvert.DeserializeObject<List<AttributeName>>(BuildAndWriteTable(new SerializeAttributeName()).ToString());
@@ -123,7 +123,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure AttributeName imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void AttributeSetName()
         {
             var attributeSetNameFromDB = JsonConvert.DeserializeObject<List<AttributeSetName>>(BuildAndWriteTable(new SerializeAttributeSetName()).ToString());
@@ -137,7 +137,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure Dashboard imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void Dashboard()
         {
             var dashboardFromDB = JsonConvert.DeserializeObject<List<Dashboard>>(BuildAndWriteTable(new SerializeDashboard()).ToString());
@@ -151,7 +151,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure DatabaseService imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void DatabaseService()
         {
             var databaseServiceFromDB = JsonConvert.DeserializeObject<List<DatabaseService>>(BuildAndWriteTable(new SerializeDatabaseService()).ToString());
@@ -165,7 +165,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure DataEntryCounterDefinition imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void DataEntryCounterDefinition()
         {
             var DataEntryCounterDefinitionFromDB = JsonConvert.DeserializeObject<List<DataEntryCounterDefinition>>(BuildAndWriteTable(new SerializeDataEntryCounterDefinition()).ToString());
@@ -179,7 +179,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure DBInfo imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void DBInfo()
         {
             var DBInfoFromDB = JsonConvert.DeserializeObject<List<DBInfo>>(BuildAndWriteTable(new SerializeDBInfo()).ToString());
@@ -193,7 +193,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure FAMUser imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void FAMUser()
         {
             var FAMUserFromDB = JsonConvert.DeserializeObject<List<FAMUser>>(BuildAndWriteTable(new SerializeFAMUser()).ToString());
@@ -207,7 +207,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure FieldSearch imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void FieldSearch()
         {
             var FieldSearchFromDB = JsonConvert.DeserializeObject<List<FieldSearch>>(BuildAndWriteTable(new SerializeFieldSearch()).ToString());
@@ -221,7 +221,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure FileHandler imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void FileHandler()
         {
             var FileHandlerFromDB = JsonConvert.DeserializeObject<List<FileHandler>>(BuildAndWriteTable(new SerializeFileHandler()).ToString());
@@ -235,7 +235,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure LabDEEncounter imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void LabDEEncounter()
         {
             var LabDEEncounterFromDB = JsonConvert.DeserializeObject<List<LabDEEncounter>>(BuildAndWriteTable(new SerializeLabDEEncounter()).ToString());
@@ -249,7 +249,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure LabDEOrder imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void LabDEOrder()
         {
             var LabDEOrderFromDB = JsonConvert.DeserializeObject<List<LabDEOrder>>(BuildAndWriteTable(new SerializeLabDEOrder()).ToString());
@@ -263,7 +263,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure LabDEPatient imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void LabDEPatient()
         {
             var LabDEPatientFromDB = JsonConvert.DeserializeObject<List<LabDEPatient>>(BuildAndWriteTable(new SerializeLabDEPatient()).ToString());
@@ -277,7 +277,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure LabDEProvider imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void LabDEProvider()
         {
             var LabDEProviderFromDB = JsonConvert.DeserializeObject<List<LabDEProvider>>(BuildAndWriteTable(new SerializeLabDEProvider()).ToString());
@@ -292,7 +292,7 @@ namespace DatabaseMigrationWizard.Test
         /// Tests to make sure Login imported properly.
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1726:UsePreferredTerms", Justification = "Naming violations are a result of acronyms in the database.")]
-        [Test]
+        [Test, Category("Automated")]
         public static void Login()
         {
             var LoginFromDB = JsonConvert.DeserializeObject<List<Login>>(BuildAndWriteTable(new SerializeLogin()).ToString());
@@ -306,7 +306,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure MetadataField imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void MetadataField()
         {
             var MetadataFieldFromDB = JsonConvert.DeserializeObject<List<MetadataField>>(BuildAndWriteTable(new SerializeMetadataField()).ToString());
@@ -320,7 +320,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure MlModel imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void MLModel()
         {
             var MLModelFromDB = JsonConvert.DeserializeObject<List<MLModel>>(BuildAndWriteTable(new SerializeMLModel()).ToString());
@@ -334,7 +334,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure Tag imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void Tag()
         {
             var TagFromDB = JsonConvert.DeserializeObject<List<Tag>>(BuildAndWriteTable(new SerializeTag()).ToString());
@@ -348,7 +348,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure UserCreatedCounter imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void UserCreatedCounter()
         {
             var UserCreatedCounterFromDB = JsonConvert.DeserializeObject<List<UserCreatedCounter>>(BuildAndWriteTable(new SerializeUserCreatedCounter()).ToString());
@@ -362,7 +362,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure WebAppConfig imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void WebAppConfig()
         {
             var WebAppConfigFromDB = JsonConvert.DeserializeObject<List<WebAppConfig>>(BuildAndWriteTable(new SerializeWebAppConfig()).ToString());
@@ -376,7 +376,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Tests to make sure Workflow imported properly.
         /// </summary>
-        [Test]
+        [Test, Category("Automated")]
         public static void Workflow()
         {
             var WorkflowFromDB = JsonConvert.DeserializeObject<List<Workflow>>(BuildAndWriteTable(new SerializeWorkflow()).ToString());

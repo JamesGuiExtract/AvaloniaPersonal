@@ -23,6 +23,7 @@
     <assembly path="Extract.UtilityApplications.TrainingCoordinator.Test.dll" />
     <assembly path="Extract.UtilityApplications.MLModelTrainer.Test.dll" />
     <assembly path="Extract.ETL.Test.dll" />
+	<assembly path="DatabaseMigrationWizard.Test.dll" />
   </Config>
   <Config name="Release" binpathtype="Auto" runtimeFramework="any" appbase="C:\Engineering\binaries\release">
     <assembly path="Extract.AttributeFinder.OutputHandlers.Test.dll" />
@@ -47,5 +48,6 @@
     <assembly path="Extract.UtilityApplications.TrainingCoordinator.Test.dll" />
     <assembly path="Extract.UtilityApplications.MLModelTrainer.Test.dll" />
     <assembly path="Extract.ETL.Test.dll" />
+	<assembly path="DatabaseMigrationWizard.Test.dll" />
   </Config>
 </NUnitProject>
