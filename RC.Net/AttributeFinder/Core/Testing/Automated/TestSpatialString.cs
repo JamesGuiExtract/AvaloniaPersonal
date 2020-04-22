@@ -163,6 +163,20 @@ namespace Extract.AttributeFinder.Test
             Assert.That(pageThrees.TrueForAll(p => p.size == pageThrees[0].size));
         }
 
+        /// <summary>
+        /// CreateFromSpatialStrings creates bad spatial string when given an empty vector
+        /// https://extract.atlassian.net/browse/ISSUE-17006
+        /// </summary>
+        [Test, Category("SpatialString")]        
+        public static void CreateFromSpatialStringsWithEmptyVector()
+        {
+            var ss = new SpatialStringClass();
+            var pages = new IUnknownVectorClass();
+            ss.CreateFromSpatialStrings(pages, false);
+
+            // Confirm that the result is non-spatial
+            Assert.AreEqual(ESpatialStringMode.kNonSpatialMode, ss.GetMode());
+        }
         #endregion Public Test Functions
     }
 }
