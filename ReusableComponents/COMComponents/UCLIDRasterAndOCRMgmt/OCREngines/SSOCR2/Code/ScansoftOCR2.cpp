@@ -2000,11 +2000,8 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	ASSERT_RESOURCE_ALLOCATION("ELI12722", ipPageInfo != __nullptr);
 
 	ipPageInfo->Initialize(info.Size.cx, info.Size.cy, orientation, dDeskew);
-		
-	// rotate the image
-	THROW_UE_ON_ERROR("ELI12723", "Unable to rotate image.",
-		kRecRotateImg(0, m_hPage, imgRotate));
 
+	// Despeckle before rotation (this matters if pZone is non-null, see https://extract.atlassian.net/browse/ISSUE-16940)
 	if (m_eForceDespeckle == kAlwaysForce
 		|| m_eForceDespeckle == kForceWhenBitonal && info.BitsPerPixel == 1)
 	{
@@ -2012,6 +2009,10 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 			kRecForceDespeckleImg(0, m_hPage, pZone, m_eForceDespeckleMethod, m_nForceDespeckleLevel));
 	}
 	
+	// rotate the image
+	THROW_UE_ON_ERROR("ELI12723", "Unable to rotate image.",
+		kRecRotateImg(0, m_hPage, imgRotate));
+
 	// create zones for handwriting recognition
 	if(bDetectHandwriting)
 	{
