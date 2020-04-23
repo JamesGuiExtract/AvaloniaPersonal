@@ -2068,6 +2068,7 @@
 		<row><td>_5FAC6B3F_5E8D_4D09_B6A8_3BC21391D615_</td><td>Microsoft SQL Server 2012 Native Client (x64).prq</td><td/><td/><td/></row>
 		<row><td>_717598A3_4B44_433B_BEE0_09A78F062472_</td><td>Microsoft .NET Framework 4.8 Full.prq</td><td/><td/><td/></row>
 		<row><td>_CD543C84_67D7_4792_A61F_5AE0D9F5DAE1_</td><td>Microsoft SQL Server 2012 Native Client (x86).prq</td><td/><td/><td/></row>
+		<row><td>_F394D37A_7A96_4EFC_A0FF_0EC851A48FA2_</td><td>Microsoft Visual C++ 2015-2019 Redistributable Package (x64).prq</td><td/><td/><td/></row>
 	</table>
 
 	<table name="ISSetupType">
