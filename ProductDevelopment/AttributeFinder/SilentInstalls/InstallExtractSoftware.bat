@@ -70,7 +70,7 @@ IF "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 
 @ECHO.
 @ECHO Installing Extract Software...
-start /wait "" "%SOFTWARE_INSTALL_ROOT%Setup" /s /f1%SOFTWARE_INSTALL_ISS% /f2nul
+start /wait "" "%SOFTWARE_INSTALL_ROOT%Setup" /s /f1%SOFTWARE_INSTALL_ISS% /f2nul /V"/qn"
 
 :: Check registry for the uninstall for FlexIndex as verification that it installed
 IF EXIST "%TEMP%\ExtractSoftwareInstalled.reg" DEL "%TEMP%\ExtractSoftwareInstalled.reg"

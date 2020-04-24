@@ -32,7 +32,7 @@ begin
     SetDCOMPermissions();
     
  	// Install FKB 
-	InstallFKB();
+	//InstallFKB();
 		
 	// Install the ESFAMService.exe 
 	InstallDotNetService( "\"" + PROGRAMFILES + EXTRACT_DIR ^ "ESFAMService.exe\"");

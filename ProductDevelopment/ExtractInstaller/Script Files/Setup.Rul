@@ -141,7 +141,7 @@ Dlg_SdStartCopy:
    	InstallCrystalReports();  
    	               
 	// Install SQL CE   	               
-   	InstallSQLCE();
+   	//InstallSQLCE();
    	                      
 	// Install Office Redist
    	InstallOfficeRedist();
