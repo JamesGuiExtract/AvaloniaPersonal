@@ -53,6 +53,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDependentAssemblyPaths Condition=" '$(VS100COMNTOOLS)' != '' " Include="$(VS100COMNTOOLS)..\IDE\PrivateAssemblies">
@@ -65,6 +66,7 @@
     <Compile Include="TestAdtMergeUnmerge.cs" />
     <Compile Include="TestDataEntryUtils.cs" />
     <Compile Include="TestLabDEQueryUtilities.cs" />
+    <Compile Include="TestLabDEDuplicateDocumentsButton.cs" />
     <Compile Include="TestOrderAndEncounterTables.cs" />
     <Compile Include="TestLabDEStoredProcedures.cs" />
   </ItemGroup>
@@ -77,9 +79,21 @@
       <Project>{6b284a4d-132c-4fe4-858f-06a9c476b19b}</Project>
       <Name>Extract.FileActionManager.Database.Test</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
+      <Project>{9d9996e1-50be-4506-b4a6-08f6b9d3f839}</Project>
+      <Name>Extract.Imaging.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
+      <Project>{4f37507c-6ce8-4c68-a54b-efcce96a99ea}</Project>
+      <Name>Extract.Interop</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Core\Code\Extract.DataEntry.csproj">
+      <Project>{55c4fa3a-26c9-4cc0-9f11-a7e607e6acd2}</Project>
+      <Name>Extract.DataEntry</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Code\Extract.DataEntry.LabDE.csproj">
       <Project>{882FDE16-73BE-4420-B89F-ABE418902983}</Project>
@@ -91,6 +105,7 @@
       <SubType>Designer</SubType>
     </None>
     <EmbeddedResource Include="Resources\Demo_LabDE.bak" />
+    <EmbeddedResource Include="Resources\Demo_LabDE_WithData.bak" />
     <None Include="Resources\ReceiveAdtEncounterMessage.nix" />
     <None Include="Resources\ReceiveOrmEncounterMessage.nix" />
   </ItemGroup>

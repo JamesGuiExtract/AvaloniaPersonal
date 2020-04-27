@@ -758,44 +758,46 @@ namespace Extract.DataEntry.LabDE
         {
             get
             {
-                string query = string.Format(CultureInfo.InvariantCulture,
-                    "SELECT [FAMFile].[ID] FROM [FAMFile] " +
-                    "   INNER JOIN [FileMetadataFieldValue] ON [FAMFile].[ID] = [FileMetadataFieldValue].[FileID] " +
-                    "   INNER JOIN [MetadataField] ON [MetadataFieldID] = [MetadataField].[ID] " +
-                    "   WHERE [Name] = '{0}' AND LEN('{1}') > 0 AND [Value] = '{1}' " +
-                    "INTERSECT " +
-                    "SELECT [FAMFile].[ID] FROM [FAMFile] " +
-                    "   INNER JOIN [FileMetadataFieldValue] ON [FAMFile].[ID] = [FileMetadataFieldValue].[FileID] " +
-                    "   INNER JOIN [MetadataField] ON [MetadataFieldID] = [MetadataField].[ID] " +
-                    "   WHERE [Name] = '{2}' AND LEN('{3}') > 0 AND [Value] = '{3}' " +
-                    "INTERSECT " +
-                    "SELECT [FAMFile].[ID] FROM [FAMFile] " +
-                    "   INNER JOIN [FileMetadataFieldValue] ON [FAMFile].[ID] = [FileMetadataFieldValue].[FileID] " +
-                    "   INNER JOIN [MetadataField] ON [MetadataFieldID] = [MetadataField].[ID] " +
-                    "   WHERE [Name] = '{4}' AND LEN('{5}') > 0 AND [Value] = '{5}' ",
-                    PatientFirstNameMetadataField, FirstName.Replace("'", "''"), 
-                    PatientLastNameMetadataField, LastName.Replace("'", "''"), 
-                    PatientDOBMetadataField, DOB.Replace("'", "''"));
+                string firstName = FirstName.Replace("'", "''");
+                string lastName = LastName.Replace("'", "''");
+                string dob = DOB.Replace("'", "''");
+                string sourceDocName = AttributeStatusInfo.SourceDocName.Replace("'", "''");
+                // Build a comma-delimited list of conditions for collection dates to allow match on
+                // any of the collection dates in the document using a 'LIKE' comparison
+                string collectionDateConditions = string.IsNullOrWhiteSpace(CollectionDate)
+                    ? "1 = 0"  // Always false if the CollectionDate value does not exist.
+                    : string.Join(" OR ", 
+                        CollectionDate.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(date => "  [CollectionDate].[Value] LIKE '%" + date.Replace("'", "''") + "%'"));
 
-                query += " INTERSECT " +
-                    "SELECT [FAMFile].[ID] FROM [FAMFile] " +
-                    "   INNER JOIN [FileMetadataFieldValue] ON [FAMFile].[ID] = [FileMetadataFieldValue].[FileID] " +
-                    "   INNER JOIN [MetadataField] ON [MetadataFieldID] = [MetadataField].[ID] " +
-                    Invariant($"   WHERE [Name] = '{CollectionDateMetadataField}' AND (");
-                
-                string[] collectionDates = string.IsNullOrWhiteSpace(CollectionDate)
-                    ? new[] { "[NO_COLLECTION_DATE]"}
-                    : CollectionDate.Split(',');
+                string query = Invariant($@"
+                    SELECT [FAMFile].[ID] FROM [FAMFile]
+                        INNER JOIN [FileMetadataFieldValue] AS [FirstName]
+                            ON [FirstName].[FileID] = [FAMFile].[ID] AND [FirstName].[MetadataFieldID] =
+			                    (SELECT [ID] FROM [MetadataField] WHERE [Name] = '{PatientFirstNameMetadataField}')
+                            AND LEN('{firstName}') > 0              -- Don't allow a match against a file missing key metadata
+                            AND [FirstName].[Value] = '{firstName}'
+                        INNER JOIN [FileMetadataFieldValue] AS [LastName]
+                            ON [LastName].[FileID] = [FAMFile].[ID] AND [LastName].[MetadataFieldID] =
+			                    (SELECT [ID] FROM [MetadataField] WHERE [Name] = '{PatientLastNameMetadataField}')
+                            AND LEN('{lastName}') > 0              -- Don't allow a match against a file missing key metadata
+                            AND [LastName].[Value] = '{lastName}'
+                        INNER JOIN [FileMetadataFieldValue] AS [DOB]
+                            ON [DOB].[FileID] = [FAMFile].[ID] AND [DOB].[MetadataFieldID] =
+			                    (SELECT [ID] FROM [MetadataField] WHERE [Name] = '{PatientDOBMetadataField}')
+                            AND LEN('{dob}') > 0              -- Don't allow a match against a file missing key metadata
+                            AND [DOB].[Value] = '{dob}'
 
-                // Match on any of the collection dates in the document.
-                query += string.Join(" OR ",
-                    collectionDates.Select(date => " [Value] LIKE '%" + date.Replace("'", "''") + "%' ")) + ")";
+                    -- Use LIKE to match one any one of multiple collection dates that may exist in the document.
+                        INNER JOIN [FileMetadataFieldValue] AS [CollectionDate]
+                            ON [CollectionDate].[FileID] = [FAMFile].[ID] AND [CollectionDate].[MetadataFieldID] =
+			                    (SELECT [ID] FROM [MetadataField] WHERE [Name] = '{CollectionDateMetadataField}')
+                            AND ({collectionDateConditions})
+                    
+                    -- Always display the current document regardless of whether the metadata was properly located.
+                    UNION SELECT [ID] FROM [FAMFile] WHERE [FileName] = '{sourceDocName}'");
 
-                // Always display the current document regardless of whether the metadata was properly located.
-                query += " UNION " +
-                    "SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [FileName] = '" +
-                    AttributeStatusInfo.SourceDocName.Replace("'", "''") + "'";
-
+                // To ensure "ORDER BY [FAMFile].[ID]" can be correctly applied to the query result
                 query = "SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] IN (" + query + ")";
 
                 return query;
@@ -910,6 +912,11 @@ namespace Extract.DataEntry.LabDE
         /// </summary>
         void CheckOutDuplicateFiles()
         {
+            if (!KeyFieldsArePopulated)
+            {
+                return;
+            }
+
             // Compile a set of FileIDs that appear to be duplicates of this one.
             Recordset duplicateFileIDRecordset =
                 FileProcessingDB.GetResultsForQuery(DuplicateDocumentsQuery);

@@ -30,10 +30,10 @@ namespace Extract.DataEntry
         public double AutoZoomContext => 0;
         public bool AllowTabbingByGroup => false;
         public bool ShowAllHighlights => false;
-        public FileProcessingDB FileProcessingDB { get; private set; }
-        public string DatabaseActionName => "";
+        public FileProcessingDB FileProcessingDB { get; set; }
+        public string DatabaseActionName { get; set; } = "";
         public string DatabaseComment { get; set; }
-        public IFileRequestHandler FileRequestHandler => null;
+        public IFileRequestHandler FileRequestHandler { get;  set; }
         public bool Dirty => false;
         public ReadOnlyCollection<int> FileIds => new List<int>().AsReadOnly();
         public bool RunningInBackground => true;
