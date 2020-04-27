@@ -10,6 +10,8 @@ using System.IO;
 using System.Runtime.Caching;
 using System.Threading;
 
+using static System.FormattableString;
+
 namespace Extract.Imaging
 {
     /// <summary>
@@ -422,7 +424,7 @@ namespace Extract.Imaging
         {
             // Chache info so that correcting spatial data on large images works well
             // https://extract.atlassian.net/projects/ISSUE/issues/ISSUE-15299
-            var key = "ImagePageProperties" + _fileName + ":" + pageNumber;
+            var key = Invariant($"ImagePageProperties{_fileName}:{pageNumber}");
             var cache = MemoryCache.Default;
             var result = cache.Get(key) as ImagePageProperties;
             if (result == null)

@@ -537,6 +537,11 @@ namespace Extract.FileActionManager.Utilities
         /// </summary>
         readonly bool _inDesignMode;
 
+        /// <summary>
+        /// Indicates when the file list is actively being updated. The database query to get the files will run
+        /// in a background thread and be invoked to the UI thread as they become available.
+        /// </summary>
+        bool _updatingFileList = false;
 
         /// <summary>
         /// A <see cref="IFFIFileSelectionPane"/> instance that should replace the
@@ -1155,6 +1160,7 @@ namespace Extract.FileActionManager.Utilities
 
                 _fileListDataGridView.Rows.Clear();
                 _fileSelectionCount = 0;
+                _updatingFileList = true;
 
                 // If generating a new file list, the previous search results don't apply anymore.
                 // Uncheck show search results until a new search is run.
@@ -1348,6 +1354,47 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI37554");
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of all file IDs currently presented in the FFI.
+        /// </summary>
+        public IEnumerable<int> DisplayedFileIds
+        { 
+            get
+            {
+                try
+                {
+                    return _rowsByFileId.Keys;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI49787");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Initializes this instance for use in unit tests. (Form will not be displayed)
+        /// </summary>
+        public void InitializeUnitTestMode()
+        {
+            try
+            {
+                InitializeCustomColumns();
+                GenerateFileList(false);
+
+                // The file list is retrieved via a background thread to keep the UI responsive as the query is ongoing.
+                // For unit test purposes, we need to block until the updating of the list is complete.
+                while (_updatingFileList)
+                {
+                    Application.DoEvents();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49786");
             }
         }
 
@@ -3764,6 +3811,10 @@ namespace Extract.FileActionManager.Utilities
             {
                 ex.ExtractDisplay("ELI35726");
             }
+            finally
+            {
+                _updatingFileList = false;
+            }
         }
 
         /// <summary>
@@ -3846,6 +3897,10 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI36790");
+            }
+            finally
+            {
+                _updatingFileList = false;
             }
         }
 
@@ -5013,6 +5068,7 @@ namespace Extract.FileActionManager.Utilities
                 column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
 
                 _fileListDataGridView.Columns.Insert(columnIndex, column);
+                columnDefinition.FAMFileInspectorFormHandle = this.Handle;
 
                 column.Width = columnDefinition.DefaultWidth;
             }

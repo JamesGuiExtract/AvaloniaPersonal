@@ -437,6 +437,27 @@ namespace Extract.DataEntry.LabDE
             }
         }
 
+        #region Properties
+
+        /// <summary>
+        /// The action name to be set to pending for ignored/skipped documents so they can be cleaned up
+        /// </summary>
+        [Category("LabDE Configuration Setting")]
+        public virtual string CleanupAction
+        {
+            get
+            {
+                return ActionColumn.CleanupAction;
+            }
+
+            set
+            {
+                ActionColumn.CleanupAction = value;
+            }
+        }
+
+        #endregion Properties
+
         /// <summary>
         /// Gets or sets the patient first name from the current document.
         /// </summary>
@@ -571,6 +592,31 @@ namespace Extract.DataEntry.LabDE
 
         #endregion Properties
 
+        #region Public Members
+
+        /// <summary>
+        /// Gets a FAMFileInspectorForm that has been initialized for use in conjunction with this
+        /// button for unit testing. Files will be loaded into the FFI according to the current property
+        /// settings and FAM DB metadata info.
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public FAMFileInspectorForm GetTestFAMFileInspector()
+        {
+            try
+            {
+                var fileInspectorForm = GetFAMFileInspectorForm();
+                fileInspectorForm.InitializeUnitTestMode();
+
+                return fileInspectorForm;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49782");
+            }
+        }
+
+        #endregion Public Members
+
         #region Overrides
 
         /// <summary>
@@ -596,42 +642,8 @@ namespace Extract.DataEntry.LabDE
                     BackColor = FlashColor;
                 }
 
-                // Provide the ActionColumn with the necessary information
-                ActionColumn.Initialize(DataEntryControlHost.DataEntryApplication);
-                ActionColumn.FirstName = FirstName;
-                ActionColumn.LastName = LastName;
-                ActionColumn.DOB = DOB;
-                ActionColumn.CollectionDate = CollectionDate;
-
-                // Initialize the FFI with a query that will list the current document as well as
-                // any documents that appear to be duplicates of this document based on patient info
-                // and collection date.
-                FAMFileSelector selector = new FAMFileSelector();
-                selector.AddQueryCondition(DuplicateDocumentsQuery);
-
-                // Collection dates are comma delimited, but for ease of use in code to compare
-                // dates no spaces are include. Add spaces to the summary message for better
-                // readability.
-                string collectionDates = CollectionDate.Replace(",", ", ");
-
-                string selectorSummary = string.Format(CultureInfo.CurrentCulture,
-                    "Potential duplicate documents for {0}, {1}\r\n" +
-                    "DOB: {2}\r\n" +
-                    "Collection date(s): {3}",
-                    LastName, FirstName, DOB, collectionDates);
-
-                using (var fileInspectorForm = new FAMFileInspectorForm())
+                using (var fileInspectorForm = GetFAMFileInspectorForm())
                 {
-                    fileInspectorForm.UseDatabaseMode = true;
-                    fileInspectorForm.FileProcessingDB.DuplicateConnection(FileProcessingDB);
-                    fileInspectorForm.FileSelector = selector;
-                    fileInspectorForm.LockFileSelector = true;
-                    fileInspectorForm.LockedFileSelectionSummary = selectorSummary;
-                    foreach (var column in _ffiCustomColumns)
-                    {
-                        fileInspectorForm.AddCustomColumn(column);
-                    }
-
                     fileInspectorForm.ShowDialog(DataEntryControlHost);
                 }
             }
@@ -714,6 +726,51 @@ namespace Extract.DataEntry.LabDE
         #endregion Event handlers
 
         #region Protected Members
+
+        /// <summary>
+        /// Gets a <see cref="FAMFileInspectorForm"/> instance to be used to display probable
+        /// duplicate files for resolution.
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        protected virtual FAMFileInspectorForm GetFAMFileInspectorForm()
+        {
+            // Provide the ActionColumn with the necessary information
+            ActionColumn.Initialize(DataEntryControlHost.DataEntryApplication);
+            ActionColumn.FirstName = FirstName;
+            ActionColumn.LastName = LastName;
+            ActionColumn.DOB = DOB;
+            ActionColumn.CollectionDate = CollectionDate;
+
+            // Initialize the FFI with a query that will list the current document as well as
+            // any documents that appear to be duplicates of this document based on patient info
+            // and collection date.
+            FAMFileSelector selector = new FAMFileSelector();
+            selector.AddQueryCondition(DuplicateDocumentsQuery);
+
+            // Collection dates are comma delimited, but for ease of use in code to compare
+            // dates no spaces are include. Add spaces to the summary message for better
+            // readability.
+            string collectionDates = CollectionDate.Replace(",", ", ");
+
+            string selectorSummary = string.Format(CultureInfo.CurrentCulture,
+                "Potential duplicate documents for {0}, {1}\r\n" +
+                "DOB: {2}\r\n" +
+                "Collection date(s): {3}",
+                LastName, FirstName, DOB, collectionDates);
+
+            var fileInspectorForm = new FAMFileInspectorForm();
+            fileInspectorForm.UseDatabaseMode = true;
+            fileInspectorForm.FileProcessingDB.DuplicateConnection(FileProcessingDB);
+            fileInspectorForm.FileSelector = selector;
+            fileInspectorForm.LockFileSelector = true;
+            fileInspectorForm.LockedFileSelectionSummary = selectorSummary;
+            foreach (var column in _ffiCustomColumns)
+            {
+                fileInspectorForm.AddCustomColumn(column);
+            }
+
+            return fileInspectorForm;
+        }
 
         /// <summary>
         /// Gets the <see cref="FileProcessingDB"/> currently being used.

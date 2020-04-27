@@ -187,6 +187,15 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
+        /// The action name to be set to pending for ignored/skipped documents so they can be cleaned up
+        /// </summary>
+        public virtual string CleanupAction
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Stores the currently selected action for all files that have been displayed in FFI.
         /// </summary>
         protected Dictionary<int, string> CurrentValues
@@ -499,6 +508,42 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
+        /// Returns the handle of the <see cref="FAMFileInspectorForm"/> in which this column is being used
+        /// or <see cref="IntPtr.Zero"/> in the case the column is not currently initialized in an FFI.
+        /// </summary>
+        public IntPtr FAMFileInspectorFormHandle
+        {
+            get
+            {
+                try
+                {
+                    return (FAMFileInspectorForm == null || FAMFileInspectorForm.IsDisposed)
+                        ? IntPtr.Zero
+                        : FAMFileInspectorForm.Handle;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.CreateComVisible("ELI49784", "Failed to retrieve FFI handle", ex);
+                }
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != this.FAMFileInspectorFormHandle)
+                    {
+                        FAMFileInspectorForm = (FAMFileInspectorForm)Form.FromHandle(value);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.CreateComVisible("ELI49785", "Failed to apply FFI handle", ex);
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the name for the column header. Will also appear in the context menu if
         /// <see cref="GetContextMenuChoices"/> returns a value.
         /// </summary>
@@ -616,7 +661,7 @@ namespace Extract.DataEntry.LabDE
                         {
                             choices = choices.Intersect(GetValueChoicesHelper(fileID));
                         }
-                    
+
                         if (!choices.Any())
                         {
                             break;
@@ -860,7 +905,7 @@ namespace Extract.DataEntry.LabDE
                     foreach (int fileId in OriginalFileIds.Except(CurrentFileIds))
                     {
                         CheckedOutFileIds.Remove(fileId);
-                        
+
                         // Since the user does not want the original file displayed in verification any
                         // longer, delay it.
                         filesToDelay.Add(fileId);
@@ -950,17 +995,6 @@ namespace Extract.DataEntry.LabDE
         #region Protected members
 
         /// <summary>
-        /// Gets the currently displayed <see cref="FAMFileInspectorForm"/>.
-        /// </summary>
-        protected static FAMFileInspectorForm FAMFileInspectorForm
-        {
-            get
-            {
-                return Application.OpenForms.OfType<FAMFileInspectorForm>().Single();
-            }
-        }
-
-        /// <summary>
         /// Gets all file options.
         /// </summary>
         /// <returns></returns>
@@ -1033,9 +1067,19 @@ namespace Extract.DataEntry.LabDE
             {
                 if (adoRecordset != null)
                 {
-                    adoRecordset.Close(); 
+                    adoRecordset.Close();
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the <see cref="FAMFileInspectorForm"/> in which this column is being used
+        /// or <c>null</c> in the case the column is not currently initialized in an FFI.
+        /// </summary>
+        protected FAMFileInspectorForm FAMFileInspectorForm
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -1247,6 +1291,21 @@ namespace Extract.DataEntry.LabDE
                 CreateStapledOutput(stapledIds, stapledIdsWithoutFirstPage);
                 StandardActionProcessor(stapledIds, EActionStatus.kActionCompleted, TagForStaple,
                     StapledIntoMetadataFieldName, StapledIntoMetadataFieldValue);
+
+                // https://extract.atlassian.net/browse/ISSUE-13751
+                // Allow for ignored/skipped documents to be forwarded to a cleanup action.
+                if (!string.IsNullOrWhiteSpace(CleanupAction))
+                {
+                    foreach (int fileId in ignoredIds
+                        .Union(stapledIds)
+                        .Union(stapledIdsWithoutFirstPage))
+                    {
+                        // Set this file ID to Pending for the specified action name 
+                        EActionStatus oldStatus;
+                        FileProcessingDB.SetStatusForFile(fileId,
+                            CleanupAction, -1, EActionStatus.kActionPending, true, false, out oldStatus);
+                    }
+                }
 
                 // Translate the actions by ID to a dictionary of actions to the associated set of file IDs.
                 var fileIDsByAction = CurrentValues

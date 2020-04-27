@@ -47,6 +47,16 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Returns the handle of the <see cref="FAMFileInspectorForm"/> in which this column is being used
+        /// or <see cref="IntPtr.Zero"/> in the case the column is not currently initialized in an FFI.
+        /// </summary>
+        IntPtr FAMFileInspectorFormHandle
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets the name for the column header. Will also appear in the context menu if
         /// <see cref="GetContextMenuChoices"/> returns a value.
         /// </summary>

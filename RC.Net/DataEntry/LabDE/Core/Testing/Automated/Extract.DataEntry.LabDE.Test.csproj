@@ -43,6 +43,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Leadtools, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907" />
     <Reference Include="nunit.framework, Version=2.5.8.10295, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\APIs\NUnit_2.5\bin\nunit.framework.dll</HintPath>
@@ -53,6 +54,9 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\..\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +83,14 @@
       <Project>{6b284a4d-132c-4fe4-858f-06a9c476b19b}</Project>
       <Name>Extract.FileActionManager.Database.Test</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\FileActionManager\Utilities\FAMFileInspector\Core\Code\FAMFileInspector.csproj">
+      <Project>{2189A8DE-A35D-4969-9E88-371A87418785}</Project>
+      <Name>FAMFileInspector</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj">
+      <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
+      <Name>Extract.Imaging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
       <Project>{9d9996e1-50be-4506-b4a6-08f6b9d3f839}</Project>
       <Name>Extract.Imaging.Forms</Name>
@@ -86,6 +98,10 @@
     <ProjectReference Include="..\..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4f37507c-6ce8-4c68-a54b-efcce96a99ea}</Project>
       <Name>Extract.Interop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
+      <Name>Extract.Utilities</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
@@ -106,6 +122,7 @@
     </None>
     <EmbeddedResource Include="Resources\Demo_LabDE.bak" />
     <EmbeddedResource Include="Resources\Demo_LabDE_WithData.bak" />
+    <None Include="packages.config" />
     <None Include="Resources\ReceiveAdtEncounterMessage.nix" />
     <None Include="Resources\ReceiveOrmEncounterMessage.nix" />
   </ItemGroup>

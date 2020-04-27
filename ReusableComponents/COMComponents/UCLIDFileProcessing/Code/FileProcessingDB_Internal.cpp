@@ -2685,65 +2685,65 @@ int CFileProcessingDB::getDBSchemaVersion()
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::validateDBSchemaVersion(bool bCheckForUnaffiliatedFiles/* = false */)
 {
-	// If in the process of checking the database schema or during an update operation, do not
-	// validate the database schema; this would cause the schema update to fail or infinite recursion.
-	if (!m_bValidatingOrUpdatingSchema)
-	{
-		// Prevent recursion when the product specific DBs check their version.
-		ValueRestorer<volatile bool> restorer(m_bValidatingOrUpdatingSchema, false);
-		m_bValidatingOrUpdatingSchema = true;
+	//// If in the process of checking the database schema or during an update operation, do not
+	//// validate the database schema; this would cause the schema update to fail or infinite recursion.
+	//if (!m_bValidatingOrUpdatingSchema)
+	//{
+	//	// Prevent recursion when the product specific DBs check their version.
+	//	ValueRestorer<volatile bool> restorer(m_bValidatingOrUpdatingSchema, false);
+	//	m_bValidatingOrUpdatingSchema = true;
 
-		// Get the Schema Version from the database
-		int iDBSchemaVersion = getDBSchemaVersion();
-		if (iDBSchemaVersion != ms_lFAMDBSchemaVersion)
-		{
-			// Update the current connection status string
-			m_strCurrentConnectionStatus = gstrWRONG_SCHEMA;
+	//	// Get the Schema Version from the database
+	//	int iDBSchemaVersion = getDBSchemaVersion();
+	//	if (iDBSchemaVersion != ms_lFAMDBSchemaVersion)
+	//	{
+	//		// Update the current connection status string
+	//		m_strCurrentConnectionStatus = gstrWRONG_SCHEMA;
 
-			UCLIDException ue("ELI14380", "DB Schema version does not match.");
-			ue.addDebugInfo("SchemaVer in Database", iDBSchemaVersion);
-			ue.addDebugInfo("SchemaVer expected", ms_lFAMDBSchemaVersion);
-			throw ue;
-		}
+	//		UCLIDException ue("ELI14380", "DB Schema version does not match.");
+	//		ue.addDebugInfo("SchemaVer in Database", iDBSchemaVersion);
+	//		ue.addDebugInfo("SchemaVer expected", ms_lFAMDBSchemaVersion);
+	//		throw ue;
+	//	}
 
-		// If we have yet to flag all the product specific DBs as valid, attempt to validate each.
-		if (!m_bProductSpecificDBSchemasAreValid)
-		{
-			// Get a list of all installed & licensed product-specific database managers.
-			IIUnknownVectorPtr ipProdSpecificMgrs = getLicensedProductSpecificMgrs();
-			ASSERT_RESOURCE_ALLOCATION("ELI31433", ipProdSpecificMgrs != __nullptr);
+	//	// If we have yet to flag all the product specific DBs as valid, attempt to validate each.
+	//	if (!m_bProductSpecificDBSchemasAreValid)
+	//	{
+	//		// Get a list of all installed & licensed product-specific database managers.
+	//		IIUnknownVectorPtr ipProdSpecificMgrs = getLicensedProductSpecificMgrs();
+	//		ASSERT_RESOURCE_ALLOCATION("ELI31433", ipProdSpecificMgrs != __nullptr);
 
-			// Loop through the managers and validate the schema of each.
-			long nCountProdSpecMgrs = ipProdSpecificMgrs->Size();
-			for (long i = 0; i < nCountProdSpecMgrs; i++)
-			{
-				UCLID_FILEPROCESSINGLib::IProductSpecificDBMgrPtr ipProdSpecificDBMgr =
-					ipProdSpecificMgrs->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI31434", ipProdSpecificDBMgr != __nullptr);
+	//		// Loop through the managers and validate the schema of each.
+	//		long nCountProdSpecMgrs = ipProdSpecificMgrs->Size();
+	//		for (long i = 0; i < nCountProdSpecMgrs; i++)
+	//		{
+	//			UCLID_FILEPROCESSINGLib::IProductSpecificDBMgrPtr ipProdSpecificDBMgr =
+	//				ipProdSpecificMgrs->At(i);
+	//			ASSERT_RESOURCE_ALLOCATION("ELI31434", ipProdSpecificDBMgr != __nullptr);
 
-				try
-				{
-					ipProdSpecificDBMgr->ValidateSchema(getThisAsCOMPtr());
-				}
-				catch (...)
-				{
-					// Update the current connection status string
-					m_strCurrentConnectionStatus = gstrWRONG_SCHEMA;
-					throw;
-				}
-			}
+	//			try
+	//			{
+	//				ipProdSpecificDBMgr->ValidateSchema(getThisAsCOMPtr());
+	//			}
+	//			catch (...)
+	//			{
+	//				// Update the current connection status string
+	//				m_strCurrentConnectionStatus = gstrWRONG_SCHEMA;
+	//				throw;
+	//			}
+	//		}
 
-			// If we reached this point without and exception being thrown, all installed and
-			// licensed product specific DB components have up-to-data schema versions.
-			m_bProductSpecificDBSchemasAreValid = true;
-		}
+	//		// If we reached this point without and exception being thrown, all installed and
+	//		// licensed product specific DB components have up-to-data schema versions.
+	//		m_bProductSpecificDBSchemasAreValid = true;
+	//	}
 
-		if (bCheckForUnaffiliatedFiles && unaffiliatedWorkflowFilesExist())
-		{
-			m_strCurrentConnectionStatus = gstrUNAFFILIATED_FILES;
-			throw UCLIDException("ELI43450", "Workflows exist, but there are unaffiliated files.");
-		}
-	}
+	//	if (bCheckForUnaffiliatedFiles && unaffiliatedWorkflowFilesExist())
+	//	{
+	//		m_strCurrentConnectionStatus = gstrUNAFFILIATED_FILES;
+	//		throw UCLIDException("ELI43450", "Workflows exist, but there are unaffiliated files.");
+	//	}
+	//}
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::unaffiliatedWorkflowFilesExist()
