@@ -280,7 +280,7 @@ namespace DatabaseMigrationWizard.Test
         {
             var LoginFromDB = JsonConvert.DeserializeObject<List<Login>>(BuildAndWriteTable(new SerializeLogin()).ToString());
 
-            foreach (var Login in DatabaseMigrationWizardTestHelper.Logins)
+            foreach (var Login in DatabaseMigrationWizardTestHelper.Logins.Where(m => !m.UserName.Equals("admin")))
             {
                 Assert.IsTrue(LoginFromDB.Where(m => m.Equals(Login)).Any());
             }

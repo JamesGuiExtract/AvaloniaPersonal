@@ -73,6 +73,7 @@ namespace DatabaseMigrationWizard.Test
                 "INSERT INTO [dbo].[WebAppConfig]([Type],[WorkflowID],[Settings]) VALUES ('Yes', '1', '123')",
                 @"INSERT INTO [dbo].[Workflow]([Name],[WorkflowTypeCode],[Description],[StartActionID],[EndActionID],[PostWorkflowActionID],[DocumentFolder],[OutputAttributeSetID],[OutputFileMetadataFieldID],[OutputFilePathInitializationFunction],[LoadBalanceWeight],[EditActionID],[PostEditActionID])
                     VALUES('MehWorkflow', 'w', 'TheSuperDescr', 1,1,1,'C:\Wut', 1,1, 'SumFunc', 4, 1,1)",
+                "INSERT INTO dbo.Login (UserName, Password, Guid) VALUES ('notAdmin', 'e086da2321be72f0525b25d5d5b0c6d7', 'd9ca9ee6-ae9b-496b-8c48-8db752fe6940')",
             };
 
         /// <summary>
@@ -111,9 +112,9 @@ namespace DatabaseMigrationWizard.Test
 
             var action = JsonConvert.DeserializeObject<List<Database.Input.DataTransformObject.Action>>(writer.ToString()).First();
                 
-            Assert.AreEqual(action.ASCName, "TestAction");
-            Assert.AreEqual(action.MainSequence, true);
-            Assert.AreEqual(action.Description, "TestDescription");
+            Assert.AreEqual("TestAction", action.ASCName);
+            Assert.AreEqual(true, action.MainSequence);
+            Assert.AreEqual("TestDescription", action.Description);
             Assert.IsNotNull(action.ActionGuid);
             Assert.IsNotNull(action.WorkflowGuid);
         }
@@ -128,7 +129,7 @@ namespace DatabaseMigrationWizard.Test
 
             var attributeName = JsonConvert.DeserializeObject<List<AttributeName>>(writer.ToString()).First();
 
-            Assert.AreEqual(attributeName.Name, "TestAttributeName");
+            Assert.AreEqual("TestAttributeName", attributeName.Name);
             Assert.NotNull(attributeName.Guid);
         }
 
@@ -142,7 +143,7 @@ namespace DatabaseMigrationWizard.Test
 
             var attributeSetName = JsonConvert.DeserializeObject<List<AttributeSetName>>(writer.ToString()).First();
 
-            Assert.AreEqual(attributeSetName.Description, "TestAttributeSetDescripton");
+            Assert.AreEqual("TestAttributeSetDescripton", attributeSetName.Description);
             Assert.NotNull(attributeSetName.Guid);
         }
 
@@ -156,14 +157,14 @@ namespace DatabaseMigrationWizard.Test
 
             var dashboard = JsonConvert.DeserializeObject<List<Dashboard>>(writer.ToString()).First();
 
-            Assert.AreEqual(dashboard.DashboardName, "CoolDBName");
-            Assert.AreEqual(DateTime.Parse(dashboard.LastImportedDate, CultureInfo.InvariantCulture).Date, new DateTime(2020, 3, 11).Date);
-            Assert.AreEqual(dashboard.UseExtractedData, true);
+            Assert.AreEqual("CoolDBName", dashboard.DashboardName);
+            Assert.AreEqual(new DateTime(2020, 3, 11).Date, DateTime.Parse(dashboard.LastImportedDate, CultureInfo.InvariantCulture).Date);
+            Assert.AreEqual(true, dashboard.UseExtractedData);
             Assert.NotNull(dashboard.DashboardGuid);
             Assert.NotNull(dashboard.FAMUserGuid);
             // XML is being auto converted to its shortened form. Below is fine even if it does not 100% match insert statement.
-            Assert.AreEqual(dashboard.Definition, "<SomeDefinition />");
-            Assert.AreEqual(dashboard.ExtractedDataDefinition, "<SomeDefinition2 />");
+            Assert.AreEqual("<SomeDefinition />", dashboard.Definition);
+            Assert.AreEqual("<SomeDefinition2 />", dashboard.ExtractedDataDefinition);
         }
 
         /// <summary>
@@ -176,9 +177,9 @@ namespace DatabaseMigrationWizard.Test
 
             var databaseService = JsonConvert.DeserializeObject<List<DatabaseService>>(writer.ToString()).First();
 
-            Assert.AreEqual(databaseService.Description, "TestServiceDescription");
-            Assert.AreEqual(databaseService.Enabled, true);
-            Assert.AreEqual(databaseService.Settings, "{\"SomeJsonSettings\":\"True\"}");
+            Assert.AreEqual("TestServiceDescription", databaseService.Description);
+            Assert.AreEqual(true, databaseService.Enabled);
+            Assert.AreEqual("{\"SomeJsonSettings\":\"True\"}", databaseService.Settings);
             Assert.NotNull(databaseService.Guid);
         }
 
@@ -192,10 +193,10 @@ namespace DatabaseMigrationWizard.Test
 
             var dataEntryCounterDefinition = JsonConvert.DeserializeObject<List<DataEntryCounterDefinition>>(writer.ToString()).First();
 
-            Assert.AreEqual(dataEntryCounterDefinition.Name, "AmazingCounter");
-            Assert.AreEqual(dataEntryCounterDefinition.AttributeQuery, "AmazingQuery");
-            Assert.AreEqual(dataEntryCounterDefinition.RecordOnLoad, true);
-            Assert.AreEqual(dataEntryCounterDefinition.RecordOnSave, false);
+            Assert.AreEqual("AmazingCounter", dataEntryCounterDefinition.Name);
+            Assert.AreEqual("AmazingQuery", dataEntryCounterDefinition.AttributeQuery);
+            Assert.AreEqual(true, dataEntryCounterDefinition.RecordOnLoad);
+            Assert.AreEqual(false, dataEntryCounterDefinition.RecordOnSave);
             Assert.NotNull(dataEntryCounterDefinition.Guid);
         }
 
@@ -210,7 +211,7 @@ namespace DatabaseMigrationWizard.Test
 
             var dbInfo = JsonConvert.DeserializeObject<List<DBInfo>>(writer.ToString()).Where(m => m.Name.Equals("DatabaseID")).First();
 
-            Assert.AreEqual(dbInfo.Name, "DatabaseID");
+            Assert.AreEqual("DatabaseID", dbInfo.Name);
             Assert.NotNull(dbInfo.Value);
         }
 
@@ -224,8 +225,8 @@ namespace DatabaseMigrationWizard.Test
 
             var famUser = JsonConvert.DeserializeObject<List<FAMUser>>(writer.ToString()).First();
 
-            Assert.AreEqual(famUser.UserName, "Bob");
-            Assert.AreEqual(famUser.FullUserName, "McBoberson");
+            Assert.AreEqual("Bob", famUser.UserName);
+            Assert.AreEqual("McBoberson", famUser.FullUserName);
             Assert.NotNull(famUser.Guid);
         }
 
@@ -239,9 +240,9 @@ namespace DatabaseMigrationWizard.Test
 
             var fieldSearch = JsonConvert.DeserializeObject<List<FieldSearch>>(writer.ToString()).First();
 
-            Assert.AreEqual(fieldSearch.Enabled, true);
-            Assert.AreEqual(fieldSearch.FieldName, "FunField");
-            Assert.AreEqual(fieldSearch.AttributeQuery, "SuperQuery");
+            Assert.AreEqual(true, fieldSearch.Enabled);
+            Assert.AreEqual("FunField", fieldSearch.FieldName);
+            Assert.AreEqual("SuperQuery", fieldSearch.AttributeQuery);
             Assert.NotNull(fieldSearch.Guid);
         }
 
@@ -255,16 +256,16 @@ namespace DatabaseMigrationWizard.Test
 
             var dataEntryCounterDefinition = JsonConvert.DeserializeObject<List<FileHandler>>(writer.ToString()).First();
 
-            Assert.AreEqual(dataEntryCounterDefinition.Enabled, true);
-            Assert.AreEqual(dataEntryCounterDefinition.AppName, "AppFunName");
-            Assert.AreEqual(dataEntryCounterDefinition.IconPath, @"C:\Icon");
-            Assert.AreEqual(dataEntryCounterDefinition.ApplicationPath, @"C:\App");
-            Assert.AreEqual(dataEntryCounterDefinition.Arguments, "yes");
-            Assert.AreEqual(dataEntryCounterDefinition.AdminOnly, true);
-            Assert.AreEqual(dataEntryCounterDefinition.AllowMultipleFiles, true);
-            Assert.AreEqual(dataEntryCounterDefinition.SupportsErrorHandling, true);
-            Assert.AreEqual(dataEntryCounterDefinition.Blocking, true);
-            Assert.AreEqual(dataEntryCounterDefinition.WorkflowName, "Turtle");
+            Assert.AreEqual(true, dataEntryCounterDefinition.Enabled);
+            Assert.AreEqual("AppFunName", dataEntryCounterDefinition.AppName);
+            Assert.AreEqual(@"C:\Icon", dataEntryCounterDefinition.IconPath);
+            Assert.AreEqual(@"C:\App", dataEntryCounterDefinition.ApplicationPath);
+            Assert.AreEqual("yes", dataEntryCounterDefinition.Arguments);
+            Assert.AreEqual(true, dataEntryCounterDefinition.AdminOnly);
+            Assert.AreEqual(true, dataEntryCounterDefinition.AllowMultipleFiles);
+            Assert.AreEqual(true, dataEntryCounterDefinition.SupportsErrorHandling);
+            Assert.AreEqual(true, dataEntryCounterDefinition.Blocking);
+            Assert.AreEqual("Turtle", dataEntryCounterDefinition.WorkflowName);
             Assert.NotNull(dataEntryCounterDefinition.Guid);
         }
 
@@ -278,15 +279,15 @@ namespace DatabaseMigrationWizard.Test
 
             var labDEEncounter = JsonConvert.DeserializeObject<List<LabDEEncounter>>(writer.ToString()).First();
 
-            Assert.AreEqual(labDEEncounter.CSN, "1159480588");
-            Assert.AreEqual(labDEEncounter.PatientMRN, "10272749");
-            Assert.AreEqual(DateTime.Parse(labDEEncounter.EncounterDateTime, CultureInfo.InvariantCulture).Date, new DateTime(2017,10,17).Date);
-            Assert.AreEqual(labDEEncounter.Department, "52CPOD");
-            Assert.AreEqual(labDEEncounter.EncounterType, "CONSULT");
-            Assert.AreEqual(labDEEncounter.EncounterProvider, "ROBERT RENSCHLER");
-            Assert.AreEqual(DateTime.Parse(labDEEncounter.DischargeDate, CultureInfo.InvariantCulture).Date, new DateTime(2020, 1, 1).Date);
-            Assert.AreEqual(DateTime.Parse(labDEEncounter.AdmissionDate, CultureInfo.InvariantCulture).Date, new DateTime(2020, 1, 2).Date);
-            Assert.AreEqual(labDEEncounter.ADTMessage, "<ADTMessage />");
+            Assert.AreEqual("1159480588", labDEEncounter.CSN);
+            Assert.AreEqual("10272749", labDEEncounter.PatientMRN);
+            Assert.AreEqual(new DateTime(2017, 10, 17).Date, DateTime.Parse(labDEEncounter.EncounterDateTime, CultureInfo.InvariantCulture).Date);
+            Assert.AreEqual("52CPOD", labDEEncounter.Department);
+            Assert.AreEqual("CONSULT", labDEEncounter.EncounterType);
+            Assert.AreEqual("ROBERT RENSCHLER", labDEEncounter.EncounterProvider);
+            Assert.AreEqual(new DateTime(2020, 1, 1).Date, DateTime.Parse(labDEEncounter.DischargeDate, CultureInfo.InvariantCulture).Date);
+            Assert.AreEqual(new DateTime(2020, 1, 2).Date, DateTime.Parse(labDEEncounter.AdmissionDate, CultureInfo.InvariantCulture).Date);
+            Assert.AreEqual("<ADTMessage />", labDEEncounter.ADTMessage);
             Assert.NotNull(labDEEncounter.Guid);
         }
 
@@ -300,15 +301,15 @@ namespace DatabaseMigrationWizard.Test
 
             var labDEOrder = JsonConvert.DeserializeObject<List<LabDEOrder>>(writer.ToString()).First();
 
-            Assert.AreEqual(labDEOrder.OrderNumber, "111");
-            Assert.AreEqual(labDEOrder.OrderCode, "c");
-            Assert.AreEqual(labDEOrder.PatientMRN, "222");
-            Assert.AreEqual(DateTime.Parse(labDEOrder.ReceivedDateTime, CultureInfo.InvariantCulture).Date, new DateTime(2020, 1, 1).Date);
-            Assert.AreEqual(labDEOrder.OrderStatus, "t");
-            Assert.AreEqual(DateTime.Parse(labDEOrder.ReferenceDateTime, CultureInfo.InvariantCulture).Date, new DateTime(2020, 1, 2).Date);
-            Assert.AreEqual(labDEOrder.ORMMessage, "orm");
-            Assert.AreEqual(labDEOrder.EncounterID, "23");
-            Assert.AreEqual(labDEOrder.AccessionNumber, "32");
+            Assert.AreEqual("111", labDEOrder.OrderNumber);
+            Assert.AreEqual("c", labDEOrder.OrderCode);
+            Assert.AreEqual("222", labDEOrder.PatientMRN);
+            Assert.AreEqual(new DateTime(2020, 1, 1).Date, DateTime.Parse(labDEOrder.ReceivedDateTime, CultureInfo.InvariantCulture).Date);
+            Assert.AreEqual("t", labDEOrder.OrderStatus);
+            Assert.AreEqual(new DateTime(2020, 1, 2).Date, DateTime.Parse(labDEOrder.ReferenceDateTime, CultureInfo.InvariantCulture).Date);
+            Assert.AreEqual("orm", labDEOrder.ORMMessage);
+            Assert.AreEqual("23", labDEOrder.EncounterID);
+            Assert.AreEqual("32", labDEOrder.AccessionNumber);
             Assert.NotNull(labDEOrder.Guid);
         }
 
@@ -322,15 +323,15 @@ namespace DatabaseMigrationWizard.Test
 
             var labDEPatient = JsonConvert.DeserializeObject<List<LabDEPatient>>(writer.ToString()).First();
 
-            Assert.AreEqual(labDEPatient.MRN, "123");
-            Assert.AreEqual(labDEPatient.FirstName, "Ninja");
-            Assert.AreEqual(labDEPatient.MiddleName, "Turtles");
-            Assert.AreEqual(labDEPatient.LastName, "Unite");
-            Assert.AreEqual(labDEPatient.Suffix, "Sr");
-            Assert.AreEqual(DateTime.Parse(labDEPatient.DOB, CultureInfo.InvariantCulture).Date, new DateTime(2020, 1, 1).Date);
-            Assert.AreEqual(labDEPatient.Gender, "w");
-            Assert.AreEqual(labDEPatient.MergedInto, "F");
-            Assert.AreEqual(labDEPatient.CurrentMRN, "FF");
+            Assert.AreEqual("123", labDEPatient.MRN);
+            Assert.AreEqual("Ninja", labDEPatient.FirstName);
+            Assert.AreEqual("Turtles", labDEPatient.MiddleName);
+            Assert.AreEqual("Unite", labDEPatient.LastName);
+            Assert.AreEqual("Sr", labDEPatient.Suffix);
+            Assert.AreEqual(new DateTime(2020, 1, 1).Date, DateTime.Parse(labDEPatient.DOB, CultureInfo.InvariantCulture).Date);
+            Assert.AreEqual("w", labDEPatient.Gender);
+            Assert.AreEqual("F", labDEPatient.MergedInto);
+            Assert.AreEqual("FF", labDEPatient.CurrentMRN);
             Assert.NotNull(labDEPatient.Guid);
         }
 
@@ -344,20 +345,20 @@ namespace DatabaseMigrationWizard.Test
 
             var labDeProvider = JsonConvert.DeserializeObject<List<LabDEProvider>>(writer.ToString()).First();
 
-            Assert.AreEqual(labDeProvider.FirstName, "James");
-            Assert.AreEqual(labDeProvider.MiddleName, "Unknown");
-            Assert.AreEqual(labDeProvider.LastName, "Bond");
-            Assert.AreEqual(labDeProvider.ProviderType, "Spy");
-            Assert.AreEqual(labDeProvider.Title, "MD");
-            Assert.AreEqual(labDeProvider.Degree, "MS");
-            Assert.AreEqual(labDeProvider.Departments, "M6");
-            Assert.AreEqual(labDeProvider.Specialties, "Classified");
-            Assert.AreEqual(labDeProvider.Phone, "111-111-1111");
-            Assert.AreEqual(labDeProvider.Fax, "111-111-1112");
-            Assert.AreEqual(labDeProvider.Address, "200 South Main Street");
-            Assert.AreEqual(labDeProvider.OtherProviderID, "43");
-            Assert.AreEqual(labDeProvider.Inactive, false);
-            Assert.AreEqual(labDeProvider.MFNMessage, "<msg />");
+            Assert.AreEqual("James", labDeProvider.FirstName);
+            Assert.AreEqual("Unknown", labDeProvider.MiddleName);
+            Assert.AreEqual("Bond", labDeProvider.LastName);
+            Assert.AreEqual("Spy", labDeProvider.ProviderType);
+            Assert.AreEqual("MD", labDeProvider.Title);
+            Assert.AreEqual("MS", labDeProvider.Degree);
+            Assert.AreEqual("M6", labDeProvider.Departments);
+            Assert.AreEqual("Classified", labDeProvider.Specialties);
+            Assert.AreEqual("111-111-1111", labDeProvider.Phone);
+            Assert.AreEqual("111-111-1112", labDeProvider.Fax);
+            Assert.AreEqual("200 South Main Street", labDeProvider.Address);
+            Assert.AreEqual("43", labDeProvider.OtherProviderID);
+            Assert.AreEqual(false, labDeProvider.Inactive);
+            Assert.AreEqual("<msg />", labDeProvider.MFNMessage);
             Assert.NotNull(labDeProvider.Guid);
         }
 
@@ -370,9 +371,9 @@ namespace DatabaseMigrationWizard.Test
         {
             var writer = BuildAndWriteTable(new SerializeLogin());
 
-            var login = JsonConvert.DeserializeObject<List<Login>>(writer.ToString()).First();
-            Assert.AreEqual(login.UserName, "admin");
-            Assert.AreEqual(login.Password, "e086da2321be72f0525b25d5d5b0c6d7");
+            var login = JsonConvert.DeserializeObject<List<Login>>(writer.ToString()).Where(m => !m.UserName.Equals("admin")).First();
+            Assert.AreEqual("notAdmin", login.UserName);
+            Assert.AreEqual("e086da2321be72f0525b25d5d5b0c6d7", login.Password);
             Assert.NotNull(login.Guid);
         }
 
@@ -385,7 +386,7 @@ namespace DatabaseMigrationWizard.Test
             var writer = BuildAndWriteTable(new SerializeMetadataField());
 
             var metadataField = JsonConvert.DeserializeObject<List<MetadataField>>(writer.ToString()).First();
-            Assert.AreEqual(metadataField.Name, "MegaField");
+            Assert.AreEqual("MegaField", metadataField.Name);
             Assert.NotNull(metadataField.Guid);
         }
 
@@ -398,7 +399,7 @@ namespace DatabaseMigrationWizard.Test
             var writer = BuildAndWriteTable(new SerializeMLModel());
 
             var mLModel = JsonConvert.DeserializeObject<List<MLModel>>(writer.ToString()).First();
-            Assert.AreEqual(mLModel.Name, "WutFace");
+            Assert.AreEqual("WutFace", mLModel.Name);
             Assert.NotNull(mLModel.Guid);
         }
 
@@ -411,8 +412,8 @@ namespace DatabaseMigrationWizard.Test
             var writer = BuildAndWriteTable(new SerializeTag());
 
             var tag = JsonConvert.DeserializeObject<List<Tag>>(writer.ToString()).First();
-            Assert.AreEqual(tag.TagName, "AwesomeTag");
-            Assert.AreEqual(tag.TagDescription, "AwesomeDescription");
+            Assert.AreEqual("AwesomeTag", tag.TagName);
+            Assert.AreEqual("AwesomeDescription", tag.TagDescription);
             Assert.NotNull(tag.Guid);
         }
 
@@ -425,8 +426,8 @@ namespace DatabaseMigrationWizard.Test
             var writer = BuildAndWriteTable(new SerializeUserCreatedCounter());
 
             var userCreatedCounter = JsonConvert.DeserializeObject<List<UserCreatedCounter>>(writer.ToString()).First();
-            Assert.AreEqual(userCreatedCounter.CounterName, "DaName");
-            Assert.AreEqual(userCreatedCounter.Value, "9001");
+            Assert.AreEqual("DaName", userCreatedCounter.CounterName);
+            Assert.AreEqual("9001", userCreatedCounter.Value);
             Assert.NotNull(userCreatedCounter.Guid);
         }
 
@@ -439,8 +440,8 @@ namespace DatabaseMigrationWizard.Test
             var writer = BuildAndWriteTable(new SerializeWebAppConfig());
 
             var webAppConfig = JsonConvert.DeserializeObject<List<WebAppConfig>>(writer.ToString()).First();
-            Assert.AreEqual(webAppConfig.Type, "Yes");
-            Assert.AreEqual(webAppConfig.Settings, "123");
+            Assert.AreEqual("Yes", webAppConfig.Type);
+            Assert.AreEqual("123", webAppConfig.Settings);
             Assert.NotNull(webAppConfig.WorkflowGuid);
             Assert.NotNull(webAppConfig.WebAppConfigGuid);
         }
@@ -454,12 +455,12 @@ namespace DatabaseMigrationWizard.Test
             var writer = BuildAndWriteTable(new SerializeWorkflow());
 
             var workFlow = JsonConvert.DeserializeObject<List<Workflow>>(writer.ToString()).Where(m => m.Name.Equals("MehWorkflow")).First();
-            Assert.AreEqual(workFlow.Name, "MehWorkflow");
-            Assert.AreEqual(workFlow.WorkflowTypeCode, "w");
-            Assert.AreEqual(workFlow.Description, "TheSuperDescr");
-            Assert.AreEqual(workFlow.DocumentFolder, @"C:\Wut");
-            Assert.AreEqual(workFlow.OutputFilePathInitializationFunction, @"SumFunc");
-            Assert.AreEqual(workFlow.LoadBalanceWeight, 4);
+            Assert.AreEqual("MehWorkflow", workFlow.Name);
+            Assert.AreEqual("w", workFlow.WorkflowTypeCode);
+            Assert.AreEqual("TheSuperDescr", workFlow.Description);
+            Assert.AreEqual(@"C:\Wut", workFlow.DocumentFolder);
+            Assert.AreEqual(@"SumFunc", workFlow.OutputFilePathInitializationFunction);
+            Assert.AreEqual(4, workFlow.LoadBalanceWeight);
             Assert.NotNull(workFlow.EditActionGuid);
             Assert.NotNull(workFlow.EndActionGuid);
             Assert.NotNull(workFlow.PostEditActionGuid);
