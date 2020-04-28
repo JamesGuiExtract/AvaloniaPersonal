@@ -1274,8 +1274,6 @@
 		<col def="S255">ISReleaseFlags</col>
 		<col def="S72">DisplayName</col>
 		<row><td>Pkg1</td><td>Extract Systems FKB.msi</td><td>{E8C428B8-A392-4FD4-9C62-452A656F5D8A}</td><td>1</td><td>1</td><td>Not Installed</td><td/><td/><td/><td/><td>FKB Install</td></row>
-		<row><td>Pkg2</td><td>SSCERuntime_x86-ENU.msi</td><td>{3A9FC03D-C685-4831-94CF-4EDFD3749497}</td><td>1</td><td>1</td><td>Not Installed</td><td>REMOVE="ALL"</td><td/><td/><td/><td>SQLCE3.5 x86</td></row>
-		<row><td>Pkg3</td><td>SSCERuntime_x64-ENU.msi</td><td>{D4AD39AD-091E-4D33-BB2B-59F6FCB8ADC3}</td><td>1</td><td>1</td><td>Not Installed</td><td>REMOVE="ALL"</td><td/><td/><td/><td>SQLCE3.5 x64</td></row>
 	</table>
 
 	<table name="ISChainPackageData">
@@ -1286,8 +1284,6 @@
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
 		<row><td>Pkg1</td><td>_96D178D9EDCB65ED59041425D2E546CF</td><td>Extract Systems FKB.msi</td><td>0</td><td/><td>&lt;PATH_TO_FKBINSTALL_FILES&gt;\Extract Systems FKB.msi</td></row>
-		<row><td>Pkg2</td><td>_FC090DD0110FE64E10DF55A94DFF3887</td><td>SSCERuntime_x86-ENU.msi</td><td>0</td><td/><td>&lt;PATH_TO_SQLCOMPACT EDIT_FI&gt;\SSCERuntime_x86-ENU.msi</td></row>
-		<row><td>Pkg3</td><td>_82BF27E12399B3B72030DB24276370F5</td><td>SSCERuntime_x64-ENU.msi</td><td>0</td><td/><td>&lt;PATH_TO_SQLCOMPACT EDIT_FI&gt;\SSCERuntime_x64-ENU.msi</td></row>
 	</table>
 
 	<table name="ISClrWrap">
