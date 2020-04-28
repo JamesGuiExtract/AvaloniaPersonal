@@ -16,6 +16,8 @@ namespace DatabaseMigrationWizard.Database.Input.DataTransformObject
 
         public override bool Equals(object obj)
         {
+            // The admin GUIDS are not compared because the user admin is automatically generated
+            // by our database creation code. This means the admin GUIDs will NEVER match.
             return obj is Login login &&
                    ((UserName == "admin" && login.UserName == "admin" &&
                    Password == login.Password) ||
@@ -29,7 +31,10 @@ namespace DatabaseMigrationWizard.Database.Input.DataTransformObject
             var hashCode = -473259731;
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(UserName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Password);
-            hashCode = hashCode * -1521134295 + Guid.GetHashCode();
+            if (UserName != "admin")
+            {
+                hashCode = hashCode * -1521134295 + Guid.GetHashCode();
+            }
             return hashCode;
         }
 

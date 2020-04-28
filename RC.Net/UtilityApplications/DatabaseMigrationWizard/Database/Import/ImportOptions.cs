@@ -9,7 +9,7 @@ namespace DatabaseMigrationWizard.Database.Input
 {
     public class ImportOptions : INotifyPropertyChanged
     {
-        private string _ImportPath = @"C:\TableExports";
+        private string _ImportPath = String.Empty;
 
         public string ImportPath
         {

@@ -19,6 +19,7 @@
             </Style.Triggers>
         </Style>
         <pages1:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <pages1:BooleanAndConverter x:Key="booleanAndConverter"/>
     </UserControl.Resources>
     <Grid Style="{StaticResource ContentRoot}">
         <ScrollViewer>
@@ -55,7 +56,15 @@
                 </Grid>
 
                 <CheckBox IsChecked="{Binding ExportOptions.IncludeLabDETables}" x:Name="IncludeLabDETables" Content="Include LabDE tables?" Margin="0,0,0,8" IsEnabled="{Binding MainWindow.UIEnabled}" />
-                <Button x:Name="ExportButton" Content="Export" Margin="0,0,0,8" Click="ExportButton_Click" IsEnabled="{Binding MainWindow.UIEnabled}" />
+                <Button x:Name="ExportButton" Content="Export" Margin="0,0,0,8" Click="ExportButton_Click">
+                    <Button.IsEnabled>
+                        <MultiBinding Converter="{StaticResource booleanAndConverter}">
+                            <Binding Path="MainWindow.UIEnabled"></Binding>
+                            <Binding Path="(Validation.HasError)" ElementName="ExportPath" Converter="{StaticResource InverseBooleanConverter}">
+                            </Binding>
+                        </MultiBinding>
+                    </Button.IsEnabled>
+                </Button>
 
             </StackPanel>
         </ScrollViewer>

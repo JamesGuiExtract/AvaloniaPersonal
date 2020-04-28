@@ -10,7 +10,7 @@ namespace DatabaseMigrationWizard.Database.Output
         /// <summary>
         /// The path to export the files to.
         /// </summary>
-        private string _ExportPath = "C:\\TableExports";
+        private string _ExportPath = string.Empty;
 
         /// <summary>
         /// Notifies the UI when the export path changes, and updates its value.
