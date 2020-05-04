@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract;
+using System;
 using System.Windows.Data;
 
 namespace DatabaseMigrationWizard.Pages.Utility
@@ -7,14 +8,21 @@ namespace DatabaseMigrationWizard.Pages.Utility
     {
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            foreach (object value in values)
+            try
             {
-                if ((value is bool) && (bool)value == false)
+                foreach (object value in values)
                 {
-                    return false;
+                    if ((value is bool) && (bool)value == false)
+                    {
+                        return false;
+                    }
                 }
+                return true;
             }
-            return true;
+            catch(Exception ex)
+            {
+                throw ex.AsExtract("ELI49781");
+            }
         }
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
         {

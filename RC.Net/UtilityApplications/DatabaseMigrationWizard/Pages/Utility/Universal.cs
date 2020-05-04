@@ -5,12 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.SqlClient;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Windows.Forms;
 
 namespace DatabaseMigrationWizard.Pages.Utility
 {

@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -21,9 +22,7 @@ namespace DatabaseMigrationWizard.Pages
     {
         public ConnectionInformation ConnectionInformation { get; set; }
 
-        public Collection<string> DatabaseNames { get; } = new Collection<string>();
-
-        private bool keepUpdatingDBStatus = true;
+        public ObservableCollection<string> DatabaseNames { get; } = new ObservableCollection<string>();
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -32,54 +31,13 @@ namespace DatabaseMigrationWizard.Pages
         public Home()
         {
             InitializeComponent();
-            this.Loaded += Home_Loaded;
             this.MainWindow = ((MainWindow)System.Windows.Application.Current.MainWindow);
             this.ConnectionInformation = this.MainWindow.ConnectionInformation;
             this.DataContext = this;
-            new Thread(() => 
-            { 
-                this.UpdateDatabaseStatus(); 
-            }).Start();
-        }
-
-        private void Home_Loaded(object sender, RoutedEventArgs e)
-        {
-            Window window = Window.GetWindow(this);
-            window.Closing += window_Closing;
-        }
-
-        private void window_Closing(object sender, global::System.ComponentModel.CancelEventArgs e)
-        {
-            keepUpdatingDBStatus = false;
-        }
-
-        /// <summary>
-        /// Switches the status on the main page from red to green if there is a valid connection
-        /// Checks every 5 seconds.
-        /// </summary>
-        private void UpdateDatabaseStatus()
-        {
-            try
-            {
-                while (keepUpdatingDBStatus)
-                {
-                    App.Current.Dispatcher.Invoke(delegate
-                    {
-                        this.ConnectionInformation.DatabaseName = this.DatabaseNameTextBox.Text;
-                        this.DatabaseServerStatus.Background = Universal.IsDBServerValid(this.ConnectionInformation) ? Brushes.Green : Brushes.Red;
-                        this.DatabaseNameStatus.Background = Universal.IsDBDatabaseValid(this.ConnectionInformation) ? Brushes.Green : Brushes.Red;
-                    });
-
-                    Thread.Sleep(5000);
-                }
-            }
-            catch (Exception) { }
         }
 
         private void PasswordChanged(object sender, RoutedEventArgs e)
         {
-            var mainWindow = ((MainWindow)Application.Current.MainWindow);
-            this.ConnectionInformation.DatabaseName = this.DatabaseNameTextBox.Text;
             var fileProcessingDb = new FileProcessingDB()
             {
                 DatabaseServer = ConnectionInformation.DatabaseServer,
@@ -88,15 +46,15 @@ namespace DatabaseMigrationWizard.Pages
             try
             {
                 fileProcessingDb.LoginUser("admin", PasswordBox.Password);
-                if(!mainWindow.MainLinks.Links.Where(link => link.DisplayName.Equals("import") || link.DisplayName.Equals("export")).Any())
+                if(!this.MainWindow.MainLinks.Links.Where(link => link.DisplayName.Equals("import") || link.DisplayName.Equals("export")).Any())
                 {
-                    mainWindow.MainLinks.Links.Add(new Link() { DisplayName = "import", Source = new Uri("/Pages/Import.xaml", UriKind.Relative) });
-                    mainWindow.MainLinks.Links.Add(new Link() { DisplayName = "export", Source = new Uri("/Pages/Export.xaml", UriKind.Relative) });
-                    mainWindow.MainLinks.Links.Add(new Link() { DisplayName = "report", Source = new Uri("/Pages/ReportWindow.xaml", UriKind.Relative) });
+                    this.MainWindow.MainLinks.Links.Add(new Link() { DisplayName = "import", Source = new Uri("/Pages/Import.xaml", UriKind.Relative) });
+                    this.MainWindow.MainLinks.Links.Add(new Link() { DisplayName = "export", Source = new Uri("/Pages/Export.xaml", UriKind.Relative) });
+                    this.MainWindow.MainLinks.Links.Add(new Link() { DisplayName = "report", Source = new Uri("/Pages/ReportWindow.xaml", UriKind.Relative) });
                 }
 
                 this.PasswordStatus.Background = Brushes.Green;
-                PasswordBox.Password = "";
+                this.PasswordBox.Password = "";
             }
             catch(Exception)
             {
@@ -104,44 +62,68 @@ namespace DatabaseMigrationWizard.Pages
             }
         }
 
-        private void ConnectionInformationChanged(object sender, SelectionChangedEventArgs e)
+        private async void DatabaseServerTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             try
             {
-                UpdateConnectionInformation(false);
+                await RemoveTabsAndUpdateStatusIcons(true);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ex.AsExtract("ELI49731").Display();
             }
         }
 
-        private void UpdateConnectionInformation(bool updateDatabaseNames)
+        private async void DatabaseNameTextBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var mainWindow = ((MainWindow)System.Windows.Application.Current.MainWindow);
-            var linksToRemove = mainWindow.MainLinks.Links.Where(link => link.DisplayName.Equals("import") || link.DisplayName.Equals("export") || link.DisplayName.Equals("report")).ToList();
-            this.PasswordStatus.Background = Brushes.Red;
-            foreach (Link link in linksToRemove)
-            {
-                mainWindow.MainLinks.Links.Remove(link);
+            try
+            {              
+                await RemoveTabsAndUpdateStatusIcons(false);
             }
-            if(updateDatabaseNames)
+            catch (Exception ex)
             {
-                this.DatabaseNames.ToList().ForEach(databaseName => this.DatabaseNames.Remove(databaseName));
-                Universal.GetDatabaseNames(this.ConnectionInformation).ToList().ForEach(databaseName => this.DatabaseNames.Add(databaseName));
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("DatabaseNames"));
+                ex.AsExtract("ELI49732").Display();
             }
         }
 
-        private void ConnectionInformationChanged(object sender, RoutedEventArgs e)
+        private async void DatabaseNameComboBox_LostFocus(object sender, RoutedEventArgs e)
         {
             try
             {
-                UpdateConnectionInformation(true);
+                await RemoveTabsAndUpdateStatusIcons(false);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                ex.AsExtract("ELI49732").Display();
+                ex.AsExtract("ELI49780").Display();
+            }
+        }
+
+        private async Task RemoveTabsAndUpdateStatusIcons(bool updateDatabaseNames)
+        {
+            this.MainWindow.MainLinks.Links.Where(link => !link.DisplayName.Equals("Database")).ToList()
+                                            .ForEach(link => this.MainWindow.MainLinks.Links.Remove(link));
+
+            this.PasswordStatus.Background = Brushes.Red;
+            this.PasswordBox.Password = string.Empty;
+
+            bool validServerName = false;
+            bool validDatabaseName = false;
+            await Task.Run(new Action(() =>
+            {
+                validServerName = Universal.IsDBServerValid(this.ConnectionInformation);
+                validDatabaseName = Universal.IsDBDatabaseValid(this.ConnectionInformation);
+            }));
+
+            this.DatabaseNameStatus.Background = validDatabaseName ? Brushes.Green : Brushes.Red;
+            this.DatabaseServerStatus.Background = validServerName ? Brushes.Green : Brushes.Red;
+            if(updateDatabaseNames)
+            {
+                this.DatabaseNames.ToList().ForEach(databaseName => this.DatabaseNames.Remove(databaseName));
+                if (validServerName)
+                {
+                    Universal.GetDatabaseNames(this.ConnectionInformation).ToList().ForEach(databaseName => this.DatabaseNames.Add(databaseName));
+                }
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("DatabaseNames"));
             }
         }
     }

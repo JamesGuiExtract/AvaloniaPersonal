@@ -10,7 +10,7 @@
             <StackPanel Margin="0,0,20,0">
                 <TextBlock Text="DatabaseServer" Style="{StaticResource Heading2}" />
                 <StackPanel Orientation="Horizontal">
-                    <TextBox Text="{Binding ConnectionInformation.DatabaseServer}" Margin="0,0,0,8" Width="700" HorizontalAlignment="Left" LostFocus="ConnectionInformationChanged" IsEnabled="{Binding MainWindow.UIEnabled}"/>
+                    <TextBox x:Name="DatabaseServerTextBox" Text="{Binding ConnectionInformation.DatabaseServer}" Margin="0,0,0,8" Width="700" HorizontalAlignment="Left" LostFocus="DatabaseServerTextBox_LostFocus" IsEnabled="{Binding MainWindow.UIEnabled}"/>
                     <Button x:Name="DatabaseServerStatus" Background="Red" IsEnabled="False" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
                         <Button.Resources>
                             <Style TargetType="{x:Type Border}">
@@ -21,7 +21,17 @@
                 </StackPanel>
                 <TextBlock Text="DatabaseName" Style="{StaticResource Heading2}" />
                 <StackPanel Orientation="Horizontal">
-                    <ComboBox Name="DatabaseNameTextBox" ItemsSource="{Binding DatabaseNames}" IsEditable="True" HorizontalAlignment="Left" Width="700" SelectionChanged="ConnectionInformationChanged" IsEnabled="{Binding MainWindow.UIEnabled}" SelectedIndex="1" IsTabStop="True">
+                    <ComboBox
+                              Text="{Binding ConnectionInformation.DatabaseName}"
+                              ItemsSource="{Binding DatabaseNames}" 
+                              IsEnabled="{Binding MainWindow.UIEnabled}" 
+                              SelectionChanged="DatabaseNameTextBox_SelectionChanged" 
+                              LostFocus="DatabaseNameComboBox_LostFocus"
+                              IsEditable="True" 
+                              HorizontalAlignment="Left" 
+                              Width="700" 
+                              SelectedIndex="1" 
+                              IsTabStop="True">
                     </ComboBox>
                     <Button x:Name="DatabaseNameStatus" Background="Red" IsEnabled="False" Width="20" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
                         <Button.Resources>
