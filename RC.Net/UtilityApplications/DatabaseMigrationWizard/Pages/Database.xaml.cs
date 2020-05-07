@@ -129,7 +129,7 @@ namespace DatabaseMigrationWizard.Pages
 
             this.DatabaseNameStatus.Background = validDatabaseName ? Brushes.Green : Brushes.Red;
             this.DatabaseServerStatus.Background = validServerName ? Brushes.Green : Brushes.Red;
-            if(updateDatabaseNames)
+            if(updateDatabaseNames && !string.IsNullOrEmpty(this.ConnectionInformation.DatabaseServer))
             {
                 this.DatabaseNames.ToList().ForEach(databaseName => this.DatabaseNames.Remove(databaseName));
                 if (validServerName)

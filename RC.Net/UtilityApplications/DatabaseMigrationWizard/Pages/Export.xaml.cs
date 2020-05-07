@@ -3,7 +3,6 @@ using DatabaseMigrationWizard.Pages.Utility;
 using Extract;
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;

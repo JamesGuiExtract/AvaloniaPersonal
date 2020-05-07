@@ -63,7 +63,7 @@ namespace DatabaseMigrationWizard.Pages.Utility
         {
             try
             {
-                if(connectionInformation.DatabaseServer == null)
+                if(string.IsNullOrEmpty(connectionInformation.DatabaseServer))
                 {
                     return false;
                 }

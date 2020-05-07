@@ -19,6 +19,7 @@
             </Style.Triggers>
         </Style>
         <pages1:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <pages1:BooleanAndConverter x:Key="booleanAndConverter"/>
     </UserControl.Resources>
     <Grid Style="{StaticResource ContentRoot}">
         
@@ -52,10 +53,21 @@
                         </TextBox.Text>
                     </TextBox>
                     <Button Grid.Column="1" x:Name="FolderButton" Content="Select Folder" Margin="0,0,0,8" Click="FolderButton_Click" IsEnabled="{Binding MainWindow.UIEnabled}"/>
-                    <Button Grid.Column="2" x:Name="FolderBrowser" Content="File Explorer" Margin="0,0,0,8" Click="FolderBrowser_Click"/>
+                    <Button Grid.Column="2" x:Name="FolderBrowser" Content="File Explorer" Margin="0,0,0,8" Click="FolderBrowser_Click">
+                        <Button.IsEnabled>
+                            <Binding Path="(Validation.HasError)" ElementName="ImportPath" Converter="{StaticResource InverseBooleanConverter}" />
+                        </Button.IsEnabled>
+                    </Button>
                 </Grid>
                 <CheckBox IsChecked="{Binding ImportOptions.ClearDatabase}" Content="Clear the database?" Margin="0,0,0,8" IsEnabled="{Binding MainWindow.UIEnabled}"/>
-                <Button x:Name="ImportButton" Content="Import" Margin="0,0,0,8" Click="Import_Click" IsEnabled="{Binding MainWindow.UIEnabled}"/>
+                <Button x:Name="ImportButton" Content="Import" Margin="0,0,0,8" Click="Import_Click" >
+                    <Button.IsEnabled>
+                        <MultiBinding Converter="{StaticResource booleanAndConverter}">
+                            <Binding Path="MainWindow.UIEnabled"></Binding>
+                            <Binding Path="(Validation.HasError)" ElementName="ImportPath" Converter="{StaticResource InverseBooleanConverter}" />
+                        </MultiBinding>
+                    </Button.IsEnabled>
+                </Button>
             </StackPanel>
         </ScrollViewer>
         <ScrollViewer Margin="0,150,0,0">

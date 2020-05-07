@@ -142,10 +142,10 @@ namespace DatabaseMigrationWizard.Database.Input
             IEnumerable<ISequence> missingFiles = instances.Where(instance => !File.Exists(this.ImportOptions.ImportPath + "\\" + instance.TableName + ".json"));
             if(missingFiles.Any())
             {
-                ExtractException extractException = new ExtractException("ELI49697", "You are missing required tables to run this import!");
+                ExtractException extractException = new ExtractException("ELI49697", "You are missing required files to run this import!");
                 foreach(ISequence sequence in missingFiles)
                 {
-                    extractException.AddDebugData("TableMissing", sequence.TableName);
+                    extractException.AddDebugData("FileMissing", sequence.TableName);
                 }
                 
                 throw extractException;

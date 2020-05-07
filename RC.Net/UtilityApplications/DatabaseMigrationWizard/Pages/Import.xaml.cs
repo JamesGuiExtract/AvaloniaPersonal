@@ -75,7 +75,11 @@ namespace DatabaseMigrationWizard.Pages
                     }
                     catch (Exception ex)
                     {
-                        throw ex.AsExtract("ELI49751");
+                        ex.ExtractDisplay("ELI49751");
+                        App.Current.Dispatcher.Invoke(delegate
+                        {
+                            this.MainWindow.UIEnabled = true;
+                        });
                     }
                 });
             }

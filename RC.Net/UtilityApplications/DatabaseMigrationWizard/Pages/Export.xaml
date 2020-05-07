@@ -52,7 +52,11 @@
                         </TextBox.Text>
                     </TextBox>
                     <Button Grid.Column="1" x:Name="FolderButton" Content="Select Folder" Margin="0,0,0,8" Click="FolderButton_Click" IsEnabled="{Binding MainWindow.UIEnabled}" />
-                    <Button Grid.Column="2" x:Name="FolderBrowser" Content="File Explorer" Margin="0,0,0,8" Click="FolderBrowser_Click"/>
+                    <Button Grid.Column="2" x:Name="FolderBrowser" Content="File Explorer" Margin="0,0,0,8" Click="FolderBrowser_Click">
+                        <Button.IsEnabled>
+                            <Binding Path="(Validation.HasError)" ElementName="ExportPath" Converter="{StaticResource InverseBooleanConverter}" />
+                        </Button.IsEnabled>
+                    </Button>
                 </Grid>
 
                 <CheckBox IsChecked="{Binding ExportOptions.IncludeLabDETables}" x:Name="IncludeLabDETables" Content="Include LabDE tables?" Margin="0,0,0,8" IsEnabled="{Binding MainWindow.UIEnabled}" />
@@ -60,8 +64,7 @@
                     <Button.IsEnabled>
                         <MultiBinding Converter="{StaticResource booleanAndConverter}">
                             <Binding Path="MainWindow.UIEnabled"></Binding>
-                            <Binding Path="(Validation.HasError)" ElementName="ExportPath" Converter="{StaticResource InverseBooleanConverter}">
-                            </Binding>
+                            <Binding Path="(Validation.HasError)" ElementName="ExportPath" Converter="{StaticResource InverseBooleanConverter}" />
                         </MultiBinding>
                     </Button.IsEnabled>
                 </Button>
