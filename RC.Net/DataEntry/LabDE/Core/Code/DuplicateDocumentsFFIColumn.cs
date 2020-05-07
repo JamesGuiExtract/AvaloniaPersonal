@@ -187,7 +187,7 @@ namespace Extract.DataEntry.LabDE
         }
 
         /// <summary>
-        /// The action name to be set to pending for ignored/skipped documents so they can be cleaned up
+        /// The action name to be set to pending for ignored/stapled documents so they can be cleaned up
         /// </summary>
         public virtual string CleanupAction
         {
@@ -1293,7 +1293,7 @@ namespace Extract.DataEntry.LabDE
                     StapledIntoMetadataFieldName, StapledIntoMetadataFieldValue);
 
                 // https://extract.atlassian.net/browse/ISSUE-13751
-                // Allow for ignored/skipped documents to be forwarded to a cleanup action.
+                // Allow for ignored/stapled documents to be forwarded to a cleanup action.
                 if (!string.IsNullOrWhiteSpace(CleanupAction))
                 {
                     foreach (int fileId in ignoredIds

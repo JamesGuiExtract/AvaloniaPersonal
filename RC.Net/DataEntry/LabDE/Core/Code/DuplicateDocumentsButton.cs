@@ -440,7 +440,7 @@ namespace Extract.DataEntry.LabDE
         #region Properties
 
         /// <summary>
-        /// The action name to be set to pending for ignored/skipped documents so they can be cleaned up
+        /// The action name to be set to pending for ignored/stapled documents so they can be cleaned up
         /// </summary>
         [Category("LabDE Configuration Setting")]
         public virtual string CleanupAction
