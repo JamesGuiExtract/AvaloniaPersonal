@@ -59,7 +59,22 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 												LEFT OUTER JOIN dbo.DBInfo
 													ON dbo.DBInfo.Name = ##DBInfo.Name
 										WHERE
-											dbo.DBInfo.Name IS NULL";
+											dbo.DBInfo.Name IS NULL
+										;
+										INSERT INTO
+											dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+										SELECT
+											'Warning'
+											, 'DBInfo'
+											, 'The value of ' + dbo.DBInfo.Name + ' has been changed from ' + dbo.DBInfo.Value + ' to ' + ##DBInfo.Value
+										FROM
+											dbo.DBInfo
+												LEFT OUTER JOIN ##DBInfo
+													ON dbo.DBInfo.Name = ##DBInfo.Name
+										WHERE
+											LOWER(dbo.DBInfo.Name) LIKE '%schema%'
+											AND
+											dbo.DBInfo.Value != ##DBInfo.Value";
 
         public Priorities Priority => Priorities.Low;
 

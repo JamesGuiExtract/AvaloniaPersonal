@@ -163,7 +163,7 @@ namespace DatabaseMigrationWizard.Pages
 
         private void Import_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if(this.MainWindow.UIEnabled)
+            if (this.MainWindow.UIEnabled && this.ImportHelper != null)
             {
                 this.ImportHelper.Dispose();
             }

@@ -28,12 +28,25 @@ namespace DatabaseMigrationWizard.Pages
 
         public MainWindow MainWindow { get; set; }
 
+        private bool hasLoadedOnce = false;
+
         public Home()
         {
             InitializeComponent();
             this.MainWindow = ((MainWindow)System.Windows.Application.Current.MainWindow);
             this.ConnectionInformation = this.MainWindow.ConnectionInformation;
             this.DataContext = this;
+            this.Loaded += Home_Loaded;
+        }
+
+        private async void Home_Loaded(object sender, RoutedEventArgs e)
+        {
+            // For some reason loaded fires multiple times. I could not find a more approperiate event though.
+            if(!hasLoadedOnce)
+            {
+                hasLoadedOnce = true;
+                await this.RemoveTabsAndUpdateStatusIcons(false);
+            }
         }
 
         private void PasswordChanged(object sender, RoutedEventArgs e)

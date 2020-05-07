@@ -91,7 +91,40 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 											LEFT OUTER JOIN dbo.FileHandler
 												ON dbo.FileHandler.Guid = ##FileHandler.GUID
 									WHERE
-										dbo.FileHandler.Guid IS NULL";
+										dbo.FileHandler.Guid IS NULL
+									;
+									-- Find all the rows that only define paths using tags. If they use only tags then there are no issues.
+									WITH TAGSONLY AS
+									(
+										SELECT
+											[AppName]
+											, [IconPath]
+											, [ApplicationPath]
+											, [Arguments]
+										FROM 
+											[dbo].[FileHandler]
+										WHERE
+											FileHandler.IconPath LIKE '%<%>\%'
+											AND
+											FileHandler.ApplicationPath LIKE '%<%>\%'
+											AND
+											--Only look at the first argument
+											SUBSTRING(Arguments, 0, CHARINDEX(' ', Arguments)) LIKE '%<%>\%'
+									)
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+
+									--Select only rows that are defined without tags.
+									SELECT
+										'Warning'
+										, 'FileHandler'
+										, 'In the filehandler table, the AppName' + dbo.FileHandler.AppName ' has a realitive path defined. Please validate all filepaths in the filehandler after importing.'
+									FROM
+										dbo.FileHandler
+											LEFT OUTER JOIN TAGSONLY
+												ON dbo.FileHandler.AppName = TAGSONLY.AppName
+									WHERE
+										TAGSONLY.AppName IS NULL";
 
 		public Priorities Priority => Priorities.Low;
 

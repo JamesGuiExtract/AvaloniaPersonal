@@ -26,6 +26,8 @@ namespace DatabaseMigrationWizard.Pages
         public Export()
         {
             this.MainWindow = ((MainWindow)System.Windows.Application.Current.MainWindow);
+            this.ExportOptions = MainWindow.ExportOptions ?? new ExportOptions();
+            // Just in case the user changes the connection information on the main page
             this.ExportOptions.ConnectionInformation = this.MainWindow.ConnectionInformation;
             InitializeComponent();
             this.DataContext = this;

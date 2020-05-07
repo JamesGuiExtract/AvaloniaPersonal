@@ -1,8 +1,12 @@
 ﻿using DatabaseMigrationWizard.Database;
+using DatabaseMigrationWizard.Database.Input;
+using DatabaseMigrationWizard.Database.Output;
 using Extract;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Resources;
+using System.Text.RegularExpressions;
 using System.Windows;
 
 [assembly: CLSCompliant(true)]
@@ -18,24 +22,115 @@ namespace DatabaseMigrationWizard
         /// The startup to the application
         /// </summary>
         /// <param name="sender">Unused</param>
-        /// <param name="e">The database server, then the database name</param>
+        /// <param name="e">
+        /// /import - This will run the import. In order for this to work, you must specifiy the database name/server and filepath
+        /// /export - will simply populate the /path on the export page if specified.
+        /// /path - The file path which houses documents for an export or import
+        /// /datbaseName - the database name
+        /// /databaseServer- the database server.
+        /// </param>
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            ConnectionInformation connectionInformation = new ConnectionInformation();
+            bool importArgument = false;
+            bool exportArgument = false;
+            string filePath = string.Empty;
+            string uexFileName = string.Empty;
+            const string Import = "/import";
+            const string Export = "/export";
+            const string Path = "/path";
+            const string DatabaseName = "/databasename";
+            const string DatabaseServer = "/databaseserver";
+            const string EF = "/ef";
+
             try
             {
-                ConnectionInformation connectionInformation = new ConnectionInformation();
-                if (e.Args.Length == 2)
+                for (int i = 0; i < e.Args.Length; i++)
                 {
-                    connectionInformation.DatabaseServer = e.Args[0].ToString();
-                    connectionInformation.DatabaseName = e.Args[1].ToString();
+                    var arugment = e.Args[i].ToLower(CultureInfo.InvariantCulture);
+                    switch (arugment)
+                    {
+                        case Import:
+                            importArgument = true;
+                            break;
+                        case Export:
+                            exportArgument = true;
+                            break;
+                        case Path:
+                            this.ValidateNextArgument(Path, e, i);
+                            i += 1;
+                            filePath = e.Args[i];
+                            break;
+                        case DatabaseName:
+                            this.ValidateNextArgument(DatabaseName, e, i);
+                            i += 1;
+                            connectionInformation.DatabaseName = e.Args[i];
+                            break;
+                        case DatabaseServer:
+                            this.ValidateNextArgument(DatabaseServer, e, i);
+                            i += 1;
+                            connectionInformation.DatabaseServer = e.Args[i];
+                            break;
+                        case "/":
+                            Console.WriteLine(@"The supported options are /import /export /path filepath /databasename databasename and /databaseserver databaseserver. ");
+                            break;
+                        case EF:
+                            this.ValidateNextArgument(EF, e, i);
+                            i += 1;
+                            uexFileName = e.Args[i];
+                            break;
+                        default:
+                            throw new ExtractException("ELI49796", $"The argument {e.Args[i]} is not supported");
+                    }
                 }
-
-                MainWindow wnd = new MainWindow(connectionInformation);
+                MainWindow wnd = null;
+                if (importArgument && exportArgument)
+                {
+                    throw new ExtractException("ELI49797", "You cannot specify both the import and export arguments. Please choose one.");
+                }
+                else if(importArgument)
+                {
+                    ImportHelper importHelper = new ImportHelper(new ImportOptions() 
+                    {
+                        ImportPath = filePath,
+                        ConnectionInformation = connectionInformation, 
+                        ClearDatabase = false 
+                    }, new Progress<string>((garbage) => { }));
+                    importHelper.Import();
+                    importHelper.CommitTransaction();
+                    Console.WriteLine("Import was successful");
+                    System.Environment.Exit(0);
+                }
+                else if(exportArgument)
+                {
+                    wnd = new MainWindow(connectionInformation, new ExportOptions() { ExportPath = filePath, ConnectionInformation = connectionInformation });
+                }
+                else
+                {
+                    wnd = new MainWindow(connectionInformation);
+                }
                 wnd.Show();
             }
             catch(Exception ex)
             {
-                ex.AsExtract("ELI49727").Display();
+                if(!uexFileName.Equals(string.Empty))
+                {
+                    ex.AsExtract("ELI49808").Log(uexFileName);
+                }
+                else
+                {
+                    ex.AsExtract("ELI49727").Display();
+                }
+                
+                System.Environment.Exit(1);
+            }
+        }
+
+        private void ValidateNextArgument(string commandName, StartupEventArgs e, int index)
+        {
+            if (index + 1 > e.Args.Length)
+            {
+                throw new ExtractException("ELI49801", $"You must provide an argument after the {commandName}");
             }
         }
     }

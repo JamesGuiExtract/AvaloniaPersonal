@@ -1,4 +1,5 @@
 ﻿using DatabaseMigrationWizard.Database;
+using DatabaseMigrationWizard.Database.Output;
 using DatabaseMigrationWizard.Pages;
 using DatabaseMigrationWizard.Pages.Utility;
 using Extract;
@@ -17,6 +18,8 @@ namespace DatabaseMigrationWizard
     public partial class MainWindow : ModernWindow, INotifyPropertyChanged
     {
         public ConnectionInformation ConnectionInformation { get; set; }
+
+        public ExportOptions ExportOptions { get; set; }
 
         private bool _UIEnabled = true;
 
@@ -45,16 +48,34 @@ namespace DatabaseMigrationWizard
         {
             try
             {
-                this.ConnectionInformation = connectionInformation;
-                LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI49728", typeof(MainWindow).ToString());
-                InitializeComponent();
-                this.Closing += new System.ComponentModel.CancelEventHandler(MainWindow_Closing);
+                this.MainWindowSetup(connectionInformation);
             }
             catch(Exception ex)
             {
                 throw ex.AsExtract("ELI49729");
             }
+        }
+
+        public MainWindow(ConnectionInformation connectionInformation, ExportOptions exportOptions)
+        {
+            try
+            {
+                this.MainWindowSetup(connectionInformation);
+                this.ExportOptions = exportOptions;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49800");
+            }
+        }
+
+        private void MainWindowSetup(ConnectionInformation connectionInformation)
+        {
+            this.ConnectionInformation = connectionInformation;
+            LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI49728", typeof(MainWindow).ToString());
+            InitializeComponent();
+            this.Closing += new System.ComponentModel.CancelEventHandler(MainWindow_Closing);
         }
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

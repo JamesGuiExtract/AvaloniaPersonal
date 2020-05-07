@@ -233,10 +233,10 @@ namespace DatabaseMigrationWizard.Database.Input
         {
             if (disposing)
             {
-                this.ImportOptions.Transaction.Dispose();
+                this.ImportOptions.Transaction?.Dispose();
                 this.ImportOptions.Transaction = null;
-                this.ImportOptions.SqlConnection.Close();
-                this.ImportOptions.SqlConnection.Dispose();
+                this.ImportOptions.SqlConnection?.Close();
+                this.ImportOptions.SqlConnection?.Dispose();
                 this.ImportOptions.SqlConnection = null;
             }
         }
