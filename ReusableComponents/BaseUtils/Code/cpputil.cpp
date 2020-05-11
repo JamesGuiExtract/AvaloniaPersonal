@@ -1483,4 +1483,44 @@ namespace Util
 		}
 		return encodedString;
 	}
+	//-------------------------------------------------------------------------------------------------
+	void retry(int maxTries, function<bool()> func, function<void(int)> retryCallback, function<void()> failureCallback)
+	{
+		int tries = 0;
+		bool failed = true;
+		while (++tries <= maxTries && (failed = !func()))
+		{
+			retryCallback(tries);
+		}
+		if (failed)
+		{
+			failureCallback();
+		}
+	}
+	//-------------------------------------------------------------------------------------------------
+	void retry(int maxTries, string description, function<bool()> func, function<void(int)> retryCallback, string eliCodeForFailure)
+	{
+		retry(
+			maxTries,
+			func,
+			retryCallback,
+			[&]() -> void { throw UCLIDException(eliCodeForFailure, "Failed to " + description + " after " + asString(maxTries) + " tries!"); }
+		);
+	}
+	//-------------------------------------------------------------------------------------------------
+	void retry(int maxTries, string description, function<bool()> func, string eliCodeForRetry, string eliCodeForFailure)
+	{
+		retry(
+			maxTries,
+			func,
+			[&](int tries) -> void {
+				UCLIDException ue(eliCodeForRetry, "Application trace: Failed to " + description + ". Retrying...");
+				ue.addDebugInfo("Attempt", tries);
+				ue.log();
+				Sleep(max(1000, 100 * tries));
+			},
+			[&]() -> void { throw UCLIDException(eliCodeForFailure, "Failed to " + description + " after " + asString(maxTries) + " tries!"); }
+		);
+	}
+	//-------------------------------------------------------------------------------------------------
 }

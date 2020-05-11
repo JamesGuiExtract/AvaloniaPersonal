@@ -4466,7 +4466,21 @@ unique_ptr<PageMap> CSpatialString::loadPagesFromArchive(const string& strFileNa
 					tmpFile = std::make_unique<TemporaryFileName>(true);
 					tmpPath = tmpFile->getName();
 				}
-				uz.UnzipFileTo(tmpPath.c_str());
+                Util::retry(50, "unzip info file",
+					[&]() -> bool {
+						return uz.UnzipFileTo(tmpPath.c_str());
+					},
+					[&](int tries) -> void {
+						UCLIDException ue("ELI49789", "Application trace: Failed to unzip info file. Retrying...");
+						ue.addDebugInfo("Attempt", tries);
+						ue.addDebugInfo("File Name", strFileName);
+						ue.log();
+
+						Sleep(max(1000, 100 * tries));
+					},
+					"ELI49790"
+				);
+
 				ifstream ifs(tmpPath);
 				rapidjson::IStreamWrapper isw(ifs);
 				rapidjson::Document document;
@@ -4491,7 +4505,22 @@ unique_ptr<PageMap> CSpatialString::loadPagesFromArchive(const string& strFileNa
 				}
 				else
 				{
-					uz.UnzipFileTo(tmpPath.c_str());
+					Util::retry(50, "unzip page",
+                        [&]() -> bool {
+							return uz.UnzipFileTo(tmpPath.c_str());
+                        },
+                        [&](int tries) -> void {
+                            UCLIDException ue("ELI49794", "Application trace: Failed to unzip page. Retrying...");
+                            ue.addDebugInfo("Attempt", tries);
+                            ue.addDebugInfo("File Name", strFileName);
+                            ue.addDebugInfo("Page Number", pageNumber);
+							ue.log();
+
+							Sleep(max(1000, 100 * tries));
+                        },
+						"ELI49795" 
+					);
+
 					if (bLoadIntoThis)
 					{
 						if (ext == "uss")
@@ -4533,25 +4562,37 @@ unique_ptr<PageMap> CSpatialString::loadPagesFromArchive(const string& strFileNa
 //-------------------------------------------------------------------------------------------------
 void CSpatialString::loadFromStorageObject(const string& strInputFile, UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLoadInto)
 {
-	// Load this object from the file
-	IPersistStreamPtr ipPersistStream = ipLoadInto;
-	ASSERT_RESOURCE_ALLOCATION("ELI46772", ipPersistStream != __nullptr);
-
-	if (CompressionEngine::isGZipFile(strInputFile))
+	try
 	{
-		// The .uss file may be compressed.
-		// create a temporary file with the uncompressed output
-		TemporaryFileName tmpFile(true);
-		CompressionEngine::decompressFile(strInputFile, tmpFile.getName());
+		// Load this object from the file
+		IPersistStreamPtr ipPersistStream = ipLoadInto;
+		ASSERT_RESOURCE_ALLOCATION("ELI46772", ipPersistStream != __nullptr);
 
-		readObjectFromFile(ipPersistStream, get_bstr_t(tmpFile.getName().c_str()),
-			gbstrSPATIAL_STRING_STREAM_NAME, false, gstrSPATIAL_STRING_FILE_SIGNATURE);
+		if (CompressionEngine::isGZipFile(strInputFile))
+		{
+			// The .uss file may be compressed.
+			// create a temporary file with the uncompressed output
+			TemporaryFileName tmpFile(true);
+			CompressionEngine::decompressFile(strInputFile, tmpFile.getName());
+
+			try
+			{
+				readObjectFromFile(ipPersistStream, get_bstr_t(tmpFile.getName().c_str()),
+					gbstrSPATIAL_STRING_STREAM_NAME, false, gstrSPATIAL_STRING_FILE_SIGNATURE);
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49791")
+		}
+		else
+		{
+			try
+			{
+				readObjectFromFile(ipPersistStream, get_bstr_t(strInputFile.c_str()),
+					gbstrSPATIAL_STRING_STREAM_NAME, false, gstrSPATIAL_STRING_FILE_SIGNATURE);
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49792")
+		}
 	}
-	else
-	{
-		readObjectFromFile(ipPersistStream, get_bstr_t(strInputFile.c_str()),
-			gbstrSPATIAL_STRING_STREAM_NAME, false, gstrSPATIAL_STRING_FILE_SIGNATURE);
-	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49793")
 }
 //-------------------------------------------------------------------------------------------------
 void CSpatialString::saveToStorageObject(const string& strFullFileName, UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipSpatialString, bool bCompress, bool bClearDirty)

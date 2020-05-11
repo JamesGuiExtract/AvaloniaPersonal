@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
+#include <functional>
 
 using namespace std;
 
@@ -1103,7 +1104,16 @@ namespace Util
 	EXPORT_BaseUtils std::basic_string<TCHAR> base64Encode(std::vector<BYTE>& inputBuffer);
 	EXPORT_BaseUtils std::basic_string<TCHAR> base64Encode(std::stringstream& input);
 
-}		// end of namespace Util
+    // Try boolean function until it returns true, up to maxTries times. Logs an exception for each failure and 
+	EXPORT_BaseUtils void retry(int maxTries, std::string description, std::function<bool()> func, std::string eliCodeForRetry, std::string eliCodeForFailure);
+
+    // Try boolean function until it returns true, up to maxTries times. Runs retryCallback(tries) for each failure and throws an exception when maxTries have failed
+	EXPORT_BaseUtils void retry(int maxTries, std::string description, std::function<bool()> func, std::function<void(int)> retryCallback, std::string eliCodeForFailure);
+
+    // Try boolean function until it returns true, up to maxTries times. Runs retryCallback(tries) for each failure and failureCallback() when maxTries have failed
+	EXPORT_BaseUtils void retry(int maxTries, std::function<bool()> func, std::function<void(int)> retryCallback, std::function<void()> failureCallback);
+}
+// end of namespace Util
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils char getWindows1252FromUTF8(const string& strCharacter);
 //-------------------------------------------------------------------------------------------------
