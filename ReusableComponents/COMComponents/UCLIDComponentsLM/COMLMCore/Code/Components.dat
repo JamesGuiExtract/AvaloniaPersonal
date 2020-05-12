@@ -76,3 +76,9 @@
 7091,Barcodes
 7092,DashboardViewer
 7093,DashboardCreator
+
+// IDs for FLEX Index / ID Shield integration efforts
+7101,Laserfiche_Integration_Verification
+7102,Laserfiche_Integration_Desktop
+7103,Laserfiche_Integration_Server
+7110,NetDMS_Components
