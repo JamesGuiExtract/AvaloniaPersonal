@@ -8,6 +8,12 @@ namespace DatabaseMigrationWizard.Pages
 {
     public class DirectoryRule : ValidationRule
     {
+        /// <summary>
+        /// Ensures the user passes a valid directory.
+        /// </summary>
+        /// <param name="value">The directory to check</param>
+        /// <param name="cultureInfo">Culture information about the string</param>
+        /// <returns></returns>
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
             try

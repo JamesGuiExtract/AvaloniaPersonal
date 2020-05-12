@@ -63,11 +63,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
-		private readonly string ReportingSQL = @"
+		private readonly string InsertReportingSQL = @"
 									INSERT INTO
-										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
 									SELECT
-										'Info'
+										'Insert'
+	                                    , 'Info'
 										, 'LabDEEncounter'
 										, CONCAT('The LabDEEncounter table will have ', COUNT(*), ' rows added to the database')
 									FROM
@@ -76,6 +77,38 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 												ON dbo.LabDEEncounter.Guid = ##LabDEEncounter.Guid
 									WHERE
 										dbo.LabDEEncounter.Guid IS NULL";
+
+		private readonly string UpdateReportingSQL = @"
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'LabDEEncounter'
+										, CONCAT('The LabDEEncounter table will have ', COUNT(*) ,' rows updated.')
+
+									FROM
+										##LabDEEncounter AS UpdatingLabDEEncounter
+		
+											INNER JOIN dbo.LabDEEncounter
+												ON dbo.LabDEEncounter.Guid = UpdatingLabDEEncounter.Guid
+
+									WHERE
+										ISNULL(UpdatingLabDEEncounter.PatientMRN, '') <> ISNULL(dbo.LabDEEncounter.PatientMRN, '')
+										OR
+										ISNULL(UpdatingLabDEEncounter.EncounterDateTime, '') <> ISNULL(dbo.LabDEEncounter.EncounterDateTime, '')
+										OR
+										ISNULL(UpdatingLabDEEncounter.Department, '') <> ISNULL(dbo.LabDEEncounter.Department, '')
+										OR
+										ISNULL(UpdatingLabDEEncounter.EncounterType, '') <> ISNULL(dbo.LabDEEncounter.EncounterType, '')
+										OR
+										ISNULL(UpdatingLabDEEncounter.EncounterProvider, '') <> ISNULL(dbo.LabDEEncounter.EncounterProvider, '')
+										OR
+										ISNULL(UpdatingLabDEEncounter.DischargeDate, '') <> ISNULL(dbo.LabDEEncounter.DischargeDate, '')
+										OR
+										ISNULL(UpdatingLabDEEncounter.AdmissionDate, '') <> ISNULL(dbo.LabDEEncounter.AdmissionDate, '')
+										OR
+										ISNULL(UpdatingLabDEEncounter.CSN, '') <> ISNULL(dbo.LabDEEncounter.CSN, '')";
 
 		public Priorities Priority => Priorities.MediumLow;
 
@@ -87,7 +120,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
 			ImportHelper.PopulateTemporaryTable<LabDEEncounter>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-			importOptions.ExecuteCommand(this.ReportingSQL);
+			importOptions.ExecuteCommand(this.InsertReportingSQL);
+			importOptions.ExecuteCommand(this.UpdateReportingSQL);
 
 			importOptions.ExecuteCommand(this.insertSQL);
 		}

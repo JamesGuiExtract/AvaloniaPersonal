@@ -316,3 +316,13 @@ static const std::string gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW_LEGACY_166 =
 "		FROM            dbo.InputEvent "
 "		GROUP BY FAMUserID, CAST(TimeStamp AS DATE)'"
 "	)";
+
+static const std::string gstrCREATE_DATABASE_MIGRATION_WIZARD_REPORTING_181 =
+" CREATE TABLE[dbo].[ReportingDatabaseMigrationWizard] "
+" ( "
+" [ID] UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID() PRIMARY KEY "
+" , [Classification] NVARCHAR(128) NOT NULL DEFAULT 'Information' "
+" , [TableName] NVARCHAR(128) NOT NULL "
+" , [Message] NVARCHAR(512) NOT NULL "
+" , [DateTime] DATETIME NOT NULL DEFAULT GETDATE() "
+" )";

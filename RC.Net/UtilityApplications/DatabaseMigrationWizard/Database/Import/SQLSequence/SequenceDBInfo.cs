@@ -36,9 +36,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
         private readonly string ReportingSQL = @"
 										INSERT INTO
-											dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+											dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
 										SELECT
-											'Warning'
+											'Insert'
+											, 'Warning'
 											, 'DBInfo'
 											, CONCAT('The DBInfo ', dbo.DBInfo.Name, ' is present in the destination database, but NOT in the importing source.')
 										FROM
@@ -49,9 +50,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 											##DBInfo.Name IS NULL
 										;
 										INSERT INTO
-											dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+											dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
 										SELECT
-											'Info'
+											'Insert'
+											, 'Info'
 											, 'DBInfo'
 											, CONCAT('The DBInfo ', ##DBInfo.Name, ' will be added to the database')
 										FROM
@@ -62,9 +64,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 											dbo.DBInfo.Name IS NULL
 										;
 										INSERT INTO
-											dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+											dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
 										SELECT
-											'Warning'
+											'Update'
+											, 'Warning'
 											, 'DBInfo'
 											, 'The value of ' + dbo.DBInfo.Name + ' has been changed from ' + dbo.DBInfo.Value + ' to ' + ##DBInfo.Value
 										FROM
@@ -72,7 +75,9 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 												LEFT OUTER JOIN ##DBInfo
 													ON dbo.DBInfo.Name = ##DBInfo.Name
 										WHERE
-											LOWER(dbo.DBInfo.Name) LIKE '%schema%'
+											LOWER(dbo.DBInfo.Name) NOT LIKE '%schema%'
+											AND
+											dbo.DBInfo.Name <> 'DatabaseID'
 											AND
 											dbo.DBInfo.Value != ##DBInfo.Value";
 

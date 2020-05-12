@@ -44,11 +44,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
-        private readonly string ReportingSQL = @"
+        private readonly string InsertReportingSQL = @"
                                     INSERT INTO
-	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
                                     SELECT
-	                                    'Warning'
+	                                    'Insert'
+	                                    , 'Warning'
 	                                    , 'Login'
 	                                    , CONCAT('The Login ', dbo.Login.UserName, ' is present in the destination database, but NOT in the importing source.')
                                     FROM
@@ -61,9 +62,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                         Login.UserName <> 'Admin'
                                     ;
                                     INSERT INTO
-	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
                                     SELECT
-	                                    'Info'
+	                                    'Insert'
+	                                    , 'Info'
 	                                    , 'Login'
 	                                    , CONCAT('The Login ', ##Login.UserName, ' will be added to the database')
                                     FROM
@@ -75,6 +77,25 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                         AND
                                         ##Login.UserName <> 'Admin'";
 
+        private readonly string UpdateReportingSQL = @"
+                                    INSERT INTO
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+                                    SELECT
+	                                    'Update'
+	                                    , 'Info'
+	                                    , 'Login'
+	                                    , 'The Login will be updated'
+	                                    , dbo.Login.UserName
+	                                    , UpdatingLogin.UserName
+                                    FROM
+	                                    ##Login AS UpdatingLogin
+
+			                                    INNER JOIN dbo.Login
+				                                    ON dbo.Login.Guid = UpdatingLogin.Guid
+
+                                    WHERE
+	                                    ISNULL(UpdatingLogin.UserName, '') <> ISNULL(dbo.Login.UserName, '')";
+
         public Priorities Priority => Priorities.Low;
 
         public string TableName => "Login";
@@ -85,7 +106,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
             ImportHelper.PopulateTemporaryTable<Login>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            importOptions.ExecuteCommand(this.ReportingSQL);
+            importOptions.ExecuteCommand(this.InsertReportingSQL);
+            importOptions.ExecuteCommand(this.UpdateReportingSQL);
 
             importOptions.ExecuteCommand(this.insertSQL);
         }

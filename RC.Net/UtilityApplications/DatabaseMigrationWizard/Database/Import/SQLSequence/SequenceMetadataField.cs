@@ -40,11 +40,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
-        private readonly string ReportingSQL = @"
+        private readonly string InsertReportingSQL = @"
                                     INSERT INTO
-	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
                                     SELECT
-	                                    'Warning'
+	                                    'Insert'
+	                                    , 'Warning'
 	                                    , 'MetadataField'
 	                                    , CONCAT('The MetadataField ', dbo.MetadataField.Name, ' is present in the destination database, but NOT in the importing source.')
                                     FROM
@@ -55,9 +56,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 	                                    ##MetadataField.GUID IS NULL
                                     ;
                                     INSERT INTO
-	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
                                     SELECT
-	                                    'Info'
+	                                    'Insert'
+	                                    , 'Info'
 	                                    , 'MetadataField'
 	                                    , CONCAT('The MetadataField ', ##MetadataField.Name, ' will be added to the database')
                                     FROM
@@ -66,6 +68,25 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 			                                    ON dbo.MetadataField.Guid = ##MetadataField.GUID
                                     WHERE
 	                                    dbo.MetadataField.Guid IS NULL";
+
+        private readonly string UpdateReportingSQL = @"
+                                    INSERT INTO
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+                                    SELECT
+	                                    'Update'
+	                                    , 'Info'
+	                                    , 'MetadataField'
+	                                    , 'The MetadataField will be updated'
+	                                    , dbo.MetadataField.Name
+	                                    , UpdatingMetadataField.Name
+                                    FROM
+	                                    ##MetadataField AS UpdatingMetadataField
+
+			                                    INNER JOIN dbo.MetadataField
+				                                    ON dbo.MetadataField.Guid = UpdatingMetadataField.Guid
+
+                                    WHERE
+	                                    ISNULL(UpdatingMetadataField.Name, '') <> ISNULL(dbo.MetadataField.Name, '')";
 
         public Priorities Priority => Priorities.High;
 
@@ -77,7 +98,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
             ImportHelper.PopulateTemporaryTable<MetadataField>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            importOptions.ExecuteCommand(this.ReportingSQL);
+            importOptions.ExecuteCommand(this.InsertReportingSQL);
+            importOptions.ExecuteCommand(this.UpdateReportingSQL);
 
             importOptions.ExecuteCommand(this.insertSQL);
         }

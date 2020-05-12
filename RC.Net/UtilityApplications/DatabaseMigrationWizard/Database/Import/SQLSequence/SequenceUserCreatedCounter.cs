@@ -42,11 +42,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
-        private readonly string ReportingSQL = @"
+        private readonly string InsertReportingSQL = @"
                                     INSERT INTO
-	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
                                     SELECT
-	                                    'Warning'
+	                                    'Insert'
+	                                    , 'Warning'
 	                                    , 'UserCreatedCounter'
 	                                    , CONCAT('The UserCreatedCounter ', dbo.UserCreatedCounter.CounterName, ' is present in the destination database, but NOT in the importing source.')
                                     FROM
@@ -57,9 +58,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 	                                    ##UserCreatedCounter.GUID IS NULL
                                     ;
                                     INSERT INTO
-	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
                                     SELECT
-	                                    'Info'
+	                                    'Insert'
+	                                    , 'Info'
 	                                    , 'UserCreatedCounter'
 	                                    , CONCAT('The UserCreatedCounter ', ##UserCreatedCounter.CounterName, ' will be added to the database')
                                     FROM
@@ -69,7 +71,47 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                     WHERE
 	                                    dbo.UserCreatedCounter.Guid IS NULL";
 
-        public Priorities Priority => Priorities.High;
+		private readonly string UpdateReportingSQL = @"
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'UserCreatedCounter'
+										, CONCAT('The UserCreatedCounter ', dbo.UserCreatedCounter.CounterName, ' will have its value updated')
+										, dbo.UserCreatedCounter.Value
+										, UpdatingCounter.Value
+									FROM
+										##UserCreatedCounter AS UpdatingCounter
+
+												INNER JOIN dbo.UserCreatedCounter
+													ON dbo.UserCreatedCounter.Guid = UpdatingCounter.Guid
+
+									WHERE
+										ISNULL(UpdatingCounter.Value, '') <> ISNULL(dbo.UserCreatedCounter.Value, '')
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'UserCreatedCounter'
+										, 'The UserCreatedCounter will have its name updated'
+										, dbo.UserCreatedCounter.CounterName
+										, UpdatingCounter.CounterName
+									FROM
+										##UserCreatedCounter AS UpdatingCounter
+
+												INNER JOIN dbo.UserCreatedCounter
+													ON dbo.UserCreatedCounter.Guid = UpdatingCounter.Guid
+
+									WHERE
+										ISNULL(UpdatingCounter.CounterName, '') <> ISNULL(dbo.UserCreatedCounter.CounterName, '')
+
+									";
+
+
+		public Priorities Priority => Priorities.High;
 
         public string TableName => "UserCreatedCounter";
 
@@ -79,9 +121,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
             ImportHelper.PopulateTemporaryTable<UserCreatedCounter>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            importOptions.ExecuteCommand(this.ReportingSQL);
+            importOptions.ExecuteCommand(this.InsertReportingSQL);
+			importOptions.ExecuteCommand(this.UpdateReportingSQL);
 
-            importOptions.ExecuteCommand(this.insertSQL);
+			importOptions.ExecuteCommand(this.insertSQL);
         }
     }
 }

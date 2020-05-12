@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace DatabaseMigrationWizard.Database.Input.SQLSequence
@@ -51,11 +52,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
-        private readonly string ReportingSQL = @"
+        private readonly string InsertReportingSQL = @"
                                             INSERT INTO
-	                                            dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                            dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
                                             SELECT
-	                                            'Warning'
+	                                            'Insert'
+	                                            , 'Warning'
 	                                            , 'DatabaseService'
 	                                            , CONCAT('The DatabaseService ', dbo.DatabaseService.Description, ' is present in the destination database, but NOT in the importing source.')
                                             FROM
@@ -66,9 +68,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 	                                            ##DatabaseService.GUID IS NULL
                                             ;
                                             INSERT INTO
-	                                            dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                            dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
                                             SELECT
-	                                            'Warning'
+	                                            'Insert'
+	                                            , 'Warning'
 	                                            , 'DatabaseService'
 	                                            , CONCAT('The service ', ##DatabaseService.Description, ' will be added to the database. Please be sure the configuration/schedule is appropriate for the new enviornment.')
                                             FROM
@@ -77,6 +80,64 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 			                                            ON dbo.DatabaseService.Guid = ##DatabaseService.GUID
                                             WHERE
 	                                            dbo.DatabaseService.Guid IS NULL";
+
+        private readonly string UpdateReportingSQL = @"
+                                        --Description
+                                        INSERT INTO
+	                                        dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+                                        SELECT
+	                                        'Update'
+	                                        , 'Info'
+	                                        , 'DatabaseService'
+	                                        , 'The database service description will be updated'
+	                                        , dbo.DatabaseService.Description
+	                                        , UpdatingDatabaseService.Description
+                                        FROM
+	                                        ##DatabaseService AS UpdatingDatabaseService
+		
+		                                        INNER JOIN dbo.DatabaseService
+			                                        ON dbo.DatabaseService.Guid = UpdatingDatabaseService.Guid
+
+                                        WHERE
+	                                        ISNULL(UpdatingDatabaseService.Description, '') <> ISNULL(dbo.DatabaseService.Description, '')
+                                        ;
+                                        --enabled
+                                        INSERT INTO
+	                                        dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+                                        SELECT
+	                                        'Update'
+	                                        , 'Info'
+	                                        , 'DatabaseService'
+	                                        , CONCAT('The ', dbo.DatabaseService.Description , ' enabled will be updated')
+	                                        , dbo.DatabaseService.Enabled
+	                                        , UpdatingDatabaseService.Enabled
+                                        FROM
+	                                        ##DatabaseService AS UpdatingDatabaseService
+		
+		                                        INNER JOIN dbo.DatabaseService
+			                                        ON dbo.DatabaseService.Guid = UpdatingDatabaseService.Guid
+
+                                        WHERE
+	                                        ISNULL(UpdatingDatabaseService.Enabled, '') <> ISNULL(dbo.DatabaseService.Enabled, '')
+                                        ;
+                                        --Settings
+                                        INSERT INTO
+	                                        dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+                                        SELECT
+	                                        'Update'
+	                                        , 'Info'
+	                                        , 'DatabaseService'
+	                                        , CONCAT('The ', dbo.DatabaseService.Description , ' Settings will be updated.')
+                                        FROM
+	                                        ##DatabaseService AS UpdatingDatabaseService
+		
+		                                        INNER JOIN dbo.DatabaseService
+			                                        ON dbo.DatabaseService.Guid = UpdatingDatabaseService.Guid
+
+                                        WHERE
+	                                        ISNULL(UpdatingDatabaseService.Settings, '') <> ISNULL(dbo.DatabaseService.Settings, '')
+                                        ";
+
         private readonly string CheckForJsonSQL = @"
                                             SELECT
 	                                            ##DatabaseService.Description
@@ -101,7 +162,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
             ImportHelper.PopulateTemporaryTable<DatabaseService>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            importOptions.ExecuteCommand(this.ReportingSQL);
+            importOptions.ExecuteCommand(this.InsertReportingSQL);
+            importOptions.ExecuteCommand(this.UpdateReportingSQL);
             this.ReportFilePaths(importOptions);
 
             importOptions.ExecuteCommand(this.insertSQL);
@@ -109,9 +171,9 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
         private void ReportFilePaths(ImportOptions importOptions)
         {
-            string sql = @"INSERT INTO dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message) ";
+            string sql = @"INSERT INTO dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message) ";
             var servicesWithFilePaths = new Collection<(string service, string path)>();
-            using (DataTable dataTable = new DataTable())
+            using (DataTable dataTable = new DataTable() { Locale = CultureInfo.InvariantCulture })
             using (DbCommand dbCommand = importOptions.SqlConnection.CreateCommand())
             {
                 dbCommand.Transaction = importOptions.Transaction;
@@ -134,11 +196,11 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
             foreach (var (service, path) in servicesWithFilePaths)
             {
-                sql += $" SELECT 'Warning', 'DatabaseService', 'The {service} service uses the absolute path {path}, please double check it is applicable to this environment' UNION ALL";
+                sql += $" SELECT 'Insert', 'Warning', 'DatabaseService', 'The {service} service uses the absolute path {path}, please double check it is applicable to this environment' UNION ALL";
             }
             if (servicesWithFilePaths.Count > 0)
             {
-                importOptions.ExecuteCommand(sql.Remove(sql.LastIndexOf("UNION ALL")));
+                importOptions.ExecuteCommand(sql.Remove(sql.LastIndexOf("UNION ALL", StringComparison.OrdinalIgnoreCase)));
             }
         }
 

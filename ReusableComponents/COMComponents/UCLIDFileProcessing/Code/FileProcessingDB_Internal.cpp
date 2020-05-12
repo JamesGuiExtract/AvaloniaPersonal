@@ -1570,6 +1570,7 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrDATABASE_SERVICE);
 			eraseFromVector(vecTables, gstrMLMODEL);
 			eraseFromVector(vecTables, gstrDASHBOARD);
+			eraseFromVector(vecTables, gstrREPORTING_DATABASE_MIGRATION_WIZARD);
 		}
 
 		// Never drop these tables
@@ -3458,6 +3459,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrDATABASE_SERVICE);
 	vecTables.push_back(gstrREPORTING_VERIFICATION_RATES);
 	vecTables.push_back(gstrDASHBOARD);
+	vecTables.push_back(gstrREPORTING_DATABASE_MIGRATION_WIZARD);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)

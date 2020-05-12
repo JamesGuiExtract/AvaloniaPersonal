@@ -36,18 +36,18 @@ namespace DatabaseMigrationWizard
             bool exportArgument = false;
             string filePath = string.Empty;
             string uexFileName = string.Empty;
-            const string Import = "/import";
-            const string Export = "/export";
-            const string Path = "/path";
-            const string DatabaseName = "/databasename";
-            const string DatabaseServer = "/databaseserver";
-            const string EF = "/ef";
+            const string Import = "/IMPORT";
+            const string Export = "/EXPORT";
+            const string Path = "/PATH";
+            const string DatabaseName = "/DATABASENAME";
+            const string DatabaseServer = "/DATABASESERVER";
+            const string EF = "/EF";
 
             try
             {
                 for (int i = 0; i < e.Args.Length; i++)
                 {
-                    var arugment = e.Args[i].ToLower(CultureInfo.InvariantCulture);
+                    var arugment = e.Args[i].ToUpperInvariant();
                     switch (arugment)
                     {
                         case Import:
@@ -57,17 +57,17 @@ namespace DatabaseMigrationWizard
                             exportArgument = true;
                             break;
                         case Path:
-                            this.ValidateNextArgument(Path, e, i);
+                            ValidateNextArgument(Path, e, i);
                             i += 1;
                             filePath = e.Args[i];
                             break;
                         case DatabaseName:
-                            this.ValidateNextArgument(DatabaseName, e, i);
+                            ValidateNextArgument(DatabaseName, e, i);
                             i += 1;
                             connectionInformation.DatabaseName = e.Args[i];
                             break;
                         case DatabaseServer:
-                            this.ValidateNextArgument(DatabaseServer, e, i);
+                            ValidateNextArgument(DatabaseServer, e, i);
                             i += 1;
                             connectionInformation.DatabaseServer = e.Args[i];
                             break;
@@ -75,7 +75,7 @@ namespace DatabaseMigrationWizard
                             Console.WriteLine(@"The supported options are /import /export /path filepath /databasename databasename and /databaseserver databaseserver. ");
                             break;
                         case EF:
-                            this.ValidateNextArgument(EF, e, i);
+                            ValidateNextArgument(EF, e, i);
                             i += 1;
                             uexFileName = e.Args[i];
                             break;
@@ -113,7 +113,7 @@ namespace DatabaseMigrationWizard
             }
             catch(Exception ex)
             {
-                if(!uexFileName.Equals(string.Empty))
+                if(!string.IsNullOrEmpty(uexFileName))
                 {
                     ex.AsExtract("ELI49808").Log(uexFileName);
                 }
@@ -126,7 +126,7 @@ namespace DatabaseMigrationWizard
             }
         }
 
-        private void ValidateNextArgument(string commandName, StartupEventArgs e, int index)
+        private static void ValidateNextArgument(string commandName, StartupEventArgs e, int index)
         {
             if (index + 1 > e.Args.Length)
             {

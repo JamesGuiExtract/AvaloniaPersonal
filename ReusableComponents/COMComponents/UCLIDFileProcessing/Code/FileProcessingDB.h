@@ -94,6 +94,7 @@ static const string gstrWEB_APP_CONFIG = "WebAppConfig";
 static const string gstrDATABASE_SERVICE = "DatabaseService";
 static const string gstrREPORTING_VERIFICATION_RATES = "ReportingVerificationRates";
 static const string gstrDASHBOARD = "Dashboard";
+static const string gstrREPORTING_DATABASE_MIGRATION_WIZARD = "ReportingDatabaseMigrationWizard";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB

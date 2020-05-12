@@ -23,6 +23,8 @@ namespace DatabaseMigrationWizard
 
         private bool _UIEnabled = true;
 
+        private bool _CommitSuccessful = false;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ObservableCollection<Report> Reporting { get; } = new ObservableCollection<Report>();
@@ -41,6 +43,19 @@ namespace DatabaseMigrationWizard
             {
                 this._UIEnabled = value;
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("UIEnabled"));
+            }
+        }
+
+        public bool CommitSuccessful
+        {
+            get
+            {
+                return this._CommitSuccessful;
+            }
+            set
+            {
+                this._CommitSuccessful = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CommitSuccessful"));
             }
         }
 

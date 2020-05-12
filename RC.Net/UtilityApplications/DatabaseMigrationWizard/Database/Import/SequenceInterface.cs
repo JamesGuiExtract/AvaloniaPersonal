@@ -23,8 +23,15 @@ namespace DatabaseMigrationWizard.Database.Input
         /// </summary>
         Priorities Priority { get; }
 
+        /// <summary>
+        /// Returns the table name of its representing class.
+        /// </summary>
         string TableName { get; }
 
+        /// <summary>
+        /// Executes the import for the respective table.
+        /// </summary>
+        /// <param name="importOptions">The options for importing</param>
         void ExecuteSequence(ImportOptions importOptions);
     }
 

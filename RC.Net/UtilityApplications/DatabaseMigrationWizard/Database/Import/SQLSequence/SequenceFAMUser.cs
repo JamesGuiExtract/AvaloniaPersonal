@@ -43,11 +43,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
-		private readonly string ReportingSQL = @"
+		private readonly string InsertReportingSQL = @"
 									INSERT INTO
-										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
 									SELECT
-										'Warning'
+										'Insert'
+	                                    , 'Warning'
 										, 'FAMUser'
 										, CONCAT('The FAMUser ', dbo.FAMUser.UserName, ' is present in the destination database, but NOT in the importing source.')
 									FROM
@@ -58,9 +59,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										##FAMUser.GUID IS NULL
 									;
 									INSERT INTO
-										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
 									SELECT
-										'Info'
+										'Insert'
+	                                    , 'Info'
 										, 'FAMUser'
 										, CONCAT('The FAMUser ', ##FAMUser.UserName, ' will be added to the database')
 									FROM
@@ -69,6 +71,44 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 												ON dbo.FAMUser.Guid = ##FAMUser.GUID
 									WHERE
 										dbo.FAMUser.Guid IS NULL";
+
+		private readonly string UpdateReportingSQL = @"
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FAMUser'
+										, 'The Full username will be updated'
+										, dbo.FAMUser.FullUserName
+										, UpdatingFAMUser.FullUserName
+									FROM
+										##FAMUser AS UpdatingFAMUser
+		
+											INNER JOIN dbo.FAMUser
+												ON dbo.FAMUser.Guid = UpdatingFAMUser.Guid
+
+									WHERE
+										ISNULL(UpdatingFAMUser.FullUserName, '') <> ISNULL(dbo.FAMUser.FullUserName, '')
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FAMUser'
+										, 'The username will be updated'
+										, dbo.FAMUser.UserName
+										, UpdatingFAMUser.UserName
+									FROM
+										##FAMUser AS UpdatingFAMUser
+		
+											INNER JOIN dbo.FAMUser
+												ON dbo.FAMUser.Guid = UpdatingFAMUser.Guid
+
+									WHERE
+										ISNULL(UpdatingFAMUser.UserName, '') <> ISNULL(dbo.FAMUser.UserName, '')
+									;";
 
 		public Priorities Priority => Priorities.High;
 
@@ -80,7 +120,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
             ImportHelper.PopulateTemporaryTable<FAMUser>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-			importOptions.ExecuteCommand(this.ReportingSQL);
+			importOptions.ExecuteCommand(this.InsertReportingSQL);
+			importOptions.ExecuteCommand(this.UpdateReportingSQL);
 
             importOptions.ExecuteCommand(this.insertSQL);
         }

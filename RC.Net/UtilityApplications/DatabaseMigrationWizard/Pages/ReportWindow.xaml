@@ -10,8 +10,8 @@
 
     <Grid>
         <DockPanel>
-            <Border x:Name="CommitPrompt" BorderBrush="Red" BorderThickness="1" Padding="2" DockPanel.Dock="Top" Visibility="Hidden">
-                <StackPanel>
+            <StackPanel>
+                <Border x:Name="CommitPrompt" BorderBrush="Red" BorderThickness="1" Padding="2" DockPanel.Dock="Top" Visibility="Hidden">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"></ColumnDefinition>
@@ -22,18 +22,30 @@
                         <Button x:Name="ImportCommit" Grid.Column="1" Content="Yes" Click="ImportCommit_Click"></Button>
                         <Button x:Name="ImportRollback" Grid.Column="2" Content="No" Click="ImportRollback_Click"></Button>
                     </Grid>
-                </StackPanel>
-            </Border>
-            
-            
-            <DataGrid Name="DataGrid1" ItemsSource="{Binding}" AutoGenerateColumns="False" >
-                <DataGrid.Columns>
-                    <mui:DataGridTextColumn Header="Classification" Binding="{Binding Classification}" />
-                    <mui:DataGridTextColumn Header="TableName" Binding="{Binding TableName}" />
-                    <mui:DataGridTextColumn Header="Message" Binding="{Binding Message}" />
-                    <mui:DataGridTextColumn Header="DateTime" Binding="{Binding DateTime}" />
-                </DataGrid.Columns>
-            </DataGrid>
+                </Border>
+                <TextBlock x:Name="CommitStatus" Text="Something went wrong if you can see this message." Visibility="Hidden"></TextBlock>
+                <Grid Margin="0,5,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="ErrorButton" Grid.Column="0" Content="Errors" BorderThickness="2" Click="ErrorButton_Click" Focusable="False"></Button>
+                    <Button x:Name="WarningButton" Grid.Column="1" Content="Warnings" BorderThickness="2" Click="WarningButton_Click" Focusable="False"></Button>
+                    <Button x:Name="InfoButton" Grid.Column="2" Content="Info" BorderThickness="2" Click="InfoButton_Click" Focusable="False"></Button>
+                </Grid>
+                <DataGrid Name="DataGrid1" ItemsSource="{Binding}" AutoGenerateColumns="False" Margin="0,5,0,0" MaxHeight="500px" HorizontalScrollBarVisibility="Visible">
+                    <DataGrid.Columns>
+                        <mui:DataGridTextColumn Header="Classification" Binding="{Binding Classification}" />
+                        <mui:DataGridTextColumn Header="Command" Binding="{Binding Command}" />
+                        <mui:DataGridTextColumn Header="TableName" Binding="{Binding TableName}" />
+                        <mui:DataGridTextColumn Header="Message" Binding="{Binding Message}" />
+                        <mui:DataGridTextColumn Header="Old Value" Binding="{Binding Old_Value}" />
+                        <mui:DataGridTextColumn Header="New Value" Binding="{Binding New_Value}" />
+                        <mui:DataGridTextColumn Header="DateTime" Binding="{Binding DateTime}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
         </DockPanel>
     </Grid>
 </UserControl>

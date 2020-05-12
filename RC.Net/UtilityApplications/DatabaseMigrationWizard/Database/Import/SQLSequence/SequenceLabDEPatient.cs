@@ -67,11 +67,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
-		private readonly string ReportingSQL = @"
+		private readonly string InsertReportingSQL = @"
 									INSERT INTO
-										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
 									SELECT
-										'Info'
+										'Insert'
+	                                    , 'Info'
 										, 'LabDEPatient'
 										, CONCAT('The LabDEPatient table will have ', COUNT(*), ' rows added to the database')
 									FROM
@@ -80,6 +81,40 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 												ON dbo.LabDEPatient.Guid = ##LabDEPatient.Guid
 									WHERE
 										dbo.LabDEPatient.Guid IS NULL";
+
+		private readonly string UpdateReportingSQL = @"
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'LabDEOrder'
+										, CONCAT('The LabDEPatient table will have ', COUNT(*) ,' rows updated.')
+
+									FROM
+										##LabDEPatient AS UpdatingLabDEPatient
+		
+											INNER JOIN dbo.LabDEPatient
+												ON dbo.LabDEPatient.Guid = UpdatingLabDEPatient.Guid
+
+									WHERE
+										ISNULL(UpdatingLabDEPatient.FirstName, '') <> ISNULL(dbo.LabDEPatient.FirstName, '')
+										OR
+										ISNULL(UpdatingLabDEPatient.MiddleName, '') <> ISNULL(dbo.LabDEPatient.MiddleName, '')
+										OR
+										ISNULL(UpdatingLabDEPatient.LastName, '') <> ISNULL(dbo.LabDEPatient.LastName, '')
+										OR
+										ISNULL(UpdatingLabDEPatient.Suffix, '') <> ISNULL(dbo.LabDEPatient.Suffix, '')
+										OR
+										ISNULL(UpdatingLabDEPatient.DOB, '') <> ISNULL(dbo.LabDEPatient.DOB, '')
+										OR
+										ISNULL(UpdatingLabDEPatient.Gender, '') <> ISNULL(dbo.LabDEPatient.Gender, '')
+										OR
+										ISNULL(UpdatingLabDEPatient.MergedInto, '') <> ISNULL(dbo.LabDEPatient.MergedInto, '')
+										OR
+										ISNULL(UpdatingLabDEPatient.CurrentMRN, '') <> ISNULL(dbo.LabDEPatient.CurrentMRN, '')
+										OR
+										ISNULL(UpdatingLabDEPatient.MRN, '') <> ISNULL(dbo.LabDEPatient.MRN, '')";
 
 		public Priorities Priority => Priorities.Medium;
 
@@ -91,7 +126,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
 			ImportHelper.PopulateTemporaryTable<LabDEPatient>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-			importOptions.ExecuteCommand(this.ReportingSQL);
+			importOptions.ExecuteCommand(this.InsertReportingSQL);
+			importOptions.ExecuteCommand(this.UpdateReportingSQL);
 
 			importOptions.ExecuteCommand(this.insertSQL);
 		}

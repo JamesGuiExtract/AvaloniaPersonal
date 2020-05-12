@@ -46,11 +46,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
-        private readonly string ReportingSQL = @"
+        private readonly string InsertReportingSQL = @"
                                     INSERT INTO
-	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
                                     SELECT
-	                                    'Warning'
+	                                    'Insert'
+	                                    , 'Warning'
 	                                    , 'FieldSearch'
 	                                    , CONCAT('The FieldSearch ', dbo.FieldSearch.FieldName, ' is present in the destination database, but NOT in the importing source.')
                                     FROM
@@ -61,9 +62,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 	                                    ##FieldSearch.GUID IS NULL
                                     ;
                                     INSERT INTO
-	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
                                     SELECT
-	                                    'Info'
+	                                    'Insert'
+	                                    , 'Info'
 	                                    , 'FieldSearch'
 	                                    , CONCAT('The FieldSearch ', ##FieldSearch.FieldName, ' will be added to the database')
                                     FROM
@@ -73,7 +75,63 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                     WHERE
 	                                    dbo.FieldSearch.Guid IS NULL";
 
-        public Priorities Priority => Priorities.Low;
+		private readonly string UpdateReportingSQL = @"
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FieldSearch'
+										, 'The FieldName will be updated'
+										, dbo.FieldSearch.FieldName
+										, UpdatingFieldSearch.FieldName
+									FROM
+										##FieldSearch AS UpdatingFieldSearch
+		
+											INNER JOIN dbo.FieldSearch
+												ON dbo.FieldSearch.Guid = UpdatingFieldSearch.Guid
+
+									WHERE
+										ISNULL(UpdatingFieldSearch.FieldName, '') <> ISNULL(dbo.FieldSearch.FieldName, '')
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FieldSearch'
+										, CONCAT('The enabled field on ', dbo.FieldSearch.FieldName ,' will be updated.')
+										, dbo.FieldSearch.Enabled
+										, UpdatingFieldSearch.Enabled
+									FROM
+										##FieldSearch AS UpdatingFieldSearch
+		
+											INNER JOIN dbo.FieldSearch
+												ON dbo.FieldSearch.Guid = UpdatingFieldSearch.Guid
+
+									WHERE
+										ISNULL(UpdatingFieldSearch.Enabled, '') <> ISNULL(dbo.FieldSearch.Enabled, '')
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FieldSearch'
+										, CONCAT('The AttributeQuery field on ', dbo.FieldSearch.FieldName ,' will be updated')
+										, dbo.FieldSearch.AttributeQuery
+										, UpdatingFieldSearch.AttributeQuery
+									FROM
+										##FieldSearch AS UpdatingFieldSearch
+		
+											INNER JOIN dbo.FieldSearch
+												ON dbo.FieldSearch.Guid = UpdatingFieldSearch.Guid
+
+									WHERE
+										ISNULL(UpdatingFieldSearch.AttributeQuery, '') <> ISNULL(dbo.FieldSearch.AttributeQuery, '')";
+
+
+		public Priorities Priority => Priorities.Low;
 
         public string TableName => "FieldSearch";
 
@@ -83,7 +141,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
             ImportHelper.PopulateTemporaryTable<FieldSearch>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            importOptions.ExecuteCommand(this.ReportingSQL);
+            importOptions.ExecuteCommand(this.InsertReportingSQL);
+			importOptions.ExecuteCommand(this.UpdateReportingSQL);
 
             importOptions.ExecuteCommand(this.insertSQL);
         }

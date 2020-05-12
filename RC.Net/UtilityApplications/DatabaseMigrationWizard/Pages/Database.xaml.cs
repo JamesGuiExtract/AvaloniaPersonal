@@ -49,6 +49,11 @@ namespace DatabaseMigrationWizard.Pages
             }
         }
 
+        /// <summary>
+        /// If the password changed then check if its valid, and try to log the user in.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void PasswordChanged(object sender, RoutedEventArgs e)
         {
             var fileProcessingDb = new FileProcessingDB()
@@ -111,6 +116,13 @@ namespace DatabaseMigrationWizard.Pages
             }
         }
 
+        /// <summary>
+        /// This method removes the tab icons at the top (Export/Import/Report),
+        /// updates the little status icons next to database name/database server/ admin pw
+        /// and updates the database names dropdown if passed true.
+        /// </summary>
+        /// <param name="updateDatabaseNames">If you want to update the database name dropdown</param>
+        /// <returns></returns>
         private async Task RemoveTabsAndUpdateStatusIcons(bool updateDatabaseNames)
         {
             this.MainWindow.MainLinks.Links.Where(link => !link.DisplayName.Equals("Database")).ToList()

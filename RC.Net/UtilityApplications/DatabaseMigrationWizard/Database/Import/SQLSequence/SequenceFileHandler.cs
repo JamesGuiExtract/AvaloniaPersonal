@@ -66,11 +66,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
-		private readonly string ReportingSQL = @"
+		private readonly string InsertReportingSQL = @"
 									INSERT INTO
-										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
 									SELECT
-										'Warning'
+										'Insert'
+	                                    , 'Warning'
 										, 'FileHandler'
 										, CONCAT('The FileHandler ', dbo.FileHandler.AppName, ' is present in the destination database, but NOT in the importing source.')
 									FROM
@@ -81,9 +82,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										##FileHandler.GUID IS NULL
 									;
 									INSERT INTO
-										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
 									SELECT
-										'Info'
+										'Insert'
+	                                    , 'Info'
 										, 'FileHandler'
 										, CONCAT('The FileHandler ', ##FileHandler.AppName, ' will be added to the database')
 									FROM
@@ -92,39 +94,257 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 												ON dbo.FileHandler.Guid = ##FileHandler.GUID
 									WHERE
 										dbo.FileHandler.Guid IS NULL
-									;
-									-- Find all the rows that only define paths using tags. If they use only tags then there are no issues.
-									WITH TAGSONLY AS
-									(
-										SELECT
-											[AppName]
-											, [IconPath]
-											, [ApplicationPath]
-											, [Arguments]
-										FROM 
-											[dbo].[FileHandler]
-										WHERE
-											FileHandler.IconPath LIKE '%<%>\%'
-											AND
-											FileHandler.ApplicationPath LIKE '%<%>\%'
-											AND
-											--Only look at the first argument
-											SUBSTRING(Arguments, 0, CHARINDEX(' ', Arguments)) LIKE '%<%>\%'
-									)
+									";
+
+		private readonly string UpdateReportingSQL = @"
 									INSERT INTO
-										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FileHandler'
+										, 'The AppName will be updated'
+										, dbo.FileHandler.AppName
+										, UpdatingFileHandler.AppName
+									FROM
+										##FileHandler AS UpdatingFileHandler
+		
+											INNER JOIN dbo.FileHandler
+												ON dbo.FileHandler.Guid = UpdatingFileHandler.Guid
+
+									WHERE
+										ISNULL(UpdatingFileHandler.AppName, '') <> ISNULL(dbo.FileHandler.AppName, '')
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FileHandler'
+										, CONCAT('The Enabled field for ', dbo.FileHandler.AppName ,' will be updated')
+										, dbo.FileHandler.Enabled
+										, UpdatingFileHandler.Enabled
+									FROM
+										##FileHandler AS UpdatingFileHandler
+		
+											INNER JOIN dbo.FileHandler
+												ON dbo.FileHandler.Guid = UpdatingFileHandler.Guid
+
+									WHERE
+										ISNULL(UpdatingFileHandler.Enabled, '') <> ISNULL(dbo.FileHandler.Enabled, '')
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FileHandler'
+										, CONCAT('The IconPath field for ', dbo.FileHandler.AppName ,' will be updated')
+										, dbo.FileHandler.IconPath
+										, UpdatingFileHandler.IconPath
+									FROM
+										##FileHandler AS UpdatingFileHandler
+		
+											INNER JOIN dbo.FileHandler
+												ON dbo.FileHandler.Guid = UpdatingFileHandler.Guid
+
+									WHERE
+										ISNULL(UpdatingFileHandler.IconPath, '') <> ISNULL(dbo.FileHandler.IconPath, '')
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FileHandler'
+										, CONCAT('The ApplicationPath field for ', dbo.FileHandler.AppName ,' will be updated')
+										, dbo.FileHandler.ApplicationPath
+										, UpdatingFileHandler.ApplicationPath
+									FROM
+										##FileHandler AS UpdatingFileHandler
+		
+											INNER JOIN dbo.FileHandler
+												ON dbo.FileHandler.Guid = UpdatingFileHandler.Guid
+
+									WHERE
+										ISNULL(UpdatingFileHandler.ApplicationPath, '') <> ISNULL(dbo.FileHandler.ApplicationPath, '')
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FileHandler'
+										, CONCAT('The Arguments field for ', dbo.FileHandler.AppName ,' will be updated')
+
+									FROM
+										##FileHandler AS UpdatingFileHandler
+		
+											INNER JOIN dbo.FileHandler
+												ON dbo.FileHandler.Guid = UpdatingFileHandler.Guid
+
+									WHERE
+										UpdatingFileHandler.Arguments NOT LIKE dbo.FileHandler.Arguments
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FileHandler'
+										, CONCAT('The AdminOnly field for ', dbo.FileHandler.AppName ,' will be updated')
+										, dbo.FileHandler.AdminOnly
+										, UpdatingFileHandler.AdminOnly
+									FROM
+										##FileHandler AS UpdatingFileHandler
+		
+											INNER JOIN dbo.FileHandler
+												ON dbo.FileHandler.Guid = UpdatingFileHandler.Guid
+
+									WHERE
+										ISNULL(UpdatingFileHandler.AdminOnly, '') <> ISNULL(dbo.FileHandler.AdminOnly, '')
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FileHandler'
+										, CONCAT('The AllowMultipleFiles field for ', dbo.FileHandler.AppName ,' will be updated')
+										, dbo.FileHandler.AllowMultipleFiles
+										, UpdatingFileHandler.AllowMultipleFiles
+									FROM
+										##FileHandler AS UpdatingFileHandler
+		
+											INNER JOIN dbo.FileHandler
+												ON dbo.FileHandler.Guid = UpdatingFileHandler.Guid
+
+									WHERE
+										ISNULL(UpdatingFileHandler.AllowMultipleFiles, '') <> ISNULL(dbo.FileHandler.AllowMultipleFiles, '')
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FileHandler'
+										, CONCAT('The SupportsErrorHandling field for ', dbo.FileHandler.AppName ,' will be updated')
+										, dbo.FileHandler.SupportsErrorHandling
+										, UpdatingFileHandler.SupportsErrorHandling
+									FROM
+										##FileHandler AS UpdatingFileHandler
+		
+											INNER JOIN dbo.FileHandler
+												ON dbo.FileHandler.Guid = UpdatingFileHandler.Guid
+
+									WHERE
+										ISNULL(UpdatingFileHandler.SupportsErrorHandling, '') <> ISNULL(dbo.FileHandler.SupportsErrorHandling, '')
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FileHandler'
+										, CONCAT('The Blocking field for ', dbo.FileHandler.AppName ,' will be updated')
+										, dbo.FileHandler.Blocking
+										, UpdatingFileHandler.Blocking
+									FROM
+										##FileHandler AS UpdatingFileHandler
+		
+											INNER JOIN dbo.FileHandler
+												ON dbo.FileHandler.Guid = UpdatingFileHandler.Guid
+
+									WHERE
+										ISNULL(UpdatingFileHandler.Blocking, '') <> ISNULL(dbo.FileHandler.Blocking, '')
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FileHandler'
+										, CONCAT('The WorkflowName field for ', dbo.FileHandler.AppName ,' will be updated')
+										, dbo.FileHandler.WorkflowName
+										, UpdatingFileHandler.WorkflowName
+									FROM
+										##FileHandler AS UpdatingFileHandler
+		
+											INNER JOIN dbo.FileHandler
+												ON dbo.FileHandler.Guid = UpdatingFileHandler.Guid
+
+									WHERE
+										ISNULL(UpdatingFileHandler.WorkflowName, '') <> ISNULL(dbo.FileHandler.WorkflowName, '')
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'FileHandler'
+										, CONCAT('The WorkflowName field for ', dbo.FileHandler.AppName ,' will be updated')
+										, dbo.FileHandler.WorkflowName
+										, UpdatingFileHandler.WorkflowName
+									FROM
+										##FileHandler AS UpdatingFileHandler
+		
+											INNER JOIN dbo.FileHandler
+												ON dbo.FileHandler.Guid = UpdatingFileHandler.Guid
+
+									WHERE
+										ISNULL(UpdatingFileHandler.WorkflowName, '') <> ISNULL(dbo.FileHandler.WorkflowName, '')
+									;";
+
+		private readonly string FilePathReportingSQL = @"
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
 
 									--Select only rows that are defined without tags.
 									SELECT
-										'Warning'
+										'N/A'
+										, 'Warning'
 										, 'FileHandler'
-										, 'In the filehandler table, the AppName' + dbo.FileHandler.AppName ' has a realitive path defined. Please validate all filepaths in the filehandler after importing.'
-									FROM
-										dbo.FileHandler
-											LEFT OUTER JOIN TAGSONLY
-												ON dbo.FileHandler.AppName = TAGSONLY.AppName
+										, 'In the filehandler table, the AppName' + ##FileHandler.AppName + ' has a realitive path defined. Please validate all filepaths in the filehandler after importing.'
+
+									FROM 
+										##FileHandler
+											LEFT OUTER JOIN [dbo].[FileHandler]
+												ON FileHandler.GUID = ##FileHandler.Guid
 									WHERE
-										TAGSONLY.AppName IS NULL";
+										-- New Row
+										(
+											[dbo].[FileHandler].GUID IS NULL
+											AND
+											(
+												##FileHandler.IconPath LIKE '%<%>\%'
+												OR
+												##FileHandler.ApplicationPath LIKE '%<%>\%'
+												OR
+												SUBSTRING(##FileHandler.Arguments, 0, CHARINDEX(' ', ##FileHandler.Arguments)) LIKE '%<%>\%'
+											)
+										)
+										OR
+										-- Row being updated
+										(
+											(
+												ISNULL(##FileHandler.IconPath, '') <> ISNULL([dbo].[FileHandler].IconPath, '')
+												AND
+												##FileHandler.IconPath LIKE '%<%>\%'
+											)
+											OR
+											(
+												ISNULL(##FileHandler.ApplicationPath, '') <> ISNULL([dbo].[FileHandler].ApplicationPath, '')
+												AND
+												##FileHandler.ApplicationPath LIKE '%<%>\%'
+											)
+											OR
+											(
+												ISNULL(CAST(##FileHandler.Arguments AS VARCHAR(MAX)), '') <> ISNULL(CAST([dbo].[FileHandler].Arguments AS VARCHAR(MAX)), '')
+												AND
+												--Only look at the first argument
+												SUBSTRING(##FileHandler.Arguments, 0, CHARINDEX(' ', ##FileHandler.Arguments)) LIKE '%<%>\%'
+											)
+										)";
 
 		public Priorities Priority => Priorities.Low;
 
@@ -136,7 +356,9 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
 			ImportHelper.PopulateTemporaryTable<FileHandler>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-			importOptions.ExecuteCommand(this.ReportingSQL);
+			importOptions.ExecuteCommand(this.InsertReportingSQL);
+			importOptions.ExecuteCommand(this.UpdateReportingSQL);
+			importOptions.ExecuteCommand(this.FilePathReportingSQL);
 
 			importOptions.ExecuteCommand(this.insertSQL);
 		}

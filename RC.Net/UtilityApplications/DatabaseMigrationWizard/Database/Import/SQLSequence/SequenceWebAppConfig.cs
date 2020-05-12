@@ -49,11 +49,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
-		private readonly string ReportingSQL = @"
+		private readonly string InsertReportingSQL = @"
 									INSERT INTO
-										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
 									SELECT
-										'Warning'
+										'Insert'
+	                                    , 'Warning'
 										, 'WebAppConfig'
 										, CONCAT('The WebAppConfig ', dbo.WebAppConfig.Type, ' is present in the destination database, but NOT in the importing source.')
 									FROM
@@ -64,9 +65,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 										##WebAppConfig.WebAppConfigGuid IS NULL
 									;
 									INSERT INTO
-										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
 									SELECT
-										'Info'
+										'Insert'
+	                                    , 'Info'
 										, 'WebAppConfig'
 										, CONCAT('The WebAppConfig ', ##WebAppConfig.Type, ' will be added to the database')
 									FROM
@@ -75,6 +77,63 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 												ON dbo.WebAppConfig.Guid = ##WebAppConfig.WebAppConfigGuid
 									WHERE
 										dbo.WebAppConfig.Guid IS NULL";
+
+		private readonly string UpdateReportingSQL = @"
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'WebAppConfig'
+										, CONCAT('The WebAppConfig ', dbo.WebAppConfig.Type, ' will have its settings updated')
+
+									FROM
+										##WebAppConfig AS UpdatingWebAppConfig
+
+												INNER JOIN dbo.WebAppConfig
+													ON dbo.WebAppConfig.Guid = UpdatingWebAppConfig.WebAppConfigGuid
+
+									WHERE
+										UpdatingWebAppConfig.Settings NOT LIKE dbo.WebAppConfig.Settings
+									;
+
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'WebAppConfig'
+										, CONCAT('The WebAppConfig ', dbo.WebAppConfig.Type, ' will have its WorkflowID updated')
+										, dbo.WebAppConfig.WorkflowID
+										, dbo.Workflow.ID
+									FROM
+										##WebAppConfig AS UpdatingWebAppConfig
+												LEFT OUTER JOIN dbo.Workflow
+													ON dbo.Workflow.Guid = UpdatingWebAppConfig.WorkflowGuid
+
+												INNER JOIN dbo.WebAppConfig
+													ON dbo.WebAppConfig.Guid = UpdatingWebAppConfig.WebAppConfigGuid
+
+									WHERE
+										ISNULL(dbo.Workflow.ID, '') <> ISNULL(dbo.WebAppConfig.WorkflowID, '')
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'WebAppConfig'
+										, 'The WebAppConfig  will have its type updated'
+										, dbo.WebAppConfig.Type
+										, UpdatingWebAppConfig.Type
+									FROM
+										##WebAppConfig AS UpdatingWebAppConfig
+
+												INNER JOIN dbo.WebAppConfig
+													ON dbo.WebAppConfig.Guid = UpdatingWebAppConfig.WebAppConfigGuid
+
+									WHERE
+										ISNULL(UpdatingWebAppConfig.Type, '') <> ISNULL(dbo.WebAppConfig.Type, '')";
 
 		public Priorities Priority => Priorities.Low;
 
@@ -86,7 +145,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
 			ImportHelper.PopulateTemporaryTable<WebAppConfig>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-			importOptions.ExecuteCommand(this.ReportingSQL);
+			importOptions.ExecuteCommand(this.InsertReportingSQL);
+			importOptions.ExecuteCommand(this.UpdateReportingSQL);
 
 			importOptions.ExecuteCommand(this.insertSQL);
 		}

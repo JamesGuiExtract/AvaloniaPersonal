@@ -82,11 +82,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
-		private readonly string ReportingSQL = @"
+		private readonly string InsertReportingSQL = @"
 									INSERT INTO
-										dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
 									SELECT
-										'Info'
+										'Insert'
+	                                    , 'Info'
 										, 'LabDEProvider'
 										, CONCAT('The LabDEProvider table will have ', COUNT(*), ' rows added to the database')
 									FROM
@@ -95,6 +96,50 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 												ON dbo.LabDEProvider.Guid = ##LabDEProvider.Guid
 									WHERE
 										dbo.LabDEProvider.Guid IS NULL";
+
+		private readonly string UpdateReportingSQL = @"
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'LabDEProvider'
+										, CONCAT('The LabDEProvider table will have ', COUNT(*) ,' rows updated.')
+
+									FROM
+										##LabDEProvider AS UpdatingLabDEProvider
+		
+											INNER JOIN dbo.LabDEProvider
+												ON dbo.LabDEProvider.Guid = UpdatingLabDEProvider.Guid
+
+									WHERE
+										ISNULL(UpdatingLabDEProvider.FirstName, '') <> ISNULL(dbo.LabDEProvider.FirstName, '')
+										OR
+										ISNULL(UpdatingLabDEProvider.MiddleName, '') <> ISNULL(dbo.LabDEProvider.MiddleName, '')
+										OR
+										ISNULL(UpdatingLabDEProvider.LastName, '') <> ISNULL(dbo.LabDEProvider.LastName, '')
+										OR
+										ISNULL(UpdatingLabDEProvider.ProviderType, '') <> ISNULL(dbo.LabDEProvider.ProviderType, '')
+										OR
+										ISNULL(UpdatingLabDEProvider.Title, '') <> ISNULL(dbo.LabDEProvider.Title, '')
+										OR
+										ISNULL(UpdatingLabDEProvider.Degree, '') <> ISNULL(dbo.LabDEProvider.Degree, '')
+										OR
+										ISNULL(UpdatingLabDEProvider.Departments, '') <> ISNULL(dbo.LabDEProvider.Departments, '')
+										OR
+										ISNULL(UpdatingLabDEProvider.Specialties, '') <> ISNULL(dbo.LabDEProvider.Specialties, '')
+										OR
+										ISNULL(UpdatingLabDEProvider.Phone, '') <> ISNULL(dbo.LabDEProvider.Phone, '')
+										OR
+										ISNULL(UpdatingLabDEProvider.Fax, '') <> ISNULL(dbo.LabDEProvider.Fax, '')
+										OR
+										ISNULL(UpdatingLabDEProvider.Address, '') <> ISNULL(dbo.LabDEProvider.Address, '')
+										OR
+										ISNULL(UpdatingLabDEProvider.OtherProviderID, '') <> ISNULL(dbo.LabDEProvider.OtherProviderID, '')
+										OR
+										ISNULL(UpdatingLabDEProvider.Inactive, '') <> ISNULL(dbo.LabDEProvider.Inactive, '')
+										OR
+										ISNULL(UpdatingLabDEProvider.ID, '') <> ISNULL(dbo.LabDEProvider.ID, '')";
 
 		public Priorities Priority => Priorities.Medium;
 
@@ -106,7 +151,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
 			ImportHelper.PopulateTemporaryTable<LabDEProvider>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-			importOptions.ExecuteCommand(this.ReportingSQL);
+			importOptions.ExecuteCommand(this.InsertReportingSQL);
+			importOptions.ExecuteCommand(this.UpdateReportingSQL);
 
 			importOptions.ExecuteCommand(this.insertSQL);
 		}

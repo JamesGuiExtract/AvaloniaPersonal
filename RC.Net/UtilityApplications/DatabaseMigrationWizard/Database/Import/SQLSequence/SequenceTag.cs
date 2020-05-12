@@ -42,11 +42,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
-        private readonly string ReportingSQL = @"
+        private readonly string InsertReportingSQL = @"
                                     INSERT INTO
-	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
                                     SELECT
-	                                    'Warning'
+	                                    'Insert'
+	                                    , 'Warning'
 	                                    , 'Tag'
 	                                    , CONCAT('The Tag ', dbo.Tag.TagName, ' is present in the destination database, but NOT in the importing source.')
                                     FROM
@@ -57,9 +58,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 	                                    ##Tag.GUID IS NULL
                                     ;
                                     INSERT INTO
-	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
                                     SELECT
-	                                    'Info'
+	                                    'Insert'
+	                                    , 'Info'
 	                                    , 'Tag'
 	                                    , CONCAT('The Tag ', ##Tag.TagName, ' will be added to the database')
                                     FROM
@@ -68,6 +70,43 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 			                                    ON dbo.Tag.Guid = ##Tag.GUID
                                     WHERE
 	                                    dbo.Tag.Guid IS NULL";
+
+        private readonly string UpdateReportingSQL = @"
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'Tag'
+										, 'The Tag will be updated'
+										, dbo.Tag.TagName
+										, UpdatingTag.TagName
+									FROM
+										##Tag AS UpdatingTag
+
+												INNER JOIN dbo.Tag
+													ON dbo.Tag.Guid = UpdatingTag.Guid
+
+									WHERE
+										ISNULL(UpdatingTag.TagName, '') <> ISNULL(dbo.Tag.TagName, '')
+									;
+									INSERT INTO
+										dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+									SELECT
+										'Update'
+										, 'Info'
+										, 'Tag'
+										, CONCAT('The tag ', dbo.Tag.TagName, ' will have its description updated')
+										, dbo.Tag.TagDescription
+										, UpdatingTag.TagDescription
+									FROM
+										##Tag AS UpdatingTag
+
+												INNER JOIN dbo.Tag
+													ON dbo.Tag.Guid = UpdatingTag.Guid
+
+									WHERE
+										ISNULL(UpdatingTag.TagDescription, '') <> ISNULL(dbo.Tag.TagDescription, '')";
 
         public Priorities Priority => Priorities.High;
 
@@ -79,9 +118,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
             ImportHelper.PopulateTemporaryTable<Tag>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            importOptions.ExecuteCommand(this.ReportingSQL);
+            importOptions.ExecuteCommand(this.InsertReportingSQL);
+			importOptions.ExecuteCommand(this.UpdateReportingSQL);
 
-            importOptions.ExecuteCommand(this.insertSQL);
+			importOptions.ExecuteCommand(this.insertSQL);
         }
     }
 }

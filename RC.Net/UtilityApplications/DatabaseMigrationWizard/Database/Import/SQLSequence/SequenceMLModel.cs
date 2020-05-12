@@ -39,11 +39,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
-        private readonly string ReportingSQL = @"
+        private readonly string InsertReportingSQL = @"
                                     INSERT INTO
-	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
                                     SELECT
-	                                    'Warning'
+	                                    'Insert'
+	                                    , 'Warning'
 	                                    , 'MLModel'
 	                                    , CONCAT('The MLModel ', dbo.MLModel.Name, ' is present in the destination database, but NOT in the importing source.')
                                     FROM
@@ -54,9 +55,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 	                                    ##MLModel.GUID IS NULL
                                     ;
                                     INSERT INTO
-	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
                                     SELECT
-	                                    'Info'
+	                                    'Insert'
+	                                    , 'Info'
 	                                    , 'MLModel'
 	                                    , CONCAT('The MLModel ', ##MLModel.Name, ' will be added to the database')
                                     FROM
@@ -65,6 +67,25 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 			                                    ON dbo.MLModel.Guid = ##MLModel.GUID
                                     WHERE
 	                                    dbo.MLModel.Guid IS NULL";
+
+        private readonly string UpdateReportingSQL = @"
+                                    INSERT INTO
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+                                    SELECT
+	                                    'Update'
+	                                    , 'Info'
+	                                    , 'MLModel'
+	                                    , 'The MLModel will be updated'
+	                                    , dbo.MLModel.Name
+	                                    , UpdatingMLModel.Name
+                                    FROM
+	                                    ##MLModel AS UpdatingMLModel
+
+			                                    INNER JOIN dbo.MLModel
+				                                    ON dbo.MLModel.Guid = UpdatingMLModel.Guid
+
+                                    WHERE
+	                                    ISNULL(UpdatingMLModel.Name, '') <> ISNULL(dbo.MLModel.Name, '')";
 
         public Priorities Priority => Priorities.Low;
 
@@ -76,7 +97,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
             ImportHelper.PopulateTemporaryTable<MLModel>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            importOptions.ExecuteCommand(this.ReportingSQL);
+            importOptions.ExecuteCommand(this.InsertReportingSQL);
+            importOptions.ExecuteCommand(this.UpdateReportingSQL);
 
             importOptions.ExecuteCommand(this.insertSQL);
         }

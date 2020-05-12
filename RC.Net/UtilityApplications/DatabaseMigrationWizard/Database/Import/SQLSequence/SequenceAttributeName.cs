@@ -40,11 +40,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                                             VALUES
                                             ";
 
-        private readonly string ReportingSQL = @"
+        private readonly string InsertReportingSQL = @"
                                     INSERT INTO
-	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                    dbo.ReportingDatabaseMigrationWizard(Command,Classification, TableName, Message)
                                     SELECT
-	                                    'Warning'
+                                        'Insert'
+	                                    , 'Warning'
 	                                    , 'AttributeName'
 	                                    , CONCAT('The Attribute Name ', dbo.AttributeName.Name, ' is present in the destination database, but NOT in the importing source.')
                                     FROM
@@ -55,9 +56,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 	                                    ##AttributeName.GUID IS NULL
                                     ;
                                     INSERT INTO
-	                                    dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
                                     SELECT
-	                                    'Info'
+                                        'Insert'
+	                                    , 'Info'
 	                                    , 'AttributeName'
 	                                    , CONCAT('The Attribute Name ', ##AttributeName.Name, ' will be added to the database')
                                     FROM
@@ -66,6 +68,23 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 			                                    ON dbo.AttributeName.Guid = ##AttributeName.GUID
                                     WHERE
 	                                    dbo.AttributeName.Guid IS NULL";
+
+        private readonly string UpdateReportingSQL = @"
+                                    INSERT INTO
+	                                    dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+                                    SELECT
+	                                    'Update'
+	                                    , 'Info'
+	                                    , 'AttributeName'
+	                                    , 'The AttributeName will be updated'
+	                                    , dbo.AttributeName.Name
+	                                    , ##AttributeName.Name
+                                    FROM
+	                                    ##AttributeName
+		                                    INNER JOIN dbo.AttributeName
+			                                    ON ##AttributeName.Guid = dbo.AttributeName.Guid
+                                    WHERE
+	                                    ISNULL(##AttributeName.Name, '') <> ISNULL(dbo.AttributeName.Name, '')";
 
         public Priorities Priority => Priorities.Low;
 
@@ -77,7 +96,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
             ImportHelper.PopulateTemporaryTable<AttributeName>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
-            importOptions.ExecuteCommand(this.ReportingSQL);
+            importOptions.ExecuteCommand(this.InsertReportingSQL);
+            importOptions.ExecuteCommand(this.UpdateReportingSQL);
 
             importOptions.ExecuteCommand(this.insertSQL);
         }

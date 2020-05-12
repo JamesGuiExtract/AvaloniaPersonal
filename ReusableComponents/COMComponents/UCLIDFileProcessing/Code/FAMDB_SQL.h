@@ -2607,5 +2607,13 @@ static const string gstrCREATE_DATABASE_MIGRATION_WIZARD_REPORTING =
 	" , [TableName] NVARCHAR(128) NOT NULL "
 	" , [Message] NVARCHAR(512) NOT NULL "
 	" , [DateTime] DATETIME NOT NULL DEFAULT GETDATE() "
+	" , [Old_Value] NVARCHAR(64)"
+	" , [New_Value] NVARCHAR(64)"
+	" , [Command] NVARCHAR(64)"
 	" )"
 	" END ";
+
+static const string gstrALTER_DATABASE_MIGRATION_WIZARD_REPORTING =
+	" ALTER TABLE dbo.ReportingDatabaseMigrationWizard ADD Old_Value NVARCHAR(64);"
+	" ALTER TABLE dbo.ReportingDatabaseMigrationWizard ADD New_Value NVARCHAR(64);"
+	" ALTER TABLE dbo.ReportingDatabaseMigrationWizard ADD Command NVARCHAR(64); ";
