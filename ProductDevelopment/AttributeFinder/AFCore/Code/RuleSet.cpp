@@ -955,15 +955,6 @@ STDMETHODIMP CRuleSet::put_ForInternalUseOnly(VARIANT_BOOL newVal)
 		bool bNewValue = asCppBool( newVal );
 		if (bNewValue != m_bRuleSetOnlyForInternalUse)
 		{
-			// NOTE: Unlike other methods/properties, calling this method requires
-			// full RDT license.
-			if (!isRdtLicensed())
-			{
-				UCLIDException ue( "ELI21522", "Modifying ForInternalUseOnly is not licensed." );
-				ue.addDebugInfo( "Rule Set Filename", m_strFileName );
-				throw ue;
-			}
-
 			// Change the setting and set the dirty flag
 			m_bRuleSetOnlyForInternalUse = bNewValue;
 			m_bDirty = true;
@@ -1016,14 +1007,6 @@ STDMETHODIMP CRuleSet::put_IsSwipingRule(VARIANT_BOOL newVal)
 		bool bNewValue = asCppBool(newVal);
 		if (bNewValue != m_bSwipingRule)
 		{
-			// Setting this property requires full RDT license.
-			if (!isRdtLicensed())
-			{
-				UCLIDException ue("ELI27012", "Not licensed to modify swiping rule status.");
-				ue.addDebugInfo("Rule set filename", m_strFileName);
-				throw ue;
-			}
-
 			// Change the setting and set the dirty flag
 			m_bSwipingRule = bNewValue;
 			m_bDirty = true;
@@ -1744,12 +1727,6 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		if (m_bIsEncrypted)
 		{
 			throw UCLIDException("ELI11581", "Encrypted RuleSet files may not be saved.");
-		}
-
-		// Must be using a counter or have the RDT licensed to save external rules [FIDSC #3592]
-		if (!isLicensedToSave())
-		{
-			throw UCLIDException("ELI21505", "A counter must be selected.");
 		}
 
 		if (fClearDirty == TRUE && m_strFKBVersion.empty() && (isUsingCounter() || m_bSwipingRule))
