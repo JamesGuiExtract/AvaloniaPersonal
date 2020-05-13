@@ -1241,6 +1241,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Rul
 	EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Extract.AttributeFinder.Rules.Dto", "..\..\..\..\..\RC.Net\AttributeFinder\Rules\Dto\Extract.AttributeFinder.Rules.Dto.fsproj", "{A66FAA6A-B785-4C7B-9590-C04F45007F7F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6DD0855C-6031-49F4-874C-667F3A576345} = {6DD0855C-6031-49F4-874C-667F3A576345}
+	EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Extract.AttributeFinder.Rules.Domain", "..\..\..\..\..\RC.Net\AttributeFinder\Rules\Domain\Extract.AttributeFinder.Rules.Domain.fsproj", "{865F2EA2-32AA-4E5C-8C0B-6BCC343741F2}"
 	ProjectSection(ProjectDependencies) = postProject
