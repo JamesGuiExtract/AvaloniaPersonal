@@ -842,6 +842,10 @@ bool CFolderFS::fileMatchPattern(const std::string& strFileName)
 		return doesFileMatchPatterns(m_vecFileExtensions, strTmp);
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI49660");
+
+	// Return true on error so as not to exclude files. I assume this will not happen but the
+	// function needs to return something.
+	return true;
 }
 //-------------------------------------------------------------------------------------------------
 void CFolderFS::onFileAdded(const std::string& strFileName)

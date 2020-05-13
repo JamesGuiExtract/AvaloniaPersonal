@@ -58,7 +58,7 @@ static const string& gstrINITIAL_CATALOG = "Initial Catalog";
 				}\
 				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION(strELICode)\
 			} \
-			catch(UCLIDException ue) \
+			catch(UCLIDException ue1) \
 			{ \
 				bool bConnectionIsAlive = false; \
 				\
@@ -73,12 +73,12 @@ static const string& gstrINITIAL_CATALOG = "Initial Catalog";
 				catch(...){}; \
 				if (bConnectionIsAlive || nRetryCount >= nMaxRetryCount) \
 				{ \
-					throw ue; \
+					throw ue1; \
 				}\
 				if (!bRetryExceptionLogged) \
 				{ \
 					UCLIDException uex("ELI29853", \
-						"Application trace: Database connection failed. Attempting to reconnect.", ue); \
+						"Application trace: Database connection failed. Attempting to reconnect.", ue1); \
 					uex.log(); \
 					bRetryExceptionLogged = true; \
 				} \
@@ -102,12 +102,12 @@ static const string& gstrINITIAL_CATALOG = "Initial Catalog";
 						} \
 						CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29855"); \
 					} \
-					catch(UCLIDException ue) \
+					catch(UCLIDException ue2) \
 					{ \
 						if (sw.getElapsedTime() > dRetryTimeout) \
 						{ \
 							/* Create exception to indicate retry timed out*/ \
-							UCLIDException uex("ELI29856", "Database connection retry timed out!", ue);  \
+							UCLIDException uex("ELI29856", "Database connection retry timed out!", ue2);  \
 							\
 							/* Log the caught exception. */ \
 							uex.log(); \

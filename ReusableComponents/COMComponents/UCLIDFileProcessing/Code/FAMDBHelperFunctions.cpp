@@ -17,9 +17,9 @@ vector<string> getTableNamesFromCreationQueries(vector<string> vecCreationQuerie
 		vector<string> vecTokens;
 		StringTokenizer::sGetTokens(vecCreationQueries[i], " )(", vecTokens, true);
 		bool foundCreateStatement = false;
-		for (int j = 0; j < vecTokens.size(); j++)
+		for (int j = 0, vecTokensSize = vecTokens.size(); j < vecTokensSize; j++)
 		{
-			if (vecTokens.size() - j > 3 && vecTokens[j] == "CREATE" && vecTokens[j+1] == "TABLE")
+			if (vecTokensSize - j > 3 && vecTokens[j] == "CREATE" && vecTokens[j+1] == "TABLE")
 			{
 				// Trim enclosing braces as well as any "dbo." prefix.
 				string strTableName = trim(vecTokens[j + 2], "[", "]");

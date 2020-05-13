@@ -902,7 +902,7 @@ void CDateTimeSplitter::trimColonWS(std::string & strText)
 			pos--;
 		}
 		//if we have hh: mm
-		if(pos + 1 < strText.length() && strText[pos + 1] == ' ')
+		if(pos + 1 < static_cast<int>(strText.length()) && strText[pos + 1] == ' ')
 		{
 			strText.replace(pos, 2, ":");
 		}
