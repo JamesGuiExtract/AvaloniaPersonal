@@ -123,7 +123,6 @@
       <OutputFile>.\..\Release/AttributeDBMgrComponents.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -154,7 +153,7 @@
       <AssemblerListingLocation>.\..\Debug/</AssemblerListingLocation>
       <ObjectFileName>.\..\Debug/</ObjectFileName>
       <ProgramDataBaseFileName>.\..\Debug/</ProgramDataBaseFileName>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
@@ -184,7 +183,6 @@
       <PreserveSBR>true</PreserveSBR>
     </Bscmake>
     <PostBuildEvent>
-      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
