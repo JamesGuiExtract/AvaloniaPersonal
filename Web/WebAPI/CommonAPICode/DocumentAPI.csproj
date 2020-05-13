@@ -19,6 +19,7 @@
     <AssemblyOriginatorKeyFile>ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>TRACE;DEBUG;Add_Test_Controller;NET46</DefineConstants>
     <OutputPath>..\..\..\Binaries\Debug\</OutputPath>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="AppBackendControllers\**" />
