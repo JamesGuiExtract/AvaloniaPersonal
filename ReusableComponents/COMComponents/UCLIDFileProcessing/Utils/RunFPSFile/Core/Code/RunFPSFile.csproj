@@ -184,7 +184,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>call CommonDebugPostBuild.bat "$(TargetPath)"
+    <PostBuildEvent>if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetPath)")
 CALL "$(DevEnvDir)..\..\VC\Auxiliary\Build\vcvars32.bat"
 editbin /largeaddressaware "$(TargetPath)"
 sn -Ra "$(TargetPath)" "$(TargetDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk"</PostBuildEvent>

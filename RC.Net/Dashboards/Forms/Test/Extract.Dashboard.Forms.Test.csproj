@@ -73,6 +73,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>UnitTestingDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>if $(ConfigurationName) == Debug (UnitTestingDebugPostBuild.bat "$(TargetPath)")</PostBuildEvent>
   </PropertyGroup>
 </Project>

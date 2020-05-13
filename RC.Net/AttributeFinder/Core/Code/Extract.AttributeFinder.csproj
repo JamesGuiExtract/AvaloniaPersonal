@@ -482,7 +482,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetPath)")</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\..\..\APIs\Accord.3.0.2\build\Accord.targets" Condition="Exists('..\..\..\APIs\Accord.3.0.2\build\Accord.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

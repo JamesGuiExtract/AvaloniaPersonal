@@ -123,6 +123,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>UnitTestingDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>if $(ConfigurationName) == Debug (UnitTestingDebugPostBuild.bat "$(TargetPath)")</PostBuildEvent>
   </PropertyGroup>
 </Project>

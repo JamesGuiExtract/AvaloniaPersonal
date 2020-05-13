@@ -457,7 +457,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>CALL CommonDebugPostBuild.bat "$(TargetPath)"
+    <PostBuildEvent>if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetPath)")
 CALL "$(DevEnvDir)..\..\VC\Auxiliary\Build\vcvars32.bat"
 editbin /STACK:4194304 "$(TargetPath)"
 editbin /largeaddressaware "$(TargetPath)"
