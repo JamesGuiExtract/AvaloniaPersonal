@@ -1329,11 +1329,6 @@ QwBEAFIATwBNAAEATQBlAGQAaQBhAA==
 		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>Microsoft_VC100_CRT_x86.AFA96EB4_FA9F_335C_A7CB_36079407553D</td><td>0</td><td>10.0</td></row>
 		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>Microsoft_VC100_MFCLOC_x86.AFA96EB4_FA9F_335C_A7CB_36079407553D</td><td>0</td><td>10.0</td></row>
 		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>Microsoft_VC100_MFC_x86.AFA96EB4_FA9F_335C_A7CB_36079407553D</td><td>0</td><td>10.0</td></row>
-		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>Microsoft_VC140_CRT_X86.F1670FCA_6780_3657_9C04_AF8005AC8143</td><td>0</td><td>14.16</td></row>
-		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>Microsoft_VC140_CXXAMP_X86.F1670FCA_6780_3657_9C04_AF8005AC8143</td><td>0</td><td>14.16</td></row>
-		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>Microsoft_VC140_MFCLOC_X86.F1670FCA_6780_3657_9C04_AF8005AC8143</td><td>0</td><td>14.16</td></row>
-		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>Microsoft_VC140_MFC_X86.F1670FCA_6780_3657_9C04_AF8005AC8143</td><td>0</td><td>14.16</td></row>
-		<row><td>ExtractBaseMM.F7D07EBD_3E69_4063_92C6_CD387B183632</td><td>0</td><td>Microsoft_VC140_OpenMP_X86.F1670FCA_6780_3657_9C04_AF8005AC8143</td><td>0</td><td>14.16</td></row>
 	</table>
 
 	<table name="ModuleExclusion">

@@ -444,6 +444,10 @@ function CloseApps()
 begin
 	strExtractTRPPath = PROGRAMFILES ^ EXTRACT_DIR ^ "ExtractTRP2.exe";
 	LaunchAppAndWait(strExtractTRPPath , "/exit", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+	ServiceStopService("Extract Systems Exception Service");
+	ServiceStopService("Extract Systems FDRS Service");
+	ServiceStopService("Extract Systems IPC Service");    
+	ServiceStopService("Nuance Licensing Service");
 end;
 
 
@@ -1096,4 +1100,6 @@ begin
 	// You may also perform your custom initialization steps, check requirements, etc.
 	
 	gbInstalled = FALSE;
+	
+	LAAW_SHELLEXECUTEVERB = "runas";
 end;

@@ -16,10 +16,7 @@ begin
    	// Rename the uex file
    	RenameUEXFile();
 
-	if (SYSINFO.nOSMajor >= 6)  then
-		LAAW_SHELLEXECUTEVERB = "runas";
-    endif;
-    
+	   
     // Delete all category lst files
 	DeleteFile(CommonAppDataFolder ^ EXTRACT_CATEGORYFILES ^ "*.LST");
 	

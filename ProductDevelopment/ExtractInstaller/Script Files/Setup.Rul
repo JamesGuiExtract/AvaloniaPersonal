@@ -124,6 +124,8 @@ Dlg_SdStartCopy:
     	endif;  
     	*/                       
     endif;
+	
+	CloseApps();
 
     // setup default status
     Enable(STATUSEX);
@@ -132,7 +134,7 @@ Dlg_SdStartCopy:
    	CopyLicFiles();
    	
    	// Install .net if not installed
-   	InstallDotNET();
+   	//InstallDotNET();
    	                                
 	// Install Inlite Key drivers
    	//InstallInliteKeyDrivers();
