@@ -1935,6 +1935,12 @@ namespace Extract.DataEntry
         {
             try
             {
+                if (attribute == null)
+                {
+                    base.PropagateAttribute(attribute, selectAttribute, selectAttribute);
+                    return;
+                }
+
                 // Needed if selecting a row (selectTabGroup)
                 DataEntryTableRow selectedRow;
 
@@ -1942,7 +1948,7 @@ namespace Extract.DataEntry
                 // is to be propagated.
                 if (attribute == TabOrderPlaceholderAttribute)
                 {
-                    // If selectAttribute is specified, activate the first visible cell in the new row.
+                    // If selectAttribute is specified, activate the first visible cell in the   new row.
                     if (selectAttribute)
                     {
                         ClearSelection();
