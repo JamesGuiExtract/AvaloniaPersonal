@@ -187,11 +187,21 @@ namespace WebAPI
             var databaseServer = Configuration["DatabaseServer"];
             var databaseName = Configuration["DatabaseName"];
             var workflowName = Configuration["DefaultWorkflow"];
-
             var dbConnectionRetries = Configuration["DbNumberOfConnectionRetries"];
             var dbConnectionTimeout = Configuration["DbConnectionRetryTimeout"];
+            var maxInterfaces = Configuration["MaxInterfaces"];
+            var requestWaitTimeout = Configuration["RequestWaitTimeout"];
+            var exceptionLogFilter = Configuration["ExceptionLogFilter"];
 
-            Utils.SetCurrentApiContext(apiVersion, databaseServer, databaseName, workflowName, dbConnectionRetries, dbConnectionTimeout);
+            Utils.SetCurrentApiContext(apiVersion
+                , databaseServer
+                , databaseName
+                , workflowName
+                , dbConnectionRetries
+                , dbConnectionTimeout
+                , maxInterfaces
+                , requestWaitTimeout
+                , exceptionLogFilter);
 
             Utils.ValidateCurrentApiContext();
 
