@@ -508,6 +508,10 @@ STDMETHODIMP CScansoftOCR2::SetOCRParameters(IOCRParameters* pOCRParameters, VAR
 				THROW_UE_ON_ERROR("ELI45930", "Unable to set default options",
 					kRecSettingSetToDefault(0, hSetting, TRUE));
 
+				// Unset the last-applied-filter so that it corresponds to the reset engine
+				// https://extract.atlassian.net/browse/ISSUE-17031
+				m_eFilter = kNoFilter;
+
 				// Set Extract-specific default settings
 				applyCommonSettings();
 			}

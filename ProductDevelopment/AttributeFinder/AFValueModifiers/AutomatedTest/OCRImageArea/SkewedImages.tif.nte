@@ -1,7 +1,0 @@
-See [FlexIDSCore:4155]
-
-Test OCRArea3 has a couple of issues associated with it:
-
-1) The unfiltered results are worse than they had been. (there is probably some debate as to whether this part should be considered a "bug" at all).
-
-2) When an alphanumeric filter is applied, the output is not including characters that were correctly recognized without the filter. Specifically, the filter is "108CHRISTAOUR", yet 1, 8, H, and R are not included in the output despite being included in the unfiltered result of "10810 CHRsm comT" 
