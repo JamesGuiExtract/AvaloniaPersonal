@@ -1175,6 +1175,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SplitRTFCollection", "..\..\..\..\..\RC.Net\UtilityApplications\SplitRTFCollection\SplitRTFCollection.csproj", "{B7417447-E716-4589-A805-EA9FC11B57FA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthorizationAPI", "..\..\..\..\..\Web\AuthorizationAPI\AuthorizationAPI\AuthorizationAPI.csproj", "{9D42E04E-CE14-4D38-B55B-CA353004AEAA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8267221B-52C3-490B-A98F-7A51EBEB2A2B} = {8267221B-52C3-490B-A98F-7A51EBEB2A2B}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Tabula", "..\..\..\..\..\RC.Net\AttributeFinder\Tabula\Code\Extract.AttributeFinder.Tabula.csproj", "{59BC0149-830C-4515-BE56-32503FA73AD6}"
 	ProjectSection(ProjectDependencies) = postProject
