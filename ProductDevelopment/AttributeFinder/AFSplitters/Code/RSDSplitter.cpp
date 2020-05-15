@@ -97,34 +97,13 @@ STDMETHODIMP CRSDSplitter::put_RSDFileName(BSTR newVal)
 
 	try
 	{
-		// validate license
 		validateLicense();
 		
 		string strNewVal = asString(newVal);
 
-		// make sure the file exists
-		// or if the file name contains valid <DocType> strings
-		if (m_ipAFUtility->StringContainsInvalidTags(newVal) == VARIANT_TRUE)
+		if (strNewVal.empty())
 		{
-			UCLIDException ue("ELI07496", "The specified filename contains invalid tags!");
-			ue.addDebugInfo("File", strNewVal);
-			throw ue;
-		}
-		else if (m_ipAFUtility->StringContainsTags(newVal) == VARIANT_FALSE)
-		{
-			if (!isAbsolutePath(strNewVal))
-			{
-				UCLIDException ue("ELI07499", "Specification of a relative path to the RSD file is not allowed!");
-				ue.addDebugInfo("File", strNewVal);
-				throw ue;
-			}
-			else if (!isValidFile(strNewVal))
-			{
-				UCLIDException ue("ELI07497", "The specified file does not exist!");
-				ue.addDebugInfo("File", strNewVal);
-				ue.addWin32ErrorInfo();
-				throw ue;
-			}
+			throw UCLIDException("ELI49814", "Please provide a .rsd file name.");
 		}
 
 		// [FlexIDSCore:5276]
@@ -149,18 +128,7 @@ STDMETHODIMP CRSDSplitter::put_RSDFileName(BSTR newVal)
 			}
 		}
 
-		// at least the file extension shall be .rsd
-		string strFileExtension = ::getExtensionFromFullPath(strNewVal, true);
-		if (strFileExtension != ".rsd" && strFileExtension != ".etf")
-		{
-			UCLIDException ue("ELI06861", "Invalid file format!");
-			ue.addDebugInfo("File", strNewVal);
-			ue.addDebugInfo("Extension", strFileExtension);
-			throw ue;
-		}
-
 		m_strRSDFileName = strNewVal;
-
 		m_bDirty = true;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05768")
