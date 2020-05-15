@@ -61,10 +61,6 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Extract.Licensing, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\binaries\Debug\Extract.Licensing.dll</HintPath>
-    </Reference>
     <Reference Include="Interop.UCLID_COMUTILSLib" />
     <Reference Include="Interop.UCLID_FILEPROCESSINGLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564">
       <EmbedInteropTypes>False</EmbedInteropTypes>
@@ -114,6 +110,10 @@
     <ProjectReference Include="..\..\..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj">
       <Project>{6b284a4d-132c-4fe4-858f-06a9c476b19b}</Project>
       <Name>Extract.FileActionManager.Database.Test</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
+      <Project>{212e31d9-5f02-43aa-8625-bcb86b15cf8f}</Project>
+      <Name>Extract.Licensing</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\DatabaseMigrationWizard.csproj">
       <Project>{481D8253-54B0-41CA-B667-9E2CB0A6968E}</Project>

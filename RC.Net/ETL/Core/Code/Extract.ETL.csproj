@@ -35,18 +35,6 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Extract.Drawing, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Binaries\Debug\Extract.Drawing.dll</HintPath>
-    </Reference>
-    <Reference Include="Extract.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Binaries\Debug\Extract.Interop.dll</HintPath>
-    </Reference>
-    <Reference Include="Extract.Licensing, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\binaries\Debug\Extract.Licensing.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -160,6 +148,10 @@
       <Project>{32679A70-BC10-4DD9-9155-9B3E08586EE9}</Project>
       <Name>Extract.DataCaptureStats</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Drawing\Core\Code\Extract.Drawing.csproj">
+      <Project>{865b9a25-1d27-4445-9cc7-7bf88d736ba8}</Project>
+      <Name>Extract.Drawing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\ExtractCodeAttributes\Core\Code\Extract.Code.Attributes.csproj">
       <Project>{9ca28a56-27b0-4f3a-bd61-970b3de2a793}</Project>
       <Name>Extract.Code.Attributes</Name>
@@ -167,6 +159,14 @@
     <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
       <Project>{8267221b-52c3-490b-a98f-7a51ebeb2a2b}</Project>
       <Name>Extract.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Interop\Core\Code\Extract.Interop.csproj">
+      <Project>{4f37507c-6ce8-4c68-a54b-efcce96a99ea}</Project>
+      <Name>Extract.Interop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
+      <Project>{212e31d9-5f02-43aa-8625-bcb86b15cf8f}</Project>
+      <Name>Extract.Licensing</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>

@@ -61,6 +61,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Testing.Utilities",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Dashboard.Forms.Test", "Forms\Test\Extract.Dashboard.Forms.Test.csproj", "{99E0F03E-A4C5-45F3-B7F0-AB65F02CF3CB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Interop.Zip", "..\Interop\Zip\Code\Extract.Interop.Zip.vcxproj", "{B6C67039-DF95-4BC8-AEE7-533919A33778}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -390,6 +392,16 @@ Global
 		{99E0F03E-A4C5-45F3-B7F0-AB65F02CF3CB}.Template|Any CPU.Build.0 = Release|Any CPU
 		{99E0F03E-A4C5-45F3-B7F0-AB65F02CF3CB}.Template|x86.ActiveCfg = Release|Any CPU
 		{99E0F03E-A4C5-45F3-B7F0-AB65F02CF3CB}.Template|x86.Build.0 = Release|Any CPU
+		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Debug|x86.ActiveCfg = Debug|Win32
+		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Debug|x86.Build.0 = Debug|Win32
+		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Release|Any CPU.ActiveCfg = Release|Win32
+		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Release|x86.ActiveCfg = Release|Win32
+		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Release|x86.Build.0 = Release|Win32
+		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Template|Any CPU.ActiveCfg = Release|Win32
+		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Template|Any CPU.Build.0 = Release|Win32
+		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Template|x86.ActiveCfg = Release|Win32
+		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Template|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

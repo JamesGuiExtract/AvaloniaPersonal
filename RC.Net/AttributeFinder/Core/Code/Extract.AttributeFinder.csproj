@@ -94,14 +94,6 @@
       <HintPath>..\..\..\APIs\Accord.Statistics.3.0.2\lib\net45\Accord.Statistics.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Extract.Imaging.Utilities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\binaries\Debug\Extract.Imaging.Utilities.dll</HintPath>
-    </Reference>
-    <Reference Include="Extract.Interop.Zip, Version=1.0.6506.36945, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\binaries\Debug\Extract.Interop.Zip.dll</HintPath>
-    </Reference>
     <Reference Include="IKVM.AWT.WinForms, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\APIs\IKVM\lib\IKVM.AWT.WinForms.dll</HintPath>
@@ -426,6 +418,10 @@
       <Project>{b2d07de4-9192-4531-8854-de03ce9b0b57}</Project>
       <Name>Extract.Imaging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj">
+      <Project>{e610e652-0891-40d4-b5ca-a622b87c7979}</Project>
+      <Name>Extract.Imaging.Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
       <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
       <Name>Extract.Interfaces</Name>
@@ -435,6 +431,10 @@
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
       <Name>Extract.Interop</Name>
       <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Interop\Zip\Code\Extract.Interop.Zip.vcxproj">
+      <Project>{b6c67039-df95-4bc8-aee7-533919a33778}</Project>
+      <Name>Extract.Interop.Zip</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
