@@ -239,19 +239,16 @@ namespace WebAPI
         {
             try
             {
-                var apiVersion = CurrentApiContext.ApiVersion.ToString();
                 var workflowName = user.Claims.Where(claim => claim.Type == _WORKFLOW_NAME).Select(claim => claim.Value).FirstOrDefault();
-                var databaseServerName = CurrentApiContext.DatabaseServerName;
-                var databaseName = CurrentApiContext.DatabaseName;
-
-                HTTPError.Assert("ELI46369", !String.IsNullOrWhiteSpace(databaseServerName),
-                    "Database server name not provided");
-                HTTPError.Assert("ELI46370", !String.IsNullOrWhiteSpace(databaseName),
-                    "Database name is not provided");
                 HTTPError.Assert("ELI46371", !String.IsNullOrWhiteSpace(workflowName),
                     "Workflow name is not provided");
 
-                var context = new ApiContext(apiVersion, databaseServerName, databaseName, workflowName);
+                var context = CurrentApiContext.CreateCopy(workflowName);
+                HTTPError.Assert("ELI46369", !String.IsNullOrWhiteSpace(context.DatabaseServerName),
+                    "Database server name not provided");
+                HTTPError.Assert("ELI46370", !String.IsNullOrWhiteSpace(context.DatabaseName),
+                    "Database name is not provided");
+
                 context.SessionId = user.GetClaim(JwtRegisteredClaimNames.Jti);
                 context.FAMSessionId = user.Claims
                     .Where(claim => claim.Type.Equals(_FAM_SESSION_ID, StringComparison.OrdinalIgnoreCase))
@@ -327,15 +324,9 @@ namespace WebAPI
         public static ApiContext LoginContext(string workflowName)
         {
             // Get the current API context once to ensure thread safety.
-            var context = CurrentApiContext;
-
-            var apiVersion = context.ApiVersion.ToString();
-            var databaseServerName = context.DatabaseServerName;
-            var databaseName = context.DatabaseName;
-
-            var namedWorkflow = !String.IsNullOrWhiteSpace(workflowName) ? workflowName : context.WorkflowName;
-
-            return new ApiContext(apiVersion, databaseServerName, databaseName, namedWorkflow);
+            var context = CurrentApiContext.CreateCopy(workflowName);
+            
+            return context;
         }
 
         /// <summary>

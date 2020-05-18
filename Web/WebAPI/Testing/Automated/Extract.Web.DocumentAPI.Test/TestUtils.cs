@@ -1,4 +1,5 @@
 ﻿using Extract.Testing.Utilities;
+using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,8 +14,8 @@ namespace Extract.Web.WebAPI.Test
     /// <summary>
     /// Tests the Sequencer class.
     /// </summary>
-    [TestFixture, Category("Sequencer")]
-    public class TestSequencer
+    [TestFixture, Category("Automated")]
+    public class TestUtils
     {
         #region TestSetup
 
@@ -36,8 +37,77 @@ namespace Extract.Web.WebAPI.Test
         }
 
         #endregion TestSetup
-        
+
         #region Tests
+
+        /// <summary>
+        /// Tests that <see cref="Test_ApiContext.CreateCopy"/> sets property values appropriately.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void Test_ApiContext()
+        {
+            Utils.SetCurrentApiContext(
+                "42.2"
+                , "TestServerName"
+                , "TestDatabaseName"
+                , "TestWorkflowName"
+                , dbNumberOfConnectionRetries: "42"
+                , dbConnectionRetryTimeout: "43"
+                , maxInterfaces: "44"
+                , requestWaitTimeout: "45"
+                , exceptionLogFilter: "401, 404");
+
+            Assert.AreEqual(new ApiVersion(42, 2), Utils.CurrentApiContext.ApiVersion);
+            Assert.AreEqual("TestServerName", Utils.CurrentApiContext.DatabaseServerName);
+            Assert.AreEqual("TestDatabaseName", Utils.CurrentApiContext.DatabaseName);
+            Assert.AreEqual("TestWorkflowName", Utils.CurrentApiContext.WorkflowName);
+            Assert.AreEqual(42, Utils.CurrentApiContext.NumberOfConnectionRetries);
+            Assert.AreEqual(43, Utils.CurrentApiContext.ConnectionRetryTimeout);
+            Assert.AreEqual(44, Utils.CurrentApiContext.MaxInterfaces);
+            Assert.AreEqual(45, Utils.CurrentApiContext.RequestWaitTimeout);
+            Assert.True(
+                new int[] { 401, 404 }
+                .SequenceEqual(
+                    Utils.CurrentApiContext.ExceptionLogFilter
+                        .SelectMany(num => num.ToEnumerable())
+                        .OrderBy(num => num)));
+
+            var cloneContext = Utils.CurrentApiContext.CreateCopy(null);
+            Assert.AreEqual(new ApiVersion(42, 2), cloneContext.ApiVersion);
+            Assert.AreEqual("TestServerName", cloneContext.DatabaseServerName);
+            Assert.AreEqual("TestDatabaseName", cloneContext.DatabaseName);
+            Assert.AreEqual("TestWorkflowName", cloneContext.WorkflowName);
+            Assert.AreEqual(42, cloneContext.NumberOfConnectionRetries);
+            Assert.AreEqual(43, cloneContext.ConnectionRetryTimeout);
+            Assert.AreEqual(44, cloneContext.MaxInterfaces);
+            Assert.AreEqual(45, cloneContext.RequestWaitTimeout);
+            Assert.True(
+                new int[] { 401, 404 }
+                .SequenceEqual(
+                    cloneContext.ExceptionLogFilter
+                        .SelectMany(num => num.ToEnumerable())
+                        .OrderBy(num => num)));
+            cloneContext.SessionId = "46";
+            cloneContext.FAMSessionId = 46;
+
+            var cloneContext2 = Utils.CurrentApiContext.CreateCopy("NewWorkflow");
+            Assert.AreEqual(cloneContext.ApiVersion, cloneContext2.ApiVersion);
+            Assert.AreEqual(cloneContext.DatabaseServerName, cloneContext2.DatabaseServerName);
+            Assert.AreEqual(cloneContext.DatabaseName, cloneContext2.DatabaseName);
+            Assert.AreEqual("NewWorkflow", cloneContext2.WorkflowName);
+            Assert.AreEqual(cloneContext.NumberOfConnectionRetries, cloneContext2.NumberOfConnectionRetries);
+            Assert.AreEqual(cloneContext.ConnectionRetryTimeout, cloneContext2.ConnectionRetryTimeout);
+            Assert.AreEqual(cloneContext.MaxInterfaces, cloneContext2.MaxInterfaces);
+            Assert.AreEqual(cloneContext.RequestWaitTimeout, cloneContext2.RequestWaitTimeout);
+            Assert.True(
+                new int[] { 401, 404 }
+                .SequenceEqual(
+                    cloneContext2.ExceptionLogFilter
+                        .SelectMany(num => num.ToEnumerable())
+                        .OrderBy(num => num)));
+            Assert.AreNotEqual(cloneContext.SessionId, cloneContext2.SessionId);
+            Assert.AreNotEqual(cloneContext.FAMSessionId, cloneContext2.FAMSessionId);
+        }
 
         /// <summary>
         /// General test of the Sequencer class.
@@ -45,7 +115,7 @@ namespace Extract.Web.WebAPI.Test
         /// This test requires at least 4 cores to run correctly.
         /// </summary>
         [Test]
-        public static void Test01()
+        public static void Test_Sequencer()
         {
             // 500ms spacing after each item is allowed its turn.
             var sequencer = new Sequencer<int>(500, false);

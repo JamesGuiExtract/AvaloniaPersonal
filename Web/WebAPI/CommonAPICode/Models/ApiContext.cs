@@ -121,47 +121,78 @@ namespace WebAPI.Models
         }
 
         /// <summary>
+        /// Creates a copy of this instance with equaly properties except session specific members
+        /// (<see cref="SessionId"/>, <see cref="FAMSessionId"/>).
+        /// </summary>
+        /// <param name="workflowName">The workflow name the clone is to use. If <c>null</c> or whitespace,
+        /// it will use the same workflow as this instance.</param>
+        public ApiContext CreateCopy(string workflowName)
+        {
+            var newContext = new ApiContext();
+
+            newContext.ApiVersion = ApiVersion;
+            newContext.DatabaseServerName = DatabaseServerName;
+            newContext.DatabaseName = DatabaseName;
+            newContext.NumberOfConnectionRetries = NumberOfConnectionRetries;
+            newContext.ConnectionRetryTimeout = ConnectionRetryTimeout;
+            newContext.MaxInterfaces = MaxInterfaces;
+            newContext.RequestWaitTimeout = RequestWaitTimeout;
+            newContext.ExceptionLogFilter = ExceptionLogFilter;
+
+            newContext.WorkflowName = string.IsNullOrWhiteSpace(workflowName)
+                ? this.WorkflowName
+                : workflowName;
+
+            return newContext;
+        }
+
+        private ApiContext()
+        {
+
+        }
+
+        /// <summary>
         /// The API version to use.
         /// </summary>
-        public ApiVersion ApiVersion { get; }
+        public ApiVersion ApiVersion { get; private set; }
 
         /// <summary>
         /// The number of times to retry DB connection on failure
         /// </summary>
-        public int NumberOfConnectionRetries { get; }
+        public int NumberOfConnectionRetries { get; private set; }
 
         /// <summary>
         /// The retry interval in seconds
         /// </summary>
-        public int ConnectionRetryTimeout { get; }
+        public int ConnectionRetryTimeout { get; private set; }
 
         /// <summary>
         /// Specifies the maximum number of concurrent COM API interfaces for a specific database workflow.
         /// Beyond this number, requests will block until an interface becomes available.
         /// </summary>
-        public int MaxInterfaces { get; } = 15;
+        public int MaxInterfaces { get; private set; } = 15;
 
         /// <summary>
         /// The number of seconds a call may wait for an available COM API instance. If more than
         /// this amount of time passes before one is available, an 500 error will be thrown.
         /// </summary>
-        public int RequestWaitTimeout { get; } = 60;
+        public int RequestWaitTimeout { get; private set; } = 60;
 
         /// <summary>
         /// Specifies the HTTP result codes that should not be logged to the main Extract exception log.
         /// Only needed for codes that pertain to an error or some sort (>= 400).
         /// </summary>
-        public IEnumerable<NumericRange> ExceptionLogFilter { get; } = new[] { new NumericRange(404) };
+        public IEnumerable<NumericRange> ExceptionLogFilter { get; private set; } = new[] { new NumericRange(404) };
 
         /// <summary>
         /// The database server name
         /// </summary>
-        public string DatabaseServerName { get; }
+        public string DatabaseServerName { get; private set; }
 
         /// <summary>
         /// The database name
         /// </summary>
-        public string DatabaseName { get; }
+        public string DatabaseName { get; private set; }
 
         /// <summary>
         /// The workflow name

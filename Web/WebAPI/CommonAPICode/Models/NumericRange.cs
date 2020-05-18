@@ -99,5 +99,14 @@ namespace WebAPI.Models
             return ((StartNumber == null || otherNumber >= StartNumber.Value) && 
                     (EndNumber == null || otherNumber <= EndNumber.Value));
         }
+
+        /// <summary>
+        /// Returns an enumeration of the integers represented by this instance.
+        /// </summary>
+        public IEnumerable<int> ToEnumerable()
+        {
+            return Enumerable.Range(StartNumber.Value, 
+                (EndNumber ?? StartNumber).Value - StartNumber.Value + 1);
+        }
     }
 }
