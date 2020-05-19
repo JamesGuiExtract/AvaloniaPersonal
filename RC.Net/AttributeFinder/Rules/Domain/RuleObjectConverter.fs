@@ -2,7 +2,6 @@
 
 open Extract
 open System
-open System.Reflection
 open UCLID_AFCORELib
 open UCLID_COMUTILSLib
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using UCLID_AFCORELib;
+using Newtonsoft.Json;
 
 namespace Extract.AttributeFinder.Rules.Json
 {
@@ -44,7 +45,10 @@ namespace Extract.AttributeFinder.Rules.Json
         {
             try
             {
-                var (json, dto) = RuleObjectJsonSerializer.Serialize<RuleSet, Dto.RuleSet>(pRuleSet);
+                var dto = (Dto.RuleSet)Domain.RuleObjectConverter.ConvertToDto(pRuleSet);
+                var container = new Dto.ObjectWithType(typeof(Dto.RuleSet).Name, dto);
+                var json = JsonConvert.SerializeObject(container, Formatting.Indented, RuleObjectJsonSerializer.Settings);
+
                 var fullPath = Path.GetFullPath(bstrFileName);
                 Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
                 File.WriteAllText(fullPath, json);
@@ -82,9 +86,18 @@ namespace Extract.AttributeFinder.Rules.Json
                 }
 
                 var json = Encoding.UTF8.GetString(bytes);
-                var (domain, dto) = RuleObjectJsonSerializer.DeserializeIncludeIntermediateObject<RuleSetClass, Dto.RuleSet>(json);
+                var dto = (Dto.ObjectWithType)JsonConvert.DeserializeObject(json, typeof(Dto.ObjectWithType), RuleObjectJsonSerializer.Settings);
+                var domain = (RuleSet)Domain.RuleObjectConverter.ConvertFromDto(dto);
+
+                // If current version changes to Dto.RuleSetV2 then change all Dto.RuleSet to Dto.RuleSetV2 in this file...
+                if (!(dto.Object is Dto.RuleSet rulesetDto))
+                {
+                    // ...and this will do the upgrading
+                    rulesetDto = (Dto.RuleSet)Domain.RuleObjectConverter.ConvertToDto(domain);
+                }
+                _unmodifiedRuleSet = Dto.RuleSetModule.GetWithCurrentSoftwareVersion(rulesetDto);
+
                 pRuleSet = domain;
-                _unmodifiedRuleSet = Domain.RuleSet.GetWithCurrentSoftwareVersion(dto);
 
                 return true;
             }

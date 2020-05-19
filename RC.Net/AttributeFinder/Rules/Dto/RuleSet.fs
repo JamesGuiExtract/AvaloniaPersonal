@@ -35,3 +35,12 @@ type RuleSet = {
   GlobalOutputHandler: ObjectWithDescription
   IgnoreOutputHandlerErrors: bool
 }
+
+module RuleSet =
+  let version = 
+    let assembly = typeof<RuleSet>.Assembly
+    if not (assembly = null)
+    then assembly.GetName().Version.ToString()
+    else "Unknown";
+
+  let GetWithCurrentSoftwareVersion (ruleSet: RuleSet) = { ruleSet with SavedWithSoftwareVersion = version }

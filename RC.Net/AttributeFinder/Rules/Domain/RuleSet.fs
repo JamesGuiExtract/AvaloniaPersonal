@@ -3,7 +3,6 @@ namespace Extract.AttributeFinder.Rules.Domain
 open Extract.AttributeFinder.Rules
 open Extract.Utilities
 open UCLID_AFCORELib
-open System.Reflection
 open UCLID_RASTERANDOCRMGMTLib
 open UCLID_COMUTILSLib
 open System.Collections.Generic
@@ -96,15 +95,9 @@ module AttributeNameToInfoMap =
 module RuleSet =
   open Extract.AttributeFinder.Rules.Dto
 
-  let version = 
-    let assembly = typeof<IRuleObjectConverter>.Assembly
-    if not (assembly = null)
-    then assembly.GetName().Version.ToString()
-    else "Unknown";
-
-  let toDto mc (domain: IRuleSet) =
+  let toDto mc (domain: IRuleSet): Dto.RuleSet =
     let irun = domain :?> IRunMode
-    { Dto.RuleSet.SavedWithSoftwareVersion = version
+    { SavedWithSoftwareVersion = Dto.RuleSet.version
       Comments = domain.Comments
       Counters = domain |> RuleExecutionCounters.toDto
       FKBVersion = domain.FKBVersion
@@ -142,8 +135,6 @@ module RuleSet =
           IgnoreOutputHandlerErrors=dto.IgnoreOutputHandlerErrors )
     RuleExecutionCounters.setFromDto domain dto.Counters
     domain
-
-  let GetWithCurrentSoftwareVersion ruleSet = { ruleSet with SavedWithSoftwareVersion = version }
 
 type RuleSetConverter() =
   inherit RuleObjectConverter<RuleSetClass, IRuleSet, Dto.RuleSet>()
