@@ -1,14 +1,18 @@
 namespace Extract.AttributeFinder.Rules.Dto
 
+type AttributeModifierCollection = {
+  Enabled: bool
+  ObjectsVector: ObjectWithDescription list
+}
+
 type AttributeRule = {
-  IsEnabled: bool
+  Enabled: bool
   Description: string
   IgnorePreprocessorErrors: bool
   RuleSpecificDocPreprocessor: ObjectWithDescription
   AttributeFindingRule: ObjectWithType
   IgnoreErrors: bool
-  ApplyModifyingRules: bool
-  AttributeModifyingRuleInfos: ObjectWithDescription list
+  AttributeModifiers: AttributeModifierCollection
   IgnoreModifierErrors: bool
   RuleSpecificOutputHandler: ObjectWithDescription
   IgnoreOutputHandlerErrors: bool
