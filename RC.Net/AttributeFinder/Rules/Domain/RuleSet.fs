@@ -25,18 +25,25 @@ module RuleExecutionCounters =
   open Extract.AttributeFinder.Rules.Dto
 
   let toDto (domain: IRuleSet) =
+    let builtInCounters =
+      seq {
+        { ID = 1; Name = "FLEX Index - Indexing (By Document)"; ByPage = false; Enabled = domain.UseDocsIndexingCounter }
+        { ID = 2; Name = "FLEX Index - Pagination (By Document)"; ByPage = false; Enabled = domain.UsePaginationCounter }
+        { ID = 3; Name = "FLEX Index - Redaction (By Page)"; ByPage = true; Enabled = domain.UsePagesRedactionCounter }
+        { ID = 4; Name = "FLEX Index - Redaction (By Document)"; ByPage = false; Enabled = domain.UseDocsRedactionCounter }
+        { ID = 5; Name = "FLEX Index - Indexing (By Page)"; ByPage = true; Enabled = domain.UsePagesIndexingCounter }
+      }
+      |> Seq.filter (fun c -> c.Enabled)
+    let customCounters =
+      domain.CustomCounters
+      |> IUnknownVector.toSeq
+      |> Seq.map(fun counterProperties ->
+        let x: obj list = counterProperties |> VariantVector.toList
+        { ID = downcast x.[0]; Name = downcast x.[1]; ByPage = downcast x.[2]; Enabled = downcast x.[3] }
+      )
     seq {
-      { ID = 1; Name = "FLEX Index - Indexing (By Document)"; ByPage = false; Enabled = domain.UseDocsIndexingCounter }
-      { ID = 2; Name = "FLEX Index - Pagination (By Document)"; ByPage = false; Enabled = domain.UsePaginationCounter }
-      { ID = 3; Name = "FLEX Index - Redaction (By Page)"; ByPage = true; Enabled = domain.UsePagesRedactionCounter }
-      { ID = 4; Name = "FLEX Index - Redaction (By Document)"; ByPage = false; Enabled = domain.UseDocsRedactionCounter }
-      { ID = 5; Name = "FLEX Index - Indexing (By Page)"; ByPage = true; Enabled = domain.UsePagesIndexingCounter }
-      yield! domain.CustomCounters
-             |> IUnknownVector.toSeq
-             |> Seq.map(fun counterProperties ->
-                let x: obj list = counterProperties |> VariantVector.toList
-                { ID = downcast x.[0]; Name = downcast x.[1]; ByPage = downcast x.[2]; Enabled = downcast x.[3] }
-             )
+      yield! builtInCounters
+      yield! customCounters
     }
     |> Seq.toList
 
