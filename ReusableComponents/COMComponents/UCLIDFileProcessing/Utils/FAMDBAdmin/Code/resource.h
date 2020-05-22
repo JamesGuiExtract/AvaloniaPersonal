@@ -181,13 +181,15 @@
 #define ID_MANAGE_DATABASESERVICES      32813
 #define ID_MANAGE_MLMODELS              32814
 #define ID_TOOLS_DASHBOARDS             32815
+#define ID_DATABASE_IMPORT              32816
+#define ID_DATABASE_EXPORT              32817
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        148
-#define _APS_NEXT_COMMAND_VALUE         32816
+#define _APS_NEXT_COMMAND_VALUE         32818
 #define _APS_NEXT_CONTROL_VALUE         2126
 #define _APS_NEXT_SYMED_VALUE           2126
 #endif

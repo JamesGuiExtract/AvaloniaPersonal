@@ -1,6 +1,7 @@
 ﻿using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using UCLID_FILEPROCESSINGLib;
@@ -103,6 +104,51 @@ namespace Extract.FileActionManager.Database.Test
                 // User without password set
                 fileProcessingDb.AddLoginUser("UserWithNoPassword");
                 Assert.Throws<COMException>(() => fileProcessingDb.LoginUser("UserWithNoPassword", ""));
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        [Test, Category("Automated")]
+        public static void OnetimePassword()
+        {
+            string testDbName = "Test_OnetimePassword";
+
+            try
+            {
+                var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+                var fileProcessingDb2 = new FileProcessingDB();
+                fileProcessingDb2.DuplicateConnection(fileProcessingDb);
+                var fileProcessingDb3 = new FileProcessingDB();
+                fileProcessingDb3.DuplicateConnection(fileProcessingDb);
+
+                // One-time passwords should only be able to be created when logged in as admin
+                Assert.Throws<COMException>(() => fileProcessingDb.GetOneTimePassword());
+
+                fileProcessingDb.LoginUser("admin", "a");
+                string onetimePassword = fileProcessingDb.GetOneTimePassword();
+
+                // One-time passwords need to be used against "<Admin>"
+                Assert.Throws<COMException>(() => fileProcessingDb2.LoginUser("Admin", onetimePassword));
+                Assert.Throws<COMException>(() => fileProcessingDb2.LoginUser("<Admin>", "a"));
+                Assert.IsFalse(fileProcessingDb2.LoggedInAsAdmin);
+
+                fileProcessingDb2.LoginUser("<Admin>", onetimePassword);
+                Assert.IsTrue(fileProcessingDb2.LoggedInAsAdmin);
+
+                // One-time passwords should only be able to be used once.
+                Assert.Throws<COMException>(() => fileProcessingDb3.LoginUser("<Admin>", onetimePassword));
+
+                // However, another password should be able to be genereatd.
+                onetimePassword = fileProcessingDb.GetOneTimePassword();
+                fileProcessingDb3.LoginUser("<Admin>", onetimePassword);
+                Assert.IsTrue(fileProcessingDb3.LoggedInAsAdmin);
+
+                // Untested:
+                // - Password is limited to use by same user/machine
+                // - Password expires in 1 minute.
             }
             finally
             {

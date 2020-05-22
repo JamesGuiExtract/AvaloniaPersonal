@@ -28,6 +28,7 @@ namespace DatabaseMigrationWizard.Pages
             this.ExportOptions = MainWindow.ExportOptions ?? new ExportOptions();
             // Just in case the user changes the connection information on the main page
             this.ExportOptions.ConnectionInformation = this.MainWindow.ConnectionInformation;
+            this.ExportOptions.ExportPath = MainWindow.DefaultPath;
             InitializeComponent();
             this.DataContext = this;
         }
@@ -60,6 +61,14 @@ namespace DatabaseMigrationWizard.Pages
                 await Task.Run(() =>
                 {
                     ExportHelper.Export(this.ExportOptions, GetProgressTracker());
+
+                    // Update the saved default path only if different from MainWindow.DefaultPath
+                    // (So as not to save an export path specified via command-line param)
+                    if (this.ExportOptions.ExportPath != MainWindow.DefaultPath)
+                    {
+                        Properties.Settings.Default.DefaultPath = this.ExportOptions.ExportPath;
+                        Properties.Settings.Default.Save();
+                    }
                 });
             }
             catch(Exception ex)

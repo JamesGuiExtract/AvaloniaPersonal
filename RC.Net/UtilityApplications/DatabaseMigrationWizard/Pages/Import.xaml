@@ -84,6 +84,5 @@
                 </ListBox>
             </StackPanel>
         </ScrollViewer>
-        <Button x:Name="HiddenReportButton" Command="mui:LinkCommands.NavigateLink" CommandParameter="/Pages/ReportWindow.xaml" Visibility="Hidden"/>
     </Grid>
 </UserControl>

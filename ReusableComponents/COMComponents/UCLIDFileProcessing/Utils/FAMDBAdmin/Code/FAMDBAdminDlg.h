@@ -45,6 +45,8 @@ protected:
 	afx_msg void OnCancel();
 	afx_msg void OnOK();
 	afx_msg void OnDatabaseClear();
+	afx_msg void OnDatabaseImport();
+	afx_msg void OnDatabaseExport();
 	afx_msg void OnDatabaseResetLock();
 	afx_msg void OnDatabaseUpdateSchema();
 	afx_msg void OnDatabaseChangePassword();

@@ -162,29 +162,6 @@ namespace Extract.Database
             }
         }
 
-        /// <overloads>
-        /// Executes the supplied <see paramref="query"/> on the specified
-        /// <see paramref="dbConnection"/>.
-        /// </overloads>
-        /// <summary>
-        /// Executes the supplied <see paramref="query"/> on the specified
-        /// <see paramref="dbConnection"/>.
-        /// </summary>
-        /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
-        /// <param name="query">The query to execute.</param>
-        /// <returns>A <see cref="DataTable"/> representing the results of the query.</returns>
-        public static DataTable ExecuteDBQuery(DbConnection dbConnection, string query)
-        {
-            try
-            {
-                return ExecuteDBQuery(dbConnection, query, null);
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI34571");
-            }
-        }
-
         /// <summary>
         /// Gets the query results as a string array.
         /// </summary>
@@ -216,14 +193,20 @@ namespace Extract.Database
         /// <param name="parameters">Parameters to be used in the query. They key for each parameter
         /// must begin with the appropriate symbol ("@" for T-SQL and SQL CE, ":" for Oracle) and
         /// that key should appear in the <see paramref="query"/>.</param>
+        /// <param name="transaction">If not <c>null</c>, the transaction in which the query
+        /// should run.</param>
         /// <returns>A <see cref="DataTable"/> representing the results of the query.</returns>
         public static DataTable ExecuteDBQuery(DbConnection dbConnection, string query,
-            Dictionary<string, string> parameters)
+            Dictionary<string, string> parameters = null, DbTransaction transaction = null)
         {
             try
             {
                 using (var command = DBMethods.CreateDBCommand(dbConnection, query, parameters))
                 {
+                    if (transaction != null)
+                    {
+                        command.Transaction = transaction;
+                    }
                     return ExecuteDBQuery(command);
                 }
             }

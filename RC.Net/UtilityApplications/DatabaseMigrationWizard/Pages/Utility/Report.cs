@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DatabaseMigrationWizard.Pages.Utility
 {
@@ -35,11 +36,13 @@ namespace DatabaseMigrationWizard.Pages.Utility
         /// <summary>
         /// The old value being updated
         /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores")]
         public string Old_Value { get; set; }
 
         /// <summary>
         /// The new value being updated.
         /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores")]
         public string New_Value { get; set; }
     }
 }

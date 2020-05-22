@@ -120,6 +120,8 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_TOOLS_FILEACTIONMANAGER, &CFAMDBAdminDlg::OnToolsFileActionManager)
 	ON_COMMAND(ID_DATABASE_EXIT, &CFAMDBAdminDlg::OnExit)
 	ON_COMMAND(ID_DATABASE_CLEAR, &CFAMDBAdminDlg::OnDatabaseClear)
+	ON_COMMAND(ID_DATABASE_IMPORT, &CFAMDBAdminDlg::OnDatabaseImport)
+	ON_COMMAND(ID_DATABASE_EXPORT, &CFAMDBAdminDlg::OnDatabaseExport)
 	ON_COMMAND(ID_DATABASE_RESETLOCK, &CFAMDBAdminDlg::OnDatabaseResetLock)
 	ON_COMMAND(ID_DATABASE_UPDATE_SCHEMA, &CFAMDBAdminDlg::OnDatabaseUpdateSchema)
 	ON_COMMAND(ID_DATABASE_SET_OPTIONS, &CFAMDBAdminDlg::OnDatabaseSetOptions)
@@ -443,6 +445,36 @@ void CFAMDBAdminDlg::OnDatabaseClear()
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14861");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnDatabaseImport()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		runEXE("DatabaseMigrationWizard.exe",
+			"/DatabaseServer " + asString(m_ipFAMDB->DatabaseServer)
+			+ " /DatabaseName " + asString(m_ipFAMDB->DatabaseName)
+			+ " /Password " + asString(m_ipFAMDB->GetOneTimePassword())
+			+ " /Import");
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI49819");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnDatabaseExport()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		runEXE("DatabaseMigrationWizard.exe",
+			+"/DatabaseServer " + asString(m_ipFAMDB->DatabaseServer)
+			+ " /DatabaseName " + asString(m_ipFAMDB->DatabaseName)
+			+ " /Password " + asString(m_ipFAMDB->GetOneTimePassword())
+			+ " /Export");
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI49820");
 }
 //-------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::OnDatabaseResetLock()

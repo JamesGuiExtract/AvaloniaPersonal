@@ -36,6 +36,7 @@ using namespace ADODB;
 // as per [p13 #4920]
 // User name for FAM DB Admin access
 const string gstrADMIN_USER = "admin";
+const string gstrONE_TIME_ADMIN_USER = "<Admin>";
 
 // Table names
 static const string gstrACTION = "Action";
@@ -381,6 +382,7 @@ public:
 	STDMETHOD(GetUncommittedAttributeData)(long nFileID, long nActionID,
 		BSTR bstrExceptIfMoreRecentAttributeSetName, IIUnknownVector** ppUncommittedPagesOfData);
 	STDMETHOD(DiscardOldCacheData)(long nFileID, long nActionID, long nExceptFileTaskSessionID);
+	STDMETHOD(GetOneTimePassword)(BSTR* pVal);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -982,6 +984,13 @@ private:
 
 	// Checks the strPassword value against the password from the database
 	bool isPasswordValid(const string& strPassword, bool bUseAdmin);
+
+	// Authenticates an admin session using the specified one-time strPassword
+	void authenticateOneTimePassword(const string& strPassword);
+
+	// Gets a one-time admin password based on the current m_nFAMSessionID (which must be non-zero).
+	// m_bLoggedInAsAdmin must also be true for call to succeed.
+	string getOneTimePassword(_ConnectionPtr ipConnection);
 
 	// Returns true if the configured database exists and is blank.
 	// Returns false if the configured database doesn't exist or is not blank.

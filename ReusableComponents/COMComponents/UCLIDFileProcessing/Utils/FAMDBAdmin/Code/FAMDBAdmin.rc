@@ -520,6 +520,9 @@ BEGIN
         MENUITEM "&Reset lock",                 ID_DATABASE_RESETLOCK
         MENUITEM "&Update database schema...",  ID_DATABASE_UPDATE_SCHEMA
         MENUITEM SEPARATOR
+        MENUITEM "&Import database configuration...", ID_DATABASE_IMPORT
+        MENUITEM "E&xport database configuration...", ID_DATABASE_EXPORT
+        MENUITEM SEPARATOR
         MENUITEM "&Database options...",        ID_DATABASE_SET_OPTIONS
         MENUITEM SEPARATOR
         MENUITEM "C&hange password...\tCtrl+H", ID_DATABASE_CHANGEPASSWORD

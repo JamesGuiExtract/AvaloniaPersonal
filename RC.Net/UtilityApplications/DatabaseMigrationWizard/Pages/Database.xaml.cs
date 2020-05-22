@@ -56,20 +56,9 @@ namespace DatabaseMigrationWizard.Pages
         /// <param name="e"></param>
         private void PasswordChanged(object sender, RoutedEventArgs e)
         {
-            var fileProcessingDb = new FileProcessingDB()
-            {
-                DatabaseServer = ConnectionInformation.DatabaseServer,
-                DatabaseName = ConnectionInformation.DatabaseName
-            };
             try
             {
-                fileProcessingDb.LoginUser("admin", PasswordBox.Password);
-                if(!this.MainWindow.MainLinks.Links.Where(link => link.DisplayName.Equals("import") || link.DisplayName.Equals("export")).Any())
-                {
-                    this.MainWindow.MainLinks.Links.Add(new Link() { DisplayName = "import", Source = new Uri("/Pages/Import.xaml", UriKind.Relative) });
-                    this.MainWindow.MainLinks.Links.Add(new Link() { DisplayName = "export", Source = new Uri("/Pages/Export.xaml", UriKind.Relative) });
-                    this.MainWindow.MainLinks.Links.Add(new Link() { DisplayName = "report", Source = new Uri("/Pages/ReportWindow.xaml", UriKind.Relative) });
-                }
+                ConnectionInformation.ValidateConnection(PasswordBox.Password);
 
                 this.PasswordStatus.Background = Brushes.Green;
                 this.PasswordBox.Password = "";
@@ -125,8 +114,7 @@ namespace DatabaseMigrationWizard.Pages
         /// <returns></returns>
         private async Task RemoveTabsAndUpdateStatusIcons(bool updateDatabaseNames)
         {
-            this.MainWindow.MainLinks.Links.Where(link => !link.DisplayName.Equals("Database")).ToList()
-                                            .ForEach(link => this.MainWindow.MainLinks.Links.Remove(link));
+            this.ConnectionInformation.ConnectionInfoValidated = false;
 
             this.PasswordStatus.Background = Brushes.Red;
             this.PasswordBox.Password = string.Empty;

@@ -3,7 +3,6 @@ using System;
 using System.ComponentModel;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Diagnostics.CodeAnalysis;
 
 namespace DatabaseMigrationWizard.Database.Input
 {
@@ -48,7 +47,7 @@ namespace DatabaseMigrationWizard.Database.Input
                     dbCommand.ExecuteNonQuery();
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e.AsExtract("ELI49730");
             }

@@ -1,14 +1,14 @@
 ﻿using DatabaseMigrationWizard.Pages.Utility;
 using Extract;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+
+using static System.FormattableString;
 
 namespace DatabaseMigrationWizard.Pages
 {
@@ -23,6 +23,10 @@ namespace DatabaseMigrationWizard.Pages
         private bool filterWarning = false;
         private bool filterInfo = true;
 
+        private int errorCount = 0;
+        private int warningCount = 0;
+        private int infoCount = 0;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private readonly ObservableCollection<Report> FilteredReport = new ObservableCollection<Report>();
@@ -33,12 +37,32 @@ namespace DatabaseMigrationWizard.Pages
             InitializeComponent();
             this.DataGrid1.DataContext = this.FilteredReport;
             this.MainWindow.ReportWindow = this;
-            SetDefaultFilters();
-            SetButtonNumberCount();
-            this.CommitPrompt.Visibility = this.MainWindow.CommitSuccessful ? Visibility.Hidden : Visibility.Visible;
-            if(this.MainWindow.CommitSuccessful)
+        }
+
+        public void ShowReport(bool promptForCommit)
+        {
+            try
             {
-                this.UpdateCommitStatusMessage();
+                SetDefaultFilters();
+                FilterTheReport();
+                SetButtonNumberCount();
+                UpdateButtonBorders();
+
+                // If there are no errors/warnings just commit the transaction.
+                if (promptForCommit)
+                {
+                    this.CommitPrompt.Visibility = Visibility.Visible;
+                    this.CommitStatus.Visibility = Visibility.Hidden;
+                }
+                else
+                {
+                    CommitPrompt.Visibility = Visibility.Hidden;
+                    ShowStatusMessage();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49826");
             }
         }
 
@@ -55,10 +79,13 @@ namespace DatabaseMigrationWizard.Pages
         {
             try
             {
-                MainWindow.Import.CommitTransaction();
-                this.CommitPrompt.Visibility = Visibility.Hidden;
+                string message = (errorCount > 0)
+                    ? Invariant($"Import completed with {errorCount} error(s).")
+                    : null;
 
-                this.UpdateCommitStatusMessage();
+                MainWindow.Import.EndTransaction(commit: true, message);
+                this.CommitPrompt.Visibility = Visibility.Hidden;
+                this.ShowStatusMessage();
             }
             catch(Exception ex)
             {
@@ -70,10 +97,9 @@ namespace DatabaseMigrationWizard.Pages
         {
             try
             {
-                MainWindow.Import.RollbackTransaction();
+                MainWindow.Import.EndTransaction(commit: false, statusMessage: "The import was cancelled");
                 this.CommitPrompt.Visibility = Visibility.Hidden;
-
-                this.UpdateCommitStatusMessage();
+                this.ShowStatusMessage();
             }
             catch(Exception ex)
             {
@@ -123,12 +149,12 @@ namespace DatabaseMigrationWizard.Pages
         /// <summary>
         /// Updates the commit status message and makes it visible on the reporting page.
         /// </summary>
-        public void UpdateCommitStatusMessage()
+        public void ShowStatusMessage()
         {
             try
             {
                 this.CommitStatus.Visibility = Visibility.Visible;
-                this.CommitStatus.Text = this.MainWindow.CommitSuccessful ? "The import was succesful!" : "The import failed";
+                this.CommitStatus.Text = this.MainWindow.ImportStatusMessage;
             }
             catch(Exception ex)
             {
@@ -154,7 +180,7 @@ namespace DatabaseMigrationWizard.Pages
         {
             try
             {
-                if (this.MainWindow.Reporting.Where(m => m.Classification.Equals("Warning") || m.Classification.Equals("Error")).Any())
+                if (this.MainWindow.ImportHasErrorsOrWarnings)
                 {
                     this.filterErrors = false;
                     this.filterWarning = false;
@@ -181,9 +207,13 @@ namespace DatabaseMigrationWizard.Pages
         {
             try
             {
-                this.ErrorButton.Content = $"Errors({this.MainWindow.Reporting.Where(m => m.Classification.Equals("Error")).Count().ToString(CultureInfo.InvariantCulture)})";
-                this.WarningButton.Content = $"Warnings({this.MainWindow.Reporting.Where(m => m.Classification.Equals("Warning")).Count().ToString(CultureInfo.InvariantCulture)})";
-                this.InfoButton.Content = $"Info({this.MainWindow.Reporting.Where(m => m.Classification.Equals("Info")).Count().ToString(CultureInfo.InvariantCulture)})";
+                errorCount = this.MainWindow.ImportReporting.Count(m => m.Classification.Equals("Error"));
+                warningCount = this.MainWindow.ImportReporting.Count(m => m.Classification.Equals("Warning"));
+                infoCount = this.MainWindow.ImportReporting.Count(m => m.Classification.Equals("Info"));
+
+                this.ErrorButton.Content = Invariant($"Errors({errorCount})");
+                this.WarningButton.Content = Invariant($"Warnings({warningCount})");
+                this.InfoButton.Content = Invariant($"Info({infoCount})");
             }
             catch(Exception ex)
             {
@@ -197,7 +227,7 @@ namespace DatabaseMigrationWizard.Pages
         private void FilterTheReport()
         {
             FilteredReport.Clear();
-            this.MainWindow.Reporting.Where(m =>
+            this.MainWindow.ImportReporting.Where(m =>
             {
                 if (!filterWarning && m.Classification.Equals("Warning"))
                 {

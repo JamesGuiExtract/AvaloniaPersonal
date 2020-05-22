@@ -12,9 +12,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Windows;
 using UCLID_FILEPROCESSINGLib;
+
+using static System.FormattableString;
 
 namespace DatabaseMigrationWizard.Database.Input
 {
@@ -91,7 +91,8 @@ namespace DatabaseMigrationWizard.Database.Input
             }
             catch(Exception e)
             {
-                ExtractException extractException = new ExtractException("ELI49683", "Error populating temporary table", e);
+                ExtractException extractException = new ExtractException("ELI49683", 
+                    Invariant($"Error processing {Path.GetFileNameWithoutExtension(tablePath)} table"), e); 
                 extractException.AddDebugData("FilePath", tablePath);
                 throw extractException;
             }
@@ -99,6 +100,9 @@ namespace DatabaseMigrationWizard.Database.Input
 
         /// <summary>
         /// Begins the import from the filesystem to the database.
+        /// <para><b>NOTE</b></para>
+        /// Upon exception, it is the caller's responsibility to call <see cref="RollbackTransaction"/>
+        /// once any reporting data from the current operation is gathered.
         /// </summary>
         public void Import()
         {
@@ -110,7 +114,8 @@ namespace DatabaseMigrationWizard.Database.Input
             }
             catch(Exception e)
             {
-                this.ImportOptions.Transaction.Rollback();
+                // Don't rollback the transaction at this point to allow for the report page to list
+                // processing errors.
                 throw e.AsExtract("ELI49681");
             }
         }   
@@ -183,12 +188,54 @@ namespace DatabaseMigrationWizard.Database.Input
                     this.Progress.Report(instanceName);
                 });
 
-                instance.ExecuteSequence(this.ImportOptions);
+                try
+                {
+                    instance.ExecuteSequence(this.ImportOptions);
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex, instanceName);
+
+                    throw ex.AsExtract("ELI49843");
+                }
 
                 App.Current?.Dispatcher.Invoke(delegate
                 {
                     this.Progress.Report(instanceName);
                 });
+            }
+        }
+
+        /// <summary>
+        /// Logs the specified exception both to the ReportingDatabaseMigrationWizard databse table and the
+        /// Extract exception log file.
+        /// </summary>
+        void LogError(Exception ex, string tableName)
+        {
+            try
+            {
+                var errorMessages = new List<string>();
+                for (Exception innerEx = ex; innerEx != null; innerEx = innerEx.InnerException)
+                {
+                    errorMessages.Add(innerEx.Message);
+                }
+
+                string query = Invariant($@"INSERT INTO
+                            dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
+                            VALUES ('Error', @0, @1)");
+
+                var parameters = new Dictionary<string, string>() {
+                                { "@0", tableName },
+                                { "@1", string.Join("; ", errorMessages) }
+                            };
+
+                DBMethods.ExecuteDBQuery(ImportOptions.SqlConnection, query, parameters, ImportOptions.Transaction);
+
+                ex.ExtractLog("ELI49841");
+            }
+            catch (Exception ex2)
+            {
+                ex2.ExtractLog("ELI49842");
             }
         }
 

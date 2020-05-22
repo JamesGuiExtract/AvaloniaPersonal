@@ -48,8 +48,10 @@ namespace DatabaseMigrationWizard.Pages
         {
             this.MainWindow = ((MainWindow)System.Windows.Application.Current.MainWindow);
             this.ImportOptions.ConnectionInformation = this.MainWindow.ConnectionInformation;
+            this.ImportOptions.ImportPath = MainWindow.DefaultPath;
             InitializeComponent();
             this.DataContext = this;
+            this.ImportPath.Text = MainWindow.DefaultPath;
             this.MainWindow.Closing += Import_Closing;
             this.MainWindow.Import = this;
         }
@@ -59,11 +61,10 @@ namespace DatabaseMigrationWizard.Pages
             this.ImportHelper = new ImportHelper(this.ImportOptions, GetProgressTracker());
             try
             {
-                this.MainWindow.Reporting.Clear();
+                this.MainWindow.ApplyImportReport(null);
                 this.Processing.Clear();
                 this.Completed.Clear();
                 this.MainWindow.UIEnabled = false;
-                this.MainWindow.CommitSuccessful = false;
                 if (ImportOptions.ClearDatabase)
                 {
                     MessageBoxResult result = System.Windows.MessageBox.Show($"DatabaseServer: {this.ImportOptions.ConnectionInformation.DatabaseServer} \nDatabaseName:{this.ImportOptions.ConnectionInformation.DatabaseName}\nAre you 100% sure you want to clear this database? This action cannot be undone!", "Database Migration Wizard", MessageBoxButton.YesNo);
@@ -85,37 +86,46 @@ namespace DatabaseMigrationWizard.Pages
         }
 
         /// <summary>
-        /// Commits the transaction, and enables the UI.
+        /// Ends the transaction for the current import operation and re-enables the UI.
         /// </summary>
-        public void CommitTransaction()
+        /// <param name="commit"><c>true</c> to commit the transaction; <c>false</c> to roll back
+        /// the transaction (cancel the operation).</param>
+        public void EndTransaction(bool commit, string statusMessage = null)
         {
             try
             {
-                this.ImportHelper?.CommitTransaction();
+                try
+                {
+                    if (commit)
+                    {
+                        this.ImportHelper?.CommitTransaction();
+                    }
+                    else
+                    {
+                        this.ImportHelper?.RollbackTransaction();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractLog("ELI49827");
+                    statusMessage = "The import failed";
+                }
+
                 this.MainWindow.UIEnabled = true;
                 this.ImportHelper?.Dispose();
-                this.MainWindow.CommitSuccessful = true;
+
+                if (statusMessage == null)
+                {
+                    statusMessage = commit
+                        ? "The import was successful!"
+                        : "The import failed";
+                }
+
+                this.MainWindow.ImportStatusMessage = statusMessage;
             }
             catch(Exception ex)
             {
                 throw ex.AsExtract("ELI49812");
-            }
-        }
-
-        /// <summary>
-        /// Rolls back a transaction, and enables the UI.
-        /// </summary>
-        public void RollbackTransaction()
-        {
-            try
-            {
-                this.ImportHelper?.RollbackTransaction();
-                this.MainWindow.UIEnabled = true;
-                this.ImportHelper?.Dispose();
-            }
-            catch(Exception ex)
-            {
-                throw ex.AsExtract("ELI49813");
             }
         }
 
@@ -132,26 +142,61 @@ namespace DatabaseMigrationWizard.Pages
                 try
                 {
                     this.ImportHelper.Import();
+
+                    // Update the saved default path only if different from MainWindow.DefaultPath
+                    // (So as not to save an export path specified via command-line param)
+                    if (this.ImportOptions.ImportPath != MainWindow.DefaultPath)
+                    {
+                        Properties.Settings.Default.DefaultPath = this.ImportOptions.ImportPath;
+                        Properties.Settings.Default.Save();
+                    }
+
+                    this.PopulateReportingInformation(startTime);
+
                     App.Current.Dispatcher.Invoke(delegate
                     {
-                        this.CheckForWarningsOrErrors(startTime);
+                        if (!MainWindow.ImportHasErrorsOrWarnings)
+                        {
+                            this.EndTransaction(commit: true);
+                        }
+
+                        MainWindow.ShowImportReport(promptForCommit: MainWindow.ImportHasErrorsOrWarnings);
                     });
                 }
                 catch (Exception ex)
                 {
                     ex.ExtractDisplay("ELI49751");
+
+                    this.PopulateReportingInformation(startTime);
+
                     App.Current.Dispatcher.Invoke(delegate
                     {
-                        this.MainWindow.UIEnabled = true;
                         try
                         {
-                            this.RollbackTransaction();
+                            this.EndTransaction(commit: false);
+                            MainWindow.ShowImportReport(promptForCommit: false);
                         }
                         // Consumed because the object could already be disposed of.
                         catch (Exception) { }
                     });
                 }
             });
+        }
+
+        /// <summary>
+        /// Clears any import status related data from previous import operations from the page UI.
+        /// </summary>
+        public void ResetProgress()
+        {
+            try
+            {
+                this.Processing.Clear();
+                this.Completed.Clear();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49844");
+            }
         }
 
         /// <summary>
@@ -200,40 +245,6 @@ namespace DatabaseMigrationWizard.Pages
         }
 
         /// <summary>
-        /// Switch to the report tab, and commit the transaction if there are no errors/warnings.
-        /// </summary>
-        /// <param name="startTime">The start time of the import.</param>
-        private void CheckForWarningsOrErrors(DateTime startTime)
-        {
-            PopulateReportingInformation(startTime);
-
-            // If there are no errors/warnings just commit the transaction.
-            if (!this.MainWindow.Reporting.Where(m => m.Classification.Equals("Warning") || m.Classification.Equals("Error")).Any())
-            {
-                this.CommitTransaction();
-                this.MainWindow.ReportWindow?.UpdateCommitStatusMessage();
-                
-                if (this.MainWindow.ReportWindow != null)
-                {
-                    this.MainWindow.ReportWindow.CommitPrompt.Visibility = Visibility.Hidden;
-                }
-            }
-            else if(this.MainWindow.ReportWindow != null)
-            {
-                this.MainWindow.ReportWindow.CommitPrompt.Visibility = Visibility.Visible;
-                this.MainWindow.ReportWindow.CommitStatus.Visibility = Visibility.Hidden;
-            }
-
-            this.MainWindow.ReportWindow?.SetDefaultFilters();
-            this.MainWindow.ReportWindow?.SetButtonNumberCount();
-
-            // Switch to the reporting tab.
-            ButtonAutomationPeer peer = new ButtonAutomationPeer(HiddenReportButton);
-            IInvokeProvider invokeProv = peer.GetPattern(PatternInterface.Invoke) as IInvokeProvider;
-            invokeProv.Invoke();
-        }
-
-        /// <summary>
         /// If we are not in the middle of an import, the dispose of the import helper.
         /// </summary>
         /// <param name="sender"></param>
@@ -273,10 +284,7 @@ namespace DatabaseMigrationWizard.Pages
                 }
             }
 
-            foreach (Report report in reports)
-            {
-                this.MainWindow.Reporting.Add(report);
-            }
+            this.MainWindow.ApplyImportReport(reports);
         }
     }
 }

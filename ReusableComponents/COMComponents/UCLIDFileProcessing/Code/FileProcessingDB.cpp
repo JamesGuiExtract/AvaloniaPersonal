@@ -3773,7 +3773,7 @@ STDMETHODIMP CFileProcessingDB::GetCounterUpdateRequestCode (BSTR* pstrUpdateReq
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), 
 				gstrSECURE_COUNTER_DB_LOCK);
-
+			
 			GetCounterUpdateRequestCode_Internal(true,  pstrUpdateRequestCode);
 		}
 		return S_OK;
@@ -4220,16 +4220,29 @@ STDMETHODIMP CFileProcessingDB::LoginUser(BSTR bstrUserName, BSTR bstrPassword)
 
 		try
 		{
-			m_strFAMUserName = asString(bstrUserName);
-
-			string strStoredPW;
-			bool bUserExists = getEncryptedPWFromDB(strStoredPW, false);
-
-			if (!bUserExists || strStoredPW.empty() || !isPasswordValid(asString(bstrPassword), false))
+			if (asString(bstrUserName) == gstrONE_TIME_ADMIN_USER)
 			{
-				UCLIDException ue("ELI42171", "Invalid username or password");
-				ue.addDebugInfo("Username", m_strFAMUserName, true);
-				throw ue;
+				authenticateOneTimePassword(asString(bstrPassword));
+				m_strFAMUserName = gstrADMIN_USER;
+			}
+			else
+			{
+				m_strFAMUserName = asString(bstrUserName);
+
+				string strStoredPW;
+				bool bUserExists = getEncryptedPWFromDB(strStoredPW, false);
+
+				if (!bUserExists || strStoredPW.empty() || !isPasswordValid(asString(bstrPassword), false))
+				{
+					UCLIDException ue("ELI42171", "Invalid username or password");
+					ue.addDebugInfo("Username", m_strFAMUserName, true);
+					throw ue;
+				}
+
+				if (m_strFAMUserName == gstrADMIN_USER)
+				{
+					m_bLoggedInAsAdmin = true;
+				}
 			}
 		}
 		catch (...)
@@ -5095,6 +5108,42 @@ STDMETHODIMP CFileProcessingDB::DiscardOldCacheData(long nFileID, long nActionID
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49517");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetOneTimePassword(BSTR* pVal)
+{
+	try
+	{
+		validateLicense();
+
+		// One-time admin password can only be generated if currently authenticated as admin.
+		// there should not be an exising FAM session.
+		ASSERT_RUNTIME_CONDITION("ELI49836", m_bLoggedInAsAdmin && m_nFAMSessionID == 0,
+			"Not authorized to generate password");
+
+		try
+		{
+			// Leverage a FAMSession as a component of one-time passwords in order to limit the
+			// password this database, prevent it from being used multiple times and to ensure it
+			// was created within the past minute.
+			getThisAsCOMPtr()->RecordFAMSessionStart(
+				gstrONE_TIME_ADMIN_USER.c_str(), "", VARIANT_FALSE, VARIANT_FALSE);
+
+			string strPassword = getOneTimePassword(getDBConnection());
+			
+			// Once the password is generated, the session ID in use for this instance should be reset.
+			m_nFAMSessionID = 0;
+
+			*pVal = get_bstr_t(strPassword).Detach();
+		}
+		catch (...)
+		{
+			m_nFAMSessionID = 0;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49832");
 }
 
 //-------------------------------------------------------------------------------------------------

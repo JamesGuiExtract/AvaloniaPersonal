@@ -3316,6 +3316,76 @@ bool  CFileProcessingDB::isPasswordValid(const string& strPassword, bool bUseAdm
 		strDecryptedCombined.substr(iUserNameSize) == strCombined.substr(iUserNameSize));
 }
 //--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::authenticateOneTimePassword(const string& strPassword)
+{
+	// One-time passwords must be relative to an active FAMSession started for FPSFileName "<Admin>"
+	// within the past minute for the active user/machine. One-time passwords are limited by the
+	// current Windows machine/user rather than a user that may have been specified via LoginUser
+	string strQueryForSession =
+		"SELECT TOP 1 [FAMSession].[ID]"
+		" FROM dbo.[FAMSession]"
+		" JOIN dbo.[Machine] ON [MachineID] = [Machine].[ID]"
+		" JOIN dbo.[FAMUser] ON [FAMUserID] = [FAMUser].[ID]"
+		" JOIN dbo.[FPSFile] ON [FPSFileID] = [FPSFile].[ID]"
+		" WHERE [StopTime] IS NULL"
+		"  AND [FPSFileName] = '" + gstrONE_TIME_ADMIN_USER + "'" +
+		"  AND [MachineName] = '" + m_strMachineName + "'" +
+		"  AND [UserName] = '" + getCurrentUserName() + "'" +
+		"  AND [StartTime] > DATEADD(minute, -1, GETDATE()) " +
+		" ORDER BY [FAMSession].[ID] DESC";
+	
+	try
+	{
+		try
+		{
+			_ConnectionPtr ipConnection = getDBConnection();
+			long nFAMSessionID = 0;
+			executeCmdQuery(ipConnection, strQueryForSession, false, &nFAMSessionID);
+
+			// If an open session was found for a one-time password, initialize m_nFAMSessionID and
+			// m_bLoggedInAsAdmin, then validate the password is what it should be for the session.
+			m_nFAMSessionID = nFAMSessionID;
+			m_bLoggedInAsAdmin = true;
+
+			string strExpectedPassword = getOneTimePassword(ipConnection);
+
+			ASSERT_RUNTIME_CONDITION("ELI49833", strPassword == strExpectedPassword, "Invalid password");
+
+			// If the password was valid, close out m_nFAMSessionID. This will prevent the password from
+			// being used again.
+			getThisAsCOMPtr()->RecordFAMSessionStop();
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49835")
+	}
+	catch (UCLIDException &ue)
+	{
+		// Authentication failed. Ensure m_nFAMSessionID and m_bLoggedInAsAdmin are reset.
+		m_nFAMSessionID = 0;
+		m_bLoggedInAsAdmin = false;
+
+		UCLIDException ueOuter("ELI49839", "Authentication failed", ue);
+
+		throw ueOuter;
+	}
+}
+//--------------------------------------------------------------------------------------------------
+string CFileProcessingDB::getOneTimePassword(_ConnectionPtr ipConnection)
+{
+	ASSERT_RUNTIME_CONDITION("ELI49834", m_bLoggedInAsAdmin && m_nFAMSessionID > 0,
+		"Not authorized to generate password");
+
+	checkDatabaseIDValid(ipConnection, false);
+	string strDatabaseID = asString(m_DatabaseIDValues.m_GUID);
+	
+	// Generate and encrypt a hash specific to this database and m_nFAMSessionID.
+	long hash = m_nFAMSessionID ^ m_DatabaseIDValues.m_nHashValue;
+	string strEncrypted = getEncryptedString(asString(hash));
+	
+	// Return last 16 chars of the of the 32 char encypted value, representing the second two bytes of
+	// the hash, as the password. (The first 16 chars will always be the same for a given DB).
+	return strEncrypted.substr(16);
+}
+//--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isBlankDB()
 {
 	try
